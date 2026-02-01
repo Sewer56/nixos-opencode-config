@@ -32,7 +32,7 @@ echo "Plugin update script finished successfully.")
       "permission": {
         "task": {
           "orchestrator-*": "deny",
-          "mcp-search": "deny"
+          "mcp-search": "allow"
         }
       }
     },
@@ -48,7 +48,7 @@ echo "Plugin update script finished successfully.")
       "permission": {
         "task": {
           "orchestrator-*": "deny",
-          "mcp-search": "deny"
+          "mcp-search": "allow"
         }
       }
     },
