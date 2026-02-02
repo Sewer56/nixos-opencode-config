@@ -48,6 +48,7 @@ think hard
 - Capture artifacts in per-prompt findings and link them from `# Findings`.
 - Findings must let the planner write the implementation plan without re-research; include needed artifacts verbatim and skip irrelevant detail.
 - If details are missing, say so succinctly; do not fabricate.
+- Do not mention the input file name/path in prompts or findings; use generic phrasing like "from input".
 - Use subagents as needed:
   - `@mcp-search` for external library/API specifics
   - `@codebase-explorer` for codebase search and pattern discovery
