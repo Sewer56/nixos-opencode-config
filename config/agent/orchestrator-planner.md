@@ -53,6 +53,7 @@ think hard
 - Only read/search within repo_root
 - Log code discovery results as prompt-scoped findings files and update the prompt's `# Findings` list
 - Also capture other research discoveries (manual reads, inferred constraints, important design decisions) as prompt-scoped findings files
+- Findings must be sufficient for future plan revisions without re-research; include complete artifacts when relevant and skip irrelevant detail
 
 4) Library Research (if needed)
 - **Required:** use @mcp-search for any external library lookup; capture key findings
