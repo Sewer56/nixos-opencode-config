@@ -44,6 +44,10 @@ think hard
 
 ### Phase 2: Research
 - Review every item, source, and reference from the user input; do not skip.
+- Reuse existing research artifacts verbatim (schemas/types, tables, precedence rules, constants, signatures); do not invent.
+- Capture artifacts in per-prompt findings and link them from `# Findings`.
+- Findings must let the planner write the implementation plan without re-research; include needed artifacts verbatim and skip irrelevant detail.
+- If details are missing, say so succinctly; do not fabricate.
 - Use subagents as needed:
   - `@mcp-search` for external library/API specifics
   - `@codebase-explorer` for codebase search and pattern discovery
@@ -52,8 +56,9 @@ think hard
 - Prefer reusing existing types and patterns; only introduce new ones when required by the current prompt.
 - Gather enough context so a runner with no prior memory can execute the prompt.
 - Identify the minimal required files to read and capture them in `# Required Reads` with brief relevance notes.
-- Log findings per prompt in `PROMPT-FINDING-<prompt-stem>-NN.md` (relevant details only) and add a one-line entry in the prompt's `# Findings`.
+- Log findings per prompt in `PROMPT-FINDING-<prompt-stem>-NN.md` (comprehensive, prompt-relevant) and add a one-line entry in the prompt's `# Findings`.
 - Include other research discoveries the same way; keep findings prompt-scoped (duplication across prompts is OK).
+- Put all supplemental artifacts in findings; do not add extra sections to prompt files.
 
 ### Phase 3: User Confirmation
 Present the proposed structure:
@@ -87,7 +92,8 @@ For each prompt file, scan for ambiguity using reduced taxonomy:
 
 Question rules:
 - Ask up to 10 questions total (prefer ≤5)
-- One question at a time
+- Ask all questions at once in a single batch
+- Use the `question` tool when available; otherwise ask in plain text using the same format
 - Format each with recommended option:
 
 **Recommended:** [X] — <reasoning>
@@ -253,6 +259,7 @@ Query: <what was searched or inspected>
 
 ## Details
 - <key API signatures, constraints, patterns>
+- <verbatim artifacts from sources (schemas/types, tables, precedence rules, constants) as needed for planning>
 
 ## Relevant Paths
 - path/to/file

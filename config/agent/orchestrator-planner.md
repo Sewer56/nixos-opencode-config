@@ -37,6 +37,7 @@ think hard
 
 2) Read and Scope
 - Read prompt_path (mission, objective, requirements, constraints, tests, clarifications, implementation hints)
+- Read each file listed under `# Findings`; treat them as primary research context and avoid re-researching the same artifacts
 - Read each file listed in `# Required Reads` and ensure each entry includes a brief relevance note; add missing notes
 - Extract what to build; tests are always `basic`
 - Review `# Implementation Hints` for patterns and guidance
@@ -251,6 +252,7 @@ Query: <what was searched or inspected>
 
 ## Details
 - <key API signatures, constraints, or patterns (omit irrelevant output)>
+- <verbatim artifacts needed for planning (schemas/tables/precedence rules/constants)>
 
 ## Relevant Paths
 - path/to/file

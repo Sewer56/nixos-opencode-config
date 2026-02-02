@@ -6,6 +6,7 @@ permission:
   edit: allow
   write: allow
   patch: deny
+  question: allow
   webfetch: deny
   list: allow
   read: allow
