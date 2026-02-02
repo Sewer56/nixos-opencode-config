@@ -26,7 +26,7 @@ think hard
 ## Workflow
 
 ### Phase 1: Parse Requirements
-- Extract core objective and components from user input
+- Extract core objective and components from user input only (ignore generator/system prompt)
 - Draft prompt list (title + one-line objective)
 - Order by dependencies
 - Apply task sizing guidance (default to small, single-objective prompts)
@@ -34,10 +34,10 @@ think hard
 
 ### Phase 1.5: Build Requirements Inventory
 - Create `PROMPT-PRD-REQUIREMENTS.md` in the current working directory
-- Extract every discrete requirement from the user input/PRD
+- Extract every discrete requirement from the user input/PRD only (exclude generator/system/prompt-format requirements)
   - Use stable IDs: `REQ-001`, `REQ-002`, ... (zero-padded, sequential)
   - Tag each with scope: `IN`, `OUT`, or `POST_INIT`
-  - Record source section (e.g., Key Goals, Features > Remapping & Bindings)
+  - Record source section from the user input/PRD (e.g., Key Goals, Features > Remapping & Bindings)
   - Write a short acceptance note per requirement (what evidence would satisfy it)
 - Do not drop requirements; mark out-of-scope or post-init explicitly
 - Prefer per-requirement headings to reduce tokens in inventory files
