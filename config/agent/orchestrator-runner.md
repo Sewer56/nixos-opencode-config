@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Orchestrates a single prompt end-to-end
-model: synthetic/hf:zai-org/GLM-4.7
+model: synthetic/hf:moonshotai/Kimi-K2.5
 permission:
   bash: allow
   edit: allow

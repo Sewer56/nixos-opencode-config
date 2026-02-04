@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Explores codebase structure, patterns, and implementation details.
-model: synthetic/hf:zai-org/GLM-4.7
+model: synthetic/hf:moonshotai/Kimi-K2.5
 permission:
   read: allow
   grep: allow

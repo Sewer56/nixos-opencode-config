@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Unified objective validation and code review with verification checks (GLM reviewer)
-model: synthetic/hf:zai-org/GLM-4.7
+model: synthetic/hf:moonshotai/Kimi-K2.5
 permission:
   bash: allow
   read: allow

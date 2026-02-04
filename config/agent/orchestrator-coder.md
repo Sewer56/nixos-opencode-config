@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Implements code changes and ensures all verification checks pass
-model: synthetic/hf:zai-org/GLM-4.7
+model: synthetic/hf:moonshotai/Kimi-K2.5
 permission:
   bash: allow
   edit: allow

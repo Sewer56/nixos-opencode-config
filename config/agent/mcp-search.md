@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Use this for third-party library research and repository documentation analysis.
-model: synthetic/hf:zai-org/GLM-4.7
+model: synthetic/hf:moonshotai/Kimi-K2.5
 permission:
   github_*: allow
   context7_*: allow

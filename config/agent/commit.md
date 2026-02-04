@@ -2,7 +2,7 @@
 mode: subagent
 hidden: false
 description: Creates semantic commits matching repository style
-model: synthetic/hf:zai-org/GLM-4.7
+model: synthetic/hf:moonshotai/Kimi-K2.5
 permission:
   bash: allow
   read: allow
