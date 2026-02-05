@@ -82,7 +82,8 @@ Read `PROMPT-ORCHESTRATOR.md` to extract:
 - Overall objective
 - List of prompt paths
 - Dependencies and tests for each prompt
-- Requirement coverage per prompt (Reqs: REQ-...)
+- Requirement mapping from `## Requirement Ownership` (source of truth)
+- Derive per-prompt requirement coverage in memory from ownership mapping
 - PRD Path and Requirements Inventory path (if present)
 - If tests are missing, assume `basic` in memory; do not edit files
 

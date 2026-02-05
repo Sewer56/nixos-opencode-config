@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Produces complete implementation plans with data model, types, and task list
+description: Produces complete implementation plans with task list and symbol map
 model: github-copilot/gpt-5.2-codex
 reasoningEffort: high
 permission:
@@ -25,6 +25,7 @@ think hard
 # Inputs
 - `prompt_path`: absolute path to PROMPT-NN-*.md file
 - `revision_notes` (optional): feedback from plan review or coder escalation
+- Expect structured entries when available: issue ID, severity, source, evidence, requested fix
 
 # Process
 
@@ -33,6 +34,8 @@ think hard
 - First call: no `revision_notes` and no existing plan → create a new plan.
 - Successive call: `revision_notes` → revise the existing plan.
 - If `revision_notes` are provided but the plan is missing, create a new plan and note the missing context in `## Plan Notes`.
+- On revision, preserve prior issue IDs and statuses in `## Review Ledger (Revision)`.
+- Do not reopen resolved items unless `revision_notes` include new evidence.
 - Ensure `plan_path` contains a complete plan (create or revise) and return only `plan_path`.
 
 2) Read and Scope
@@ -67,13 +70,19 @@ think hard
 - Findings must remain scoped to a single prompt; duplicating info across prompts is acceptable
 5) Draft Complete Plan
 Build these sections:
-- **Types**: each type as a subsection with a short explanation and code block
-- **External Symbols**: map repo file paths to required `use` statements
-- **Implementation Steps**: ordered by file; include `use` lines in snippets and required docs with params/returns; examples recommended
+- **External Symbols**: map files to required `use` statements and referenced types/classes for implementation
+- **Implementation Steps**: ordered by file.
+  - Add dedicated steps for new type/error definitions before the steps that consume them.
+  - Include required `use` lines.
+  - Include required docs with params/returns.
+  - Examples recommended.
 - **Test Steps**: include when `# Tests` is "basic"
 
 Plan fidelity:
-- External Symbols: required `use` per file; snippets include them.
+- Each file snippet must include required `use` statements.
+- Keep `## External Symbols` current so reviewers/coder can find reused files/classes without re-searching each iteration.
+- If new types/errors are needed, include explicit implementation step(s) for their definitions before first use.
+- Do not create a separate `## Types` section.
 - New helpers/conversions must be fully defined with file/location; no placeholders in prose or code. Only allow "copy/adapt from X" for simple external snippets with a named source.
 - On revision, include a short checklist addressing reviewer concerns.
 
@@ -95,6 +104,11 @@ Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 
 8) Findings and Plan Notes
 - Create or update `## Plan Notes` with key assumptions, risks, open questions, and review focus areas
+- Maintain `### Settled Facts` in `## Plan Notes` for facts validated by findings/repo evidence (with source references)
+- On revision, update `## Review Ledger (Revision)` with statuses:
+  - `OPEN`: unresolved blocking concern
+  - `RESOLVED`: fixed in this revision
+  - `DEFERRED`: non-blocking note intentionally postponed
 - If findings were created, ensure the prompt's `# Findings` section includes each file path with a short relevance note
 - If the prompt lacks a `# Findings` section, add one and list findings as they are created
 
@@ -124,60 +138,64 @@ Write this to `<prompt_filename>-PLAN.md`:
 ### Review Focus
 - <areas reviewers should scrutinize>
 
+### Settled Facts
+- [FACT-001] <fact validated by findings/repo evidence> (Source: PROMPT-FINDING-... or file:line)
+
 ### Revision History
 - Iteration <n>: <what changed and why>
 
-## Types
+## Review Ledger (Revision)
 
-### User
-Core domain entity.
-
-```rust
-struct User {
-    id: Uuid,
-    email: String,
-}
-```
-
-### CreateUserInput
-Input DTO for user creation.
-
-```rust
-struct CreateUserInput {
-    email: String,
-}
-```
-
-### UserError
-Error variants for user operations.
-
-```rust
-enum UserError {
-    DuplicateEmail(String),
-}
-```
+| ID     | Severity | Source | Status   | Summary        | Evidence  |
+| ------ | -------- | ------ | -------- | -------------- | --------- |
+| PR-001 | HIGH     | GPT-5  | RESOLVED | <what changed> | file:line |
 
 ## External Symbols
 
-Map files to required `use` statements.
+Map files to required `use` statements and referenced symbols so later iterations do not need to re-search the same files/classes.
 
-- `src/services/user.rs`:
+- `src/services/user.rs`
+  - `use crate::models::{CreateUserInput, User};`
   - `use crate::repository::user::UserRepository;`
-  - `use serde::Serialize;`
+  - `UserError`
+- `src/repository/user.rs`
+  - `use crate::db::DbError;`
+  - `use crate::models::User;`
 
 ## Implementation Steps
 
-Include `use` lines in each file's snippet. Include required docs with params/returns; examples recommended.
+Include required `use` lines in each file's snippet. When introducing new types/errors, add dedicated implementation steps for those definitions before consumer steps. Include required docs with params/returns; examples recommended.
+
+### src/models/user.rs
+
+Define foundational types used by service/repository steps:
+
+```rust
+use uuid::Uuid;
+
+pub struct User {
+    pub id: Uuid,
+    pub email: String,
+}
+
+pub struct CreateUserInput {
+    pub email: String,
+}
+```
 
 ### src/services/user.rs
 
-Add UserService impl:
+Define service error type and add UserService impl:
 
 ```rust
+use crate::models::{CreateUserInput, User};
 use crate::repository::user::UserRepository;
-use crate::services::user::{CreateUserInput, User, UserError};
 use std::sync::Arc;
 use uuid::Uuid;
+
+pub enum UserError {
+    DuplicateEmail(String),
+}
 
 impl UserService {
     pub fn new(repo: Arc<dyn UserRepository>) -> Self {

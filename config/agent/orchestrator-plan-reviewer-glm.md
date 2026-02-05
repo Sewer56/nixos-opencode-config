@@ -19,12 +19,19 @@ think hard
 # Inputs
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner
+- `review_context` (optional):
+  - Open issue ledger from prior review rounds
+  - Settled facts validated by findings/repo evidence
 
 # Process
 
 ## 1) Understand Requirements
 - Read `prompt_path` for mission, objectives, requirements, constraints, success criteria
 - Tests are always `basic`
+- If `review_context` is provided:
+  - Reuse existing issue IDs when re-raising the same issue
+  - Do not reopen `RESOLVED` items unless you provide new concrete evidence
+  - Treat settled facts as true unless contradicted with explicit evidence
 
 ## 2) Review Plan Against Requirements
 - Read `plan_path` for proposed implementation
@@ -62,8 +69,10 @@ REJECT IF: any CRITICAL/HIGH severity issue is foreseeable in the planned code.
 
 ## 6) Decide Status
 - **APPROVE**: plan is sound, complete, and should pass the quality gate
-- **REVISE**: plan has issues that must be fixed before coding
-- LOW issues with clear fixes may be listed in Notes
+- **REVISE** only when at least one BLOCKING issue exists:
+  - Any CRITICAL/HIGH issue
+  - Any requirement/success criterion marked MISSING/PARTIAL
+- If only MEDIUM/LOW issues exist and requirements are fully covered, return **APPROVE** and list issues in Notes
 
 # Output
 
@@ -77,19 +86,22 @@ REJECT IF: any CRITICAL/HIGH severity issue is foreseeable in the planned code.
 - "requirement" — [COVERED|MISSING|PARTIAL]
 
 ## Code Style Issues (predicted)
-- [INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION] [CRITICAL|HIGH|MEDIUM|LOW]
+- [ID: <stable-id>] [INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION] [CRITICAL|HIGH|MEDIUM|LOW]
   What the plan proposes and why it's problematic
+  Evidence: file:line or exact section
   **Fix:** How to revise the plan
 
 ## Semantic Issues (predicted)
-- [SECURITY|CORRECTNESS|PERFORMANCE|ERROR_HANDLING|ARCHITECTURE] [CRITICAL|HIGH|MEDIUM|LOW]
+- [ID: <stable-id>] [SECURITY|CORRECTNESS|PERFORMANCE|ERROR_HANDLING|ARCHITECTURE] [CRITICAL|HIGH|MEDIUM|LOW]
   What issue the planned code will have
+  Evidence: file:line or exact section
   **Impact:** What could go wrong
   **Fix:** How to revise the plan
 
 ## Test Plan Issues
-- [MISSING|DUPLICATE|OVERENGINEERED|NOT_PARAMETERIZED] [CRITICAL|HIGH|MEDIUM|LOW]
+- [ID: <stable-id>] [MISSING|DUPLICATE|OVERENGINEERED|NOT_PARAMETERIZED] [CRITICAL|HIGH|MEDIUM|LOW]
   Description
+  Evidence: file:line or exact section
 
 ## Notes
 Brief summary and observations for the planner

@@ -33,7 +33,8 @@ think hard
 ## 1) Load Sources
 - Read `requirements_path` and parse requirement IDs, scope, and acceptance notes
 - Ignore `## Unmet Requirements` or `## Unachieved Requirements` sections; they are not inventory entries
-- Read `orchestrator_path` for prompt list and requirement coverage (Reqs: ...)
+- Read `orchestrator_path` for prompt list and requirement mapping from `## Requirement Ownership`
+- FAIL if `## Requirement Ownership` is missing or malformed
 - Read prompt files referenced by the orchestrator index; extract `# Requirements` IDs
 - Read `state_path` and collect prompt statuses
   - FAIL if `state_path` is missing or unreadable
@@ -51,7 +52,8 @@ think hard
 - FAIL if any `IN` requirement is unmapped and not listed as known unmet
 - FAIL if any prompt references a requirement ID not in the inventory
 - WARN if any prompt maps only to `OUT` or `POST_INIT` requirements
-- WARN if `Reqs:` in the orchestrator index do not match the prompt's `# Requirements` IDs
+- FAIL if an `IN` requirement has no owner or has an owner prompt not listed in the index
+- WARN if ownership mapping disagrees with prompt `# Requirements` IDs
 
 ## 4) Final Validation
 - For each `IN` requirement not listed as known unmet, ensure at least one covering prompt has status SUCCESS or INCOMPLETE in `state_path`

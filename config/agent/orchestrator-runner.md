@@ -41,6 +41,14 @@ think hard
 - `requirements_path` = `<prompt_path_parent>/PROMPT-PRD-REQUIREMENTS.md` if it exists
 - `unmet_requirements_path` = `<prompt_path_parent>/PROMPT-REQUIREMENTS-UNMET.md`
 
+## Review State (in-memory, per prompt)
+- Maintain `plan_review_ledger` across plan-review iterations:
+  - fields: `id`, `source` (GPT-5|GLM), `severity`, `summary`, `status` (OPEN|RESOLVED|DEFERRED), `evidence`
+- Build `review_context` from that state for each reviewer call:
+  - `open_ledger_items`: unresolved entries from `plan_review_ledger` (typically OPEN/DEFERRED)
+  - `settled_facts`: facts validated by findings/repo evidence
+- Do not reopen `RESOLVED` items unless a reviewer provides new concrete evidence
+
 ## Unmet Requirements Tracking
 Record unmet requirements only when tied to specific IDs (from plan notes, coder notes, gate feedback, or a max-iteration exit). Continue execution.
 - Append/merge into `unmet_requirements_path`:
@@ -67,20 +75,23 @@ Record unmet requirements only when tied to specific IDs (from plan notes, coder
 
 ### Phase 2: Plan Review (parallel)
 1. Spawn `@orchestrator-plan-reviewer-gpt5` and `@orchestrator-plan-reviewer-glm` in parallel.
-2. Inputs: `prompt_path`, `plan_path`.
+2. Inputs: `prompt_path`, `plan_path`, and `review_context` (`open_ledger_items` + `settled_facts`).
 3. Decision rules:
-   - Approve only if BOTH reviewers approve
+   - Approve if no unresolved BLOCKING issues remain after contradiction handling
    - If severity is missing, treat it as HIGH
-   - If they contradict directly, prefer GPT-5
-   - If approved with LOW issues, pass them to coder as plan review notes
+   - BLOCKING = CRITICAL/HIGH, or any requirement marked MISSING/PARTIAL
+   - Non-blocking MEDIUM/LOW issues become plan review notes for coder
 4. If they disagree, run a contradiction check:
-   - Re-run BOTH reviewers with each other's feedback
+   - Re-run BOTH reviewers once with each other's feedback and current `review_context`
    - Ask each to assess the other's concerns
    - If GPT-5 says GLM's concern is a non-issue, accept GPT-5 and proceed
    - If GLM resolves GPT-5's concern, accept approval
+   - If disagreement remains but no BLOCKING issues remain, proceed with notes
 5. If revision needed:
-   - Distill feedback and include BOTH reviewers' notes
-   - Re-run planner with `revision_notes: <feedback>`
+   - Distill only unresolved BLOCKING issues into structured `revision_notes`
+   - Include issue IDs, severity, source, evidence, and requested fix
+   - Include `settled_facts` so resolved facts are not re-litigated
+   - Re-run planner with `revision_notes: <structured_feedback>`
    - Re-run both reviewers (max 10 iterations)
 6. If still not approved after 10 iterations, record unmet requirements (when applicable) and proceed with the latest plan.
 
@@ -106,21 +117,24 @@ Record unmet requirements only when tied to specific IDs (from plan notes, coder
 
 ### Phase 4: Quality Gate (loop <= 10)
 - Build review context:
+  - `prompt_path` (required)
   - task intent
   - coder concerns and related files (from latest coder notes)
 - Do not pass coder notes; reviewers read `-CODER-NOTES.md` directly
 - Spawn `@orchestrator-quality-gate-glm` and `@orchestrator-quality-gate-gpt5` in parallel
 - Do NOT pass the plan file to reviewers
+- If a reviewer asks for missing inputs, re-run that reviewer once with corrected inputs (do not count as an iteration)
 - Decision rules:
-  - PASS only if BOTH reviewers PASS
-  - If they contradict directly, prefer GPT-5
+  - PASS if BOTH reviewers PASS
+  - If one/both are PARTIAL and all objectives are MET with no in-scope CRITICAL/HIGH findings, treat as non-blocking PARTIAL and continue
+  - Treat unrelated pre-existing verification failures as non-blocking notes (do not force re-coding)
 - If they disagree, run a contradiction check:
   - Re-run BOTH reviewers with each other's findings
   - Ask each to assess the other's concerns
   - If GPT-5 says GLM's concern is a non-issue, accept GPT-5 and proceed
   - If GLM resolves GPT-5's concern, accept PASS
 - If revision needed:
-  - Distill issues and include BOTH reviewers' notes
+  - Distill only in-scope BLOCKING issues and include BOTH reviewers' notes
   - Re-invoke coder with feedback
   - Re-run gate
 - If still not passing after 10 iterations, record unmet requirements (when applicable) and proceed to commit

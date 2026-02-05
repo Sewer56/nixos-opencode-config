@@ -30,10 +30,11 @@ think hard
 
 ## 1) Load Requirements Inventory
 - Read `requirements_path`
-- Parse requirement IDs, scope tags, and acceptance notes
+- Parse requirement IDs, scope tags, acceptance notes, and `Owner Prompt`
 - Ignore `## Unmet Requirements` or `## Unachieved Requirements` sections; they are not inventory entries
 - FAIL if any ID is duplicated or malformed
 - WARN if any requirement lacks scope or acceptance
+- FAIL if any requirement is missing `Owner Prompt`
 
 ## 2) Determine Prompt List
 - If `orchestrator_path` is provided, parse it and use the listed prompt paths
@@ -49,6 +50,10 @@ think hard
 - Each `IN` requirement must appear in at least one prompt
 - FAIL if any `IN` requirement is unmapped
 - WARN if any prompt maps only to `OUT` or `POST_INIT` requirements
+- Each `IN` requirement must have exactly one non-`None` `Owner Prompt`
+- FAIL if owner prompt file is missing from discovered prompt list
+- FAIL if owner prompt does not include that requirement ID in its `# Requirements`
+- WARN if owner is set for `OUT` or `POST_INIT`
 
 # Output
 Return a single report in this format:
@@ -64,12 +69,16 @@ Status: PASS | PARTIAL | FAIL
 - Covered: <n>
 - Missing: <n>
 - Unknown IDs: <n>
+- Ownership issues: <n>
 
 ## Missing or Unmapped
 - REQ-###: <requirement text>
 
 ## Unknown IDs
 - REQ-###: referenced in <prompt>
+
+## Ownership Issues
+- REQ-###: <owner mismatch or missing owner>
 
 ## Notes
 - Short, actionable guidance

@@ -31,6 +31,9 @@ think hard
 - Order by dependencies
 - Apply task sizing guidance (default to small, single-objective prompts)
 - Convert broad goals into vertical slices that yield working code
+- Produce a requirement-to-prompt ownership draft:
+  - Each `IN` requirement must have exactly one primary owner prompt
+  - Secondary prompts may reference a requirement but must not own it
 
 ### Phase 1.5: Build Requirements Inventory
 - Create `PROMPT-PRD-REQUIREMENTS.md` in the current working directory
@@ -57,11 +60,19 @@ think hard
 - Prefer reusing existing types and patterns; only introduce new ones when required by the current prompt.
 - Gather enough context so a runner with no prior memory can execute the prompt.
 - Identify the minimal required files to read and capture them in `# Required Reads` with brief relevance notes.
+- Capture a short "repo conventions snapshot" in findings when relevant (test commands, CI action versions, lint/build expectations) to reduce avoidable downstream review churn.
 - Log findings per prompt in `PROMPT-FINDING-<prompt-stem>-NN.md` (comprehensive, prompt-relevant) and add a one-line entry in the prompt's `# Findings`.
 - Include other research discoveries the same way; keep findings prompt-scoped (duplication across prompts is OK).
 - Put all supplemental artifacts in findings; do not add extra sections to prompt files.
 
-### Phase 3: User Confirmation
+### Phase 3: Blocking Ambiguity Triage (before writing prompts)
+- Identify only blockers that would materially change implementation shape.
+- Ask targeted questions only for unknowns that cannot be resolved from input/research.
+- Ask all blocking questions in one batch.
+- When asking questions, use the `question` tool and send the full batch in a single call.
+- If no blocking ambiguity remains, skip directly to Phase 4.
+
+### Phase 4: User Confirmation
 Present the proposed structure:
 ```
 Proposed Prompts:
@@ -74,15 +85,17 @@ Tests: basic (required)
 Say "go" to continue, or suggest changes.
 ```
 Iterate on structure based on user feedback.
-**Continue to Phase 4 only when user says "go".**
+**Continue to Phase 5 only when user says "go".**
 
-### Phase 4: Generate Prompt Files
+### Phase 5: Generate Prompt Files
 Create in current working directory:
 - `PROMPT-NN-{title}.md` — one per task (standalone, self-contained)
 - Ensure each prompt includes concrete deliverables
 - Every prompt `# Requirements` entry must include a requirement ID (e.g., `REQ-012: ...`)
+- Add `# Settled Facts` with validated facts and source pointers (`FACT-###`)
+- Add `# Verification Scope` to define in-scope checks and known unrelated pre-existing failures
 
-### Phase 5: Clarification Loop
+### Phase 6: Clarification Loop (non-blocking refinements)
 For each prompt file, scan for ambiguity using reduced taxonomy:
 1. **Scope Boundaries** — what's in/out of scope
 2. **Data Shapes (used now)** — entities, fields, relationships required by this prompt
@@ -92,9 +105,9 @@ For each prompt file, scan for ambiguity using reduced taxonomy:
 6. **Testing Expectations** — coverage approach, critical paths
 
 Question rules:
-- Ask up to 10 questions total (prefer ≤5)
+- Ask up to 10 questions total across Phases 3 and 6 (prefer <=5)
 - Ask all questions at once in a single batch
-- Use the `question` tool when available; otherwise ask in plain text using the same format
+- Use the `question` tool for that batch (single call)
 - Format each with recommended option:
 
 **Recommended:** [X] — <reasoning>
@@ -123,7 +136,7 @@ Please review the generated PROMPT-*.md files to see if anything else comes to m
 Say "go" to validate requirements coverage and generate the orchestrator index.
 ```
 
-### Phase 6: Validate Requirements Coverage (Subagent)
+### Phase 7: Validate Requirements Coverage (Subagent)
 - Spawn `@orchestrator-requirements-preflight` with:
   - `requirements_path` (absolute path to `PROMPT-PRD-REQUIREMENTS.md`)
   - `prompts_dir` (absolute path to the current working directory)
@@ -131,14 +144,17 @@ Say "go" to validate requirements coverage and generate the orchestrator index.
 - If status is FAIL or PARTIAL: revise the prompt pack and re-run this phase
 - If PASS: proceed
 
-### Phase 7: Generate Orchestrator Index
+### Phase 8: Generate Orchestrator Index
 Create `PROMPT-ORCHESTRATOR.md` in current working directory with:
 - Overall objective
 - Prompt list with dependencies and tests
 - `PRD Path` and `Requirements Inventory` paths (relative)
-- Per-prompt `Reqs:` coverage list (requirement IDs)
+- Add a `## Requirement Ownership` section:
+  - `REQ-### — Owner: PROMPT-NN-... — Secondary: ... | None`
+  - Every `IN` requirement must have exactly one owner
+  - This section is the source of truth for requirement-to-prompt mapping
 
-### Phase 8: Hand Off to User
+### Phase 9: Hand Off to User
 ```
 Ready for orchestration with `@ orchestrator` (scheduler). For a single prompt, use `@ orchestrator-runner`.
 ```
@@ -190,9 +206,17 @@ A: <answer>
 # Findings
 - PROMPT-FINDING-<prompt-stem>-01.md: <one-line relevance>
 
+# Settled Facts
+- FACT-001: <validated fact used by this prompt> (Source: PROMPT-FINDING-... or path:line)
+
 # Implementation Hints
 - [Patterns, library usage, existing code to reuse]
 - [Actionable guidance for planner/coder]
+
+# Verification Scope
+- In scope checks: <format/lint/build/tests relevant to this prompt>
+- Out of scope known failures: <pre-existing unrelated failures if any, else None>
+- Priority files: <files reviewers should prioritize>
 ```
 
 ## Orchestrator Index: `PROMPT-ORCHESTRATOR.md`
@@ -205,8 +229,12 @@ PRD Path: <relative path to PRD input>
 Requirements Inventory: PROMPT-PRD-REQUIREMENTS.md
 
 ## Prompts
-- PROMPT-01-{title}.md — Objective: <short> — Reqs: REQ-001, REQ-004 — Dependencies: None
-- PROMPT-02-{title}.md — Objective: <short> — Reqs: REQ-002 — Dependencies: PROMPT-01
+- PROMPT-01-{title}.md — Objective: <short> — Dependencies: None
+- PROMPT-02-{title}.md — Objective: <short> — Dependencies: PROMPT-01
+
+## Requirement Ownership
+- REQ-001 — Owner: PROMPT-01-{title}.md — Secondary: None
+- REQ-002 — Owner: PROMPT-02-{title}.md — Secondary: PROMPT-03-{title}.md
 ```
 
 ## Requirements Inventory: `PROMPT-PRD-REQUIREMENTS.md`
@@ -219,10 +247,12 @@ Source PRD: PROMPT-PRD.md
 ## REQ-001 [IN] <requirement>
 - Source: <section>
 - Acceptance: <evidence or outcome>
+- Owner Prompt: PROMPT-01-<title>.md
 
 ## REQ-002 [POST_INIT] <requirement>
 - Source: <section>
 - Acceptance: <evidence or outcome>
+- Owner Prompt: None
 ```
 
 ## Investigation Rules
@@ -238,6 +268,9 @@ Before creating any prompt:
 - Order prompts by dependency
 - Each prompt must be standalone and self-contained
 - Every prompt must have code as a deliverable (no research-only prompts)
+- Every `IN` requirement must have exactly one owner prompt in the index
+- Do not duplicate requirement mappings in multiple index sections; keep mapping in `## Requirement Ownership`
+- Do not place unresolved blockers into generated prompts; resolve or surface in Phase 3
 
 ## Task Sizing Guidance
 - Default to the smallest useful unit; one primary objective per prompt

@@ -19,7 +19,7 @@ Single-pass review that validates objectives and code, runs checks, and reports 
 think hard
 
 # Inputs
-- `prompt_path`: requirements and objectives
+- `prompt_path`: requirements and objectives (required)
 - Review context from orchestrator:
   - Task intent (one-line summary)
   - Coder's concerns (areas of uncertainty — focus review here)
@@ -39,6 +39,8 @@ think hard
 - Collect changed paths via `git status --porcelain` and focus review on those
 - Use diffs of staged and unstaged changes for analysis
 - Read full file contents for changed files to understand context
+- Treat `prompt_path` objectives plus `Related files reviewed by coder` as in-scope anchors
+- If changed files include unrelated pre-existing work outside prompt scope, mark them as out-of-scope and do not fail solely for those
 
 ## 3) Review code style
 - FAIL IF: a small, single-caller helper is defined separately instead of inlining
@@ -77,10 +79,11 @@ These are areas where the implementer was uncertain; validate the approach or fl
 ## 8) Run verification checks
 - Run formatter, linter, and type/build checks per project conventions
 - Capture outputs and exit codes
+- If a check fails due to unrelated pre-existing workspace/package issues outside prompt scope, report it explicitly as non-blocking context
 
 ## 9) Decide status
-- **FAIL**: any CRITICAL/HIGH severity finding, objectives not met, or checks fail
-- **PARTIAL**: only MEDIUM/LOW findings with all objectives met and checks passing
+- **FAIL**: any in-scope CRITICAL/HIGH finding, any unmet objective, or in-scope blocking check failure
+- **PARTIAL**: only MEDIUM/LOW in-scope findings, or only unrelated pre-existing check failures with objectives met
 - **PASS**: no findings, all objectives met, all checks pass
 
 # Output

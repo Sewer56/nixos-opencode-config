@@ -2,13 +2,13 @@
 
 This folder defines the multi-agent workflow that turns a prompt pack into working code, with planning, review, verification, and requirements validation.
 
-**Entry Points**
+## Entry Points
 - `prompt-pack-generator` builds prompt packs (`PROMPT-*.md`), `PROMPT-PRD-REQUIREMENTS.md`, and `PROMPT-ORCHESTRATOR.md` using the builder workflow.
 - `orchestrate-plan` turns a clarified plan into a single prompt and runs the same pipeline without an index.
 - `orchestrator` is the scheduler that executes an existing `PROMPT-ORCHESTRATOR.md` sequentially.
 - `orchestrator-runner` can be used directly for a single prompt when you already have a prompt file.
 
-**Core Artifacts**
+## Core Artifacts
 - `PROMPT-ORCHESTRATOR.md`: ordered prompt list with objectives, dependencies, tests, and requirement coverage.
 - `PROMPT-PRD-REQUIREMENTS.md`: requirement inventory with scope and acceptance notes.
 - `PROMPT-ORCHESTRATOR.state.md`: resumable state (prompt status, plan paths, base branch).
@@ -16,16 +16,16 @@ This folder defines the multi-agent workflow that turns a prompt pack into worki
 - `PROMPT-*-PLAN.md` and `PROMPT-*-CODER-NOTES.md`: per-prompt plan and execution notes.
 - `PROMPT-ORCHESTRATOR.validation.md`: final requirements validation report written by the requirements checker.
 
-**End-to-End Flow**
+## End-to-End Flow
 - Generate a prompt pack and orchestrator index via `prompt-pack-generator` (includes requirements preflight).
 - The scheduler reads the index, initializes state, detects base branch, and runs prompts in order.
 - Each prompt is executed by `@orchestrator-runner` through plan, review, implementation, quality gate, and commit.
 - After each prompt, the scheduler runs CodeRabbit review when available.
 - After all prompts, final requirements validation checks coverage and evidence against `base_branch`.
 
-**Simple Diagrams**
+## Simple Diagrams
 
-End-to-end pipeline:
+### End-to-end pipeline
 ```
 User Input
   |
@@ -45,7 +45,7 @@ orchestrator-requirements-final
 Done
 ```
 
-Per-prompt runner cycle:
+### Per-prompt runner cycle
 ```
 PROMPT-NN-*.md
   |
@@ -58,27 +58,69 @@ Planner -> Plan Review -> Coder -> Quality Gate -> Commit
 PROMPT-NN-*-PLAN.md      PROMPT-NN-*-CODER-NOTES.md
 ```
 
-**Per-Prompt Runner Cycle**
+## Per-Prompt Runner Cycle
 - Plan: `@orchestrator-planner` writes a concrete `-PLAN.md` and optional findings.
 - Plan review: GPT-5 + GLM reviewers must both approve; revisions loop as needed.
 - Implementation: `@orchestrator-coder` applies the plan, runs checks, and writes `-CODER-NOTES.md`.
 - Quality gate: GPT-5 + GLM reviewers validate objectives, code, and verification checks.
 - Commit: `@commit` creates repo-style commits, excluding `PROMPT-*` files.
 
-**Artifacts and Feedback Flow**
+## Artifacts and Feedback Flow
 - **Planner and coder persist artifacts** to disk: `PROMPT-*-PLAN.md`, `PROMPT-*-CODER-NOTES.md`, and findings files.
 - **Reviewers return feedback directly** in their agent response (plan reviewers and quality gates); the runner uses that feedback to decide approval or revision.
 - **Scheduler state is persisted** in `PROMPT-ORCHESTRATOR.state.md` after each prompt for resume support.
 - **Validation output is persisted** by the requirements checker in `PROMPT-ORCHESTRATOR.validation.md` after the final validation run.
 
-**Iterative Updates (Planner and Coder)**
+## Review Context (`review_context`)
+- **Plan review**: pass `open_ledger_items` + `settled_facts` on each re-review to keep issue IDs stable and avoid reopening resolved items without new evidence.
+- **Quality gate**: pass `prompt_path`, task intent, coder concerns, and related files to keep review in scope and treat unrelated pre-existing failures as non-blocking context.
+
+## Iterative Updates (Planner and Coder)
 - **Planner revisions**: updates the same `PROMPT-*-PLAN.md` across iterations, adding `## Reviewer Concerns (Revision)` and updating `## Plan Notes` and revision history when feedback requests changes.
 - **Coder iterations**: appends a new `## Iteration N` block in `PROMPT-*-CODER-NOTES.md` on each run, capturing status, concerns, issues encountered, and issues remaining.
 
-**Roles At A Glance**
+## Roles At A Glance
 - **Scheduler**: `orchestrator` manages state, ordering, and final validation; never edits code.
 - **Runner**: `orchestrator-runner` coordinates the plan -> build -> gate -> commit cycle per prompt.
 - **Planner**: `orchestrator-planner` produces the actionable plan and updates prompt findings/required reads when needed.
 - **Coder**: `orchestrator-coder` implements changes, runs verification, and records coder notes.
 - **Reviewers**: plan reviewers (`orchestrator-plan-reviewer-*`) and quality gates (`orchestrator-quality-gate-*`) provide dual-model approval.
 - **Validation and Tools**: requirements preflight/final (`orchestrator-requirements-*`), CodeRabbit (`orchestrator-coderabbit`), and commits (`commit`).
+
+## Why Generated Artifact Sections Exist
+
+### `PROMPT-*-PLAN.md`
+- `## Plan Notes`: captures assumptions and risks for reviewer context.
+  - What it improves:
+    - Fewer first-pass/multi-pass misunderstandings
+    - Faster review alignment
+- `### Settled Facts` (`FACT-###`): stores evidence-backed facts with sources.
+  - What it improves:
+    - Less re-research/tool-call cost
+    - Better handoff to cheaper execution models
+    - Easier decision traceability
+- `## Implementation Steps`: captures the full planned change path in one file, including any required type/error definitions and `use` statements.
+  - What it improves:
+    - `use` statements prevent missing imports; reducing tool call counts.
+    - Single tool call to write entire plan saves costs.
+- `## External Symbols`: records reused files/classes and required imports for each touched file.
+  - What it improves:
+    - Avoids searching for the same files/classes across iterations.
+    - Speeds up planner/coder/reviewer handoffs.
+- `## Reviewer Concerns (Revision)` + revision history: keeps loop memory across iterations.
+  - What it improves:
+    - Reviewers don't have to as-heavily think about already addressed issues, only validate.
+    - Lowers contradictions when using multiple reviewers; they will treat it as a result of earlier review.
+
+### `PROMPT-*-CODER-NOTES.md`
+- For passing information from Coder to Quality Gate. Not everything the quality gate returns can always be fixed.
+- Can also prevent same bug from being 'rediscovered' in later loops.
+
+### `PROMPT-REQUIREMENTS-UNMET.md`
+- Sometimes you can't meet all the requirements, so it's important to keep track of that to avoid loops or early exits.
+
+### `PROMPT-ORCHESTRATOR.state.md`
+- Prompt status + plan mapping enables safe resume and avoids rerunning completed work, reducing wasted iterations.
+
+### `PROMPT-ORCHESTRATOR.validation.md`
+- Final requirement-level verdict ensures "all prompts passed" still maps to PRD coverage, reducing correctness drift.
