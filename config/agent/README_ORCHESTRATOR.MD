@@ -72,7 +72,7 @@ PROMPT-NN-*-PLAN.md      PROMPT-NN-*-CODER-NOTES.md
 - **Validation output is persisted** by the requirements checker in `PROMPT-ORCHESTRATOR.validation.md` after the final validation run.
 
 ## Review Context (`review_context`)
-- **Plan review**: pass `open_ledger_items` + `settled_facts` on each re-review to keep issue IDs stable and avoid reopening resolved items without new evidence.
+- **Plan review**: pass `open_ledger_items` + `settled_facts` on each re-review to keep issue IDs stable and avoid reopening resolved items without new evidence; use issue `confidence` + `fix_specificity` to route medium/low items into `advisory_items` (non-blocking) or coder notes.
 - **Quality gate**: pass `prompt_path`, task intent, coder concerns, and related files to keep review in scope and treat unrelated pre-existing failures as non-blocking context.
 
 ## Iterative Updates (Planner and Coder)

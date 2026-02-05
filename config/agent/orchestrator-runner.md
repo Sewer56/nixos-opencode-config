@@ -43,7 +43,9 @@ think hard
 
 ## Review State (in-memory, per prompt)
 - Maintain `plan_review_ledger` across plan-review iterations:
-  - fields: `id`, `source` (GPT-5|GLM), `severity`, `summary`, `status` (OPEN|RESOLVED|DEFERRED), `evidence`
+  - fields: `id`, `source` (GPT-5|GLM), `severity`, `confidence`, `fix_specificity`, `summary`, `status` (OPEN|RESOLVED|DEFERRED), `evidence`
+- Maintain `advisory_items` across plan-review iterations:
+  - non-blocking MEDIUM/LOW issues where `confidence != HIGH` or `fix_specificity != CONCRETE`
 - Build `review_context` from that state for each reviewer call:
   - `open_ledger_items`: unresolved entries from `plan_review_ledger` (typically OPEN/DEFERRED)
   - `settled_facts`: facts validated by findings/repo evidence
@@ -79,8 +81,12 @@ Record unmet requirements only when tied to specific IDs (from plan notes, coder
 3. Decision rules:
    - Approve if no unresolved BLOCKING issues remain after contradiction handling
    - If severity is missing, treat it as HIGH
+   - If confidence is missing, treat it as MEDIUM
+   - If `fix_specificity` is missing, treat it as PARTIAL
    - BLOCKING = CRITICAL/HIGH, or any requirement marked MISSING/PARTIAL
-   - Non-blocking MEDIUM/LOW issues become plan review notes for coder
+   - For non-blocking MEDIUM/LOW issues:
+      - `confidence = HIGH` and `fix_specificity = CONCRETE` → coder notes only
+      - otherwise → append to `advisory_items`
 4. If they disagree, run a contradiction check:
    - Re-run BOTH reviewers once with each other's feedback and current `review_context`
    - Ask each to assess the other's concerns
@@ -88,12 +94,14 @@ Record unmet requirements only when tied to specific IDs (from plan notes, coder
    - If GLM resolves GPT-5's concern, accept approval
    - If disagreement remains but no BLOCKING issues remain, proceed with notes
 5. If revision needed:
-   - Distill only unresolved BLOCKING issues into structured `revision_notes`
-   - Include issue IDs, severity, source, evidence, and requested fix
+   - Distill unresolved BLOCKING issues into structured `revision_notes` (required)
+   - Include issue IDs, severity, confidence, fix_specificity, source, evidence, and requested fix
+   - Include `advisory_items` in `revision_notes` only when a planner rerun is already required by BLOCKING issues
    - Include `settled_facts` so resolved facts are not re-litigated
    - Re-run planner with `revision_notes: <structured_feedback>`
    - Re-run both reviewers (max 10 iterations)
-6. If still not approved after 10 iterations, record unmet requirements (when applicable) and proceed with the latest plan.
+6. If no BLOCKING issues remain, do not re-run planner for `advisory_items`; carry them as coder notes.
+7. If still not approved after 10 iterations, record unmet requirements (when applicable) and proceed with the latest plan.
 
 ### Phase 3: Implementation (loop <= 10)
 - Spawn `@orchestrator-coder`

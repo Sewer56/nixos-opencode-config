@@ -48,8 +48,14 @@ The plan contains code blocks. Review them as if reviewing final code:
 - REJECT IF: plan uses public visibility when private/protected suffices
 - REJECT IF: plan includes debug/logging code not intended for production
 - REJECT IF: plan creates unnecessary abstractions (interface with only 1 implementation)
-- For each issue, include a severity tag: [CRITICAL|HIGH|MEDIUM|LOW]
-- Always describe the fix needed in the plan
+- For each issue, include:
+  - severity: [CRITICAL|HIGH|MEDIUM|LOW]
+  - `confidence`: [HIGH|MEDIUM|LOW] (how sure you are the issue is real)
+  - `fix_specificity`: [CONCRETE|PARTIAL|UNCLEAR] (how actionable the proposed fix is)
+- Format each issue with a short header line; put a 1-line summary on the next line
+- Keep one blank line between issue headers
+- Always include a short fix explanation
+- If `fix_specificity` is `CONCRETE`, include a minimal code snippet showing the exact fix
 
 ## 4) Review Planned Code Semantics
 Analyze the planned implementation deeply. Reason through whether issues will exist:
@@ -86,22 +92,44 @@ REJECT IF: any CRITICAL/HIGH severity issue is foreseeable in the planned code.
 - "requirement" — [COVERED|MISSING|PARTIAL]
 
 ## Code Style Issues (predicted)
-- [ID: <stable-id>] [INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION] [CRITICAL|HIGH|MEDIUM|LOW]
-  What the plan proposes and why it's problematic
-  Evidence: file:line or exact section
-  **Fix:** How to revise the plan
+### [ID: <stable-id>] [INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION] [CRITICAL|HIGH|MEDIUM|LOW]
+Summary: <1-line summary>
+confidence: [HIGH|MEDIUM|LOW]
+fix_specificity: [CONCRETE|PARTIAL|UNCLEAR]
+Problem: <full details>
+Evidence: <file:line or exact section>
+Fix Explanation: <short explanation>
+Fix Code (when `fix_specificity=CONCRETE`):
+```<language>
+<exact replacement snippet>
+```
 
 ## Semantic Issues (predicted)
-- [ID: <stable-id>] [SECURITY|CORRECTNESS|PERFORMANCE|ERROR_HANDLING|ARCHITECTURE] [CRITICAL|HIGH|MEDIUM|LOW]
-  What issue the planned code will have
-  Evidence: file:line or exact section
-  **Impact:** What could go wrong
-  **Fix:** How to revise the plan
+### [ID: <stable-id>] [SECURITY|CORRECTNESS|PERFORMANCE|ERROR_HANDLING|ARCHITECTURE] [CRITICAL|HIGH|MEDIUM|LOW]
+Summary: <1-line summary>
+confidence: [HIGH|MEDIUM|LOW]
+fix_specificity: [CONCRETE|PARTIAL|UNCLEAR]
+Problem: <full details>
+Evidence: <file:line or exact section>
+Impact: <what could go wrong>
+Fix Explanation: <short explanation>
+Fix Code (when `fix_specificity=CONCRETE`):
+```<language>
+<exact replacement snippet>
+```
 
 ## Test Plan Issues
-- [ID: <stable-id>] [MISSING|DUPLICATE|OVERENGINEERED|NOT_PARAMETERIZED] [CRITICAL|HIGH|MEDIUM|LOW]
-  Description
-  Evidence: file:line or exact section
+### [ID: <stable-id>] [MISSING|DUPLICATE|OVERENGINEERED|NOT_PARAMETERIZED] [CRITICAL|HIGH|MEDIUM|LOW]
+Summary: <1-line summary>
+confidence: [HIGH|MEDIUM|LOW]
+fix_specificity: [CONCRETE|PARTIAL|UNCLEAR]
+Problem: <full details>
+Evidence: <file:line or exact section>
+Fix Explanation: <short explanation>
+Fix Code (when `fix_specificity=CONCRETE`):
+```<language>
+<exact replacement snippet>
+```
 
 ## Notes
 Brief summary and observations for the planner

@@ -25,7 +25,7 @@ think hard
 # Inputs
 - `prompt_path`: absolute path to PROMPT-NN-*.md file
 - `revision_notes` (optional): feedback from plan review or coder escalation
-- Expect structured entries when available: issue ID, severity, source, evidence, requested fix
+- Expect structured entries when available: issue ID, severity, confidence, fix_specificity, source, evidence, requested fix
 
 # Process
 
