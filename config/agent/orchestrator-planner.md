@@ -173,11 +173,13 @@ Define foundational types used by service/repository steps:
 ```rust
 use uuid::Uuid;
 
+/// <documentation here>
 pub struct User {
     pub id: Uuid,
     pub email: String,
 }
 
+/// <documentation here>
 pub struct CreateUserInput {
     pub email: String,
 }
