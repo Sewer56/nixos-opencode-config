@@ -67,16 +67,19 @@ Say "go" to apply this plan, or suggest changes.
 5. Modularize implementation (after `go`)
 - Split catch-all files into focused modules/files with single responsibilities.
 - Keep top-level orchestration logic in the parent module/file entrypoint.
-- Place primarily data-holder models (with only trivial logic) in dedicated model files/folders where appropriate.
+- Place primarily data-holder models (with only trivial logic) in dedicated model files/folders by default.
 - Keep enums/newtypes colocated with a parent type when they are only used by that parent.
 - Keep non-public helper types local; do not widen visibility solely to move code.
+- Keep conversion impls/functions (`From`/`TryFrom`/mappers) with the related type definitions; avoid global `conversions` buckets.
+- Co-locate tests with the module they validate; avoid central `tests.rs` files for unrelated modules.
+- Keep `models/mod.rs` for module wiring/re-exports; avoid accumulating concrete model definitions there.
 
 6. Apply naming discipline
 - Use descriptive, domain-first names for modules/files/types/functions.
 - Avoid vague names like `utils`, `helpers`, `common`, or `misc` unless those are established and intentionally scoped.
 
 7. Apply language-appropriate structure
-- Rust: prefer `domain/mod.rs` with focused child modules; use `models/` for data-holder model types when appropriate.
+- Rust: prefer `domain/mod.rs` with focused child modules; use `models/` for data-holder model types; prefer `#[cfg(test)] mod tests` in each module over a central test module.
 - TypeScript/JavaScript: prefer feature folders with focused files and explicit exports.
 - Python: prefer packages with focused modules and explicit public exports.
 - C#/Java/Kotlin: align folders with namespace/package boundaries and responsibilities.

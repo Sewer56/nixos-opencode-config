@@ -41,7 +41,7 @@ think
 
 2) Implement changes
 - Prefer smallest viable diff; reuse existing patterns
-- Inline tiny single-use helpers; avoid new files
+- Inline tiny single-use helpers; add new files when module boundaries benefit
 - Limit visibility; avoid public unless required
 - Avoid unnecessary abstractions; no single-impl interfaces
 - Remove dead code and unused imports; delete unused paths

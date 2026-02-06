@@ -36,7 +36,7 @@ think hard
   - Log each relevant/important discovery to `PROMPT-FINDING-<prompt-stem>-NN.md`
   - Update the prompt's `# Findings` list with each finding file and a one-line relevance note
 - If external library/API details are needed, use `@mcp-search` and log findings the same way
-- Apply discipline: smallest viable change, inline tiny helpers, avoid new files, avoid unnecessary abstractions, restrict visibility
+- Apply discipline: smallest viable change, inline tiny helpers, add files when module boundaries benefit, avoid unnecessary abstractions, restrict visibility
 - Do NOT modify the prompt file except to update `# Required Reads` and `# Findings`
 
 ### Phase 4: Plan Review (Parallel)

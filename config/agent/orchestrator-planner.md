@@ -101,9 +101,12 @@ Plan fidelity:
 - Apply these modularization rules verbatim:
   - Split catch-all files into focused modules/files with single responsibilities.
   - Keep top-level orchestration logic in the parent module/file entrypoint.
-  - Place primarily data-holder models (with only trivial logic) in dedicated model files/folders where appropriate.
+  - Place primarily data-holder models (with only trivial logic) in dedicated model files/folders by default.
   - Keep enums/newtypes colocated with a parent type when they are only used by that parent.
   - Keep non-public helper types local; do not widen visibility solely to move code.
+  - Keep conversion impls/functions (`From`/`TryFrom`/mappers) with related type definitions; avoid global `conversions` buckets.
+  - Co-locate tests with the module they validate; avoid central `tests.rs` files for unrelated modules.
+  - Keep `models/mod.rs` for module wiring/re-exports; avoid accumulating concrete model definitions there.
 - Apply these rules to new code and directly touched code.
 - Do not force broad structural refactors of pre-existing code unless required by the objective or explicitly requested.
 - Do not convert modular code into monolithic files unless explicitly requested.
@@ -262,7 +265,7 @@ async fn find_by_email(&self, email: &str) -> Result<Option<User>, DbError> {
 
 ## Test Steps
 
-### tests/user_service.rs
+### src/services/user.rs (add/extend `#[cfg(test)] mod tests`)
 
 ```rust
 use crate::services::user::{CreateUserInput, UserError};
