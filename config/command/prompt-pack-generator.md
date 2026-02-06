@@ -22,6 +22,7 @@ think hard
 - Isolation-safe: each prompt must run in isolation; include all required context and file paths.
 - No speculative types/errors: define types/errors only when used in this prompt; later prompts may extend.
 - Tests required: every prompt uses `basic` tests.
+- Apply the canonical modularization rules in this file when shaping prompts.
 
 ## Workflow
 
@@ -94,6 +95,8 @@ Create in current working directory:
 - Every prompt `# Requirements` entry must include a requirement ID (e.g., `REQ-012: ...`)
 - Add `# Settled Facts` with validated facts and source pointers (`FACT-###`)
 - Add `# Verification Scope` to define in-scope checks and known unrelated pre-existing failures
+- Always include `# Module Layout` with language, current structure, target structure, and naming map
+  - If unchanged, set `Target structure: No structural changes` and `Naming map: None`
 
 ### Phase 6: Clarification Loop (non-blocking refinements)
 For each prompt file, scan for ambiguity using reduced taxonomy:
@@ -209,6 +212,31 @@ A: <answer>
 # Settled Facts
 - FACT-001: <validated fact used by this prompt> (Source: PROMPT-FINDING-... or path:line)
 
+# Module Layout
+- Language: <e.g., rust|typescript|python|csharp>
+- Current structure:
+```text
+path/to/domain/
+  <module-or-file>
+```
+- Target structure:
+```text
+path/to/domain/
+  <module-or-file>
+```
+- Naming map: None | <old name -> new name> plus one-line rationale
+
+Example:
+```text
+src/config/
+  mod.rs
+  models/
+    binding_profile.rs
+    config_binding.rs
+    device_mapping.rs
+```
+Naming map: `types` -> `config_binding` (explicit and easier to search).
+
 # Implementation Hints
 - [Patterns, library usage, existing code to reuse]
 - [Actionable guidance for planner/coder]
@@ -262,6 +290,17 @@ Before creating any prompt:
 - **Fix tasks**: confirm the bug is real
 - **Migration tasks**: compare current vs target; skip if compliant
 
+## Canonical Modularization Rules
+- Split catch-all files into focused modules/files with single responsibilities.
+- Keep top-level orchestration logic in the parent module/file entrypoint.
+- Place primarily data-holder models (with only trivial logic) in dedicated model files/folders where appropriate.
+- Keep enums/newtypes colocated with a parent type when they are only used by that parent.
+- Keep non-public helper types local; do not widen visibility solely to move code.
+- Apply these rules to new code and directly touched code.
+- Do not require refactoring pre-existing monolithic code unless the user asks.
+- Do not convert modular code into monolithic files unless the user asks.
+- If a monolith-to-modular (or modular-to-monolith) migration is requested, plan it as a dedicated objective/prompt before any other requested changes.
+
 ## Constraints
 - Be thorough; validate work is needed before creating prompts
 - Do not omit requirements; mark as OUT or POST_INIT when no work is needed
@@ -271,13 +310,18 @@ Before creating any prompt:
 - Every `IN` requirement must have exactly one owner prompt in the index
 - Do not duplicate requirement mappings in multiple index sections; keep mapping in `## Requirement Ownership`
 - Do not place unresolved blockers into generated prompts; resolve or surface in Phase 3
+- Apply the canonical modularization rules in this file
+- Always include `# Module Layout`; use `Target structure: No structural changes` and `Naming map: None` when unchanged
 
 ## Task Sizing Guidance
 - Default to the smallest useful unit; one primary objective per prompt
+- Keep extraction/migration/verification in one prompt when they serve a single objective
 - If a task spans subsystems or integrations, split into prompts ordered by dependency
+- Split prompts only when objectives are independently shippable/testable
 - Avoid cross-cutting refactors unless explicitly required by the user
-- Prefer prompts that touch few files; if likely to touch many, split
-- If work combines new types, integration changes, and tests, split
+- Prefer focused change sets, but allow touching multiple files when needed for coherent module boundaries
+- Use descriptive, domain-first names for modules/files/types/functions
+- If work combines unrelated objectives, split
 - When unsure, err on more prompts with smaller scopes
 - Aim for <=500 lines per prompt; split if likely to exceed
 

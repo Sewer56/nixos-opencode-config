@@ -44,6 +44,7 @@ think hard
 - Read each file listed in `# Required Reads` and ensure each entry includes a brief relevance note; add missing notes
 - Extract what to build; tests are always `basic`
 - Review `# Implementation Hints` for patterns and guidance
+- Read `# Module Layout` and align planned file/module structure and naming to it
 - Determine project type (library vs binary/service) and doc expectations
 - Identify libraries/frameworks needing lookup
 - Set repo_root as the closest ancestor of prompt_path containing `.git`; if none, use prompt_path parent
@@ -84,11 +85,29 @@ Plan fidelity:
 - If new types/errors are needed, include explicit implementation step(s) for their definitions before first use.
 - Do not create a separate `## Types` section.
 - New helpers/conversions must be fully defined with file/location; no placeholders in prose or code. Only allow "copy/adapt from X" for simple external snippets with a named source.
+- If the plan adds files or changes module layout, include a short target layout tree and explicit migration order in `## Implementation Steps`.
+  - Example (Rust):
+    ```text
+    src/config/
+      mod.rs
+      models/
+        binding_profile.rs
+        device_mapping.rs
+    ```
 - On revision, include a short checklist addressing reviewer concerns.
 
 6) Apply Discipline
 - Smallest viable change; reuse existing patterns
-- Inline tiny single-use helpers; avoid new files
+- Apply these modularization rules verbatim:
+  - Split catch-all files into focused modules/files with single responsibilities.
+  - Keep top-level orchestration logic in the parent module/file entrypoint.
+  - Place primarily data-holder models (with only trivial logic) in dedicated model files/folders where appropriate.
+  - Keep enums/newtypes colocated with a parent type when they are only used by that parent.
+  - Keep non-public helper types local; do not widen visibility solely to move code.
+- Apply these rules to new code and directly touched code.
+- Do not force broad structural refactors of pre-existing code unless required by the objective or explicitly requested.
+- Do not convert modular code into monolithic files unless explicitly requested.
+- Use descriptive, domain-first names for modules/files/types/functions; avoid vague buckets like `utils`, `helpers`, or `misc` unless already established.
 - Restrict visibility; avoid public unless required
 - Documentation required for public APIs unless project is a binary; required for non-obvious behavior. Keep minimal and colocated in snippets. Examples recommended, not required.
 - Style constraints:
