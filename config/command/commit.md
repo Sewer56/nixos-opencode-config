@@ -32,16 +32,34 @@ $ARGUMENTS
 - Commit when ready
 - Be concise but informative
 
-## Format:
+## Format (Keep a Changelog style):
 ```
-[Category]: Brief description of changes
+Changed/Added/Deprecated/Removed/Fixed/Security: <1 line change>
 
-More detailed explanation if needed.
+<Short description>
+
+Changes:
+- <Short bullet point>
+- <Short bullet point>
+
+Benefits:
+- <Short bullet point>
+- <Short bullet point>
 ```
 
-Examples:
-- `Added: User authentication system with JWT tokens`
-- `Fixed: Memory leak in image processing module`  
-- `Changed: Database schema to support new user roles`
+Example:
+```
+Changed: Refine commit template for changelog-style messages
+
+Use a structured body so commit history is easier to scan and understand.
+
+Changes:
+- Added explicit Changes and Benefits sections
+- Standardized allowed Keep a Changelog categories
+
+Benefits:
+- Makes commit intent clearer at a glance
+- Improves readability of project history
+```
 
 Follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) principles for clear, maintainable commit history.

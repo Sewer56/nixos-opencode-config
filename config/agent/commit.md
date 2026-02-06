@@ -53,10 +53,17 @@ Match the detected repository style:
 
 Format:
 ```
-[Category]: Brief description
+Changed/Added/Deprecated/Removed/Fixed/Security: <1 line change>
 
-- Detail 1
-- Detail 2
+<Short description>
+
+Changes:
+- <Short bullet point>
+- <Short bullet point>
+
+Benefits:
+- <Short bullet point>
+- <Short bullet point>
 ```
 
 **If another style detected** (e.g., conventional commits, simple messages):
