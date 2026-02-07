@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates PRD requirement coverage across prompt files (preflight)
-model: github-copilot/gpt-5.2-codex
+model: openai/gpt-5.3-codex
 reasoningEffort: high
 permission:
   read: allow

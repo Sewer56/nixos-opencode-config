@@ -1,7 +1,7 @@
 ---
 description: "Generate concise PR summary"
 agent: build
-model: github-copilot/gpt-5.2-codex
+model: openai/gpt-5.3-codex
 ---
 
 # Simple PR Summary

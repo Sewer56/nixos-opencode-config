@@ -1,7 +1,7 @@
 ---
 description: "Orchestrate a clarified plan"
 agent: build
-model: github-copilot/gpt-5.2-codex
+model: openai/gpt-5.3-codex
 ---
 
 # Orchestrate Plan
