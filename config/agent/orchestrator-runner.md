@@ -144,7 +144,7 @@ Record unmet requirements only when tied to specific IDs (from plan notes, coder
   - If GLM resolves GPT-5's concern, accept PASS
 - If revision needed:
   - Distill only in-scope BLOCKING issues and include BOTH reviewers' notes
-  - Re-invoke coder with feedback
+  - Re-invoke `@orchestrator-coder` with feedback
   - Re-run gate
 - If still not passing after 10 iterations, record unmet requirements (when applicable) and proceed to commit
 - Max 10 iterations total
