@@ -95,7 +95,8 @@ Record unmet requirements only when tied to specific IDs (from plan notes, coder
    - If disagreement remains but no BLOCKING issues remain, proceed with notes
 5. If revision needed:
    - Distill unresolved BLOCKING issues into structured `revision_notes` (required)
-   - Include issue IDs, severity, confidence, fix_specificity, source, evidence, and requested fix
+   - For each issue include: `id`, `severity`, `confidence`, `fix_specificity`, `source`, `evidence`, `requested_fix`, `acceptance_criteria`
+   - `acceptance_criteria` must be a short, testable closure condition for that issue
    - Include `advisory_items` in `revision_notes` only when a planner rerun is already required by BLOCKING issues
    - Include `settled_facts` so resolved facts are not re-litigated
    - Re-run planner with `revision_notes: <structured_feedback>`

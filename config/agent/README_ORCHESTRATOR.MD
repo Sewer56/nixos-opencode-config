@@ -111,6 +111,14 @@ PROMPT-NN-*-PLAN.md      PROMPT-NN-*-CODER-NOTES.md
   - What it improves:
     - Reviewers don't have to as-heavily think about already addressed issues, only validate.
     - Lowers contradictions when using multiple reviewers; they will treat it as a result of earlier review.
+- `## Requirement Trace Matrix`: maps each requirement to implementation refs, test refs, and acceptance criteria.
+  - What it improves:
+    - Catches missing/partial requirement coverage earlier.
+    - Gives reviewers a quick proof map instead of scanning the whole plan.
+- `## Revision Impact Table` (revisions): maps changed hunks/steps to affected requirements and tests.
+  - What it improves:
+    - Makes re-review focus on the real delta.
+    - Reduces accidental regressions and re-litigation of unchanged sections.
 
 ### `PROMPT-*-CODER-NOTES.md`
 - For passing information from Coder to Quality Gate. Not everything the quality gate returns can always be fixed.

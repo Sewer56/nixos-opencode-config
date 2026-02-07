@@ -46,8 +46,12 @@ think hard
 ## 3) Review Against Requirements and Shared Rules
 - Verify every requirement/success criterion has concrete implementation and tests.
 - Verify the plan follows `PLANNING_RULES_PATH`.
+- Require `## Requirement Trace Matrix`.
+- If the plan is a revision, require `## Revision Impact Table`.
 - Categorize issues under code style, semantics, or test plan.
 - For each issue include severity, `confidence`, `fix_specificity`, evidence, and fix explanation.
+- For BLOCKING issues, include `Requirement Impact`, `Evidence`, `Failing Scenario`, and `Acceptance Criteria`.
+- If reopening a previously `RESOLVED` issue ID, include `New Evidence`.
 - If `fix_specificity=CONCRETE`, include a minimal replacement snippet.
 
 ## 4) Decide Status
@@ -73,8 +77,12 @@ think hard
 Summary: <1-line summary>
 confidence: [HIGH|MEDIUM|LOW]
 fix_specificity: [CONCRETE|PARTIAL|UNCLEAR]
+Requirement Impact: <REQ-### or success criterion>
 Problem: <full details>
 Evidence: <file:line or exact section>
+Failing Scenario: <minimal failing case>
+Acceptance Criteria: <short, testable closure condition>
+New Evidence: <required when reopening RESOLVED issue; else N/A>
 Fix Explanation: <short explanation>
 Fix Code (when `fix_specificity=CONCRETE`):
 ```<language>
@@ -86,8 +94,12 @@ Fix Code (when `fix_specificity=CONCRETE`):
 Summary: <1-line summary>
 confidence: [HIGH|MEDIUM|LOW]
 fix_specificity: [CONCRETE|PARTIAL|UNCLEAR]
+Requirement Impact: <REQ-### or success criterion>
 Problem: <full details>
 Evidence: <file:line or exact section>
+Failing Scenario: <minimal failing case>
+Acceptance Criteria: <short, testable closure condition>
+New Evidence: <required when reopening RESOLVED issue; else N/A>
 Impact: <what could go wrong>
 Fix Explanation: <short explanation>
 Fix Code (when `fix_specificity=CONCRETE`):
@@ -100,8 +112,12 @@ Fix Code (when `fix_specificity=CONCRETE`):
 Summary: <1-line summary>
 confidence: [HIGH|MEDIUM|LOW]
 fix_specificity: [CONCRETE|PARTIAL|UNCLEAR]
+Requirement Impact: <REQ-### or success criterion>
 Problem: <full details>
 Evidence: <file:line or exact section>
+Failing Scenario: <minimal failing case>
+Acceptance Criteria: <short, testable closure condition>
+New Evidence: <required when reopening RESOLVED issue; else N/A>
 Fix Explanation: <short explanation>
 Fix Code (when `fix_specificity=CONCRETE`):
 ```<language>

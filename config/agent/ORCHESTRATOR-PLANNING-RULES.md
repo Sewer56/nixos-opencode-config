@@ -7,6 +7,7 @@ Use these rules for both planning and plan review.
 - No undefined helpers/types/symbols in snippets.
 - Map each requirement to implementation step(s).
 - Map each requirement to test assertion(s).
+- Include `## Requirement Trace Matrix` with requirement, implementation step ref(s), test step ref(s), and acceptance criteria.
 - Keep `## External Symbols` current.
 - Include required `use` lines in each file snippet.
 - Define new types/errors before first use.
@@ -17,8 +18,9 @@ Use these rules for both planning and plan review.
 
 ## Revision Quality
 - Preserve issue IDs across revisions when root cause is unchanged.
-- Include acceptance criteria for each open issue ID.
+- Include `acceptance_criteria` for each open issue ID (short, testable closure condition).
 - Point to changed implementation/test sections that close each issue.
+- Include `## Revision Impact Table` on revisions (changed hunk/step -> affected requirement(s) -> affected test(s)).
 - Do not reopen resolved issues without new evidence.
 
 ## Design Discipline

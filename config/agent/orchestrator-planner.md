@@ -25,7 +25,7 @@ think hard
 # Inputs
 - `prompt_path`: absolute path to PROMPT-NN-*.md file
 - `revision_notes` (optional): feedback from plan review or coder escalation
-- Expect structured entries when available: issue ID, severity, confidence, fix_specificity, source, evidence, requested fix
+- Expect structured entries when available: issue ID, severity, confidence, fix_specificity, source, evidence, requested fix, `acceptance_criteria`
 - `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/ORCHESTRATOR-PLANNING-RULES.md`
 
 # Process
@@ -36,6 +36,7 @@ think hard
 - Successive call: `revision_notes` → revise the existing plan.
 - If `revision_notes` are provided but the plan is missing, create a new plan and note the missing context in `## Plan Notes`.
 - On revision, preserve prior issue IDs and statuses in `## Review Ledger (Revision)`.
+- On revision, treat each issue's `acceptance_criteria` as the closure target; only mark `RESOLVED` when plan changes satisfy it.
 - Do not reopen resolved items unless `revision_notes` include new evidence.
 - Ensure `plan_path` contains a complete plan (create or revise) and return only `plan_path`.
 
@@ -83,6 +84,8 @@ Build these sections:
   - Include required docs with params/returns.
   - Examples recommended.
 - **Test Steps**: include when `# Tests` is "basic"
+- **Requirement Trace Matrix**: map each requirement to implementation step refs, test step refs, and acceptance criteria.
+- **Revision Impact Table** (on revisions): map each changed hunk/step to affected requirement(s) and affected test(s).
 
 6) Write Plan File
 Create or update `<prompt_filename>-PLAN.md` (may already exist).
@@ -101,6 +104,8 @@ Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 
 8) Self-Review Before Output
 - Review the final plan using `PLANNING_RULES_PATH` (already loaded).
+- Ensure `## Requirement Trace Matrix` is complete.
+- On revision, ensure `## Revision Impact Table` is present and complete.
 - If any rule is violated, update the plan file before returning `plan_path`.
 
 Do NOT modify the original prompt file except to update its `# Findings` and `# Required Reads` sections.
@@ -137,9 +142,23 @@ Write this to `<prompt_filename>-PLAN.md`:
 
 ## Review Ledger (Revision)
 
-| ID     | Severity | Source | Status   | Summary        | Evidence  |
-| ------ | -------- | ------ | -------- | -------------- | --------- |
-| PR-001 | HIGH     | GPT-5  | RESOLVED | <what changed> | file:line |
+| ID     | Severity | Source | Status   | Summary        | Acceptance Criteria | Evidence  |
+| ------ | -------- | ------ | -------- | -------------- | ------------------- | --------- |
+| PR-001 | HIGH     | GPT-5  | RESOLVED | <what changed> | <closure condition> | file:line |
+
+## Requirement Trace Matrix
+
+| Requirement | Impl Ref(s) | Test Ref(s) | Acceptance Criteria |
+| ----------- | ----------- | ----------- | ------------------- |
+| REQ-001     | `<impl-ref>` | `<test-ref>` | <what must be true> |
+
+## Revision Impact Table
+
+Include this section for revisions.
+
+| Changed Hunk/Step | Affected Requirement(s) | Affected Test(s) |
+| ----------------- | ----------------------- | ---------------- |
+| <file/section>    | REQ-###                 | <test ref(s)>    |
 
 ## External Symbols
 
