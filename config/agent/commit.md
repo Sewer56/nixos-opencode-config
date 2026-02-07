@@ -40,6 +40,13 @@ You will receive context and requirements from the orchestrator, including:
 - Only commit actual implementation changes
 - Use `git add` selectively to exclude reports
 
+## Submodule Handling
+
+If changes are in a submodule directory:
+1. `cd <submodule-path>` and check `git status`
+2. Commit and push changes in submodule first
+3. Return to main repo, stage submodule pointer update
+
 4) Create Commits
 
 **CRITICAL: Use heredoc for multiline commit messages to avoid quoting issues:**

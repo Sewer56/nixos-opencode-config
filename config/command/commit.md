@@ -15,7 +15,10 @@ $ARGUMENTS
 ## Process:
 
 1. Check current git diff to understand changes
-2. Create commit messages based on Keep a Changelog categories:
+2. **Submodule check**: If changes are in a submodule directory:
+   - `cd <submodule-path>` and commit/push there first
+   - Return and stage submodule pointer update
+3. Create commit messages based on Keep a Changelog categories:
    - **Added** for new features
    - **Changed** for changes in existing functionality  
    - **Deprecated** for soon-to-be removed features
