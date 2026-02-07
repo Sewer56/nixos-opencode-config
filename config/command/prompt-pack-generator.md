@@ -95,8 +95,8 @@ Create in current working directory:
 - Every prompt `# Requirements` entry must include a requirement ID (e.g., `REQ-012: ...`)
 - Add `# Settled Facts` with validated facts and source pointers (`FACT-###`)
 - Add `# Verification Scope` to define in-scope checks and known unrelated pre-existing failures
-- Always include `# Module Layout` with language, current structure, target structure, and naming map
-  - If unchanged, set `Target structure: No structural changes` and `Naming map: None`
+- Always include `# Module Layout` with language, current/target structure, and naming map
+  - If unchanged, set `Target structure: unchanged` and omit the code block
 
 ### Phase 6: Clarification Loop (non-blocking refinements)
 For each prompt file, scan for ambiguity using reduced taxonomy:
@@ -219,14 +219,10 @@ A: <answer>
 path/to/domain/
   <module-or-file>
 ```
-- Target structure:
-```text
-path/to/domain/
-  <module-or-file>
-```
+- Target structure: unchanged | <describe changes>
 - Naming map: None | <old name -> new name> plus one-line rationale
 
-Example:
+Example (with changes):
 ```text
 src/config/
   mod.rs
@@ -314,7 +310,7 @@ Before creating any prompt:
 - Do not duplicate requirement mappings in multiple index sections; keep mapping in `## Requirement Ownership`
 - Do not place unresolved blockers into generated prompts; resolve or surface in Phase 3
 - Apply the canonical modularization rules in this file
-- Always include `# Module Layout`; use `Target structure: No structural changes` and `Naming map: None` when unchanged
+- Always include `# Module Layout`; use `Target structure: unchanged` when there are no structural changes
 
 ## Task Sizing Guidance
 - Default to the smallest useful unit; one primary objective per prompt
