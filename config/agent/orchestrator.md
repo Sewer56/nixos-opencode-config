@@ -125,7 +125,7 @@ For each prompt in the listed order:
 7. Run CodeRabbit review for this prompt (see Phase 2) unless status is FAIL.
 
 ## Phase 2: CodeRabbit Review (after each prompt)
-After each prompt with status SUCCESS or INCOMPLETE, spawn `@orchestrator-coderabbit`.
+After each prompt with status SUCCESS or INCOMPLETE, spawn `@coderabbit`.
 - Input: always pass `base_branch` from Phase 0
 - If CodeRabbit status is PASS: continue
 - If CodeRabbit status is FAIL due to rate limit (detect: "rate limit", "429", "too many requests"):

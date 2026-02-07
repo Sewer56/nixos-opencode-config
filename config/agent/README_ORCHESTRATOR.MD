@@ -85,7 +85,7 @@ PROMPT-NN-*-PLAN.md      PROMPT-NN-*-CODER-NOTES.md
 - **Planner**: `orchestrator-planner` produces the actionable plan and updates prompt findings/required reads when needed.
 - **Coder**: `orchestrator-coder` implements changes, runs verification, and records coder notes.
 - **Reviewers**: plan reviewers (`orchestrator-plan-reviewer-*`) and quality gates (`orchestrator-quality-gate-*`) provide dual-model approval.
-- **Validation and Tools**: requirements preflight/final (`orchestrator-requirements-*`), CodeRabbit (`orchestrator-coderabbit`), and commits (`commit`).
+- **Validation and Tools**: requirements preflight/final (`orchestrator-requirements-*`), CodeRabbit (`coderabbit`), and commits (`commit`).
 
 ## Why Generated Artifact Sections Exist
 

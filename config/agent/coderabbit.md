@@ -1,6 +1,5 @@
 ---
 mode: subagent
-hidden: true
 description: Runs CodeRabbit CLI review and fixes findings
 model: synthetic/hf:moonshotai/Kimi-K2.5
 permission:
