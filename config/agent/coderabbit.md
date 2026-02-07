@@ -122,4 +122,5 @@ Details: <commit report summary or amending note>
 # Constraints
 - Apply every finding, including nitpicks
 - Re-run CodeRabbit once after fixes unless wait time exceeds 30 minutes
+- Do not call `coderabbit` a second time to check exit code, rely on output parsing.
 - Keep output concise and focused
