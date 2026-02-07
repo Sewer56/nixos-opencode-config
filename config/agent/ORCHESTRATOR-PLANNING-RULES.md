@@ -33,6 +33,7 @@ Use these rules for both planning and plan review.
 - Keep conversions with related type definitions.
 - Co-locate tests with the module they validate.
 - Keep visibility minimal.
+- Within files, order declarations from most public to most private.
 - Avoid broad refactors unless required or requested.
 - Avoid dead code, debug/dev-only logging, and unnecessary abstractions.
 
