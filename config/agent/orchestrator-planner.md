@@ -26,7 +26,7 @@ think hard
 - `prompt_path`: absolute path to PROMPT-NN-*.md file
 - `revision_notes` (optional): feedback from plan review or coder escalation
 - Expect structured entries when available: issue ID, severity, confidence, fix_specificity, source, evidence, requested fix, `acceptance_criteria`
-- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/ORCHESTRATOR-PLANNING-RULES.md`
+- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
 
 # Process
 

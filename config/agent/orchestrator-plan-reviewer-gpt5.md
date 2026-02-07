@@ -20,7 +20,7 @@ think hard
 # Inputs
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner
-- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/ORCHESTRATOR-PLANNING-RULES.md`
+- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
 - `review_context` (optional):
   - Open issue ledger from prior review rounds
   - Settled facts validated by findings/repo evidence
