@@ -23,7 +23,7 @@ think
 
 # Inputs
 - `prompt_path`: requirements and objectives
-- `plan_path`: implementation plan from planner (contains `## Types` and `## Implementation Steps`)
+- `plan_path`: implementation plan from planner (contains `## Implementation Steps` and `## Test Steps`)
 - Orchestrator context: task intent and notes from prior phases
 
 # Derived Paths
@@ -33,7 +33,7 @@ think
 
 1) Read requirements and plan
 - Read `prompt_path` for mission, requirements, constraints
-- Read `plan_path` for complete plan with `## Types` and `## Implementation Steps`
+- Read `plan_path` for complete plan with `## Implementation Steps`
 - Follow `## Implementation Steps` exactly; they contain concrete code blocks to implement
 - You may add or improve documentation beyond the plan when helpful (include parameters and return values for functions; examples are recommended, not required); note it in `## Coder Notes`
 - Tests are always `basic`

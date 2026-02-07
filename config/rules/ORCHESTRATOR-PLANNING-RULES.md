@@ -9,11 +9,10 @@ Use these rules for both planning and plan review.
 - Map each requirement to test assertion(s).
 - Include `## Requirement Trace Matrix` with requirement, implementation step ref(s), test step ref(s), and acceptance criteria.
 - Keep `## External Symbols` current.
-- Include required `use` lines in each file snippet.
-- Define new types/errors before first use.
-- Do not create a separate `## Types` section.
-- In `## Implementation Steps`, use `diff` blocks for simple edits.
-- Use full snippets for new types/APIs or complex behavior.
+- In `## Implementation Steps`, each step includes `Action`, `Anchor`, `Lines` (approx), and `Order` (if needed).
+- Insertions use normal code blocks with `Insert at: <anchor> (~start-end)`.
+- Edits/removals use `diff` blocks; deletions include `Remove lines: ~start-end`.
+- Import changes use a dedicated import `diff` block.
 - If layout changes, include target tree and migration order.
 
 ## Revision Quality

@@ -78,11 +78,7 @@ think hard
 5) Draft Complete Plan
 Build these sections:
 - **External Symbols**: map files to required `use` statements and referenced types/classes for implementation
-- **Implementation Steps**: ordered by file.
-  - Add dedicated steps for new type/error definitions before the steps that consume them.
-  - Include required `use` lines.
-  - Include required docs with params/returns.
-  - Examples recommended.
+- **Implementation Steps**: ordered by file and compliant with `PLANNING_RULES_PATH`
 - **Test Steps**: include when `# Tests` is "basic"
 - **Requirement Trace Matrix**: map each requirement to implementation step refs, test step refs, and acceptance criteria.
 - **Revision Impact Table** (on revisions): map each changed hunk/step to affected requirement(s) and affected test(s).
@@ -174,52 +170,30 @@ Map files to required `use` statements and referenced symbols so later iteration
 
 ## Implementation Steps
 
-Include required `use` lines in each file's snippet. When introducing new types/errors, add dedicated implementation steps for those definitions before consumer steps. Include required docs with params/returns; examples recommended.
-
-### src/models/user.rs
-
-Define foundational types used by service/repository steps:
-
-```rust
-use uuid::Uuid;
-
-/// <documentation here>
-pub struct User {
-    pub id: Uuid,
-    pub email: String,
-}
-
-/// <documentation here>
-pub struct CreateUserInput {
-    pub email: String,
-}
-```
+Follow `PLANNING_RULES_PATH`.
 
 ### src/services/user.rs
 
-Define service error type and add UserService impl:
+Action: INSERT
+Anchor: `impl UserService`
+Lines: ~18-70
+Insert at: before `impl UserService` (~24-28)
+
+Import diff:
+
+```diff
+@@ use section
++use crate::models::{CreateUserInput, User};
++use crate::repository::user::UserRepository;
++use uuid::Uuid;
+```
 
 ```rust
-use crate::models::{CreateUserInput, User};
-use crate::repository::user::UserRepository;
-use std::sync::Arc;
-use uuid::Uuid;
-
 pub enum UserError {
     DuplicateEmail(String),
 }
 
 impl UserService {
-    pub fn new(repo: Arc<dyn UserRepository>) -> Self {
-        Self { repo }
-    }
-
-    /// Creates a new user.
-    ///
-    /// Parameters:
-    /// - `input`: user creation payload
-    ///
-    /// Returns: created `User` on success or `UserError` on failure.
     pub async fn create_user(&self, input: CreateUserInput) -> Result<User, UserError> {
         if self.repo.find_by_email(&input.email).await?.is_some() {
             return Err(UserError::DuplicateEmail(input.email));
@@ -233,16 +207,24 @@ impl UserService {
 
 ### src/repository/user.rs
 
-Add find_by_email to UserRepository trait and impl:
+Action: REPLACE
+Anchor: `UserRepository` trait + impl block
+Lines: ~10-60
+Order: after `src/services/user.rs` type/import additions
+
+Import diff (if needed):
+
+```diff
+@@ use section
++use crate::db::DbError;
++use crate::models::User;
+```
 
 ```rust
-use crate::db::DbError;
-use crate::models::User;
-
-// In trait:
+// in trait
 async fn find_by_email(&self, email: &str) -> Result<Option<User>, DbError>;
 
-// In impl:
+// in impl
 async fn find_by_email(&self, email: &str) -> Result<Option<User>, DbError> {
     sqlx::query_as!(User, "SELECT * FROM users WHERE email = $1", email)
         .fetch_optional(&self.pool)
@@ -251,21 +233,25 @@ async fn find_by_email(&self, email: &str) -> Result<Option<User>, DbError> {
 }
 ```
 
-### src/services/user.rs (small edit example)
+### src/services/user.rs
 
-For simple edits, `## Implementation Steps` may use a `diff` block instead of a full snippet:
+Action: DELETE
+Anchor: `legacy_normalize_email`
+Lines: ~120-140
+Remove lines: ~128-136
+
+Import diff:
 
 ```diff
-@@ create_user
--if self.repo.find_by_email(&input.email).await?.is_some() {
--    return Err(UserError::DuplicateEmail(input.email));
+@@ use section
+-use crate::legacy::EmailNormalizer;
+```
+
+```diff
+@@
+-fn legacy_normalize_email(email: &str) -> String {
+-    email.trim().to_lowercase()
 -}
--let user = User { id: Uuid::new_v4(), email: input.email };
-+let email = input.email.trim().to_lowercase();
-+if self.repo.find_by_email(&email).await?.is_some() {
-+    return Err(UserError::DuplicateEmail(email));
-+}
-+let user = User { id: Uuid::new_v4(), email };
 ```
 
 ## Test Steps
