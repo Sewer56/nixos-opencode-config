@@ -23,6 +23,26 @@ $ARGUMENTS
    - **Fixed** for any bug fixes
    - **Security** for vulnerability fixes
 
+## Commit Execution
+
+**CRITICAL: Use heredoc for multiline commit messages to avoid quoting issues:**
+
+```bash
+git commit -F - <<'EOF'
+Changed: Brief summary of the change
+
+Description of what changed and why.
+
+Changes:
+- Specific change one
+- Specific change two
+
+Benefits:
+- Benefit one
+- Benefit two
+EOF
+```
+
 ## Guidelines:
 
 - Changelogs are for humans, not machines.

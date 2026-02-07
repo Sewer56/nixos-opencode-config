@@ -41,6 +41,25 @@ You will receive context and requirements from the orchestrator, including:
 - Use `git add` selectively to exclude reports
 
 4) Create Commits
+
+**CRITICAL: Use heredoc for multiline commit messages to avoid quoting issues:**
+
+```bash
+git commit -F - <<'EOF'
+Changed: Brief summary of the change
+
+Description of what changed and why.
+
+Changes:
+- Specific change one
+- Specific change two
+
+Benefits:
+- Benefit one
+- Benefit two
+EOF
+```
+
 Match the detected repository style:
 
 **If Keep a Changelog style detected**, use these categories:
