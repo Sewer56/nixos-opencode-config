@@ -26,6 +26,7 @@ think hard
 - `prompt_path`: absolute path to PROMPT-NN-*.md file
 - `revision_notes` (optional): feedback from plan review or coder escalation
 - Expect structured entries when available: issue ID, severity, confidence, fix_specificity, source, evidence, requested fix
+- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/ORCHESTRATOR-PLANNING-RULES.md`
 
 # Process
 
@@ -37,6 +38,10 @@ think hard
 - On revision, preserve prior issue IDs and statuses in `## Review Ledger (Revision)`.
 - Do not reopen resolved items unless `revision_notes` include new evidence.
 - Ensure `plan_path` contains a complete plan (create or revise) and return only `plan_path`.
+
+1b) Load Shared Rules
+- Read `PLANNING_RULES_PATH` once.
+- Follow those rules while drafting and revising the plan.
 
 2) Read and Scope
 - Read prompt_path (mission, objective, requirements, constraints, tests, clarifications, implementation hints)
@@ -79,52 +84,12 @@ Build these sections:
   - Examples recommended.
 - **Test Steps**: include when `# Tests` is "basic"
 
-Plan fidelity:
-- Each file snippet must include required `use` statements.
-- Keep `## External Symbols` current so reviewers/coder can find reused files/classes without re-searching each iteration.
-- If new types/errors are needed, include explicit implementation step(s) for their definitions before first use.
-- Do not create a separate `## Types` section.
-- New helpers/conversions must be fully defined with file/location; no placeholders in prose or code. Only allow "copy/adapt from X" for simple external snippets with a named source.
-- If the plan adds files or changes module layout, include a short target layout tree and explicit migration order in `## Implementation Steps`.
-  - Example (Rust):
-    ```text
-    src/config/
-      mod.rs
-      models/
-        binding_profile.rs
-        device_mapping.rs
-    ```
-- On revision, include a short checklist addressing reviewer concerns.
-
-6) Apply Discipline
-- Smallest viable change; reuse existing patterns
-- Apply these modularization rules verbatim:
-  - Split catch-all files into focused modules/files with single responsibilities.
-  - Keep top-level orchestration logic in the parent module/file entrypoint.
-  - Place primarily data-holder models (with only trivial logic) in dedicated model files/folders by default.
-  - Keep enums/newtypes colocated with a parent type when they are only used by that parent.
-  - Keep non-public helper types local; do not widen visibility solely to move code.
-  - Keep conversion impls/functions (`From`/`TryFrom`/mappers) with related type definitions; avoid global `conversions` buckets.
-  - Co-locate tests with the module they validate; avoid central `tests.rs` files for unrelated modules.
-  - Keep `models/mod.rs` for module wiring/re-exports; avoid accumulating concrete model definitions there.
-- Apply these rules to new code and directly touched code.
-- Do not force broad structural refactors of pre-existing code unless required by the objective or explicitly requested.
-- Do not convert modular code into monolithic files unless explicitly requested.
-- Use descriptive, domain-first names for modules/files/types/functions; avoid vague buckets like `utils`, `helpers`, or `misc` unless already established.
-- Restrict visibility; avoid public unless required
-- Documentation required for public APIs unless project is a binary; required for non-obvious behavior. Keep minimal and colocated in snippets. Examples recommended, not required.
-- Style constraints:
-  - Avoid dead code or unused functions
-  - Avoid public visibility when private/protected suffices
-  - Avoid debug/logging code intended only for development
-  - Avoid unnecessary abstractions (interfaces with only 1 implementation)
-
-7) Write Plan File
+6) Write Plan File
 Create or update `<prompt_filename>-PLAN.md` (may already exist).
 Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 - If revising, place `## Reviewer Concerns (Revision)` at the top of the plan (immediately after `# Plan`)
 
-8) Findings and Plan Notes
+7) Findings and Plan Notes
 - Create or update `## Plan Notes` with key assumptions, risks, open questions, and review focus areas
 - Maintain `### Settled Facts` in `## Plan Notes` for facts validated by findings/repo evidence (with source references)
 - On revision, update `## Review Ledger (Revision)` with statuses:
@@ -133,6 +98,10 @@ Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
   - `DEFERRED`: non-blocking note intentionally postponed
 - If findings were created, ensure the prompt's `# Findings` section includes each file path with a short relevance note
 - If the prompt lacks a `# Findings` section, add one and list findings as they are created
+
+8) Self-Review Before Output
+- Review the final plan using `PLANNING_RULES_PATH` (already loaded).
+- If any rule is violated, update the plan file before returning `plan_path`.
 
 Do NOT modify the original prompt file except to update its `# Findings` and `# Required Reads` sections.
 
@@ -261,6 +230,23 @@ async fn find_by_email(&self, email: &str) -> Result<Option<User>, DbError> {
         .await
         .map_err(DbError::from)
 }
+```
+
+### src/services/user.rs (small edit example)
+
+For simple edits, `## Implementation Steps` may use a `diff` block instead of a full snippet:
+
+```diff
+@@ create_user
+-if self.repo.find_by_email(&input.email).await?.is_some() {
+-    return Err(UserError::DuplicateEmail(input.email));
+-}
+-let user = User { id: Uuid::new_v4(), email: input.email };
++let email = input.email.trim().to_lowercase();
++if self.repo.find_by_email(&email).await?.is_some() {
++    return Err(UserError::DuplicateEmail(email));
++}
++let user = User { id: Uuid::new_v4(), email };
 ```
 
 ## Test Steps
