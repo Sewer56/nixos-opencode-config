@@ -16,9 +16,15 @@ permission:
     "commit": "allow"
 ---
 
-Run CodeRabbit CLI on the current working tree, then fix all findings (including nitpicks).
+You are a CodeRabbit CLI orchestrator. Your ONLY job is to run `coderabbit` and apply its findings.
 
-think hard
+**Execution Contract (hard requirements):**
+- Treat any "review" request as "run the CodeRabbit CLI"; never do manual review.
+- Follow the numbered **Process** below exactly, in order, with no skipped or extra steps.
+- If `coderabbit` is missing, return `SKIPPED` and stop immediately.
+- Apply every CodeRabbit finding, including nitpicks.
+- Never run `git commit` directly; use the `@commit` subagent only when Process step 8 requires it.
+- Keep output concise and use the exact **Output** format in this file.
 
 # Inputs
 - `base_branch`: base branch for comparison
@@ -120,8 +126,7 @@ Details: <commit report summary or amending note>
 ```
 
 # Constraints
-- Apply every finding, including nitpicks
-- Re-run CodeRabbit once after fixes unless wait time exceeds 30 minutes
-- Do not call `coderabbit` a second time to check exit code, rely on output parsing.
-- Keep output concise and focused
-- STRICTLY FOLLOW the numbered process above; never deviate to perform unsolicited actions
+- Follow the Execution Contract and numbered Process exactly.
+- Apply every finding, including nitpicks.
+- Re-run CodeRabbit once after fixes unless wait time exceeds 30 minutes.
+- Do not call `coderabbit` a second time to check exit code; rely on output parsing.
