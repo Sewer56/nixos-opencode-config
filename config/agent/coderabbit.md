@@ -24,17 +24,17 @@ think hard
 - `base_branch`: base branch for comparison
 
 # Process
-1) Check CLI availability
+1. Check CLI availability
 - If `coderabbit` is not available in PATH, return SKIPPED
 
-2) Validate base branch
+2. Validate base branch
 - If `base_branch` is empty or missing, return FAIL
 
-3) Determine review type
+3. Determine review type
 - If working tree is clean, use `--type committed`
 - If there are uncommitted changes, use `--type uncommitted`
 
-4) Run review with rate-limit handling
+4. Run review with rate-limit handling
 - Base command: `coderabbit --plain --type <committed|uncommitted> --base <base_branch>`
 - Capture exit code and output
 - Exit codes are not documented; treat non-zero as FAIL unless rate limit is detected
@@ -44,11 +44,11 @@ think hard
   - Retry up to 3 total attempts
   - If still rate limited after retries, return FAIL with note
 
-5) If review PASS
+5. If review PASS
 - If the output ends after "Review completed" (no further output), treat as PASS
 - Report PASS with no changes
 
-6) If review FAIL
+6. If review FAIL
 - Parse findings and identify every required change (include nitpicks)
 - Apply fixes directly to codebase
    - Prefer smallest viable diff
@@ -62,7 +62,7 @@ think hard
    - If any check fails, fix and re-run until clean
 - If all findings are applied and verification passes, proceed to step 7
 
-7) Re-run CodeRabbit after fixes
+7. Re-run CodeRabbit after fixes
 - Re-run the CodeRabbit command from step 4
 - If rate limit detected with wait time:
   - If wait time > 1800s (30 minutes), skip re-review and proceed to commit (will amend after step 8)
@@ -71,7 +71,7 @@ think hard
   - If findings remain: continue applying fixes (loop back to step 6)
   - If no findings: report Status: PASS
 
-8) Commit fixes (mandatory when changes exist)
+8. Commit fixes (mandatory when changes exist)
 - Determine whether changes exist with `git status --porcelain`
 - If any non-PROMPT files changed and verification passed, you MUST spawn the `@commit` subagent (task)
 - Do NOT run `git commit` directly
@@ -80,7 +80,7 @@ think hard
   - A short bullet summary of CodeRabbit fixes (note any further changes)
 - Only skip when the working tree is clean
 
-9) Summarize
+9. Summarize
 - Provide a short summary of findings and fixes
 - Include whether changes were made, whether re-review was skipped, and list modified files
 - Do not dump full output; include only key lines or counts
@@ -124,3 +124,4 @@ Details: <commit report summary or amending note>
 - Re-run CodeRabbit once after fixes unless wait time exceeds 30 minutes
 - Do not call `coderabbit` a second time to check exit code, rely on output parsing.
 - Keep output concise and focused
+- STRICTLY FOLLOW the numbered process above; never deviate to perform unsolicited actions
