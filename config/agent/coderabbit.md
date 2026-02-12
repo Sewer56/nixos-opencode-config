@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Runs CodeRabbit CLI review and fixes findings
-model: synthetic/hf:moonshotai/Kimi-K2.5
+model: synthetic/hf:nvidia/Kimi-K2.5-NVFP4
 permission:
   bash: allow
   read: allow

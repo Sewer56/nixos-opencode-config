@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Use this for third-party library research and repository documentation analysis.
-model: synthetic/hf:moonshotai/Kimi-K2.5
+model: synthetic/hf:nvidia/Kimi-K2.5-NVFP4
 permission:
   github_*: allow
   context7_*: allow

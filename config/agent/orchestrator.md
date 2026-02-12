@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Schedules per-prompt orchestration via subagents
-model: synthetic/hf:moonshotai/Kimi-K2.5
+model: synthetic/hf:nvidia/Kimi-K2.5-NVFP4
 permission:
   bash: allow
   edit: allow

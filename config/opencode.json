@@ -45,7 +45,7 @@ echo "Plugin update script finished successfully.")
       }
     },
     "general": {
-      "model": "synthetic/hf:moonshotai/Kimi-K2.5",
+      "model": "synthetic/hf:nvidia/Kimi-K2.5-NVFP4",
       "permission": {
         "task": {
           "orchestrator-*": "deny",
@@ -80,6 +80,15 @@ echo "Plugin update script finished successfully.")
       "type": "remote",
       "url": "https://mcp.deepwiki.com/sse",
       "enabled": true
+    }
+  },
+  "provider": {
+    "synthetic": {
+      "models": {
+        "hf:nvidia/Kimi-K2.5-NVFP4": {
+          "id": "hf:nvidia/Kimi-K2.5-NVFP4"
+        }
+      }
     }
   },
   // Disable paste summary. Paste whole thing.

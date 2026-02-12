@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Unified objective validation and code review with verification checks (GLM reviewer)
-model: synthetic/hf:moonshotai/Kimi-K2.5
+model: synthetic/hf:nvidia/Kimi-K2.5-NVFP4
 permission:
   bash: allow
   read: allow

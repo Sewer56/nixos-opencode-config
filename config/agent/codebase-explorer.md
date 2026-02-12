@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Explores codebase structure, patterns, and implementation details.
-model: synthetic/hf:moonshotai/Kimi-K2.5
+model: synthetic/hf:nvidia/Kimi-K2.5-NVFP4
 permission:
   read: allow
   grep: allow

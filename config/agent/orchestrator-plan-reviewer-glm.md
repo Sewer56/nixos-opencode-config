@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews implementation plans before coding begins (GLM reviewer)
-model: synthetic/hf:moonshotai/Kimi-K2.5
+model: synthetic/hf:nvidia/Kimi-K2.5-NVFP4
 permission:
   read: allow
   grep: allow
