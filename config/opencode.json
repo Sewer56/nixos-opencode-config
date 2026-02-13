@@ -20,9 +20,13 @@ echo "Plugin update script finished successfully.")
     "bash": {
       "*": "allow"
     },
+    "task": {
+      "discord-messages": "deny"
+    },
     "webfetch": "allow",
     "doom_loop": "deny",
     "github_*": "deny",
+    "discord_*": "deny",
     "context7_*": "deny",
     "deepwiki_*": "deny",
     "external_directory": "allow"
@@ -79,6 +83,15 @@ echo "Plugin update script finished successfully.")
     "deepwiki": {
       "type": "remote",
       "url": "https://mcp.deepwiki.com/sse",
+      "enabled": true
+    },
+    "discord": {
+      "type": "local",
+      "command": [
+        "bash",
+        "-c",
+        "if [ ! -f \"$HOME/.secrets/discord-token\" ]; then echo \"Error: Discord token secret file not found\" >&2; exit 1; fi; export DISCORD_TOKEN=\"$(cat \"$HOME/.secrets/discord-token\")\"; exec docker run -i --rm -e DISCORD_TOKEN barryy625/mcp-discord:latest"
+      ],
       "enabled": true
     }
   },
