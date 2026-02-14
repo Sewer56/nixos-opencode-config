@@ -17,6 +17,7 @@ permission:
   task: {
     "*": "deny",
     "commit": "allow",
+    "coderabbit": "allow",
     "orchestrator-*": "allow"
   }
 ---
