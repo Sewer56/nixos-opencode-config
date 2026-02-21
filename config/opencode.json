@@ -49,7 +49,7 @@ echo "Plugin update script finished successfully.")
       }
     },
     "general": {
-      "model": "synthetic/hf:nvidia/Kimi-K2.5-NVFP4",
+      "model": "synthetic/hf:moonshotai/Kimi-K2.5",
       "permission": {
         "task": {
           "orchestrator-*": "deny",
@@ -98,8 +98,8 @@ echo "Plugin update script finished successfully.")
   "provider": {
     "synthetic": {
       "models": {
-        "hf:nvidia/Kimi-K2.5-NVFP4": {
-          "id": "hf:nvidia/Kimi-K2.5-NVFP4"
+        "hf:Qwen/Qwen3.5-397B-A17B": {
+          "id": "hf:Qwen/Qwen3.5-397B-A17B"
         }
       }
     }
