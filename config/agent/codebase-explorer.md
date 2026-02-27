@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Explores codebase structure, patterns, and implementation details.
-model: synthetic/hf:moonshotai/Kimi-K2.5
+model: synthetic/hf:MiniMaxAI/MiniMax-M2.5
 permission:
   read: allow
   grep: allow
