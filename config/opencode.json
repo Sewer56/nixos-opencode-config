@@ -1,7 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "theme": "catppuccin",
-  "lsp": false,
   "plugin": [
     "opencode-gemini-auth"
   ],
@@ -101,6 +100,9 @@ echo "Plugin update script finished successfully.")
       "models": {
         "hf:Qwen/Qwen3.5-397B-A17B": {
           "id": "hf:Qwen/Qwen3.5-397B-A17B"
+        },
+        "hf:MiniMaxAI/MiniMax-M2.5": {
+          "id": "hf:MiniMaxAI/MiniMax-M2.5"
         }
       }
     }
