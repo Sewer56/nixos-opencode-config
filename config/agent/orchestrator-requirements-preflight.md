@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates PRD requirement coverage across prompt files (preflight)
-model: openai/gpt-5.3-codex
+model: openai/gpt-5.4
 reasoningEffort: high
 permission:
   read: allow

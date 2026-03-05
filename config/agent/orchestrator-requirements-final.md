@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates PRD requirement completion and writes a validation report
-model: openai/gpt-5.3-codex
+model: openai/gpt-5.4
 reasoningEffort: high
 permission:
   bash: allow

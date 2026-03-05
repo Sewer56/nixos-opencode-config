@@ -6,6 +6,7 @@
 }: let
   opencodeBin = "/home/sewer/Project/opencode/packages/opencode/dist/opencode-linux-x64/bin/opencode";
   opencodeScript = pkgs.writeShellScriptBin "opencode" ''
+    export OPENCODE_ENABLE_EXA=1
     if [ "$#" -eq 0 ]; then
       exec ${opencodeBin} .
     else

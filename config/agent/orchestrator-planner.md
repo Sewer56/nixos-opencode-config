@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces complete implementation plans with task list and symbol map
-model: openai/gpt-5.3-codex
+model: openai/gpt-5.4
 reasoningEffort: high
 permission:
   read: allow
@@ -144,8 +144,8 @@ Write this to `<prompt_filename>-PLAN.md`:
 
 ## Requirement Trace Matrix
 
-| Requirement | Impl Ref(s) | Test Ref(s) | Acceptance Criteria |
-| ----------- | ----------- | ----------- | ------------------- |
+| Requirement | Impl Ref(s)  | Test Ref(s)  | Acceptance Criteria |
+| ----------- | ------------ | ------------ | ------------------- |
 | REQ-001     | `<impl-ref>` | `<test-ref>` | <what must be true> |
 
 ## Revision Impact Table

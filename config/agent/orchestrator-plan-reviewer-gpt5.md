@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews implementation plans before coding begins (GPT-5 reviewer)
-model: openai/gpt-5.3-codex
+model: openai/gpt-5.4
 reasoningEffort: high
 permission:
   read: allow
