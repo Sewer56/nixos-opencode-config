@@ -96,6 +96,11 @@ echo "Plugin update script finished successfully.")
     }
   },
   "provider": {
+    "openai": {
+      "options": {
+        "reasoningSummary": "detailed"
+      }
+    },
     "synthetic": {
       "models": {
         "hf:Qwen/Qwen3.5-397B-A17B": {
@@ -106,85 +111,10 @@ echo "Plugin update script finished successfully.")
         }
       }
     },
-    "openai": {
-      "models": {
-        "gpt-5.2": {
-          "id": "gpt-5.4",
-          "name": "GPT-5.4",
-          "family": "gpt",
-          "release_date": "2026-03-05",
-          "last_updated": "2026-03-05",
-          "attachment": true,
-          "reasoning": true,
-          "temperature": false,
-          "knowledge": "2025-08-31",
-          "tool_call": true,
-          "structured_output": true,
-          "open_weights": false,
-          "cost": {
-            "input": 2.50,
-            "output": 15.00,
-            "cache_read": 0.25,
-            "context_over_200k": {
-              "input": 5.00,
-              "output": 22.50,
-              "cache_read": 0.50
-            }
-          },
-          "limit": {
-            "context": 1050000,
-            "input": 272000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "gpt-5.2-pro": {
-          "id": "gpt-5.4-pro",
-          "name": "GPT-5.4 Pro",
-          "family": "gpt-pro",
-          "release_date": "2026-03-05",
-          "last_updated": "2026-03-05",
-          "attachment": true,
-          "reasoning": true,
-          "temperature": false,
-          "knowledge": "2025-08-31",
-          "tool_call": true,
-          "structured_output": false,
-          "open_weights": false,
-          "cost": {
-            "input": 30.00,
-            "output": 180.00,
-            "context_over_200k": {
-              "input": 60.00,
-              "output": 270.00
-            }
-          },
-          "limit": {
-            "context": 1050000,
-            "input": 272000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        }
-      }
-    },
     "github-copilot": {
+      "options": {
+        "reasoningSummary": "detailed"
+      },
       "models": {
         "gpt-5.3-codex": {
           "id": "gpt-5.3-codex",
