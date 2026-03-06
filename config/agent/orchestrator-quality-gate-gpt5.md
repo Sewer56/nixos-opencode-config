@@ -46,8 +46,11 @@ think hard
 - FAIL IF: a small, single-caller helper is defined separately instead of inlining
 - FAIL IF: there is dead code (unused functions, unreachable branches, commented-out code)
 - FAIL IF: public visibility is used when private/protected suffices
+- FAIL IF: non-trivial public APIs lack docs with a blurb, params, and returns
 - FAIL IF: there is leftover debug/logging code not intended for production
 - WARNING IF: there is unnecessary abstraction (interface with only 1 implementation)
+- WARNING IF: trivial public APIs lack a brief doc blurb
+- WARNING IF: non-obvious logic lacks brief inline comments
 
 ## 4) Review code semantics
 
@@ -73,6 +76,7 @@ These are areas where the implementer was uncertain; validate the approach or fl
 - Check whole test files, not just diffs
 - FAIL IF: newly added tests duplicate existing test coverage
 - FAIL IF: same behavior is asserted in multiple tests (if one verifies it, others should skip)
+- FAIL IF: tests or test helpers duplicate existing coverage or setup
 - FAIL IF: tests could be parameterized to avoid duplication
 - FAIL IF: tests are non-deterministic (real I/O, time, network without mocking/seeding)
 

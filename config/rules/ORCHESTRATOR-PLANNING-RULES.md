@@ -35,7 +35,9 @@ Use these rules for both planning and plan review.
 - Within files, order declarations from most public to most private.
 - Avoid broad refactors unless required or requested.
 - Avoid dead code, debug/dev-only logging, and unnecessary abstractions.
+- Avoid duplicate tests and test helpers.
 
 ## Documentation
 - Document public APIs unless the project is a binary.
-- Document non-obvious behavior.
+- For non-trivial public APIs: blurb, params, and returns. Trivial APIs may use a blurb only.
+- Add brief inline comments for non-obvious logic.

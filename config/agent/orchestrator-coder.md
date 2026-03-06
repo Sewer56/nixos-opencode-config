@@ -35,7 +35,7 @@ think
 - Read `prompt_path` for mission, requirements, constraints
 - Read `plan_path` for complete plan with `## Implementation Steps`
 - Follow `## Implementation Steps` exactly; they contain concrete code blocks to implement
-- You may add or improve documentation beyond the plan when helpful (include parameters and return values for functions; examples are recommended, not required); note it in `## Coder Notes`
+- Document public APIs with a blurb, params, and returns; trivial APIs may use a blurb only. Add brief inline comments for non-obvious logic when helpful; note it in `## Coder Notes`
 - Tests are always `basic`
 - Incorporate orchestrator context
 
@@ -50,7 +50,7 @@ think
 
 3) Verify
 - Run formatter (unless forbidden by system prompt), linter, and build; iterate until clean
-- Tests: basic → add minimal, non-duplicative tests; parametrize to reduce repetition; avoid real I/O/time/network—seed/freeze
+- Tests: basic → add minimal, non-duplicative tests; reuse or extract shared helpers; parametrize to reduce repetition; avoid real I/O/time/network—seed/freeze
 
 4) Fix and iterate
 - If any check fails, analyze, fix, and rerun verification
