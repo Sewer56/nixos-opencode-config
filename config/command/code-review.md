@@ -7,6 +7,10 @@ agent: build
 
 Perform a comprehensive code review of files with uncommitted changes and related files. Generate both a detailed `REVIEW.md` report with the format specified below and a concise CLI summary with file/line counts and issue summaries.
 
+## Shared Rules
+
+- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
+
 When invoked:
 
 1. **Verify current branch** (do NOT switch branches at any point):
@@ -36,9 +40,12 @@ When invoked:
    git status
    ```
 
-6. Focus on modified files compared to origin/main.
-7. Thoroughly analyze the diff output to understand all implications.
-8. Generate a comprehensive code review and save it to `REVIEW.md`.
+6. **Load shared doc policy**:
+   - Read `PLANNING_RULES_PATH` once.
+
+7. Focus on modified files compared to origin/main.
+8. Thoroughly analyze the diff output to understand all implications.
+9. Generate a comprehensive code review and save it to `REVIEW.md`.
 
 ## Review Checklist
 
@@ -48,6 +55,7 @@ When invoked:
 - Proper error handling
 - Input validation implemented
 - Good test coverage
+- Docs in changed scope follow `PLANNING_RULES_PATH`, including module/file docs when public surface or boundaries changed
 - Performance considerations addressed
 - No bandaid fixes
 - Security vulnerabilities

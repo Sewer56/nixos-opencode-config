@@ -82,6 +82,7 @@ Build these sections:
 - **Test Steps**: include when `# Tests` is "basic"
 - **Requirement Trace Matrix**: map each requirement to implementation step refs, test step refs, and acceptance criteria.
 - **Revision Impact Table** (on revisions): map each changed hunk/step to affected requirement(s) and affected test(s).
+- Plan docs explicitly. Name module/file doc headings instead of writing "update docs".
 
 6) Write Plan File
 Create or update `<prompt_filename>-PLAN.md` (may already exist).
@@ -190,6 +191,19 @@ Import diff:
 ```
 
 ```rust
+//! User creation service.
+//! <add more caller-facing context here per rules>
+//! Backed by a [`UserRepository`].
+//!
+//! # Public API
+//! - `UserService::create_user` - Create a user if the email is unique.
+//! - `UserError` - User creation failures.
+//!
+//! # Validation
+//! - Rejects duplicate emails.
+//!
+//! [`UserRepository`]: crate::repository::user::UserRepository
+
 pub enum UserError {
     DuplicateEmail(String),
 }

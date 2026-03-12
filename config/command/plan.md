@@ -124,6 +124,7 @@ A: <answer>
 **Example Implementation Step:**
 ```
 1. LoginManager: Add logging functionality
+   - expand module/file docs with purpose and `Public API`
    - add `public LogLevel CurrentLogLevel { get; set; } = LogLevel.Info` property
    - add concise docs for the changed public API surface
    - add `private async Task<bool> LogEventAsync(string eventName, LogLevel level = LogLevel.Info, CancellationToken cancellationToken = default)` method

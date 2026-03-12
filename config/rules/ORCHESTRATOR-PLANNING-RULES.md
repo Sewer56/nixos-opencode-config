@@ -38,16 +38,17 @@ Use these rules for both planning and plan review.
 - Avoid duplicate tests and test helpers.
 
 ## Documentation
-- Scope: In changed scope, document public APIs unless the target is a binary-only entrypoint.
+- Scope:
+  - In changed scope, document caller-facing public APIs unless the target is a binary-only entrypoint.
+  - If a change materially alters a module/file boundary, refresh module/file docs.
 - Required docs:
-  - Non-trivial public APIs: description, parameters, and returns.
-  - Trivial public APIs: brief description only.
-  - New or materially changed modules/files: top-level docs (e.g. module docs) covering purpose and key context when supported.
-  - Rust docs: when changed module or public-item docs mention sibling or external symbols, use [`TypeName`] in prose and add trailing reference-style link definitions when needed (for example `[`AgentCatalog`]: llm_coding_tools_agents::AgentCatalog`).
-- Severity:
-  - Missing required docs and trivial API blurb is blocking.
-  - Docs must not contradict implementation.
-- Limits:
-  - Keep doc changes concise when behavior changes.
-  - Do not backfill untouched legacy files solely for docs.
-  - Add inline comments only for non-obvious logic.
+  - Non-trivial public APIs: purpose, params, returns, notable failure behavior.
+  - Trivial public APIs: brief purpose.
+  - New or materially changed modules/files: top-level docs with purpose and caller-facing context.
+  - If the language lacks native module docs, use the nearest file-level doc block/comment.
+  - Add focused headings when useful: `Public API`, `Usage`, `Errors`, `Validation`, `Identifier Format`, `Precedence`.
+  - `Public API` lists caller-facing entrypoints/types by role.
+  - Rust external symbol mentions use [`TypeName`] plus trailing reference links when needed.
+  - Never use `ignore` fences.
+- Severity: Missing required docs is blocking. Docs must not contradict implementation.
+- Limits: Keep docs dense, not skeletal. Do not backfill untouched legacy files solely for docs. Add inline comments only for non-obvious logic.

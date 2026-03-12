@@ -36,6 +36,7 @@ think hard
 - Use `PROMPT-01-{title}.md` as the source of truth
 - Do minimal code discovery only as needed to make steps concrete; otherwise reuse the plan details
 - Plan doc work explicitly; do not leave module/API docs implied
+- When docs change, name the headings to add or revise
 - If additional code discovery is needed:
   - Use `@codebase-explorer` to find relevant files and patterns
   - Update the prompt's `# Required Reads` with new paths and relevance notes
@@ -109,7 +110,7 @@ think hard
 # Constraints
 - [Technical constraints]
 - [What to avoid]
-- Note when the prompt changes public APIs or module boundaries
+- Note when the prompt changes caller-facing public APIs or module boundaries
 
 # Success Criteria
 - [How we'll know the objective is met]
@@ -210,6 +211,19 @@ Map files to required `use` statements.
 Add UserService impl:
 
 ```rust
+//! User creation service.
+//! <add more caller-facing context here per rules>
+//!
+//! # Public API
+//! - `UserService::new` - Build the service with a [`UserRepository`].
+//! - `UserService::create_user` - Create a user if the email is unique.
+//! - `UserError` - User creation failures.
+//!
+//! # Validation
+//! - Rejects duplicate emails.
+//!
+//! [`UserRepository`]: crate::repository::user::UserRepository
+
 impl UserService {
     /// Create a service backed by the provided repository.
     pub fn new(repo: Arc<dyn UserRepository>) -> Self {

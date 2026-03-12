@@ -30,7 +30,7 @@ think hard
 
 ## 1) Read objectives
 - Read `prompt_path` (and `objectives_path` if provided)
-- Read `PLANNING_RULES_PATH` once and apply its documentation rules
+- Read `PLANNING_RULES_PATH` once and apply its rules
 - Extract objectives, requirements, and success criteria; treat each requirement and success criterion as an objective
 - Tests are always `basic`
 - Derive `coder_notes_path` from `prompt_path` by replacing the extension with `-CODER-NOTES.md`

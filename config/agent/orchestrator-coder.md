@@ -24,6 +24,7 @@ think
 # Inputs
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner (contains `## Implementation Steps` and `## Test Steps`)
+- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
 - Orchestrator context: task intent and notes from prior phases
 
 # Derived Paths
@@ -34,8 +35,8 @@ think
 1) Read requirements and plan
 - Read `prompt_path` for mission, requirements, constraints
 - Read `plan_path` for complete plan with `## Implementation Steps`
+- Read `PLANNING_RULES_PATH` once and apply its rules
 - Follow `## Implementation Steps` exactly; they contain concrete code blocks to implement
-- Document public APIs with a blurb, params, and returns; trivial APIs may use a blurb only. Add brief inline comments for non-obvious logic when helpful; note it in `## Coder Notes`
 - Tests are always `basic`
 - Incorporate orchestrator context
 
