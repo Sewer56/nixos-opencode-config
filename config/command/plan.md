@@ -7,8 +7,17 @@ agent: plan
 
 You produce implementation plans. Do not modify files.
 
-## Inputs
-- User requirements via $ARGUMENTS
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+Use the user input as the planning request.
+
+## Shared Rules
+
+- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
 
 ## Process
 
@@ -28,8 +37,10 @@ You produce implementation plans. Do not modify files.
 - Capture key findings to inform the plan
 
 4) Plan
+- Read `PLANNING_RULES_PATH` once and follow it.
 - Generate plan using Output Format below
 - Every file needing changes must have an Implementation Step
+- Include documentation work required by `PLANNING_RULES_PATH`
 
 5) Clarify (if needed)
 - Scan for ambiguity using reduced taxonomy:
@@ -103,6 +114,9 @@ A: <answer>
   - ❌ Bad: `add RefreshUserInfoAsync method`
   - ✅ Good: `add private async Task<UserInfo> RefreshUserInfoAsync(TimeSpan timeout = default, CancellationToken cancellationToken = default) method`
 
+- **Documentation**: Include doc updates when the step changes public surface or a module/file boundary
+  - Follow `PLANNING_RULES_PATH`
+
 - **Implementation Order**: Order code changes within each step to prevent compile errors
   - Add fields/properties first, then methods, then interfaces
   - This ensures dependencies exist before code that uses them
@@ -111,6 +125,7 @@ A: <answer>
 ```
 1. LoginManager: Add logging functionality
    - add `public LogLevel CurrentLogLevel { get; set; } = LogLevel.Info` property
+   - add concise docs for the changed public API surface
    - add `private async Task<bool> LogEventAsync(string eventName, LogLevel level = LogLevel.Info, CancellationToken cancellationToken = default)` method
 ```
 
@@ -118,5 +133,3 @@ A: <answer>
 - TODO items: concrete file/pattern searches, not analysis tasks
 - Key Implementation Details: only reference files with Implementation Steps
 - Only output a plan after clarifications are resolved
-
-$ARGUMENTS

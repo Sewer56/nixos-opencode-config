@@ -51,7 +51,7 @@ think hard
 - Extract what to build; tests are always `basic`
 - Review `# Implementation Hints` for patterns and guidance
 - Read `# Module Layout` and align planned file/module structure and naming to it
-- Determine project type (library vs binary/service) and doc expectations
+- Determine project type and documentation scope expected by `PLANNING_RULES_PATH`
 - Identify libraries/frameworks needing lookup
 - Set repo_root as the closest ancestor of prompt_path containing `.git`; if none, use prompt_path parent
 
@@ -101,6 +101,7 @@ Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 8) Self-Review Before Output
 - Review the final plan using `PLANNING_RULES_PATH` (already loaded).
 - Ensure `## Requirement Trace Matrix` is complete.
+- Ensure documentation work required by `PLANNING_RULES_PATH` is covered.
 - On revision, ensure `## Revision Impact Table` is present and complete.
 - If any rule is violated, update the plan file before returning `plan_path`.
 
@@ -194,6 +195,14 @@ pub enum UserError {
 }
 
 impl UserService {
+    /// Create a new user when the email is not already registered.
+    ///
+    /// # Parameters
+    /// - `input`: New user data to validate and persist.
+    ///
+    /// # Returns
+    /// - `Ok(User)`: The created user.
+    /// - `Err(UserError)`: Validation or persistence failure.
     pub async fn create_user(&self, input: CreateUserInput) -> Result<User, UserError> {
         if self.repo.find_by_email(&input.email).await?.is_some() {
             return Err(UserError::DuplicateEmail(input.email));

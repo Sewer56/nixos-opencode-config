@@ -46,6 +46,7 @@ think hard
 ## 3) Review Against Requirements and Shared Rules
 - Verify every requirement/success criterion has concrete implementation and tests.
 - Verify the plan follows `PLANNING_RULES_PATH`.
+- Verify the plan explicitly covers documentation work required by `PLANNING_RULES_PATH`.
 - Require `## Requirement Trace Matrix`.
 - If the plan is a revision, require `## Revision Impact Table`.
 - Categorize issues under code style, semantics, or test plan.
@@ -73,7 +74,7 @@ think hard
 - "requirement" — [COVERED|MISSING|PARTIAL]
 
 ## Code Style Issues (predicted)
-### [ID: <stable-id>] [INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION] [CRITICAL|HIGH|MEDIUM|LOW]
+### [ID: <stable-id>] [DOCS|INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION] [CRITICAL|HIGH|MEDIUM|LOW]
 Summary: <1-line summary>
 confidence: [HIGH|MEDIUM|LOW]
 fix_specificity: [CONCRETE|PARTIAL|UNCLEAR]

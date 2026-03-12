@@ -19,6 +19,7 @@ think hard
 
 # Inputs
 - `prompt_path`: requirements and objectives (required)
+- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
 - Review context from orchestrator:
   - Task intent (one-line summary)
   - Coder's concerns (areas of uncertainty — focus review here)
@@ -28,6 +29,7 @@ think hard
 
 ## 1) Read objectives
 - Read `prompt_path` (and `objectives_path` if provided)
+- Read `PLANNING_RULES_PATH` once and apply its documentation rules
 - Extract objectives, requirements, and success criteria; treat each requirement and success criterion as an objective
 - Tests are always `basic`
 - Derive `coder_notes_path` from `prompt_path` by replacing the extension with `-CODER-NOTES.md`
@@ -45,10 +47,10 @@ think hard
 - FAIL IF: a small, single-caller helper is defined separately instead of inlining
 - FAIL IF: there is dead code (unused functions, unreachable branches, commented-out code)
 - FAIL IF: public visibility is used when private/protected suffices
-- FAIL IF: non-trivial public APIs lack docs with a blurb, params, and returns
+- FAIL IF: a blocking documentation issue from `PLANNING_RULES_PATH` exists in changed scope
 - FAIL IF: there is leftover debug/logging code not intended for production
 - WARNING IF: there is unnecessary abstraction (interface with only 1 implementation)
-- WARNING IF: trivial public APIs lack a brief doc blurb
+- WARNING IF: only advisory documentation issues from `PLANNING_RULES_PATH` remain
 - WARNING IF: non-obvious logic lacks brief inline comments
 
 ## 4) Review code semantics
@@ -109,7 +111,7 @@ Suggestion: ... (if not met)
 ## Code Style Issues
 
 ### path/to/file:line
-[INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION] [HIGH|MEDIUM]
+[DOCS|INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION] [HIGH|MEDIUM]
 Description of issue
 **Fix:** suggested fix
 

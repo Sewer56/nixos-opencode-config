@@ -10,6 +10,10 @@ Use the plan from the immediately previous assistant message. Assume clarificati
 
 think hard
 
+## Shared Rules
+
+- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
+
 ## Workflow
 
 ### Phase 1: Parse the Plan
@@ -26,10 +30,12 @@ think hard
 - Findings: start empty; populate if you perform code discovery or library research
 
 ### Phase 3: Create Plan File
+- Read `PLANNING_RULES_PATH` once and follow it while drafting the plan
 - Create a plan file named `<prompt_filename>-PLAN.md`
   - Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 - Use `PROMPT-01-{title}.md` as the source of truth
 - Do minimal code discovery only as needed to make steps concrete; otherwise reuse the plan details
+- Plan doc work explicitly; do not leave module/API docs implied
 - If additional code discovery is needed:
   - Use `@codebase-explorer` to find relevant files and patterns
   - Update the prompt's `# Required Reads` with new paths and relevance notes
@@ -103,6 +109,7 @@ think hard
 # Constraints
 - [Technical constraints]
 - [What to avoid]
+- Note when the prompt changes public APIs or module boundaries
 
 # Success Criteria
 - [How we'll know the objective is met]
@@ -204,10 +211,19 @@ Add UserService impl:
 
 ```rust
 impl UserService {
+    /// Create a service backed by the provided repository.
     pub fn new(repo: Arc<dyn UserRepository>) -> Self {
         Self { repo }
     }
 
+    /// Create a new user when the email is not already registered.
+    ///
+    /// # Parameters
+    /// - `input`: New user data to validate and persist.
+    ///
+    /// # Returns
+    /// - `Ok(User)`: The created user.
+    /// - `Err(UserError)`: Validation or persistence failure.
     pub async fn create_user(&self, input: CreateUserInput) -> Result<User, UserError> {
         if self.repo.find_by_email(&input.email).await?.is_some() {
             return Err(UserError::DuplicateEmail(input.email));

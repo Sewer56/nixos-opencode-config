@@ -65,6 +65,9 @@ PROMPT-NN-*-PLAN.md      PROMPT-NN-*-CODER-NOTES.md
 - Quality gate: GPT-5 + GLM reviewers validate objectives, code, and verification checks.
 - Commit: `@commit` creates repo-style commits, excluding `PROMPT-*` files.
 
+## Documentation Rules
+- The canonical documentation policy lives in `../rules/ORCHESTRATOR-PLANNING-RULES.md`.
+
 ## Artifacts and Feedback Flow
 - **Planner and coder persist artifacts** to disk: `PROMPT-*-PLAN.md`, `PROMPT-*-CODER-NOTES.md`, and findings files.
 - **Reviewers return feedback directly** in their agent response (plan reviewers and quality gates); the runner uses that feedback to decide approval or revision.

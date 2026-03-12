@@ -38,6 +38,15 @@ Use these rules for both planning and plan review.
 - Avoid duplicate tests and test helpers.
 
 ## Documentation
-- Document public APIs unless the project is a binary.
-- For non-trivial public APIs: blurb, params, and returns. Trivial APIs may use a blurb only.
-- Add brief inline comments for non-obvious logic.
+- Scope: In changed scope, document public APIs unless the target is a binary-only entrypoint.
+- Required docs:
+  - Non-trivial public APIs: description, parameters, and returns.
+  - Trivial public APIs: brief description only.
+  - New or materially changed modules/files: top-level docs (e.g. module docs) covering purpose and key context when supported.
+- Severity:
+  - Missing required docs and trivial API blurb is blocking.
+  - Docs must not contradict implementation.
+- Limits:
+  - Keep doc changes concise when behavior changes.
+  - Do not backfill untouched legacy files solely for docs.
+  - Add inline comments only for non-obvious logic.
