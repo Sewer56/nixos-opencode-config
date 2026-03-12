@@ -43,6 +43,7 @@ Use these rules for both planning and plan review.
   - Non-trivial public APIs: description, parameters, and returns.
   - Trivial public APIs: brief description only.
   - New or materially changed modules/files: top-level docs (e.g. module docs) covering purpose and key context when supported.
+  - Rust docs: when changed module or public-item docs mention sibling or external symbols, use [`TypeName`] in prose and add trailing reference-style link definitions when needed (for example `[`AgentCatalog`]: llm_coding_tools_agents::AgentCatalog`).
 - Severity:
   - Missing required docs and trivial API blurb is blocking.
   - Docs must not contradict implementation.
