@@ -1,11 +1,11 @@
 ---
-description: "Add missing docs to uncommitted source files"
+description: "Add missing docs to specified source files"
 agent: build
 ---
 
-# Document Changed Code
+# Document Source Files
 
-Add missing docs to uncommitted source files only.
+Add missing docs to the files specified by the user.
 
 think hard
 
@@ -23,14 +23,13 @@ $ARGUMENTS
 
 1. Read `DOC_RULES_PATH` once and use it as the documentation source of truth.
 
-2. Collect changed files with `git status --porcelain`.
-   - Include staged, unstaged, and untracked files.
-   - If user input includes paths, intersect with the changed-file set.
-   - If no matching files exist, stop and say nothing needs documentation.
-
-3. Review only matching source files.
+2. Collect files to document.
+   - If user input includes file paths, use those paths directly.
+   - If no paths provided, collect changed files with `git status --porcelain`.
    - Skip generated files, vendored code, lockfiles, snapshots, and binary assets.
-   - Do not edit files without uncommitted changes.
+
+3. Review the specified source files.
+   - Do not edit files outside the provided paths unless explicitly requested.
 
 4. Add the docs required by `DOC_RULES_PATH`.
 
