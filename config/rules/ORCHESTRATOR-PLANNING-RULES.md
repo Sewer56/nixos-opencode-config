@@ -50,5 +50,11 @@ Use these rules for both planning and plan review.
   - `Public API` lists caller-facing entrypoints/types by role.
   - Rust external symbol mentions use [`TypeName`] plus trailing reference links when needed.
   - Never use `ignore` fences.
+- Style:
+  - Lead with a one-sentence purpose in plain language.
+  - Prefer goal-oriented phrasing ("What you can do with this") over implementation terms.
+  - Avoid jargon: no "materialization", "JIT", "framework-agnostic", "deterministic resolution", etc.
+  - Keep examples practical and minimal.
+  - Dense but accessible: full information without sacrificing readability.
 - Severity: Missing required docs is blocking. Docs must not contradict implementation.
 - Limits: Keep docs dense, not skeletal. Do not backfill untouched legacy files solely for docs. Add inline comments only for non-obvious logic.
