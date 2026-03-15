@@ -53,7 +53,7 @@ Use these rules for both planning and plan review.
 - Style:
   - Lead with a one-sentence purpose in plain language.
   - Prefer goal-oriented phrasing ("What you can do with this") over implementation terms.
-  - Avoid jargon: no "materialization", "JIT", "framework-agnostic", "deterministic resolution", etc.
+  - Avoid jargon: no "materialization", "JIT", "framework-agnostic", "deterministic resolution", etc. Apply this to both code and documentation.
   - Keep examples practical and minimal.
   - Dense but accessible: full information without sacrificing readability.
 - Severity: Missing required docs is blocking. Docs must not contradict implementation.
