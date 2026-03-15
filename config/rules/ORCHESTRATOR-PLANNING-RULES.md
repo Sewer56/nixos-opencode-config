@@ -24,6 +24,10 @@ Use these rules for both planning and plan review.
 
 ## Design Discipline
 - Keep changes minimal.
+- Prefer plain code and names; avoid jargon and cleverness.
+- Write the least new code that fully satisfies the requirement.
+- Optimize for review: keep control flow obvious and change sets cohesive.
+- Always prefer the more performant correct approach; then make it as simple and reviewable as possible.
 - Reuse existing patterns.
 - Split catch-all files into focused modules.
 - Keep top-level orchestration in parent module/file entrypoint.

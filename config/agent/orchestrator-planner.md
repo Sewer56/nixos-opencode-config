@@ -49,8 +49,8 @@ think hard
 - Read each file listed under `# Findings`; treat them as primary research context and avoid re-researching the same artifacts
 - Read each file listed in `# Required Reads` and ensure each entry includes a brief relevance note; add missing notes
 - Extract what to build; tests are always `basic`
-- Review `# Implementation Hints` for patterns and guidance
-- Read `# Module Layout` and align planned file/module structure and naming to it
+- Treat `# Implementation Hints` and `# Module Layout` as guidance, not a locked plan
+- Requirements, clarifications, and settled facts are binding; if a simpler valid approach preserves them without sacrificing performance, prefer it
 - Determine project type and documentation scope expected by `PLANNING_RULES_PATH`
 - Identify libraries/frameworks needing lookup
 - Set repo_root as the closest ancestor of prompt_path containing `.git`; if none, use prompt_path parent

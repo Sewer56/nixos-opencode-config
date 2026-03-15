@@ -13,7 +13,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 # Prompt Pack Generator
 
-Generate prompt files for orchestrated execution. Planning happens during orchestration.
+Generate prompt files for orchestrated execution. They define requirements and deliverables; implementation planning happens during orchestration.
 
 think hard
 
@@ -24,6 +24,8 @@ think hard
 - Tests required: every prompt uses `basic` tests.
 - Apply the canonical modularization rules in this file when shaping prompts.
 - Consider planning rules: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
+- Prompts define outcomes and constraints, not the final implementation plan.
+- `# Implementation Hints` and `# Module Layout` are guidance. A simpler valid approach may be used if it still satisfies requirements, clarifications, and settled facts without sacrificing performance.
 
 ## Workflow
 
@@ -189,6 +191,7 @@ Ready for orchestration with `@ orchestrator` (scheduler). For a single prompt, 
 - [Technical constraints]
 - [What to avoid]
 - No placeholder types/errors; define new ones only when used here; later prompts may extend
+- `# Implementation Hints` and `# Module Layout` are guidance, not fixed implementation steps; a simpler valid implementation is allowed if requirements, clarifications, and settled facts still hold without sacrificing performance
 
 # Success Criteria
 - [How to know the objective is met]
