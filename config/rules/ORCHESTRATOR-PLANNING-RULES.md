@@ -57,4 +57,4 @@ Use these rules for both planning and plan review.
   - Keep examples practical and minimal.
   - Dense but accessible: full information without sacrificing readability.
 - Severity: Missing required docs is blocking. Docs must not contradict implementation.
-- Limits: Keep docs dense, not skeletal. Do not backfill untouched legacy files solely for docs. Add inline comments only for non-obvious logic.
+- Limits: Keep docs dense, not skeletal. Do not backfill untouched legacy files solely for docs. Add inline comments for non-obvious logic.
