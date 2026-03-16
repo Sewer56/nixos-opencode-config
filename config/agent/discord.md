@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Handles Discord operations through MCP tools.
-model: synthetic/hf:moonshotai/Kimi-K2.5
+model: zai-coding-plan/glm-5
 permission:
   discord_*: ask
   discord_login: allow
