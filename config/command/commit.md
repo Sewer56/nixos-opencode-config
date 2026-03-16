@@ -5,84 +5,65 @@ agent: build
 
 # Commit Changes
 
-Create meaningful commits following `Keep a Changelog` format.
-Additional user's instructions (if present) are below:
+Write a clear commit for the current changes. Additional user instructions (if present):
 
 ```
 $ARGUMENTS
 ```
 
-## Process:
+## Process
 
-1. Check current git diff to understand changes
+1. Run `git diff` to understand what changed
 2. **Submodule check**: If changes are in a submodule directory:
-   - `cd <submodule-path>` and commit/push there first
-   - Return and stage submodule pointer update
-3. Create commit messages based on Keep a Changelog categories:
-   - **Added** for new features
-   - **Changed** for changes in existing functionality  
-   - **Deprecated** for soon-to-be removed features
-   - **Removed** for now removed features
-   - **Fixed** for any bug fixes
-   - **Security** for vulnerability fixes
+   - Commit and push inside the submodule first
+   - Return and stage the submodule pointer update
+3. Write the commit message using a Keep a Changelog prefix:
+   - **Added** — new features
+   - **Changed** — changes to existing functionality
+   - **Deprecated** — soon-to-be removed features
+   - **Removed** — now-removed features
+   - **Fixed** — bug fixes
+   - **Security** — vulnerability fixes
 
-## Commit Execution
+## Commit format
 
-**CRITICAL: Use heredoc for multiline commit messages to avoid quoting issues:**
+Use a heredoc so multiline messages stay clean:
 
 ```bash
 git commit -F - <<'EOF'
-Changed: Brief summary of the change
+Changed: Short summary of what changed and why
 
-Description of what changed and why.
+Longer description if the change needs context.
+Keep this optional — skip it for small changes.
 
 Changes:
-- Specific change one
-- Specific change two
+- Bullet point (optional, useful for larger changes)
 
 Benefits:
-- Benefit one
-- Benefit two
+- Bullet point (optional, useful for larger changes)
 EOF
 ```
 
-## Guidelines:
+The only required part is the first line (`Category: summary`). Add a body, Changes, or Benefits only when they add real value.
 
-- Changelogs are for humans, not machines.
-- Use clear, descriptive commit messages
-- Focus on what changed and why
-- Group related changes logically
-- Commit when ready
-- Be concise but informative
+## Example
 
-## Format (Keep a Changelog style):
 ```
-Changed/Added/Deprecated/Removed/Fixed/Security: <1 line change>
+Fixed: Handle missing config file gracefully
 
-<Short description>
+The app crashed on startup when config.json was absent.
+Now it creates a default config instead.
 
 Changes:
-- <Short bullet point>
-- <Short bullet point>
-
-Benefits:
-- <Short bullet point>
-- <Short bullet point>
+- Added fallback to default config on missing file
+- Removed hard exit on parse error
 ```
 
-Example:
-```
-Changed: Refine commit template for changelog-style messages
+## Guidelines
 
-Use a structured body so commit history is easier to scan and understand.
+- One logical change per commit
+- Say what changed and why, not how
+- Reference issues/tickets when applicable
+- Run tests before committing
 
-Changes:
-- Added explicit Changes and Benefits sections
-- Standardized allowed Keep a Changelog categories
-
-Benefits:
-- Makes commit intent clearer at a glance
-- Improves readability of project history
-```
-
-Follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) principles for clear, maintainable commit history.
+Follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) for more on the prefix categories.

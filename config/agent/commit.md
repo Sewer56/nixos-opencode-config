@@ -9,7 +9,7 @@ permission:
   task: deny
 ---
 
-Create semantic commits that match the repository's commit style for completed work.
+Create commits that match this repository's existing style for completed work.
 
 think
 
@@ -19,114 +19,61 @@ You will receive context and requirements from the orchestrator, including:
 - Primary prompt file path (standalone, contains mission, requirements, and plan)
 - A short bulleted list of changes describing what was implemented, validated, and reviewed
 
-# Commit Process
+# Process
 
-1) Detect Repository Commit Style
-- Run `git log -30 --format="%B---COMMIT_SEPARATOR---"` to inspect recent full commit messages (subject + body)
-- Analyze commit message patterns:
-  - Keep a Changelog prefixes (Added, Changed, Fixed, etc.)
-  - Conventional commits (feat:, fix:, chore:, etc.)
-  - Another consistent pattern
-  - Whether commit bodies include bullet points
-- Remember the detected style for step 4
+## 1. Match existing style
 
-2) Analyze Changes
-- Run git diff to understand modifications
-- Group related changes logically
-- Determine appropriate category based on detected style
+Run `git log -30 --format="%B---COMMIT_SEPARATOR---"` to inspect recent commit messages. Look for:
+- Keep a Changelog prefixes (Added, Changed, Fixed, etc.)
+- Conventional commits (feat:, fix:, chore:, etc.)
+- Another consistent pattern
+- Whether bodies include bullet points
 
-3) Critical Constraint
-- **NEVER** commit report files (`PROMPT-*`)
-- Only commit actual implementation changes
-- Use `git add` selectively to exclude reports
+Use whatever pattern you find. Don't force a different style.
 
-## Submodule Handling
+## 2. Analyze changes
 
-If changes are in a submodule directory:
+Run `git diff` to understand what was modified. Group related changes and pick the right category.
+
+## 3. Exclude reports
+
+Do not commit report files (`PROMPT-*`). Use `git add` selectively.
+
+## Submodule handling
+
+If changes are in a submodule:
 1. `cd <submodule-path>` and check `git status`
-2. Commit and push changes in submodule first
-3. Return to main repo, stage submodule pointer update
+2. Commit and push there first
+3. Return to the main repo, stage the submodule pointer update
 
-4) Create Commits
+## 4. Write commits
 
-**CRITICAL: Use heredoc for multiline commit messages to avoid quoting issues:**
+Use a heredoc for multiline messages:
 
 ```bash
 git commit -F - <<'EOF'
-Changed: Brief summary of the change
+Changed: Short summary of what changed and why
 
-Description of what changed and why.
+Longer description if the change needs context.
 
 Changes:
-- Specific change one
-- Specific change two
+- Bullet point (optional)
 
 Benefits:
-- Benefit one
-- Benefit two
+- Bullet point (optional)
 EOF
 ```
 
-Match the detected repository style:
+The only required part is the first line. Add body, Changes, or Benefits only when they help.
 
-**If Keep a Changelog style detected**, use these categories:
-- **Added** - New features
-- **Changed** - Changes in existing functionality
-- **Deprecated** - Soon-to-be removed features
-- **Removed** - Removed features
-- **Fixed** - Bug fixes
-- **Security** - Vulnerability fixes
+If the repo uses a different style (conventional commits, plain messages, etc.), match that instead.
 
-Format:
-```
-Changed/Added/Deprecated/Removed/Fixed/Security: <1 line change>
+# Output
 
-<Short description>
+When done, reply with:
 
-Changes:
-- <Short bullet point>
-- <Short bullet point>
+- Each commit hash and its first line
+- Total files committed
+- Any errors (if applicable)
 
-Benefits:
-- <Short bullet point>
-- <Short bullet point>
-```
-
-**If another style detected** (e.g., conventional commits, simple messages):
-- Mimic the observed patterns from recent commits
-- Match the tone, casing, and structure used in the repository
-- Include body/details only if the repository typically does so
-
-# Output Format
-
-**CRITICAL**: Provide your report directly in your final message using this structure:
-
-```
-# COMMIT REPORT
-
-## Commit Summary
-status: [SUCCESS/FAILED]
-
-## Commits Created
-- hash: "commit_hash"
-  message: "Commit message"
-  files: X
-
-## Errors
-{Only list errors if commit failed - if successful, omit section}
-{list of any errors encountered}
-```
-
-**Final Response**: Provide the complete report above as your final message.
-
-# Commit Guidelines
-
-- One logical change per commit
-- Clear, descriptive messages
-- Focus on what and why, not how
-- Reference issues/tickets if applicable
-- Ensure all tests pass before committing
-
-# Communication Protocol
-
-Your output will be consumed by the orchestrator agent. Provide structured data about commits created. **BE CONCISE** - no lengthy explanations, only essential commit info.
+Keep it brief — just the facts.
