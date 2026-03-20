@@ -50,6 +50,7 @@ think hard
 - FAIL IF: public visibility is used when private/protected suffices
 - FAIL IF: a blocking documentation issue from `PLANNING_RULES_PATH` exists in changed scope
 - FAIL IF: there is leftover debug/logging code not intended for production
+- FAIL IF: declarations violate reading order: callees defined before their callers within the same visibility level
 - WARNING IF: there is unnecessary abstraction (interface with only 1 implementation)
 - WARNING IF: only advisory documentation issues from `PLANNING_RULES_PATH` remain
 - WARNING IF: non-obvious logic lacks brief inline comments
