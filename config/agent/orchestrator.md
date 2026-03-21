@@ -128,6 +128,7 @@ For each prompt in the listed order:
 ## Phase 2: CodeRabbit Review (after each prompt)
 After each prompt with status SUCCESS or INCOMPLETE, spawn `@coderabbit`.
 - Input: always pass `base_branch` from Phase 0
+- CodeRabbit is allowed to make edits. Tell it to apply all findings and then amend last commit.
 - If CodeRabbit status is PASS: continue
 - If CodeRabbit status is FAIL due to rate limit (detect: "rate limit", "429", "too many requests"):
   - Wait for the indicated reset window if present; otherwise sleep 3600s
