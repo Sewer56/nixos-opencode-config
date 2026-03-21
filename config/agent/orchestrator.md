@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Schedules per-prompt orchestration via subagents
-model: zai-coding-plan/glm-5
+model: zai-coding-plan/glm-5-turbo
 permission:
   bash: allow
   edit: allow
@@ -130,11 +130,8 @@ After each prompt with status SUCCESS or INCOMPLETE, spawn `@coderabbit`.
 - Input: always pass `base_branch` from Phase 0
 - If CodeRabbit status is PASS: continue
 - If CodeRabbit status is FAIL due to rate limit (detect: "rate limit", "429", "too many requests"):
-  - If this is the final prompt:
-    - Wait for the indicated reset window if present; otherwise sleep 3600s
-    - Re-run CodeRabbit once
-    - If still rate limited, warn and continue
-  - Otherwise: warn and continue (skipped)
+  - Wait for the indicated reset window if present; otherwise sleep 3600s
+  - Re-run CodeRabbit (repeat until it succeeds or fails for a non-rate-limit reason)
 - If CodeRabbit status is FAIL for any other reason: report failure and stop
 - If CodeRabbit status is SKIPPED (missing CLI): continue silently
 - If CodeRabbit reports Changes Made: yes but Commit Status is not SUCCESS or AMENDED: report failure and stop

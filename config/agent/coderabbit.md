@@ -47,8 +47,7 @@ You are a CodeRabbit CLI orchestrator. Your ONLY job is to run `coderabbit` and 
 - If output indicates rate limiting ("rate limit", "429", "too many requests"):
   - If output includes a wait time or reset window, honor it
   - If no wait time is provided, sleep 3600s
-  - Retry up to 3 total attempts
-  - If still rate limited after retries, return FAIL with note
+  - Retry indefinitely until review succeeds or fails for a non-rate-limit reason
 
 5. If review PASS
 - If the output ends after "Review completed" (no further output), treat as PASS
@@ -70,9 +69,10 @@ You are a CodeRabbit CLI orchestrator. Your ONLY job is to run `coderabbit` and 
 
 7. Re-run CodeRabbit after fixes
 - Re-run the CodeRabbit command from step 4
-- If rate limit detected with wait time:
-  - If wait time > 1800s (30 minutes), skip re-review and proceed to commit (will amend after step 8)
-  - If wait time <= 1800s, wait and retry
+- If rate limit detected:
+  - If output includes a wait time or reset window, honor it
+  - If no wait time is provided, sleep 3600s
+  - Retry indefinitely until review succeeds or fails for a non-rate-limit reason
 - If no rate limit, check for remaining findings
   - If findings remain: continue applying fixes (loop back to step 6)
   - If no findings: report Status: PASS
