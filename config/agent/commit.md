@@ -52,19 +52,13 @@ Use a heredoc for multiline messages:
 
 ```bash
 git commit -F - <<'EOF'
-Changed: Short summary of what changed and why
+Changed: Short summary of what changed
 
-Longer description if the change needs context.
-
-Changes:
-- Bullet point (optional)
-
-Benefits:
-- Bullet point (optional)
+Optional: brief description or bullet points when helpful.
 EOF
 ```
 
-The only required part is the first line. Add body, Changes, or Benefits only when they help.
+Only the first line is required. Add bullets or description only when they help the reader understand the change.
 
 If the repo uses a different style (conventional commits, plain messages, etc.), match that instead.
 
@@ -76,4 +70,4 @@ When done, reply with:
 - Total files committed
 - Any errors (if applicable)
 
-Keep it brief — just the facts.
+Keep it brief - just the facts.

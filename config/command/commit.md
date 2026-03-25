@@ -18,45 +18,40 @@ $ARGUMENTS
    - Commit and push inside the submodule first
    - Return and stage the submodule pointer update
 3. Write the commit message using a Keep a Changelog prefix:
-   - **Added** — new features
-   - **Changed** — changes to existing functionality
-   - **Deprecated** — soon-to-be removed features
-   - **Removed** — now-removed features
-   - **Fixed** — bug fixes
-   - **Security** — vulnerability fixes
+    - **Added** - new features
+    - **Changed** - changes to existing functionality
+    - **Deprecated** - soon-to-be removed features
+    - **Removed** - now-removed features
+    - **Fixed** - bug fixes
+    - **Security** - vulnerability fixes
 
 ## Commit format
 
-Use a heredoc so multiline messages stay clean:
+Write clear, human-readable commits. Only the first line is required; add context only when it helps.
+
+Use a heredoc for multiline messages:
 
 ```bash
 git commit -F - <<'EOF'
-Changed: Short summary of what changed and why
+Changed: Short summary of what changed
 
-Longer description if the change needs context.
-Keep this optional — skip it for small changes.
-
-Changes:
-- Bullet point (optional, useful for larger changes)
-
-Benefits:
-- Bullet point (optional, useful for larger changes)
+Optional: brief description or bullet points when helpful.
 EOF
 ```
 
-The only required part is the first line (`Category: summary`). Add a body, Changes, or Benefits only when they add real value.
-
-## Example
+## Example (simple)
 
 ```
 Fixed: Handle missing config file gracefully
+```
 
-The app crashed on startup when config.json was absent.
-Now it creates a default config instead.
+## Example (with bullets when helpful)
 
-Changes:
-- Added fallback to default config on missing file
-- Removed hard exit on parse error
+```
+Changed: Refactor authentication flow
+
+- Move login logic into AuthService
+- Add token refresh on 401 responses
 ```
 
 ## Guidelines

@@ -38,60 +38,43 @@ $ARGUMENTS
 
 ## Commit Execution
 
+Write clear, human-readable commits. Only the first line is required; add context only when it helps.
+
 **CRITICAL: Use heredoc for multiline commit messages to avoid quoting issues:**
 
 ```bash
 git commit -F - <<'EOF'
 Changed: Brief summary of the change
 
-Description of what changed and why.
-
-Changes:
-- Specific change one
-- Specific change two
-
-Benefits:
-- Benefit one
-- Benefit two
+Optional: why the change matters in plain language.
 EOF
 ```
 
-## Guidelines:
+## Guidelines
 
 - Changelogs are for humans, not machines.
-- Use clear, descriptive commit messages.
+- Use clear, descriptive language; avoid jargon.
 - Focus on what changed and why.
 - Group related changes logically.
-- Be concise but informative.
+- Keep it brief: first line only unless context helps.
 
-## Format (Keep a Changelog style):
+## Format (Keep a Changelog style)
+
 ```
-Changed/Added/Deprecated/Removed/Fixed/Security: <1 line change>
+Changed/Added/Fixed/Removed: <one-line summary>
 
-<Short description>
-
-Changes:
-- <Short bullet point>
-- <Short bullet point>
-
-Benefits:
-- <Short bullet point>
-- <Short bullet point>
+Optional: brief description or bullet points if helpful.
 ```
 
-Example:
+Example (simple):
 ```
-Fixed: Correct submodule-only commit workflow for nested repo changes
-
-Restrict commit execution to the target submodule to avoid accidental parent-repo commits.
-
-Changes:
-- Added strict parent-repo commit prohibition rules
-- Added explicit submodule path and commit hash reporting
-
-Benefits:
-- Prevents accidental top-level history changes
-- Makes submodule commit results easier to verify
+Fixed: Prevent accidental parent-repo commits
 ```
 
-Follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) principles for clear, maintainable commit history.
+Example (with bullets when helpful):
+```
+Changed: Refactor authentication flow
+
+- Move login logic into AuthService
+- Add token refresh on 401 responses
+```
