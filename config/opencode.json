@@ -98,7 +98,7 @@ echo "Plugin update script finished successfully.")
   "provider": {
     "openai": {
       "options": {
-        "reasoningSummary": "detailed"
+        "reasoningSummary": "concise"
       }
     },
     "synthetic": {
@@ -141,7 +141,7 @@ echo "Plugin update script finished successfully.")
     },
     "github-copilot": {
       "options": {
-        "reasoningSummary": "detailed"
+        "reasoningSummary": "concise"
       },
       "models": {
         "gpt-5.3-codex": {
