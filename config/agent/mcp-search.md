@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Use this for third-party library research and repository documentation analysis.
-model: zai-coding-plan/glm-5-turbo
+model: synthetic/hf:MiniMaxAI/MiniMax-M2.5
 permission:
   github_*: allow
   context7_*: allow

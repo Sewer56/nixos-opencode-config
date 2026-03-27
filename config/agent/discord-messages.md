@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Handles Discord message and channel operations through MCP tools.
-model: zai-coding-plan/glm-5
+model: synthetic/hf:moonshotai/Kimi-K2.5
 permission:
   discord_*: ask
   discord_login: allow

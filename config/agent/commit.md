@@ -2,7 +2,7 @@
 mode: subagent
 hidden: false
 description: Creates semantic commits matching repository style
-model: zai-coding-plan/glm-5-turbo
+model: synthetic/hf:MiniMaxAI/MiniMax-M2.5
 permission:
   bash: allow
   read: allow
