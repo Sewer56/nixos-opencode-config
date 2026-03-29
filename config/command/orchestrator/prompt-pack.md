@@ -1,5 +1,5 @@
 ---
-description: "Generate prompt packs for orchestrated execution"
+description: "Generate a human review pack, then prompt packs for orchestrated execution"
 agent: orchestrator/builder
 ---
 
@@ -13,11 +13,12 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 # Prompt Pack Generator
 
-Generate prompt files for orchestrated execution. They define requirements and deliverables; implementation planning happens during orchestration.
+Generate a human review pack first, then prompt files for orchestrated execution after approval. Prompts define requirements and deliverables; implementation planning happens during orchestration.
 
 think hard
 
 ## Core Principles
+- Human-first review: let the user review a plain-language draft before deep discovery or machine-only artifacts are generated.
 - Deliverable-first: each prompt must produce working code. No placeholder-only prompts.
 - Isolation-safe: each prompt must run in isolation; include all required context and file paths.
 - No speculative types/errors: define types/errors only when used in this prompt; later prompts may extend.
@@ -32,122 +33,99 @@ think hard
 - Prompts define outcomes and constraints, not the final implementation plan.
 - `# Implementation Hints` and `# Module Layout` are guidance. A simpler valid approach may be used if it still satisfies requirements, clarifications, and settled facts without sacrificing performance.
 
+## Simple Flow
+1. Draft `PROMPT-REVIEW.md`.
+2. Let the human review it, answer questions, and suggest edits.
+3. On `go`, generate the machine prompt pack.
+4. Run requirements preflight and write `PROMPT-ORCHESTRATOR.md`.
+
 ## Workflow
 
-### Phase 1: Parse Requirements
+### Phase 1: Parse Request
 - Extract core objective and components from user input only (ignore generator/system prompt)
 - Draft prompt list (title + one-line objective)
 - Order by dependencies
 - Apply task sizing guidance (default to small, single-objective prompts)
 - Convert broad goals into vertical slices that yield working code
-- Produce a requirement-to-prompt ownership draft:
+- Produce a requirement-to-prompt ownership draft in memory only:
   - Each `IN` requirement must have exactly one primary owner prompt
   - Secondary prompts may reference a requirement but must not own it
+- Keep this pass simple and human-reviewable; do not write machine-only artifacts yet
 
-### Phase 1.5: Build Requirements Inventory
-- Create `PROMPT-PRD-REQUIREMENTS.md` in the current working directory
-- Extract every discrete requirement from the user input/PRD only (exclude generator/system/prompt-format requirements)
+### Phase 2: Light Discovery
+- Do a minimal repo scan only to avoid obviously bad prompt splits or misleading prompt titles
+- Read only the most relevant entry points and patterns; do not do full prompt research yet
+- Resolve only ambiguities that would make the review draft misleading
+- Do not create findings files, prompt files, or the requirements inventory yet
+
+### Phase 3: Create Human Review Pack
+- Create `PROMPT-REVIEW.md` in the current working directory
+- Write a plain-language draft for the human to review before any machine-heavy artifacts are generated
+- Keep it free of requirement IDs, trace matrices, acceptance criteria jargon, revision tables, and other machine-only sections
+- Include:
+  - overall goal
+  - proposed prompt list
+  - for each prompt: what this does, why it is separate, draft plan, likely areas touched, needs first, open questions, done when, what we'll check
+
+### Phase 4: Review Questions and Confirmation
+- While waiting for confirmation, ask up to 10 questions total if answers would improve prompt quality
+- Ask all questions in one batch using the `question` tool
+- Prefer simple wording and concise options; include a recommended option when there is one
+- Update `PROMPT-REVIEW.md` based on user feedback and answers
+- Let the user edit, reorder, split, or merge prompts
+- Continue to Phase 5 only when the user says `go`
+- After `go`, do not ask more review questions unless full discovery uncovers a new hard blocker
+
+When presenting the draft, use:
+```
+Review draft written to `PROMPT-REVIEW.md`.
+
+Proposed prompts:
+1. Prompt 01 - {title}: {objective}
+2. Prompt 02 - {title}: {objective}
+...
+
+Questions: <count or none>
+
+Say "go" to continue, or suggest changes.
+```
+
+### Phase 5: Full Discovery and Generate Machine Prompt Pack
+- Review every item, source, and reference from the user input; do not skip
+- Reuse existing research artifacts verbatim (schemas/types, tables, precedence rules, constants, signatures); do not invent
+- If details are missing, say so succinctly; do not fabricate
+- Do not mention the input file name/path in prompts or findings; use generic phrasing like "from input"
+- Use subagents as needed:
+  - `@mcp-search` for external library/API specifics
+  - `@codebase-explorer` for codebase search and pattern discovery
+- Default to parallel subagent calls; only serialize when a dependency requires it
+- Treat findings as suggestions, not specs; use judgment when populating `# Implementation Hints`
+- Prefer reusing existing types and patterns; only introduce new ones when required by the current prompt
+- Gather enough context so a runner with no prior memory can execute the prompt
+- Identify the minimal required files to read and capture them in `# Required Reads` with brief relevance notes
+- Capture a short "repo conventions snapshot" in findings when relevant (test commands, CI action versions, lint/build expectations) to reduce avoidable downstream review churn
+- Log findings per prompt in `PROMPT-FINDING-<prompt-stem>-NN.md` (comprehensive, prompt-relevant) and add a one-line entry in the prompt's `# Findings`
+- Include other research discoveries the same way; keep findings prompt-scoped (duplication across prompts is OK)
+- Put all supplemental artifacts in findings; do not add extra sections to prompt files
+- Create `PROMPT-PRD-REQUIREMENTS.md` in the current working directory:
+  - Extract every discrete requirement from the user input/PRD only (exclude generator/system/prompt-format requirements)
   - Use stable IDs: `REQ-001`, `REQ-002`, ... (zero-padded, sequential)
   - Tag each with scope: `IN`, `OUT`, or `POST_INIT`
   - Record source section from the user input/PRD (e.g., Key Goals, Features > Remapping & Bindings)
   - Write a short acceptance note per requirement (what evidence would satisfy it)
-- Do not drop requirements; mark out-of-scope or post-init explicitly
-- Prefer per-requirement headings to reduce tokens in inventory files
+  - Do not drop requirements; mark out-of-scope or post-init explicitly
+  - Prefer per-requirement headings to reduce tokens in inventory files
+- Create in current working directory:
+  - `PROMPT-NN-{title}.md` - one per task (standalone, self-contained)
+  - Ensure each prompt includes concrete deliverables
+  - Carry approved review decisions into `# Clarifications`
+  - Every prompt `# Requirements` entry must include a requirement ID (e.g., `REQ-012: ...`)
+  - Add `# Settled Facts` with validated facts and source pointers (`FACT-###`)
+  - Add `# Verification Scope` to define in-scope checks and known unrelated pre-existing failures
+  - Always include `# Module Layout` with language and a structure diff when layout changes
+  - If unchanged, set `Structure: unchanged` and omit the diff block and `Why` line
 
-### Phase 2: Research
-- Review every item, source, and reference from the user input; do not skip.
-- Reuse existing research artifacts verbatim (schemas/types, tables, precedence rules, constants, signatures); do not invent.
-- Capture artifacts in per-prompt findings and link them from `# Findings`.
-- Findings must let the planner write the implementation plan without re-research; include needed artifacts verbatim and skip irrelevant detail.
-- If details are missing, say so succinctly; do not fabricate.
-- Do not mention the input file name/path in prompts or findings; use generic phrasing like "from input".
-- Use subagents as needed:
-  - `@mcp-search` for external library/API specifics
-  - `@codebase-explorer` for codebase search and pattern discovery
-- Default to parallel subagent calls; only serialize when a dependency requires it.
-- Treat findings as suggestions, not specs; use judgment when populating `# Implementation Hints`.
-- Prefer reusing existing types and patterns; only introduce new ones when required by the current prompt.
-- Gather enough context so a runner with no prior memory can execute the prompt.
-- Identify the minimal required files to read and capture them in `# Required Reads` with brief relevance notes.
-- Capture a short "repo conventions snapshot" in findings when relevant (test commands, CI action versions, lint/build expectations) to reduce avoidable downstream review churn.
-- Log findings per prompt in `PROMPT-FINDING-<prompt-stem>-NN.md` (comprehensive, prompt-relevant) and add a one-line entry in the prompt's `# Findings`.
-- Include other research discoveries the same way; keep findings prompt-scoped (duplication across prompts is OK).
-- Put all supplemental artifacts in findings; do not add extra sections to prompt files.
-
-### Phase 3: Blocking Ambiguity Triage (before writing prompts)
-- Identify only blockers that would materially change implementation shape.
-- Ask targeted questions only for unknowns that cannot be resolved from input/research.
-- Ask all blocking questions in one batch.
-- When asking questions, use the `question` tool and send the full batch in a single call.
-- If no blocking ambiguity remains, skip directly to Phase 4.
-
-### Phase 4: User Confirmation
-Present the proposed structure:
-```
-Proposed Prompts:
-1. PROMPT-01-{title} — {objective}
-2. PROMPT-02-{title} — {objective}
-...
-
-Tests: basic (required)
-
-Say "go" to continue, or suggest changes.
-```
-Iterate on structure based on user feedback.
-**Continue to Phase 5 only when user says "go".**
-
-### Phase 5: Generate Prompt Files
-Create in current working directory:
-- `PROMPT-NN-{title}.md` — one per task (standalone, self-contained)
-- Ensure each prompt includes concrete deliverables
-- Every prompt `# Requirements` entry must include a requirement ID (e.g., `REQ-012: ...`)
-- Add `# Settled Facts` with validated facts and source pointers (`FACT-###`)
-- Add `# Verification Scope` to define in-scope checks and known unrelated pre-existing failures
-- Always include `# Module Layout` with language, current/target structure, and naming map
-  - If unchanged, set `Target structure: unchanged` and omit the code block
-
-### Phase 6: Clarification Loop (non-blocking refinements)
-For each prompt file, scan for ambiguity using reduced taxonomy:
-1. **Scope Boundaries** — what's in/out of scope
-2. **Data Shapes (used now)** — entities, fields, relationships required by this prompt
-3. **Error Handling (current flow only)** — failure modes, recovery strategies for this prompt
-4. **Integration Patterns** — APIs, external dependencies
-5. **Isolation Context** — missing info that would block a runner without prior context
-6. **Testing Expectations** — coverage approach, critical paths
-
-Question rules:
-- Ask up to 10 questions total across Phases 3 and 6 (prefer <=5)
-- Ask all questions at once in a single batch
-- Use the `question` tool for that batch (single call)
-- Format each with recommended option:
-
-**Recommended:** [X] — <reasoning>
-
-**A:** <option description>
-**B:** <option description>
-**C:** <option description>
-**Custom:** Provide your own answer
-
-Reply with letter, "yes" for recommended, or custom answer.
-
-After each answer, insert into the relevant prompt file under `# Clarifications`:
-```
-Q: <question>
-A: <answer>
-```
-
-Stop when: all critical gaps filled, user says "done", or limit reached.
-
-After clarification completes, present summary:
-```
-Clarification complete.
-
-Please review the generated PROMPT-*.md files to see if anything else comes to mind.
-
-Say "go" to validate requirements coverage and generate the orchestrator index.
-```
-
-### Phase 7: Validate Requirements Coverage (Subagent)
+### Phase 6: Validate Requirements Coverage (Subagent)
 - Spawn `@orchestrator/requirements-preflight` with:
   - `requirements_path` (absolute path to `PROMPT-PRD-REQUIREMENTS.md`)
   - `prompts_dir` (absolute path to the current working directory)
@@ -155,7 +133,7 @@ Say "go" to validate requirements coverage and generate the orchestrator index.
 - If status is FAIL or PARTIAL: revise the prompt pack and re-run this phase
 - If PASS: proceed
 
-### Phase 8: Generate Orchestrator Index
+### Phase 7: Generate Orchestrator Index
 Create `PROMPT-ORCHESTRATOR.md` in current working directory with:
 - Overall objective
 - Prompt list with dependencies and tests
@@ -165,14 +143,46 @@ Create `PROMPT-ORCHESTRATOR.md` in current working directory with:
   - Every `IN` requirement must have exactly one owner
   - This section is the source of truth for requirement-to-prompt mapping
 
-### Phase 9: Hand Off to User
+### Phase 8: Hand Off to User
 ```
 Ready for orchestration with `@ orchestrator` (scheduler). For a single prompt, use `@ orchestrator/runner`.
 ```
 
-## Prompt File Format: `PROMPT-NN-{title}.md`
+## Review Pack Format: `PROMPT-REVIEW.md`
 
 ```markdown
+# Prompt Review Pack
+
+Overall Goal: <short line>
+
+## Proposed Prompts
+
+### Prompt 01: <title>
+- What this does: <plain-language outcome>
+- Why this is separate: <why this is its own step>
+- Draft plan:
+  1. <step>
+  2. <step>
+  3. <step>
+- Likely areas touched:
+  - path/to/file-or-dir
+- Needs first: None | Prompt 0N
+- Open questions:
+  - <question or None>
+- Done when:
+  - <human-readable outcome>
+- What we'll check:
+  - basic
+
+## Review Notes
+- Status: waiting for feedback | approved
+- Decisions:
+  - <feedback, answer, or none>
+```
+
+## Prompt File Format: `PROMPT-NN-{title}.md`
+
+````markdown
 # Mission
 [1-2 sentence goal for this task]
 
@@ -223,24 +233,22 @@ A: <answer>
 
 # Module Layout
 - Language: <e.g., rust|typescript|python|csharp>
-- Current structure:
-```text
-path/to/domain/
-  <module-or-file>
-```
-- Target structure: unchanged | <describe changes>
-- Naming map: None | <old name -> new name> plus one-line rationale
+- Structure: unchanged | changed
 
-Example (with changes):
-```text
+If `changed`, show only the relevant structure delta:
+
+```diff
 src/config/
-  mod.rs
-  models/
-    binding_profile.rs
-    config_binding.rs
-    device_mapping.rs
+- types.rs
++ config_binding.rs
++ models/
++   binding_profile.rs
++   device_mapping.rs
 ```
-Naming map: `types` -> `config_binding` (explicit and easier to search).
+
+- Why: <one-line rationale>
+
+If `unchanged`, stop after `- Structure: unchanged`.
 
 # Implementation Hints
 - [Patterns, library usage, existing code to reuse]
@@ -250,7 +258,7 @@ Naming map: `types` -> `config_binding` (explicit and easier to search).
 - In scope checks: <format/lint/build/tests relevant to this prompt>
 - Out of scope known failures: <pre-existing unrelated failures if any, else None>
 - Priority files: <files reviewers should prioritize>
-```
+````
 
 ## Orchestrator Index: `PROMPT-ORCHESTRATOR.md`
 
@@ -320,9 +328,9 @@ Before creating any prompt:
 - Every prompt must have code as a deliverable (no research-only prompts)
 - Every `IN` requirement must have exactly one owner prompt in the index
 - Do not duplicate requirement mappings in multiple index sections; keep mapping in `## Requirement Ownership`
-- Do not place unresolved blockers into generated prompts; resolve or surface in Phase 3
+- Do not place unresolved blockers into generated prompts; resolve or surface them during the review phase
 - Apply the canonical modularization rules in this file
-- Always include `# Module Layout`; use `Target structure: unchanged` when there are no structural changes
+- Always include `# Module Layout`; use `Structure: unchanged` when there are no structural changes
 
 ## Task Sizing Guidance
 - Default to the smallest useful unit; one primary objective per prompt
