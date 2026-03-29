@@ -9,7 +9,11 @@ Perform a comprehensive code review of files with uncommitted changes and relate
 
 ## Shared Rules
 
-- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
+- `GENERAL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/GENERAL-RULES.md`
+- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
+- `PERFORMANCE_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/PERFORMANCE-RULES.md`
+- `TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/TEST-PARAMETERIZATION-RULES.md`
+- `CODE_PLACEMENT_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/CODE-PLACEMENT-RULES.md`
 
 When invoked:
 
@@ -40,8 +44,8 @@ When invoked:
    git status
    ```
 
-6. **Load shared doc policy**:
-   - Read `PLANNING_RULES_PATH` once.
+6. **Load shared review policy**:
+   - Read `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel.
 
 7. Focus on modified files compared to origin/main.
 8. Thoroughly analyze the diff output to understand all implications.
@@ -55,7 +59,7 @@ When invoked:
 - Proper error handling
 - Input validation implemented
 - Good test coverage
-- Docs in changed scope follow `PLANNING_RULES_PATH`, including module/file docs when public surface or boundaries changed
+- Docs in changed scope follow `DOCUMENTATION_RULES_PATH`, including module/file docs when public surface or boundaries changed
 - Performance considerations addressed
 - No bandaid fixes
 - Security vulnerabilities

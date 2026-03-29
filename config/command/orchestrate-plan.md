@@ -12,7 +12,10 @@ think hard
 
 ## Shared Rules
 
-- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
+- `ALL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ALL-RULES.md`
+- `ORCHESTRATION_PLAN_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATION-PLAN-RULES.md`
+- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
+- `ORCHESTRATION_REVISION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATION-REVISION-RULES.md`
 
 ## Workflow
 
@@ -30,7 +33,7 @@ think hard
 - Findings: start empty; populate if you perform code discovery or library research
 
 ### Phase 3: Create Plan File
-- Read `PLANNING_RULES_PATH` once and follow it while drafting the plan
+- Read `ALL_RULES_PATH`, `ORCHESTRATION_PLAN_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, and `ORCHESTRATION_REVISION_RULES_PATH` once, in parallel
 - Create a plan file named `<prompt_filename>-PLAN.md`
   - Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 - Use `PROMPT-01-{title}.md` as the source of truth

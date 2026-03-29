@@ -20,7 +20,11 @@ think hard
 
 # Inputs
 - `prompt_path`: requirements and objectives (required)
-- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
+- `GENERAL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/GENERAL-RULES.md`
+- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
+- `PERFORMANCE_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/PERFORMANCE-RULES.md`
+- `TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/TEST-PARAMETERIZATION-RULES.md`
+- `CODE_PLACEMENT_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/CODE-PLACEMENT-RULES.md`
 - Review context from orchestrator:
   - Task intent (one-line summary)
   - Coder's concerns (areas of uncertainty — focus review here)
@@ -30,7 +34,7 @@ think hard
 
 ## 1) Read objectives
 - Read `prompt_path` (and `objectives_path` if provided)
-- Read `PLANNING_RULES_PATH` once and apply its rules
+- Read `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel
 - Extract objectives, requirements, and success criteria; treat each requirement and success criterion as an objective
 - Tests are always `basic`
 - Derive `coder_notes_path` from `prompt_path` by replacing the extension with `-CODER-NOTES.md`
@@ -48,11 +52,11 @@ think hard
 - FAIL IF: a small, single-caller helper is defined separately instead of inlining
 - FAIL IF: there is dead code (unused functions, unreachable branches, commented-out code)
 - FAIL IF: public visibility is used when private/protected suffices
-- FAIL IF: a blocking documentation issue from `PLANNING_RULES_PATH` exists in changed scope
+- FAIL IF: a blocking documentation issue from `DOCUMENTATION_RULES_PATH` exists in changed scope
 - FAIL IF: there is leftover debug/logging code not intended for production
 - FAIL IF: declarations violate reading order: callees defined before their callers within the same visibility level
 - WARNING IF: there is unnecessary abstraction (interface with only 1 implementation)
-- WARNING IF: only advisory documentation issues from `PLANNING_RULES_PATH` remain
+- WARNING IF: only advisory documentation issues from `DOCUMENTATION_RULES_PATH` remain
 - WARNING IF: non-obvious logic lacks brief inline comments
 
 ## 4) Review code semantics

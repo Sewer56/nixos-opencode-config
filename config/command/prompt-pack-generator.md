@@ -23,7 +23,12 @@ think hard
 - No speculative types/errors: define types/errors only when used in this prompt; later prompts may extend.
 - Tests required: every prompt uses `basic` tests.
 - Apply the canonical modularization rules in this file when shaping prompts.
-- Consider planning rules: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
+- Consider shared rules:
+  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/GENERAL-RULES.md`
+  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
+  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/PERFORMANCE-RULES.md`
+  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/TEST-PARAMETERIZATION-RULES.md`
+  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/CODE-PLACEMENT-RULES.md`
 - Prompts define outcomes and constraints, not the final implementation plan.
 - `# Implementation Hints` and `# Module Layout` are guidance. A simpler valid approach may be used if it still satisfies requirements, clarifications, and settled facts without sacrificing performance.
 

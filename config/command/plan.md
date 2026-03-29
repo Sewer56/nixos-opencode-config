@@ -17,7 +17,8 @@ Use the user input as the planning request.
 
 ## Shared Rules
 
-- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
+- `ALL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ALL-RULES.md`
+- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
 
 ## Process
 
@@ -37,10 +38,10 @@ Use the user input as the planning request.
 - Capture key findings to inform the plan
 
 4) Plan
-- Read `PLANNING_RULES_PATH` once and follow it.
+- Read `ALL_RULES_PATH` once and follow it.
 - Generate plan using Output Format below
 - Every file needing changes must have an Implementation Step
-- Include documentation work required by `PLANNING_RULES_PATH`
+- Include documentation work required by `DOCUMENTATION_RULES_PATH`
 
 5) Clarify (if needed)
 - Scan for ambiguity using reduced taxonomy:
@@ -115,7 +116,7 @@ A: <answer>
   - ✅ Good: `add private async Task<UserInfo> RefreshUserInfoAsync(TimeSpan timeout = default, CancellationToken cancellationToken = default) method`
 
 - **Documentation**: Include doc updates when the step changes public surface or a module/file boundary
-  - Follow `PLANNING_RULES_PATH`
+  - Follow the shared rules above, especially `DOCUMENTATION_RULES_PATH`
 
 - **Implementation Order**: Order code changes within each step to prevent compile errors
   - Add fields/properties first, then methods, then interfaces

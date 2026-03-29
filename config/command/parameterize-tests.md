@@ -53,18 +53,9 @@ think hard
 - Ask for confirmation: `Say "go" to apply this plan, or suggest changes.`
 - Show proposed changes for every target file (not just selected files).
 
-## Parameterisation Rules (All Languages)
+## Shared Style Rules
 
-- Give each case a descriptive name; avoid generic names like `case_1`.
-- Keep argument order stable: primary input -> mode/flags -> expected output.
-- Label parameters with short plain-English comments only when the meaning is
-  non-obvious.
-- Keep labels aligned where practical.
-- If inline labels become too long, move labels above the case.
-- Add occasional in-body comments for non-obvious setup or assertions.
-- Keep tests human-friendly, jargon-free, and around 80-100 characters/line.
-
-## Rust Example (Style Reference)
+- Follow `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/TEST-PARAMETERIZATION-RULES.md`.
 
 ```rust
 /// Verifies that line truncation in formatted output behaves correctly for

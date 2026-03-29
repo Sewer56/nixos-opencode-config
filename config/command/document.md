@@ -17,11 +17,11 @@ $ARGUMENTS
 
 ## Shared Rules
 
-- `DOC_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
+- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
 
 ## Workflow
 
-1. Read `DOC_RULES_PATH` once and use it as the documentation source of truth.
+1. Read `DOCUMENTATION_RULES_PATH` once and use it as the documentation source of truth.
 
 2. Collect files to document.
    - If user input includes file paths, use those paths directly.
@@ -31,7 +31,7 @@ $ARGUMENTS
 3. Review the specified source files.
    - Do not edit files outside the provided paths unless explicitly requested.
 
-4. Add the docs required by `DOC_RULES_PATH`.
+4. Add the docs required by `DOCUMENTATION_RULES_PATH`.
 
 5. Keep scope tight.
    - Do not churn untouched legacy code.
