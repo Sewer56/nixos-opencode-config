@@ -51,7 +51,10 @@ think
 
 3) Verify
 - Run formatter (unless forbidden by system prompt), linter, and build; iterate until clean
-- Tests: basic → add minimal, non-duplicative tests; reuse or extract shared helpers; parametrize to reduce repetition; avoid real I/O/time/network—seed/freeze
+- Tests: basic → add minimal, non-duplicative tests; reuse or extract shared
+  helpers; parameterise repeated cases to reduce repetition (e.g. use `rstest`
+  for Rust), with descriptive case names and labelled parameters/comments;
+  avoid real I/O/time/network—seed/freeze
 
 4) Fix and iterate
 - If any check fails, analyze, fix, and rerun verification

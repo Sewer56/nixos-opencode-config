@@ -40,6 +40,10 @@ Use these rules for both planning and plan review.
 - Avoid broad refactors unless required or requested.
 - Avoid dead code, debug/dev-only logging, and unnecessary abstractions.
 - Avoid duplicate tests and test helpers.
+- Prefer parameterised tests when multiple inputs exercise the same logic path;
+  keep separate tests only when setup, assertions, or failure modes differ.
+- When planning parameterised tests, include representative case naming and
+  parameter labelling style (for example `empty_input_returns_zero`).
 
 ## Documentation
 - Scope:

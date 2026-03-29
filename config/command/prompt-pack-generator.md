@@ -298,6 +298,9 @@ Before creating any prompt:
 - Keep non-public helper types local; do not widen visibility solely to move code.
 - Keep conversion impls/functions (`From`/`TryFrom`/mappers) with related type definitions; avoid global `conversions` buckets.
 - Co-locate tests with the module they validate; avoid central `tests.rs` files for unrelated modules.
+- Prefer parameterised tests for repeated input/output cases rather than many
+  near-identical tests (e.g. use `rstest` for Rust), with descriptive case
+  names and labelled parameters/comments.
 - Keep `models/mod.rs` for module wiring/re-exports; avoid accumulating concrete model definitions there.
 - Apply these rules to new code and directly touched code.
 - Do not require refactoring pre-existing monolithic code unless the user asks.

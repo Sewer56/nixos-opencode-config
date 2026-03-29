@@ -72,6 +72,9 @@ Say "go" to apply this plan, or suggest changes.
 - Keep non-public helper types local; do not widen visibility solely to move code.
 - Keep conversion impls/functions (`From`/`TryFrom`/mappers) with the related type definitions; avoid global `conversions` buckets.
 - Co-locate tests with the module they validate; avoid central `tests.rs` files for unrelated modules.
+- When multiple inputs test the same logic path, prefer parameterised tests over
+  near-duplicate test functions (e.g. use `rstest` for Rust), with descriptive
+  case names and labelled parameters/comments.
 - Keep `models/mod.rs` for module wiring/re-exports; avoid accumulating concrete model definitions there.
 
 6. Apply naming discipline
