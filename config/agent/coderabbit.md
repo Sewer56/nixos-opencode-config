@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Runs CodeRabbit CLI review and fixes findings
-model: synthetic/hf:moonshotai/Kimi-K2.5
+model: zai-coding-plan/glm-5.1
 permission:
   bash: allow
   read: allow

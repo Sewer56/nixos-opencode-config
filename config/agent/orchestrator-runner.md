@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Orchestrates a single prompt end-to-end
-model: synthetic/hf:MiniMaxAI/MiniMax-M2.5
+model: zai-coding-plan/glm-5-turbo
 permission:
   bash: allow
   edit: deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews implementation plans before coding begins (GLM reviewer)
-model: synthetic/hf:moonshotai/Kimi-K2.5
+model: zai-coding-plan/glm-5.1
 permission:
   read: allow
   grep: allow

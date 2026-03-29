@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Schedules per-prompt orchestration via subagents
-model: synthetic/hf:MiniMaxAI/MiniMax-M2.5
+model: zai-coding-plan/glm-5-turbo
 permission:
   bash: allow
   edit: allow

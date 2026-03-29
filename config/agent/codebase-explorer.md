@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Explores codebase structure, patterns, and implementation details.
-model: synthetic/hf:MiniMaxAI/MiniMax-M2.5
+model: zai-coding-plan/glm-5-turbo
 permission:
   read: allow
   grep: allow
