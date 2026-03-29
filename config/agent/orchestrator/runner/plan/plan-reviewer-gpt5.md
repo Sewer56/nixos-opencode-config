@@ -20,10 +20,7 @@ think hard
 # Inputs
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner
-- `ALL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ALL-RULES.md`
-- `ORCHESTRATION_PLAN_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATION-PLAN-RULES.md`
-- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
-- `ORCHESTRATION_REVISION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATION-REVISION-RULES.md`
+- `ALL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/all.md`
 - `review_context` (optional):
   - Open issue ledger from prior review rounds
   - Settled facts validated by findings/repo evidence
@@ -32,7 +29,7 @@ think hard
 
 ## 1) Load Context
 - Read `prompt_path` and `plan_path`.
-- Read `ALL_RULES_PATH`, `ORCHESTRATION_PLAN_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, and `ORCHESTRATION_REVISION_RULES_PATH` once, in parallel.
+- Read `ALL_RULES_PATH` once.
 - Tests are always `basic`.
 - If `review_context` is provided:
   - Reuse issue IDs when root cause is unchanged.
@@ -48,10 +45,9 @@ think hard
 
 ## 3) Review Against Requirements and Shared Rules
 - Verify every requirement/success criterion has concrete implementation and tests.
-- Verify the plan follows `ORCHESTRATION_PLAN_RULES_PATH`.
-- Verify the plan explicitly covers documentation work required by `DOCUMENTATION_RULES_PATH`.
+- Verify the plan follows `ALL_RULES_PATH`, including documentation coverage and revision requirements when applicable.
 - Require `## Requirement Trace Matrix`.
-- If the plan is a revision, require `## Revision Impact Table` per `ORCHESTRATION_REVISION_RULES_PATH`.
+- If the plan is a revision, require `## Revision Impact Table` as required by `ALL_RULES_PATH`.
 - Categorize issues under code style, semantics, or test plan.
 - For each issue include severity, `confidence`, `fix_specificity`, evidence, and fix explanation.
 - For BLOCKING issues, include `Requirement Impact`, `Evidence`, `Failing Scenario`, and `Acceptance Criteria`.

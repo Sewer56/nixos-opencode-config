@@ -7,6 +7,7 @@ Use these rules for planning, implementation, and review unless a more specific 
 - Use descriptive, domain-first names for modules, files, types, and functions.
 - Write the least new code that fully satisfies the requirement.
 - Reuse existing patterns.
+- Optimize for review: keep control flow obvious and change sets cohesive.
 - Keep visibility minimal.
 - Within files, order declarations from most public to most private; within each visibility level, define callers before callees (reading order).
 - Avoid broad refactors unless required or requested.

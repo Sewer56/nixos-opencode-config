@@ -24,12 +24,13 @@ If empty, use the current working directory.
 - Every prompt must be standalone, include the context and file paths a fresh runner needs, and produce real code.
 - Every prompt uses `basic` tests.
 - Prefer existing types, constants, schemas, signatures, and patterns. If a detail is missing, say so; do not fabricate.
-- Apply the shaping rules in this file and these shared rules:
-  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/GENERAL-RULES.md`
-  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
-  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/PERFORMANCE-RULES.md`
-  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/TEST-PARAMETERIZATION-RULES.md`
-  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/CODE-PLACEMENT-RULES.md`
+- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
+- Apply the shaping rules in this file and these shared rules relative to `RULES_DIR`:
+  - `general.md`
+  - `documentation.md`
+  - `performance.md`
+  - `test-parameterization.md`
+  - `code-placement.md`
 - `# Implementation Hints` and `# Module Layout` are guidance, not locked steps. Simpler valid implementations are allowed if requirements, clarifications, and settled facts still hold without sacrificing performance.
 
 ## Workflow

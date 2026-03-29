@@ -20,11 +20,12 @@ think hard
 
 # Inputs
 - `prompt_path`: requirements and objectives (required)
-- `GENERAL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/GENERAL-RULES.md`
-- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
-- `PERFORMANCE_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/PERFORMANCE-RULES.md`
-- `TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/TEST-PARAMETERIZATION-RULES.md`
-- `CODE_PLACEMENT_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/CODE-PLACEMENT-RULES.md`
+- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
+- `GENERAL_RULES_PATH`: `general.md` relative to `RULES_DIR`
+- `DOCUMENTATION_RULES_PATH`: `documentation.md` relative to `RULES_DIR`
+- `PERFORMANCE_RULES_PATH`: `performance.md` relative to `RULES_DIR`
+- `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
+- `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
 - Review context from orchestrator:
   - Task intent (one-line summary)
   - Coder's concerns (areas of uncertainty — focus review here)
@@ -34,7 +35,7 @@ think hard
 
 ## 1) Read objectives
 - Read `prompt_path` (and `objectives_path` if provided)
-- Read `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel
+- Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel
 - Extract objectives, requirements, and success criteria; treat each requirement and success criterion as an objective
 - Tests are always `basic`
 - Derive `coder_notes_path` from `prompt_path` by replacing the extension with `-CODER-NOTES.md`

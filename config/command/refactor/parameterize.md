@@ -55,7 +55,7 @@ think hard
 
 ## Shared Style Rules
 
-- Follow `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/TEST-PARAMETERIZATION-RULES.md`.
+- Follow `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/test-parameterization.md`.
 
 ```rust
 /// Verifies that line truncation in formatted output behaves correctly for

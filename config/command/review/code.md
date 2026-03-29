@@ -9,11 +9,12 @@ Perform a comprehensive code review of files with uncommitted changes and relate
 
 ## Shared Rules
 
-- `GENERAL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/GENERAL-RULES.md`
-- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
-- `PERFORMANCE_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/PERFORMANCE-RULES.md`
-- `TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/TEST-PARAMETERIZATION-RULES.md`
-- `CODE_PLACEMENT_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/CODE-PLACEMENT-RULES.md`
+- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
+- `GENERAL_RULES_PATH`: `general.md` relative to `RULES_DIR`
+- `DOCUMENTATION_RULES_PATH`: `documentation.md` relative to `RULES_DIR`
+- `PERFORMANCE_RULES_PATH`: `performance.md` relative to `RULES_DIR`
+- `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
+- `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
 
 When invoked:
 
@@ -45,7 +46,7 @@ When invoked:
    ```
 
 6. **Load shared review policy**:
-   - Read `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel.
+   - Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel.
 
 7. Focus on modified files compared to origin/main.
 8. Thoroughly analyze the diff output to understand all implications.

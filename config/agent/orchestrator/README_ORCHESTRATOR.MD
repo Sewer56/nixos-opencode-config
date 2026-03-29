@@ -80,8 +80,11 @@ PROMPT-NN-*-PLAN.md      PROMPT-NN-*-CODER-NOTES.md
 - Quality gate: GPT-5 + GLM reviewers validate objectives, code, and verification checks.
 - Commit: `@commit` creates repo-style commits, excluding `PROMPT-*` files.
 
-## Documentation Rules
-- The canonical documentation policy lives in `../rules/ORCHESTRATOR-PLANNING-RULES.md`.
+## Rules Model
+- Canonical split rules live under `../rules/`: `general.md`, `documentation.md`, `performance.md`, `test-parameterization.md`, `code-placement.md`.
+- `../rules/all.md` is the convenience/derived aggregate for `runner/plan/planner` and `runner/plan/plan-reviewer-*`.
+- `runner/code/coder` and `runner/code/quality-gate-*` keep reading the split files directly.
+- The canonical documentation policy lives in `../rules/documentation.md`.
 
 ## Artifacts and Feedback Flow
 - **Planner and coder persist artifacts** to disk: `PROMPT-*-PLAN.md`, `PROMPT-*-CODER-NOTES.md`, and findings files.
