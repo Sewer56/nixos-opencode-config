@@ -1,6 +1,6 @@
 ---
 description: "Generate prompt packs for orchestrated execution"
-agent: orchestrator-builder
+agent: orchestrator/builder
 ---
 
 ## User Input
@@ -148,7 +148,7 @@ Say "go" to validate requirements coverage and generate the orchestrator index.
 ```
 
 ### Phase 7: Validate Requirements Coverage (Subagent)
-- Spawn `@orchestrator-requirements-preflight` with:
+- Spawn `@orchestrator/requirements-preflight` with:
   - `requirements_path` (absolute path to `PROMPT-PRD-REQUIREMENTS.md`)
   - `prompts_dir` (absolute path to the current working directory)
   - `prd_path` (absolute path to the PRD input)
@@ -167,7 +167,7 @@ Create `PROMPT-ORCHESTRATOR.md` in current working directory with:
 
 ### Phase 9: Hand Off to User
 ```
-Ready for orchestration with `@ orchestrator` (scheduler). For a single prompt, use `@ orchestrator-runner`.
+Ready for orchestration with `@ orchestrator` (scheduler). For a single prompt, use `@ orchestrator/runner`.
 ```
 
 ## Prompt File Format: `PROMPT-NN-{title}.md`

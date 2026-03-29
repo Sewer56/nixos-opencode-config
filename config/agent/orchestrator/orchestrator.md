@@ -18,7 +18,7 @@ permission:
     "*": "deny",
     "commit": "allow",
     "coderabbit": "allow",
-    "orchestrator-*": "allow"
+    "orchestrator/*": "allow"
   }
 ---
 
@@ -110,7 +110,7 @@ Determine `base_branch` at start and store it for later use:
 For each prompt in the listed order:
 
 1. Update state: set prompt status `RUNNING`, set `current_prompt_index`, update the row, preserve `Reqs`, write state file.
-2. Spawn `@orchestrator-runner`.
+2. Spawn `@orchestrator/runner`.
    - Inputs: `prompt_path` (absolute path), one-line overall objective
 3. Wait for the runner and parse its report:
     - Status: SUCCESS|FAIL|INCOMPLETE
@@ -139,7 +139,7 @@ After each prompt with status SUCCESS or INCOMPLETE, spawn `@coderabbit`.
 - Make sure CodeRabbit changes are committed via `@commit`.
 
 ## Phase 3: Final Requirements Validation
-After all prompts complete (SUCCESS or INCOMPLETE), run `@orchestrator-requirements-final`.
+After all prompts complete (SUCCESS or INCOMPLETE), run `@orchestrator/requirements-final`.
 - Inputs:
   - `orchestrator_path` (absolute)
   - `requirements_path` (absolute)

@@ -27,7 +27,7 @@
     "plan": {
       "permission": {
         "task": {
-          "orchestrator-*": "deny",
+          "orchestrator/*": "deny",
           "mcp-search": "allow"
         }
       }
@@ -35,7 +35,7 @@
     "build": {
       "permission": {
         "task": {
-          "orchestrator-*": "deny",
+          "orchestrator/*": "deny",
           "mcp-search": "deny"
         }
       }
@@ -44,7 +44,7 @@
       "model": "zai-coding-plan/glm-5.1",
       "permission": {
         "task": {
-          "orchestrator-*": "deny",
+          "orchestrator/*": "deny",
           "mcp-search": "allow"
         }
       }
