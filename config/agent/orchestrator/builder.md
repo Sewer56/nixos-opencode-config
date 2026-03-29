@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Generates human review packs and prompt packs for orchestrated execution
+description: Builds orchestrator prompt packs from task descriptions
 permission:
   bash: deny
   edit: allow

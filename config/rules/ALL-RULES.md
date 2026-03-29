@@ -13,6 +13,7 @@ This file combines the shared rules and the orchestrator-specific rules in one p
 ## General
 - Keep changes minimal.
 - Prefer plain code and names; avoid jargon and cleverness.
+- Use descriptive, domain-first names for modules, files, types, and functions.
 - Write the least new code that fully satisfies the requirement.
 - Reuse existing patterns.
 - Keep visibility minimal.
@@ -41,9 +42,12 @@ This file combines the shared rules and the orchestrator-specific rules in one p
 - Split catch-all files into focused modules.
 - Keep top-level orchestration in the parent module/file entrypoint.
 - Keep data-holder models in dedicated model modules.
+- Keep enums and newtypes with the parent type when only that parent uses them.
 - Keep non-public helper types local.
 - Keep conversions with related type definitions.
 - Co-locate tests with the module they validate.
+- Keep `models/mod.rs` for wiring and re-exports, not concrete model definitions.
+- Do not collapse modular code into monoliths unless the user asks.
 - Put shared behavior in the lowest shared package that owns it.
 - If behavior belongs in `core` because every implementation, adapter, or extension should benefit from it, put it in `core`, not in an extension, middleware, or integration package.
 - Shared validation, normalization, parsing, and domain contracts belong in shared/core packages when multiple implementations should inherit that behavior.

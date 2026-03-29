@@ -4,6 +4,7 @@ Use these rules for planning, implementation, and review unless a more specific 
 
 - Keep changes minimal.
 - Prefer plain code and names; avoid jargon and cleverness.
+- Use descriptive, domain-first names for modules, files, types, and functions.
 - Write the least new code that fully satisfies the requirement.
 - Reuse existing patterns.
 - Keep visibility minimal.

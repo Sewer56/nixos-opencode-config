@@ -1,5 +1,5 @@
 ---
-description: "Generate a human review pack, then prompt packs for orchestrated execution"
+description: "Build orchestrator prompt files from task descriptions"
 agent: orchestrator/builder
 ---
 
@@ -9,207 +9,143 @@ agent: orchestrator/builder
 $ARGUMENTS
 ```
 
-You **MUST** consider the user input before proceeding (if not empty).
+Use the input as either:
+- a directory containing markdown task files
+- one or more markdown task files
 
-# Prompt Pack Generator
+If empty, use the current working directory.
 
-Generate a human review pack first, then prompt files for orchestrated execution after approval. Prompts define requirements and deliverables; implementation planning happens during orchestration.
-
-think hard
-
-## Core Principles
-- Human-first review: let the user review a plain-language draft before deep discovery or machine-only artifacts are generated.
-- Deliverable-first: each prompt must produce working code. No placeholder-only prompts.
-- Isolation-safe: each prompt must run in isolation; include all required context and file paths.
-- No speculative types/errors: define types/errors only when used in this prompt; later prompts may extend.
-- Tests required: every prompt uses `basic` tests.
-- Apply the canonical modularization rules in this file when shaping prompts.
-- Consider shared rules:
+## Hard Rules
+- Start from the task description files. Do not invent tasks.
+- Do deep discovery before writing prompts.
+- Preserve task intent. Do not silently merge, split, drop, or reorder tasks in ways that change that intent.
+- If discovery finds a real blocker or a required reshape, stop and explain it instead of rewriting the task set.
+- Write machine-ready prompts that define outcomes, constraints, and evidence. Do not write implementation plans.
+- Every prompt must be standalone, include the context and file paths a fresh runner needs, and produce real code.
+- Every prompt uses `basic` tests.
+- Prefer existing types, constants, schemas, signatures, and patterns. If a detail is missing, say so; do not fabricate.
+- Apply the shaping rules in this file and these shared rules:
   - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/GENERAL-RULES.md`
   - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
   - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/PERFORMANCE-RULES.md`
   - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/TEST-PARAMETERIZATION-RULES.md`
   - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/CODE-PLACEMENT-RULES.md`
-- Prompts define outcomes and constraints, not the final implementation plan.
-- `# Implementation Hints` and `# Module Layout` are guidance. A simpler valid approach may be used if it still satisfies requirements, clarifications, and settled facts without sacrificing performance.
-
-## Simple Flow
-1. Draft `PROMPT-REVIEW.md`.
-2. Let the human review it, answer questions, and suggest edits.
-3. On `go`, generate the machine prompt pack.
-4. Run requirements preflight and write `PROMPT-ORCHESTRATOR.md`.
+- `# Implementation Hints` and `# Module Layout` are guidance, not locked steps. Simpler valid implementations are allowed if requirements, clarifications, and settled facts still hold without sacrificing performance.
 
 ## Workflow
 
-### Phase 1: Parse Request
-- Extract core objective and components from user input only (ignore generator/system prompt)
-- Draft prompt list (title + one-line objective)
-- Order by dependencies
-- Apply task sizing guidance (default to small, single-objective prompts)
-- Convert broad goals into vertical slices that yield working code
-- Produce a requirement-to-prompt ownership draft in memory only:
-  - Each `IN` requirement must have exactly one primary owner prompt
-  - Secondary prompts may reference a requirement but must not own it
-- Keep this pass simple and human-reviewable; do not write machine-only artifacts yet
+### 1. Load task inputs
+- Resolve the input path or use the current working directory.
+- Accept one or more markdown task files.
+- If the input is a directory, discover task files inside it.
+- When present, prefer `PROMPT-SPLIT.md` as the overview and `PROMPT-DRAFT-*.md` as per-task inputs.
+- If specific files are provided, use those files directly.
+- Require at least one actionable task file.
+- Use the inputs to determine task order, dependencies, scope notes, clarifications, and the source document.
+- If files disagree, keep the most concrete task description and carry the resolved interpretation into `# Clarifications`.
+- Determine the source document path:
+  - If any input file contains a valid `Source Document:` path, use it.
+  - Otherwise, use the most relevant input file.
 
-### Phase 2: Light Discovery
-- Do a minimal repo scan only to avoid obviously bad prompt splits or misleading prompt titles
-- Read only the most relevant entry points and patterns; do not do full prompt research yet
-- Resolve only ambiguities that would make the review draft misleading
-- Do not create findings files, prompt files, or the requirements inventory yet
+### 2. Do discovery
+- Read every described task, cited source, and referenced artifact before writing prompts.
+- Confirm the work is needed:
+  - update or sync: compare current and requested state; skip if identical
+  - add or create: confirm it does not already exist
+  - fix: confirm the bug is real
+  - migration: compare current and target state; skip if already compliant
+- Reuse existing artifacts verbatim when they exist: schemas, types, tables, precedence rules, constants, signatures.
+- If details are missing, note the gap; do not fabricate.
+- Do not mention internal command names in generated prompts.
+- Use subagents when needed:
+  - `@codebase-explorer` for repo search and pattern discovery
+  - `@mcp-search` for external libraries and APIs
+- Default to parallel subagent calls unless one depends on another.
+- Gather enough context that a runner with no prior memory can execute the prompt.
+- Capture the minimum required files in `# Required Reads`, each with a short relevance note.
+- Write prompt-scoped findings files as `PROMPT-FINDING-<prompt-stem>-NN.md` and list them in `# Findings`.
+- Keep findings prompt-scoped. Duplicate findings across prompts if that keeps prompts standalone.
+- Put extra research in findings files, not extra sections in prompt files.
+- Capture repo conventions in findings when they matter: test commands, lint/build expectations, and CI versions.
 
-### Phase 3: Create Human Review Pack
-- Create `PROMPT-REVIEW.md` in the current working directory
-- Write a plain-language draft for the human to review before any machine-heavy artifacts are generated
-- Keep it free of requirement IDs, trace matrices, acceptance criteria jargon, revision tables, and other machine-only sections
+### 3. Write `PROMPT-PRD-REQUIREMENTS.md`
+- Create it in the current working directory.
+- Extract every discrete requirement from the task files and the source document only.
+- Use stable IDs: `REQ-001`, `REQ-002`, ...
+- Tag each requirement as `IN`, `OUT`, or `POST_INIT`.
+- Include the source section, a short acceptance note, and `Owner Prompt` for every requirement.
+- Set `Owner Prompt` to a prompt file or `None`.
+- Do not drop requirements; mark `OUT` or `POST_INIT` explicitly.
+
+### 4. Write `PROMPT-NN-{title}.md`
+- Create one prompt per described task.
+- Keep task titles unless discovery requires a clearer name.
+- Keep task boundaries when they are viable.
+- If a task must be split because of a real blocker, stop and ask the user first.
+- Order prompts by dependency.
+- Every prompt must include concrete deliverables and at least one code artifact.
+- Carry relevant decisions, dependencies, and open questions into `# Clarifications`.
+- Every `# Requirements` item must include a requirement ID.
+- Add `# Settled Facts` with `FACT-###` source pointers.
+- Add `# Verification Scope` with in-scope checks and known unrelated failures.
+- Always include `# Module Layout`.
+
+### 5. Run requirements preflight
+- Spawn `@orchestrator/runner/requirements/requirements-preflight` with:
+  - `requirements_path`: absolute path to `PROMPT-PRD-REQUIREMENTS.md`
+  - `prompts_dir`: absolute path to the current working directory
+  - `prd_path`: absolute path to the source document
+- If the result is FAIL or PARTIAL, revise the prompt pack and run preflight again.
+- Proceed only on PASS.
+
+### 6. Write `PROMPT-ORCHESTRATOR.md`
+- Create it in the current working directory.
 - Include:
-  - overall goal
-  - proposed prompt list
-  - for each prompt: what this does, why it is separate, draft plan, likely areas touched, needs first, open questions, done when, what we'll check
+  - the overall objective
+  - the prompt list with dependencies and tests
+  - `PRD Path` relative to the working directory
+  - `Requirements Inventory: PROMPT-PRD-REQUIREMENTS.md`
+  - `## Requirement Ownership` entries in this format:
+    - `REQ-### - Owner: PROMPT-NN-... - Secondary: ... | None`
+- Every `IN` requirement must have exactly one owner.
+- In `PROMPT-ORCHESTRATOR.md`, keep ownership mapping only in `## Requirement Ownership`.
 
-### Phase 4: Review Questions and Confirmation
-- While waiting for confirmation, ask up to 10 questions total if answers would improve prompt quality
-- Ask all questions in one batch using the `question` tool
-- Prefer simple wording and concise options; include a recommended option when there is one
-- Update `PROMPT-REVIEW.md` based on user feedback and answers
-- Let the user edit, reorder, split, or merge prompts
-- Continue to Phase 5 only when the user says `go`
-- After `go`, do not ask more review questions unless full discovery uncovers a new hard blocker
-
-When presenting the draft, use:
+### 7. Hand off
 ```
-Review draft written to `PROMPT-REVIEW.md`.
+Prompt pack ready.
 
-Proposed prompts:
-1. Prompt 01 - {title}: {objective}
-2. Prompt 02 - {title}: {objective}
-...
-
-Questions: <count or none>
-
-Say "go" to continue, or suggest changes.
-```
-
-### Phase 5: Full Discovery and Generate Machine Prompt Pack
-- Review every item, source, and reference from the user input; do not skip
-- Reuse existing research artifacts verbatim (schemas/types, tables, precedence rules, constants, signatures); do not invent
-- If details are missing, say so succinctly; do not fabricate
-- Do not mention the input file name/path in prompts or findings; use generic phrasing like "from input"
-- Use subagents as needed:
-  - `@mcp-search` for external library/API specifics
-  - `@codebase-explorer` for codebase search and pattern discovery
-- Default to parallel subagent calls; only serialize when a dependency requires it
-- Treat findings as suggestions, not specs; use judgment when populating `# Implementation Hints`
-- Prefer reusing existing types and patterns; only introduce new ones when required by the current prompt
-- Gather enough context so a runner with no prior memory can execute the prompt
-- Identify the minimal required files to read and capture them in `# Required Reads` with brief relevance notes
-- Capture a short "repo conventions snapshot" in findings when relevant (test commands, CI action versions, lint/build expectations) to reduce avoidable downstream review churn
-- Log findings per prompt in `PROMPT-FINDING-<prompt-stem>-NN.md` (comprehensive, prompt-relevant) and add a one-line entry in the prompt's `# Findings`
-- Include other research discoveries the same way; keep findings prompt-scoped (duplication across prompts is OK)
-- Put all supplemental artifacts in findings; do not add extra sections to prompt files
-- Create `PROMPT-PRD-REQUIREMENTS.md` in the current working directory:
-  - Extract every discrete requirement from the user input/PRD only (exclude generator/system/prompt-format requirements)
-  - Use stable IDs: `REQ-001`, `REQ-002`, ... (zero-padded, sequential)
-  - Tag each with scope: `IN`, `OUT`, or `POST_INIT`
-  - Record source section from the user input/PRD (e.g., Key Goals, Features > Remapping & Bindings)
-  - Write a short acceptance note per requirement (what evidence would satisfy it)
-  - Do not drop requirements; mark out-of-scope or post-init explicitly
-  - Prefer per-requirement headings to reduce tokens in inventory files
-- Create in current working directory:
-  - `PROMPT-NN-{title}.md` - one per task (standalone, self-contained)
-  - Ensure each prompt includes concrete deliverables
-  - Carry approved review decisions into `# Clarifications`
-  - Every prompt `# Requirements` entry must include a requirement ID (e.g., `REQ-012: ...`)
-  - Add `# Settled Facts` with validated facts and source pointers (`FACT-###`)
-  - Add `# Verification Scope` to define in-scope checks and known unrelated pre-existing failures
-  - Always include `# Module Layout` with language and a structure diff when layout changes
-  - If unchanged, set `Structure: unchanged` and omit the diff block and `Why` line
-
-### Phase 6: Validate Requirements Coverage (Subagent)
-- Spawn `@orchestrator/requirements-preflight` with:
-  - `requirements_path` (absolute path to `PROMPT-PRD-REQUIREMENTS.md`)
-  - `prompts_dir` (absolute path to the current working directory)
-  - `prd_path` (absolute path to the PRD input)
-- If status is FAIL or PARTIAL: revise the prompt pack and re-run this phase
-- If PASS: proceed
-
-### Phase 7: Generate Orchestrator Index
-Create `PROMPT-ORCHESTRATOR.md` in current working directory with:
-- Overall objective
-- Prompt list with dependencies and tests
-- `PRD Path` and `Requirements Inventory` paths (relative)
-- Add a `## Requirement Ownership` section:
-  - `REQ-### — Owner: PROMPT-NN-... — Secondary: ... | None`
-  - Every `IN` requirement must have exactly one owner
-  - This section is the source of truth for requirement-to-prompt mapping
-
-### Phase 8: Hand Off to User
-```
-Ready for orchestration with `@ orchestrator` (scheduler). For a single prompt, use `@ orchestrator/runner`.
-```
-
-## Review Pack Format: `PROMPT-REVIEW.md`
-
-```markdown
-# Prompt Review Pack
-
-Overall Goal: <short line>
-
-## Proposed Prompts
-
-### Prompt 01: <title>
-- What this does: <plain-language outcome>
-- Why this is separate: <why this is its own step>
-- Draft plan:
-  1. <step>
-  2. <step>
-  3. <step>
-- Likely areas touched:
-  - path/to/file-or-dir
-- Needs first: None | Prompt 0N
-- Open questions:
-  - <question or None>
-- Done when:
-  - <human-readable outcome>
-- What we'll check:
-  - basic
-
-## Review Notes
-- Status: waiting for feedback | approved
-- Decisions:
-  - <feedback, answer, or none>
+Run `@ orchestrator` with `PROMPT-ORCHESTRATOR.md` to start execution.
+For a single prompt, use `@ orchestrator/runner`.
 ```
 
 ## Prompt File Format: `PROMPT-NN-{title}.md`
 
 ````markdown
 # Mission
-[1-2 sentence goal for this task]
+[1-2 sentence goal]
 
 # Objective
 [What must be achieved]
 
 # Context
-[Relevant background; include file paths and decisions for isolated execution]
+[Background, decisions, and file paths needed for isolated execution]
 
 # Required Reads
-- path/to/file: [Why this file is relevant]
+- path/to/file: [why this file matters]
 
 # Requirements
-- REQ-###: [Specific, measurable requirement]
-- REQ-###: [Expected behaviors and outcomes]
+- REQ-###: [specific, measurable requirement]
 
 # Deliverables
-- [Concrete code artifacts from this prompt]
+- [concrete code artifacts]
 
 # Constraints
-- [Technical constraints]
-- [What to avoid]
-- No placeholder types/errors; define new ones only when used here; later prompts may extend
-- `# Implementation Hints` and `# Module Layout` are guidance, not fixed implementation steps; a simpler valid implementation is allowed if requirements, clarifications, and settled facts still hold without sacrificing performance
+- [technical constraints and things to avoid]
+- No placeholder types or errors; define new ones only when used here; later prompts may extend.
+- `# Implementation Hints` and `# Module Layout` are guidance, not fixed steps.
 
 # Success Criteria
-- [How to know the objective is met]
+- [observable outcomes]
 
 # Scope
 - IN: [what's in scope]
@@ -251,8 +187,8 @@ src/config/
 If `unchanged`, stop after `- Structure: unchanged`.
 
 # Implementation Hints
-- [Patterns, library usage, existing code to reuse]
-- [Actionable guidance for planner/coder]
+- [existing patterns, APIs, or files to reuse]
+- [guidance for planner/coder]
 
 # Verification Scope
 - In scope checks: <format/lint/build/tests relevant to this prompt>
@@ -266,16 +202,16 @@ If `unchanged`, stop after `- Structure: unchanged`.
 # Orchestrator Index
 
 Overall Objective: <short line>
-PRD Path: <relative path to PRD input>
+PRD Path: <relative path to source document>
 Requirements Inventory: PROMPT-PRD-REQUIREMENTS.md
 
 ## Prompts
-- PROMPT-01-{title}.md — Objective: <short> — Dependencies: None
-- PROMPT-02-{title}.md — Objective: <short> — Dependencies: PROMPT-01
+- PROMPT-01-{title}.md - Objective: <short> - Dependencies: None
+- PROMPT-02-{title}.md - Objective: <short> - Dependencies: PROMPT-01
 
 ## Requirement Ownership
-- REQ-001 — Owner: PROMPT-01-{title}.md — Secondary: None
-- REQ-002 — Owner: PROMPT-02-{title}.md — Secondary: PROMPT-03-{title}.md
+- REQ-001 - Owner: PROMPT-01-{title}.md - Secondary: None
+- REQ-002 - Owner: PROMPT-02-{title}.md - Secondary: PROMPT-03-{title}.md
 ```
 
 ## Requirements Inventory: `PROMPT-PRD-REQUIREMENTS.md`
@@ -283,7 +219,7 @@ Requirements Inventory: PROMPT-PRD-REQUIREMENTS.md
 ```markdown
 # PRD Requirements Inventory
 
-Source PRD: PROMPT-PRD.md
+Source PRD: <relative path to source document>
 
 ## REQ-001 [IN] <requirement>
 - Source: <section>
@@ -296,53 +232,11 @@ Source PRD: PROMPT-PRD.md
 - Owner Prompt: None
 ```
 
-## Investigation Rules
-Before creating any prompt:
-- **Update/sync tasks**: fetch and compare; skip if identical
-- **Add/create tasks**: confirm it doesn't already exist
-- **Fix tasks**: confirm the bug is real
-- **Migration tasks**: compare current vs target; skip if compliant
-
-## Canonical Modularization Rules
-- Split catch-all files into focused modules/files with single responsibilities.
-- Keep top-level orchestration logic in the parent module/file entrypoint.
-- Place primarily data-holder models (with only trivial logic) in dedicated model files/folders by default.
-- Keep enums/newtypes colocated with a parent type when they are only used by that parent.
-- Keep non-public helper types local; do not widen visibility solely to move code.
-- Keep conversion impls/functions (`From`/`TryFrom`/mappers) with related type definitions; avoid global `conversions` buckets.
-- Co-locate tests with the module they validate; avoid central `tests.rs` files for unrelated modules.
-- Prefer parameterised tests for repeated input/output cases rather than many
-  near-identical tests (e.g. use `rstest` for Rust), with descriptive case
-  names and labelled parameters/comments.
-- Keep `models/mod.rs` for module wiring/re-exports; avoid accumulating concrete model definitions there.
-- Apply these rules to new code and directly touched code.
-- Do not require refactoring pre-existing monolithic code unless the user asks.
-- Do not convert modular code into monolithic files unless the user asks.
-- If a monolith-to-modular (or modular-to-monolith) migration is requested, plan it as a dedicated objective/prompt before any other requested changes.
-
-## Constraints
-- Be thorough; validate work is needed before creating prompts
-- Do not omit requirements; mark as OUT or POST_INIT when no work is needed
-- Order prompts by dependency
-- Each prompt must be standalone and self-contained
-- Every prompt must have code as a deliverable (no research-only prompts)
-- Every `IN` requirement must have exactly one owner prompt in the index
-- Do not duplicate requirement mappings in multiple index sections; keep mapping in `## Requirement Ownership`
-- Do not place unresolved blockers into generated prompts; resolve or surface them during the review phase
-- Apply the canonical modularization rules in this file
-- Always include `# Module Layout`; use `Structure: unchanged` when there are no structural changes
-
-## Task Sizing Guidance
-- Default to the smallest useful unit; one primary objective per prompt
-- Keep extraction/migration/verification in one prompt when they serve a single objective
-- If a task spans subsystems or integrations, split into prompts ordered by dependency
-- Split prompts only when objectives are independently shippable/testable
-- Avoid cross-cutting refactors unless explicitly required by the user
-- Prefer focused change sets, but allow touching multiple files when needed for coherent module boundaries
-- Use descriptive, domain-first names for modules/files/types/functions
-- If work combines unrelated objectives, split
-- When unsure, err on more prompts with smaller scopes
-- Aim for <=500 lines per prompt; split if likely to exceed
+## Shaping Rules
+- Respect the task boundaries from the input when they are viable.
+- Keep extraction, migration, and verification together when they serve one objective.
+- If a task spans subsystems or integrations, split only when a real blocker forces it, and ask the user first.
+- If the request itself is a monolith-to-modular or modular-to-monolith migration, make that its own prompt before other work.
 
 ## Findings File Format: `PROMPT-FINDING-<prompt-stem>-NN.md`
 

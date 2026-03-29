@@ -1,14 +1,16 @@
 # Orchestrator Overview
 
-This folder defines the multi-agent workflow that turns a reviewed prompt pack into working code, with planning, review, verification, and requirements validation.
+This folder defines the multi-agent workflow that turns task descriptions into a machine prompt pack, then into working code, with planning, review, verification, and requirements validation.
 
 ## Entry Points
-- `orchestrator/prompt-pack-generator` creates a human review draft first (`PROMPT-REVIEW.md`), then generates `PROMPT-*.md`, `PROMPT-PRD-REQUIREMENTS.md`, and `PROMPT-ORCHESTRATOR.md` after approval.
+- `plan/split` scans the repo, then creates the human review drafts: `PROMPT-SPLIT.md` and `PROMPT-DRAFT-*.md`.
+- `orchestrator/prompt-pack` turns task description files into `PROMPT-*.md`, `PROMPT-PRD-REQUIREMENTS.md`, and `PROMPT-ORCHESTRATOR.md`.
 - `orchestrator` is the scheduler that executes an existing `PROMPT-ORCHESTRATOR.md` sequentially.
 - `orchestrator/runner/runner` can be used directly for a single prompt when you already have a prompt file.
 
 ## Core Artifacts
-- `PROMPT-REVIEW.md`: human-friendly draft prompt pack for review before deep discovery and machine-only artifacts.
+- `PROMPT-SPLIT.md`: high-level split summary for human review.
+- `PROMPT-DRAFT-*.md`: human-friendly draft tasks reviewed before prompt-pack generation.
 - `PROMPT-ORCHESTRATOR.md`: ordered prompt list with objectives, dependencies, tests, and requirement coverage.
 - `PROMPT-PRD-REQUIREMENTS.md`: requirement inventory with scope and acceptance notes.
 - `PROMPT-ORCHESTRATOR.state.md`: resumable state (prompt status, plan paths, base branch).
@@ -17,14 +19,14 @@ This folder defines the multi-agent workflow that turns a reviewed prompt pack i
 - `PROMPT-ORCHESTRATOR.validation.md`: final requirements validation report written by the requirements checker.
 
 ## Short Version
-1. Generate `PROMPT-REVIEW.md`.
-2. Review it and say `go`.
-3. Generate the machine prompt pack.
+1. Run `plan/split`.
+2. Review `PROMPT-SPLIT.md` and `PROMPT-DRAFT-*.md`.
+3. Run `orchestrator/prompt-pack`.
 4. Run the scheduler.
 
 ## End-to-End Flow
-- Generate `PROMPT-REVIEW.md` via `orchestrator/prompt-pack-generator` and get user approval.
-- After approval, the generator performs deep discovery, writes the machine prompt pack, and runs requirements preflight.
+- Generate `PROMPT-SPLIT.md` and `PROMPT-DRAFT-*.md` via `plan/split` and get user approval.
+- `orchestrator/prompt-pack` takes task descriptions, performs deep discovery, writes the machine prompt pack, and runs requirements preflight.
 - The scheduler reads the index, initializes state, detects base branch, and runs prompts in order.
 - Each prompt is executed by `@orchestrator/runner/runner` through plan, review, implementation, quality gate, and commit.
 - After each prompt, the scheduler runs CodeRabbit review when available.
@@ -37,13 +39,13 @@ This folder defines the multi-agent workflow that turns a reviewed prompt pack i
 User Input
   |
   v
-orchestrator/prompt-pack-generator
-  |  (PROMPT-REVIEW.md)
+plan/split
+  |  (PROMPT-SPLIT.md, PROMPT-DRAFT-*.md)
   v
 Human review + approval
   |
   v
-orchestrator/prompt-pack-generator
+orchestrator/prompt-pack
   |  (PROMPT-*.md, PROMPT-PRD-REQUIREMENTS.md, PROMPT-ORCHESTRATOR.md)
   v
 orchestrator (scheduler)
