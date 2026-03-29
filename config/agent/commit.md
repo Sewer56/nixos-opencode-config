@@ -2,7 +2,7 @@
 mode: subagent
 hidden: false
 description: Creates semantic commits matching repository style
-model: zai-coding-plan/glm-5-turbo
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   bash: allow
   read: allow

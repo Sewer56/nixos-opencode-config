@@ -17,12 +17,12 @@ permission:
   todoread: deny
   task:
     "*": "deny"
-    "orchestrator-planner": "allow"
-    "orchestrator-plan-reviewer-gpt5": "allow"
-    "orchestrator-plan-reviewer-glm": "allow"
-    "orchestrator-coder": "allow"
-    "orchestrator-quality-gate-glm": "allow"
-    "orchestrator-quality-gate-gpt5": "allow"
+    "orchestrator/runner/plan/planner": "allow"
+    "orchestrator/runner/plan/plan-reviewer-gpt5": "allow"
+    "orchestrator/runner/plan/plan-reviewer-glm": "allow"
+    "orchestrator/runner/code/coder": "allow"
+    "orchestrator/runner/code/quality-gate-glm": "allow"
+    "orchestrator/runner/code/quality-gate-gpt5": "allow"
     "commit": "allow"
 ---
 
@@ -66,7 +66,7 @@ Record unmet requirements only when tied to specific IDs (from plan notes, coder
 
 ### Phase 1: Plan
 1. Read `prompt_path` and `overall_objective`; extract a one-line task intent.
-2. Spawn `@orchestrator-planner` with `prompt_path` (no `revision_notes` on first call).
+2. Spawn `@orchestrator/runner/plan/planner` with `prompt_path` (no `revision_notes` on first call).
 3. Parse response for `plan_path`.
    - If planner fails or returns no plan, retry up to 3 times
    - Do not write the plan yourself
@@ -76,7 +76,7 @@ Record unmet requirements only when tied to specific IDs (from plan notes, coder
    - If planner output differs, rename with `mv`, update `plan_path`, and stop on failure
 
 ### Phase 2: Plan Review (parallel)
-1. Spawn `@orchestrator-plan-reviewer-gpt5` and `@orchestrator-plan-reviewer-glm` in parallel.
+1. Spawn `@orchestrator/runner/plan/plan-reviewer-gpt5` and `@orchestrator/runner/plan/plan-reviewer-glm` in parallel.
 2. Inputs: `prompt_path`, `plan_path`, and `review_context` (`open_ledger_items` + `settled_facts`).
 3. Decision rules:
    - Approve if no unresolved BLOCKING issues remain after contradiction handling
@@ -106,7 +106,7 @@ Record unmet requirements only when tied to specific IDs (from plan notes, coder
 7. If still not approved after 10 iterations, record unmet requirements (when applicable) and proceed with the latest plan.
 
 ### Phase 3: Implementation (loop <= 10)
-- Spawn `@orchestrator-coder`
+- Spawn `@orchestrator/runner/code/coder`
 - Inputs: `prompt_path`, `plan_path`, one-line task intent, and any plan review notes
 - Parse the coder response as `# CODER RESULT` to extract:
   - `Status: SUCCESS | FAIL | ESCALATE`
@@ -131,7 +131,7 @@ Record unmet requirements only when tied to specific IDs (from plan notes, coder
   - task intent
   - coder concerns and related files (from latest coder notes)
 - Do not pass coder notes; reviewers read `-CODER-NOTES.md` directly
-- Spawn `@orchestrator-quality-gate-glm` and `@orchestrator-quality-gate-gpt5` in parallel
+- Spawn `@orchestrator/runner/code/quality-gate-glm` and `@orchestrator/runner/code/quality-gate-gpt5` in parallel
 - Do NOT pass the plan file to reviewers
 - If a reviewer asks for missing inputs, re-run that reviewer once with corrected inputs (do not count as an iteration)
 - Decision rules:
@@ -145,7 +145,7 @@ Record unmet requirements only when tied to specific IDs (from plan notes, coder
   - If GLM resolves GPT-5's concern, accept PASS
 - If revision needed:
   - Distill only in-scope BLOCKING issues and include BOTH reviewers' notes
-  - Re-invoke `@orchestrator-coder` with feedback
+  - Re-invoke `@orchestrator/coder` with feedback
   - Re-run gate
 - If still not passing after 10 iterations, record unmet requirements (when applicable) and proceed to commit
 - Max 10 iterations total
@@ -185,7 +185,7 @@ Iterations: <n>
 - Review Focus: <short summary or None>
 
 ## Implementation
-Coder: @orchestrator-coder
+Coder: @orchestrator/runner/code/coder
 Status: SUCCESS | FAIL | ESCALATE
 
 ## Coder Notes Summary

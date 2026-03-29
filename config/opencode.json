@@ -27,7 +27,7 @@
     "plan": {
       "permission": {
         "task": {
-          "orchestrator-*": "deny",
+          "orchestrator/*": "deny",
           "mcp-search": "allow"
         }
       }
@@ -35,16 +35,16 @@
     "build": {
       "permission": {
         "task": {
-          "orchestrator-*": "deny",
+          "orchestrator/*": "deny",
           "mcp-search": "deny"
         }
       }
     },
     "general": {
-      "model": "zai-coding-plan/glm-5.1",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "permission": {
         "task": {
-          "orchestrator-*": "deny",
+          "orchestrator/*": "deny",
           "mcp-search": "allow"
         }
       }

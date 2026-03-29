@@ -26,7 +26,10 @@ think hard
 - `prompt_path`: absolute path to PROMPT-NN-*.md file
 - `revision_notes` (optional): feedback from plan review or coder escalation
 - Expect structured entries when available: issue ID, severity, confidence, fix_specificity, source, evidence, requested fix, `acceptance_criteria`
-- `PLANNING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
+- `ALL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ALL-RULES.md`
+- `ORCHESTRATION_PLAN_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATION-PLAN-RULES.md`
+- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
+- `ORCHESTRATION_REVISION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATION-REVISION-RULES.md`
 
 # Process
 
@@ -41,8 +44,7 @@ think hard
 - Ensure `plan_path` contains a complete plan (create or revise) and return only `plan_path`.
 
 1b) Load Shared Rules
-- Read `PLANNING_RULES_PATH` once.
-- Follow those rules while drafting and revising the plan.
+- Read `ALL_RULES_PATH`, `ORCHESTRATION_PLAN_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, and `ORCHESTRATION_REVISION_RULES_PATH` once, in parallel.
 
 2) Read and Scope
 - Read prompt_path (mission, objective, requirements, constraints, tests, clarifications, implementation hints)
@@ -51,7 +53,7 @@ think hard
 - Extract what to build; tests are always `basic`
 - Treat `# Implementation Hints` and `# Module Layout` as guidance, not a locked plan
 - Requirements, clarifications, and settled facts are binding; if a simpler valid approach preserves them without sacrificing performance, prefer it
-- Determine project type and documentation scope expected by `PLANNING_RULES_PATH`
+- Determine project type, package boundaries, and documentation scope expected by `ALL_RULES_PATH`
 - Identify libraries/frameworks needing lookup
 - Set repo_root as the closest ancestor of prompt_path containing `.git`; if none, use prompt_path parent
 
@@ -78,7 +80,7 @@ think hard
 5) Draft Complete Plan
 Build these sections:
 - **External Symbols**: map files to required `use` statements and referenced types/classes for implementation
-- **Implementation Steps**: ordered by file and compliant with `PLANNING_RULES_PATH`
+- **Implementation Steps**: ordered by file and compliant with `ORCHESTRATION_PLAN_RULES_PATH`
 - **Test Steps**: include when `# Tests` is "basic"
 - **Requirement Trace Matrix**: map each requirement to implementation step refs, test step refs, and acceptance criteria.
 - **Revision Impact Table** (on revisions): map each changed hunk/step to affected requirement(s) and affected test(s).
@@ -100,10 +102,10 @@ Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 - If the prompt lacks a `# Findings` section, add one and list findings as they are created
 
 8) Self-Review Before Output
-- Review the final plan using `PLANNING_RULES_PATH` (already loaded).
+- Review the final plan using `ALL_RULES_PATH`.
 - Ensure `## Requirement Trace Matrix` is complete.
-- Ensure documentation work required by `PLANNING_RULES_PATH` is covered.
-- On revision, ensure `## Revision Impact Table` is present and complete.
+- Ensure documentation work required by `DOCUMENTATION_RULES_PATH` is covered.
+- On revision, ensure `## Revision Impact Table` is present and complete per `ORCHESTRATION_REVISION_RULES_PATH`.
 - If any rule is violated, update the plan file before returning `plan_path`.
 
 Do NOT modify the original prompt file except to update its `# Findings` and `# Required Reads` sections.

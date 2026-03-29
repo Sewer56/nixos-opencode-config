@@ -1,6 +1,6 @@
 ---
 description: "Generate prompt packs for orchestrated execution"
-agent: orchestrator-builder
+agent: orchestrator/builder
 ---
 
 ## User Input
@@ -23,7 +23,12 @@ think hard
 - No speculative types/errors: define types/errors only when used in this prompt; later prompts may extend.
 - Tests required: every prompt uses `basic` tests.
 - Apply the canonical modularization rules in this file when shaping prompts.
-- Consider planning rules: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/ORCHESTRATOR-PLANNING-RULES.md`
+- Consider shared rules:
+  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/GENERAL-RULES.md`
+  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/DOCUMENTATION-RULES.md`
+  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/PERFORMANCE-RULES.md`
+  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/TEST-PARAMETERIZATION-RULES.md`
+  - `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/CODE-PLACEMENT-RULES.md`
 - Prompts define outcomes and constraints, not the final implementation plan.
 - `# Implementation Hints` and `# Module Layout` are guidance. A simpler valid approach may be used if it still satisfies requirements, clarifications, and settled facts without sacrificing performance.
 
@@ -143,7 +148,7 @@ Say "go" to validate requirements coverage and generate the orchestrator index.
 ```
 
 ### Phase 7: Validate Requirements Coverage (Subagent)
-- Spawn `@orchestrator-requirements-preflight` with:
+- Spawn `@orchestrator/requirements-preflight` with:
   - `requirements_path` (absolute path to `PROMPT-PRD-REQUIREMENTS.md`)
   - `prompts_dir` (absolute path to the current working directory)
   - `prd_path` (absolute path to the PRD input)
@@ -162,7 +167,7 @@ Create `PROMPT-ORCHESTRATOR.md` in current working directory with:
 
 ### Phase 9: Hand Off to User
 ```
-Ready for orchestration with `@ orchestrator` (scheduler). For a single prompt, use `@ orchestrator-runner`.
+Ready for orchestration with `@ orchestrator` (scheduler). For a single prompt, use `@ orchestrator/runner`.
 ```
 
 ## Prompt File Format: `PROMPT-NN-{title}.md`
