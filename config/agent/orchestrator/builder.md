@@ -18,6 +18,6 @@ permission:
     "*": "deny",
     "codebase-explorer": "allow",
     "mcp-search": "allow",
-    "orchestrator/requirements-preflight": "allow"
+    "orchestrator/runner/requirements/requirements-preflight": "allow"
   }
 ---
