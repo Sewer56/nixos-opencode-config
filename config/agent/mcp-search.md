@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Use this for third-party library research and repository documentation analysis.
-model: zai-coding-plan/glm-5-turbo
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   github_*: allow
   context7_*: allow
