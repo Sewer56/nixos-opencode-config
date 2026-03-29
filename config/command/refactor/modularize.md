@@ -18,19 +18,32 @@ $ARGUMENTS
 
 Use the user input as the target scope (one or more files/directories).
 
+## Shared Rules
+
+- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
+- `GENERAL_RULES_PATH`: `general.md` relative to `RULES_DIR`
+- `DOCUMENTATION_RULES_PATH`: `documentation.md` relative to `RULES_DIR`
+- `PERFORMANCE_RULES_PATH`: `performance.md` relative to `RULES_DIR`
+- `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
+- `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
+
 ## Workflow
 
-1. Scope targets
+1. Load shared rules
+- Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once.
+- Use them as the source of truth for naming, structure, docs, performance, and test shape.
+
+2. Scope targets
 - Resolve each provided path.
 - If a directory is provided, discover relevant source files under it.
 - If no target is provided, stop and ask for explicit path(s).
 
-2. Build a migration map (in memory)
+3. Build a migration map (in memory)
 - Map old files/modules to new files/modules.
 - Map old exported/public symbols to new names and locations.
 - Preserve behavior while improving modular structure.
 
-3. Draft a modularization plan (no file edits)
+4. Draft a modularization plan (no file edits)
 - Produce:
   - target module/file layout
   - rename map (old symbol -> new symbol)
@@ -38,7 +51,7 @@ Use the user input as the target scope (one or more files/directories).
   - compatibility strategy (re-exports/shims vs direct break)
   - verification plan
 
-4. Confirmation gate (required)
+5. Confirmation gate (required)
 - Present the plan and stop.
 - Use this format:
 ```text
@@ -64,38 +77,18 @@ Say "go" to apply this plan, or suggest changes.
 - Continue only when user says `go`.
 - If user suggests changes, revise the plan and re-run this gate.
 
-5. Modularize implementation (after `go`)
-- Split catch-all files into focused modules/files with single responsibilities.
-- Keep top-level orchestration logic in the parent module/file entrypoint.
-- Place primarily data-holder models (with only trivial logic) in dedicated model files/folders by default.
-- Keep enums/newtypes colocated with a parent type when they are only used by that parent.
-- Keep non-public helper types local; do not widen visibility solely to move code.
-- Keep conversion impls/functions (`From`/`TryFrom`/mappers) with the related type definitions; avoid global `conversions` buckets.
-- Co-locate tests with the module they validate; avoid central `tests.rs` files for unrelated modules.
-- When multiple inputs test the same logic path, prefer parameterised tests over
-  near-duplicate test functions (e.g. use `rstest` for Rust), with descriptive
-  case names and labelled parameters/comments.
-- Keep `models/mod.rs` for module wiring/re-exports; avoid accumulating concrete model definitions there.
+6. Modularize implementation (after `go`)
+- Apply `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH`.
 
-6. Apply naming discipline
-- Use descriptive, domain-first names for modules/files/types/functions.
-- Avoid vague names like `utils`, `helpers`, `common`, or `misc` unless those are established and intentionally scoped.
-
-7. Apply language-appropriate structure
-- Rust: prefer `domain/mod.rs` with focused child modules; use `models/` for data-holder model types; prefer `#[cfg(test)] mod tests` in each module over a central test module.
-- TypeScript/JavaScript: prefer feature folders with focused files and explicit exports.
-- Python: prefer packages with focused modules and explicit public exports.
-- C#/Java/Kotlin: align folders with namespace/package boundaries and responsibilities.
-
-8. Update references
+7. Update references
 - Update imports/usages across the codebase for moved or renamed symbols.
 - Keep compatibility re-exports/shims only when useful; otherwise complete the rename migration.
 
-9. Verify
+8. Verify
 - Run formatter, lint, build/type checks, and tests according to repository conventions.
 - Iterate until checks pass, or report exact blockers with file/symbol details.
 
-10. Report
+9. Report
 - Summarize:
   - Files/modules created, removed, and moved
   - Symbol renames and final locations
@@ -118,8 +111,3 @@ Example rename map:
 - `ConfigData` -> `InputConfig`
 - `helpers.rs` -> `device_selector.rs`
 - `parse` -> `parse_binding_profile`
-
-## Constraints
-- Keep behavior equivalent unless a change is required for safe modularization.
-- Avoid placeholder abstractions and dead code.
-- Avoid replacing one monolith with another.

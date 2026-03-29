@@ -3,6 +3,8 @@
 ## Scope
 - In changed scope, document caller-facing public APIs unless the target is a binary-only entrypoint.
 - If a change materially alters a module/file boundary, refresh module/file docs.
+- Update existing documentation as needed.
+- Do not remove existing documentation unless it is incorrect or no longer applies.
 
 ## Required Docs
 - Non-trivial public APIs: purpose, params, returns, notable failure behavior.

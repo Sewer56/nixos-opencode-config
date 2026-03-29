@@ -7,8 +7,6 @@ agent: build
 
 Add missing docs to the files specified by the user.
 
-think hard
-
 ## User Input
 
 ```text
@@ -34,9 +32,7 @@ $ARGUMENTS
 4. Add the docs required by `DOCUMENTATION_RULES_PATH`.
 
 5. Keep scope tight.
-   - Do not churn untouched legacy code.
-   - Do not create separate docs files unless the repo already does that.
-   - Update docs only where behavior, public surface, or module/file boundaries changed.
+   - Do not widen beyond the requested or changed files unless explicitly asked.
 
 6. Verify edits.
    - Run the formatter if the repo has an obvious one for touched files.

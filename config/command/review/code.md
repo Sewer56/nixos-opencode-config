@@ -16,6 +16,8 @@ Perform a comprehensive code review of files with uncommitted changes and relate
 - `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
 - `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
 
+The loaded rule files are the source of truth for reusable code-writing policy.
+
 When invoked:
 
 1. **Verify current branch** (do NOT switch branches at any point):
@@ -54,16 +56,13 @@ When invoked:
 
 ## Review Checklist
 
-- Code is simple and readable
-- Functions and variables are well-named
-- No duplicated code
-- Proper error handling
-- Input validation implemented
-- Good test coverage
+- Adherence to `GENERAL_RULES_PATH`
 - Docs in changed scope follow `DOCUMENTATION_RULES_PATH`, including module/file docs when public surface or boundaries changed
-- Performance considerations addressed
-- No bandaid fixes
+- Performance-sensitive code follows `PERFORMANCE_RULES_PATH`
+- Test design follows `TEST_PARAMETERIZATION_RULES_PATH`
+- Module/file boundaries follow `CODE_PLACEMENT_RULES_PATH`
 - Security vulnerabilities
+- Correctness, edge cases, and regression risk
 - Architecture and design patterns
 - Consistency with codebase standards
 

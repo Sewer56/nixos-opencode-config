@@ -15,8 +15,6 @@ permission:
 
 Review the implementation plan for completeness, correctness, and quality. Catch issues before coding begins.
 
-think hard
-
 # Inputs
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner

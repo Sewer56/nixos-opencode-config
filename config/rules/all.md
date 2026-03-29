@@ -21,11 +21,14 @@ Use these rules for planning, implementation, and review unless a more specific 
 - Keep changes minimal.
 - Prefer plain code and names; avoid jargon and cleverness.
 - Use descriptive, domain-first names for modules, files, types, and functions.
+- Avoid vague bucket names like `utils`, `helpers`, `common`, or `misc` unless they are already established and intentionally narrow.
 - Write the least new code that fully satisfies the requirement.
+- Prefer existing types, constants, schemas, signatures, and patterns over inventing new ones.
 - Reuse existing patterns.
 - Optimize for review: keep control flow obvious and change sets cohesive.
 - Keep visibility minimal.
 - Within files, order declarations from most public to most private; within each visibility level, define callers before callees (reading order).
+- Preserve behavior unless a change is required or explicitly requested.
 - Avoid broad refactors unless required or requested.
 - Avoid dead code, debug/dev-only logging, and unnecessary abstractions.
 
@@ -38,6 +41,7 @@ Use these rules for planning, implementation, and review unless a more specific 
 ## Test Parameterization
 
 - Avoid duplicate tests and test helpers.
+- Keep tests deterministic; avoid real I/O, time, and network unless the test deliberately controls them.
 - Prefer parameterized tests when multiple inputs exercise the same logic path; keep separate tests only when setup, assertions, or failure modes differ.
 - When planning parameterized tests, include representative case naming and parameter labeling style (for example `empty_input_returns_zero`).
 - Give each case a descriptive name; avoid generic names like `case_1`.
@@ -88,10 +92,10 @@ fn grep_format_handles_line_truncation(
 
 - Split catch-all files into focused modules.
 - Keep top-level orchestration in the parent module/file entrypoint.
-- Keep data-holder models in dedicated model modules.
+- Keep data-holder models in dedicated `models` modules/directories where the repo structure supports it.
 - Keep enums and newtypes with the parent type when only that parent uses them.
 - Keep non-public helper types local.
-- Keep conversions with related type definitions.
+- Keep conversions with related type definitions; avoid global `conversions` buckets.
 - Co-locate tests with the module they validate.
 - Keep `models/mod.rs` for wiring and re-exports, not concrete model definitions.
 - Do not collapse modular code into monoliths unless the user asks.
@@ -106,6 +110,8 @@ fn grep_format_handles_line_truncation(
 ### Scope
 - In changed scope, document caller-facing public APIs unless the target is a binary-only entrypoint.
 - If a change materially alters a module/file boundary, refresh module/file docs.
+- Update existing documentation as needed.
+- Do not remove existing documentation unless it is incorrect or no longer applies.
 
 ### Required Docs
 - Non-trivial public APIs: purpose, params, returns, notable failure behavior.

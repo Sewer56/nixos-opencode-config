@@ -18,8 +18,6 @@ permission:
 
 Verify PRD requirements are satisfied by completed work. Write only the validation report file.
 
-think hard
-
 # Inputs
 - `orchestrator_path`: absolute path to PROMPT-ORCHESTRATOR.md
 - `requirements_path`: absolute path to PROMPT-PRD-REQUIREMENTS.md

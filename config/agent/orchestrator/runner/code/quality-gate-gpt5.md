@@ -16,8 +16,6 @@ permission:
 
 Single-pass review that validates objectives and code, runs checks, and reports results. Never edits files.
 
-think hard
-
 # Inputs
 - `prompt_path`: requirements and objectives (required)
 - `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`

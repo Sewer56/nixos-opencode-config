@@ -20,8 +20,6 @@ permission:
 
 Create a complete implementation plan in a separate plan file. Use @mcp-search for external docs and @codebase-explorer for codebase search; log findings.
 
-think hard
-
 # Inputs
 - `prompt_path`: absolute path to PROMPT-NN-*.md file
 - `revision_notes` (optional): feedback from plan review or coder escalation

@@ -23,7 +23,6 @@ If empty, use the current working directory.
 - Write machine-ready prompts that define outcomes, constraints, and evidence. Do not write implementation plans.
 - Every prompt must be standalone, include the context and file paths a fresh runner needs, and produce real code.
 - Every prompt uses `basic` tests.
-- Prefer existing types, constants, schemas, signatures, and patterns. If a detail is missing, say so; do not fabricate.
 - `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
 - Apply the shaping rules in this file and these shared rules relative to `RULES_DIR`:
   - `general.md`
@@ -31,6 +30,7 @@ If empty, use the current working directory.
   - `performance.md`
   - `test-parameterization.md`
   - `code-placement.md`
+- The shared rule files are the source of truth for reusable code-writing guidance.
 - `# Implementation Hints` and `# Module Layout` are guidance, not locked steps. Simpler valid implementations are allowed if requirements, clarifications, and settled facts still hold without sacrificing performance.
 
 ## Workflow
@@ -56,7 +56,6 @@ If empty, use the current working directory.
   - fix: confirm the bug is real
   - migration: compare current and target state; skip if already compliant
 - Reuse existing artifacts verbatim when they exist: schemas, types, tables, precedence rules, constants, signatures.
-- If details are missing, note the gap; do not fabricate.
 - Do not mention internal command names in generated prompts.
 - Use subagents when needed:
   - `@codebase-explorer` for repo search and pattern discovery

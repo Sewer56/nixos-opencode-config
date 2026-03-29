@@ -30,8 +30,6 @@ permission:
 
 Runs plan -> review -> implement -> quality gate -> commit for one prompt. Does not edit code; may update prompt findings/notes files and rename plan files.
 
-think hard
-
 ## Inputs
 - `prompt_path`: absolute path to PROMPT-NN-*.md
 - `overall_objective`: one-line summary from the orchestrator index

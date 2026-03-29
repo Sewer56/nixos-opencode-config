@@ -2,10 +2,10 @@
 
 - Split catch-all files into focused modules.
 - Keep top-level orchestration in the parent module/file entrypoint.
-- Keep data-holder models in dedicated model modules.
+- Keep data-holder models in dedicated `models` modules/directories where the repo structure supports it.
 - Keep enums and newtypes with the parent type when only that parent uses them.
 - Keep non-public helper types local.
-- Keep conversions with related type definitions.
+- Keep conversions with related type definitions; avoid global `conversions` buckets.
 - Co-locate tests with the module they validate.
 - Keep `models/mod.rs` for wiring and re-exports, not concrete model definitions.
 - Do not collapse modular code into monoliths unless the user asks.

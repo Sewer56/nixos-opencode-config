@@ -18,8 +18,6 @@ permission:
 
 Verify PRD requirements map to prompt files before orchestration. Never modify files.
 
-think hard
-
 # Inputs
 - `requirements_path`: absolute path to PROMPT-PRD-REQUIREMENTS.md
 - `prompts_dir`: absolute path to directory containing PROMPT-*.md (optional)

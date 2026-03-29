@@ -18,25 +18,28 @@ Use `$ARGUMENTS` as one or more file or directory paths.
 
 If no target path is provided, stop and ask for an explicit path.
 
-think hard
+## Shared Rules
+
+- `TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/test-parameterization.md`
 
 ## Process
 
-1. Resolve targets
+1. Read `TEST_PARAMETERIZATION_RULES_PATH` once and use it as the source of truth for case naming, labels/comments, and duplicate-coverage rules.
+
+2. Resolve targets
 - If a file is provided, use it directly.
 - If a directory is provided, find test files in scope based on project
   conventions.
 
-2. Read and group tests
+3. Read and group tests
 - Read each target file fully.
 - Group tests that exercise the same logic path but vary by data only.
 
-3. Choose framework-specific strategy
+4. Choose framework-specific strategy
 - Use the existing test framework for each file.
 - Prefer native parameterisation support in that framework.
-- Rust example: `rstest` with `#[case::name(...)]` and labelled parameters.
 
-4. Draft the plan (no edits)
+5. Draft the plan (no edits)
 - For each file, list each candidate group and proposed replacement test.
 - For each proposed parameterised test, include:
   - test function name
@@ -44,51 +47,14 @@ think hard
   - planned parameters in order
   - parameter labels/comments style
 
-5. Verification plan
+6. Verification plan
 - Include exact commands to run after implementation.
 - Prefer repo verification scripts when available.
 
-6. Confirmation gate
+7. Confirmation gate
 - Return the plan and stop.
 - Ask for confirmation: `Say "go" to apply this plan, or suggest changes.`
 - Show proposed changes for every target file (not just selected files).
-
-## Shared Style Rules
-
-- Follow `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/test-parameterization.md`.
-
-```rust
-/// Verifies that line truncation in formatted output behaves correctly for
-/// different line lengths and line number settings.
-#[rstest]
-#[case::with_line_numbers_short(
-    6,           // max_len: line "abcdefghij" (10 chars) truncated to 6
-    true,        // with_line_numbers: yes, shows "L1: " prefix
-    "L1: abc..." // expected: truncated with line number prefix
-)]
-#[case::without_line_numbers_short(
-    4,        // max_len: line truncated to 4 chars
-    false,    // with_line_numbers: no prefix
-    "  a..."  // expected: truncated without line number prefix
-)]
-#[case::no_truncation_when_fits(
-    200,             // max_len: larger than line length (10 chars)
-    true,            // with_line_numbers: yes
-    "L1: abcdefghij" // expected: full line preserved, no truncation
-)]
-#[case::exact_boundary_no_truncation(
-    10,              // max_len: exactly matches line length (10 chars)
-    true,            // with_line_numbers: yes
-    "L1: abcdefghij" // expected: full line preserved, boundary not exceeded
-)]
-fn grep_format_handles_line_truncation(
-    #[case] max_len: usize,
-    #[case] with_line_numbers: bool,
-    #[case] expected: &str,
-) {
-    // Keep setup short; comment only non-obvious assertions.
-}
-```
 
 ## Output Format (Template)
 
@@ -240,6 +206,5 @@ Say "go" to apply this plan, or suggest changes.
 ````
 
 ## Constraints
-- Do not edit files in this command.
 - Keep the plan implementation-ready and concrete.
 - Keep behaviour and coverage at least equivalent.
