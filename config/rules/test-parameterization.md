@@ -10,7 +10,7 @@ Use these rules when a single behavior needs multiple similar test cases.
 - Keep labels aligned where practical.
 - If inline labels become too long, move labels above the case.
 - Add occasional in-body comments for non-obvious setup or assertions.
-- Keep tests human-friendly, jargon-free, and around 80-100 characters per line.
+- Keep tests human-friendly and around 80-100 characters per line.
 - For Rust, prefer `rstest` with `#[case::name(...)]` and aligned labeled parameters/comments.
 
 ## Rust Style Reference

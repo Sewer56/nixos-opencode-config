@@ -6,7 +6,6 @@ Use these rules for planning, implementation, and review unless a more specific 
 - Prefer plain code and names; avoid jargon and cleverness.
 - Use descriptive, domain-first names for modules, files, types, and functions.
 - Avoid vague bucket names like `utils`, `helpers`, `common`, or `misc` unless they are already established and intentionally narrow.
-- Write the least new code that fully satisfies the requirement.
 - Prefer existing types, constants, schemas, signatures, and patterns over inventing new ones.
 - Reuse existing patterns.
 - Inline tiny single-use helpers unless naming them materially improves reuse, readability, or module boundaries.

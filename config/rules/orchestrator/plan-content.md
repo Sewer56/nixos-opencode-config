@@ -1,7 +1,5 @@
 # Plan Content Rules
 
-Use these rules when writing `-PLAN.md` files.
-
 - No placeholders (`...`, `TODO`, comment-only test bodies).
 - No undefined helpers/types/symbols in snippets.
 - Insertions use normal code blocks with `Insert at: <anchor> (~start-end)`.

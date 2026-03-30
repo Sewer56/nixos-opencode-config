@@ -1,7 +1,5 @@
 # Plan Content Rules
 
-Use these rules when writing `-PLAN.md` files.
-
 - No placeholders (`...`, `TODO`, comment-only test bodies).
 - No undefined helpers/types/symbols in snippets.
 - Insertions use normal code blocks with `Insert at: <anchor> (~start-end)`.
@@ -17,7 +15,6 @@ Use these rules for planning, implementation, and review unless a more specific 
 - Prefer plain code and names; avoid jargon and cleverness.
 - Use descriptive, domain-first names for modules, files, types, and functions.
 - Avoid vague bucket names like `utils`, `helpers`, `common`, or `misc` unless they are already established and intentionally narrow.
-- Write the least new code that fully satisfies the requirement.
 - Prefer existing types, constants, schemas, signatures, and patterns over inventing new ones.
 - Reuse existing patterns.
 - Inline tiny single-use helpers unless naming them materially improves reuse, readability, or module boundaries.
@@ -44,7 +41,7 @@ Use these rules when the task requires tests.
 - Avoid duplicate coverage and duplicate setup; if an existing test already proves a behavior, do not restate it elsewhere.
 - Reuse existing test helpers when they fit; extract a shared helper only when it reduces repetition or makes setup clearer across multiple tests.
 - Keep tests deterministic; avoid real I/O, time, and network unless the test deliberately controls, seeds, or freezes them.
-- When one behavior needs multiple similar cases, prefer parameterized tests and follow `test-parameterization.md` for naming, labels, and case structure.
+- When one behavior needs multiple similar cases, follow `test-parameterization.md` for naming, labels, and case structure.
 
 # Test Parameterization Rules
 
@@ -58,7 +55,7 @@ Use these rules when a single behavior needs multiple similar test cases.
 - Keep labels aligned where practical.
 - If inline labels become too long, move labels above the case.
 - Add occasional in-body comments for non-obvious setup or assertions.
-- Keep tests human-friendly, jargon-free, and around 80-100 characters per line.
+- Keep tests human-friendly and around 80-100 characters per line.
 - For Rust, prefer `rstest` with `#[case::name(...)]` and aligned labeled parameters/comments.
 
 ## Rust Style Reference
