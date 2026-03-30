@@ -6,15 +6,15 @@ rules_dir="$repo_root/config/rules"
 output_path="$rules_dir/all.md"
 
 sources=(
-  "plan-content.md"
+  "orchestrator/plan-content.md"
   "general.md"
   "performance.md"
   "testing.md"
   "test-parameterization.md"
   "code-placement.md"
   "documentation.md"
-  "orchestration-plan.md"
-  "orchestration-revision.md"
+  "orchestrator/orchestration-plan.md"
+  "orchestrator/orchestration-revision.md"
 )
 
 for source in "${sources[@]}"; do
