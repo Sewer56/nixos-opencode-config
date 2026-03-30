@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates PRD requirement coverage across prompt files (preflight)
-model: openai/gpt-5.4
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 reasoningEffort: high
 permission:
   read: allow
