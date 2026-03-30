@@ -107,7 +107,6 @@ If empty, use the current working directory.
 - Spawn `@orchestrator/prompt-pack-reviewer` with:
   - `requirements_path`: absolute path to `PROMPT-PRD-REQUIREMENTS.md`
   - `orchestrator_path`: absolute path to `PROMPT-ORCHESTRATOR.md`
-  - `prompt_paths`: absolute paths to all current `PROMPT-NN-*.md` files
   - `source_paths`: absolute paths to the original task files, the source document, and any `PROMPT-SPLIT.md` or `PROMPT-DRAFT-*.md` inputs that shaped the pack
   - `original_context`: the original user request text, or a short summary when the raw text is not available
 - If the reviewer returns `BLOCKING`, revise the draft prompt pack and review again.

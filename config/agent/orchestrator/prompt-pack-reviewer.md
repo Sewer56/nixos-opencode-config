@@ -20,7 +20,6 @@ Review a written orchestrator prompt pack for correctness. Never modify files.
 # Inputs
 - `requirements_path`: absolute path to `PROMPT-PRD-REQUIREMENTS.md`
 - `orchestrator_path`: absolute path to `PROMPT-ORCHESTRATOR.md`
-- `prompt_paths` (optional): absolute paths to current `PROMPT-NN-*.md` files
 - `source_paths` (optional): absolute paths to the original task files, split files, and source documents used to build the pack
 - `original_context` (optional): raw user request text or a short summary of the original ask when available
 
@@ -38,10 +37,9 @@ Review a written orchestrator prompt pack for correctness. Never modify files.
 ## 1. Load Context
 - Read `PROMPT_PACK_COMMAND_PATH` and the rule files above.
 - Read `requirements_path` and `orchestrator_path`.
-- Read every path in `prompt_paths` when provided.
 - Read every path in `source_paths` when provided.
 - Read `original_context` when provided.
-- If `prompt_paths` are not provided, derive the prompt list from `orchestrator_path`.
+- Derive the prompt list from `orchestrator_path`.
 
 ## 2. Correctness Review
 
