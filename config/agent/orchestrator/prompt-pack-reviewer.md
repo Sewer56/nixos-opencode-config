@@ -55,7 +55,6 @@ Review a written orchestrator prompt pack for correctness. Never modify files.
 - Each prompt includes concrete deliverables with at least one code artifact.
 - Required reads, findings, and settled facts are sufficient for isolated execution.
 - Verification scope is specific and useful.
-- `# Implementation Hints` and `# Module Layout` guide without locking the implementation.
 
 ### Structural Correctness
 - The prompt list matches the written prompt files.

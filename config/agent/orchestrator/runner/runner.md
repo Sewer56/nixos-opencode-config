@@ -36,6 +36,9 @@ Runs plan -> specialist review -> implement -> quality gate -> commit for one pr
 Uses 5 plan reviewers and 3 code reviewers.
 Does not edit product code. May update ledger and unmet requirements files.
 
+Does not create plans themselves. You're an arbitrator that communicates with
+subagents that do the planning, review and coding.
+
 ## Inputs
 - `prompt_path`: absolute path to PROMPT-NN-*.md
 - `overall_objective`: one-line summary from the orchestrator index

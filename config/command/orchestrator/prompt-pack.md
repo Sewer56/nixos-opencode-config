@@ -32,7 +32,6 @@ If empty, use the current working directory.
   - `test-parameterization.md`
   - `code-placement.md`
 - The shared rule files are the source of truth for reusable code-writing guidance.
-- `# Implementation Hints` and `# Module Layout` are guidance, not locked steps. Simpler valid implementations are allowed if requirements, clarifications, and settled facts still hold without sacrificing performance.
 
 ## Workflow
 
@@ -89,7 +88,6 @@ If empty, use the current working directory.
 - Every `# Requirements` item must include a requirement ID.
 - Add `# Settled Facts` with `FACT-###` source pointers.
 - Add `# Verification Scope` with in-scope checks and known unrelated failures.
-- Always include `# Module Layout`.
 
 ### Phase 5: Write draft `PROMPT-ORCHESTRATOR.md`
 - Create it in the current working directory.
@@ -154,7 +152,6 @@ For a single prompt, use `@ orchestrator/runner`.
 # Constraints
 - [technical constraints and things to avoid]
 - No placeholder types or errors; define new ones only when used here; later prompts may extend.
-- `# Implementation Hints` and `# Module Layout` are guidance, not fixed steps.
 
 # Success Criteria
 - [observable outcomes]
@@ -175,25 +172,6 @@ A: <answer>
 
 # Settled Facts
 - FACT-001: <validated fact used by this prompt> (Source: PROMPT-FINDING-... or path:line)
-
-# Module Layout
-- Language: <e.g., rust|typescript|python|csharp>
-- Structure: unchanged | changed
-
-If `changed`, show only the relevant structure delta:
-
-```diff
-src/config/
-- types.rs
-+ config_binding.rs
-+ models/
-+   binding_profile.rs
-+   device_mapping.rs
-```
-
-- Why: <one-line rationale>
-
-If `unchanged`, stop after `- Structure: unchanged`.
 
 # Implementation Hints
 - [existing patterns, APIs, or files to reuse]

@@ -47,7 +47,7 @@ Read `ALL_RULES_PATH` once.
 - Read files listed under `# Required Reads`.
 - Ensure each `# Required Reads` entry includes a brief relevance note. Add missing notes.
 - Extract what must be built.
-- Treat `# Implementation Hints` and `# Module Layout` as guidance, not a locked plan.
+- Treat `# Implementation Hints` as guidance, not a locked plan.
 - Requirements, clarifications, and settled facts are binding. If a simpler valid approach preserves them without sacrificing performance, prefer it.
 - Determine project type, package boundaries, and documentation scope required by `ALL_RULES_PATH`.
 - Identify any libraries or frameworks that need lookup.
