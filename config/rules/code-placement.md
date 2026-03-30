@@ -1,5 +1,7 @@
 # Code Placement Rules
 
+- Keep small changes in the existing file/module when that keeps ownership clear.
+- Create new files/modules only when module boundaries materially benefit.
 - Split catch-all files into focused modules.
 - Keep top-level orchestration in the parent module/file entrypoint.
 - Keep data-holder models in dedicated `models` modules/directories where the repo structure supports it.

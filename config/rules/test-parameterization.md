@@ -1,7 +1,7 @@
 # Test Parameterization Rules
 
-- Avoid duplicate tests and test helpers.
-- Keep tests deterministic; avoid real I/O, time, and network unless the test deliberately controls them.
+Use these rules when a single behavior needs multiple similar test cases.
+
 - Prefer parameterized tests when multiple inputs exercise the same logic path; keep separate tests only when setup, assertions, or failure modes differ.
 - When planning parameterized tests, include representative case naming and parameter labeling style (for example `empty_input_returns_zero`).
 - Give each case a descriptive name; avoid generic names like `case_1`.

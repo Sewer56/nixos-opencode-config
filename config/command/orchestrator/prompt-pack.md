@@ -22,12 +22,12 @@ If empty, use the current working directory.
 - If discovery finds a real blocker or a required reshape, stop and explain it instead of rewriting the task set.
 - Write machine-ready prompts that define outcomes, constraints, and evidence. Do not write implementation plans.
 - Every prompt must be standalone, include the context and file paths a fresh runner needs, and produce real code.
-- Every prompt uses `basic` tests.
 - `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
 - Apply the shaping rules in this file and these shared rules relative to `RULES_DIR`:
   - `general.md`
   - `documentation.md`
   - `performance.md`
+  - `testing.md`
   - `test-parameterization.md`
   - `code-placement.md`
 - The shared rule files are the source of truth for reusable code-writing guidance.
@@ -102,7 +102,7 @@ If empty, use the current working directory.
 - Create it in the current working directory.
 - Include:
   - the overall objective
-  - the prompt list with dependencies and tests
+  - the prompt list with dependencies
   - `PRD Path` relative to the working directory
   - `Requirements Inventory: PROMPT-PRD-REQUIREMENTS.md`
   - `## Requirement Ownership` entries in this format:
@@ -150,9 +150,6 @@ For a single prompt, use `@ orchestrator/runner`.
 # Scope
 - IN: [what's in scope]
 - OUT: [what's out of scope]
-
-# Tests
-basic
 
 # Dependencies
 None | depends on PROMPT-NN-...

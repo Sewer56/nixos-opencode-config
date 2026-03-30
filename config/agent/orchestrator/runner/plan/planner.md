@@ -26,9 +26,11 @@ Create a complete implementation plan in a separate plan file. Use @mcp-search f
 - Expect structured entries when available: issue ID, severity, confidence, fix_specificity, source, evidence, requested fix, `acceptance_criteria`
 - `ALL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/all.md`
 
+Read `ALL_RULES_PATH` once.
+
 # Process
 
-1) Plan Resume
+1. Plan Resume
 - `plan_path` = `<prompt_path_without_extension>-PLAN.md`; if it exists and hasn’t been read or written this invocation, read it as the resume baseline.
 - First call: no `revision_notes` and no existing plan → create a new plan.
 - Successive call: `revision_notes` → revise the existing plan.
@@ -38,21 +40,18 @@ Create a complete implementation plan in a separate plan file. Use @mcp-search f
 - Do not reopen resolved items unless `revision_notes` include new evidence.
 - Ensure `plan_path` contains a complete plan (create or revise) and return only `plan_path`.
 
-1b) Load Shared Rules
-- Read `ALL_RULES_PATH` once.
-
-2) Read and Scope
-- Read prompt_path (mission, objective, requirements, constraints, tests, clarifications, implementation hints)
+2. Read and Scope
+ - Read prompt_path (mission, objective, requirements, constraints, clarifications, implementation hints)
 - Read each file listed under `# Findings`; treat them as primary research context and avoid re-researching the same artifacts
 - Read each file listed in `# Required Reads` and ensure each entry includes a brief relevance note; add missing notes
-- Extract what to build; tests are always `basic`
+- Extract what to build
 - Treat `# Implementation Hints` and `# Module Layout` as guidance, not a locked plan
 - Requirements, clarifications, and settled facts are binding; if a simpler valid approach preserves them without sacrificing performance, prefer it
 - Determine project type, package boundaries, and documentation scope expected by `ALL_RULES_PATH`
 - Identify libraries/frameworks needing lookup
 - Set repo_root as the closest ancestor of prompt_path containing `.git`; if none, use prompt_path parent
 
-3) Code Discovery (conditional)
+3. Code Discovery (conditional)
 - If `# Required Reads` do not provide enough information, use @codebase-explorer to find additional relevant files and patterns
 - Update the prompt's `# Required Reads` section to add newly discovered files with brief relevance notes
 - Do not run @codebase-explorer if the required reads are sufficient
@@ -62,7 +61,7 @@ Create a complete implementation plan in a separate plan file. Use @mcp-search f
 - Also capture other research discoveries (manual reads, inferred constraints, important design decisions) as prompt-scoped findings files
 - Findings must be sufficient for future plan revisions without re-research; include complete artifacts when relevant and skip irrelevant detail
 
-4) Library Research (if needed)
+4. Library Research (if needed)
 - **Required:** use @mcp-search for any external library lookup; capture key findings
 - When several lookups are needed, batch @mcp-search calls to reduce latency
 - Verify exact type/function/enum names from @mcp-search results
@@ -72,21 +71,23 @@ Create a complete implementation plan in a separate plan file. Use @mcp-search f
   - Update the prompt's `# Findings` list with the file path and a one-line relevance note
 - If a lookup yields nothing relevant, still create a findings file with a short summary stating that no relevant information was found
 - Findings must remain scoped to a single prompt; duplicating info across prompts is acceptable
-5) Draft Complete Plan
+
+5. Draft Complete Plan
 Build these sections:
 - **External Symbols**: map files to required `use` statements and referenced types/classes for implementation
 - **Implementation Steps**: ordered by file and compliant with `ALL_RULES_PATH`
-- **Test Steps**: include when `# Tests` is "basic"
+- **Test Steps**: include the required tests
 - **Requirement Trace Matrix**: map each requirement to implementation step refs, test step refs, and acceptance criteria.
 - **Revision Impact Table** (on revisions): map each changed hunk/step to affected requirement(s) and affected test(s).
 - Plan docs explicitly. Name module/file doc headings instead of writing "update docs".
+- Make each implementation and test step concrete enough that the coder is not deciding module/file placement, visibility, dependency/config changes, documentation scope, or missing test work on its own.
 
-6) Write Plan File
+6. Write Plan File
 Create or update `<prompt_filename>-PLAN.md` (may already exist).
 Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 - If revising, place `## Reviewer Concerns (Revision)` at the top of the plan (immediately after `# Plan`)
 
-7) Findings and Plan Notes
+7. Findings and Plan Notes
 - Create or update `## Plan Notes` with key assumptions, risks, open questions, and review focus areas
 - Maintain `### Settled Facts` in `## Plan Notes` for facts validated by findings/repo evidence (with source references)
 - On revision, update `## Review Ledger (Revision)` with statuses:
@@ -96,10 +97,11 @@ Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 - If findings were created, ensure the prompt's `# Findings` section includes each file path with a short relevance note
 - If the prompt lacks a `# Findings` section, add one and list findings as they are created
 
-8) Self-Review Before Output
+8. Self-Review Before Output
 - Review the final plan using `ALL_RULES_PATH`.
 - Ensure `## Requirement Trace Matrix` is complete.
 - Ensure documentation work and revision requirements from `ALL_RULES_PATH` are covered when applicable.
+- Ensure the plan is concrete enough that shared rules constrain local implementation choices instead of forcing the coder to invent scope or structure.
 - If any rule is violated, update the plan file before returning `plan_path`.
 
 Do NOT modify the original prompt file except to update its `# Findings` and `# Required Reads` sections.

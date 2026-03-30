@@ -28,6 +28,7 @@ think
 - `GENERAL_RULES_PATH`: `general.md` relative to `RULES_DIR`
 - `DOCUMENTATION_RULES_PATH`: `documentation.md` relative to `RULES_DIR`
 - `PERFORMANCE_RULES_PATH`: `performance.md` relative to `RULES_DIR`
+- `TESTING_RULES_PATH`: `testing.md` relative to `RULES_DIR`
 - `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
 - `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
 - Orchestrator context: task intent and notes from prior phases
@@ -39,27 +40,19 @@ think
 
 1) Read requirements and plan
 - Read `prompt_path` for mission, requirements, constraints
-- Read `plan_path` for complete plan with `## Implementation Steps`
-- Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel
-- Follow `## Implementation Steps` exactly; they contain concrete code blocks to implement
-- Tests are always `basic`
+- Read `plan_path` for complete plan with `## Implementation Steps` and `## Test Steps`
+- Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel
+- Follow `## Implementation Steps` and `## Test Steps` exactly; they define what to change
 - Incorporate orchestrator context
 
 2) Implement changes
-- Prefer smallest viable diff; reuse existing patterns
-- Inline tiny single-use helpers; add new files when module boundaries benefit
-- Limit visibility; avoid public unless required
-- Avoid unnecessary abstractions; no single-impl interfaces
-- Remove dead code and unused imports; delete unused paths
-- Add only necessary deps/config
-- No debug/temporary logging
+- Use `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` to resolve local implementation details inside the plan's scope
+- Treat shared rules as constraints, not permission to widen the task or redesign the plan
+- If the plan is materially insufficient about module/file placement, visibility, dependency/config changes, documentation scope, or required test work, return `Status: ESCALATE` instead of inventing a broader approach
 
 3) Verify
 - Run formatter (unless forbidden by system prompt), linter, and build; iterate until clean
-- Tests: basic → add minimal, non-duplicative tests; reuse or extract shared
-  helpers; parameterise repeated cases to reduce repetition (e.g. use `rstest`
-  for Rust), with descriptive case names and labelled parameters/comments;
-  avoid real I/O/time/network—seed/freeze
+- Verify any added or updated tests against `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH`
 
 4) Fix and iterate
 - If any check fails, analyze, fix, and rerun verification

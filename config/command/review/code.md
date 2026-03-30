@@ -13,6 +13,7 @@ Perform a comprehensive code review of files with uncommitted changes and relate
 - `GENERAL_RULES_PATH`: `general.md` relative to `RULES_DIR`
 - `DOCUMENTATION_RULES_PATH`: `documentation.md` relative to `RULES_DIR`
 - `PERFORMANCE_RULES_PATH`: `performance.md` relative to `RULES_DIR`
+- `TESTING_RULES_PATH`: `testing.md` relative to `RULES_DIR`
 - `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
 - `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
 
@@ -48,7 +49,7 @@ When invoked:
    ```
 
 6. **Load shared review policy**:
-   - Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel.
+    - Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel.
 
 7. Focus on modified files compared to origin/main.
 8. Thoroughly analyze the diff output to understand all implications.
@@ -59,7 +60,8 @@ When invoked:
 - Adherence to `GENERAL_RULES_PATH`
 - Docs in changed scope follow `DOCUMENTATION_RULES_PATH`, including module/file docs when public surface or boundaries changed
 - Performance-sensitive code follows `PERFORMANCE_RULES_PATH`
-- Test design follows `TEST_PARAMETERIZATION_RULES_PATH`
+- Test coverage and determinism follow `TESTING_RULES_PATH`
+- Parameterized test design follows `TEST_PARAMETERIZATION_RULES_PATH`
 - Module/file boundaries follow `CODE_PLACEMENT_RULES_PATH`
 - Security vulnerabilities
 - Correctness, edge cases, and regression risk

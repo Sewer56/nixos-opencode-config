@@ -27,7 +27,6 @@ Review the implementation plan for completeness, correctness, and quality. Catch
 ## 1) Load Context
 - Read `prompt_path` and `plan_path`.
 - Read `ALL_RULES_PATH` once.
-- Tests are always `basic`.
 - If `review_context` is provided:
   - Reuse issue IDs when root cause is unchanged.
   - Do not reopen `RESOLVED` items without new concrete evidence.
@@ -43,9 +42,12 @@ Review the implementation plan for completeness, correctness, and quality. Catch
 ## 3) Review Against Requirements and Shared Rules
 - Verify every requirement/success criterion has concrete implementation and tests.
 - Verify the plan follows `ALL_RULES_PATH`, including documentation coverage and revision requirements when applicable.
+- Verify the plan includes concrete test work.
 - Require `## Requirement Trace Matrix`.
 - If the plan is a revision, require `## Revision Impact Table` as required by `ALL_RULES_PATH`.
 - Categorize issues under code style, semantics, or test plan.
+- Use these code style categories when applicable: `DOCS`, `INLINE_HELPER`, `DEAD_CODE`, `VISIBILITY`, `DEBUG_CODE`, `UNNECESSARY_ABSTRACTION`, `DECLARATION_ORDER`, `CODE_PLACEMENT`.
+- Use these test categories when applicable: `MISSING_COVERAGE`, `DUPLICATE`, `NOT_PARAMETERIZED`, `NON_DETERMINISTIC`, `OVERENGINEERED`.
 - For each issue include severity, `confidence`, `fix_specificity`, evidence, and fix explanation.
 - For BLOCKING issues, include `Requirement Impact`, `Evidence`, `Failing Scenario`, and `Acceptance Criteria`.
 - If reopening a previously `RESOLVED` issue ID, include `New Evidence`.
@@ -70,7 +72,7 @@ Review the implementation plan for completeness, correctness, and quality. Catch
 - "requirement" — [COVERED|MISSING|PARTIAL]
 
 ## Code Style Issues (predicted)
-### [ID: <stable-id>] [DOCS|INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION] [CRITICAL|HIGH|MEDIUM|LOW]
+### [ID: <stable-id>] [DOCS|INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION|DECLARATION_ORDER|CODE_PLACEMENT] [CRITICAL|HIGH|MEDIUM|LOW]
 Summary: <1-line summary>
 confidence: [HIGH|MEDIUM|LOW]
 fix_specificity: [CONCRETE|PARTIAL|UNCLEAR]
@@ -87,7 +89,7 @@ Fix Code (when `fix_specificity=CONCRETE`):
 ```
 
 ## Semantic Issues (predicted)
-### [ID: <stable-id>] [SECURITY|CORRECTNESS|PERFORMANCE|ERROR_HANDLING|ARCHITECTURE] [CRITICAL|HIGH|MEDIUM|LOW]
+### [ID: <stable-id>] [SECURITY|CORRECTNESS|PERFORMANCE|ERROR_HANDLING|ARCHITECTURE|CROSS_FILE] [CRITICAL|HIGH|MEDIUM|LOW]
 Summary: <1-line summary>
 confidence: [HIGH|MEDIUM|LOW]
 fix_specificity: [CONCRETE|PARTIAL|UNCLEAR]
@@ -105,7 +107,7 @@ Fix Code (when `fix_specificity=CONCRETE`):
 ```
 
 ## Test Plan Issues
-### [ID: <stable-id>] [MISSING|DUPLICATE|OVERENGINEERED|NOT_PARAMETERIZED] [CRITICAL|HIGH|MEDIUM|LOW]
+### [ID: <stable-id>] [MISSING_COVERAGE|DUPLICATE|NOT_PARAMETERIZED|NON_DETERMINISTIC|OVERENGINEERED] [CRITICAL|HIGH|MEDIUM|LOW]
 Summary: <1-line summary>
 confidence: [HIGH|MEDIUM|LOW]
 fix_specificity: [CONCRETE|PARTIAL|UNCLEAR]

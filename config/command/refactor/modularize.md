@@ -24,14 +24,15 @@ Use the user input as the target scope (one or more files/directories).
 - `GENERAL_RULES_PATH`: `general.md` relative to `RULES_DIR`
 - `DOCUMENTATION_RULES_PATH`: `documentation.md` relative to `RULES_DIR`
 - `PERFORMANCE_RULES_PATH`: `performance.md` relative to `RULES_DIR`
+- `TESTING_RULES_PATH`: `testing.md` relative to `RULES_DIR`
 - `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
 - `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
 
 ## Workflow
 
 1. Load shared rules
-- Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once.
-- Use them as the source of truth for naming, structure, docs, performance, and test shape.
+- Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once.
+- Use them as the source of truth for naming, structure, docs, performance, test coverage, and test shape.
 
 2. Scope targets
 - Resolve each provided path.
@@ -78,7 +79,7 @@ Say "go" to apply this plan, or suggest changes.
 - If user suggests changes, revise the plan and re-run this gate.
 
 6. Modularize implementation (after `go`)
-- Apply `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH`.
+- Apply `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH`.
 
 7. Update references
 - Update imports/usages across the codebase for moved or renamed symbols.

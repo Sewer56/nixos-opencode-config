@@ -55,8 +55,8 @@ Validation Status: NONE|FINAL_OK|FINAL_FAIL
 Current Prompt Index: 0
 
 ## Prompts
-| Index | Status | Prompt Path | Plan Path | Tests | Dependencies | Reqs |
-| 0 | PENDING | PROMPT-01-foo.md | PROMPT-01-foo-PLAN.md | basic | PROMPT-00-bar | REQ-001, REQ-002 |
+| Index | Status | Prompt Path | Plan Path | Dependencies | Reqs |
+| 0 | PENDING | PROMPT-01-foo.md | PROMPT-01-foo-PLAN.md | PROMPT-00-bar | REQ-001, REQ-002 |
 ```
 
 Prompt status values: PENDING | RUNNING | SUCCESS | FAIL | INCOMPLETE
@@ -82,11 +82,10 @@ Resume rules:
 Read `PROMPT-ORCHESTRATOR.md` to extract:
 - Overall objective
 - List of prompt paths
-- Dependencies and tests for each prompt
+- Dependencies for each prompt
 - Requirement mapping from `## Requirement Ownership` (source of truth)
 - Derive per-prompt requirement coverage in memory from ownership mapping
 - PRD Path and Requirements Inventory path (if present)
-- If tests are missing, assume `basic` in memory; do not edit files
 
 ### 0.3: Load/Init State (resume support)
 - If `state_path` exists, apply resume rules; otherwise initialize state from the current index.

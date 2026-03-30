@@ -1,9 +1,4 @@
-# All Rules
-
-This file is the convenience/derived aggregate for planner and plan-reviewer prompts.
-Canonical rules live in the split files in this directory.
-
-## Plan Content
+# Plan Content Rules
 
 Use these rules when writing `-PLAN.md` files.
 
@@ -14,34 +9,47 @@ Use these rules when writing `-PLAN.md` files.
 - Import changes use a dedicated import `diff` block.
 - If layout changes, include target tree and migration order.
 
-## General
+# General Rules
 
 Use these rules for planning, implementation, and review unless a more specific rules file overrides them.
 
-- Keep changes minimal.
+- Keep changes minimal; prefer the smallest viable diff that fully satisfies the requirement.
 - Prefer plain code and names; avoid jargon and cleverness.
 - Use descriptive, domain-first names for modules, files, types, and functions.
 - Avoid vague bucket names like `utils`, `helpers`, `common`, or `misc` unless they are already established and intentionally narrow.
 - Write the least new code that fully satisfies the requirement.
 - Prefer existing types, constants, schemas, signatures, and patterns over inventing new ones.
 - Reuse existing patterns.
+- Inline tiny single-use helpers unless naming them materially improves reuse, readability, or module boundaries.
 - Optimize for review: keep control flow obvious and change sets cohesive.
 - Keep visibility minimal.
 - Within files, order declarations from most public to most private; within each visibility level, define callers before callees (reading order).
 - Preserve behavior unless a change is required or explicitly requested.
 - Avoid broad refactors unless required or requested.
-- Avoid dead code, debug/dev-only logging, and unnecessary abstractions.
+- Remove dead code, unused imports, and newly-unused paths created by the change.
+- Avoid debug/dev-only logging, temporary instrumentation, and unnecessary abstractions.
+- Avoid single-implementation interfaces/traits unless there is a concrete need.
 
-## Performance
+# Performance Rules
 
 - Prefer the highest-performance correct implementation that still keeps the code readable.
 - After choosing the performant correct approach, make it as simple and reviewable as possible without sacrificing performance.
 - Simplify only after performance is preserved; do not give up meaningful performance just to make the code look shorter or superficially simpler.
 
-## Test Parameterization
+# Testing Rules
 
-- Avoid duplicate tests and test helpers.
-- Keep tests deterministic; avoid real I/O, time, and network unless the test deliberately controls them.
+Use these rules when the task requires tests.
+
+- Add or update sufficient tests so all new code introduced by the change is covered.
+- Avoid duplicate coverage and duplicate setup; if an existing test already proves a behavior, do not restate it elsewhere.
+- Reuse existing test helpers when they fit; extract a shared helper only when it reduces repetition or makes setup clearer across multiple tests.
+- Keep tests deterministic; avoid real I/O, time, and network unless the test deliberately controls, seeds, or freezes them.
+- When one behavior needs multiple similar cases, prefer parameterized tests and follow `test-parameterization.md` for naming, labels, and case structure.
+
+# Test Parameterization Rules
+
+Use these rules when a single behavior needs multiple similar test cases.
+
 - Prefer parameterized tests when multiple inputs exercise the same logic path; keep separate tests only when setup, assertions, or failure modes differ.
 - When planning parameterized tests, include representative case naming and parameter labeling style (for example `empty_input_returns_zero`).
 - Give each case a descriptive name; avoid generic names like `case_1`.
@@ -53,7 +61,7 @@ Use these rules for planning, implementation, and review unless a more specific 
 - Keep tests human-friendly, jargon-free, and around 80-100 characters per line.
 - For Rust, prefer `rstest` with `#[case::name(...)]` and aligned labeled parameters/comments.
 
-### Rust Style Reference
+## Rust Style Reference
 
 ```rust
 /// Verifies that line truncation in formatted output behaves correctly for
@@ -88,8 +96,10 @@ fn grep_format_handles_line_truncation(
 }
 ```
 
-## Code Placement
+# Code Placement Rules
 
+- Keep small changes in the existing file/module when that keeps ownership clear.
+- Create new files/modules only when module boundaries materially benefit.
 - Split catch-all files into focused modules.
 - Keep top-level orchestration in the parent module/file entrypoint.
 - Keep data-holder models in dedicated `models` modules/directories where the repo structure supports it.
@@ -105,15 +115,15 @@ fn grep_format_handles_line_truncation(
 - Keep extension, adapter, middleware, and integration packages focused on wiring and package-specific behavior.
 - If ownership is unclear, prefer the package that other packages depend on, not the package that depends on them.
 
-## Documentation
+# Documentation Rules
 
-### Scope
+## Scope
 - In changed scope, document caller-facing public APIs unless the target is a binary-only entrypoint.
 - If a change materially alters a module/file boundary, refresh module/file docs.
 - Update existing documentation as needed.
 - Do not remove existing documentation unless it is incorrect or no longer applies.
 
-### Required Docs
+## Required Docs
 - Non-trivial public APIs: purpose, params, returns, notable failure behavior.
 - Trivial public APIs: brief purpose.
 - New or materially changed modules/files: top-level docs with purpose and caller-facing context.
@@ -123,21 +133,21 @@ fn grep_format_handles_line_truncation(
 - Rust external symbol mentions use [`TypeName`] plus trailing reference links when needed.
 - Never use `ignore` fences.
 
-### Style
+## Style
 - Lead with a one-sentence purpose in plain language.
 - Prefer goal-oriented phrasing ("What you can do with this") over implementation terms.
 - Avoid jargon: no "materialization", "JIT", "framework-agnostic", "deterministic resolution", etc. Apply this to both code and documentation.
 - Keep examples practical and minimal.
 - Dense but accessible: full information without sacrificing readability.
 
-### Review Bar
+## Review Bar
 - Missing required docs is blocking.
 - Docs must not contradict implementation.
 - Keep docs dense, not skeletal.
 - Do not backfill untouched legacy files solely for docs.
 - Add inline comments for non-obvious logic.
 
-## Orchestration Plan
+# Orchestration Plan Rules
 
 Use these rules for the orchestrator workflow's `-PLAN.md` files.
 
@@ -147,7 +157,7 @@ Use these rules for the orchestrator workflow's `-PLAN.md` files.
 - Keep `## External Symbols` current.
 - In `## Implementation Steps`, each step includes `Action`, `Anchor`, `Lines` (approx), and `Order` (if needed).
 
-## Orchestration Revision
+# Orchestration Revision Rules
 
 Use these rules only for orchestrator plan review, plan revision, and review ledger handling.
 

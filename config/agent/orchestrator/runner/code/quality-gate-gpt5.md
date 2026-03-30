@@ -22,6 +22,7 @@ Single-pass review that validates objectives and code, runs checks, and reports 
 - `GENERAL_RULES_PATH`: `general.md` relative to `RULES_DIR`
 - `DOCUMENTATION_RULES_PATH`: `documentation.md` relative to `RULES_DIR`
 - `PERFORMANCE_RULES_PATH`: `performance.md` relative to `RULES_DIR`
+- `TESTING_RULES_PATH`: `testing.md` relative to `RULES_DIR`
 - `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
 - `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
 - Review context from orchestrator:
@@ -33,9 +34,8 @@ Single-pass review that validates objectives and code, runs checks, and reports 
 
 ## 1) Read objectives
 - Read `prompt_path` (and `objectives_path` if provided)
-- Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel
+- Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel
 - Extract objectives, requirements, and success criteria; treat each requirement and success criterion as an objective
-- Tests are always `basic`
 - Derive `coder_notes_path` from `prompt_path` by replacing the extension with `-CODER-NOTES.md`
 - If the coder notes file exists, read it and prioritize review around noted concerns, deviations, and unresolved issues
 
@@ -48,15 +48,10 @@ Single-pass review that validates objectives and code, runs checks, and reports 
 - If changed files include unrelated pre-existing work outside prompt scope, mark them as out-of-scope and do not fail solely for those
 
 ## 3) Review code style
-- FAIL IF: a small, single-caller helper is defined separately instead of inlining
-- FAIL IF: there is dead code (unused functions, unreachable branches, commented-out code)
-- FAIL IF: public visibility is used when private/protected suffices
-- FAIL IF: a blocking documentation issue from `DOCUMENTATION_RULES_PATH` exists in changed scope
-- FAIL IF: there is leftover debug/logging code not intended for production
-- FAIL IF: declarations violate reading order: callees defined before their callers within the same visibility level
-- WARNING IF: there is unnecessary abstraction (interface with only 1 implementation)
-- WARNING IF: only advisory documentation issues from `DOCUMENTATION_RULES_PATH` remain
-- WARNING IF: non-obvious logic lacks brief inline comments
+- Review changed code against `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH`
+- Use these categories when applicable: `DOCS`, `INLINE_HELPER`, `DEAD_CODE`, `VISIBILITY`, `DEBUG_CODE`, `UNNECESSARY_ABSTRACTION`, `DECLARATION_ORDER`, `CODE_PLACEMENT`
+- `HIGH`: blocking shared-rule violation in changed scope
+- `MEDIUM`: actionable non-blocking maintainability/readability issue
 
 ## 4) Review code semantics
 
@@ -78,13 +73,9 @@ These are areas where the implementer was uncertain; validate the approach or fl
 - FAIL IF: any requirement or success criterion is not met
 
 ## 7) Review tests
-- Tests: basic → ensure basic tests exist for new functionality and run tests
+- Review changed tests against `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH`
 - Check whole test files, not just diffs
-- FAIL IF: newly added tests duplicate existing test coverage
-- FAIL IF: same behavior is asserted in multiple tests (if one verifies it, others should skip)
-- FAIL IF: tests or test helpers duplicate existing coverage or setup
-- FAIL IF: tests could be parameterized to avoid duplication
-- FAIL IF: tests are non-deterministic (real I/O, time, network without mocking/seeding)
+- Use these categories when applicable: `MISSING_COVERAGE`, `DUPLICATE`, `NOT_PARAMETERIZED`, `NON_DETERMINISTIC`, `OVERENGINEERED`
 
 ## 8) Run verification checks
 - Run formatter, linter, and type/build checks per project conventions
@@ -116,7 +107,7 @@ Suggestion: ... (if not met)
 ## Code Style Issues
 
 ### path/to/file:line
-[DOCS|INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION] [HIGH|MEDIUM]
+[DOCS|INLINE_HELPER|DEAD_CODE|VISIBILITY|DEBUG_CODE|UNNECESSARY_ABSTRACTION|DECLARATION_ORDER|CODE_PLACEMENT] [HIGH|MEDIUM]
 Description of issue
 **Fix:** suggested fix
 
@@ -132,10 +123,10 @@ Detailed explanation of the problem and why it matters
 ```
 
 ## Test Issues
-[basic] — [PASS|FAIL]
+[new-code coverage] — [PASS|FAIL]
 
 ### path/to/test:line
-[DUPLICATE|NON_DETERMINISTIC|MISSING_COVERAGE|OVERENGINEERED]
+[MISSING_COVERAGE|DUPLICATE|NOT_PARAMETERIZED|NON_DETERMINISTIC|OVERENGINEERED]
 Description
 
 ## Verification Checks
