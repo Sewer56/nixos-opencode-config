@@ -28,7 +28,7 @@ This folder defines the multi-agent workflow that turns task descriptions into a
 - Generate `PROMPT-SPLIT.md` and `PROMPT-DRAFT-*.md` via `plan/split` and get user approval.
 - `orchestrator/prompt-pack` takes task descriptions, performs deep discovery, writes the machine prompt pack, and runs requirements preflight.
 - The scheduler reads the index, initializes state, detects base branch, and runs prompts in order.
-- Each prompt is executed by `@orchestrator/runner/runner` through plan, review, implementation, quality gate, and commit.
+- Each prompt is executed by `@orchestrator/runner/runner` through plan, specialist plan review, implementation, quality gate, and commit.
 - After each prompt, the scheduler runs CodeRabbit review when available.
 - After all prompts, final requirements validation checks coverage and evidence against `base_branch`.
 
@@ -75,26 +75,27 @@ PROMPT-NN-*-PLAN.md      PROMPT-NN-*-CODER-NOTES.md
 
 ## Per-Prompt Runner Cycle
 - Plan: `@orchestrator/runner/plan/planner` writes a concrete `-PLAN.md` and optional findings.
-- Plan review: GPT-5 + GLM reviewers must both approve; revisions loop as needed.
+- Plan review: 5 reviewers run on every plan: correctness (GPT-5), correctness (GLM), economy, test, and performance.
 - Implementation: `@orchestrator/runner/code/coder` applies the plan, runs checks, and writes `-CODER-NOTES.md`.
-- Quality gate: GPT-5 + GLM reviewers validate objectives, code, and verification checks.
+- Quality gate: 3 reviewers run on every change: sanity (GPT-5), sanity (GLM), and test integrity.
 - Commit: `@commit` creates repo-style commits, excluding `PROMPT-*` files.
 
 ## Rules Model
 - Canonical split rules live under `../rules/`: `general.md`, `documentation.md`, `performance.md`, `test-parameterization.md`, `code-placement.md`.
-- `../rules/all.md` is the convenience/derived aggregate for `runner/plan/planner` and `runner/plan/plan-reviewer-*`.
-- `runner/code/coder` and `runner/code/quality-gate-*` keep reading the split files directly.
+- `../rules/all.md` is the convenience aggregate for `runner/plan/planner`, `runner/plan/plan-correctness-*`, and `runner/plan/plan-performance-reviewer`.
+- `runner/code/coder` and the specialist reviewers read the split files they need directly.
 - The canonical documentation policy lives in `../rules/documentation.md`.
 
 ## Artifacts and Feedback Flow
-- **Planner and coder persist artifacts** to disk: `PROMPT-*-PLAN.md`, `PROMPT-*-CODER-NOTES.md`, and findings files.
-- **Reviewers return feedback directly** in their agent response (plan reviewers and quality gates); the runner uses that feedback to decide approval or revision.
+- **Planner and coder persist artifacts** to disk: `PROMPT-*-PLAN.md` and `PROMPT-*-CODER-NOTES.md`.
+- **Runner persists the canonical review ledger** to `PROMPT-*-REVIEW-LEDGER.md`.
+- **Reviewers return feedback directly** in their agent response; the runner normalizes it into the ledger.
 - **Scheduler state is persisted** in `PROMPT-ORCHESTRATOR.state.md` after each prompt for resume support.
 - **Validation output is persisted** by the requirements checker in `PROMPT-ORCHESTRATOR.validation.md` after the final validation run.
 
-## Review Context (`review_context`)
-- **Plan review**: pass `open_ledger_items` + `settled_facts` on each re-review to keep issue IDs stable and avoid reopening resolved items without new evidence; use issue `confidence` + `fix_specificity` to route medium/low items into `advisory_items` (non-blocking) or coder notes.
-- **Quality gate**: pass `prompt_path`, task intent, coder concerns, and related files to keep review in scope and treat unrelated pre-existing failures as non-blocking context.
+## Review Context
+- **Plan review**: pass `ledger_path` on re-review so reviewers can read prior decisions and avoid reopening resolved issues.
+- **Quality gate**: pass `ledger_path` and `coder_notes_path`; the gate loops with coder only.
 
 ## Iterative Updates (Planner and Coder)
 - **Planner revisions**: updates the same `PROMPT-*-PLAN.md` across iterations, adding `## Reviewer Concerns (Revision)` and updating `## Plan Notes` and revision history when feedback requests changes.
@@ -105,7 +106,7 @@ PROMPT-NN-*-PLAN.md      PROMPT-NN-*-CODER-NOTES.md
 - **Runner**: `orchestrator/runner/runner` coordinates the plan -> build -> gate -> commit cycle per prompt.
 - **Planner**: `orchestrator/runner/plan/planner` produces the actionable plan and updates prompt findings/required reads when needed.
 - **Coder**: `orchestrator/runner/code/coder` implements changes, runs verification, and records coder notes.
-- **Reviewers**: plan reviewers (`orchestrator/runner/plan/plan-reviewer-*`) and quality gates (`orchestrator/runner/code/quality-gate-*`) provide dual-model approval.
+- **Reviewers**: plan reviewers (`plan-correctness-*`, `plan-economy-reviewer`, `plan-test-reviewer`, `plan-performance-reviewer`) and code reviewers (`code-sanity-*`, `code-test-integrity-reviewer`).
 - **Validation and Tools**: requirements preflight/final (`orchestrator/runner/requirements/requirements-*`), CodeRabbit (`coderabbit`), and commits (`commit`).
 
 ## Why Generated Artifact Sections Exist

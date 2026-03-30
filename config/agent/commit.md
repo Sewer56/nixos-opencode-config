@@ -37,7 +37,7 @@ Run `git diff` to understand what was modified. Group related changes and pick t
 
 ## 3. Exclude reports
 
-Do not commit report files (`PROMPT-*`). Use `git add` selectively.
+Do not commit orchestration artifacts (`PROMPT-*`, `*-REVIEW-LEDGER.md`). Use `git add` selectively.
 
 ## Submodule handling
 
