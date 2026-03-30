@@ -22,6 +22,7 @@ If empty, use the current working directory.
 - If discovery finds a real blocker or a required reshape, stop and explain it instead of rewriting the task set.
 - Write machine-ready prompts that define outcomes, constraints, and evidence. Do not write implementation plans.
 - Every prompt must be standalone, include the context and file paths a fresh runner needs, and produce real code.
+- Review written prompt-pack files, not an in-memory draft.
 - `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
 - Apply the shaping rules in this file and these shared rules relative to `RULES_DIR`:
   - `general.md`
@@ -35,7 +36,7 @@ If empty, use the current working directory.
 
 ## Workflow
 
-### 1. Load task inputs
+### Phase 1: Load task inputs
 - Resolve the input path or use the current working directory.
 - Accept one or more markdown task files.
 - If the input is a directory, discover task files inside it.
@@ -48,7 +49,7 @@ If empty, use the current working directory.
   - If any input file contains a valid `Source Document:` path, use it.
   - Otherwise, use the most relevant input file.
 
-### 2. Do discovery
+### Phase 2: Do discovery
 - Read every described task, cited source, and referenced artifact before writing prompts.
 - Confirm the work is needed:
   - update or sync: compare current and requested state; skip if identical
@@ -68,7 +69,7 @@ If empty, use the current working directory.
 - Put extra research in findings files, not extra sections in prompt files.
 - Capture repo conventions in findings when they matter: test commands, lint/build expectations, and CI versions.
 
-### 3. Write `PROMPT-PRD-REQUIREMENTS.md`
+### Phase 3: Write draft `PROMPT-PRD-REQUIREMENTS.md`
 - Create it in the current working directory.
 - Extract every discrete requirement from the task files and the source document only.
 - Use stable IDs: `REQ-001`, `REQ-002`, ...
@@ -77,7 +78,7 @@ If empty, use the current working directory.
 - Set `Owner Prompt` to a prompt file or `None`.
 - Do not drop requirements; mark `OUT` or `POST_INIT` explicitly.
 
-### 4. Write `PROMPT-NN-{title}.md`
+### Phase 4: Write draft `PROMPT-NN-{title}.md`
 - Create one prompt per described task.
 - Keep task titles unless discovery requires a clearer name.
 - Keep task boundaries when they are viable.
@@ -90,15 +91,7 @@ If empty, use the current working directory.
 - Add `# Verification Scope` with in-scope checks and known unrelated failures.
 - Always include `# Module Layout`.
 
-### 5. Run requirements preflight
-- Spawn `@orchestrator/runner/requirements/requirements-preflight` with:
-  - `requirements_path`: absolute path to `PROMPT-PRD-REQUIREMENTS.md`
-  - `prompts_dir`: absolute path to the current working directory
-  - `prd_path`: absolute path to the source document
-- If the result is FAIL or PARTIAL, revise the prompt pack and run preflight again.
-- Proceed only on PASS.
-
-### 6. Write `PROMPT-ORCHESTRATOR.md`
+### Phase 5: Write draft `PROMPT-ORCHESTRATOR.md`
 - Create it in the current working directory.
 - Include:
   - the overall objective
@@ -110,7 +103,27 @@ If empty, use the current working directory.
 - Every `IN` requirement must have exactly one owner.
 - In `PROMPT-ORCHESTRATOR.md`, keep ownership mapping only in `## Requirement Ownership`.
 
-### 7. Hand off
+### Phase 6: Review draft prompt pack
+- Spawn `@orchestrator/prompt-pack-reviewer` with:
+  - `requirements_path`: absolute path to `PROMPT-PRD-REQUIREMENTS.md`
+  - `orchestrator_path`: absolute path to `PROMPT-ORCHESTRATOR.md`
+  - `prompt_paths`: absolute paths to all current `PROMPT-NN-*.md` files
+  - `source_paths`: absolute paths to the original task files, the source document, and any `PROMPT-SPLIT.md` or `PROMPT-DRAFT-*.md` inputs that shaped the pack
+  - `original_context`: the original user request text, or a short summary when the raw text is not available
+- If the reviewer returns `BLOCKING`, revise the draft prompt pack and review again.
+- Proceed only when the reviewer is `PASS` or `ADVISORY`.
+- Max 5 review iterations.
+
+### Phase 7: Run requirements preflight
+- Run `@orchestrator/runner/requirements/requirements-preflight` with:
+  - `requirements_path`: absolute path to `PROMPT-PRD-REQUIREMENTS.md`
+  - `prompts_dir`: absolute path to the current working directory
+  - `orchestrator_path`: absolute path to `PROMPT-ORCHESTRATOR.md`
+  - `prd_path`: absolute path to the source document
+- If preflight returns `FAIL` or `PARTIAL`, revise the draft prompt pack, then rerun Phase 6 before running preflight again.
+- Proceed only on `PASS`.
+
+### Phase 8: Hand off
 ```
 Prompt pack ready.
 
