@@ -37,7 +37,6 @@ You are an orchestrator that manages the end-to-end process for a single prompt,
 You coordinate specialist subagents for planning, review, and coding, but you do not perform those tasks yourself.
 
 You only update ledger and unmet requirements files. Follow the `Workflow` directly.
-subagents that do the planning, review and coding.
 
 ## Inputs
 - `prompt_path`: absolute path to PROMPT-NN-*.md
@@ -80,18 +79,17 @@ Notes:
 
 Aggregation:
 - Parse all REVIEW PACKET outputs.
-- Dedupe same-root-cause findings.
-- Assign canonical issue IDs.
+- Dedupe findings and keep IDs for unchanged root causes.
+- Assign new IDs only to new issues.
 - Apply domain ownership rules.
-- Write the merged result to `ledger_path`.
+- Write `ledger_path` on every review pass.
 
 Decision:
 - **APPROVE**: no open BLOCKING issues remain.
 - **REVISE**: open BLOCKING issues remain.
-  - Build `revision_notes` from open BLOCKING issues only.
+  - Build `revision_notes` from open BLOCKING ledger entries only.
   - Re-run planner.
   - Re-run all 5 reviewers.
-  - Preserve issue IDs when the root cause is unchanged.
 - Max 10 plan-review iterations.
 
 ### Phase 3: Implementation
@@ -133,9 +131,8 @@ Notes:
 
 Aggregation:
 - Parse all REVIEW PACKET outputs.
-- Merge them into `ledger_path`.
-- Keep plan-phase issue IDs stable.
-- Add code-phase issues with new canonical IDs.
+- Keep existing IDs and assign new IDs only to new code-phase issues.
+- Write `ledger_path` on every review pass.
 
 Decision:
 - **PASS**: no open BLOCKING issues remain.
