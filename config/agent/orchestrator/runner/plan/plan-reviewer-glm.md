@@ -12,7 +12,7 @@ permission:
   patch: deny
 ---
 
-Review the implementation plan for completeness, correctness, and quality. Catch issues before coding begins.
+Review the implementation plan for completeness, correctness, and quality. Catch issues before coding.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -24,27 +24,26 @@ Review the implementation plan for completeness, correctness, and quality. Catch
 
 # Process
 
-## 1) Load Context
-- Read `prompt_path` and `plan_path`.
-- Read `ALL_RULES_PATH` once.
+## 1. Load Context
+- Read `prompt_path`, `plan_path`, and `ALL_RULES_PATH` once.
 - If `review_context` is provided:
-  - Reuse issue IDs when root cause is unchanged.
+  - Reuse issue IDs when the root cause is unchanged.
   - Do not reopen `RESOLVED` items without new concrete evidence.
-  - Treat settled facts as true unless contradicted with explicit evidence.
+  - Treat settled facts as true unless explicit evidence contradicts them.
 
-## 2) Blocking Evidence Rule
+## 2. Blocking Evidence Rule
 - Mark an issue BLOCKING only if all are present:
   1. Requirement impact (`REQ-###` or success criterion)
   2. Concrete evidence (plan refs; source refs for semantic/runtime claims)
   3. Minimal failing scenario
 - If any are missing, downgrade to advisory.
 
-## 3) Review Against Requirements and Shared Rules
+## 3. Review Against Requirements and Shared Rules
 - Verify every requirement/success criterion has concrete implementation and tests.
 - Verify the plan follows `ALL_RULES_PATH`, including documentation coverage and revision requirements when applicable.
 - Verify the plan includes concrete test work.
 - Require `## Requirement Trace Matrix`.
-- If the plan is a revision, require `## Revision Impact Table` as required by `ALL_RULES_PATH`.
+- If the plan is a revision, require `## Revision Impact Table` per `ALL_RULES_PATH`.
 - Categorize issues under code style, semantics, or test plan.
 - Use these code style categories when applicable: `DOCS`, `INLINE_HELPER`, `DEAD_CODE`, `VISIBILITY`, `DEBUG_CODE`, `UNNECESSARY_ABSTRACTION`, `DECLARATION_ORDER`, `CODE_PLACEMENT`.
 - Use these test categories when applicable: `MISSING_COVERAGE`, `DUPLICATE`, `NOT_PARAMETERIZED`, `NON_DETERMINISTIC`, `OVERENGINEERED`.
@@ -53,12 +52,12 @@ Review the implementation plan for completeness, correctness, and quality. Catch
 - If reopening a previously `RESOLVED` issue ID, include `New Evidence`.
 - If `fix_specificity=CONCRETE`, include a minimal replacement snippet.
 
-## 4) Decide Status
+## 4. Decide Status
 - **APPROVE**: plan is sound, complete, and should pass the quality gate
 - **REVISE** only when at least one BLOCKING issue exists:
   - Any CRITICAL/HIGH issue
   - Any requirement/success criterion marked MISSING/PARTIAL
-- If only MEDIUM/LOW issues exist and requirements are fully covered, return **APPROVE** and list issues in Notes
+- If only MEDIUM/LOW issues exist and requirements are fully covered, return **APPROVE** and list them in Notes
 
 # Output
 

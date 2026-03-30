@@ -25,70 +25,62 @@ Single-pass review that validates objectives and code, runs checks, and reports 
 - `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
 - `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
 - Review context from orchestrator:
-  - Task intent (one-line summary)
-  - Coder's concerns (areas of uncertainty — focus review here)
+  - Task intent
+  - Coder concerns
   - Related files reviewed by coder
 
 # Process
 
-## 1) Read objectives
-- Read `prompt_path` (and `objectives_path` if provided)
-- Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel
-- Extract objectives, requirements, and success criteria; treat each requirement and success criterion as an objective
-- Derive `coder_notes_path` from `prompt_path` by replacing the extension with `-CODER-NOTES.md`
-- If the coder notes file exists, read it and prioritize review around noted concerns, deviations, and unresolved issues
+## 1. Read objectives and context
+- Read `prompt_path`.
+- Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `PERFORMANCE_RULES_PATH`, `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` once, in parallel.
+- Extract objectives, requirements, and success criteria. Treat each requirement or success criterion as an objective.
+- Derive `coder_notes_path` from `prompt_path` by replacing the extension with `-CODER-NOTES.md`.
+- If the coder notes file exists, read it and prioritize review around noted concerns, deviations, and unresolved issues.
 
-## 2) Discover changes
-- Handle unstaged and untracked work; do not assume commits exist
-- Collect changed paths via `git status --porcelain` and focus review on those
-- Use diffs of staged and unstaged changes for analysis
-- Read full file contents for changed files to understand context
-- Treat `prompt_path` objectives plus `Related files reviewed by coder` as in-scope anchors
-- If changed files include unrelated pre-existing work outside prompt scope, mark them as out-of-scope and do not fail solely for those
+## 2. Discover changes
+- Handle unstaged and untracked work. Do not assume commits exist.
+- Collect changed paths via `git status --porcelain` and focus review on those files.
+- Use both staged and unstaged diffs for analysis.
+- Read full changed files for context.
+- Treat the prompt objectives plus `Related files reviewed by coder` as in-scope anchors.
+- If changed files include unrelated pre-existing work outside prompt scope, mark it out of scope and do not fail solely for it.
 
-## 3) Review code style
-- Review changed code against `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH`
-- Use these categories when applicable: `DOCS`, `INLINE_HELPER`, `DEAD_CODE`, `VISIBILITY`, `DEBUG_CODE`, `UNNECESSARY_ABSTRACTION`, `DECLARATION_ORDER`, `CODE_PLACEMENT`
-- `HIGH`: blocking shared-rule violation in changed scope
-- `MEDIUM`: actionable non-blocking maintainability/readability issue
+## 3. Review code style
+- Review changed code against `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH`.
+- Use these categories when applicable: `DOCS`, `INLINE_HELPER`, `DEAD_CODE`, `VISIBILITY`, `DEBUG_CODE`, `UNNECESSARY_ABSTRACTION`, `DECLARATION_ORDER`, `CODE_PLACEMENT`.
+- `HIGH`: blocking shared-rule violation in changed scope.
+- `MEDIUM`: actionable non-blocking maintainability/readability issue.
 
-## 4) Review code semantics
+## 4. Review code semantics
+- Analyze changed files deeply and flag anything suspicious.
 
-Analyze each changed file deeply. Reason through whether issues exist before concluding. Be comprehensive; flag anything suspicious.
+## 5. Review coder concerns
+If the coder flagged concerns, review those areas more closely and validate the approach.
 
-- **Security**: vulnerabilities, auth issues, data exposure, injection vectors, cryptographic weaknesses
-- **Correctness**: logic bugs, edge cases, race conditions, resource handling, state management
-- **Performance**: algorithmic complexity, unnecessary work, blocking operations, memory issues
-- **Error handling**: swallowed errors, missing cases, unclear messages, cleanup failures
-- **Architecture**: coupling, responsibility boundaries, contract changes, cross-file impact
-
-## 5) Review coder concerns
-If the coder flagged concerns, examine those areas with extra scrutiny.
-These are areas where the implementer was uncertain; validate the approach or flag issues.
-
-## 6) Review objectives
+## 6. Review objectives
 - Read `# Objective`, `# Requirements`, and `# Success Criteria` from the prompt file
 - Ensure each requirement and success criterion is met by the implementation
 - FAIL IF: any requirement or success criterion is not met
 
-## 7) Review tests
-- Review changed tests against `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH`
-- Check whole test files, not just diffs
-- Use these categories when applicable: `MISSING_COVERAGE`, `DUPLICATE`, `NOT_PARAMETERIZED`, `NON_DETERMINISTIC`, `OVERENGINEERED`
+## 7. Review tests
+- Review changed tests against `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH`.
+- Check whole test files, not just diffs.
+- Use these categories when applicable: `MISSING_COVERAGE`, `DUPLICATE`, `NOT_PARAMETERIZED`, `NON_DETERMINISTIC`, `OVERENGINEERED`.
 
-## 8) Run verification checks
-- Run formatter, linter, and type/build checks per project conventions
-- Capture outputs and exit codes
-- If a check fails due to unrelated pre-existing workspace/package issues outside prompt scope, report it explicitly as non-blocking context
+## 8. Run verification checks
+- Run formatter, linter, and type/build checks per project conventions.
+- Capture outputs and exit codes.
+- Report unrelated pre-existing workspace/package failures outside prompt scope as non-blocking context.
 
-## 9) Decide status
-- **FAIL**: any in-scope CRITICAL/HIGH finding, any unmet objective, or in-scope blocking check failure
+## 9. Decide status
+- **FAIL**: any in-scope CRITICAL/HIGH finding, any unmet objective, or any in-scope blocking check failure
 - **PARTIAL**: only MEDIUM/LOW in-scope findings, or only unrelated pre-existing check failures with objectives met
 - **PASS**: no findings, all objectives met, all checks pass
 
 # Output
 
-Provide this exact structure in the final message:
+Use this exact output:
 
 ```
 # QUALITY GATE REPORT (GLM)

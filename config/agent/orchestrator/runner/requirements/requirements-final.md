@@ -16,7 +16,7 @@ permission:
   task: deny
 ---
 
-Verify PRD requirements are satisfied by completed work. Write only the validation report file.
+Verify PRD requirements against completed work. Write only the validation report file.
 
 # Inputs
 - `orchestrator_path`: absolute path to PROMPT-ORCHESTRATOR.md
@@ -28,10 +28,10 @@ Verify PRD requirements are satisfied by completed work. Write only the validati
 
 # Process
 
-## 1) Load Sources
+## 1. Load Sources
 - Read `requirements_path` and parse requirement IDs, scope, and acceptance notes
 - Ignore `## Unmet Requirements` or `## Unachieved Requirements` sections; they are not inventory entries
-- Read `orchestrator_path` for prompt list and requirement mapping from `## Requirement Ownership`
+- Read `orchestrator_path` for the prompt list and `## Requirement Ownership` mapping
 - FAIL if `## Requirement Ownership` is missing or malformed
 - Read prompt files referenced by the orchestrator index; extract `# Requirements` IDs
 - Read `state_path` and collect prompt statuses
@@ -41,11 +41,11 @@ Verify PRD requirements are satisfied by completed work. Write only the validati
   - Parse `### Prompt: PROMPT-##-*.md` entries to associate unmet requirements with prompts
   - Warn (do not fail) if the unmet file references unknown requirement IDs
 
-## 2) Validate Inventory Integrity
+## 2. Validate `Requirements Inventory` Integrity
 - FAIL if any requirement ID is duplicated or malformed
 - WARN if any requirement lacks scope or acceptance
 
-## 3) Coverage Consistency
+## 3. Coverage Consistency
 - Each `IN` requirement must appear in at least one prompt's `# Requirements`
 - FAIL if any `IN` requirement is unmapped and not listed as known unmet
 - FAIL if any prompt references a requirement ID not in the inventory
@@ -53,7 +53,7 @@ Verify PRD requirements are satisfied by completed work. Write only the validati
 - FAIL if an `IN` requirement has no owner or has an owner prompt not listed in the index
 - WARN if ownership mapping disagrees with prompt `# Requirements` IDs
 
-## 4) Final Validation
+## 4. Final Validation
 - For each `IN` requirement not listed as known unmet, ensure at least one covering prompt has status SUCCESS or INCOMPLETE in `state_path`
   - If a requirement is listed as unmet for a specific prompt, do not treat that prompt as satisfying the requirement
 - Use git diff against `base_branch` to look for evidence in changed files
@@ -63,14 +63,14 @@ Verify PRD requirements are satisfied by completed work. Write only the validati
 - FAIL if evidence is missing for a requirement marked as met by a prompt (excluding known unmet)
 - List known unmet requirements separately; do not treat them as missing coverage or evidence gaps
 
-## 5) Write Validation Report
+## 5. Write Validation Report
 - Write the full report (format below) to `PROMPT-ORCHESTRATOR.validation.md`
 - Location: same directory as `orchestrator_path`
 - Overwrite if it already exists
 - Do not write any other files
 
 # Output
-Write the report to `PROMPT-ORCHESTRATOR.validation.md`, then return the same report in this format:
+Write the report to `PROMPT-ORCHESTRATOR.validation.md`, then return the same report:
 
 ```
 # REQUIREMENTS FINAL VALIDATION
