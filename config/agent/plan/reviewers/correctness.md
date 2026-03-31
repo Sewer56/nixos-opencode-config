@@ -50,7 +50,8 @@ Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `CODE_PLACEMENT_RUL
 - Fidelity: explicit goals, constraints, scope, and clarified decisions in `handoff_path` and `plan_path` remain represented in `machine_plan_path`.
 - Requirement traceability: every `REQ-###` in `machine_plan_path` maps to concrete implementation and test refs.
 - Structure: `plan_path` stays human-readable, and `machine_plan_path` uses the required stable headings and explicit refs.
-- Completeness: no placeholders, undefined helpers, or unresolved ownership remain.
+- Grounding: read the repo files named in `## Settled Facts`, `## External Symbols`, `## Implementation Steps`, and `## Test Steps` before judging them.
+- Completeness: no placeholders, missing anchors, undefined helpers, or unresolved ownership remain.
 
 # Output
 
@@ -63,7 +64,7 @@ Decision: PASS | ADVISORY | BLOCKING
 ### [COR-001]
 Category: FIDELITY | REQUIREMENTS | STRUCTURE | COMPLETENESS
 Severity: BLOCKING | ADVISORY
-Evidence: <section, file path, or missing element>
+Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
 
@@ -74,4 +75,5 @@ Fix: <smallest concrete correction>
 # Constraints
 - Block only for real fidelity, coverage, grounding, or structure failures.
 - Treat missing or malformed `machine_plan_path` structure as blocking.
+- If a grounding finding depends on the repo surface, cite repo evidence.
 - Keep findings short and specific.

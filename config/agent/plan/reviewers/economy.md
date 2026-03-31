@@ -45,7 +45,7 @@ Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `CODE_PLACEMENT_RUL
 # Focus
 - Economy lens: flag only clear unnecessary expansion in implementation scope, file/module count, documentation churn, or planned test surface.
 - Leave detailed test quality to the test reviewer.
-- Use `handoff_path` and `plan_path` only to judge whether the machine plan grew beyond the confirmed human intent.
+- Read the referenced repo files first and use `handoff_path` and `plan_path` only to judge whether the machine plan grew beyond the confirmed human intent.
 
 # Output
 
@@ -58,7 +58,7 @@ Decision: PASS | ADVISORY | BLOCKING
 ### [ECO-001]
 Category: ECONOMY | PLACEMENT | DOCS
 Severity: BLOCKING | ADVISORY
-Evidence: <plan section or path>
+Evidence: <plan section or `path:line`>
 Problem: <what is unnecessarily broad or misplaced>
 Fix: <smallest simplification>
 

@@ -71,10 +71,10 @@ Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `CODE_PLACEMENT_RUL
 
 ## 2. Deepen discovery only where needed
 - Start from the paths and shapes already present in `plan_path`.
-- Deepen discovery only where the confirmed plan still leaves concrete file placement, ownership, test coverage, verification commands, or external API details unresolved.
-- Use `@codebase-explorer` for repo discovery when needed.
-- Use `@mcp-search` for external libraries or APIs when needed.
-- After those subagents return, read the files and external facts they surfaced that matter to the machine plan.
+- Deepen discovery only where the confirmed plan still leaves concrete file placement, ownership, code shape, test coverage, verification commands, or external API details unresolved.
+- Use `@codebase-explorer` for repo discovery first when needed.
+- Use `@mcp-search` for external libraries or APIs first when needed.
+- Only after that initial search is complete, read the files and external facts they surfaced that matter to the machine plan.
 
 ## 3. Write the handoff file
 - Rewrite `handoff_path` from scratch for this run.
@@ -83,7 +83,9 @@ Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `CODE_PLACEMENT_RUL
 
 ## 4. Write the machine plan
 - Derive discrete `REQ-###` items from the confirmed human plan and handoff.
-- Keep the machine plan concrete enough that an implementer does not need to invent file placement, major structure, missing test coverage, or verification commands.
+- Record the settled repo facts that the plan depends on.
+- Keep the machine plan concrete enough that an implementer does not need to invent file placement, major structure, missing test coverage, verification commands, or code shape.
+- Ground each implementation step in the current repo surface with a real file path, an anchor, repo evidence, and a short code snippet or diff.
 - Keep the planned change as small as correctness allows.
 - Write `machine_plan_path` using the `# Templates` section below.
 
@@ -120,7 +122,7 @@ Summary: <one-line summary>
 - Only write planning artifacts `PROMPT-PLAN.handoff.md` and `PROMPT-PLAN.machine.md` during finalize.
 - Never modify product code while planning.
 - Never rewrite `PROMPT-PLAN.md` in this command.
-- Keep `PROMPT-PLAN.machine.md` machine-first: stable headings, explicit refs, and concrete file-level steps.
+- Keep `PROMPT-PLAN.machine.md` machine-first: stable headings, explicit refs, concrete file-level steps, and anchors that point at the current repo surface.
 - Keep `PROMPT-PLAN.handoff.md` factual and stable enough for the machine plan and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
 
@@ -180,6 +182,10 @@ Source Handoff: <absolute path to `PROMPT-PLAN.handoff.md`>
 ## Summary
 - <brief goal and shape of the change>
 
+## Settled Facts
+- [FACT-001] <repo fact the plan depends on> (Source: `path/to/file:line`)
+- <or `None`>
+
 ## Assumptions
 - <assumptions or `None`>
 
@@ -217,10 +223,27 @@ Source Handoff: <absolute path to `PROMPT-PLAN.handoff.md`>
 ### I1. `path/to/file`
 Action: UPDATE | INSERT | ADD | REMOVE
 Why: <why this file changes>
+Anchor: `<existing symbol or section>` | `None`
+Lines: ~<start>-<end> | `None`
+Insert at: before | after | replace `<anchor or region>` | `None`
+
+Import diff:
+
+```diff
+<import changes or `None`>
+```
+
+Code Shape:
+
+```language
+<small concrete snippet or diff showing the intended change>
+```
+
 Changes:
 - <concrete code change>
 - <doc update when needed>
 Dependencies: None | I#
+Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
 
 ## Test Steps
 

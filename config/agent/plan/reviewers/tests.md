@@ -45,7 +45,7 @@ Read the files in `RULES_DIR` named by `TESTING_RULES_PATH` and `TEST_PARAMETERI
 - Acceptance lens: planned tests should prove the stated acceptance criteria.
 - Scope lens: flag when the planned test surface is disproportionate to the behavior under test.
 - Recommend parameterization for repetitive similar cases.
-- Use `handoff_path` and `plan_path` to confirm that test coverage still matches the confirmed human intent.
+- Read the referenced repo tests or nearby test modules before judging placement and coverage, then use `handoff_path` and `plan_path` to confirm that test coverage still matches the confirmed human intent.
 
 # Output
 
@@ -56,9 +56,9 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [TST-001]
-Category: COVERAGE | REDUNDANCY | PARAMETERIZATION
+Category: COVERAGE | REDUNDANCY | PARAMETERIZATION | PLACEMENT
 Severity: BLOCKING | ADVISORY
-Evidence: <plan section or requirement>
+Evidence: <plan section, requirement, or `path:line`>
 Problem: <missing coverage or unnecessary duplication>
 Fix: <smallest useful test-plan correction>
 
@@ -67,5 +67,5 @@ Fix: <smallest useful test-plan correction>
 ```
 
 # Constraints
-- Block for missing coverage, obvious duplicate coverage, or clearly missed parameterization.
+- Block for missing coverage, obvious duplicate coverage, clearly missed parameterization, or test placement that conflicts with the current repo surface.
 - Focus on behavior, not implementation-detail tests.

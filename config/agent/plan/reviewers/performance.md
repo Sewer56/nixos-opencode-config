@@ -43,7 +43,7 @@ Read the file in `RULES_DIR` named by `PERFORMANCE_RULES_PATH` once.
 # Focus
 - Trigger: only review deeply if the plan touches performance-sensitive work.
 - Hunt: algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, or missing validation that could cause material performance issues.
-- Use `handoff_path` and `plan_path` only to verify that the machine plan did not introduce performance-sensitive scope beyond the confirmed plan.
+- Read the referenced repo code before judging performance risk, then use `handoff_path` and `plan_path` only to verify that the machine plan did not introduce performance-sensitive scope beyond the confirmed plan.
 
 # Output
 
@@ -59,7 +59,7 @@ Decision: PASS | ADVISORY | BLOCKING
 ### [PERF-001]
 Category: ALGORITHM | DATA | DATABASE | CONCURRENCY | VALIDATION
 Severity: BLOCKING | ADVISORY
-Evidence: <plan section or path>
+Evidence: <plan section or `path:line`>
 Problem: <material performance risk>
 Fix: <smallest correction>
 
@@ -69,4 +69,5 @@ Fix: <smallest correction>
 
 # Constraints
 - If the plan is not performance-sensitive, return `PASS` with `Performance Sensitive: NO`.
+- If a performance finding depends on the repo surface, cite repo evidence.
 - Block only for material performance risks, not micro-optimizations.
