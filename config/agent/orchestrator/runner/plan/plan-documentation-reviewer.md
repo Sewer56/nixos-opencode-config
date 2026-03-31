@@ -2,6 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates plan documentation coverage and specificity
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   "*": deny
   read:

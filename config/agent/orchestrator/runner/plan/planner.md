@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Produces complete implementation plans with task list and symbol map
 model: github-copilot/gpt-5.4
-reasoningEffort: high
+reasoningEffort: medium
 permission:
   "*": deny
   read:

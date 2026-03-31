@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews written orchestrator prompt-pack files for correctness and fidelity
 model: openai/gpt-5.4
-reasoningEffort: high
+reasoningEffort: medium
 permission:
   "*": deny
   read:

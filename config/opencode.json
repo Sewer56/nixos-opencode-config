@@ -109,6 +109,34 @@
         },
         "hf:MiniMaxAI/MiniMax-M2.5": {
           "id": "hf:MiniMaxAI/MiniMax-M2.5"
+        },
+        "hf:zai-org/GLM-5": {
+          "id": "hf:zai-org/GLM-5",
+          "name": "GLM-5",
+          "family": "glm",
+          "release_date": "2026-03-01",
+          "last_updated": "2026-03-01",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "open_weights": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 192000,
+            "output": 131072
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
         }
       }
     },

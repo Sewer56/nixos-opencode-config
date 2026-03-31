@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Validates plan completeness, correctness, and requirements coverage (GPT-5)
 model: openai/gpt-5.4
-reasoningEffort: high
+reasoningEffort: medium
 permission:
   "*": deny
   read:

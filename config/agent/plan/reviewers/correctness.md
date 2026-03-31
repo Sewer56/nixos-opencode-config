@@ -2,8 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks machine-plan coverage, fidelity, and structure
-model: openai/gpt-5.4
-reasoningEffort: xhigh
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   "*": deny
   read:
