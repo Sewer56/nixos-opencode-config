@@ -5,15 +5,31 @@ description: Validates PRD requirement completion and writes a validation report
 model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 reasoningEffort: high
 permission:
-  bash: allow
-  read: allow
-  grep: allow
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
+  edit:
+    "*": deny
+    "*PROMPT-ORCHESTRATOR.validation.md": allow
+  bash:
+    "*": deny
+    "git diff*": allow
   glob: allow
   list: allow
-  edit: deny
-  write: allow
-  patch: deny
-  task: deny
+  grep: allow
+  todowrite: allow
+  # task: deny
+  # external_directory: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Verify PRD requirements against completed work. Write only the validation report file.

@@ -4,13 +4,27 @@ hidden: true
 description: Validates implementation against objectives (GLM)
 model: zai-coding-plan/glm-5.1
 permission:
-  bash: allow
-  read: allow
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
   grep: allow
   glob: allow
-  task: deny
-  edit: deny
-  patch: deny
+  bash: allow
+  todowrite: allow
+  list: allow
+  external_directory: allow
+  # edit: deny
+  # task: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Validate that implementation satisfies the objectives. Narrow sanity gate only. Never modify files.

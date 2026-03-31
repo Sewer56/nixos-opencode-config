@@ -4,13 +4,27 @@ hidden: true
 description: Validates test execution, compilation, and coverage integrity
 model: zai-coding-plan/glm-5.1
 permission:
-  bash: allow
-  read: allow
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
   grep: allow
   glob: allow
-  task: deny
-  edit: deny
-  patch: deny
+  bash: allow
+  list: allow
+  todowrite: allow
+  external_directory: allow
+  # edit: deny
+  # task: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Validate that tests compile, run, and provide coverage as planned. Verify test integrity after implementation. Never modify files.

@@ -4,17 +4,30 @@ hidden: true
 description: Implements code changes and ensures all verification checks pass
 model: zai-coding-plan/glm-5.1
 permission:
-  bash: allow
-  edit: allow
-  write: allow
-  patch: allow
-  read: allow
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
   grep: allow
   glob: allow
   list: allow
+  edit:
+    "*": allow
+    "*PROMPT-*.md": deny
+    "*PROMPT-??-*-CODER-NOTES.md": allow
+  bash: allow
   todowrite: allow
-  todoread: allow
-  task: deny
+  external_directory: allow
+  webfetch: allow
+  websearch: allow
+  codesearch: allow
+  lsp: allow
+  # task: deny
+  # question: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Implement the requested changes and ensure required verification checks pass before returning.

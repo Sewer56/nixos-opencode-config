@@ -5,17 +5,38 @@ description: Produces complete implementation plans with task list and symbol ma
 model: github-copilot/gpt-5.4
 reasoningEffort: high
 permission:
-  read: allow
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
   grep: allow
   glob: allow
-  list: allow
-  write: allow
-  edit: allow
-  task: {
-    "*": "deny",
-    "mcp-search": "allow",
-    "codebase-explorer": "allow"
-  }
+  edit:
+    "*": deny
+    "*PROMPT-??-*.md": allow
+    "*PROMPT-FINDING-*.md": allow
+    "*PROMPT-??-*-CODER-NOTES.md": deny
+    "*PROMPT-??-*-REVIEW-LEDGER.md": deny
+    "*PROMPT-ORCHESTRATOR*.md": deny
+    "*PROMPT-PRD-REQUIREMENTS.md": deny
+    "*PROMPT-REQUIREMENTS-UNMET.md": deny
+  todowrite: allow
+  external_directory: allow
+  task:
+    "*": deny
+    "mcp-search": allow
+    "codebase-explorer": allow
+  # list: deny
+  # bash: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Create a complete implementation plan in a separate plan file. Use `@mcp-search` for external docs and `@codebase-explorer` for repo discovery when needed. Log useful findings.

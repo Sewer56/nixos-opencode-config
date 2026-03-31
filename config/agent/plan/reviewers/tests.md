@@ -3,6 +3,28 @@ mode: subagent
 hidden: true
 description: Checks test coverage and test minimality for finalized machine plans
 model: zai-coding-plan/glm-5.1
+permission:
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
+  grep: allow
+  glob: allow
+  list: allow
+  todowrite: allow
+  external_directory: allow
+  # edit: deny
+  # bash: deny
+  # task: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Review a machine plan's test strategy. Never modify files.

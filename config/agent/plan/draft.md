@@ -4,11 +4,34 @@ description: Collaboratively drafts a short human-first implementation plan
 model: openai/gpt-5.4
 reasoningEffort: xhigh
 permission:
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
+  edit:
+    "*": deny
+    "PROMPT-PLAN.md": allow
+    "*PROMPT-PLAN.md": allow
+  question: allow
+  todowrite: allow
+  external_directory: allow
+  glob: allow
+  grep: allow
+  list: allow
   task: {
     "*": "deny",
     "codebase-explorer": "allow",
     "mcp-search": "allow"
   }
+  # bash: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Create and maintain a collaborative human-first plan. Write only `PROMPT-PLAN.md`.

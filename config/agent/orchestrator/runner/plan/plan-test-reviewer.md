@@ -4,12 +4,27 @@ hidden: true
 description: Validates test design, deduplication, and parameterization opportunities
 model: zai-coding-plan/glm-5.1
 permission:
-  read: allow
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
   grep: allow
   glob: allow
-  task: deny
-  edit: deny
-  patch: deny
+  list: allow
+  todowrite: allow
+  external_directory: allow
+  # edit: deny
+  # bash: deny
+  # task: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Validate that tests are well-designed, non-redundant, and follow parameterization best practices. Never modify files.

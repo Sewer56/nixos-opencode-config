@@ -5,12 +5,27 @@ description: Validates plan completeness, correctness, and requirements coverage
 model: openai/gpt-5.4
 reasoningEffort: high
 permission:
-  read: allow
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
   grep: allow
   glob: allow
-  task: deny
-  edit: deny
-  patch: deny
+  list: allow
+  todowrite: allow
+  external_directory: allow
+  # edit: deny
+  # bash: deny
+  # task: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Validate that the implementation plan will correctly and completely satisfy all requirements. Never modify files.

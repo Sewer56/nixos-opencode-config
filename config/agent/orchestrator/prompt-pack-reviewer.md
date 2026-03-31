@@ -5,14 +5,27 @@ description: Reviews written orchestrator prompt-pack files for correctness and 
 model: openai/gpt-5.4
 reasoningEffort: high
 permission:
-  read: allow
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
   grep: allow
   glob: allow
   list: allow
-  task: deny
-  edit: deny
-  write: deny
-  patch: deny
+  todowrite: allow
+  external_directory: allow
+  # edit: deny
+  # bash: deny
+  # task: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Review a written orchestrator prompt pack for correctness. Never modify files.

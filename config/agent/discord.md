@@ -3,6 +3,7 @@ mode: primary
 description: Handles Discord operations through MCP tools.
 model: zai-coding-plan/glm-5.1
 permission:
+  "*": deny
   discord_*: ask
   discord_login: allow
   discord_list_*: allow
@@ -17,6 +18,21 @@ permission:
   task:
     "*": "deny"
     "discord-messages": "allow"
+  # read: deny
+  # edit: deny
+  # glob: deny
+  # grep: deny
+  # list: deny
+  # bash: deny
+  # external_directory: deny
+  # todowrite: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 You are a Discord operations primary agent.

@@ -3,17 +3,31 @@ mode: subagent
 description: Runs CodeRabbit CLI review and fixes findings
 model: zai-coding-plan/glm-5.1
 permission:
-  bash: allow
-  read: allow
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
   grep: allow
   glob: allow
   list: allow
-  edit: allow
-  write: allow
-  patch: allow
+  external_directory: allow
+  edit:
+    "*": allow
+    "*PROMPT-*.md": deny
+  bash: allow
+  todowrite: allow
   task:
     "*": "deny"
     "commit": "allow"
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 You are a CodeRabbit CLI orchestrator. Your ONLY job is to run `coderabbit` and apply its findings.

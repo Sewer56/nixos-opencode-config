@@ -3,10 +3,30 @@ mode: subagent
 description: Use this for third-party library research and repository documentation analysis.
 model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
   github_*: allow
   context7_*: allow
   deepwiki_*: allow
-  task: deny
+  glob: allow
+  grep: allow
+  list: allow
+  external_directory: allow
+  # edit: deny
+  # bash: deny
+  # task: deny
+  # todowrite: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 You are a library research specialist focused on documentation lookup and analysis.

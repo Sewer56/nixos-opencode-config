@@ -4,15 +4,21 @@ hidden: true
 description: Orchestrates a single prompt end-to-end with specialist reviewers
 model: openai/gpt-5.4
 permission:
-  bash: allow
-  edit: allow
-  write: allow
-  patch: deny
-  webfetch: deny
-  list: deny
-  read: allow
-  grep: deny
-  glob: deny
+  "*": deny
+  read:
+    "*": deny
+    "*PROMPT-??-*.md": allow
+    "*PROMPT-PRD-REQUIREMENTS.md": allow
+    "*PROMPT-REQUIREMENTS-UNMET.md": allow
+  edit:
+    "*": deny
+    "*PROMPT-??-*-REVIEW-LEDGER.md": allow
+    "*PROMPT-PRD-REQUIREMENTS.md": allow
+    "*PROMPT-REQUIREMENTS-UNMET.md": allow
+  bash:
+    "*": deny
+    "mv *": allow
+  todowrite: allow
   task:
     "*": "deny"
     "orchestrator/runner/plan/planner": "allow"
@@ -26,6 +32,17 @@ permission:
     "orchestrator/runner/code/code-sanity-glm": "allow"
     "orchestrator/runner/code/code-test-integrity-reviewer": "allow"
     "commit": "allow"
+  # glob: deny
+  # grep: deny
+  # list: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
+  # external_directory: deny
 ---
 
 # Orchestrator Runner

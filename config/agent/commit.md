@@ -4,9 +4,33 @@ hidden: false
 description: Creates semantic commits matching repository style
 model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
-  bash: allow
-  read: allow
-  task: deny
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
+  glob: allow
+  grep: allow
+  list: allow
+  external_directory: allow
+  bash:
+    "*": deny
+    "git status*": allow
+    "git diff*": allow
+    "git log*": allow
+    "git add*": allow
+    "git commit*": allow
+  # edit: deny
+  # task: deny
+  # todowrite: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Create commits that match this repository's existing style for completed work.

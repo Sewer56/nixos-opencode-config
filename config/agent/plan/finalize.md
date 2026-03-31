@@ -5,12 +5,37 @@ description: Converts a confirmed human plan into a reviewed machine plan
 model: openai/gpt-5.4
 reasoningEffort: xhigh
 permission:
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
+  edit:
+    "*": deny
+    "PROMPT-PLAN.handoff.md": allow
+    "PROMPT-PLAN.machine.md": allow
+    "*PROMPT-PLAN.handoff.md": allow
+    "*PROMPT-PLAN.machine.md": allow
+  todowrite: allow
+  external_directory: allow
+  glob: allow
+  grep: allow
+  list: allow
   task: {
     "*": "deny",
     "codebase-explorer": "allow",
     "mcp-search": "allow",
     "plan/reviewers/*": "allow"
   }
+  # bash: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.handoff.md` and `PROMPT-PLAN.machine.md`.

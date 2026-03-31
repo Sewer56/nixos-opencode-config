@@ -3,23 +3,36 @@ mode: primary
 description: Schedules per-prompt orchestration via subagents
 model: zai-coding-plan/glm-5-turbo
 permission:
-  bash: allow
-  edit: allow
-  write: allow
-  patch: deny
-  webfetch: deny
-  list: deny
-  read: allow
-  grep: deny
-  glob: deny
+  "*": deny
+  read:
+    "*": deny
+    "*PROMPT-ORCHESTRATOR.md": allow
+    "*PROMPT-ORCHESTRATOR.state.md": allow
+    "*PROMPT-ORCHESTRATOR.validation.md": allow
+  edit:
+    "*": deny
+    "*PROMPT-ORCHESTRATOR.state.md": allow
+  bash:
+    "*": deny
+    "git symbolic-ref*": allow
+    "git remote show*": allow
   todowrite: allow
-  todoread: allow
-  task: {
-    "*": "deny",
-    "commit": "allow",
-    "coderabbit": "allow",
-    "orchestrator/runner/*": "allow"
-  }
+  task:
+    "*": deny
+    "coderabbit": allow
+    "orchestrator/runner/runner": allow
+    "orchestrator/runner/requirements/requirements-final": allow
+  # glob: deny
+  # grep: deny
+  # list: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
+  # external_directory: deny
 ---
 
 # Orchestrator Scheduler

@@ -5,15 +5,27 @@ description: Validates PRD requirement coverage across prompt files (preflight)
 model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 reasoningEffort: high
 permission:
-  read: allow
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
   glob: allow
   list: allow
   grep: allow
-  edit: deny
-  write: deny
-  patch: deny
-  bash: deny
-  task: deny
+  todowrite: allow
+  # edit: deny
+  # bash: deny
+  # task: deny
+  # external_directory: deny
+  # question: deny
+  # webfetch: deny
+  # websearch: deny
+  # codesearch: deny
+  # lsp: deny
+  # doom_loop: deny
+  # skill: deny
 ---
 
 Verify PRD requirements map to prompt files before orchestration. Never modify files.
