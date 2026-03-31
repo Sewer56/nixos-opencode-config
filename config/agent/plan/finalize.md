@@ -71,7 +71,7 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
 - Derive discrete `REQ-###` items from the confirmed human plan and handoff.
 - Record the settled repo facts that the plan depends on.
 - Keep the machine plan concrete enough that an implementer does not need to invent file placement, major structure, missing test coverage, verification commands, or code shape.
-- Ground each implementation step in the current repo surface with a real file path, an anchor, repo evidence, and a short code snippet or diff.
+- Ground each implementation and test step in the current repo surface with a real file path, an anchor, repo evidence, and a short code snippet or diff.
 - Write `machine_plan_path` using the `# Templates` section below.
 
 ## 5. Run the review loop
@@ -227,11 +227,28 @@ Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
 ## Test Steps
 
 ### T1. `path/to/test-or-module`
+Action: UPDATE | INSERT | ADD | REMOVE
 Purpose: <behavior to prove>
 Covers: REQ-###
-Approach:
+Anchor: `<existing symbol or section>` | `None`
+Lines: ~<start>-<end> | `None`
+Insert at: before | after | replace `<anchor or region>` | `None`
+
+Import diff:
+
+```diff
+<import changes or `None`>
+```
+
+Code shape:
+
+Use the target file language or `diff`. Follow doc shape rules below.
+
+Changes:
 - <specific checks>
 Parameterization: None | <cases>
+Dependencies: None | I# | T#
+Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
 
 ## Verification Commands
 - `<command>`: <why it should be run>
