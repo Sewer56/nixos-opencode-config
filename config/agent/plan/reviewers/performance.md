@@ -34,12 +34,6 @@ Review only the performance-sensitive parts of a machine plan.
 - `plan_path`
 - `machine_plan_path`
 
-# Shared Rules
-- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
-- `PERFORMANCE_RULES_PATH`: `performance.md` in `RULES_DIR`
-
-Read the file in `RULES_DIR` named by `PERFORMANCE_RULES_PATH` once.
-
 # Focus
 - Trigger: only review deeply if the plan touches performance-sensitive work.
 - Hunt: algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, or missing validation that could cause material performance issues.
@@ -71,3 +65,9 @@ Fix: <smallest correction>
 - If the plan is not performance-sensitive, return `PASS` with `Performance Sensitive: NO`.
 - If a performance finding depends on the repo surface, cite repo evidence.
 - Block only for material performance risks, not micro-optimizations.
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/performance.md

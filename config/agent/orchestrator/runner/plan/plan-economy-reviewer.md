@@ -34,23 +34,19 @@ Validate that the plan represents the smallest correct implementation. Enforce m
 - `plan_path`: implementation plan from planner
 - `ledger_path` (optional): absolute path to the current review ledger
 
-# Defaults
-- `GENERAL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/general.md`
-- `CODE_PLACEMENT_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/code-placement.md`
-
 # Process
 
 ## 1. Load Context
-Read `prompt_path`, `plan_path`, `GENERAL_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH`.
+Read `prompt_path` and `plan_path`.
 If `ledger_path` is provided, read the ledger from that path.
 
 ## 2. Minimality Review
 
 ### Code Minimality
-Apply `GENERAL_RULES_PATH` rules to the plan. Flag any rule that would be violated by the planned implementation.
+Flag any rule that would be violated by the planned implementation.
 
 ### Placement Economy
-Apply `CODE_PLACEMENT_RULES_PATH` rules to the plan. Flag any rule that would be violated by the planned file layout.
+Flag any rule that would be violated by the planned file layout.
 
 ### Test Footprint
 - Keep the planned test surface small
@@ -130,3 +126,10 @@ Acceptance Criteria: Direct implementation without trait, or justification for t
 # Constraints
 - Be explicit about why an abstraction/file/helper is unnecessary
 - Leave duplicate coverage and parameterization to `plan-test-reviewer`
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/general.md
+/home/sewer/opencode/config/rules/code-placement.md

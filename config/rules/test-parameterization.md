@@ -1,4 +1,4 @@
-# Test Parameterization Rules
+## Test Parameterization Rules
 
 Use these rules when a single behavior needs multiple similar test cases.
 

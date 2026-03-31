@@ -34,10 +34,6 @@ Validate performance-critical aspects of the implementation plan. Only review wh
 - `plan_path`: implementation plan from planner
 - `ledger_path` (optional): absolute path to the current review ledger
 
-# Defaults
-- `ALL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/all.md`
-- `PERFORMANCE_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/performance.md`
-
 # Process
 
 ## 1. Load Context
@@ -100,7 +96,7 @@ BLOCKING for:
 - **CONCURRENCY_BUG**: Race condition or deadlock risk in concurrent code
 
 ADVISORY for:
-- Findings that conflict with `PERFORMANCE_RULES_PATH` readability guidance
+- Findings that conflict with the rules
 - Debatable improvement choices
 
 ## 5. Issue Categories
@@ -191,3 +187,17 @@ Acceptance Criteria: No unnecessary cloning of large data structures
 # Constraints
 - If no performance-sensitive areas detected, return PASS with brief note
 - Require validation plans for performance-critical changes
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/orchestrator/plan-content.md
+/home/sewer/opencode/config/rules/general.md
+/home/sewer/opencode/config/rules/performance.md
+/home/sewer/opencode/config/rules/testing.md
+/home/sewer/opencode/config/rules/test-parameterization.md
+/home/sewer/opencode/config/rules/code-placement.md
+/home/sewer/opencode/config/rules/documentation.md
+/home/sewer/opencode/config/rules/orchestrator/orchestration-plan.md
+/home/sewer/opencode/config/rules/orchestrator/orchestration-revision.md

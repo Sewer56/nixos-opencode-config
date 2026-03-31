@@ -33,14 +33,6 @@ Validate that the implementation plan will correctly and completely satisfy all 
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner
 - `ledger_path` (optional): absolute path to the current review ledger
-
-# Defaults
-- `ALL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/all.md`
-
-# Process
-
-## 1. Load Context
-Read `prompt_path`, `plan_path`, and `ALL_RULES_PATH`.
 If `ledger_path` is provided, read the ledger from that path and use it as prior review context.
 
 ## 2. Blocking Criteria
@@ -53,12 +45,12 @@ If any missing, downgrade to ADVISORY.
 
 ## 3. Review Dimensions
 
-Check plan compliance against the rules loaded from `ALL_RULES_PATH`.
+Check plan compliance against the rules.
 
 Focus areas for correctness review:
-- **Plan Content Rules**: placeholders, undefined symbols, import specs
-- **Orchestration Plan Rules**: requirement mapping, trace matrix, external symbols
-- **Orchestration Revision Rules** (if ledger present): acceptance criteria, changed-section refs, reopen policy
+- Placeholders, undefined symbols, import specs
+- Requirement mapping, trace matrix, external symbols
+- Acceptance criteria, changed-section refs, reopen policy (revisions)
 
 ### Risk Areas
 - Cross-file changes have proper ordering
@@ -138,3 +130,17 @@ Acceptance Criteria: All referenced symbols are defined or mapped to existing co
 - Focus on correctness and completeness, not minimality (economy reviewer handles that)
 - Treat documentation gaps as correctness issues only when they make a stated requirement or acceptance criterion unprovable
 - Be explicit about requirement gaps - they are always blocking
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/orchestrator/plan-content.md
+/home/sewer/opencode/config/rules/general.md
+/home/sewer/opencode/config/rules/performance.md
+/home/sewer/opencode/config/rules/testing.md
+/home/sewer/opencode/config/rules/test-parameterization.md
+/home/sewer/opencode/config/rules/code-placement.md
+/home/sewer/opencode/config/rules/documentation.md
+/home/sewer/opencode/config/rules/orchestrator/orchestration-plan.md
+/home/sewer/opencode/config/rules/orchestrator/orchestration-revision.md

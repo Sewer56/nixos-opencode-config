@@ -1,4 +1,4 @@
-# Documentation Rules
+## Documentation Rules
 
 ## Scope
 - In changed scope, document public APIs and exports (Rust: `pub` and `pub(crate)` items).

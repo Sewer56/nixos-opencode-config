@@ -1,4 +1,4 @@
-# Plan Content Rules
+## Plan Content Rules
 
 - No placeholders (`...`, `TODO`, comment-only test bodies).
 - No undefined helpers/types/symbols in snippets.

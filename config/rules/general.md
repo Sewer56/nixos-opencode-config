@@ -1,4 +1,4 @@
-# General Rules
+## General Rules
 
 Use these rules for planning, implementation, and review unless a more specific rules file overrides them.
 

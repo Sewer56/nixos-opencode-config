@@ -34,20 +34,15 @@ Validate that tests are well-designed, non-redundant, and follow parameterizatio
 - `plan_path`: implementation plan from planner
 - `ledger_path` (optional): absolute path to the current review ledger
 
-# Defaults
-- `TESTING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/testing.md`
-- `TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/test-parameterization.md`
-- `GENERAL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/general.md`
-
 # Process
 
 ## 1. Load Context
-Read `prompt_path`, `plan_path`, `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `GENERAL_RULES_PATH`.
+Read `prompt_path` and `plan_path`.
 If `ledger_path` is provided, read the ledger from that path.
 
 ## 2. Test Design Review
 
-Evaluate against `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH`.
+Evaluate per the rules.
 
 ### Coverage & Structure
 - All new code paths have test coverage (edge cases explicitly)
@@ -142,7 +137,7 @@ Severity: BLOCKING
 Confidence: HIGH
 Evidence: Six separate test steps for parse_json_valid, parse_json_invalid, parse_json_null, parse_json_empty_array, parse_json_nested, parse_json_malformed
 Summary: Six tests should be one parameterized test
-Why It Matters: test-parameterization.md strongly prefers parameterized tests for multiple inputs on same logic
+Why It Matters: the rules strongly prefer parameterized tests for multiple inputs on same logic
 Requested Fix: Merge into one test with #[case::valid(...), #[case::invalid(...), etc.
 Acceptance Criteria: One test with six descriptive cases
 
@@ -156,5 +151,11 @@ Acceptance Criteria: One test with six descriptive cases
 - Priority: coverage > deduplication > parameterization style
 
 # Constraints
-- Apply rules from `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH` strictly
 - Ensure sufficient coverage exists before flagging style issues
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/testing.md
+/home/sewer/opencode/config/rules/test-parameterization.md

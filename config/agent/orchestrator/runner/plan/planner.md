@@ -45,9 +45,6 @@ Create a complete implementation plan in a separate plan file. Use `@mcp-search`
 - `prompt_path`: absolute path to PROMPT-NN-*.md file
 - `revision_notes` (optional): feedback from plan review or coder escalation
 - Expect structured entries when available: issue ID, severity, confidence, fix_specificity, source, evidence, requested fix, `acceptance_criteria`
-- `ALL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/all.md`
-
-Read `ALL_RULES_PATH` once.
 
 # Process
 
@@ -57,7 +54,7 @@ Read `ALL_RULES_PATH` once.
 - First call: no `revision_notes` and no existing plan -> create a new plan.
 - Revision call: `revision_notes` present -> revise the existing plan.
 - If `revision_notes` are present but the plan is missing, create a new plan and note the missing context in `## Plan Notes`.
-- On revision, follow the Orchestration Revision Rules in `ALL_RULES_PATH` for issue ID preservation, `acceptance_criteria`, `## Review Ledger (Revision)`, and `## Revision Impact Table`.
+- On revision, follow the rules for issue ID preservation, `acceptance_criteria`, `## Review Ledger (Revision)`, and `## Revision Impact Table`.
 - Ensure `plan_path` contains a complete plan, then return only `plan_path`.
 
 2. Read and Scope
@@ -68,7 +65,7 @@ Read `ALL_RULES_PATH` once.
 - Extract what must be built.
 - Treat `# Implementation Hints` as guidance, not a locked plan.
 - Requirements, clarifications, and settled facts are binding. If a simpler valid approach preserves them without sacrificing performance, prefer it.
-- Determine project type, package boundaries, and documentation scope required by `ALL_RULES_PATH`.
+- Determine project type, package boundaries, and documentation scope required (see rules below).
 - Identify any libraries or frameworks that need lookup.
 - Set `repo_root` as the closest ancestor of `prompt_path` that contains `.git`. If none exists, use `prompt_path` parent.
 
@@ -93,7 +90,7 @@ Read `ALL_RULES_PATH` once.
 - Findings stay prompt-scoped. Duplication across prompts is acceptable.
 
  5. Draft Complete Plan
-Build the sections mandated by `ALL_RULES_PATH` (Orchestration Plan Rules, Orchestration Revision Rules, Plan Content Rules, Documentation Rules).
+Build the sections mandated by the rules.
 - Make each implementation and test step concrete enough that the coder is not deciding module or file placement, visibility, dependency or config changes, documentation scope, or missing test work.
 
 6. Write Plan File
@@ -112,14 +109,14 @@ Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 - If the prompt lacks `# Findings`, add it and list created findings
 
  8. Self-Review Before Output
-- Review the final plan against `ALL_RULES_PATH`; if any rule is violated, update the plan before returning.
+- Review the final plan against the rules; if any rule is violated, update the plan before returning.
 - Ensure the plan is concrete enough that shared rules constrain local implementation choices instead of forcing the coder to invent scope or structure.
 
 Do NOT modify the original prompt file except to update `# Findings` and `# Required Reads`.
 
 # Plan File Format
 
-Write this to `<prompt_filename>-PLAN.md`. Follow the format rules in `ALL_RULES_PATH` (Plan Content Rules, Orchestration Plan Rules, Orchestration Revision Rules).
+Write this to `<prompt_filename>-PLAN.md`. Follow the format rules.
 
 Include these sections in this order:
 
@@ -127,11 +124,11 @@ Include these sections in this order:
 2. `## Reviewer Concerns (Revision)` — only on revisions; checklist of reviewer concerns
 3. `## Plan Notes` — Summary, Assumptions, Risks, Review Focus, Settled Facts, Revision History
 4. `## Review Ledger (Revision)` — table with ID, Severity, Source, Status, Summary, Acceptance Criteria, Evidence (revisions only)
-5. `## Requirement Trace Matrix` — table per Orchestration Plan Rules
-6. `## Revision Impact Table` — table per Orchestration Revision Rules (revisions only)
+5. `## Requirement Trace Matrix` — table per rules
+6. `## Revision Impact Table` — table per rules (revisions only)
 7. `## External Symbols` — map files to `use` statements and referenced symbols
-8. `## Implementation Steps` — per-file steps with Action, Anchor, Lines, import diffs, and code blocks per Plan Content Rules
-9. `## Test Steps` — concrete test code per Testing and Test Parameterization Rules
+8. `## Implementation Steps` — per-file steps with Action, Anchor, Lines, import diffs, and code blocks per rules
+9. `## Test Steps` — concrete test code per rules
 
 # Findings File Format
 
@@ -164,3 +161,17 @@ Final message must contain:
 - Do not read outside repo_root
 - Do not read local registries/caches (e.g., `~/.cargo/registry`, `~/.local/share/opencode/tool-output`, `target/`, `node_modules/`)
 - External crate/SDK details must come from @mcp-search
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/orchestrator/plan-content.md
+/home/sewer/opencode/config/rules/general.md
+/home/sewer/opencode/config/rules/performance.md
+/home/sewer/opencode/config/rules/testing.md
+/home/sewer/opencode/config/rules/test-parameterization.md
+/home/sewer/opencode/config/rules/code-placement.md
+/home/sewer/opencode/config/rules/documentation.md
+/home/sewer/opencode/config/rules/orchestrator/orchestration-plan.md
+/home/sewer/opencode/config/rules/orchestrator/orchestration-revision.md

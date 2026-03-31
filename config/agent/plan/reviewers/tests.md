@@ -34,16 +34,9 @@ Review a machine plan's test strategy.
 - `plan_path`
 - `machine_plan_path`
 
-# Shared Rules
-- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
-- `TESTING_RULES_PATH`: `testing.md` in `RULES_DIR`
-- `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` in `RULES_DIR`
-
-Read the files in `RULES_DIR` named by `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH` once, in parallel.
-
 # Focus
 - Acceptance lens: planned tests should prove the stated acceptance criteria.
-- Apply `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH` to judge coverage, duplication, and parameterization.
+- Judge coverage, duplication, and parameterization.
 - Read the referenced repo tests or nearby test modules before judging placement and coverage, then use `handoff_path` and `plan_path` to confirm that test coverage still matches the confirmed human intent.
 
 # Output
@@ -66,5 +59,11 @@ Fix: <smallest useful test-plan correction>
 ```
 
 # Constraints
-- Apply `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH` to judge coverage, duplication, and parameterization.
 - Focus on behavior, not implementation-detail tests.
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/testing.md
+/home/sewer/opencode/config/rules/test-parameterization.md

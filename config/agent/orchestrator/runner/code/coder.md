@@ -37,13 +37,6 @@ think
 # Inputs
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner (contains `## Implementation Steps` and `## Test Steps`)
-- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
-- `GENERAL_RULES_PATH`: `general.md` relative to `RULES_DIR`
-- `DOCUMENTATION_RULES_PATH`: `documentation.md` relative to `RULES_DIR`
-- `PERFORMANCE_RULES_PATH`: `performance.md` relative to `RULES_DIR`
-- `TESTING_RULES_PATH`: `testing.md` relative to `RULES_DIR`
-- `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
-- `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
 - Orchestrator context: task intent and notes from prior phases
 
 # Derived Paths
@@ -51,21 +44,20 @@ think
 
 # Workflow
 
-1. Read requirements, plan, and rules
+1. Read requirements and plan
 - Read `prompt_path` for mission, requirements, and constraints.
 - Read `plan_path` for `## Implementation Steps` and `## Test Steps`.
-- Read the rule files named above once, in parallel.
 - Follow `## Implementation Steps` and `## Test Steps` exactly.
 - Use orchestrator context.
 
 2. Implement changes
-- Use the shared rules for local details inside plan scope.
-- Treat shared rules as constraints, not permission to widen the task or redesign the plan.
+- Use the rules for local details inside plan scope.
+- Treat the rules as constraints, not permission to widen the task or redesign the plan.
 - If the plan is materially insufficient about module or file placement, visibility, dependency or config changes, documentation scope, or required test work, return `Status: ESCALATE` instead of inventing a broader approach.
 
 3. Verify
 - Run formatter unless the system prompt forbids it, then run linter and build. Iterate until clean.
-- Verify any added or updated tests against `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH`.
+- Verify any added or updated tests follow the rules.
 
 4. Fix and iterate
 - If any check fails, analyze it, fix it, and rerun verification.
@@ -136,3 +128,14 @@ When escalating, include exact symbol/module paths and the relevant compiler err
 Include escalation details only in the final message, not in the notes file.
 
 Do not escalate for straightforward errors you can fix. Escalate early if stuck.
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/general.md
+/home/sewer/opencode/config/rules/code-placement.md
+/home/sewer/opencode/config/rules/documentation.md
+/home/sewer/opencode/config/rules/testing.md
+/home/sewer/opencode/config/rules/test-parameterization.md
+/home/sewer/opencode/config/rules/performance.md

@@ -1,4 +1,4 @@
-# Testing Rules
+## Testing Rules
 
 Use these rules when the task requires tests.
 

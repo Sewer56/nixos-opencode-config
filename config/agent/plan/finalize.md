@@ -44,17 +44,6 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
 - Required local artifacts for this run:
   - `PROMPT-PLAN.md`
 
-# Shared Rules
-- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
-- `GENERAL_RULES_PATH`: `general.md` in `RULES_DIR`
-- `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` in `RULES_DIR`
-- `DOCUMENTATION_RULES_PATH`: `documentation.md` in `RULES_DIR`
-- `TESTING_RULES_PATH`: `testing.md` in `RULES_DIR`
-- `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` in `RULES_DIR`
-- `PERFORMANCE_RULES_PATH`: `performance.md` in `RULES_DIR`
-
-Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `CODE_PLACEMENT_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `PERFORMANCE_RULES_PATH` once, in parallel, after discovery and before finalizing `machine_plan_path`.
-
 # Artifacts
 - `plan_path`: `PROMPT-PLAN.md`
 - `handoff_path`: `PROMPT-PLAN.handoff.md`
@@ -85,7 +74,6 @@ Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `CODE_PLACEMENT_RUL
 - Record the settled repo facts that the plan depends on.
 - Keep the machine plan concrete enough that an implementer does not need to invent file placement, major structure, missing test coverage, verification commands, or code shape.
 - Ground each implementation step in the current repo surface with a real file path, an anchor, repo evidence, and a short code snippet or diff.
-- Apply the rules loaded in step 2 to each implementation and test step; do not restate them here.
 - Write `machine_plan_path` using the `# Templates` section below.
 
 ## 5. Run the review loop
@@ -235,7 +223,7 @@ Import diff:
 
 Code Shape:
 
-Use the target file language or `diff`. Follow doc shape rules in `DOCUMENTATION_RULES_PATH`.
+Use the target file language or `diff`. Follow doc shape rules below.
 
 Changes:
 - <concrete code change>
@@ -255,3 +243,14 @@ Parameterization: None | <cases>
 ## Verification Commands
 - `<command>`: <why it should be run>
 ```
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/general.md
+/home/sewer/opencode/config/rules/code-placement.md
+/home/sewer/opencode/config/rules/documentation.md
+/home/sewer/opencode/config/rules/testing.md
+/home/sewer/opencode/config/rules/test-parameterization.md
+/home/sewer/opencode/config/rules/performance.md

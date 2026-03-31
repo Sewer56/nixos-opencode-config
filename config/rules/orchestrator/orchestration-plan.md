@@ -1,4 +1,4 @@
-# Orchestration Plan Rules
+## Orchestration Plan Rules
 
 For orchestrator workflow -PLAN.md files.
 

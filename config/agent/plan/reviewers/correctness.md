@@ -35,16 +35,6 @@ Review a finalized machine plan for correctness, completeness, and fidelity to t
 - `plan_path`
 - `machine_plan_path`
 
-# Shared Rules
-- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
-- `GENERAL_RULES_PATH`: `general.md` in `RULES_DIR`
-- `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` in `RULES_DIR`
-- `TESTING_RULES_PATH`: `testing.md` in `RULES_DIR`
-- `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` in `RULES_DIR`
-- `PERFORMANCE_RULES_PATH`: `performance.md` in `RULES_DIR`
-
-Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `CODE_PLACEMENT_RULES_PATH`, `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `PERFORMANCE_RULES_PATH` once, in parallel.
-
 # Focus
 - Fidelity: explicit goals, constraints, scope, and clarified decisions in `handoff_path` and `plan_path` remain represented in `machine_plan_path`.
 - Requirement traceability: every `REQ-###` in `machine_plan_path` maps to concrete implementation and test refs.
@@ -77,3 +67,13 @@ Fix: <smallest concrete correction>
 - Treat missing or malformed `machine_plan_path` structure as blocking.
 - If a grounding finding depends on the repo surface, cite repo evidence.
 - Keep findings short and specific.
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/general.md
+/home/sewer/opencode/config/rules/code-placement.md
+/home/sewer/opencode/config/rules/testing.md
+/home/sewer/opencode/config/rules/test-parameterization.md
+/home/sewer/opencode/config/rules/performance.md

@@ -1,7 +1,6 @@
 ---
 mode: primary
 description: Collaboratively drafts a short human-first implementation plan
-reasoningEffort: xhigh
 permission:
   "*": deny
   read:

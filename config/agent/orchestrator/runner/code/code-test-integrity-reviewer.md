@@ -35,11 +35,6 @@ Validate that tests compile, run, and provide coverage as planned. Verify test i
 - `coder_notes_path`: notes from coder implementation
 - `ledger_path` (optional): absolute path to the current review ledger
 
-# Defaults
-- `TESTING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/testing.md`
-- `TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/test-parameterization.md`
-- `CODE_PLACEMENT_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/code-placement.md`
-
 # Process
 
 ## 1. Load Context
@@ -52,8 +47,6 @@ Validate that tests compile, run, and provide coverage as planned. Verify test i
 - Do not rerun formatter or lint unless coder notes show a related failure
 
 ## 2. Test Integrity Checks
-
-Apply the standards in `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` when evaluating each category below.
 
 ### Compilation
 - Do all new tests compile?
@@ -185,3 +178,11 @@ Acceptance Criteria: All tests pass or failure is explained and justified
 - Verify planned tests are actually implemented
 - Flag compilation failures as blocking
 - This reviewer is the code-phase verification authority
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/testing.md
+/home/sewer/opencode/config/rules/test-parameterization.md
+/home/sewer/opencode/config/rules/code-placement.md

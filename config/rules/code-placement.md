@@ -1,4 +1,4 @@
-# Code Placement Rules
+## Code Placement Rules
 
 - Prefer the existing file/module; create new ones only when module boundaries materially benefit.
 - Split catch-all files into focused, domain-named modules.

@@ -35,18 +35,15 @@ Validate that the implementation plan covers documentation requirements concrete
 - `plan_path`: implementation plan from planner
 - `ledger_path` (optional): absolute path to the current review ledger
 
-# Defaults
-- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
-
 # Process
 
 ## 1. Load Context
-Read `prompt_path`, `plan_path`, and `DOCUMENTATION_RULES_PATH`.
+Read `prompt_path` and `plan_path`.
 If `ledger_path` is provided, read the ledger from that path.
 
 ## 2. Documentation Review
-- Apply every rule in `DOCUMENTATION_RULES_PATH` to the changed scope described by the plan.
-- Verify each relevant implementation step satisfies the "Review Bar" section of `documentation.md`.
+- Review the changed scope described by the plan.
+- Verify each relevant implementation step satisfies the "Review Bar" section below.
 - Read only the repo files needed to ground those checks.
 
 ## 3. Blocking Criteria
@@ -86,13 +83,19 @@ Evidence: Plan step `I4` for `src/paths.ts` only says `update docs` and does not
 Summary: Required in-source docs are not planned concretely
 Why It Matters: The coder would need to invent documentation scope and content
 Requested Fix: Show the intended module and required API doc block/comment directly in the relevant implementation step snippet or diff
-Acceptance Criteria: The affected implementation step includes concrete doc snippets or diffs that satisfy `documentation.md`
+Acceptance Criteria: The affected implementation step includes concrete doc snippets or diffs that satisfy the rules
 
 ## Notes
 - Brief observations for other reviewers or planner
 ```
 
 # Constraints
-- Block when the plan violates any rule in the "Review Bar" section of `documentation.md`
+- Block for "Review Bar" violations below
 - Do not block for minor wording preferences when required coverage is already concrete
-- Keep findings short and specific
+- Keep findings short and specific.
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/documentation.md
