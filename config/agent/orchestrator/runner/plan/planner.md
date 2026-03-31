@@ -101,7 +101,8 @@ Build these sections:
 - **Test Steps**: include the required tests
 - **`## Requirement Trace Matrix`**: map each requirement to implementation step refs, test step refs, and acceptance criteria.
 - **`## Revision Impact Table`** (on revisions): map each changed hunk or step to affected requirement(s) and affected test(s).
-- Plan docs explicitly. Name module or file doc headings; do not write just "update docs".
+- Show the exact required doc block/comment in code steps and the matching README/package-doc snippet in package-doc steps.
+- If the user asked for examples, put them on the API docs, not only the README.
 - Make each implementation and test step concrete enough that the coder is not deciding module or file placement, visibility, dependency or config changes, documentation scope, or missing test work.
 
 6. Write Plan File
@@ -212,7 +213,7 @@ Import diff:
 
 ```rust
 //! User creation service.
-//! <add more caller-facing context here per rules>
+//! <add usage context here per rules>
 //! Backed by a [`UserRepository`].
 //!
 //! # Public API
@@ -231,12 +232,21 @@ pub enum UserError {
 impl UserService {
     /// Create a new user when the email is not already registered.
     ///
-    /// # Parameters
+    /// # Arguments
     /// - `input`: New user data to validate and persist.
     ///
     /// # Returns
     /// - `Ok(User)`: The created user.
     /// - `Err(UserError)`: Validation or persistence failure.
+    ///
+    /// # Examples
+    /// ```rust
+    /// let input = CreateUserInput { email: "user@example.com".into() };
+    /// let result = service
+    ///     .create_user(input)
+    ///     .await;
+    /// assert!(result.is_ok());
+    /// ```
     pub async fn create_user(&self, input: CreateUserInput) -> Result<User, UserError> {
         if self.repo.find_by_email(&input.email).await?.is_some() {
             return Err(UserError::DuplicateEmail(input.email));

@@ -85,12 +85,15 @@ Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `CODE_PLACEMENT_RUL
 - Record the settled repo facts that the plan depends on.
 - Keep the machine plan concrete enough that an implementer does not need to invent file placement, major structure, missing test coverage, verification commands, or code shape.
 - Ground each implementation step in the current repo surface with a real file path, an anchor, repo evidence, and a short code snippet or diff.
+- Show the exact required doc block/comment in code steps and the matching README/package-doc snippet in package-doc steps.
+- If the user asked for examples, put them on the API docs, not only the README.
 - Keep the planned change as small as correctness allows.
 - Write `machine_plan_path` using the `# Templates` section below.
 
 ## 5. Run the review loop
 - After each full machine-plan draft, run these reviewers in parallel, passing `handoff_path`, `plan_path`, and `machine_plan_path` to each reviewer:
   - `@plan/reviewers/correctness`
+  - `@plan/reviewers/documentation`
   - `@plan/reviewers/economy`
   - `@plan/reviewers/tests`
   - `@plan/reviewers/performance`
@@ -234,13 +237,35 @@ Import diff:
 
 Code Shape:
 
-```language
-<small concrete snippet or diff showing the intended change>
+Use the target file language or `diff`. For example:
+
+```rust
+/// Split raw installer paths into files and explicit directories.
+///
+/// # Arguments
+/// - `paths`: Raw installer-relative paths where trailing separators mark directories.
+///
+/// # Returns
+/// - [`PathGroups`]: Split file paths and explicit directory paths.
+///
+/// # Examples
+/// ```rust
+/// let paths = vec!["Pack/".to_string(), "Pack/file.txt".to_string()];
+/// let groups = split_paths_by_kind(paths);
+/// assert_eq!(groups.files, vec!["Pack/file.txt"]);
+/// assert_eq!(groups.directories, vec!["Pack"]);
+/// ```
+pub fn split_paths_by_kind(paths: Vec<String>) -> PathGroups {
+    PathGroups {
+        files: Vec::new(),
+        directories: Vec::new(),
+    }
+}
 ```
 
 Changes:
 - <concrete code change>
-- <doc update when needed>
+- <explicit doc update when docs are in scope>
 Dependencies: None | I#
 Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
 

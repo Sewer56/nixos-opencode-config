@@ -27,7 +27,7 @@ permission:
   # skill: deny
 ---
 
-Validate performance-critical aspects of the implementation plan. Only review when plan touches performance-sensitive areas. Never modify files.
+Validate performance-critical aspects of the implementation plan. Only review when plan touches performance-sensitive areas.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -190,7 +190,6 @@ Acceptance Criteria: No unnecessary cloning of large data structures
 - Only flag performance issues that materially impact the workload
 
 # Constraints
-- Review-only: never modify files
 - Focus on significant performance impacts, not micro-optimizations
 - If no performance-sensitive areas detected, return PASS with brief note
 - Require validation plans for performance-critical changes

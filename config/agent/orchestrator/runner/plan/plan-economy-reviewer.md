@@ -27,7 +27,7 @@ permission:
   # skill: deny
 ---
 
-Validate that the plan represents the smallest correct implementation. Enforce minimal code and a small test footprint. Never modify files.
+Validate that the plan represents the smallest correct implementation. Enforce minimal code and a small test footprint.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -37,12 +37,11 @@ Validate that the plan represents the smallest correct implementation. Enforce m
 # Defaults
 - `GENERAL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/general.md`
 - `CODE_PLACEMENT_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/code-placement.md`
-- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
 
 # Process
 
 ## 1. Load Context
-Read `prompt_path`, `plan_path`, `GENERAL_RULES_PATH`, `CODE_PLACEMENT_RULES_PATH`, and `DOCUMENTATION_RULES_PATH`.
+Read `prompt_path`, `plan_path`, `GENERAL_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH`.
 If `ledger_path` is provided, read the ledger from that path.
 
 ## 2. Minimality Review
@@ -70,13 +69,6 @@ Check against `code-placement.md`:
 - Flag extra test files or helpers when they add structure without value
 - Leave duplicate coverage and parameterization to `plan-test-reviewer`
 
-### Documentation Economy
-Check against `documentation.md`:
-- Are docs scoped to changed public APIs only?
-- Is doc work justified (not backfilling untouched legacy)?
-- Are module/file docs refreshed only when boundaries change?
-- Is jargon avoided?
-
 ## 3. Blocking Criteria
 
 Mark BLOCKING only for:
@@ -87,7 +79,6 @@ Mark BLOCKING only for:
 ADVISORY for:
 - Minor style preferences
 - Debatable abstraction choices
-- Documentation verbosity (unless excessive)
 
 ## 4. Issue Categories
 
@@ -105,12 +96,6 @@ ADVISORY for:
 - MISPLACED_CODE: Should stay in existing file
 - MISPLACED_TEST: Tests not co-located with module
 - UNNECESSARY_MODULE_SPLIT: Split not justified by ownership
-
-### Documentation Issues
-**Category**: DOCS_SCOPE
-**Types**:
-- UNNECESSARY_DOC_SCOPE: Docs beyond changed public APIs
-- DOC_REFACTOR: Rewriting docs not touched by change
 
 ## 5. Output Format
 
@@ -155,7 +140,6 @@ Acceptance Criteria: Direct implementation without trait, or justification for t
 - Flag economy issues that become more important after correctness fixes
 
 # Constraints
-- Review-only: never modify files
 - Focus on minimal diff and minimal test surface
 - Prefer inline solutions unless reuse/boundary is clear
 - Leave duplicate coverage and parameterization to `plan-test-reviewer`

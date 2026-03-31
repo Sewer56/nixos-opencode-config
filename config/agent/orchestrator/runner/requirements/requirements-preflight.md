@@ -28,7 +28,7 @@ permission:
   # skill: deny
 ---
 
-Verify PRD requirements map to prompt files before orchestration. Never modify files.
+Verify PRD requirements map to prompt files before orchestration.
 
 # Inputs
 - `requirements_path`: absolute path to PROMPT-PRD-REQUIREMENTS.md
@@ -95,5 +95,4 @@ Status: PASS | PARTIAL | FAIL
 ```
 
 # Constraints
-- Review-only: never modify files
 - Be explicit about missing coverage and unknown IDs

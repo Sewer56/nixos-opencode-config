@@ -27,7 +27,7 @@ permission:
   # skill: deny
 ---
 
-Validate that tests are well-designed, non-redundant, and follow parameterization best practices. Never modify files.
+Validate that tests are well-designed, non-redundant, and follow parameterization best practices.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -177,7 +177,6 @@ Acceptance Criteria: One test with six descriptive cases
 - Priority: coverage > deduplication > parameterization style
 
 # Constraints
-- Review-only: never modify files
 - Prefer parameterized tests aggressively
 - Detect and flag all redundant test coverage
 - Ensure sufficient coverage exists before complaining about style

@@ -27,7 +27,7 @@ permission:
   # skill: deny
 ---
 
-Review a machine plan's test strategy. Never modify files.
+Review a machine plan's test strategy.
 
 # Inputs
 - `handoff_path`

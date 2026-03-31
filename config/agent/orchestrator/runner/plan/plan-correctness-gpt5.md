@@ -28,7 +28,7 @@ permission:
   # skill: deny
 ---
 
-Validate that the implementation plan will correctly and completely satisfy all requirements. Never modify files.
+Validate that the implementation plan will correctly and completely satisfy all requirements.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -78,7 +78,6 @@ If any missing, downgrade to ADVISORY.
 
 ### Risk Areas
 - Cross-file changes have proper ordering
-- API changes have doc updates planned
 - Performance-sensitive paths have validation
 - Error handling is specified for new code paths
 
@@ -151,7 +150,7 @@ Acceptance Criteria: All referenced symbols are defined or mapped to existing co
 - If you disagree with glm's assessment, include both perspectives in Notes
 
 # Constraints
-- Review-only: never modify files
 - Trust the planner's code discovery for repo structure
 - Focus on correctness and completeness, not minimality (economy reviewer handles that)
+- Treat documentation gaps as correctness issues only when they make a stated requirement or acceptance criterion unprovable
 - Be explicit about requirement gaps - they are always blocking

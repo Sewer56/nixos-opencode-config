@@ -24,6 +24,7 @@ permission:
     "orchestrator/runner/plan/planner": "allow"
     "orchestrator/runner/plan/plan-correctness-gpt5": "allow"
     "orchestrator/runner/plan/plan-correctness-glm": "allow"
+    "orchestrator/runner/plan/plan-documentation-reviewer": "allow"
     "orchestrator/runner/plan/plan-economy-reviewer": "allow"
     "orchestrator/runner/plan/plan-test-reviewer": "allow"
     "orchestrator/runner/plan/plan-performance-reviewer": "allow"
@@ -76,12 +77,13 @@ You only update ledger and unmet requirements files. Follow the `Workflow` direc
    - If different, rename with `mv`, update `plan_path`, stop on failure.
 
 ### Phase 2: Plan Review
-Run all 5 plan reviewers in parallel:
+Run all 6 plan reviewers in parallel:
 1. `@orchestrator/runner/plan/plan-correctness-gpt5`
 2. `@orchestrator/runner/plan/plan-correctness-glm`
-3. `@orchestrator/runner/plan/plan-economy-reviewer`
-4. `@orchestrator/runner/plan/plan-test-reviewer`
-5. `@orchestrator/runner/plan/plan-performance-reviewer`
+3. `@orchestrator/runner/plan/plan-documentation-reviewer`
+4. `@orchestrator/runner/plan/plan-economy-reviewer`
+5. `@orchestrator/runner/plan/plan-test-reviewer`
+6. `@orchestrator/runner/plan/plan-performance-reviewer`
 
 Inputs:
 - `prompt_path`
@@ -104,7 +106,7 @@ Decision:
 - **REVISE**: open BLOCKING issues remain.
   - Build `revision_notes` from open BLOCKING ledger entries only.
   - Re-run planner.
-  - Re-run all 5 reviewers.
+  - Re-run all 6 reviewers.
 - Max 10 plan-review iterations.
 
 ### Phase 3: Implementation
@@ -207,6 +209,7 @@ Iterations: <n>
 |----------|----------|----------|----------|
 | Correctness (GPT-5) | PASS/BLOCKING/ADVISORY | X | Y |
 | Correctness (GLM) | PASS/BLOCKING/ADVISORY | X | Y |
+| Documentation | PASS/BLOCKING/ADVISORY | X | Y |
 | Economy | PASS/BLOCKING/ADVISORY | X | Y |
 | Test Design | PASS/BLOCKING/ADVISORY | X | Y |
 | Performance | PASS/BLOCKING/ADVISORY | X | Y |
@@ -261,7 +264,8 @@ Write to `PROMPT-REQUIREMENTS-UNMET.md`:
 
 ### Domain Ownership
 - `REQ-*`, `COMPLETENESS`, `REVISION`: correctness reviewers
-- `ECONOMY`, `PLACEMENT`, `DOCS_SCOPE`: economy reviewer
+- `DOCS`: documentation reviewer
+- `ECONOMY`, `PLACEMENT`: economy reviewer
 - `TEST_*` in plan phase: test reviewer
 - `PERF_*`: performance reviewer
 - `TEST_*` in code phase: test-integrity reviewer

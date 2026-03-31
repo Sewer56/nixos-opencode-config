@@ -27,7 +27,7 @@ permission:
   # skill: deny
 ---
 
-Review only the performance-sensitive parts of a machine plan. Never modify files.
+Review only the performance-sensitive parts of a machine plan.
 
 # Inputs
 - `handoff_path`

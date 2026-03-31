@@ -27,7 +27,7 @@ permission:
   # skill: deny
 ---
 
-Validate that tests compile, run, and provide coverage as planned. Verify test integrity after implementation. Never modify files.
+Validate that tests compile, run, and provide coverage as planned. Verify test integrity after implementation.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -176,7 +176,6 @@ Acceptance Criteria: All tests pass or failure is explained and justified
 - Coordinate on whether issues are implementation bugs or test design problems
 
 # Constraints
-- Review-only: never modify files
 - Focus on test execution integrity
 - Verify planned tests are actually implemented
 - Flag compilation failures as blocking

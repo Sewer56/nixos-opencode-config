@@ -28,7 +28,7 @@ permission:
   # skill: deny
 ---
 
-Review a written orchestrator prompt pack for correctness. Never modify files.
+Review a written orchestrator prompt pack for correctness.
 
 # Inputs
 - `requirements_path`: absolute path to `PROMPT-PRD-REQUIREMENTS.md`
@@ -131,7 +131,6 @@ Acceptance Criteria: Prompt boundaries match the source task intent
 ```
 
 # Constraints
-- Review-only: never modify files
 - Review written files, not an in-memory pack
 - Be explicit about correctness, fidelity, and pack structure issues
 - Leave exact requirement coverage accounting to `requirements-preflight`

@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks minimality, placement, and docs scope for finalized machine plans
+description: Checks minimality and placement for finalized machine plans
 model: zai-coding-plan/glm-5.1
 permission:
   "*": deny
@@ -27,7 +27,7 @@ permission:
   # skill: deny
 ---
 
-Review a machine plan for minimality. Never modify files.
+Review a machine plan for minimality and placement.
 
 # Inputs
 - `handoff_path`
@@ -38,12 +38,11 @@ Review a machine plan for minimality. Never modify files.
 - `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
 - `GENERAL_RULES_PATH`: `general.md` in `RULES_DIR`
 - `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` in `RULES_DIR`
-- `DOCUMENTATION_RULES_PATH`: `documentation.md` in `RULES_DIR`
 
-Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `CODE_PLACEMENT_RULES_PATH`, and `DOCUMENTATION_RULES_PATH` once, in parallel.
+Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH` and `CODE_PLACEMENT_RULES_PATH` once, in parallel.
 
 # Focus
-- Economy lens: flag only clear unnecessary expansion in implementation scope, file/module count, documentation churn, or planned test surface.
+- Economy lens: flag only clear unnecessary expansion in implementation scope, file/module count, or planned test surface.
 - Leave detailed test quality to the test reviewer.
 - Read the referenced repo files first and use `handoff_path` and `plan_path` only to judge whether the machine plan grew beyond the confirmed human intent.
 
@@ -56,7 +55,7 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [ECO-001]
-Category: ECONOMY | PLACEMENT | DOCS
+Category: ECONOMY | PLACEMENT
 Severity: BLOCKING | ADVISORY
 Evidence: <plan section or `path:line`>
 Problem: <what is unnecessarily broad or misplaced>

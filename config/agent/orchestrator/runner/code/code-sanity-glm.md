@@ -27,7 +27,7 @@ permission:
   # skill: deny
 ---
 
-Validate that implementation satisfies the objectives. Narrow sanity gate only. Never modify files.
+Validate that implementation satisfies the objectives. Narrow sanity gate only.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -173,7 +173,6 @@ Acceptance Criteria: Verified failure is gone
 - If you disagree, both perspectives go to aggregator
 
 # Constraints
-- Review-only: never modify files
 - Narrow scope: only severe misses not caught in plan
 - Prefer objective verification over style debate
 - Trust plan decisions on abstraction, placement, test design
