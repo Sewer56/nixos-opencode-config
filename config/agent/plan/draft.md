@@ -1,7 +1,6 @@
 ---
 mode: primary
 description: Collaboratively drafts a short human-first implementation plan
-model: openai/gpt-5.4
 reasoningEffort: xhigh
 permission:
   "*": deny
