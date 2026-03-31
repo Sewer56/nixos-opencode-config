@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Orchestrates a single prompt end-to-end with specialist reviewers
-model: zai-coding-plan/glm-5.1
+model: openai/gpt-5.4
 permission:
   bash: allow
   edit: allow
@@ -13,8 +13,6 @@ permission:
   read: allow
   grep: deny
   glob: deny
-  todowrite: deny
-  todoread: deny
   task:
     "*": "deny"
     "orchestrator/runner/plan/planner": "allow"
