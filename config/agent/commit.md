@@ -1,6 +1,6 @@
 ---
 mode: subagent
-hidden: false
+hidden: true
 description: Creates semantic commits matching repository style
 model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:

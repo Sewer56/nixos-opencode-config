@@ -16,14 +16,14 @@ Use these rules for planning, implementation, and review unless a more specific 
 - Use descriptive, domain-first names for modules, files, types, and functions.
 - Avoid vague bucket names like `utils`, `helpers`, `common`, or `misc` unless already established and intentionally narrow.
 - Prefer existing types, constants, schemas, signatures, and patterns.
-- Inline tiny single-use helpers unless naming improves readability, reuse, or module boundaries.
+- Inline tiny single-use helpers unless naming improves readability, reuse, or boundaries.
 - Keep control flow obvious and change sets cohesive.
 - Keep visibility minimal.
 - Preserve behavior unless explicitly changing it.
 - Avoid broad refactors unless required or requested.
 - Remove dead code, unused imports, and newly-unused paths.
 - Avoid debug-only logging, temporary instrumentation, and unnecessary abstractions.
-- Avoid single-implementation abstractions (interfaces, traits, protocols) unless a concrete need exists.
+- Avoid single-implementation abstractions (interfaces, traits, protocols) unless needed.
 - Add inline comments for non-obvious logic.
 
 # Performance Rules
@@ -53,33 +53,22 @@ Use these rules when a single behavior needs multiple similar test cases.
 - If inline labels become too long, move labels above the case.
 - Comment non-obvious setup or assertions inline.
 - Keep tests human-friendly and around 80-100 characters per line.
-- For Rust, prefer `rstest` with `#[case::name(...)]` and aligned labeled parameters/comments.
+- For Rust: prefer `rstest` with `#[case::name(...)]` and aligned parameters/comments.
 
 ## Style Reference
 
 ```rust
-/// Verifies that line truncation in formatted output behaves correctly for
-/// different line lengths and line number settings.
+/// Verifies line truncation in formatted output.
 #[rstest]
-#[case::with_line_numbers_short(
-    6,           // max_len: line "abcdefghij" (10 chars) truncated to 6
+#[case::with_line_numbers(
+    6,           // max_len: truncate "abcdefghij" (10 chars) to 6
     true,        // with_line_numbers: yes, shows "L1: " prefix
     "L1: abc..." // expected: truncated with line number prefix
 )]
-#[case::without_line_numbers_short(
-    4,        // max_len: line truncated to 4 chars
+#[case::without_line_numbers(
+    4,        // max_len: truncate to 4 chars
     false,    // with_line_numbers: no prefix
-    "  a..."  // expected: truncated without line number prefix
-)]
-#[case::no_truncation_when_fits(
-    200,             // max_len: larger than line length (10 chars)
-    true,            // with_line_numbers: yes
-    "L1: abcdefghij" // expected: full line preserved, no truncation
-)]
-#[case::exact_boundary_no_truncation(
-    10,              // max_len: exactly matches line length (10 chars)
-    true,            // with_line_numbers: yes
-    "L1: abcdefghij" // expected: full line preserved, boundary not exceeded
+    "  a..."  // expected: truncated without prefix
 )]
 fn grep_format_handles_line_truncation(
     #[case] max_len: usize,
@@ -99,7 +88,7 @@ fn grep_format_handles_line_truncation(
 - Keep enums, newtypes, and value objects with the parent type when only that parent uses them.
 - Keep non-public helper types local.
 - Keep conversions next to the type; avoid global `conversions` buckets.
-- Co-locate tests with the module they validate.
+- Co-locate tests with their module.
 - Keep `models` barrel/index files for wiring and re-exports, not concrete definitions.
 - Do not collapse modular code into monoliths unless the user asks.
 - Put shared behavior in the lowest shared package that owns it.
@@ -119,17 +108,17 @@ fn grep_format_handles_line_truncation(
 - When moving or renaming documented items, preserve or replace the affected docs.
 
 ## Required Docs
-- Public APIs and exports: brief purpose. Document parameters on public APIs.
-- Non-trivial public APIs: also document returns, failure behavior, and examples when requested or helpful.
-- Non-trivial private APIs: brief purpose plus any non-obvious parameters, returns, side effects, or invariants.
-- Trivial private APIs do not need full API docs.
-- If examples are requested, add them to in-code API docs, not only package-level docs.
-- New or materially changed modules/files: top-level docs with purpose and usage context.
-- Package-level docs cover import/usage shape; in-code docs cover exported symbols.
-- If the language lacks native module docs, use the nearest file-level doc block/comment.
-- Add focused headings when useful: `Public API`, `Arguments`, `Returns`, `Examples`, `Usage`, `Errors`, `Validation`, `Identifier Format`, `Precedence`.
-- `Public API` lists public entrypoints/types by role.
-- Reference linked symbols using the language's doc convention (e.g., Rust: `[`TypeName`]`).
+- Public APIs/exports: purpose. Document parameters.
+- Non-trivial public APIs: add returns, failure behavior, examples when helpful.
+- Non-trivial private APIs: purpose plus non-obvious parameters, returns, side effects, invariants.
+- Trivial private APIs: no full docs needed.
+- If examples requested: add to in-code API docs, not just package docs.
+- New/changed modules: top-level docs with purpose and usage.
+- Package docs: import/usage shape; in-code docs: exported symbols.
+- If no native module docs: use nearest file-level doc block.
+- Use focused headings: `Public API`, `Arguments`, `Returns`, `Examples`, `Usage`, `Errors`, `Validation`, `Identifier Format`, `Precedence`.
+- `Public API`: list public entrypoints/types by role.
+- Reference symbols using language convention (Rust: `[`TypeName`]`).
 - Never use `ignore` fences.
 
 ## Style
@@ -142,8 +131,6 @@ fn grep_format_handles_line_truncation(
 - Dense but accessible.
 
 ### API Doc Example
-
-Example for non-trivial public APIs:
 
 ```rust
 /// Split raw installer paths into files and explicit directories.
@@ -162,19 +149,18 @@ Example for non-trivial public APIs:
 /// assert_eq!(groups.directories, vec!["Pack"]);
 /// ```
 pub fn split_paths_by_kind(paths: Vec<String>) -> PathGroups {
-    PathGroups {
-        files: Vec::new(),
-        directories: Vec::new(),
-    }
+    PathGroups { files: Vec::new(), directories: Vec::new() }
 }
 ```
 
 ## Review Bar
 - Missing required docs is blocking.
+- When both package-level and in-code docs are in scope: missing either side is blocking.
+- Missing docs for non-trivial private APIs in changed scope is blocking.
 - Docs must not contradict implementation.
 - Keep docs dense, not skeletal.
-- If examples were explicitly requested, README-only examples are insufficient.
-- In machine plans, docs must appear in the relevant implementation snippet/diff; a generic `update docs` note is insufficient.
+- If examples explicitly requested: README-only is insufficient.
+- In machine plans: docs must appear in relevant snippet/diff; generic `update docs` note is insufficient.
 - Do not backfill untouched legacy files solely for docs.
 
 # Orchestration Plan Rules

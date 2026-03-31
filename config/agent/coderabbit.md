@@ -1,5 +1,6 @@
 ---
 mode: subagent
+hidden: true
 description: Runs CodeRabbit CLI review and fixes findings
 model: zai-coding-plan/glm-5.1
 permission:

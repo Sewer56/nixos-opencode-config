@@ -28,6 +28,9 @@
       "permission": {
         "task": {
           "orchestrator/*": "deny",
+          "plan/reviewers/*": "deny",
+          "commit": "deny",
+          "coderabbit": "deny",
           "mcp-search": "allow"
         }
       }
@@ -36,6 +39,9 @@
       "permission": {
         "task": {
           "orchestrator/*": "deny",
+          "plan/reviewers/*": "deny",
+          "commit": "deny",
+          "coderabbit": "deny",
           "mcp-search": "deny"
         }
       }
@@ -45,6 +51,9 @@
       "permission": {
         "task": {
           "orchestrator/*": "deny",
+          "plan/reviewers/*": "deny",
+          "commit": "deny",
+          "coderabbit": "deny",
           "mcp-search": "allow"
         }
       }

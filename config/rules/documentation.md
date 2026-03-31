@@ -10,17 +10,17 @@
 - When moving or renaming documented items, preserve or replace the affected docs.
 
 ## Required Docs
-- Public APIs and exports: brief purpose. Document parameters on public APIs.
-- Non-trivial public APIs: also document returns, failure behavior, and examples when requested or helpful.
-- Non-trivial private APIs: brief purpose plus any non-obvious parameters, returns, side effects, or invariants.
-- Trivial private APIs do not need full API docs.
-- If examples are requested, add them to in-code API docs, not only package-level docs.
-- New or materially changed modules/files: top-level docs with purpose and usage context.
-- Package-level docs cover import/usage shape; in-code docs cover exported symbols.
-- If the language lacks native module docs, use the nearest file-level doc block/comment.
-- Add focused headings when useful: `Public API`, `Arguments`, `Returns`, `Examples`, `Usage`, `Errors`, `Validation`, `Identifier Format`, `Precedence`.
-- `Public API` lists public entrypoints/types by role.
-- Reference linked symbols using the language's doc convention (e.g., Rust: `[`TypeName`]`).
+- Public APIs/exports: purpose. Document parameters.
+- Non-trivial public APIs: add returns, failure behavior, examples when helpful.
+- Non-trivial private APIs: purpose plus non-obvious parameters, returns, side effects, invariants.
+- Trivial private APIs: no full docs needed.
+- If examples requested: add to in-code API docs, not just package docs.
+- New/changed modules: top-level docs with purpose and usage.
+- Package docs: import/usage shape; in-code docs: exported symbols.
+- If no native module docs: use nearest file-level doc block.
+- Use focused headings: `Public API`, `Arguments`, `Returns`, `Examples`, `Usage`, `Errors`, `Validation`, `Identifier Format`, `Precedence`.
+- `Public API`: list public entrypoints/types by role.
+- Reference symbols using language convention (Rust: `[`TypeName`]`).
 - Never use `ignore` fences.
 
 ## Style
@@ -33,8 +33,6 @@
 - Dense but accessible.
 
 ### API Doc Example
-
-Example for non-trivial public APIs:
 
 ```rust
 /// Split raw installer paths into files and explicit directories.
@@ -53,17 +51,16 @@ Example for non-trivial public APIs:
 /// assert_eq!(groups.directories, vec!["Pack"]);
 /// ```
 pub fn split_paths_by_kind(paths: Vec<String>) -> PathGroups {
-    PathGroups {
-        files: Vec::new(),
-        directories: Vec::new(),
-    }
+    PathGroups { files: Vec::new(), directories: Vec::new() }
 }
 ```
 
 ## Review Bar
 - Missing required docs is blocking.
+- When both package-level and in-code docs are in scope: missing either side is blocking.
+- Missing docs for non-trivial private APIs in changed scope is blocking.
 - Docs must not contradict implementation.
 - Keep docs dense, not skeletal.
-- If examples were explicitly requested, README-only examples are insufficient.
-- In machine plans, docs must appear in the relevant implementation snippet/diff; a generic `update docs` note is insufficient.
+- If examples explicitly requested: README-only is insufficient.
+- In machine plans: docs must appear in relevant snippet/diff; generic `update docs` note is insufficient.
 - Do not backfill untouched legacy files solely for docs.

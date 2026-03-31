@@ -10,33 +10,22 @@ Use these rules when a single behavior needs multiple similar test cases.
 - If inline labels become too long, move labels above the case.
 - Comment non-obvious setup or assertions inline.
 - Keep tests human-friendly and around 80-100 characters per line.
-- For Rust, prefer `rstest` with `#[case::name(...)]` and aligned labeled parameters/comments.
+- For Rust: prefer `rstest` with `#[case::name(...)]` and aligned parameters/comments.
 
 ## Style Reference
 
 ```rust
-/// Verifies that line truncation in formatted output behaves correctly for
-/// different line lengths and line number settings.
+/// Verifies line truncation in formatted output.
 #[rstest]
-#[case::with_line_numbers_short(
-    6,           // max_len: line "abcdefghij" (10 chars) truncated to 6
+#[case::with_line_numbers(
+    6,           // max_len: truncate "abcdefghij" (10 chars) to 6
     true,        // with_line_numbers: yes, shows "L1: " prefix
     "L1: abc..." // expected: truncated with line number prefix
 )]
-#[case::without_line_numbers_short(
-    4,        // max_len: line truncated to 4 chars
+#[case::without_line_numbers(
+    4,        // max_len: truncate to 4 chars
     false,    // with_line_numbers: no prefix
-    "  a..."  // expected: truncated without line number prefix
-)]
-#[case::no_truncation_when_fits(
-    200,             // max_len: larger than line length (10 chars)
-    true,            // with_line_numbers: yes
-    "L1: abcdefghij" // expected: full line preserved, no truncation
-)]
-#[case::exact_boundary_no_truncation(
-    10,              // max_len: exactly matches line length (10 chars)
-    true,            // with_line_numbers: yes
-    "L1: abcdefghij" // expected: full line preserved, boundary not exceeded
+    "  a..."  // expected: truncated without prefix
 )]
 fn grep_format_handles_line_truncation(
     #[case] max_len: usize,
