@@ -102,12 +102,9 @@ Aggregation:
 - Write `ledger_path` on every review pass.
 
 Decision:
-- **APPROVE**: no open BLOCKING issues remain.
-- **REVISE**: open BLOCKING issues remain.
-  - Build `revision_notes` from open BLOCKING ledger entries only.
-  - Re-run planner.
-  - Re-run all 6 reviewers.
-- Max 10 plan-review iterations.
+- **APPROVE**: no open findings remain.
+- **REVISE**: any finding remains. Build `revision_notes` from all open entries (BLOCKING first).
+- Max 10 iterations. At cap: FAIL if BLOCKING remains, continue if only ADVISORY.
 
 ### Phase 3: Implementation
 - Spawn `@orchestrator/runner/code/coder`.
@@ -152,20 +149,17 @@ Aggregation:
 - Write `ledger_path` on every review pass.
 
 Decision:
-- **PASS**: no open BLOCKING issues remain.
-- **BLOCKING**: open BLOCKING issues remain.
+- **PASS**: no open findings remain.
+- **BLOCKING**: any finding remains.
 - Code-phase blocking rules:
   - `SANITY_OBJECTIVE`: blocking when a requirement or success criterion is unmet.
   - `SANITY_FIDELITY`: advisory by default.
   - Drift blocks only when it causes an unmet requirement, missing required verification, or a severe regression.
   - `SANITY_REGRESSION`: blocking when backed by concrete evidence.
   - `TEST_*`: `code-test-integrity-reviewer` decides.
-- If blocking:
-  - Send blocking issues back to coder only.
-  - Re-run the quality gate after coder changes.
-  - Do not return to planner from Phase 4.
-- If requirements are met, checks pass, and no severe regression remains, continue even when the implementation differs from the plan.
-- Max 10 quality-gate retries.
+- If blocking: send all open issues to coder (BLOCKING first). Re-run gate. Do not return to planner.
+- Continue even when implementation differs from plan if requirements are met and no findings remain.
+- Max 10 retries. At cap: FAIL if BLOCKING remains, continue if only ADVISORY.
 
 ### Phase 5: Commit
 - Spawn `@commit` with `prompt_path` and a short bullet summary.

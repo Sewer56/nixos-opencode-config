@@ -81,16 +81,11 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
   - `@plan/reviewers/economy`
   - `@plan/reviewers/tests`
   - `@plan/reviewers/performance`
-- Any single `BLOCKING` finding requires revision.
-- Treat `PASS` and `ADVISORY` as non-blocking.
-- If any reviewer returns `BLOCKING`, synthesize only the current blocking findings into a concise revision checklist.
-- Revise `machine_plan_path` only where needed to close those blocking issues.
-- Append one line to `## Revision History` describing what changed.
+- All findings require revision. Synthesize into a checklist (BLOCKING first).
+- Revise `machine_plan_path` only where needed. Append one line to `## Revision History`.
 - Re-run all reviewers after every material revision.
-- Continue until no blocking findings remain or 10 review iterations have run.
-- If a blocking issue can only be fixed by changing the confirmed human plan's intent, stop and tell the user to update the plan with `/plan/draft`.
-- If the loop finishes with no blocking findings, return `Status: SUCCESS`.
-- If the loop hits the cap, keep the best machine plan, record remaining concerns under `## Risks and Open Questions`, and return `Status: INCOMPLETE`.
+- Loop until no findings or 10 iterations.
+- No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
 # Output
 Return exactly:
