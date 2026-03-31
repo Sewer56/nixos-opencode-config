@@ -11,54 +11,51 @@
 
 Use these rules for planning, implementation, and review unless a more specific rules file overrides them.
 
-- Keep changes minimal; prefer the smallest viable diff that fully satisfies the requirement.
+- Keep changes minimal; use the smallest viable diff.
 - Prefer plain code and names; avoid jargon and cleverness.
 - Use descriptive, domain-first names for modules, files, types, and functions.
-- Avoid vague bucket names like `utils`, `helpers`, `common`, or `misc` unless they are already established and intentionally narrow.
-- Prefer existing types, constants, schemas, signatures, and patterns over inventing new ones.
-- Reuse existing patterns.
-- Inline tiny single-use helpers unless naming them materially improves reuse, readability, or module boundaries.
-- Optimize for review: keep control flow obvious and change sets cohesive.
+- Avoid vague bucket names like `utils`, `helpers`, `common`, or `misc` unless already established and intentionally narrow.
+- Prefer existing types, constants, schemas, signatures, and patterns.
+- Inline tiny single-use helpers unless naming improves readability, reuse, or module boundaries.
+- Keep control flow obvious and change sets cohesive.
 - Keep visibility minimal.
-- Within files, order declarations from most public to most private; within each visibility level, define callers before callees (reading order).
-- Preserve behavior unless a change is required or explicitly requested.
+- Preserve behavior unless explicitly changing it.
 - Avoid broad refactors unless required or requested.
-- Remove dead code, unused imports, and newly-unused paths created by the change.
-- Avoid debug/dev-only logging, temporary instrumentation, and unnecessary abstractions.
-- Avoid single-implementation interfaces/traits unless there is a concrete need.
+- Remove dead code, unused imports, and newly-unused paths.
+- Avoid debug-only logging, temporary instrumentation, and unnecessary abstractions.
+- Avoid single-implementation abstractions (interfaces, traits, protocols) unless a concrete need exists.
+- Add inline comments for non-obvious logic.
 
 # Performance Rules
 
-- Prefer the highest-performance correct implementation that still keeps the code readable.
-- After choosing the performant correct approach, make it as simple and reviewable as possible without sacrificing performance.
-- Simplify only after performance is preserved; do not give up meaningful performance just to make the code look shorter or superficially simpler.
+- Prefer the highest-performance correct implementation.
+- Then simplify for readability and reviewability, but never trade meaningful performance for brevity or superficial simplicity.
 
 # Testing Rules
 
 Use these rules when the task requires tests.
 
-- Add or update sufficient tests so all new code introduced by the change is covered.
-- Avoid duplicate coverage and duplicate setup; if an existing test already proves a behavior, do not restate it elsewhere.
-- Reuse existing test helpers when they fit; extract a shared helper only when it reduces repetition or makes setup clearer across multiple tests.
-- Keep tests deterministic; avoid real I/O, time, and network unless the test deliberately controls, seeds, or freezes them.
+- Cover all new code with tests.
+- Avoid duplicate coverage and setup; do not restate what an existing test already proves.
+- Reuse existing test helpers; extract shared helpers only when they reduce repetition or clarify setup across multiple tests.
+- Keep tests deterministic; avoid real I/O, time, and network unless controlled, seeded, or frozen.
 - When one behavior needs multiple similar cases, follow `test-parameterization.md` for naming, labels, and case structure.
 
 # Test Parameterization Rules
 
 Use these rules when a single behavior needs multiple similar test cases.
 
-- Prefer parameterized tests when multiple inputs exercise the same logic path; keep separate tests only when setup, assertions, or failure modes differ.
-- When planning parameterized tests, include representative case naming and parameter labeling style (for example `empty_input_returns_zero`).
-- Give each case a descriptive name; avoid generic names like `case_1`.
+- Prefer parameterized tests for multiple inputs on the same logic path; use separate tests only when setup, assertions, or failure modes differ.
+- Give each case a descriptive name and parameter labeling style (e.g. `empty_input_returns_zero`); avoid generic names like `case_1`.
 - Keep argument order stable: primary input -> mode/flags -> expected output.
-- Label parameters with short plain-English comments only when the meaning is non-obvious.
+- Label parameters with short comments only when non-obvious.
 - Keep labels aligned where practical.
 - If inline labels become too long, move labels above the case.
-- Add occasional in-body comments for non-obvious setup or assertions.
+- Comment non-obvious setup or assertions inline.
 - Keep tests human-friendly and around 80-100 characters per line.
 - For Rust, prefer `rstest` with `#[case::name(...)]` and aligned labeled parameters/comments.
 
-## Rust Style Reference
+## Style Reference
 
 ```rust
 /// Verifies that line truncation in formatted output behaves correctly for
@@ -95,60 +92,58 @@ fn grep_format_handles_line_truncation(
 
 # Code Placement Rules
 
-- Keep small changes in the existing file/module when that keeps ownership clear.
-- Create new files/modules only when module boundaries materially benefit.
-- Split catch-all files into focused modules.
-- Keep top-level orchestration in the parent module/file entrypoint.
-- Keep data-holder models in dedicated `models` modules/directories where the repo structure supports it.
-- Keep enums and newtypes with the parent type when only that parent uses them.
+- Prefer the existing file/module; create new ones only when module boundaries materially benefit.
+- Split catch-all files into focused, domain-named modules.
+- Keep orchestration in the entrypoint file/module.
+- Keep data-holder models in dedicated `models` modules/directories where the repo supports it.
+- Keep enums, newtypes, and value objects with the parent type when only that parent uses them.
 - Keep non-public helper types local.
-- Keep conversions with related type definitions; avoid global `conversions` buckets.
+- Keep conversions next to the type; avoid global `conversions` buckets.
 - Co-locate tests with the module they validate.
-- Keep `models/mod.rs` for wiring and re-exports, not concrete model definitions.
+- Keep `models` barrel/index files for wiring and re-exports, not concrete definitions.
 - Do not collapse modular code into monoliths unless the user asks.
 - Put shared behavior in the lowest shared package that owns it.
-- If behavior belongs in `core` because every implementation, adapter, or extension should benefit from it, put it in `core`, not in an extension, middleware, or integration package.
-- Shared validation, normalization, parsing, and domain contracts belong in shared/core packages when multiple implementations should inherit that behavior.
 - Keep extension, adapter, middleware, and integration packages focused on wiring and package-specific behavior.
-- If ownership is unclear, prefer the package that other packages depend on, not the package that depends on them.
+- When ownership is unclear, place in the package that others depend on.
+- Order declarations most-public to most-private; callers before callees.
 
 # Documentation Rules
 
 ## Scope
-- In changed scope, document public APIs and exports. In Rust, treat `pub` and `pub(crate)` items as public for this rule.
+- In changed scope, document public APIs and exports (Rust: `pub` and `pub(crate)` items).
 - In changed scope, document non-trivial private APIs.
-- For library or package APIs, update both package-level docs (`README.md` or the nearest usage doc) and in-code API docs when both surfaces exist in the changed scope.
+- When both package-level docs (`README.md` or nearest usage doc) and in-code API docs exist in changed scope, update both.
 - If a change materially alters a module/file boundary, refresh module/file docs.
 - Update existing documentation as needed.
 - Do not remove existing documentation unless it is incorrect or no longer applies.
-- When moving or renaming documented public APIs, exports, non-trivial private APIs, or modules/files, preserve or replace the affected docs explicitly.
+- When moving or renaming documented items, preserve or replace the affected docs.
 
 ## Required Docs
 - Public APIs and exports: brief purpose. Document parameters on public APIs.
-- Non-trivial public APIs and exports: also document returns, notable failure behavior, and examples when requested or materially helpful.
+- Non-trivial public APIs: also document returns, failure behavior, and examples when requested or helpful.
 - Non-trivial private APIs: brief purpose plus any non-obvious parameters, returns, side effects, or invariants.
 - Trivial private APIs do not need full API docs.
-- If the user explicitly asks for examples, add a practical example to the relevant public API docs, not only to package-level docs.
+- If examples are requested, add them to in-code API docs, not only package-level docs.
 - New or materially changed modules/files: top-level docs with purpose and usage context.
-- Package-level docs cover import and usage shape; in-code API docs cover the exported symbols themselves.
+- Package-level docs cover import/usage shape; in-code docs cover exported symbols.
 - If the language lacks native module docs, use the nearest file-level doc block/comment.
 - Add focused headings when useful: `Public API`, `Arguments`, `Returns`, `Examples`, `Usage`, `Errors`, `Validation`, `Identifier Format`, `Precedence`.
 - `Public API` lists public entrypoints/types by role.
-- Rust external symbol mentions use [`TypeName`] plus trailing reference links when needed.
+- Reference linked symbols using the language's doc convention (e.g., Rust: `[`TypeName`]`).
 - Never use `ignore` fences.
 
 ## Style
 - Lead with a one-sentence purpose in plain language.
 - For sectioned function and method docs, use this order: short summary, `Arguments`, `Returns`, then `Examples`.
-- Prefer goal-oriented phrasing ("What you can do with this") over implementation terms.
-- Avoid jargon: no "materialization", "JIT", "framework-agnostic", "deterministic resolution", etc. Apply this to both code and documentation.
+- Prefer goal-oriented phrasing over implementation terms.
+- Avoid jargon: no "materialization", "JIT", "framework-agnostic", "deterministic resolution", etc.
 - Keep examples practical and minimal.
-- When the doc format supports fenced examples, include a language tag such as `rust`.
-- Dense but accessible: full information without sacrificing readability.
+- When the doc format supports fenced examples, include a language tag (e.g., `rust`).
+- Dense but accessible.
 
-### Rust Doc Example
+### API Doc Example
 
-Non-trivial public Rust APIs should look like this:
+Example for non-trivial public APIs:
 
 ```rust
 /// Split raw installer paths into files and explicit directories.
@@ -174,32 +169,26 @@ pub fn split_paths_by_kind(paths: Vec<String>) -> PathGroups {
 }
 ```
 
-Lead with a purpose sentence, then `# Arguments`, `# Returns`, then `# Examples`. Rust external symbol mentions use [`TypeName`] plus trailing reference links when needed.
-
 ## Review Bar
 - Missing required docs is blocking.
 - Docs must not contradict implementation.
 - Keep docs dense, not skeletal.
-- When package-level docs and in-code API docs are both in scope, missing either side is blocking.
 - If examples were explicitly requested, README-only examples are insufficient.
-- Missing docs for non-trivial private APIs in changed scope is blocking.
-- In machine plans, required docs must appear concretely in the relevant implementation step snippet/diff; a generic `update docs` note is insufficient.
+- In machine plans, docs must appear in the relevant implementation snippet/diff; a generic `update docs` note is insufficient.
 - Do not backfill untouched legacy files solely for docs.
-- Add inline comments for non-obvious logic.
 
 # Orchestration Plan Rules
 
-Use these rules for the orchestrator workflow's `-PLAN.md` files.
+For orchestrator workflow -PLAN.md files.
 
-- Map each requirement to implementation step(s).
-- Map each requirement to test step(s) or assertion(s).
+- Map each requirement to its implementation step(s) and test step(s) or assertion(s).
 - Include `## Requirement Trace Matrix` with requirement, implementation step ref(s), test step ref(s), and acceptance criteria.
 - Keep `## External Symbols` current.
 - In `## Implementation Steps`, each step includes `Action`, `Anchor`, `Lines` (approx), and `Order` (if needed).
 
 # Orchestration Revision Rules
 
-Use these rules only for orchestrator plan review, plan revision, and review ledger handling.
+For orchestrator plan review, revision, and review ledger handling.
 
 - Preserve issue IDs across revisions when root cause is unchanged.
 - Include `acceptance_criteria` for each open issue ID (short, testable closure condition).

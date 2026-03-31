@@ -2,18 +2,17 @@
 
 Use these rules when a single behavior needs multiple similar test cases.
 
-- Prefer parameterized tests when multiple inputs exercise the same logic path; keep separate tests only when setup, assertions, or failure modes differ.
-- When planning parameterized tests, include representative case naming and parameter labeling style (for example `empty_input_returns_zero`).
-- Give each case a descriptive name; avoid generic names like `case_1`.
+- Prefer parameterized tests for multiple inputs on the same logic path; use separate tests only when setup, assertions, or failure modes differ.
+- Give each case a descriptive name and parameter labeling style (e.g. `empty_input_returns_zero`); avoid generic names like `case_1`.
 - Keep argument order stable: primary input -> mode/flags -> expected output.
-- Label parameters with short plain-English comments only when the meaning is non-obvious.
+- Label parameters with short comments only when non-obvious.
 - Keep labels aligned where practical.
 - If inline labels become too long, move labels above the case.
-- Add occasional in-body comments for non-obvious setup or assertions.
+- Comment non-obvious setup or assertions inline.
 - Keep tests human-friendly and around 80-100 characters per line.
 - For Rust, prefer `rstest` with `#[case::name(...)]` and aligned labeled parameters/comments.
 
-## Rust Style Reference
+## Style Reference
 
 ```rust
 /// Verifies that line truncation in formatted output behaves correctly for
