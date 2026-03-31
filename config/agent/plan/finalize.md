@@ -1,6 +1,5 @@
 ---
 mode: primary
-hidden: true
 description: Converts a confirmed human plan into a reviewed machine plan
 model: openai/gpt-5.4
 reasoningEffort: xhigh
