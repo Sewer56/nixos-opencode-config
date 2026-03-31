@@ -42,7 +42,7 @@ Review a machine plan for minimality and placement.
 Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH` and `CODE_PLACEMENT_RULES_PATH` once, in parallel.
 
 # Focus
-- Economy lens: flag only clear unnecessary expansion in implementation scope, file/module count, or planned test surface.
+- Economy lens: flag only clear unnecessary expansion beyond the confirmed human intent in `handoff_path` and `plan_path`. Apply `GENERAL_RULES_PATH` and `CODE_PLACEMENT_RULES_PATH` to judge minimality and placement.
 - Leave detailed test quality to the test reviewer.
 - Read the referenced repo files first and use `handoff_path` and `plan_path` only to judge whether the machine plan grew beyond the confirmed human intent.
 
@@ -66,5 +66,5 @@ Fix: <smallest simplification>
 ```
 
 # Constraints
-- Block only for clear unnecessary complexity, file creation, or refactor scope.
-- Prefer inline or existing-file solutions unless a new boundary is clearly justified.
+- Block only when the plan clearly exceeds confirmed scope.
+- Apply `GENERAL_RULES_PATH` and `CODE_PLACEMENT_RULES_PATH` to judge minimality and placement.

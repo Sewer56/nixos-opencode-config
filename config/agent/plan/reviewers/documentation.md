@@ -41,40 +41,9 @@ Review a finalized machine plan's documentation work.
 Read `DOCUMENTATION_RULES_PATH` once.
 
 # Focus
-- Apply `documentation.md` to the changed scope described by `machine_plan_path`.
-- Verify the plan covers required public/export docs, required non-trivial private API docs, and package-level docs when both surfaces are in scope.
-- In Rust, treat `pub(crate)` items as public for this review.
-- Verify the relevant implementation steps show the exact doc block/comment or README/package-doc snippet, not just abstract doc work.
-- For sectioned API doc snippets, verify the shape is concrete: short summary, `Arguments`, `Returns`, then `Examples` when present.
-- If the request asked for examples, verify the plan puts them on the relevant API docs, not only package-level docs.
-- Compare against current repo docs when documented public APIs, `pub(crate)` items, non-trivial private APIs, or module/file boundaries are being moved, renamed, or replaced.
+- Apply `DOCUMENTATION_RULES_PATH` to the changed scope described by `machine_plan_path`.
+- Compare against current repo docs when any documented surface is being moved, renamed, or replaced.
 - Read only the repo files needed to ground those checks.
-
-Example of enough detail:
-
-```rust
-/// Split raw installer paths into files and explicit directories.
-///
-/// # Arguments
-/// - `paths`: Raw installer-relative paths where trailing separators mark directories.
-///
-/// # Returns
-/// - [`PathGroups`]: Split file paths and explicit directory paths.
-///
-/// # Examples
-/// ```rust
-/// let paths = vec!["Pack/".to_string(), "Pack/file.txt".to_string()];
-/// let groups = split_paths_by_kind(paths);
-/// assert_eq!(groups.files, vec!["Pack/file.txt"]);
-/// assert_eq!(groups.directories, vec!["Pack"]);
-/// ```
-pub fn split_paths_by_kind(paths: Vec<String>) -> PathGroups {
-    PathGroups {
-        files: Vec::new(),
-        directories: Vec::new(),
-    }
-}
-```
 
 # Output
 
@@ -96,6 +65,6 @@ Fix: <smallest concrete correction>
 ```
 
 # Constraints
-- Block when required public/export docs, required non-trivial private API docs, or required package-level docs are missing, when requested examples appear only in package-level docs, or when meaningful existing docs would be dropped.
+- Block when the plan violates any rule in the "Review Bar" section of `documentation.md`
 - Do not block for minor wording preferences when the required coverage is explicit and concrete.
 - Keep findings short and specific.

@@ -32,6 +32,36 @@
 - When the doc format supports fenced examples, include a language tag such as `rust`.
 - Dense but accessible: full information without sacrificing readability.
 
+### Rust Doc Example
+
+Non-trivial public Rust APIs should look like this:
+
+```rust
+/// Split raw installer paths into files and explicit directories.
+///
+/// # Arguments
+/// - `paths`: Raw installer-relative paths where trailing separators mark directories.
+///
+/// # Returns
+/// - [`PathGroups`]: Split file paths and explicit directory paths.
+///
+/// # Examples
+/// ```rust
+/// let paths = vec!["Pack/".to_string(), "Pack/file.txt".to_string()];
+/// let groups = split_paths_by_kind(paths);
+/// assert_eq!(groups.files, vec!["Pack/file.txt"]);
+/// assert_eq!(groups.directories, vec!["Pack"]);
+/// ```
+pub fn split_paths_by_kind(paths: Vec<String>) -> PathGroups {
+    PathGroups {
+        files: Vec::new(),
+        directories: Vec::new(),
+    }
+}
+```
+
+Lead with a purpose sentence, then `# Arguments`, `# Returns`, then `# Examples`. Rust external symbol mentions use [`TypeName`] plus trailing reference links when needed.
+
 ## Review Bar
 - Missing required docs is blocking.
 - Docs must not contradict implementation.

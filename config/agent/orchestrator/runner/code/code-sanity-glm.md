@@ -72,7 +72,6 @@ Validate that implementation satisfies the objectives. Narrow sanity gate only.
 ### Objective Satisfaction
 - Does the code actually satisfy each requirement?
 - Are success criteria provably met?
-- Is behavior preserved unless explicitly changed?
 
 ### Verification Checks
 - Use coder notes and gate context as the source of truth
@@ -177,4 +176,3 @@ Acceptance Criteria: Verified failure is gone
 - Prefer objective verification over style debate
 - Trust plan decisions on abstraction, placement, test design
 - Plan drift alone is not blocking
-- Do not rerun formatter, lint, build, or tests

@@ -73,7 +73,6 @@ Validate that implementation satisfies the objectives. Narrow sanity gate only.
 ### Objective Satisfaction
 - Does the code actually satisfy each requirement?
 - Are success criteria provably met?
-- Is behavior preserved unless explicitly changed?
 
 ### Verification Checks
 - Use coder notes and gate context as the source of truth

@@ -57,9 +57,7 @@ Read `ALL_RULES_PATH` once.
 - First call: no `revision_notes` and no existing plan -> create a new plan.
 - Revision call: `revision_notes` present -> revise the existing plan.
 - If `revision_notes` are present but the plan is missing, create a new plan and note the missing context in `## Plan Notes`.
-- On revision, preserve prior issue IDs and statuses in `## Review Ledger (Revision)`.
-- Treat each issue's `acceptance_criteria` as the closure target. Mark an issue `RESOLVED` only when the plan changes satisfy it.
-- Do not reopen resolved items unless `revision_notes` include new evidence.
+- On revision, follow the Orchestration Revision Rules in `ALL_RULES_PATH` for issue ID preservation, `acceptance_criteria`, `## Review Ledger (Revision)`, and `## Revision Impact Table`.
 - Ensure `plan_path` contains a complete plan, then return only `plan_path`.
 
 2. Read and Scope
@@ -94,15 +92,8 @@ Read `ALL_RULES_PATH` once.
 - If a lookup finds nothing useful, still create a findings file that says so.
 - Findings stay prompt-scoped. Duplication across prompts is acceptable.
 
-5. Draft Complete Plan
-Build these sections:
-- **External Symbols**: map files to required `use` statements and referenced types/classes for implementation
-- **Implementation Steps**: ordered by file and compliant with `ALL_RULES_PATH`
-- **Test Steps**: include the required tests
-- **`## Requirement Trace Matrix`**: map each requirement to implementation step refs, test step refs, and acceptance criteria.
-- **`## Revision Impact Table`** (on revisions): map each changed hunk or step to affected requirement(s) and affected test(s).
-- Show the exact required doc block/comment in code steps and the matching README/package-doc snippet in package-doc steps.
-- If the user asked for examples, put them on the API docs, not only the README.
+ 5. Draft Complete Plan
+Build the sections mandated by `ALL_RULES_PATH` (Orchestration Plan Rules, Orchestration Revision Rules, Plan Content Rules, Documentation Rules).
 - Make each implementation and test step concrete enough that the coder is not deciding module or file placement, visibility, dependency or config changes, documentation scope, or missing test work.
 
 6. Write Plan File
@@ -120,210 +111,27 @@ Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 - If findings were created, ensure `# Findings` includes each file path with a short relevance note
 - If the prompt lacks `# Findings`, add it and list created findings
 
-8. Self-Review Before Output
-- Review the final plan using `ALL_RULES_PATH`.
-- Ensure `## Requirement Trace Matrix` is complete.
-- Ensure documentation work and revision requirements from `ALL_RULES_PATH` are covered when applicable.
+ 8. Self-Review Before Output
+- Review the final plan against `ALL_RULES_PATH`; if any rule is violated, update the plan before returning.
 - Ensure the plan is concrete enough that shared rules constrain local implementation choices instead of forcing the coder to invent scope or structure.
-- If any rule is violated, update the plan file before returning `plan_path`.
 
 Do NOT modify the original prompt file except to update `# Findings` and `# Required Reads`.
 
 # Plan File Format
 
-Write this to `<prompt_filename>-PLAN.md`:
+Write this to `<prompt_filename>-PLAN.md`. Follow the format rules in `ALL_RULES_PATH` (Plan Content Rules, Orchestration Plan Rules, Orchestration Revision Rules).
 
-```markdown
-# Plan
+Include these sections in this order:
 
-## Reviewer Concerns (Revision)
-- [ ] Address <concern>
-
-## Plan Notes
-
-### Summary
-- <short overview of intent and risks>
-
-### Assumptions
-- <assumptions made while planning>
-
-### Risks and Open Questions
-- <unknowns or potential blockers>
-
-### Review Focus
-- <areas reviewers should scrutinize>
-
-### Settled Facts
-- [FACT-001] <fact validated by findings/repo evidence> (Source: PROMPT-FINDING-... or file:line)
-
-### Revision History
-- Iteration <n>: <what changed and why>
-
-## Review Ledger (Revision)
-
-| ID     | Severity | Source | Status   | Summary        | Acceptance Criteria | Evidence  |
-| ------ | -------- | ------ | -------- | -------------- | ------------------- | --------- |
-| PR-001 | HIGH     | GPT-5  | RESOLVED | <what changed> | <closure condition> | file:line |
-
-## Requirement Trace Matrix
-
-| Requirement | Impl Ref(s)  | Test Ref(s)  | Acceptance Criteria |
-| ----------- | ------------ | ------------ | ------------------- |
-| REQ-001     | `<impl-ref>` | `<test-ref>` | <what must be true> |
-
-## Revision Impact Table
-
-Include this section for revisions.
-
-| Changed Hunk/Step | Affected Requirement(s) | Affected Test(s) |
-| ----------------- | ----------------------- | ---------------- |
-| <file/section>    | REQ-###                 | <test ref(s)>    |
-
-## External Symbols
-
-Map files to required `use` statements and referenced symbols so later iterations do not need to re-search the same files/classes.
-
-- `src/services/user.rs`
-  - `use crate::models::{CreateUserInput, User};`
-  - `use crate::repository::user::UserRepository;`
-  - `UserError`
-- `src/repository/user.rs`
-  - `use crate::db::DbError;`
-  - `use crate::models::User;`
-
-## Implementation Steps
-
-Follow `ALL_RULES_PATH`.
-
-### src/services/user.rs
-
-Action: INSERT
-Anchor: `impl UserService`
-Lines: ~18-70
-Insert at: before `impl UserService` (~24-28)
-
-Import diff:
-
-```diff
-@@ use section
-+use crate::models::{CreateUserInput, User};
-+use crate::repository::user::UserRepository;
-+use uuid::Uuid;
-```
-
-```rust
-//! User creation service.
-//! <add usage context here per rules>
-//! Backed by a [`UserRepository`].
-//!
-//! # Public API
-//! - `UserService::create_user` - Create a user if the email is unique.
-//! - `UserError` - User creation failures.
-//!
-//! # Validation
-//! - Rejects duplicate emails.
-//!
-//! [`UserRepository`]: crate::repository::user::UserRepository
-
-pub enum UserError {
-    DuplicateEmail(String),
-}
-
-impl UserService {
-    /// Create a new user when the email is not already registered.
-    ///
-    /// # Arguments
-    /// - `input`: New user data to validate and persist.
-    ///
-    /// # Returns
-    /// - `Ok(User)`: The created user.
-    /// - `Err(UserError)`: Validation or persistence failure.
-    ///
-    /// # Examples
-    /// ```rust
-    /// let input = CreateUserInput { email: "user@example.com".into() };
-    /// let result = service
-    ///     .create_user(input)
-    ///     .await;
-    /// assert!(result.is_ok());
-    /// ```
-    pub async fn create_user(&self, input: CreateUserInput) -> Result<User, UserError> {
-        if self.repo.find_by_email(&input.email).await?.is_some() {
-            return Err(UserError::DuplicateEmail(input.email));
-        }
-        let user = User { id: Uuid::new_v4(), email: input.email };
-        self.repo.create(&user).await?;
-        Ok(user)
-    }
-}
-```
-
-### src/repository/user.rs
-
-Action: REPLACE
-Anchor: `UserRepository` trait + impl block
-Lines: ~10-60
-Order: after `src/services/user.rs` type/import additions
-
-Import diff (if needed):
-
-```diff
-@@ use section
-+use crate::db::DbError;
-+use crate::models::User;
-```
-
-```rust
-// in trait
-async fn find_by_email(&self, email: &str) -> Result<Option<User>, DbError>;
-
-// in impl
-async fn find_by_email(&self, email: &str) -> Result<Option<User>, DbError> {
-    sqlx::query_as!(User, "SELECT * FROM users WHERE email = $1", email)
-        .fetch_optional(&self.pool)
-        .await
-        .map_err(DbError::from)
-}
-```
-
-### src/services/user.rs
-
-Action: DELETE
-Anchor: `legacy_normalize_email`
-Lines: ~120-140
-Remove lines: ~128-136
-
-Import diff:
-
-```diff
-@@ use section
--use crate::legacy::EmailNormalizer;
-```
-
-```diff
-@@
--fn legacy_normalize_email(email: &str) -> String {
--    email.trim().to_lowercase()
--}
-```
-
-## Test Steps
-
-### src/services/user.rs (add/extend `#[cfg(test)] mod tests`)
-
-```rust
-use crate::services::user::{CreateUserInput, UserError};
-
-#[tokio::test]
-async fn create_user_rejects_duplicate_email() {
-    let service = setup_test_service().await;
-    service.create_user(CreateUserInput { email: "dupe@example.com".into() }).await.unwrap();
-    let result = service.create_user(CreateUserInput { email: "dupe@example.com".into() }).await;
-    assert!(matches!(result, Err(UserError::DuplicateEmail(_))));
-}
-```
-
-```
+1. `# Plan`
+2. `## Reviewer Concerns (Revision)` — only on revisions; checklist of reviewer concerns
+3. `## Plan Notes` — Summary, Assumptions, Risks, Review Focus, Settled Facts, Revision History
+4. `## Review Ledger (Revision)` — table with ID, Severity, Source, Status, Summary, Acceptance Criteria, Evidence (revisions only)
+5. `## Requirement Trace Matrix` — table per Orchestration Plan Rules
+6. `## Revision Impact Table` — table per Orchestration Revision Rules (revisions only)
+7. `## External Symbols` — map files to `use` statements and referenced symbols
+8. `## Implementation Steps` — per-file steps with Action, Anchor, Lines, import diffs, and code blocks per Plan Content Rules
+9. `## Test Steps` — concrete test code per Testing and Test Parameterization Rules
 
 # Findings File Format
 

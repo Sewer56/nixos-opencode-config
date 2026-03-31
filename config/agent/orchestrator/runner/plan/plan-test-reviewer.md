@@ -47,32 +47,11 @@ If `ledger_path` is provided, read the ledger from that path.
 
 ## 2. Test Design Review
 
-### Coverage Quality
-- Are all new code paths covered by tests?
-- Is coverage achieved with minimal test count?
-- Are edge cases explicitly tested?
+Evaluate against `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH`.
 
-### Test Deduplication
-**Critical focus**: Detect when the same behavior is tested multiple times.
-
-Look for:
-- Same module tested in multiple test files without clear separation
-- Similar assertions on same code path
-- Tests that could be consolidated via parameterization
-
-### Parameterization Opportunities
-Check against `test-parameterization.md`:
-- Multiple inputs exercising same logic path → should be parameterized
-- Descriptive case names (not `case_1`, `case_2`)
-- Stable argument order: primary input → mode/flags → expected output
-- Labels aligned where practical
-- Short plain-English comments only when non-obvious
-
-### Test Structure
-- Deterministic (no real I/O, time, network unless controlled)
-- Reuse existing helpers when they fit
-- Extract new helpers only when reducing repetition across multiple tests
-- Focus on behavior, not implementation details
+### Coverage & Structure
+- All new code paths have test coverage (edge cases explicitly)
+- Each test step maps to a requirement; tests prove acceptance criteria without over-testing internals
 
 ### Test-Requirement Mapping
 - Each test step maps to a requirement or behavior
@@ -177,6 +156,5 @@ Acceptance Criteria: One test with six descriptive cases
 - Priority: coverage > deduplication > parameterization style
 
 # Constraints
-- Prefer parameterized tests aggressively
-- Detect and flag all redundant test coverage
-- Ensure sufficient coverage exists before complaining about style
+- Apply rules from `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH` strictly
+- Ensure sufficient coverage exists before flagging style issues

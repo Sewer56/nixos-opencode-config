@@ -69,7 +69,7 @@ think
 
 4. Fix and iterate
 - If any check fails, analyze it, fix it, and rerun verification.
-- Do not return until all required checks pass.
+- Do not return until all required checks pass, or until you must escalate.
 
 5. Record coder notes (required)
 - Write or update `coder_notes_path` on every run.
@@ -98,7 +98,6 @@ Blocker: <what prevents completion>
 # Constraints
 - Do not commit; the orchestrator handles commits
 - Keep reports concise; include only failures/warnings when present
-- Return only after all required checks pass (or escalation)
 
 # Coder Notes File Format
 

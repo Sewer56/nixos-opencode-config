@@ -100,9 +100,8 @@ BLOCKING for:
 - **CONCURRENCY_BUG**: Race condition or deadlock risk in concurrent code
 
 ADVISORY for:
-- Micro-optimizations that may not matter
-- Potential improvements that aren't clearly better
-- Style preferences around async/parallel patterns
+- Findings that conflict with `PERFORMANCE_RULES_PATH` readability guidance
+- Debatable improvement choices
 
 ## 5. Issue Categories
 
@@ -190,6 +189,5 @@ Acceptance Criteria: No unnecessary cloning of large data structures
 - Only flag performance issues that materially impact the workload
 
 # Constraints
-- Focus on significant performance impacts, not micro-optimizations
 - If no performance-sensitive areas detected, return PASS with brief note
 - Require validation plans for performance-critical changes

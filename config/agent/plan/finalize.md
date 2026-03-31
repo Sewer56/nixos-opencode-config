@@ -85,9 +85,7 @@ Read the files in `RULES_DIR` named by `GENERAL_RULES_PATH`, `CODE_PLACEMENT_RUL
 - Record the settled repo facts that the plan depends on.
 - Keep the machine plan concrete enough that an implementer does not need to invent file placement, major structure, missing test coverage, verification commands, or code shape.
 - Ground each implementation step in the current repo surface with a real file path, an anchor, repo evidence, and a short code snippet or diff.
-- Show the exact required doc block/comment in code steps and the matching README/package-doc snippet in package-doc steps.
-- If the user asked for examples, put them on the API docs, not only the README.
-- Keep the planned change as small as correctness allows.
+- Apply the rules loaded in step 2 to each implementation and test step; do not restate them here.
 - Write `machine_plan_path` using the `# Templates` section below.
 
 ## 5. Run the review loop
@@ -237,31 +235,7 @@ Import diff:
 
 Code Shape:
 
-Use the target file language or `diff`. For example:
-
-```rust
-/// Split raw installer paths into files and explicit directories.
-///
-/// # Arguments
-/// - `paths`: Raw installer-relative paths where trailing separators mark directories.
-///
-/// # Returns
-/// - [`PathGroups`]: Split file paths and explicit directory paths.
-///
-/// # Examples
-/// ```rust
-/// let paths = vec!["Pack/".to_string(), "Pack/file.txt".to_string()];
-/// let groups = split_paths_by_kind(paths);
-/// assert_eq!(groups.files, vec!["Pack/file.txt"]);
-/// assert_eq!(groups.directories, vec!["Pack"]);
-/// ```
-pub fn split_paths_by_kind(paths: Vec<String>) -> PathGroups {
-    PathGroups {
-        files: Vec::new(),
-        directories: Vec::new(),
-    }
-}
-```
+Use the target file language or `diff`. Follow doc shape rules in `DOCUMENTATION_RULES_PATH`.
 
 Changes:
 - <concrete code change>

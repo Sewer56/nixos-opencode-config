@@ -47,22 +47,10 @@ If `ledger_path` is provided, read the ledger from that path.
 ## 2. Minimality Review
 
 ### Code Minimality
-Check against `general.md`:
-- Is this the smallest viable diff?
-- Are new files/modules justified by clear ownership benefits?
-- Are helpers/types introduced for reuse or boundary clarity, not one-off use?
-- Are single-implementation interfaces avoided?
-- Is unnecessary abstraction avoided?
-- Is dead code removal specified?
-- Are debug/logging statements avoided unless explicitly required?
+Apply `GENERAL_RULES_PATH` rules to the plan. Flag any rule that would be violated by the planned implementation.
 
 ### Placement Economy
-Check against `code-placement.md`:
-- Are changes kept in existing files when ownership is clear?
-- Are new files created only when module boundaries materially benefit?
-- Are catch-all files split into focused modules (but not prematurely)?
-- Is test co-location correct?
-- Are conversions kept with their types?
+Apply `CODE_PLACEMENT_RULES_PATH` rules to the plan. Flag any rule that would be violated by the planned file layout.
 
 ### Test Footprint
 - Keep the planned test surface small
@@ -140,7 +128,5 @@ Acceptance Criteria: Direct implementation without trait, or justification for t
 - Flag economy issues that become more important after correctness fixes
 
 # Constraints
-- Focus on minimal diff and minimal test surface
-- Prefer inline solutions unless reuse/boundary is clear
-- Leave duplicate coverage and parameterization to `plan-test-reviewer`
 - Be explicit about why an abstraction/file/helper is unnecessary
+- Leave duplicate coverage and parameterization to `plan-test-reviewer`

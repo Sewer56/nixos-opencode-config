@@ -38,17 +38,11 @@ Review a written orchestrator prompt pack for correctness.
 
 # Defaults
 - `PROMPT_PACK_COMMAND_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/command/orchestrator/prompt-pack.md`
-- `GENERAL_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/general.md`
-- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
-- `PERFORMANCE_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/performance.md`
-- `TESTING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/testing.md`
-- `TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/test-parameterization.md`
-- `CODE_PLACEMENT_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/code-placement.md`
 
 # Process
 
 ## 1. Load Context
-- Read `PROMPT_PACK_COMMAND_PATH` and the rule files above.
+- Read `PROMPT_PACK_COMMAND_PATH`.
 - Read `requirements_path` and `orchestrator_path`.
 - Read every path in `source_paths` when provided.
 - Read `original_context` when provided.

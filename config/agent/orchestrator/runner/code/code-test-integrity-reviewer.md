@@ -35,6 +35,11 @@ Validate that tests compile, run, and provide coverage as planned. Verify test i
 - `coder_notes_path`: notes from coder implementation
 - `ledger_path` (optional): absolute path to the current review ledger
 
+# Defaults
+- `TESTING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/testing.md`
+- `TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/test-parameterization.md`
+- `CODE_PLACEMENT_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/code-placement.md`
+
 # Process
 
 ## 1. Load Context
@@ -48,6 +53,8 @@ Validate that tests compile, run, and provide coverage as planned. Verify test i
 
 ## 2. Test Integrity Checks
 
+Apply the standards in `TESTING_RULES_PATH`, `TEST_PARAMETERIZATION_RULES_PATH`, and `CODE_PLACEMENT_RULES_PATH` when evaluating each category below.
+
 ### Compilation
 - Do all new tests compile?
 - Are there import errors or missing dependencies?
@@ -59,12 +66,10 @@ Validate that tests compile, run, and provide coverage as planned. Verify test i
 - Are test failures related to the change?
 
 ### Coverage
-- Are all new code paths covered by tests?
 - Does coverage match the plan's expectations?
 - Are there coverage gaps in critical paths?
 
 ### Parameterization
-- Do parameterized tests have proper case names?
 - Are parameterized tests executing all cases?
 - Are there failures in specific parameter cases?
 

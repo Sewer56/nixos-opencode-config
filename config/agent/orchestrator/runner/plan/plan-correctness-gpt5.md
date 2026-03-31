@@ -54,27 +54,12 @@ If any missing, downgrade to ADVISORY.
 
 ## 3. Review Dimensions
 
-### Requirements Coverage
-- Every REQ-### has implementation step(s)
-- Every REQ-### has test step(s) or explicit justification for why not
-- Every success criterion is provable by the plan
+Check plan compliance against the rules loaded from `ALL_RULES_PATH`.
 
-### Trace Matrix
-- Verify `## Requirement Trace Matrix` exists
-- Every requirement maps to concrete implementation refs
-- Every requirement maps to concrete test refs
-- Every requirement has testable acceptance criteria
-
-### Completeness
-- No undefined helpers/types/symbols in implementation steps
-- No placeholder text (`...`, `TODO`, `FIXME`)
-- Import changes specified for all new dependencies
-- External symbols map is current and complete
-
-### Revision Ledger (if present)
-- Prior blocking issues have acceptance criteria
-- Prior blocking issues point to changed implementation/test sections
-- Do not reopen RESOLVED items without new concrete evidence
+Focus areas for correctness review:
+- **Plan Content Rules**: placeholders, undefined symbols, import specs
+- **Orchestration Plan Rules**: requirement mapping, trace matrix, external symbols
+- **Orchestration Revision Rules** (if ledger present): acceptance criteria, changed-section refs, reopen policy
 
 ### Risk Areas
 - Cross-file changes have proper ordering
