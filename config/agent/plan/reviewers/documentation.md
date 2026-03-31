@@ -2,8 +2,6 @@
 mode: subagent
 hidden: true
 description: Checks documentation coverage and specificity for finalized machine plans
-model: openai/gpt-5.4
-reasoningEffort: xhigh
 permission:
   "*": deny
   read:

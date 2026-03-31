@@ -2,8 +2,6 @@
 mode: subagent
 hidden: true
 description: Validates plan documentation coverage and specificity
-model: openai/gpt-5.4
-reasoningEffort: high
 permission:
   "*": deny
   read:
