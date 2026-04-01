@@ -45,7 +45,7 @@ Review a finalized machine plan for correctness, completeness, and fidelity to t
 
 ```text
 # REVIEW
-Agent: plan/reviewers/correctness
+Agent: _plan/reviewers/correctness
 Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings

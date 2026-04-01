@@ -1,6 +1,6 @@
 ---
 description: "Build orchestrator prompt files from task descriptions"
-agent: orchestrator/builder
+agent: _orchestrator/builder
 ---
 
 ## User Input
@@ -102,7 +102,7 @@ If empty, use the current working directory.
 - In `PROMPT-ORCHESTRATOR.md`, keep ownership mapping only in `## Requirement Ownership`.
 
 ### Phase 6: Review draft prompt pack
-- Spawn `@orchestrator/prompt-pack-reviewer` with:
+- Spawn `@_orchestrator/prompt-pack-reviewer` with:
   - `requirements_path`: absolute path to `PROMPT-PRD-REQUIREMENTS.md`
   - `orchestrator_path`: absolute path to `PROMPT-ORCHESTRATOR.md`
   - `source_paths`: absolute paths to the original task files, the source document, and any `PROMPT-SPLIT.md` or `PROMPT-DRAFT-*.md` inputs that shaped the pack
@@ -112,7 +112,7 @@ If empty, use the current working directory.
 - Max 5 review iterations.
 
 ### Phase 7: Run requirements preflight
-- Run `@orchestrator/runner/requirements/requirements-preflight` with:
+- Run `@_orchestrator/runner/requirements/requirements-preflight` with:
   - `requirements_path`: absolute path to `PROMPT-PRD-REQUIREMENTS.md`
   - `prompts_dir`: absolute path to the current working directory
   - `orchestrator_path`: absolute path to `PROMPT-ORCHESTRATOR.md`
@@ -124,8 +124,8 @@ If empty, use the current working directory.
 ```
 Prompt pack ready.
 
-Run `@ orchestrator` with `PROMPT-ORCHESTRATOR.md` to start execution.
-For a single prompt, use `@ orchestrator/runner`.
+Run `@_orchestrator` with `PROMPT-ORCHESTRATOR.md` to start execution.
+For a single prompt, use `@_orchestrator/runner`.
 ```
 
 ## Prompt File Format: `PROMPT-NN-{title}.md`

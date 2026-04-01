@@ -166,12 +166,12 @@ Final message must contain:
 
 Apply the rules below:
 
-/home/sewer/opencode/config/rules/orchestrator/plan-content.md
+/home/sewer/opencode/config/rules/_orchestrator/plan-content.md
 /home/sewer/opencode/config/rules/general.md
 /home/sewer/opencode/config/rules/performance.md
 /home/sewer/opencode/config/rules/testing.md
 /home/sewer/opencode/config/rules/test-parameterization.md
 /home/sewer/opencode/config/rules/code-placement.md
 /home/sewer/opencode/config/rules/documentation.md
-/home/sewer/opencode/config/rules/orchestrator/orchestration-plan.md
-/home/sewer/opencode/config/rules/orchestrator/orchestration-revision.md
+/home/sewer/opencode/config/rules/_orchestrator/orchestration-plan.md
+/home/sewer/opencode/config/rules/_orchestrator/orchestration-revision.md

@@ -32,8 +32,8 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "mcp-search": allow
-    "orchestrator/prompt-pack-reviewer": allow
-    "orchestrator/runner/requirements/requirements-preflight": allow
+    "_orchestrator/prompt-pack-reviewer": allow
+    "_orchestrator/runner/requirements/requirements-preflight": allow
   # bash: deny
   # webfetch: deny
   # websearch: deny

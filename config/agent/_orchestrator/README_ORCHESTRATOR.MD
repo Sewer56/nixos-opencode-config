@@ -6,7 +6,7 @@ This folder defines the multi-agent workflow that turns task descriptions into a
 - `plan/split` scans the repo, then creates the human review drafts: `PROMPT-SPLIT.md` and `PROMPT-DRAFT-*.md`.
 - `orchestrator/prompt-pack` turns task description files into `PROMPT-*.md`, `PROMPT-PRD-REQUIREMENTS.md`, and `PROMPT-ORCHESTRATOR.md`.
 - `orchestrator` is the scheduler that executes an existing `PROMPT-ORCHESTRATOR.md` sequentially.
-- `orchestrator/runner/runner` can be used directly for a single prompt when you already have a prompt file.
+- `_orchestrator/runner/runner` can be used directly for a single prompt when you already have a prompt file.
 
 ## Core Artifacts
 - `PROMPT-SPLIT.md`: high-level split summary for human review.
@@ -28,7 +28,7 @@ This folder defines the multi-agent workflow that turns task descriptions into a
 - Generate `PROMPT-SPLIT.md` and `PROMPT-DRAFT-*.md` via `plan/split` and get user approval.
 - `orchestrator/prompt-pack` takes task descriptions, performs deep discovery, writes the machine prompt pack, and runs requirements preflight.
 - The scheduler reads the index, initializes state, detects base branch, and runs prompts in order.
-- Each prompt is executed by `@orchestrator/runner/runner` through plan, specialist plan review, implementation, quality gate, and commit.
+- Each prompt is executed by `@_orchestrator/runner/runner` through plan, specialist plan review, implementation, quality gate, and commit.
 - After each prompt, the scheduler runs CodeRabbit review when available.
 - After all prompts, final requirements validation checks coverage and evidence against `base_branch`.
 
@@ -74,9 +74,9 @@ PROMPT-NN-*-PLAN.md      PROMPT-NN-*-CODER-NOTES.md
 ```
 
 ## Per-Prompt Runner Cycle
-- Plan: `@orchestrator/runner/plan/planner` writes a concrete `-PLAN.md` and optional findings.
+- Plan: `@_orchestrator/runner/plan/planner` writes a concrete `-PLAN.md` and optional findings.
 - Plan review: 5 reviewers run on every plan: correctness (GPT-5), correctness (GLM), economy, test, and performance.
-- Implementation: `@orchestrator/runner/code/coder` applies the plan, runs checks, and writes `-CODER-NOTES.md`.
+- Implementation: `@_orchestrator/runner/code/coder` applies the plan, runs checks, and writes `-CODER-NOTES.md`.
 - Quality gate: 3 reviewers run on every change: sanity (GPT-5), sanity (GLM), and test integrity.
 - Commit: `@commit` creates repo-style commits, excluding `PROMPT-*` files.
 
@@ -103,11 +103,11 @@ PROMPT-NN-*-PLAN.md      PROMPT-NN-*-CODER-NOTES.md
 
 ## Roles At A Glance
 - **Scheduler**: `orchestrator` manages state, ordering, and final validation; never edits code.
-- **Runner**: `orchestrator/runner/runner` coordinates the plan -> build -> gate -> commit cycle per prompt.
-- **Planner**: `orchestrator/runner/plan/planner` produces the actionable plan and updates prompt findings/required reads when needed.
-- **Coder**: `orchestrator/runner/code/coder` implements changes, runs verification, and records coder notes.
+- **Runner**: `_orchestrator/runner/runner` coordinates the plan -> build -> gate -> commit cycle per prompt.
+- **Planner**: `_orchestrator/runner/plan/planner` produces the actionable plan and updates prompt findings/required reads when needed.
+- **Coder**: `_orchestrator/runner/code/coder` implements changes, runs verification, and records coder notes.
 - **Reviewers**: plan reviewers (`plan-correctness-*`, `plan-economy-reviewer`, `plan-test-reviewer`, `plan-performance-reviewer`) and code reviewers (`code-sanity-*`, `code-test-integrity-reviewer`).
-- **Validation and Tools**: requirements preflight/final (`orchestrator/runner/requirements/requirements-*`), CodeRabbit (`coderabbit`), and commits (`commit`).
+- **Validation and Tools**: requirements preflight/final (`_orchestrator/runner/requirements/requirements-*`), CodeRabbit (`coderabbit`), and commits (`commit`).
 
 ## Why Generated Artifact Sections Exist
 

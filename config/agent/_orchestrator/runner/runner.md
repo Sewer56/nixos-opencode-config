@@ -21,17 +21,17 @@ permission:
   todowrite: allow
   task:
     "*": "deny"
-    "orchestrator/runner/plan/planner": "allow"
-    "orchestrator/runner/plan/plan-correctness-gpt5": "allow"
-    "orchestrator/runner/plan/plan-correctness-glm": "allow"
-    "orchestrator/runner/plan/plan-documentation-reviewer": "allow"
-    "orchestrator/runner/plan/plan-economy-reviewer": "allow"
-    "orchestrator/runner/plan/plan-test-reviewer": "allow"
-    "orchestrator/runner/plan/plan-performance-reviewer": "allow"
-    "orchestrator/runner/code/coder": "allow"
-    "orchestrator/runner/code/code-sanity-gpt5": "allow"
-    "orchestrator/runner/code/code-sanity-glm": "allow"
-    "orchestrator/runner/code/code-test-integrity-reviewer": "allow"
+    "_orchestrator/runner/plan/planner": "allow"
+    "_orchestrator/runner/plan/plan-correctness-gpt5": "allow"
+    "_orchestrator/runner/plan/plan-correctness-glm": "allow"
+    "_orchestrator/runner/plan/plan-documentation-reviewer": "allow"
+    "_orchestrator/runner/plan/plan-economy-reviewer": "allow"
+    "_orchestrator/runner/plan/plan-test-reviewer": "allow"
+    "_orchestrator/runner/plan/plan-performance-reviewer": "allow"
+    "_orchestrator/runner/code/coder": "allow"
+    "_orchestrator/runner/code/code-sanity-gpt5": "allow"
+    "_orchestrator/runner/code/code-sanity-glm": "allow"
+    "_orchestrator/runner/code/code-test-integrity-reviewer": "allow"
     "commit": "allow"
   # glob: deny
   # grep: deny
@@ -68,7 +68,7 @@ You only update ledger and unmet requirements files. Follow the `Workflow` direc
 
 ### Phase 1: Plan
 1. Read `prompt_path` and `overall_objective`; extract one-line task intent.
-2. Spawn `@orchestrator/runner/plan/planner` with `prompt_path`.
+2. Spawn `@_orchestrator/runner/plan/planner` with `prompt_path`.
 3. Parse response for `plan_path`.
    - If planner fails or returns no plan, retry up to 3 times.
    - If still no valid plan, return `Status: FAIL`.
@@ -78,12 +78,12 @@ You only update ledger and unmet requirements files. Follow the `Workflow` direc
 
 ### Phase 2: Plan Review
 Run all 6 plan reviewers in parallel:
-1. `@orchestrator/runner/plan/plan-correctness-gpt5`
-2. `@orchestrator/runner/plan/plan-correctness-glm`
-3. `@orchestrator/runner/plan/plan-documentation-reviewer`
-4. `@orchestrator/runner/plan/plan-economy-reviewer`
-5. `@orchestrator/runner/plan/plan-test-reviewer`
-6. `@orchestrator/runner/plan/plan-performance-reviewer`
+1. `@_orchestrator/runner/plan/plan-correctness-gpt5`
+2. `@_orchestrator/runner/plan/plan-correctness-glm`
+3. `@_orchestrator/runner/plan/plan-documentation-reviewer`
+4. `@_orchestrator/runner/plan/plan-economy-reviewer`
+5. `@_orchestrator/runner/plan/plan-test-reviewer`
+6. `@_orchestrator/runner/plan/plan-performance-reviewer`
 
 Inputs:
 - `prompt_path`
@@ -107,7 +107,7 @@ Decision:
 - Max 10 iterations. At cap: FAIL if BLOCKING remains, continue if only ADVISORY.
 
 ### Phase 3: Implementation
-- Spawn `@orchestrator/runner/code/coder`.
+- Spawn `@_orchestrator/runner/code/coder`.
 - Inputs:
   - `prompt_path`
   - `plan_path`
@@ -127,9 +127,9 @@ Decision:
 
 ### Phase 4: Quality Gate
 Run all 3 code reviewers in parallel:
-1. `@orchestrator/runner/code/code-sanity-gpt5`
-2. `@orchestrator/runner/code/code-sanity-glm`
-3. `@orchestrator/runner/code/code-test-integrity-reviewer`
+1. `@_orchestrator/runner/code/code-sanity-gpt5`
+2. `@_orchestrator/runner/code/code-sanity-glm`
+3. `@_orchestrator/runner/code/code-test-integrity-reviewer`
 
 Inputs:
 - `prompt_path`
@@ -209,7 +209,7 @@ Iterations: <n>
 | Performance | PASS/BLOCKING/ADVISORY | X | Y |
 
 ## Implementation
-Coder: @orchestrator/runner/code/coder
+Coder: @_orchestrator/runner/code/coder
 Status: SUCCESS | FAIL | ESCALATE
 Iterations: <n>
 

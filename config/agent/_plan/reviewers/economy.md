@@ -43,7 +43,7 @@ Review a machine plan for minimality and placement.
 
 ```text
 # REVIEW
-Agent: plan/reviewers/economy
+Agent: _plan/reviewers/economy
 Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings

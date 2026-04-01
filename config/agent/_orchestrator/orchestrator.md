@@ -20,8 +20,8 @@ permission:
   task:
     "*": deny
     "coderabbit": allow
-    "orchestrator/runner/runner": allow
-    "orchestrator/runner/requirements/requirements-final": allow
+    "_orchestrator/runner/runner": allow
+    "_orchestrator/runner/requirements/requirements-final": allow
   # glob: deny
   # grep: deny
   # list: deny
@@ -120,7 +120,7 @@ Determine `base_branch` once:
 For each prompt in listed order:
 
 1. Update state: set prompt status `RUNNING`, set `current_prompt_index`, update the row, preserve `Reqs`, write the state file.
-2. Spawn `@orchestrator/runner/runner` with:
+2. Spawn `@_orchestrator/runner/runner` with:
    - `prompt_path` (absolute)
    - one-line overall objective
 3. Wait for the runner and parse its report:
@@ -150,7 +150,7 @@ After each prompt with status `SUCCESS` or `INCOMPLETE`, spawn `@coderabbit`.
 - Make sure CodeRabbit changes are committed via `@commit`.
 
 ## Phase 3: Final Requirements Validation
-After all prompts complete (`SUCCESS` or `INCOMPLETE`), run `@orchestrator/runner/requirements/requirements-final`.
+After all prompts complete (`SUCCESS` or `INCOMPLETE`), run `@_orchestrator/runner/requirements/requirements-final`.
 - Inputs:
   - `orchestrator_path` (absolute)
   - `requirements_path` (absolute)

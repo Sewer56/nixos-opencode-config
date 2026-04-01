@@ -23,7 +23,7 @@ permission:
     "*": "deny",
     "codebase-explorer": "allow",
     "mcp-search": "allow",
-    "plan/reviewers/*": "allow"
+    "_plan/reviewers/*": "allow"
   }
   # bash: deny
   # question: deny
@@ -76,11 +76,11 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
 
 ## 5. Run the review loop
 - After each full machine-plan draft, run these reviewers in parallel, passing `handoff_path`, `plan_path`, and `machine_plan_path` to each reviewer:
-  - `@plan/reviewers/correctness`
-  - `@plan/reviewers/documentation`
-  - `@plan/reviewers/economy`
-  - `@plan/reviewers/tests`
-  - `@plan/reviewers/performance`
+  - `@_plan/reviewers/correctness`
+  - `@_plan/reviewers/documentation`
+  - `@_plan/reviewers/economy`
+  - `@_plan/reviewers/tests`
+  - `@_plan/reviewers/performance`
 - All findings require revision. Synthesize into a checklist (BLOCKING first).
 - Revise `machine_plan_path` only where needed. Append one line to `## Revision History`.
 - Re-run all reviewers after every material revision.

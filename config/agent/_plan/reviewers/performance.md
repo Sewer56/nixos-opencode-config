@@ -43,7 +43,7 @@ Review only the performance-sensitive parts of a machine plan.
 
 ```text
 # REVIEW
-Agent: plan/reviewers/performance
+Agent: _plan/reviewers/performance
 Decision: PASS | ADVISORY | BLOCKING
 
 ## Scope

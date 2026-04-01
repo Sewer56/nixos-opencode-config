@@ -43,7 +43,7 @@ Review a finalized machine plan's documentation work.
 
 ```text
 # REVIEW
-Agent: plan/reviewers/documentation
+Agent: _plan/reviewers/documentation
 Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings

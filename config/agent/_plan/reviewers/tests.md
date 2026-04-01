@@ -43,7 +43,7 @@ Review a machine plan's test strategy.
 
 ```text
 # REVIEW
-Agent: plan/reviewers/tests
+Agent: _plan/reviewers/tests
 Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
