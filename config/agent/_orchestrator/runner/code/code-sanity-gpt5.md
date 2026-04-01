@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Validates implementation against objectives (GPT-5)
 model: openai/gpt-5.4
-reasoningEffort: medium
+reasoningEffort: high
 permission:
   "*": deny
   read:

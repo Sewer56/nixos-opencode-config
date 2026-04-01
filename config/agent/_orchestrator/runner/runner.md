@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Orchestrates a single prompt end-to-end with specialist reviewers
-model: openai/gpt-5.4
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   "*": deny
   read:

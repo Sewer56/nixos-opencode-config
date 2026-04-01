@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Runs CodeRabbit CLI review and fixes findings
-model: zai-coding-plan/glm-5.1
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   "*": deny
   read:

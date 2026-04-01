@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces complete implementation plans with task list and symbol map
-model: github-copilot/gpt-5.4
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 reasoningEffort: medium
 permission:
   "*": deny

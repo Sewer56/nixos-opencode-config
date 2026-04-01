@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews written orchestrator prompt-pack files for correctness and fidelity
-model: openai/gpt-5.4
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 reasoningEffort: medium
 permission:
   "*": deny
