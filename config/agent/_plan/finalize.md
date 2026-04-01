@@ -84,7 +84,7 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
 - All findings require revision. Synthesize into a checklist (BLOCKING first).
 - Revise `machine_plan_path` only where needed. Append one line to `## Revision History`.
 - Re-run all reviewers after every material revision.
-- Loop until no findings or 10 iterations.
+- Loop until no findings of any severity remain or 10 iterations.
 - No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
 # Output
