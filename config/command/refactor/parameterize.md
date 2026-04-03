@@ -36,17 +36,20 @@ If no target path is provided, stop and ask for an explicit path.
 - Read each target file fully.
 - Group tests that exercise the same logic path but vary by data only.
 
-4. Choose framework-specific strategy
+4. Choose strategy per group
 - Use the existing test framework for each file.
 - Prefer native parameterisation support in that framework.
+- Apply the parameterize-vs-split rules from `TEST_PARAMETERIZATION_RULES_PATH`.
 
 5. Draft the plan (no edits)
-- For each file, list each candidate group and proposed replacement test.
-- For each proposed parameterised test, include:
+- For each file, list each candidate group and proposed replacement strategy (parameterized or split).
+- For parameterized tests, include:
   - test function name
   - case names
   - planned parameters in order
-  - parameter labels/comments style
+- For split proposals, include:
+  - shared helper name and signature
+  - individual test names
 
 6. Verification plan
 - Include exact commands to run after implementation.
@@ -101,8 +104,7 @@ After (planned):
 ```
 
 Parameter labelling (only when non-obvious):
-- Add labels directly beside `#[case]` parameters in the `After (planned)` code
-  block (for example: `#[case] include: Option<&str>, // optional glob filter`).
+- Add labels directly beside parameters in the `After (planned)` code block.
 
 Verification:
 - <command>
@@ -110,102 +112,75 @@ Verification:
 Say "go" to apply this plan, or suggest changes.
 ````
 
-## Example Output (From This Repo Style)
+## Constraints
+- Keep the plan implementation-ready and concrete.
+- Keep behaviour and coverage at least equivalent.
+
+## Example Output
 
 ````markdown
 Proposed Parameterisation Plan
 
 Targets:
-- llm-coding-tools-core/src/tools/grep.rs
-- llm-coding-tools-core/src/path/allowed.rs
+- src/math.rs
 
 ## Parameterisation Summary
 | Metric | Value |
 |---|---:|
-| Files in scope | 2 |
-| Test functions (before) | 14 |
-| Test functions (after) | 9 |
-| Net change | -5 |
-| Parameterised test functions | 4 |
-| Named cases added | 13 |
+| Files in scope | 1 |
+| Test functions (before) | 3 |
+| Test functions (after) | 1 |
+| Net change | -2 |
+| Parameterised test functions | 1 |
+| Named cases added | 3 |
 | Coverage intent | Equal or better |
 
 ## File Delta
 | File | Before | After | Main change |
 |---|---:|---:|---|
-| tools/grep.rs | 6 | 5 | grouped repetitive search and edge-case checks |
-| path/allowed.rs | 8 | 4 | grouped valid resolution and traversal rejection checks |
+| math.rs | 3 | 1 | grouped sign-check tests by data variation |
 
 ## Changes (Diff-Ready, All Files)
 
-### llm-coding-tools-core/src/tools/grep.rs
+### src/math.rs
 Group:
-- Basic search behaviour tests with the same setup but different data.
+- Sign-check tests with identical logic, differing only in input/expected.
 
 Before:
 ```rust
 #[test]
-fn grep_finds_matches() { ... }
+fn absolute_value_should_flip_negative() { ... }
 
 #[test]
-fn grep_respects_glob_filter() { ... }
+fn absolute_value_should_keep_zero() { ... }
+
+#[test]
+fn absolute_value_should_keep_positive() { ... }
 ```
 
 After (planned):
 ```rust
 #[rstest]
-#[case::single_file_no_filter(
-    vec![("match.txt", "hello world")], // files: 1 file with 1 match
-    "hello",                            // pattern: matches 1 place
-    None::<&str>,                       // filter: none (search all)
-    1,                                  // expected: 1 file matched
-    1                                   // expected: 1 total match
+#[case::negative_should_flip(
+    -5,  // input: negative value
+    5    // expected: sign flipped
 )]
-#[case::glob_filters_to_rs_only(
-    vec![("match.rs", "hello"), ("match.txt", "hello")], // files: 2 files
-    "hello",                                             // pattern: matches 1+1 places
-    Some("*.rs"),                                        // filter: only .rs files
-    1,                                                   // expected: 1 file matched
-    1                                                    // expected: 1 total match
+#[case::zero_should_be_unchanged(
+    0, // input: zero
+    0  // expected: no change
 )]
-fn grep_search_finds_expected_matches(
-    #[case] files: Vec<(&str, &str)>,
-    #[case] pattern: &str,
-    #[case] include: Option<&str>, // optional glob filter
-    #[case] expected_file_count: usize, // files with at least one match
-    #[case] expected_match_count: usize, // total matches across files
-) { ... }
-```
-
-### llm-coding-tools-core/src/path/allowed.rs
-Group:
-- Path resolution tests with identical resolver setup and assertion style.
-
-Before:
-```rust
-#[test] fn resolves_relative_path_in_allowed_dir() { ... }
-#[test] fn resolves_nested_path() { ... }
-#[test] fn allows_non_existent_path_for_write() { ... }
-```
-
-After (planned):
-```rust
-#[rstest]
-#[case::existing_file_in_root("file.txt", "file.txt")]  // exists: setup_test_dir()
-#[case::nested_existing_file("subdir/nested.txt", "nested.txt")]  // exists: setup
-#[case::new_file_in_root("new_file.txt", "new_file.txt")]  // does NOT exist
-fn resolves_valid_paths_successfully(
-    #[case] input_path: &str,
-    #[case] expected_filename: &str, // expected suffix after resolution
+#[case::positive_should_be_unchanged(
+    7, // input: positive value
+    7  // expected: no change
+)]
+fn absolute_value_should_return_expected(
+    #[case] input: i32,
+    #[case] expected: i32,
 ) { ... }
 ```
 
 Verification:
-- bash /home/sewer/Project/llm-coding-tools/src/.cargo/verify.sh
+- cargo test
 
 Say "go" to apply this plan, or suggest changes.
 ````
-
-## Constraints
-- Keep the plan implementation-ready and concrete.
-- Keep behaviour and coverage at least equivalent.

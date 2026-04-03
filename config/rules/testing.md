@@ -7,3 +7,8 @@ Use these rules when the task requires tests.
 - Reuse existing test helpers; extract shared helpers only when they reduce repetition or clarify setup across multiple tests.
 - Keep tests deterministic; avoid real I/O, time, and network unless controlled, seeded, or frozen.
 - When one behavior needs multiple similar cases, follow `test-parameterization.md` for naming, labels, and case structure.
+- Name tests as behavioral claims: `subject_should_expectation_when_condition`. Use the language's standard identifier style.
+- Omit the `when` clause for simple cases; include it for conditional or edge-case behavior.
+- Drop redundant prefixes (`test_`, `rule_`) when the module already provides context.
+- Group related tests with lightweight section comments (e.g. `// --- section ---`).
+- Order: construction → core behavior → edge cases → convenience.
