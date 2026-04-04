@@ -2,6 +2,10 @@
 node_modules/
 bun.lockb
 
+# Lockfile for user config not needed.
+package-lock.json
+opencode.json.tui-migration.bak
+
 # TypeScript cache
 *.tsbuildinfo
 
