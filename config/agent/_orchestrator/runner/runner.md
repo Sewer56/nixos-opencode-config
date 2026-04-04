@@ -89,10 +89,11 @@ Inputs:
 - `prompt_path`
 - `plan_path`
 - `ledger_path` when `ledger_path` already exists
+- Nothing else.
 
 Notes:
 - Reviewers read fixed rule paths directly. Do not pass rule file paths as inputs.
-- Runner writes the canonical ledger.
+- Runner writes the canonical ledger, use it for any extra info.
 
 Aggregation:
 - Parse all REVIEW PACKET outputs.
