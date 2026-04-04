@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates test execution, compilation, and coverage integrity
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: zai-coding-plan/glm-5.1
 permission:
   "*": deny
   read:
