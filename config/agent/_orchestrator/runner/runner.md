@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Orchestrates a single prompt end-to-end with specialist reviewers
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: fireworks-ai/accounts/fireworks/routers/glm-5-fast
 permission:
   "*": deny
   read:
@@ -200,14 +200,14 @@ Status: APPROVED | FAILED
 Iterations: <n>
 
 ### Specialist Findings Summary
-| Reviewer | Decision | Blocking | Advisory |
-|----------|----------|----------|----------|
-| Correctness (GPT-5) | PASS/BLOCKING/ADVISORY | X | Y |
-| Correctness (GLM) | PASS/BLOCKING/ADVISORY | X | Y |
-| Documentation | PASS/BLOCKING/ADVISORY | X | Y |
-| Economy | PASS/BLOCKING/ADVISORY | X | Y |
-| Test Design | PASS/BLOCKING/ADVISORY | X | Y |
-| Performance | PASS/BLOCKING/ADVISORY | X | Y |
+| Reviewer            | Decision               | Blocking | Advisory |
+| ------------------- | ---------------------- | -------- | -------- |
+| Correctness (GPT-5) | PASS/BLOCKING/ADVISORY | X        | Y        |
+| Correctness (GLM)   | PASS/BLOCKING/ADVISORY | X        | Y        |
+| Documentation       | PASS/BLOCKING/ADVISORY | X        | Y        |
+| Economy             | PASS/BLOCKING/ADVISORY | X        | Y        |
+| Test Design         | PASS/BLOCKING/ADVISORY | X        | Y        |
+| Performance         | PASS/BLOCKING/ADVISORY | X        | Y        |
 
 ## Implementation
 Coder: @_orchestrator/runner/code/coder
@@ -219,11 +219,11 @@ Status: PASS | FAIL
 Iterations: <n>
 
 ### Specialist Findings Summary
-| Reviewer | Decision | Blocking | Advisory |
-|----------|----------|----------|----------|
-| Sanity (GPT-5) | PASS/BLOCKING/ADVISORY | X | Y |
-| Sanity (GLM) | PASS/BLOCKING/ADVISORY | X | Y |
-| Test Integrity | PASS/BLOCKING/ADVISORY | X | Y |
+| Reviewer       | Decision               | Blocking | Advisory |
+| -------------- | ---------------------- | -------- | -------- |
+| Sanity (GPT-5) | PASS/BLOCKING/ADVISORY | X        | Y        |
+| Sanity (GLM)   | PASS/BLOCKING/ADVISORY | X        | Y        |
+| Test Integrity | PASS/BLOCKING/ADVISORY | X        | Y        |
 
 ## Unmet Requirements
 - REQ-###: <reason> | File: PROMPT-REQUIREMENTS-UNMET.md
