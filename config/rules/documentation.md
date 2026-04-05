@@ -12,6 +12,7 @@
 ## Required Docs
 - Public APIs/exports: purpose. Document parameters.
 - Non-trivial public APIs: add returns, failure behavior, examples when helpful.
+- Any API that can return errors: an `# Errors` section listing each error variant/type and the conditions that trigger it.
 - Non-trivial private APIs: purpose plus non-obvious parameters, returns, side effects, invariants.
 - Trivial private APIs: no full docs needed.
 - If examples requested: add to in-code API docs, not just package docs.
@@ -25,7 +26,7 @@
 
 ## Style
 - Lead with a one-sentence purpose in plain language.
-- For sectioned function and method docs, use this order: short summary, `Arguments`, `Returns`, then `Examples`.
+- For sectioned function and method docs, use this order: short summary, `Arguments`, `Returns`, `Errors`, then `Examples`.
 - Prefer goal-oriented phrasing over implementation terms.
 - Avoid jargon: no "materialization", "JIT", "framework-agnostic", "deterministic resolution", etc.
 - Keep examples practical and minimal.
@@ -42,6 +43,12 @@
 ///
 /// # Returns
 /// - [`PathGroups`]: Split file paths and explicit directory paths.
+///
+/// # Errors
+/// - Returns [`Error::InvalidPath`] when `paths` contains entries that
+///   are not valid relative to the installer root.
+///
+/// [`Error::InvalidPath`]: crate::path::Error::InvalidPath
 ///
 /// # Examples
 /// ```rust
