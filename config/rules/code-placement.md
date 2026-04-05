@@ -13,4 +13,6 @@
 - Put shared behavior in the lowest shared package that owns it.
 - Keep extension, adapter, middleware, and integration packages focused on wiring and package-specific behavior.
 - When ownership is unclear, place in the package that others depend on.
-- Order declarations most-public to most-private; callers before callees.
+- Order declarations most-public to most-private.
+- Within each visibility tier, place callers before callees (reading order).
+- Place the entry point first; then helpers in call sequence.
