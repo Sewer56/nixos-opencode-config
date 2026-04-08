@@ -20,7 +20,7 @@ Use these rules when adding, moving, or renaming modules, files, types, or funct
 ### Ordering
 - Order declarations most-public to most-private.
 - Within each visibility tier, place callers before callees (reading order).
-- Place the entry point first; then helpers in call sequence.
+- Place the structs and entry point first; then helpers in call sequence.
 
 ### Example
 
