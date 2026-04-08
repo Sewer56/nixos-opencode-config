@@ -1,37 +1,31 @@
 ## Documentation Rules
 
-## Scope
-- In changed scope, document public APIs and exports (Rust: `pub` and `pub(crate)` items).
-- In changed scope, document non-trivial private APIs.
-- When both package-level docs (`README.md` or nearest usage doc) and in-code API docs exist in changed scope, update both.
-- If a change materially alters a module/file boundary, refresh module/file docs.
-- Update existing documentation as needed.
-- Do not remove existing documentation unless it is incorrect or no longer applies.
-- When moving or renaming documented items, preserve or replace the affected docs.
+Use these rules when writing or updating documentation in changed scope.
 
-## Required Docs
-- Public APIs/exports: purpose. Document parameters.
+### Required Docs
+- Public APIs (`pub`, `pub(crate)`): purpose and parameters.
 - Non-trivial public APIs: add returns, failure behavior, examples when helpful.
-- Any API that can return errors: an `# Errors` section listing each error variant/type and the conditions that trigger it.
+- Error-returning APIs: `# Errors` section listing each variant/type and trigger conditions.
 - Non-trivial private APIs: purpose plus non-obvious parameters, returns, side effects, invariants.
 - Trivial private APIs: no full docs needed.
-- If examples requested: add to in-code API docs, not just package docs.
 - New/changed modules: top-level docs with purpose and usage.
-- Package docs: import/usage shape; in-code docs: exported symbols.
-- If no native module docs: use nearest file-level doc block.
-- Use focused headings: `Public API`, `Arguments`, `Returns`, `Examples`, `Usage`, `Errors`, `Validation`, `Identifier Format`, `Precedence`.
-- `Public API`: list public entrypoints/types by role.
-- Reference symbols using language convention (Rust: `[`TypeName`]`).
-- Never use `ignore` fences.
 
-## Style
+### Placement & Maintenance
+- Package docs cover import/usage shape; in-code docs cover exported symbols — update both when both exist.
+- If examples requested: add to in-code API docs, not just package docs.
+- If no native module docs: use nearest file-level doc block.
+- Update existing docs when behavior changes; remove only if incorrect or inapplicable.
+- When moving or renaming documented items, preserve or replace the affected docs.
+- If a change alters module/file boundaries, refresh boundary docs.
+
+### Style
 - Lead with a one-sentence purpose in plain language.
-- For sectioned function and method docs, use this order: short summary, `Arguments`, `Returns`, `Errors`, then `Examples`.
-- Prefer goal-oriented phrasing over implementation terms.
-- Avoid jargon: no "materialization", "JIT", "framework-agnostic", "deterministic resolution", etc.
+- Section order: summary, `Arguments`, `Returns`, `Errors`, `Examples`.
+- Use focused headings (`Arguments`, `Returns`, `Errors`, `Examples`, `Usage`, `Public API`); list entrypoints by role under `Public API`.
+- Prefer goal-oriented phrasing: "split paths" not "materialize path groups", "resolve early" not "JIT resolution".
+- Reference symbols using language convention (Rust: `[`TypeName`]`).
+- Always include a language tag on fenced code blocks; never use bare `ignore` fences.
 - Keep examples practical and minimal.
-- When the doc format supports fenced examples, include a language tag (e.g., `rust`).
-- Dense but accessible.
 
 ### API Doc Example
 
@@ -45,10 +39,8 @@
 /// - [`PathGroups`]: Split file paths and explicit directory paths.
 ///
 /// # Errors
-/// - Returns [`Error::InvalidPath`] when `paths` contains entries that
-///   are not valid relative to the installer root.
-///
-/// [`Error::InvalidPath`]: crate::path::Error::InvalidPath
+/// - Returns [`Error::InvalidPath`] when `paths` contains entries not valid
+///   relative to the installer root.
 ///
 /// # Examples
 /// ```rust
@@ -57,17 +49,14 @@
 /// assert_eq!(groups.files, vec!["Pack/file.txt"]);
 /// assert_eq!(groups.directories, vec!["Pack"]);
 /// ```
-pub fn split_paths_by_kind(paths: Vec<String>) -> PathGroups {
-    PathGroups { files: Vec::new(), directories: Vec::new() }
-}
+pub fn split_paths_by_kind(paths: Vec<String>) -> PathGroups { ... }
 ```
 
-## Review Bar
-- Missing required docs is blocking.
-- When both package-level and in-code docs are in scope: missing either side is blocking.
-- Missing docs for non-trivial private APIs in changed scope is blocking.
+### Inline Readability Comments
+- In non-trivial function bodies, add a short inline comment at each logical step describing intent — a reader scanning only comments should understand the function.
+- Skip obvious steps; prefer `// Strip the search-root prefix to get a relative path` over `// check if ft is dir`.
+
+### Review Blocking Criteria
 - Docs must not contradict implementation.
-- Keep docs dense, not skeletal.
-- If examples explicitly requested: README-only is insufficient.
 - In machine plans: docs must appear in relevant snippet/diff; generic `update docs` note is insufficient.
 - Do not backfill untouched legacy files solely for docs.

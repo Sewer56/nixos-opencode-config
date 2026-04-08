@@ -59,7 +59,7 @@ Fix: <smallest concrete correction>
 ```
 
 # Constraints
-- Block for "Review Bar" violations below
+- Block for "Review Blocking Criteria" violations in the rules
 - Do not block for minor wording preferences when the required coverage is explicit and concrete.
 - Keep findings short and specific.
 

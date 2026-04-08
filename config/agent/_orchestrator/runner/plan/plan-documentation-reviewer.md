@@ -42,7 +42,7 @@ If `ledger_path` is provided, read the ledger from that path.
 
 ## 2. Documentation Review
 - Review the changed scope described by the plan.
-- Verify each relevant implementation step satisfies the "Review Bar" section below.
+- Verify each relevant implementation step satisfies the "Review Blocking Criteria" section in the rules.
 - Read only the repo files needed to ground those checks.
 
 ## 3. Blocking Criteria
@@ -89,7 +89,7 @@ Acceptance Criteria: The affected implementation step includes concrete doc snip
 ```
 
 # Constraints
-- Block for "Review Bar" violations below
+- Block for "Review Blocking Criteria" violations in the rules
 - Do not block for minor wording preferences when required coverage is already concrete
 - Keep findings short and specific.
 

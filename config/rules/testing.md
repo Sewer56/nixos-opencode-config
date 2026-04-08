@@ -12,3 +12,16 @@ Use these rules when the task requires tests.
 - Drop redundant prefixes (`test_`, `rule_`) when the module already provides context.
 - Group related tests with lightweight section comments (e.g. `// --- section ---`).
 - Order: construction → core behavior → edge cases → convenience.
+
+### Example
+
+```rust
+#[test]
+fn glob_should_return_matching_files_when_pattern_matches() { ... }
+fn glob_should_return_empty_when_pattern_matches_nothing() { ... }
+
+#[rstest]
+#[case::matches_extension("*.rs", "lib.rs", true)]
+#[case::excludes_gitignored("build/", "output.rs", false)]
+fn glob_pattern_includes_or_excludes_files(#[case] p: &str, #[case] n: &str, #[case] ok: bool) { ... }
+```

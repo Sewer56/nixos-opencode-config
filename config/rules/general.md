@@ -2,6 +2,8 @@
 
 Use these rules for planning, implementation, and review unless a more specific rules file overrides them.
 
+### Rules
+
 - Keep changes minimal; use the smallest viable diff.
 - Prefer plain code and names; avoid jargon and cleverness.
 - Use descriptive, domain-first names for modules, files, types, and functions.
@@ -15,4 +17,12 @@ Use these rules for planning, implementation, and review unless a more specific 
 - Remove dead code, unused imports, and newly-unused paths.
 - Avoid debug-only logging, temporary instrumentation, and unnecessary abstractions.
 - Avoid single-implementation abstractions (interfaces, traits, protocols) unless needed.
-- Add inline comments for non-obvious logic.
+
+### Example
+
+```diff
+- fn handle(d: &Data) { ... }
++ fn install_package(pkg: &Package) { ... }
+
+# Prefer src/package/installer.rs over src/utils/mod.rs
+```
