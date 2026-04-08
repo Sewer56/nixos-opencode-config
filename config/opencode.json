@@ -45,7 +45,7 @@
       }
     },
     "general": {
-      "model": "fireworks-ai/accounts/fireworks/routers/glm-5-fast",
+      "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "permission": {
         "task": {
           "_orchestrator/*": "deny",
@@ -101,76 +101,6 @@
         "reasoningSummary": "concise"
       }
     },
-    "synthetic": {
-      "models": {
-        "hf:Qwen/Qwen3.5-397B-A17B": {
-          "id": "hf:Qwen/Qwen3.5-397B-A17B"
-        },
-        "hf:MiniMaxAI/MiniMax-M2.5": {
-          "id": "hf:MiniMaxAI/MiniMax-M2.5"
-        },
-        "hf:zai-org/GLM-5": {
-          "id": "hf:zai-org/GLM-5",
-          "name": "GLM-5",
-          "family": "glm",
-          "release_date": "2026-03-01",
-          "last_updated": "2026-03-01",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "open_weights": true,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 192000,
-            "output": 131072
-          },
-          "modalities": {
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        }
-      }
-    },
-    "zai-coding-plan": {
-      "models": {
-        "glm-5-turbo": {
-          "id": "glm-5-turbo",
-          "name": "GLM-5-Turbo",
-          "family": "glm",
-          "release_date": "2026-02-11",
-          "last_updated": "2026-02-11",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "open_weights": true,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 204800,
-            "output": 131072
-          },
-          "modalities": {
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        }
-      }
-    },
     "fireworks-ai": {
       "models": {
         "accounts/fireworks/routers/glm-5-fast": {
@@ -202,41 +132,6 @@
     "github-copilot": {
       "options": {
         "reasoningSummary": "concise"
-      },
-      "models": {
-        "gpt-5.3-codex": {
-          "id": "gpt-5.3-codex",
-          "name": "GPT-5.3-Codex",
-          "family": "gpt-codex",
-          "release_date": "2026-02-05",
-          "last_updated": "2026-02-05",
-          "attachment": true,
-          "reasoning": true,
-          "temperature": false,
-          "knowledge": "2025-08-31",
-          "tool_call": true,
-          "structured_output": true,
-          "open_weights": false,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 400000,
-            "input": 272000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image",
-              "pdf"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        }
       }
     }
   },
