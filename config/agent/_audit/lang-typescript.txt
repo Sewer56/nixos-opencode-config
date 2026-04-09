@@ -1,0 +1,25 @@
+TypeScript/JavaScript-specific enumeration and visibility rules.
+
+# What to Enumerate
+
+| Enumerate | Skip |
+|-----------|------|
+| `export` keyword or `declare` in `.d.ts` | no `export` (file-scoped) |
+
+# Module Boundary
+
+Directory containing `package.json`.
+
+# Re-export Detection
+
+- `export * from 'module'`
+- `export { item } from 'module'`
+- Re-exporting `index.ts`/`index.js` files
+
+# Qualified Path Matching
+
+`import { item } from 'module'` or `module.item`
+
+# Test Patterns
+
+`*.test.ts`, `*.spec.ts`, `__tests__/`

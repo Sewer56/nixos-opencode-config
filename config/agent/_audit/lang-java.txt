@@ -1,0 +1,27 @@
+Java-specific enumeration and visibility rules.
+
+# What to Enumerate
+
+| Enumerate | Skip |
+|-----------|------|
+| `public`, `protected`, or no modifier (package-private) | `private` |
+
+# Module Boundary
+
+Source root matching the package declaration.
+
+# Re-export Detection
+
+Java does not have re-exports. Public items are accessible via import.
+
+# Qualified Path Matching
+
+`org.pkg.Class.item` or `import org.pkg.Class.item`
+
+# Test Patterns
+
+`*Test.java`
+
+# Reflection Access
+
+Items accessed via `Class.forName("Name")` or `getMethod("name")` may be effectively public even with zero compile-time external usages.

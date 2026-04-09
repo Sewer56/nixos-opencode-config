@@ -1,0 +1,31 @@
+Rust-specific enumeration and visibility rules.
+
+# What to Enumerate
+
+| Enumerate | Skip |
+|-----------|------|
+| bare `pub`, `pub(crate)`, `pub(super)`, `pub(in ...)` | no visibility keyword or `pub(self)` (fully private) |
+
+# Module Boundary
+
+Directory containing `Cargo.toml` (workspace member root).
+
+# Re-export Detection
+
+`pub use item;` — item is re-exported.
+
+# Qualified Path Matching
+
+`module::item` or `crate::module::item`.
+
+# Import-only Detection
+
+A `use crate::module::Item;` statement with no subsequent reference to `Item` in the same file is import-only. Count separately, does not contribute to usage totals.
+
+# Test Patterns
+
+`#[cfg(test)]` modules, `#[test]` functions, `tests/` directory (integration tests), `*_test.rs` files.
+
+# Doc Hidden
+
+Items annotated with `#[doc(hidden)]` are intentionally hidden from documentation. Append `[doc(hidden)]` to the Visibility field value (e.g. `pub [doc(hidden)]`, `pub(crate) [doc(hidden)]`).

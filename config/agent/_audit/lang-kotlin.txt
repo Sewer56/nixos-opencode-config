@@ -1,0 +1,32 @@
+Kotlin-specific enumeration and visibility rules.
+
+# What to Enumerate
+
+| Enumerate | Skip |
+|-----------|------|
+| `public`, `protected`, `internal`, or no modifier (public by default) | `private` |
+
+Record items with no explicit modifier as visibility `public`.
+
+# Module Boundary
+
+Directory containing `build.gradle` or `build.gradle.kts` (Gradle module root). `internal` is scoped to the compilation module, not the package.
+
+# Re-export Detection
+
+`public fun`/`public val` that delegate to internal items are re-exports.
+
+# Qualified Path Matching
+
+`org.pkg.Class.item` or `import org.pkg.Class.item`
+
+# Test Patterns
+
+`*Tests.kt`
+
+# Cross-Module `internal` Usage
+
+An `internal` item used from a different Gradle module is either:
+- Dead code (unused import)
+- Architecture violation (compiler would reject)
+Classify as `review` — not a privatization candidate.

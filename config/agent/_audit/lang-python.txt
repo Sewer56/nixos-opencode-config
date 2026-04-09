@@ -1,0 +1,27 @@
+Python-specific enumeration and visibility rules.
+
+# What to Enumerate
+
+| Enumerate | Skip |
+|-----------|------|
+| In `__all__` OR non-`_`-prefixed at module scope | `_`-prefixed |
+
+# Module Boundary
+
+Directory containing `__init__.py`.
+
+# Re-export Detection
+
+`__init__.py` re-imports: `from .module import Name` — Name is re-exported to package consumers.
+
+# Qualified Path Matching
+
+`from module import item`, `module.Item`, `module.function_name`
+
+# Test Patterns
+
+`test_*.py`, `tests/`
+
+# Special Case
+
+References in `__init__.py` at the module root that re-export an item (via `from .module import Name`) count as **external-facing** for both enumeration and cross-reference. During cross-reference classification, treat such `__init__.py` references as "External" (not "Internal non-test") because they expose the item to package consumers outside the module.

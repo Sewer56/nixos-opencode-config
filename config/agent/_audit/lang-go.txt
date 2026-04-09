@@ -1,0 +1,27 @@
+Go-specific enumeration and visibility rules.
+
+# What to Enumerate
+
+| Enumerate | Skip |
+|-----------|------|
+| First letter capitalized | lowercase first letter |
+
+# Special Case
+
+Items in `internal/` directories are compiler-enforced module-private regardless of capitalization. **Skip all items in `internal/`.**
+
+# Module Boundary
+
+Each directory containing `.go` files with the same `package` clause is one package. Cross-reference boundaries are per-package: files in a different package (even under the same `go.mod`) are external. An exported item used by another package must remain exported — Go has no narrower scope.
+
+# Re-export Detection
+
+Go does not have re-exports. Public items are accessible via import.
+
+# Qualified Path Matching
+
+`pkgname.Identifier` or `recv.Method`
+
+# Test Patterns
+
+`*_test.go`

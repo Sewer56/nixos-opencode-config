@@ -23,6 +23,7 @@
     "plan": {
       "permission": {
         "task": {
+          "_audit/*": "deny",
           "_orchestrator/*": "deny",
           "_plan/reviewers/*": "deny",
           "_implement/*": "deny",
@@ -35,6 +36,7 @@
     "build": {
       "permission": {
         "task": {
+          "_audit/*": "deny",
           "_orchestrator/*": "deny",
           "_plan/reviewers/*": "deny",
           "_implement/*": "deny",
@@ -48,6 +50,7 @@
       "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
       "permission": {
         "task": {
+          "_audit/*": "deny",
           "_orchestrator/*": "deny",
           "_plan/reviewers/*": "deny",
           "_implement/*": "deny",

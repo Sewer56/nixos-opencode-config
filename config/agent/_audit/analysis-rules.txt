@@ -1,0 +1,84 @@
+Shared classification rules, restriction hint mapping, report format, and CLI summary. Read this file after the gate step and before classification.
+
+# Classify
+
+Before evaluating the decision table, gather evidence per item for each override condition. For each item, check all that apply:
+
+- **Re-exports** (rule 1): grep for `pub use` (Rust), `export.*from`/`export *` (TypeScript), `__init__.py` re-imports (Python), re-exporting index files, `public fun`/`public val` delegating to internal items (Kotlin).
+- **Doc contract** (rule 2): read the item's doc comments for API guarantees or `# API` sections.
+- **Derive macros** (rule 3): check if the item is a field on a struct/enum with derive attributes that access fields or generate public methods.
+- **Trait impl** (rule 4): check if the item appears in `impl Trait for Type` where the type is not fully private.
+- **Binary/FFI** (rule 5): grep binary targets, examples, and FFI bindings for the item.
+- **Reflection/DI** (rule 6): grep for `getattr`, `Class.forName`, `getMethod`, Spring wiring by string name.
+
+Rules are evaluated top-to-bottom; first match wins.
+
+| # | Condition | Decision |
+|---|-----------|----------|
+| 1 | Re-exported by another module's public API | **KEEP PUBLIC** |
+| 2 | Documented as public API contract (doc comments indicating external use, `# API` sections) | **KEEP PUBLIC** |
+| 3 | Required by a derive macro on a non-fully-private type — any derive that accesses fields or generates public accessor methods requires field visibility ≥ type visibility (including but not limited to: `Serialize`, `Deserialize`, any `serde` derive, `JsonSchema`, `TypeJson`, `FromPyObject`, `IntoPyObject`, `pyclass`, `pymethods`, any `pyo3` derive, `QueryFragment`, `derive_builder`, `typed_builder`, `strum`, `prost`, `tonic`, `diesel`, `sqlx`) | **KEEP PUBLIC** |
+| 4 | Part of a trait implementation on a non-fully-private type (visibility must satisfy the trait contract) | **KEEP PUBLIC** |
+| 5 | Referenced in a binary, example, or FFI binding outside the module | **KEEP PUBLIC** |
+| 6 | Accessed via reflection/string reference or DI container wiring (real runtime usage invisible to grep — e.g. `getattr(obj, "name")`, `Class.forName("Name")`, `obj.getClass().getMethod("name")`, Spring XML/annotations resolving by string name) | **KEEP PUBLIC** |
+| 7 | Collector's Visibility field contains `doc(hidden)` — author has flagged as intentionally hidden from documentation | **MANUAL REVIEW** |
+| 8 | Collector says `candidate-medium` AND used only in code-generated files (look for `Code generated`, `@generated`, `DO NOT EDIT` headers) | **CANDIDATE LOW** |
+| 9 | Collector says `candidate-high` | **CANDIDATE HIGH** |
+| 10 | Collector says `candidate-medium` | **CANDIDATE MEDIUM** |
+| 11 | Collector says `review` | **MANUAL REVIEW** |
+| 12 | Collector says `keep-public` | **KEEP PUBLIC** |
+
+The decision table is the sole authority for initial classification. Rules 1–6 promote an item to KEEP PUBLIC; rule 7 marks doc-hidden items for review; rule 8 demotes from MEDIUM to LOW; rule 12 confirms the collector's `keep-public` when no override applies. After the decision table produces an initial classification, apply the restriction hint override: if restriction hint is `none` AND the table outcome is not **KEEP PUBLIC**, reclassify the item as **MANUAL REVIEW** (no specific visibility change can be recommended). KEEP PUBLIC items are correctly public regardless of restriction hint.
+
+For every candidate, use the collector's Restriction Hint to determine the target visibility in the diff:
+
+- `can-be-private` → remove visibility keyword entirely (Rust: remove `pub`/`pub(crate)`; TS: remove `export`; Python: add `_` prefix or remove from `__all__`; Go: lowercase first letter; Java: change to `private`; Kotlin: change to `private`)
+- `can-be-package-private` → remove `public`/`protected` keyword, leaving default access (Java only)
+- `can-be-internal` → add `internal` modifier (Kotlin only)
+- `can-be-pub-super` → `pub(super)` (Rust only)
+- `can-be-pub-in(<path>)` → `pub(in <path>)` using the path from the collector's hint (Rust only)
+- `none` → item needs its current scope but is still over-exposed compared to external demand; the restriction hint override above reclassifies these as MANUAL REVIEW
+
+# Report
+
+Write `API-AUDIT.md` to the repository root with these sections in order:
+
+**Summary** - one block: scope (`<scope_value>`), languages, modules audited, total public items, candidate counts by confidence (high / medium / low), correctly public count, needs review count.
+
+**Privatization Candidates** - one subsection per item. Number sequentially starting from `API-001`, ordered by confidence (High before Medium before Low):
+
+```
+### [API-NNN] `item_name` - <confidence>
+- File: path:line
+- Language: ...
+- Visibility: current keyword
+- External Usages: count (detail)
+- Used In Tests Only: yes/no
+- Reason: one sentence
+
+Diff:
+(unified diff - the exact source line before and after the visibility change)
+```
+
+**Correctly Public Items** - bullet list: `` `item_name` - reason (path:line) ``
+
+**Needs Manual Review** - bullet list: `` `item_name` - why ambiguous (path:line) ``
+
+**Module Breakdown** - table: Module | Language | Public Items | Candidates | High Confidence
+
+# CLI Summary
+
+Print after writing:
+
+```
+Audited: <scope_line>
+Public items: N
+Privatization candidates: N (High: X, Medium: Y, Low: Z)
+Correctly public: N
+
+Top candidates:
+  API-001: item_name (path:line) - High
+  ...
+
+Full report: ./API-AUDIT.md
+```
