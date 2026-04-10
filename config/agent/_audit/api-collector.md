@@ -70,7 +70,9 @@ If qualified-path matching discards all matches for a short/generic name but the
 
 ## 3. Return
 
-Output one block per item, then one summary block.
+Output is a single contiguous response containing, in order: (1) per-item blocks, then (2) the summary block. Both sections must appear in the same response — never emit one without the other.
+
+Do **not** emit per-item blocks for `Preliminary: keep-public` items. Omit them entirely; report only their count in the summary. Emit per-item blocks only for candidates and `review` items.
 
 ### Per-item block
 
@@ -121,6 +123,7 @@ Language: <language>
 Tool Used: <cargo-public-api | grep>
 Tool Available: yes (cargo-public-api succeeded) | no (cargo-public-api failed or not installed) | n/a (non-Rust language)
 Total Public Items: <count>
+Keep Public (not returned): <count>
 Zero External Usage: <count>
 Test-only External usage: <count>
 Enumeration: full | truncated (<enumerated> of <total> items)

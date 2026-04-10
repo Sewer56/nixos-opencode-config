@@ -26,9 +26,8 @@ Rules are evaluated top-to-bottom; first match wins.
 | 9 | Collector says `candidate-high` | **CANDIDATE HIGH** |
 | 10 | Collector says `candidate-medium` | **CANDIDATE MEDIUM** |
 | 11 | Collector says `review` | **MANUAL REVIEW** |
-| 12 | Collector says `keep-public` | **KEEP PUBLIC** |
 
-The decision table is the sole authority for initial classification. Rules 1–6 promote an item to KEEP PUBLIC; rule 7 marks doc-hidden items for review; rule 8 demotes from MEDIUM to LOW; rule 12 confirms the collector's `keep-public` when no override applies. After the decision table produces an initial classification, apply the restriction hint override: if restriction hint is `none` AND the table outcome is not **KEEP PUBLIC**, reclassify the item as **MANUAL REVIEW** (no specific visibility change can be recommended). KEEP PUBLIC items are correctly public regardless of restriction hint.
+The decision table is the sole authority for initial classification. Rules 1–6 promote an item to KEEP PUBLIC; rule 7 marks doc-hidden items for review; rule 8 demotes from MEDIUM to LOW. After the decision table produces an initial classification, apply the restriction hint override: if restriction hint is `none` AND the table outcome is not **KEEP PUBLIC**, reclassify the item as **MANUAL REVIEW** (no specific visibility change can be recommended). KEEP PUBLIC items are correctly public regardless of restriction hint.
 
 For every candidate, use the collector's Restriction Hint to determine the target visibility in the diff:
 
@@ -43,7 +42,7 @@ For every candidate, use the collector's Restriction Hint to determine the targe
 
 Write `API-AUDIT.md` to the repository root with these sections in order:
 
-**Summary** - one block: scope (`<scope_value>`), languages, modules audited, total public items, candidate counts by confidence (high / medium / low), correctly public count, needs review count.
+**Summary** - scope, languages, modules, total public items, candidates by confidence (high/medium/low), correctly public (including collector-preclassified keep-public), needs review.
 
 **Privatization Candidates** - one subsection per item. Number sequentially starting from `API-001`, ordered by confidence (High before Medium before Low):
 
@@ -60,7 +59,7 @@ Diff:
 (unified diff - the exact source line before and after the visibility change)
 ```
 
-**Correctly Public Items** - bullet list: `` `item_name` - reason (path:line) ``
+**Correctly Public Items** - items promoted to KEEP PUBLIC by rules 1–6: `` `item_name` - reason (path:line) ``. Then one count line: `N items preclassified keep-public by collector (not individually listed)`.
 
 **Needs Manual Review** - bullet list: `` `item_name` - why ambiguous (path:line) ``
 

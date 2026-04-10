@@ -61,6 +61,8 @@ Collectors cross-reference against the entire repo - not just the target paths -
 
 Wait for ALL collectors to return before proceeding. Do not begin any analysis until every collector has reported.
 
+Collector output is final — per-item blocks for candidates/review, then summary. Do not re-query or resume.
+
 # ANALYSIS
 
 ## 4. Filter

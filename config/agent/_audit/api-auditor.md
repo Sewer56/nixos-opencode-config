@@ -51,6 +51,8 @@ Per collector, pass:
 
 Wait for ALL collectors to return before proceeding. Do not begin any analysis until every collector has reported.
 
+Collector output is final — per-item blocks for candidates/review, then summary. Do not re-query or resume.
+
 # ANALYSIS
 
 ## 4. Classify
