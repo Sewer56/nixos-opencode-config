@@ -4,7 +4,7 @@ Shared classification rules, restriction hint mapping, report format, and CLI su
 
 Before evaluating the decision table, gather evidence per item for each override condition. For each item, check all that apply:
 
-- **Re-exports** (rule 1): grep for `pub use` (Rust), `export.*from`/`export *` (TypeScript), `__init__.py` re-imports (Python), re-exporting index files, `public fun`/`public val` delegating to internal items (Kotlin).
+- **Re-exports** (rule 1): grep for re-exports (`pub use`, `export.*from`, `__init__.py` re-imports, `public fun` delegating). Only count matches where the re-export site is in a **different module** than the defining module. Same-module re-exports are internal organization, not external demand.
 - **Doc contract** (rule 2): read the item's doc comments for API guarantees or `# API` sections.
 - **Derive macros** (rule 3): check if the item is a field on a struct/enum with derive attributes that access fields or generate public methods.
 - **Trait impl** (rule 4): check if the item appears in `impl Trait for Type` where the type is not fully private.

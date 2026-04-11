@@ -24,4 +24,4 @@ Directory containing `__init__.py`.
 
 # Special Case
 
-References in `__init__.py` at the module root that re-export an item (via `from .module import Name`) count as **external-facing** for both enumeration and cross-reference. During cross-reference classification, treat such `__init__.py` references as "External" (not "Internal non-test") because they expose the item to package consumers outside the module.
+References in `__init__.py` that re-export an item from a submodule within the same package (via `from .module import Name`) are **Internal non-test** — they are the package's own API surface, not external demand. Real external consumers importing the item from other packages will still appear as External usages from their own files.
