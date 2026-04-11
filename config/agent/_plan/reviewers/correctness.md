@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks machine-plan coverage, fidelity, and structure
-model: github-copilot/gpt-5.4
+model: zai-coding-plan/glm-5.1
 reasoningEffort: medium
 permission:
   "*": deny
