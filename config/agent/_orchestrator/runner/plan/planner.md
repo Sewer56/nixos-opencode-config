@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces complete implementation plans with task list and symbol map
-model: synthetic/hf:zai-org/GLM-5.1
+model: zai-coding-plan/glm-5.1
 reasoningEffort: medium
 permission:
   "*": deny

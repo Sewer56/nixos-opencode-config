@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews implementation against a machine plan
-model: fireworks-ai/accounts/fireworks/routers/glm-5-fast
+model: synthetic/hf:zai-org/GLM-5.1
 permission:
   "*": deny
   read:

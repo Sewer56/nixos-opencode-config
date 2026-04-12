@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Implements code changes and ensures all verification checks pass
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: zai-coding-plan/glm-5.1
 permission:
   "*": deny
   read:

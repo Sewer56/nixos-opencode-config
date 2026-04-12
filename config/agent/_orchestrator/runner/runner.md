@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Orchestrates a single prompt end-to-end with specialist reviewers
-model: synthetic/hf:zai-org/GLM-5.1
+model: zai-coding-plan/glm-5.1
 permission:
   "*": deny
   read:

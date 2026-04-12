@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews implementation against request intent from conversation context
-model: zai-coding-plan/glm-5.1
+model: synthetic/hf:zai-org/GLM-5.1
 permission:
   "*": deny
   read:

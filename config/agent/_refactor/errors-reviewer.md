@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews error docs plan for coverage, specificity, format, and fidelity
-model: zai-coding-plan/glm-5.1
+model: synthetic/hf:zai-org/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny
