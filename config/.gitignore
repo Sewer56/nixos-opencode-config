@@ -24,3 +24,6 @@ npm-debug.log*
 .DS_Store?
 ._*
 Thumbs.db
+
+# Prompt files
+PROMPT-*.md

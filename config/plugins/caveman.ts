@@ -15,53 +15,13 @@
  * - `CavemanPlugin` — default export, consumed by OpenCode plugin loader
  */
 import type { Plugin } from "@opencode-ai/plugin"
+import type { Event } from "@opencode-ai/sdk"
 
-/**
- * OpenCode plugin that auto-activates caveman brevity mode on every session.
- *
- * Injects the active mode's instruction string into the LLM system prompt
- * via the `experimental.chat.system.transform` hook and tracks mode changes
- * through user messages via the `event` hook.
- *
- * # Hooks
- * - `experimental.chat.system.transform` — pushes the active mode's instruction
- *   string into `output.system` on every LLM call; no-op when inactive.
- * - `event` — listens for `message.updated` events from the user to detect
- *   `/caveman [level]` commands or natural-language deactivation phrases,
- *   then updates the in-memory mode.
- */
-export const CavemanPlugin: Plugin = async () => {
-  let mode: CavemanMode | null = "full"
+/** Agents that receive caveman instructions. Others are unaffected. */
+const ALLOWED_AGENTS = new Set(["build", "plan"])
 
-  return {
-    "experimental.chat.system.transform": async (_input: unknown, output: { system: string[] }) => {
-      // Only inject instructions when a mode is active; inactive = no-op
-      if (mode && MODE_INSTRUCTIONS[mode]) {
-        output.system.push(MODE_INSTRUCTIONS[mode])
-      }
-    },
-
-    event: async ({ event }) => {
-      // Only react to user message updates
-      if (event.type !== "message.updated") return
-
-      const info = (event.properties as Record<string, unknown>).info as Record<string, unknown> | undefined
-      if (!info || info.role !== "user") return
-
-      // Extract user text from the event payload
-      const text = extractUserText({ properties: { info } } as Parameters<typeof extractUserText>[0])
-      if (!text) return
-
-      // Apply mode change or deactivation
-      const detected = detectMode(text)
-      if (detected === "off") {
-        mode = null
-      } else if (detected) {
-        mode = detected
-      }
-    },
-  }
-}
+/** Max entries in the session→agent map before oldest insertion is evicted. */
+const SESSION_MAP_MAX = 256
 
 /** Supported brevity intensity levels. */
 type CavemanMode = "lite" | "full" | "ultra"
@@ -98,6 +58,74 @@ ${SHARED}`,
 }
 
 /**
+ * OpenCode plugin that auto-activates caveman brevity mode for specific agents.
+ *
+ * Injects the active mode's instruction string into the LLM system prompt
+ * via the `experimental.chat.system.transform` hook and tracks mode changes
+ * through user messages via the `event` hook. Only injects for agents in
+ * ALLOWED_AGENTS; other agents are unaffected.
+ *
+ * # Hooks
+ * - `chat.message` — records the session→agent mapping when a user message
+ *   arrives, before the system prompt is built. This ensures the agent is
+ *   known by the time `system.transform` runs, preserving prompt caching.
+ * - `experimental.chat.system.transform` — pushes the active mode's instruction
+ *   string into `output.system` on every LLM call; no-op when inactive or
+ *   the calling agent is not in the allowlist.
+ * - `event` — listens for `message.updated` events from the user to detect
+ *   `/caveman [level]` commands or natural-language deactivation phrases,
+ *   then updates the in-memory mode.
+ */
+export const CavemanPlugin: Plugin = async () => {
+  let mode: CavemanMode | null = "full"
+  const sessionAgent = new Map<string, string>()
+
+  return {
+    "chat.message": async (input: Record<string, unknown>) => {
+      const sid = input.sessionID as string | undefined
+      const agent = input.agent as string | undefined
+      if (sid && agent) {
+        if (sessionAgent.size >= SESSION_MAP_MAX) {
+          const oldest = sessionAgent.keys().next().value
+          if (oldest !== undefined) sessionAgent.delete(oldest)
+        }
+        sessionAgent.set(sid, agent)
+      }
+    },
+
+    "experimental.chat.system.transform": async (
+      _input: unknown,
+      output: { system: string[] },
+    ) => {
+      if (!mode) return
+
+      const input = _input as { sessionID?: string }
+      const agent = input.sessionID ? sessionAgent.get(input.sessionID) : undefined
+      if (!agent || !ALLOWED_AGENTS.has(agent)) return
+
+      output.system.push(MODE_INSTRUCTIONS[mode])
+    },
+
+    event: async ({ event }: { event: Event }) => {
+      if (event.type !== "message.updated") return
+
+      const info = (event.properties as Record<string, unknown>).info as Record<string, unknown> | undefined
+      if (!info || info.role !== "user") return
+
+      const text = extractUserText({ properties: { info } })
+      if (!text) return
+
+      const detected = detectMode(text)
+      if (detected === "off") {
+        mode = null
+      } else if (detected) {
+        mode = detected
+      }
+    },
+  } as unknown as Awaited<ReturnType<Plugin>>
+}
+
+/**
  * Extract plain text from a user message event payload.
  *
  * Tries `info.parts` (structured parts array) first, then falls back to
@@ -106,20 +134,18 @@ ${SHARED}`,
  * # Returns
  * - Concatenated text from all text-type parts, or empty string.
  */
-function extractUserText(event: { properties: { info: { role: string } & Record<string, unknown> } }): string {
-  const info = event.properties.info as Record<string, unknown>
-  if (!info || info.role !== "user") return ""
+function extractUserText(event: { properties: { info: Record<string, unknown> } }): string {
+  const info = event.properties.info
+  if (info.role !== "user") return ""
 
-  // Try structured parts first (standard OpenCode event shape)
   const parts = info.parts as Array<{ type: string; text?: string }> | undefined
   if (parts) {
     return parts
       .filter((p) => p.type === "text" && typeof p.text === "string")
-      .map((p) => p.text!)
+      .map((p) => p.text as string)
       .join(" ")
   }
 
-  // Fallback: raw content field
   const content = info.content
   if (typeof content === "string") return content
   if (Array.isArray(content)) {
@@ -142,10 +168,9 @@ function extractUserText(event: { properties: { info: { role: string } & Record<
  */
 function detectMode(text: string): CavemanMode | "off" | null {
   const trimmed = text.trim()
-  // Check explicit level before bare `/caveman` so `/caveman lite` doesn't fall through.
   if (/^\/caveman\s+lite\b/i.test(trimmed)) return "lite"
   if (/^\/caveman\s+ultra\b/i.test(trimmed)) return "ultra"
-  if (/^\/caveman(?:\s|$)/i.test(trimmed)) return "full"
-  if (/\b(stop caveman|normal mode|caveman off|disable caveman)\b/i.test(text)) return "off"
+  if (/^\/caveman$/i.test(trimmed)) return "full"
+  if (/(?:^|\s)(stop caveman|normal mode|caveman off|disable caveman)(?:\s|$)/i.test(text)) return "off"
   return null
 }
