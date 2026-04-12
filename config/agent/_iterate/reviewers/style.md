@@ -11,6 +11,8 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
+  edit:
+    "*PROMPT-ITERATE.review-style.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -33,6 +35,13 @@ Review finalized iteration artifacts for instruction style quality.
 - Self-contained: each revision item usable without cross-referencing other files or external docs. Inline schemas, types, formats. Do not write "see the documentation" or "refer to the rules file".
 - Output format pinned: when a revision prescribes structured output, specify the exact format in a fenced code block with `text` language tag. Never use `json`, `yaml`, or other language tags for plain structured output — always `text`.
 
+# Process
+- Read `PROMPT-ITERATE.review-style.md` if it exists. Treat missing or malformed cache as empty.
+- Read `## Delta` from `handoff_path`.
+- Skip re-evaluating Verified items that are Unchanged in Delta.
+- Re-evaluate Changed and New items. Re-evaluate own Open items from cache. Check Open→Resolved transitions.
+- Write updated cache to `PROMPT-ITERATE.review-style.md` after review.
+
 # Output
 
 ```text
@@ -48,6 +57,9 @@ Evidence: <section, `path:line`, or field>
 Problem: <what violates the style criterion>
 Fix: <smallest concrete correction>
 
+## Verified
+- <REV-###>: <item description — unchanged items that remain verified>
+
 ## Notes
 - <optional short notes>
 ```
@@ -56,4 +68,4 @@ Fix: <smallest concrete correction>
 - Block for persistent imperative-voice violations, missing negative examples where they matter, unpinned output formats, or instruction language that leads with prohibitions instead of actions.
 - Do not block for minor wording when instructions are already imperative, positive-framing, and self-contained.
 - Keep findings short and specific.
-- Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
+- Follow the `# Process` section for cache, Delta, and skip handling.

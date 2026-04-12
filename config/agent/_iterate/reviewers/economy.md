@@ -11,6 +11,8 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
+  edit:
+    "*PROMPT-ITERATE.review-economy.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -34,6 +36,13 @@ Review finalized iteration artifacts for token density and minimality.
 - Diff quality: flag incomplete diffs, diffs that restate unchanged content from `context_path`, or diffs that could be expressed more compactly.
 - Cross-document redundancy: flag when an artifact re-states information available in another artifact or referenced file (all pairwise: context↔handoff, context↔machine, handoff↔machine, machine↔targets). Prefer referencing by section name or file path over re-quoting content.
 
+# Process
+- Read `PROMPT-ITERATE.review-economy.md` if it exists. Treat missing or malformed cache as empty.
+- Read `## Delta` from `handoff_path`.
+- Skip re-evaluating Verified items that are Unchanged in Delta.
+- Re-evaluate Changed and New items. Re-evaluate own Open items from cache. Check Open→Resolved transitions.
+- Write updated cache to `PROMPT-ITERATE.review-economy.md` after review.
+
 # Output
 
 ```text
@@ -49,6 +58,9 @@ Evidence: <section, `path:line`, or field>
 Problem: <what is unnecessarily verbose or redundant>
 Fix: <smallest simplification>
 
+## Verified
+- <REV-###>: <item description — unchanged items that remain verified>
+
 ## Notes
 - <optional short notes>
 ```
@@ -57,4 +69,4 @@ Fix: <smallest simplification>
 - Block only when revision instructions clearly exceed what the confirmed context requires.
 - Do not block for concise but complete instructions.
 - Keep findings short and specific.
-- Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
+- Follow the `# Process` section for cache, Delta, and skip handling.

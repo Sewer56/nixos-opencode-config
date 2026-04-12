@@ -61,13 +61,13 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - Each REV item uses one or more diff blocks grounded in the current file state. Frontmatter and content are different regions of the same file — combine into a single diff block when contiguous, use multiple blocks when scattered. Cover only changes needed — omit restatements of unchanged content. Write `machine_path` using the `# Templates` section below.
 
 ## 5. Run the review loop
+- Write `## Delta` to `handoff_path` before spawning reviewers. Delta lists each REV item as Unchanged, Changed, or New relative to the prior machine artifact.
 - After each full machine-artifact draft, run these reviewers in parallel, passing `context_path`, `handoff_path`, and `machine_path` to each:
   - `@_iterate/reviewers/correctness`
   - `@_iterate/reviewers/economy`
   - `@_iterate/reviewers/style`
-- Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
+- Update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files.
 - Apply domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; STYLE → style reviewer. Arbitrate cross-domain conflicts.
-- Do not reopen RESOLVED issues without new concrete evidence.
 - Revise `machine_path` only where needed. Append one line to `## Revision History`.
 - Re-run all reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
@@ -138,21 +138,11 @@ Source Context: <absolute path to `PROMPT-ITERATE.md`>
 - In scope: <what this iteration covers>
 - Out of scope: <what this iteration intentionally leaves alone>
 
+## Delta
+- REV-###: Unchanged | Changed | New
+
 ## Review Ledger
 Updated: <timestamp>
-
-### Issues
-
-#### [COR-001]
-Id: COR-001
-Domain: CORRECTNESS | ECONOMY | STYLE
-Source: _iterate/reviewers/correctness
-Severity: BLOCKING | ADVISORY
-Status: OPEN | RESOLVED | DEFERRED
-Evidence: <section or path:line>
-Summary: <brief description>
-Requested Fix: <what needs to change>
-Acceptance Criteria: <testable closure condition>
 
 ### Decisions
 

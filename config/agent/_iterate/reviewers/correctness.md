@@ -11,6 +11,8 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
+  edit:
+    "*PROMPT-ITERATE.review-correctness.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -32,6 +34,13 @@ Review finalized iteration artifacts for correctness, schema validity, and cross
 - Completeness: no placeholders, undefined fields, or unresolved ownership in `machine_path`.
 - Diff format: diff blocks parse correctly (balanced `+`/`-` lines, no stray markers); `Lines`, `Anchor`, and diff hunks reference valid content and ranges in the target file.
 
+# Process
+- Read `PROMPT-ITERATE.review-correctness.md` if it exists. Treat missing or malformed cache as empty.
+- Read `## Delta` from `handoff_path`.
+- Skip re-evaluating Verified items that are Unchanged in Delta.
+- Re-evaluate Changed and New items. Re-evaluate own Open items from cache. Check Open→Resolved transitions.
+- Write updated cache to `PROMPT-ITERATE.review-correctness.md` after review.
+
 # Output
 
 ```text
@@ -47,6 +56,9 @@ Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
 
+## Verified
+- <REV-###>: <item description — unchanged items that remain verified>
+
 ## Notes
 - <optional short notes>
 ```
@@ -56,4 +68,4 @@ Fix: <smallest concrete correction>
 - Do not block for minor wording preferences when schema and cross-references are valid.
 - Cite file paths and specific frontmatter fields or sections as evidence.
 - Keep findings short and specific.
-- Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
+- Follow the `# Process` section for cache, Delta, and skip handling.
