@@ -23,6 +23,30 @@ const ALLOWED_AGENTS = new Set(["build", "plan"])
 /** Max entries in the session→agent map before oldest insertion is evicted. */
 const SESSION_MAP_MAX = 256
 
+/**
+ * Set `CAVEMAN_DEBUG=1` in your shell env to enable debug logging.
+ * Logs are written via the opencode SDK (client.app.log) to:
+ *   ~/.local/share/opencode/log/<YYYY-MM-DDTHHMMSS>.log
+ * Does NOT print to the TUI.
+ */
+const DEBUG = process.env.CAVEMAN_DEBUG === "1"
+
+/** @internal Builds a scoped logger that writes to the opencode server log via the SDK client. */
+function createLog(client: { app: { log: (opts: unknown) => Promise<unknown> } }) {
+  return (...args: unknown[]) => {
+    if (!DEBUG) return
+    client.app
+      .log({
+        body: {
+          service: "caveman",
+          level: "info",
+          message: args.map((a) => (typeof a === "string" ? a : JSON.stringify(a))).join(" "),
+        },
+      })
+      .catch(() => {})
+  }
+}
+
 /** Supported brevity intensity levels. */
 type CavemanMode = "lite" | "full" | "ultra"
 
@@ -76,10 +100,10 @@ ${SHARED}`,
  *   `/caveman [level]` commands or natural-language deactivation phrases,
  *   then updates the in-memory mode.
  */
-export const CavemanPlugin: Plugin = async () => {
+export const CavemanPlugin: Plugin = async (input) => {
   let mode: CavemanMode | null = "full"
   const sessionAgent = new Map<string, string>()
-
+  const log = createLog(input.client as { app: { log: (opts: unknown) => Promise<unknown> } })
   return {
     "chat.message": async (input: Record<string, unknown>) => {
       const sid = input.sessionID as string | undefined
@@ -90,6 +114,7 @@ export const CavemanPlugin: Plugin = async () => {
           if (oldest !== undefined) sessionAgent.delete(oldest)
         }
         sessionAgent.set(sid, agent)
+        log(`chat.message: session=${sid} agent=${agent} mapSize=${sessionAgent.size}`)
       }
     },
 
@@ -101,7 +126,16 @@ export const CavemanPlugin: Plugin = async () => {
 
       const input = _input as { sessionID?: string }
       const agent = input.sessionID ? sessionAgent.get(input.sessionID) : undefined
-      if (!agent || !ALLOWED_AGENTS.has(agent)) return
+
+      if (!agent) {
+        log(`system.transform: no agent for session=${input.sessionID} (mapKeys=${sessionAgent.size})`)
+        return
+      }
+
+      const allowed = ALLOWED_AGENTS.has(agent)
+      log(`system.transform: session=${input.sessionID} agent=${agent} allowed=${allowed} mode=${mode}`)
+
+      if (!allowed) return
 
       output.system.push(MODE_INSTRUCTIONS[mode])
     },
