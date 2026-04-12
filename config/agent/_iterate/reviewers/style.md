@@ -64,6 +64,10 @@ Fix: <smallest concrete correction>
 - <optional short notes>
 ```
 
+Return ONLY the block above — no introduction, no summary, no conversational
+wrapper, no text before `# REVIEW` or after the final `## Notes` line.
+Any content outside this format is a protocol violation.
+
 # Constraints
 - Block for persistent imperative-voice violations, missing negative examples where they matter, unpinned output formats, or instruction language that leads with prohibitions instead of actions.
 - Do not block for minor wording when instructions are already imperative, positive-framing, and self-contained.

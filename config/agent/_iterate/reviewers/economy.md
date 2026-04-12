@@ -65,6 +65,10 @@ Fix: <smallest simplification>
 - <optional short notes>
 ```
 
+Return ONLY the block above — no introduction, no summary, no conversational
+wrapper, no text before `# REVIEW` or after the final `## Notes` line.
+Any content outside this format is a protocol violation.
+
 # Constraints
 - Block only when revision instructions clearly exceed what the confirmed context requires.
 - Do not block for concise but complete instructions.

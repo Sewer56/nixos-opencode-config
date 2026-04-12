@@ -63,6 +63,10 @@ Fix: <smallest concrete correction>
 - <optional short notes>
 ```
 
+Return ONLY the block above — no introduction, no summary, no conversational
+wrapper, no text before `# REVIEW` or after the final `## Notes` line.
+Any content outside this format is a protocol violation.
+
 # Constraints
 - Block for schema errors, missing required fields, permission inconsistencies, dangling references, or unresolved placeholders.
 - Do not block for minor wording preferences when schema and cross-references are valid.

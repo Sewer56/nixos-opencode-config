@@ -66,6 +66,14 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
   - `@_iterate/reviewers/correctness`
   - `@_iterate/reviewers/economy`
   - `@_iterate/reviewers/style`
+- After each reviewer returns, validate its output:
+  - Must start with `# REVIEW`.
+  - Must contain `Decision: PASS | ADVISORY | BLOCKING`.
+  - Must contain `## Findings` and `## Verified` headings.
+  - If validation fails: feed the specific error back to the reviewer
+    ("Output must start with '# REVIEW'. Got: …") and retry up to 2 times.
+  - If still malformed after retries: treat as BLOCKING with a synthetic
+    finding noting the reviewer returned unparseable output.
 - Update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files.
 - Apply domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; STYLE → style reviewer. Arbitrate cross-domain conflicts.
 - Revise `machine_path` only where needed. Append one line to `## Revision History`.
