@@ -25,11 +25,16 @@ Review an error docs plan for correctness and completeness before it is applied 
 
 # Focus
 
-Read `plan_path` fully. Read each source file named in `## Items` to ground checks. Apply these checks:
+Read `plan_path` fully. Read the lang rules file for each language in the plan. Then read each source file named in `## Items`. Apply all checks below.
 
-1. **Coverage**: every item entry in the plan corresponds to a real error-returning function in the named source file. No item present in the plan is missing a `**Proposed:**` section.
+For each source file read, also note every public error-returning function per the lang file's **Detection** and **Scope** rules (match each file to its language via the plan items' `**Language:**` field). After reading all files, compare against the plan's item list. Any function that should be in the plan but is absent is a coverage gap.
+
+1. **Coverage**:
+   - Every plan item corresponds to a real error-returning function at the named path and line.
+   - No plan item is missing a `**Proposed:**` section.
+   - **Same-file cross-check**: every public error-returning function in each source file (per lang rules) is either in the plan or already classified `specific` per the lang file's **Classification** table. Functions that are `missing` or `vague` but absent from the plan are BLOCKING gaps.
 2. **Specificity**: each `**Proposed:**` section has one bullet per traced error path. Variant names are exact (match source code). Triggers are plain-language and predictable from inputs/state alone — no vague triggers like "if an error occurs".
-3. **Format**: proposed docs match the doc format from the matching `lang-<language>-errors.txt` in `LANG_RULES_DIR`. Read the relevant lang file to verify.
+3. **Format**: proposed docs match the doc format from the matching lang rules file.
 4. **Zero-path fallback**: when `Traced Error Paths: (none)`, the proposed docs apply the Zero-Path Fallback from the lang file.
 5. **No placeholders**: no TODO, TBD, FIXME, or vague stubs in `**Proposed:**` sections.
 6. **Fidelity**: `**Current:**` matches the verbatim source docs (or is "NONE" when truly absent). Function names, file paths, line numbers match source.
@@ -38,7 +43,7 @@ Read `plan_path` fully. Read each source file named in `## Items` to ground chec
 
 `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor`
 
-Read `lang-<language>-errors.txt` from that directory when checking format compliance for an item's language.
+Read `lang-<language>-errors.txt` once per language. Use its **Detection**, **Scope**, **Doc Format**, **Classification**, and **Zero-Path Fallback** sections to ground all checks for that language's items.
 
 # Output
 
