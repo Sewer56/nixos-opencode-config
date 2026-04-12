@@ -23,10 +23,10 @@ permission:
 Review an implementation against request intent from conversation context.
 
 # Inputs
-- Summary of the original request and what was done (passed by caller).
+- `context_path`: absolute path to `PROMPT-FREEFORM-CONTEXT.md`
 
 # Process
-1. Read the request summary provided by the caller.
+1. Read `context_path` fully. Extract `## Request`, `## Plan Summary`, `## Changes Made`, `## Notes`.
 2. Inspect all changes via `git diff`.
 3. Validate:
 - Intent satisfied: the original request goals are met by the changes.

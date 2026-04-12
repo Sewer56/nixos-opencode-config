@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Schedules per-prompt orchestration via subagents
-model: fireworks-ai/accounts/fireworks/routers/glm-5-fast
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   "*": deny
   read:

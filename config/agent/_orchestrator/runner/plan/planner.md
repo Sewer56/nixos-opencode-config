@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces complete implementation plans with task list and symbol map
-model: fireworks-ai/accounts/fireworks/routers/glm-5-fast
+model: synthetic/hf:zai-org/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny
