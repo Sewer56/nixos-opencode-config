@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews implementation against a machine plan
-model: synthetic/hf:zai-org/GLM-5.1
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   "*": deny
   read:
