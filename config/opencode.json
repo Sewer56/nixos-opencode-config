@@ -23,39 +23,26 @@
     "plan": {
       "permission": {
         "task": {
-          "_audit/*": "deny",
-          "_orchestrator/*": "deny",
-          "_plan/reviewers/*": "deny",
-          "_implement/*": "deny",
-          "commit": "deny",
-          "coderabbit": "deny",
-          "mcp-search": "allow"
+          "*": "deny",
+          "mcp-search": "allow",
+          "codebase-explorer": "allow"
         }
       }
     },
     "build": {
       "permission": {
         "task": {
-          "_audit/*": "deny",
-          "_orchestrator/*": "deny",
-          "_plan/reviewers/*": "deny",
-          "_implement/*": "deny",
-          "commit": "deny",
-          "coderabbit": "deny",
-          "mcp-search": "deny"
+          "*": "deny",
+          "mcp-search": "allow",
+          "codebase-explorer": "allow"
         }
       }
     },
     "general": {
-      "model": "fireworks-ai/accounts/fireworks/routers/glm-5-fast",
+      "model": "synthetic/hf:zai-org/GLM-5.1",
       "permission": {
         "task": {
-          "_audit/*": "deny",
-          "_orchestrator/*": "deny",
-          "_plan/reviewers/*": "deny",
-          "_implement/*": "deny",
-          "commit": "deny",
-          "coderabbit": "deny",
+          "*": "deny",
           "mcp-search": "allow"
         }
       }
