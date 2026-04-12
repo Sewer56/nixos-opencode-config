@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: "Rewrites vague or missing # Errors docs with specific variant-level bullets"
+description: "Produces a reviewed error docs plan for missing or vague # Errors documentation"
 permission:
   "*": deny
   read:
@@ -8,28 +8,38 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
-  edit: allow
-  write: allow
+  edit:
+    "*": deny
+    "PROMPT-ERROR-DOCS-PLAN.md": allow
+    "*PROMPT-ERROR-DOCS-PLAN.md": allow
+  write:
+    "*": deny
+    "PROMPT-ERROR-DOCS-PLAN.md": allow
+    "*PROMPT-ERROR-DOCS-PLAN.md": allow
   grep: allow
   glob: allow
   list: allow
-  bash: allow
   todowrite: allow
   external_directory: allow
   task:
     "*": "deny"
     "codebase-explorer": "allow"
     "_refactor/errors-collector": "allow"
+    "_refactor/errors-reviewer": "allow"
 ---
 
-Find every public error-returning function in the repository with missing or vague error documentation. Draft specific error docs by tracing actual error paths in each function body. Present a confirmation plan before editing.
+Produce a reviewed error docs plan. Discover error-returning functions with missing or vague documentation. Draft specific error docs by tracing actual error paths. Write and review plan file until it passes. Return plan path for a separate apply session.
 
 # SHARED RULES
 
 - `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
 - `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor`
 
-Read `DOCUMENTATION_RULES_PATH` once before starting. Use it as the source of truth for doc format and style.
+Read `DOCUMENTATION_RULES_PATH` once before starting. Source of truth for doc format and style.
+
+# Artifacts
+
+- `plan_path`: `PROMPT-ERROR-DOCS-PLAN.md` (repo root)
 
 # ORCHESTRATION
 
@@ -39,7 +49,7 @@ Spawn `@codebase-explorer` to map the repository:
 
 - Every language present
 - Every module/crate boundary: Cargo.toml (Rust workspace members), package.json (Node). For Go: each directory containing `.go` files is a separate module.
-- Focus on library modules (those depended on by other modules) and application modules. Skip test-only fixtures.
+- Focus on library modules and application modules. Skip test-only fixtures.
 
 For each detected language, check if `lang-<language>-errors.txt` exists in `LANG_RULES_DIR`. Only languages with a matching rules file will be processed.
 
@@ -59,9 +69,11 @@ Wait for ALL collectors to return before proceeding. Do not begin any analysis u
 
 Collector output is final — per-item blocks for missing/vague functions, then summary. Do not re-query or resume.
 
-# ANALYSIS
+# PLAN
 
-## 4. Draft
+## 4. Write plan file
+
+Write `plan_path` using the template in `# Templates` below.
 
 For every `missing` or `vague` item from the collectors, draft the proposed error documentation using the `Traced Error Paths` from the collector output.
 
@@ -72,69 +84,92 @@ For each item, read the matching `lang-<language>-errors.txt` from `LANG_RULES_D
 
 One bullet per traced error path. Preserve the exact variant/class name from the trace. Write the trigger in plain language that a reader can predict from inputs/state alone.
 
-## 5. Confirmation gate (REQUIRED — DO NOT SKIP)
+Populate `## Settled Facts` from collector summaries. Populate each `## Items` subsection from collector per-item blocks.
 
-Present the plan and STOP. Do not proceed to step 6. Use this format:
+## 5. Review loop
 
-```markdown
-# Proposed Error Docs Plan
+After writing or revising `plan_path`, spawn `@_refactor/errors-reviewer`, passing `plan_path`.
 
-Targets: <paths>
+Synthesize all findings into a checklist (BLOCKING first).
 
-## <relative_path:line> — `function_name` (missing|vague)
+If findings exist:
+- Revise `plan_path` only where needed. Append one line to `## Revision History`.
+- Re-run reviewer after every material revision.
+
+Loop until no findings of any severity remain or 10 iterations.
+
+- No findings: SUCCESS.
+- At cap with any BLOCKING finding: FAIL.
+- At cap with only ADVISORY findings: SUCCESS with risks.
+
+# Output
+
+Return exactly:
+
+```text
+Status: SUCCESS | INCOMPLETE | FAIL
+Plan Path: <absolute path>
+Review Iterations: <n>
+Summary: <one-line summary>
+```
+
+# Constraints
+
+- Only write `PROMPT-ERROR-DOCS-PLAN.md` during this command.
+- Never modify product code while planning.
+
+# Templates
+
+## `PROMPT-ERROR-DOCS-PLAN.md`
+
+````markdown
+# Error Docs Plan
+
+## Summary
+- Targets: <module paths>
+- Languages: <list>
+- Total functions: N (M missing, K vague)
+- Already specific (skipped): K
+
+## Settled Facts
+- [FACT-001] <fact from collector> (Source: `relative_path:line`)
+- <or `None`>
+
+## Revision History
+- Iteration 1: Initial draft.
+
+## Items
+
+### <relative_path:line> — `function_name` (missing|vague)
+
+**Language:** <language>
+**Returns:** <full return type signature>
 
 **Current:**
 
 <verbatim current error docs section, or "NONE">
 
+**Traced Error Paths:**
+- Variant: <Error::Foo>, Trigger: <specific condition from body>
+- Variant: <Error::Bar>, Trigger: <specific condition from body>
+(When zero paths traced: `Traced Error Paths: (none)`)
+
 **Proposed:**
 
 <drafted error docs section>
 
-## <relative_path:line> — `function_name` (missing|vague)
-
-...
-
 ---
 
-Functions already specific: N (skipped)
+# Apply Instructions
 
-Say "go" to apply this plan, or suggest changes.
-```
+For each item in `## Items`:
 
-Continue ONLY when user says exactly "go".
-If user suggests changes, revise the plan and re-run this gate.
-DO NOT use edit or write tools before receiving "go".
-
-# APPLY
-
-## 6. Edit files (after `go`)
-
-For each item in the confirmed plan:
-
-1. Read the file.
+1. Read the source file at the path and line given in the heading.
 2. Locate the function's doc comments (the line immediately before `pub fn`, `async fn`, `function`, `export function`, etc.).
-3. If `missing`: insert the proposed error docs block after the existing doc sections, before the function signature.
-4. If `vague`: replace the existing error docs block with the proposed block.
+3. If `missing`: insert the content under **Proposed** after the existing doc sections, before the function signature.
+4. If `vague`: replace the existing error docs block with the content under **Proposed**.
 5. Do not alter function signatures, bodies, imports, or any non-doc content.
 6. Preserve surrounding blank lines and formatting conventions in the file.
 
-## 7. Verify
-
-Run formatter, lint, build/type checks, and tests according to repository conventions.
-Iterate until checks pass, or report exact blockers with file/function details.
-
-## 8. Report
-
-```
-Error Docs Updated
-Files: N
-Functions documented: N (M missing, K vague)
-Specificity: all bullets name concrete variants with trigger conditions
-
-Top changes:
-  <path:line> <function_name> — added N bullets
-  ...
-
-Verification: <pass/fail + details>
-```
+After applying all items, run formatter, lint, build/type checks, and tests according to repository conventions. Iterate until checks pass.
+````
