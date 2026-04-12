@@ -1,8 +1,14 @@
 TypeScript error-returning function detection and tracing rules. Read this file before enumeration.
 
+# Scope — Visibility
+
+Only target functions that are part of the module's public interface:
+- **Include**: `export function`, `export async function`, `export default function`, exported `const` arrow functions, `public` methods on exported classes (including default exports)
+- **Skip**: non-exported functions, `private` methods, `protected` methods, file-local helpers, callback arguments
+
 # Detection
 
-A function returns errors when any of:
+A function (passing the scope filter above) returns errors when any of:
 
 - Return type includes `Error`, `Err`, or a custom error class (e.g. `AppError`, `ApiError`)
 - Body contains `throw` or `throw new`

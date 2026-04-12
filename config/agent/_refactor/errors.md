@@ -22,7 +22,7 @@ permission:
     "_refactor/errors-collector": "allow"
 ---
 
-Find every error-returning function in the repository with missing or vague error documentation. Draft specific error docs by tracing actual error paths in each function body. Present a confirmation plan before editing.
+Find every public error-returning function in the repository with missing or vague error documentation. Draft specific error docs by tracing actual error paths in each function body. Present a confirmation plan before editing.
 
 # SHARED RULES
 

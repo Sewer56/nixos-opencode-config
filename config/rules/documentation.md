@@ -5,7 +5,7 @@ Use these rules when writing or updating documentation in changed scope.
 ### Required Docs
 - Public APIs (`pub`, `pub(crate)`): purpose and parameters.
 - Non-trivial public APIs: add returns, failure behavior, examples when helpful.
-- Error-returning APIs: `# Errors` section with one bullet per variant/type and a specific trigger condition. Required format:
+- Public error-returning APIs (`pub`, `pub(crate)`, `export`, `public`): `# Errors` section with one bullet per variant/type and a specific trigger condition. Private/internal functions do not need `# Errors` docs. Required format:
   ```
   /// # Errors
   /// - Returns [`Error::Variant`] when <specific condition>.

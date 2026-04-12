@@ -1,8 +1,14 @@
 Rust error-returning function detection and tracing rules. Read this file before enumeration.
 
+# Scope — Visibility
+
+Only target functions reachable outside their defining module:
+- **Include**: `pub fn`, `pub async fn`, `pub(crate) fn`, `pub(crate) async fn`, `pub const fn`, `pub(crate) const fn`, `fn` in `impl Trait for Type` where `Trait` is `pub`
+- **Skip**: `fn` (private, excluding trait impl methods for public traits), `pub(super)`, `pub(in path::to::module)`, trait-default methods that are not overridden
+
 # Detection
 
-A function returns errors when its return type matches any of:
+A function (passing the scope filter above) returns errors when its return type matches any of:
 
 - `-> Result<...>` (aliased or fully-qualified `std::result::Result`)
 - `-> Option<...>` where the body uses `ok_or`, `ok_or_else`, or `?` on an Option (meaning None is converted to an error)

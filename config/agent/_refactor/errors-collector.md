@@ -35,7 +35,7 @@ Read `lang-<language>-errors.txt` from that directory (e.g. `lang-rust-errors.tx
 
 ## 1. Enumerate
 
-Find every error-returning function in `target_path` using the detection rules from the language file.
+Find every **public** error-returning function in `target_path` using the detection and scope rules from the language file. Private and internal helpers are out of scope.
 
 For each function record: name, file path, line number, return type.
 
