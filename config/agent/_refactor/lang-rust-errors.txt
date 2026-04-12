@@ -1,0 +1,58 @@
+Rust error-returning function detection and tracing rules. Read this file before enumeration.
+
+# Detection
+
+A function returns errors when its return type matches any of:
+
+- `-> Result<...>` (aliased or fully-qualified `std::result::Result`)
+- `-> Option<...>` where the body uses `ok_or`, `ok_or_else`, or `?` on an Option (meaning None is converted to an error)
+
+Skip functions inside `#[cfg(test)]` modules and `#[test]` functions.
+
+Skip functions whose error type is `Infallible` or `!` (e.g. `Result<T, Infallible>`, `Result<T, !>`) — these cannot return errors.
+
+# Tracing
+
+For each detected function, read the full body. Enumerate every reachable error path:
+
+1. **`?` operator**: the `?` propagates the `Err` variant of the callee's return type. Record:
+   - Variant: the error type/variant returned by the callee on failure
+   - Trigger: the condition that causes the callee to return `Err` (infer from callee docs, name, or immediate context — e.g. `File::open(path)?` → `std::io::Error` when `path` does not exist or permissions deny access)
+2. **`Err(...)` construction**: extract the variant name from the expression. Record:
+   - Variant: the enum variant being constructed (e.g. `Error::InvalidPath`)
+   - Trigger: the `if` / `match` guard or condition that reaches this line
+3. **`.map_err(|...| ...)`**: record the mapped-to variant and the condition that produced the original error being mapped
+4. **`ok_or(...)` / `ok_or_else(...)` on `Option`**: record the error variant produced when the Option is `None` and the condition that makes it `None`
+5. **`bail!(...)` / `anyhow!(...)` / `ensure!(...)`**: if the crate uses anyhow/eyre, record the macro call site and the condition text as the trigger. Variant is the crate's error type.
+
+When a single variant is returned from multiple sites with different conditions, produce one bullet per distinct condition.
+
+# Doc Format
+
+```
+/// # Errors
+/// - Returns [`Error::Variant`] when <specific condition>.
+/// - Returns [`Error::OtherVariant`] when <specific condition>.
+```
+
+Use backtick-qualified paths in triggers: `when `path` does not exist`, `when `count` is zero`.
+
+# Classification
+
+| # | Condition | Classification |
+|---|-----------|---------------|
+| 1 | No `# Errors` section in the doc comments above the function | `missing` |
+| 2 | `# Errors` section exists but any bullet lacks a specific variant name (uses phrases like "on error", "when the operation fails", "if invalid") | `vague` |
+| 3 | `# Errors` section exists AND every bullet names a concrete variant AND describes a specific trigger condition | `specific` |
+
+Functions classified `specific` are excluded from the report entirely.
+
+# Zero-Path Fallback
+
+When zero error paths were traced for a function classified `missing` or `vague`:
+
+| # | Condition | Action |
+|---|-----------|--------|
+| 1 | Return type proves infallible (`Result<T, Infallible>`, `Result<T, !>`) | Skip — no `# Errors` section needed |
+| 2 | Return type is `Box<dyn Error>` or equivalent dynamic type | Write: `- May propagate errors from <callee>.` with the callee name |
+| 3 | All other cases | Infer error types from the return type signature; look up the error enum's variants and write one bullet per variant |

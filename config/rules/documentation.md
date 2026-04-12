@@ -5,7 +5,16 @@ Use these rules when writing or updating documentation in changed scope.
 ### Required Docs
 - Public APIs (`pub`, `pub(crate)`): purpose and parameters.
 - Non-trivial public APIs: add returns, failure behavior, examples when helpful.
-- Error-returning APIs: `# Errors` section listing each variant/type and trigger conditions.
+- Error-returning APIs: `# Errors` section with one bullet per variant/type and a specific trigger condition. Required format:
+  ```
+  /// # Errors
+  /// - Returns [`Error::Variant`] when <specific condition>.
+  /// - Returns [`Error::OtherVariant`] when <specific condition>.
+  ```
+  Each bullet must let a reader predict exactly which input/state produces which variant. Never write vague triggers:
+  - ~~"when the operation fails"~~
+  - ~~"on error"~~
+  - ~~"if something goes wrong"~~
 - Non-trivial private APIs: purpose plus non-obvious parameters, returns, side effects, invariants.
 - Trivial private APIs: no full docs needed.
 - New/changed modules: top-level docs with purpose and usage.
@@ -60,3 +69,4 @@ pub fn split_paths_by_kind(paths: Vec<String>) -> PathGroups { ... }
 - Docs must not contradict implementation.
 - In machine plans: docs must appear in relevant snippet/diff; generic `update docs` note is insufficient.
 - Do not backfill untouched legacy files solely for docs.
+- `# Errors` sections must enumerate every reachable error variant with a specific trigger condition. Vague bullets (e.g. "when the operation fails") block the review.

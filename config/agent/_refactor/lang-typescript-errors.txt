@@ -1,0 +1,59 @@
+TypeScript error-returning function detection and tracing rules. Read this file before enumeration.
+
+# Detection
+
+A function returns errors when any of:
+
+- Return type includes `Error`, `Err`, or a custom error class (e.g. `AppError`, `ApiError`)
+- Body contains `throw` or `throw new`
+- Return type is a union including `null` or `undefined` used as an error signal (e.g. `T | null` where `null` means failure) — only when the function also has a non-null success path. Example: `function findUser(id: string): User | null` returns null when user not found — detect. Skip `function getConfig(): Config | null` where null is a valid value, not an error signal.
+- Return type is `Promise<T>` or `Promise<T | E>` where `E` is an error type
+- Body uses `Promise.reject(...)` or rejects via `async` throw
+
+Skip files matching test patterns: `*.test.ts`, `*.spec.ts`, `*.test.tsx`, `*.spec.tsx`, `__tests__/`, `test/`, `tests/`.
+
+# Tracing
+
+For each detected function, read the full body. Enumerate every reachable error path:
+
+1. **`throw new CustomError(...)`**: extract the error class. Record:
+   - Variant: the error class name (e.g. `ValidationError`, `NotFoundError`)
+   - Trigger: the `if` / guard condition that reaches this throw
+2. **`throw ...`** (not `new`): extract the expression. Record the value thrown and the condition.
+3. **`return new ...Error(...)`**: when returned as an error result (not thrown). Record the class and condition.
+4. **`Promise.reject(...)`**: record the rejection value and the condition.
+5. **`return null` / `return undefined`** as error signal: record what condition produces the null/undefined return. Variant is `null` or `undefined`.
+
+When a single error class is thrown from multiple sites with different conditions, produce one bullet per distinct condition.
+
+# Doc Format
+
+```
+@throws {ErrorClass} When <specific condition>.
+@throws {OtherError} When <specific condition>.
+```
+
+For null-return-as-error:
+```
+Returns `null` when <specific condition>.
+```
+
+# Classification
+
+| # | Condition | Classification |
+|---|-----------|---------------|
+| 1 | No `@throws` or error documentation above the function | `missing` |
+| 2 | Error docs exist but any bullet lacks a specific error class name or uses vague phrases ("on error", "when the operation fails", "if something goes wrong") | `vague` |
+| 3 | Error docs exist AND every bullet names a concrete error class AND describes a specific trigger condition | `specific` |
+
+Functions classified `specific` are excluded from the report entirely.
+
+# Zero-Path Fallback
+
+When zero error paths were traced for a function classified `missing` or `vague`:
+
+| # | Condition | Action |
+|---|-----------|--------|
+| 1 | Return type is `unknown`, `any`, or equivalent dynamic type | Write: `- May throw or propagate errors from <callee>.` with the callee name |
+| 2 | Return type is `T \| null` / `T \| undefined` with no explicit throw paths | Write: `Returns \`null\` when <inferred condition>.` based on the function's logic |
+| 3 | All other cases | Infer error classes from the return type union or thrown types in called functions; write one bullet per class |

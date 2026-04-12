@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews implementation against request intent from conversation context
-model: fireworks-ai/accounts/fireworks/routers/glm-5-fast
+model: zai-coding-plan/glm-5.1
 permission:
   "*": deny
   read:
