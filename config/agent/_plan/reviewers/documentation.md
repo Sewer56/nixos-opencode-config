@@ -62,6 +62,7 @@ Fix: <smallest concrete correction>
 - Block for "Review Blocking Criteria" violations in the rules
 - Do not block for minor wording preferences when the required coverage is explicit and concrete.
 - Keep findings short and specific.
+- Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
 
 # Rules
 

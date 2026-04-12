@@ -65,6 +65,7 @@ Fix: <smallest correction>
 - If the plan is not performance-sensitive, return `PASS` with `Performance Sensitive: NO`.
 - If a performance finding depends on the repo surface, cite repo evidence.
 - Block only for material performance risks, not micro-optimizations.
+- Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
 
 # Rules
 

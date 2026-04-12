@@ -60,6 +60,7 @@ Fix: <smallest useful test-plan correction>
 
 # Constraints
 - Focus on behavior, not implementation-detail tests.
+- Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
 
 # Rules
 

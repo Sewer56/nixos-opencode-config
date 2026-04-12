@@ -67,6 +67,7 @@ Fix: <smallest concrete correction>
 - Treat missing or malformed `machine_plan_path` structure as blocking.
 - If a grounding finding depends on the repo surface, cite repo evidence.
 - Keep findings short and specific.
+- Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
 
 # Rules
 

@@ -81,7 +81,9 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
   - `@_plan/reviewers/economy`
   - `@_plan/reviewers/tests`
   - `@_plan/reviewers/performance`
-- All findings require revision. Synthesize into a checklist (BLOCKING first).
+- Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
+- Apply domain ownership: CORRECTNESS → correctness reviewer; DOCS → documentation reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer. Arbitrate cross-domain conflicts.
+- Do not reopen RESOLVED issues without new concrete evidence.
 - Revise `machine_plan_path` only where needed. Append one line to `## Revision History`.
 - Re-run all reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
@@ -123,11 +125,11 @@ Source Plan: <absolute path to `PROMPT-PLAN.md`>
 ```
 
 ## Mission
-- Goal: <plain-language outcome>
+- Goal: see Overall Goal in source plan
 - Why: <why this work matters>
 
-## Context
-- <repo fact, boundary, or pattern>
+## Supplementary Context
+- <repo fact, boundary, or pattern not already in source plan [P#] sections>
 - <or `None`>
 
 ## Required Reads
@@ -147,9 +149,31 @@ Source Plan: <absolute path to `PROMPT-PLAN.md`>
 - Out of scope: <what this plan intentionally leaves alone>
 
 ## Clarifications
-- Q: <question>
-  A: <answer>
-- <or `None`>
+- See Open Questions and Decisions in source plan
+
+## Review Ledger
+Updated: <timestamp>
+
+### Issues
+
+#### [COR-001]
+Id: COR-001
+Domain: CORRECTNESS | DOCS | ECONOMY | TEST | PERF
+Source: _plan/reviewers/correctness
+Severity: BLOCKING | ADVISORY
+Status: OPEN | RESOLVED | DEFERRED
+Evidence: <section or path:line>
+Summary: <brief description>
+Requested Fix: <what needs to change>
+Acceptance Criteria: <testable closure condition>
+
+### Decisions
+
+#### [DEC-001]
+Type: DOMAIN_AUTHORITY | ARBITRATION
+Issue: COR-001
+Winner: <reviewer_name>
+Rationale: <why this view prevailed>
 ````
 
 ## `PROMPT-PLAN.machine.md`

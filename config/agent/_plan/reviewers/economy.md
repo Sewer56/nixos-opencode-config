@@ -60,6 +60,7 @@ Fix: <smallest simplification>
 
 # Constraints
 - Block only when the plan clearly exceeds confirmed scope.
+- Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
 
 # Rules
 
