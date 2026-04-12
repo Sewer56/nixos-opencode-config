@@ -15,14 +15,14 @@ Skip functions whose error type is `Infallible` or `!` (e.g. `Result<T, Infallib
 
 For each detected function, read the full body. Enumerate every reachable error path:
 
-1. **`?` operator**: the `?` propagates the `Err` variant of the callee's return type. Record:
+1. **`?` operator**: the `?` propagates the [`Err`] variant of the callee's return type. Record:
    - Variant: the error type/variant returned by the callee on failure
-   - Trigger: the condition that causes the callee to return `Err` (infer from callee docs, name, or immediate context — e.g. `File::open(path)?` → `std::io::Error` when `path` does not exist or permissions deny access)
-2. **`Err(...)` construction**: extract the variant name from the expression. Record:
-   - Variant: the enum variant being constructed (e.g. `Error::InvalidPath`)
+   - Trigger: the condition that causes the callee to return [`Err`] (infer from callee docs, name, or immediate context — e.g. `File::open(path)?` → `std::io::Error` when `path` does not exist or permissions deny access)
+2. **[`Err`]`(...)` construction**: extract the variant name from the expression. Record:
+   - Variant: the enum variant being constructed (e.g. [`Error::InvalidPath`])
    - Trigger: the `if` / `match` guard or condition that reaches this line
 3. **`.map_err(|...| ...)`**: record the mapped-to variant and the condition that produced the original error being mapped
-4. **`ok_or(...)` / `ok_or_else(...)` on `Option`**: record the error variant produced when the Option is `None` and the condition that makes it `None`
+4. **`ok_or(...)` / `ok_or_else(...)` on [`Option`]**: record the error variant produced when the [`Option`] is [`None`] and the condition that makes it [`None`]
 5. **`bail!(...)` / `anyhow!(...)` / `ensure!(...)`**: if the crate uses anyhow/eyre, record the macro call site and the condition text as the trigger. Variant is the crate's error type.
 
 When a single variant is returned from multiple sites with different conditions, produce one bullet per distinct condition.
@@ -35,7 +35,7 @@ When a single variant is returned from multiple sites with different conditions,
 /// - Returns [`Error::OtherVariant`] when <specific condition>.
 ```
 
-Use backtick-qualified paths in triggers: `when `path` does not exist`, `when `count` is zero`.
+In triggers, use `[`Type`]` for type/variant references ([`None`], [`Option`], [`Error::Foo`]); plain backticks only for value expressions (`path`, `count`).
 
 # Classification
 

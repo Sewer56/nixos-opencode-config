@@ -32,7 +32,7 @@ Use these rules when writing or updating documentation in changed scope.
 - Section order: summary, `Arguments`, `Returns`, `Errors`, `Examples`.
 - Use focused headings (`Arguments`, `Returns`, `Errors`, `Examples`, `Usage`, `Public API`); list entrypoints by role under `Public API`.
 - Prefer goal-oriented phrasing: "split paths" not "materialize path groups", "resolve early" not "JIT resolution".
-- Reference symbols using language convention (Rust: `[`TypeName`]`).
+- Reference symbols using language convention for doc links (Rust: `[`TypeName`]`). Use doc-link syntax for type/variant references where the language supports it; plain backticks only for value expressions (`path`, `count`).
 - Always include a language tag on fenced code blocks; never use bare `ignore` fences.
 - Keep examples practical and minimal.
 
