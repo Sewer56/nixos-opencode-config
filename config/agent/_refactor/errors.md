@@ -10,11 +10,9 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "PROMPT-ERROR-DOCS-PLAN.md": allow
     "*PROMPT-ERROR-DOCS-PLAN.md": allow
   write:
     "*": deny
-    "PROMPT-ERROR-DOCS-PLAN.md": allow
     "*PROMPT-ERROR-DOCS-PLAN.md": allow
   grep: allow
   glob: allow
@@ -53,7 +51,11 @@ Spawn `@codebase-explorer` to map the repository:
 
 For each detected language, check if `lang-<language>-errors.txt` exists in `LANG_RULES_DIR`. Only languages with a matching rules file will be processed.
 
-## 2. Collect
+## 2. Scope
+
+Read the user message. If it contains file or directory paths, restrict collectors to those modules only. If empty or no paths found, scan the full repository.
+
+## 3. Collect
 
 Spawn one `@_refactor/errors-collector` per (library or application module, language) pair in a single parallel call.
 
@@ -63,15 +65,17 @@ Per collector, pass:
 - `language`: language name as reported by `@codebase-explorer`
 - `repo_root`: absolute path to the repository root
 
-## 3. Gate
+## 4. Gate
 
 Wait for ALL collectors to return before proceeding. Do not begin any analysis until every collector has reported.
 
 Collector output is final — per-item blocks for missing/vague functions, then summary. Do not re-query or resume.
 
+Verify each collector output begins with `---COLLECTOR-START---` and ends with `---COLLECTOR-END---`. If markers are missing, note it but proceed — do not re-spawn the collector.
+
 # PLAN
 
-## 4. Write plan file
+## 5. Write plan file
 
 Write `plan_path` using the template in `# Templates` below.
 
@@ -86,7 +90,7 @@ One bullet per traced error path. Preserve the exact variant/class name from the
 
 Populate `## Settled Facts` from collector summaries. Populate each `## Items` subsection from collector per-item blocks.
 
-## 5. Review loop
+## 6. Review loop
 
 After writing or revising `plan_path`, spawn `@_refactor/errors-reviewer`, passing `plan_path`.
 
@@ -94,9 +98,9 @@ Synthesize all findings into a checklist (BLOCKING first).
 
 If findings exist:
 - Revise `plan_path` only where needed. Append one line to `## Revision History`.
-- Re-run reviewer after every material revision.
+- Re-run reviewer after every material revision. A material revision is any change to a **Proposed:** section or addition/removal of an item.
 
-Loop until no findings of any severity remain or 10 iterations.
+Loop until no findings of any severity remain or 10 iterations. If 3 consecutive iterations produce only ADVISORY findings with no BLOCKING, accept and exit early.
 
 - No findings: SUCCESS.
 - At cap with any BLOCKING finding: FAIL.
@@ -159,17 +163,4 @@ Summary: <one-line summary>
 <drafted error docs section>
 
 ---
-
-# Apply Instructions
-
-For each item in `## Items`:
-
-1. Read the source file at the path and line given in the heading.
-2. Locate the function's doc comments (the line immediately before `pub fn`, `async fn`, `function`, `export function`, etc.).
-3. If `missing`: insert the content under **Proposed** after the existing doc sections, before the function signature.
-4. If `vague`: replace the existing error docs block with the content under **Proposed**.
-5. Do not alter function signatures, bodies, imports, or any non-doc content.
-6. Preserve surrounding blank lines and formatting conventions in the file.
-
-After applying all items, run formatter, lint, build/type checks, and tests according to repository conventions. Iterate until checks pass.
 ````

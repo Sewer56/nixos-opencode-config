@@ -83,6 +83,15 @@ Ask up to 10 questions in one batch only if answers would materially improve the
 - If latest user message explicitly confirms the draft is ready, return `Status: READY`.
 - Otherwise return `Status: DRAFT`.
 
+# Command→Agent Composition
+
+When creating or refining command/agent pairs, understand how arguments flow:
+
+1. The command template body (after `$ARGUMENTS` in-place replacement) becomes the **user message** sent to the LLM.
+2. The agent file content becomes the **system prompt**.
+3. OpenCode appends the user message to the agent's context by default — the agent already receives arguments without explicit plumbing.
+4. Reference the user message in agent instructions when arguments affect behavior (e.g., scoping to user-provided paths). If the agent ignores arguments that affect its task, the command→agent wire is broken.
+
 # Template: `PROMPT-ITERATE.md`
 
 ````markdown

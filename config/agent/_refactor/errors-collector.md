@@ -57,11 +57,12 @@ Do **not** emit per-item blocks for `specific` functions. Omit them entirely; re
 
 ## 4. Return
 
-EMIT exactly one response containing all per-item blocks then the summary block. Do NOT split across responses.
+EMIT exactly one response wrapped with structural markers. Begin with `---COLLECTOR-START---`, end with `---COLLECTOR-END---`. Do NOT split across responses.
 
 ### Per-item block
 
 ```
+---COLLECTOR-START---
 ---ITEM---
 Function: <name>
 File: <relative_path:line>
@@ -87,4 +88,5 @@ Missing: <count>
 Vague: <count>
 Specific (skipped): <count>
 ---END---
+---COLLECTOR-END---
 ```
