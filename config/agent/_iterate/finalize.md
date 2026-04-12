@@ -122,16 +122,9 @@ Source Context: <absolute path to `PROMPT-ITERATE.md`>
 <verbatim user request or current consolidated request>
 ```
 
-## Mission
-- Goal: see Overall Goal in source context
-- Why: <why this work matters>
-
 ## Supplementary Context
 - <repo fact, boundary, or pattern not already in source context Discovery>
 - <or `None`>
-
-## Required Reads
-- See Discovery > Reference Files in source context
 
 ## Constraints
 - <explicit user or repo constraint>
@@ -144,9 +137,6 @@ Source Context: <absolute path to `PROMPT-ITERATE.md`>
 ## Scope
 - In scope: <what this iteration covers>
 - Out of scope: <what this iteration intentionally leaves alone>
-
-## Clarifications
-- See Open Questions and Decisions in source context
 
 ## Review Ledger
 Updated: <timestamp>
