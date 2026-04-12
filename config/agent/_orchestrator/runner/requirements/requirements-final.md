@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates PRD requirement completion and writes a validation report
-model: fireworks-ai/accounts/fireworks/routers/glm-5-fast
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   "*": deny
   read:
