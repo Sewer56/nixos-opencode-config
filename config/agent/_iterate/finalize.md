@@ -26,22 +26,11 @@ permission:
 
 Convert a confirmed iteration context into reviewed revision instructions. Write `PROMPT-ITERATE.handoff.md` and `PROMPT-ITERATE.machine.md`. Edit only `PROMPT-ITERATE.handoff.md` and `PROMPT-ITERATE.machine.md`.
 
-# Inputs
-- The latest user message may confirm the draft, provide finalize-time notes, or note changes since the draft.
-- Required local artifact: `PROMPT-ITERATE.md`
-
-# Artifacts
-- `context_path`: `PROMPT-ITERATE.md`
-- `handoff_path`: `PROMPT-ITERATE.handoff.md`
-- `machine_path`: `PROMPT-ITERATE.machine.md`
-
 # Process
 
 ## 1. Preconditions and source of truth
-- Read `context_path`.
-- Treat `context_path` and any explicit finalize-time notes from the latest user message as the source of truth.
+- Read `context_path` as the source of truth, supplemented only by any explicit finalize-time notes from the latest user message.
 - Treat the `/iterate/finalize` invocation as the confirmation boundary.
-- Read `context_path` as source of truth only; do not rewrite it.
 
 ## 2. Deepen discovery only where needed
 - Start from the paths and shapes already present in `context_path`.
@@ -61,47 +50,63 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - Each REV item uses one or more diff blocks grounded in the current file state. Frontmatter and content are different regions of the same file — combine into a single diff block when contiguous, use multiple blocks when scattered. Cover only changes needed — omit restatements of unchanged content. Write `machine_path` using the `# Templates` section below.
 
 ## 5. Run the review loop
-- Write `## Delta` to `handoff_path` before spawning reviewers and recompute it after every material revision.
+Follow the ordered steps below exactly, in order.
+
+1. Write and maintain `## Delta`
+- Write `## Delta` to `handoff_path` before the first reviewer pass.
 - Record each `REV-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields relative to the prior machine artifact.
 - Add artifact markers for `Source Context` and `Review Ledger` so reviewers can skip rereading unchanged artifacts.
-- After each full machine-artifact draft, run these reviewers in parallel, passing `context_path`, `handoff_path`, and `machine_path` to each:
+- Recompute `## Delta` after every material revision.
+
+2. Build reviewer prompts
+- After each full machine-artifact draft, run these reviewers in parallel:
   - `@_iterate/reviewers/correctness`
   - `@_iterate/reviewers/economy`
   - `@_iterate/reviewers/style`
-   - `@_iterate/reviewers/performance`
+  - `@_iterate/reviewers/performance`
+- Include:
+  - Artifact paths (`context_path`, `handoff_path`, `machine_path`)
+  - Iteration/delta summary from `## Delta` in handoff
+  - Current `### Decisions` excerpt from handoff when it is non-empty
+  - Finalize-time user notes if any
+- Omit:
+  - Output format (reviewer agent files define their own `# Output`)
+  - Focus or check lists (reviewer agent files define their own `# Focus`)
+  - Target file paths from REV items (`machine_path` already enumerates every target)
+  - Role assignment ("You are a …") — OpenCode routes tasks to the correct agent automatically
+  - Blanket read orders such as "read all three artifacts" or "read every REV target file" — reviewers decide what to open from Delta, cache state, and Decisions
 
-### Reviewer task prompt discipline
+3. Validate each reviewer response
+- Confirm the response starts with `# REVIEW`.
+- Confirm the response contains `Decision: PASS | ADVISORY | BLOCKING`.
+- Confirm the response contains `## Findings` and `## Verified` headings.
+- If the response remains malformed after retries, treat it as BLOCKING with a synthetic finding that notes the reviewer returned unparseable output.
 
-Include:
-- Artifact paths (`context_path`, `handoff_path`, `machine_path`)
-- Iteration/delta summary from `## Delta` in handoff
-- Current `### Decisions` excerpt from handoff when it is non-empty
-- Finalize-time user notes if any
+4. Retry malformed responses from the existing review state
+- If validation fails and Delta plus Decisions are unchanged, send only the specific protocol error, tell the reviewer to reuse prior analysis/cache, and request a protocol-compliant re-emit from the existing review state.
+- If validation fails after a material revision changed Delta or Decisions, include only the new Delta/Decision excerpt in the retry prompt and request a fresh protocol-compliant response.
 
-Omit:
-- Output format (reviewer agent files define their own `# Output`)
-- Focus or check lists (reviewer agent files define their own `# Focus`)
-- Target file paths from REV items (`machine_path` already enumerates every target)
-- Role assignment ("You are a …") — OpenCode routes tasks to the correct agent automatically
-- Blanket read orders such as "read all three artifacts" or "read every REV target file" — reviewers decide what to open from Delta and cache state
-
-Wrong: "You are a correctness reviewer. Output # REVIEW with Decision/Findings/Verified. Focus: schema, permissions, cross-refs. Review files: config/agent/_iterate/finalize.md, …"
-Correct: "context_path: /abs/PROMPT-ITERATE.md | handoff_path: /abs/PROMPT-ITERATE.handoff.md | machine_path: /abs/PROMPT-ITERATE.machine.md | delta: REV-001 Status=Changed Touched=config/agent/_iterate/finalize.md Why=Delta schema updated | decisions: None"
-
-- After each reviewer returns, validate its output:
-  - Must start with `# REVIEW`.
-  - Must contain `Decision: PASS | ADVISORY | BLOCKING`.
-  - Must contain `## Findings` and `## Verified` headings.
-  - If validation fails and Delta is unchanged: feed only the specific protocol error back to the reviewer, tell it to reuse prior analysis/cache, and retry up to 2 times without asking for rereads.
-  - If validation fails after a material revision changed Delta: include only the new Delta/Decision excerpt in the retry prompt and ask for a fresh protocol-compliant response.
-  - If still malformed after retries: treat as BLOCKING with a synthetic
-    finding noting the reviewer returned unparseable output.
+5. Record decisions and apply domain ownership
 - Update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files.
 - Apply domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; STYLE → style reviewer; PERFORMANCE → performance reviewer. Arbitrate cross-domain conflicts.
-- Revise `machine_path` only where needed. Append one line to `## Revision History`.
-- Recompute `## Delta` in `handoff_path`, then re-run all reviewers after every material revision.
+
+6. Revise the machine artifact when findings require it
+- Revise `machine_path` only where needed.
+- Append one line to `## Revision History`.
+
+7. Re-run or finish
+- Re-run all reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
 - No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
+
+# Inputs
+- The latest user message may confirm the draft, provide finalize-time notes, or note changes since the draft.
+- Required local artifact: `PROMPT-ITERATE.md`
+
+# Artifacts
+- `context_path`: `PROMPT-ITERATE.md`
+- `handoff_path`: `PROMPT-ITERATE.handoff.md`
+- `machine_path`: `PROMPT-ITERATE.machine.md`
 
 # Optimization Rules
 

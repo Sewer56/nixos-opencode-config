@@ -3,6 +3,27 @@
 Reference for optimization patterns used by the `/iterate` workflow
 and other similar workflows.
 
+## Ordered-Step Placement
+
+Put ordered steps near the top of `/iterate/finalize` and iterate reviewer
+prompts.
+Keep the ordered step list contiguous.
+Move supporting reference material — inputs, focus notes, templates, and
+examples — below the ordered steps when the file shape allows it.
+
+For reviewers, use this order:
+1. Load cache
+2. Read Delta and Decisions
+3. Reopen only Changed, New, cached-open, or decision-referenced REV items
+4. Inspect only the selected `machine_path` sections and target files
+5. Write cache
+6. Emit the required final output block
+
+Keep the output step last so the required review block or finalize status block
+remains the final answer.
+For finalize, keep the review-loop steps together in `# Process` and place prompt
+examples in the reference sections below the ordered steps.
+
 ## Per-Reviewer Cache and Delta
 
 Applies only to targets that run a review loop or coordinate subagents.
@@ -48,9 +69,10 @@ Read `machine_path` sections first. Then open target files only for:
 
 Malformed-output retries are protocol fixes, not rediscovery.
 
-If Delta did not change:
+If Delta and Decisions did not change:
 - Reuse prior analysis and cache
-- Re-emit valid output
+- Re-emit valid output from the existing review state
+- Keep the retry format-only
 
 Re-read artifacts only when the retry includes new Delta or Decision entries.
 

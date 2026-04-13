@@ -22,6 +22,39 @@ permission:
 
 Review finalized iteration artifacts for instruction style quality.
 
+**Execution Contract (hard requirements):**
+- Follow the numbered `# Process` steps exactly, in order.
+- Use Delta, cache state, and `### Decisions` to decide which REV items to reopen.
+- Write the reviewer cache before the final response.
+- Use only the `# REVIEW` block from `# Output` as the final answer.
+
+# Process
+1. Load cache
+- Read `PROMPT-ITERATE.review-style.md` if it exists. Treat missing or malformed cache as empty.
+- Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+
+2. Read Delta and Decisions
+- Read `## Delta` from `handoff_path`.
+- Read `### Decisions` only when it is non-empty.
+
+3. Select REV items to inspect
+- Carry forward Verified items that are Unchanged in Delta.
+- Re-evaluate Changed and New items.
+- Re-evaluate own Open items from cache and decision-referenced REV items.
+
+4. Inspect selected content
+- Read only the `machine_path` sections for the REV items selected in step 3.
+- Open target files only for the REV items selected in step 3.
+- Check Open→Resolved transitions.
+- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
+
+5. Update cache
+- Write updated cache to `PROMPT-ITERATE.review-style.md` after review.
+- Prune removed REV ids and refresh the same fields.
+
+6. Emit the final review block
+- Emit the `# REVIEW` block from `# Output`.
+
 # Inputs
 - `context_path`
 - `handoff_path`
@@ -35,13 +68,6 @@ Review finalized iteration artifacts for instruction style quality.
 - Self-contained: each revision item usable without cross-referencing other files or external docs. Inline schemas, types, formats. Do not write "see the documentation" or "refer to the rules file".
 - Output format pinned: when a revision or `REV-###` target prescribes structured output, specify the exact format in a fenced code block with `text` language tag. No loose format descriptions, no `json`/`yaml` tags for plain structured output — always `text`.
 - Fixed-output consistency: when multiple `REV-###` targets define the same structured output kind (e.g., review decisions), use identical format blocks. Divergent format blocks for the same kind are a style violation.
-
-# Process
-- Read `PROMPT-ITERATE.review-style.md` if it exists. Treat missing or malformed cache as empty. Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
-- Read `## Delta` from `handoff_path`.
-- Skip re-evaluating Verified items that are Unchanged in Delta.
-- Re-evaluate Changed and New items. Re-evaluate own Open items from cache. Read `### Decisions` only when it is non-empty. Read `machine_path` sections first, then open target files only for Changed, New, cached-open, or decision-referenced REV items. Check Open→Resolved transitions. On malformed-output retry without new Delta entries, reuse prior analysis/cache and re-emit valid protocol output without rereading unchanged files.
-- Write updated cache to `PROMPT-ITERATE.review-style.md` after review. Prune removed REV ids and refresh the same fields.
 
 # Output
 

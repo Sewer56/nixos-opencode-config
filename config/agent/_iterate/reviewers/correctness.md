@@ -22,6 +22,39 @@ permission:
 
 Review finalized iteration artifacts for correctness, schema validity, and cross-reference integrity.
 
+**Execution Contract (hard requirements):**
+- Follow the numbered `# Process` steps exactly, in order.
+- Use Delta, cache state, and `### Decisions` to decide which REV items to reopen.
+- Write the reviewer cache before the final response.
+- Use only the `# REVIEW` block from `# Output` as the final answer.
+
+# Process
+1. Load cache
+- Read `PROMPT-ITERATE.review-correctness.md` if it exists. Treat missing or malformed cache as empty.
+- Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+
+2. Read Delta and Decisions
+- Read `## Delta` from `handoff_path`.
+- Read `### Decisions` only when it is non-empty.
+
+3. Select REV items to inspect
+- Carry forward Verified items that are Unchanged in Delta.
+- Re-evaluate Changed and New items.
+- Re-evaluate own Open items from cache and decision-referenced REV items.
+
+4. Inspect selected content
+- Read only the `machine_path` sections for the REV items selected in step 3.
+- Open target files only for the REV items selected in step 3.
+- Check Open→Resolved transitions.
+- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
+
+5. Update cache
+- Write updated cache to `PROMPT-ITERATE.review-correctness.md` after review.
+- Prune removed REV ids and refresh the same fields.
+
+6. Emit the final review block
+- Emit the `# REVIEW` block from `# Output`.
+
 # Inputs
 - `context_path`
 - `handoff_path`
@@ -34,13 +67,6 @@ Review finalized iteration artifacts for correctness, schema validity, and cross
 - Completeness: no placeholders, undefined fields, or unresolved ownership in `machine_path`.
 - Diff format: diff blocks parse correctly (balanced `+`/`-` lines, no stray markers); `Lines`, `Anchor`, and diff hunks reference valid content and ranges in the target file.
 - Ledger-file schema: Review Ledger in handoff contains only `### Decisions` for cross-domain arbitration. No `### Issues` subsection — domain-internal issue tracking stays in reviewer cache files.
-
-# Process
-- Read `PROMPT-ITERATE.review-correctness.md` if it exists. Treat missing or malformed cache as empty. Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
-- Read `## Delta` from `handoff_path`.
-- Skip re-evaluating Verified items that are Unchanged in Delta.
-- Re-evaluate Changed and New items. Re-evaluate own Open items from cache. Read `### Decisions` only when it is non-empty. Read `machine_path` sections first, then open target files only for Changed, New, cached-open, or decision-referenced REV items. Check Open→Resolved transitions. On malformed-output retry without new Delta entries, reuse prior analysis/cache and re-emit valid protocol output without rereading unchanged files.
-- Write updated cache to `PROMPT-ITERATE.review-correctness.md` after review. Prune removed REV ids and refresh the same fields.
 
 # Output
 
