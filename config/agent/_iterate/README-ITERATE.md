@@ -23,3 +23,16 @@ Do not re-state information available in another artifact. Reference by section 
 ## File-Based Coordination
 
 When a finalize agent or orchestrator coordinates multiple subagents, use a shared ledger or coordination file for cross-domain arbitration. Domain-internal issue tracking stays in reviewer cache files — the Review Ledger in handoff contains only `### Decisions`.
+
+## Tight Subagent Inputs
+
+Applies to any command or agent that spawns subagents (reviewers, explorers, etc.). The callee's agent file is the contract — the caller trusts it, not re-states it.
+
+Include:
+- Artifact paths the callee cannot discover on its own
+- Deltas and scoping context
+- User-supplied notes or arguments affecting the task
+
+Omit:
+- Output format, focus/check lists, role assignment — the callee's agent file already defines these
+- Target file paths already enumerated in a shared artifact the callee receives

@@ -92,6 +92,7 @@ Targets produced by this iteration must follow:
 - **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
 - **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.
 - **Concise README-ITERATE.md**: when the iteration changes conventions or adds new artifacts, create a short reference file at `config/agent/_iterate/README-ITERATE.md`.
+- **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — paths, deltas, scoping. Never re-state output formats, focus lists, role assignments, or contracts the callee already defines.
 
 # Command→Agent Composition
 

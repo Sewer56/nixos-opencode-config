@@ -66,7 +66,24 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
   - `@_iterate/reviewers/correctness`
   - `@_iterate/reviewers/economy`
   - `@_iterate/reviewers/style`
-  - `@_iterate/reviewers/performance`
+   - `@_iterate/reviewers/performance`
+
+### Reviewer task prompt discipline
+
+Include:
+- Artifact paths (`context_path`, `handoff_path`, `machine_path`)
+- Iteration/delta summary from `## Delta` in handoff
+- Finalize-time user notes if any
+
+Omit:
+- Output format (reviewer agent files define their own `# Output`)
+- Focus or check lists (reviewer agent files define their own `# Focus`)
+- Target file paths from REV items (`machine_path` already enumerates every target)
+- Role assignment ("You are a …") — OpenCode routes tasks to the correct agent automatically
+
+Wrong: "You are a correctness reviewer. Output # REVIEW with Decision/Findings/Verified. Focus: schema, permissions, cross-refs. Review files: config/agent/_iterate/finalize.md, …"
+Correct: "context_path: /abs/PROMPT-ITERATE.md | handoff_path: /abs/PROMPT-ITERATE.handoff.md | machine_path: /abs/PROMPT-ITERATE.machine.md | delta: REV-001 New"
+
 - After each reviewer returns, validate its output:
   - Must start with `# REVIEW`.
   - Must contain `Decision: PASS | ADVISORY | BLOCKING`.
