@@ -1,0 +1,3 @@
+[submodule "opencode-source"]
+	path = opencode-source
+	url = https://github.com/Sewer56/opencode.git
