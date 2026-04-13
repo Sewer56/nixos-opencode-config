@@ -65,6 +65,8 @@ Review finalized iteration artifacts for iterate performance patterns.
 - Duplication cost: flag when duplicated content across artifacts increases re-review token cost. Prefer referencing over re-quoting when the same information appears in context, handoff, machine, and targets.
 - Coordination overhead: flag when a finalize agent or orchestrator scatters coordination state across subagent outputs instead of using a shared ledger or coordination file.
 - Scaling: flag patterns that scale badly as REV items grow — reviewers reading all artifacts on every pass, handoff growing unbounded, or cache files that accumulate stale entries without pruning.
+- External-doc lookup: flag revisions that make future finalize runs or generated targets consult external docs for operational behavior instead of embedding only the relevant rule fragments in the affected prompts or reviewers.
+- Rule-copy scaling: flag when the same optimization contract text is duplicated across multiple target prompts instead of split by role.
 
 # Output
 
@@ -93,7 +95,7 @@ wrapper, no text before `# REVIEW` or after the final `## Notes` line.
 Any content outside this format is a protocol violation.
 
 # Constraints
-- Block only when a target that runs a review loop or coordinates subagents lacks cache/Delta.
+- Block only when a target that runs a review loop or coordinates subagents lacks cache/Delta, or when operational behavior requires external-doc lookup.
 - Do not flag missing cache/Delta for targets that have no review loop or subagent coordination.
 - Keep findings short and specific.
 - Follow the `# Process` section for cache, Delta, and skip handling.

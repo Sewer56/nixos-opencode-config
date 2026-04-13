@@ -36,6 +36,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - Start from the paths and shapes already present in `context_path`.
 - Consume `Overall Goal:` lines and `[P#]` labeled steps directly.
 - Deepen discovery only where the confirmed context leaves concrete frontmatter fields, permission patterns, naming, cross-references, or output formats unresolved.
+- Infer which rules in `# Optimization Rules` apply to each confirmed target from its behavior: review loop, subagent coordination, machine-readable output, or convention/artifact changes.
 - Use `@codebase-explorer` for repo discovery first when needed.
 - Use `@mcp-search` for external libraries or APIs only when needed.
 - Read the files surfaced by discovery that matter to the machine artifact.
@@ -48,6 +49,8 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 ## 4. Write the machine artifact
 - Derive discrete `REV-###` items from the confirmed context and handoff.
 - Each REV item uses one or more diff blocks grounded in the current file state. Frontmatter and content are different regions of the same file — combine into a single diff block when contiguous, use multiple blocks when scattered. Cover only changes needed — omit restatements of unchanged content. Write `machine_path` using the `# Templates` section below.
+- Apply only the relevant rules from `# Optimization Rules` to each target. Split those rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
+- Keep operational rules in the generated targets themselves. Do not delegate model-facing behavior to external docs.
 
 ## 5. Run the review loop
 Follow the ordered steps below exactly, in order.
@@ -64,7 +67,8 @@ Follow the ordered steps below exactly, in order.
   - `@_iterate/reviewers/economy`
   - `@_iterate/reviewers/style`
   - `@_iterate/reviewers/performance`
-- Include:
+- Treat each reviewer prompt as scoped call data for the callee.
+- Include only:
   - Artifact paths (`context_path`, `handoff_path`, `machine_path`)
   - Iteration/delta summary from `## Delta` in handoff
   - Current `### Decisions` excerpt from handoff when it is non-empty
@@ -110,13 +114,14 @@ Follow the ordered steps below exactly, in order.
 
 # Optimization Rules
 
-Revisions produced by this iteration must follow:
+Revisions produced by this iteration must follow. Apply only the relevant rules below to each generated target and reviewer prompt:
 
 - **Reviewer cache + Delta**: targets that themselves run review loops or coordinate subagents include per-reviewer cache files and a Delta section in handoff so reviewers skip unchanged items on re-runs.
 - **Fixed output blocks**: machine-readable responses use fenced code blocks with `text` language tag. Never use `json`, `yaml`, or other tags for plain structured output.
 - **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
 - **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.
-- **Concise README-ITERATE.md**: when the iteration changes conventions or adds new artifacts, create a short reference file at `config/agent/_iterate/README-ITERATE.md`.
+- **Concise human-facing docs**: when the iteration changes conventions or adds new artifacts, include a short documentation update for humans.
+- **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — artifact paths, Delta/Decision excerpts, scoping, and user notes. Do not restate output formats, focus lists, role assignments, target paths already enumerated in shared artifacts, or blanket read orders.
 
 # Output
 

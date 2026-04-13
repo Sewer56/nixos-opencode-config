@@ -69,6 +69,9 @@ Review finalized iteration artifacts for token density and minimality.
 - Diff quality: flag incomplete diffs, diffs that restate unchanged content from `context_path`, or diffs that could be expressed more compactly.
 - Cross-document redundancy: flag when an artifact re-states information available in another artifact or referenced file (all pairwise: context↔handoff, context↔machine, handoff↔machine, machine↔targets). Prefer referencing by section name or file path over re-quoting content.
 - Optimization contract: extends cross-document redundancy to targets↔targets — flag when two REV items duplicate each other's content instead of referencing.
+- Rule splitting: flag when a `REV-###` copies the full optimization contract or human-facing documentation prose into multiple targets instead of placing only the relevant rule fragments in each prompt or reviewer.
+- Human-doc economy: when a `REV-###` adds or updates human-facing docs, keep them short and do not duplicate that prose in model-facing prompt instructions.
+- Subagent input economy: flag caller prompts that restate callee-owned output formats, focus/check lists, role assignments, target paths already available via `machine_path`, or blanket read orders. Prefer artifact paths, Delta/Decision excerpts, and user notes only.
 
 # Output
 
@@ -97,7 +100,7 @@ wrapper, no text before `# REVIEW` or after the final `## Notes` line.
 Any content outside this format is a protocol violation.
 
 # Constraints
-- Block only when revision instructions clearly exceed what the confirmed context requires.
+- Block only when revision instructions clearly exceed what the confirmed context requires, duplicate full rule contracts across targets, or copy human-facing documentation into model-facing prompts.
 - Do not block for concise but complete instructions.
 - Keep findings short and specific.
 - Follow the `# Process` section for cache, Delta, and skip handling.

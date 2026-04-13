@@ -67,6 +67,8 @@ Review finalized iteration artifacts for correctness, schema validity, and cross
 - Completeness: no placeholders, undefined fields, or unresolved ownership in `machine_path`.
 - Diff format: diff blocks parse correctly (balanced `+`/`-` lines, no stray markers); `Lines`, `Anchor`, and diff hunks reference valid content and ranges in the target file.
 - Ledger-file schema: Review Ledger in handoff contains only `### Decisions` for cross-domain arbitration. No `### Issues` subsection — domain-internal issue tracking stays in reviewer cache files.
+- Operational rule coverage: when a `REV-###` target runs a review loop, coordinates subagents, defines machine-readable output, or changes iterate conventions/artifacts, require the corresponding rule fragments to appear in that target revision: cache/Delta, shared coordination state, prompt-local structured-output instructions, short human-facing docs, and tight subagent inputs where applicable.
+- External-doc delegation: flag `REV-###` instructions that tell a target prompt or reviewer to consult external docs for operational behavior instead of stating the requirement directly.
 
 # Output
 
@@ -95,7 +97,7 @@ wrapper, no text before `# REVIEW` or after the final `## Notes` line.
 Any content outside this format is a protocol violation.
 
 # Constraints
-- Block for schema errors, missing required fields, permission inconsistencies, dangling references, or unresolved placeholders.
+- Block for schema errors, missing required fields, permission inconsistencies, dangling references, unresolved placeholders, missing applicable optimization rule fragments, or operational behavior delegated to external docs.
 - Do not block for minor wording preferences when schema and cross-references are valid.
 - Cite file paths and specific frontmatter fields or sections as evidence.
 - Keep findings short and specific.

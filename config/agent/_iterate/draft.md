@@ -50,6 +50,7 @@ Extract from user input:
 - Target: command, agent, or both. Which files.
 - Action: create new, refine existing, or both.
 - Intent: what the command/agent should accomplish.
+- Behavior traits: whether the target runs a review loop, coordinates subagents, defines machine-readable output, or changes conventions/artifacts.
 
 ## 2. Discover
 
@@ -68,11 +69,12 @@ From discovery, determine:
 - For new files: correct directory and naming convention.
 - For existing files: current state and gaps vs. request intent.
 - Dependencies: does the command need an agent that doesn't exist yet?
+- Applicable optimization requirements from `# Optimization Rules`: which rules the target files must satisfy based on the behavior traits above.
 
 ## 4. Write context
 
 Write `context_path` using the template below. Populate every section from discovery and request analysis.
-Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator. Human zone must stay narrative — no file paths, no action labels, no status markers. Machine zone must stay operational — no prose explanations. Zero overlap between zones. Return only items requiring action.
+Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator. Human zone must stay narrative — no file paths, no action labels, no status markers. Machine zone must stay operational — no prose explanations. Zero overlap between zones. In each `[P#]` `Shape:` line, state the applicable optimization requirements as target-file behavior and split them across the affected prompts or reviewers directly. Return only items requiring action.
 
 ## 5. Clarify
 
@@ -85,13 +87,13 @@ Ask up to 10 questions in one batch only if answers would materially improve the
 
 # Optimization Rules
 
-Targets produced by this iteration must follow:
+Targets produced by this iteration must follow. Carry only the applicable rules below into `PROMPT-ITERATE.md` as target-file behavior:
 
 - **Reviewer cache + Delta**: when the target itself runs a review loop or coordinates subagents, include per-reviewer cache files and a Delta section so reviewers skip unchanged items on re-runs.
 - **Fixed output blocks**: machine-readable responses use fenced code blocks with `text` language tag. Never use `json`, `yaml`, or other tags for plain structured output.
 - **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
 - **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.
-- **Concise README-ITERATE.md**: when the iteration changes conventions or adds new artifacts, create a short reference file at `config/agent/_iterate/README-ITERATE.md`.
+- **Concise human-facing docs**: when the iteration changes conventions or adds new artifacts, include a short documentation update for humans.
 - **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — paths, deltas, scoping. Never re-state output formats, focus lists, role assignments, or contracts the callee already defines.
 
 # Command→Agent Composition
@@ -128,11 +130,11 @@ create | refine | both
 
 ### [P1] <label>
 Paths: `<path>`
-Shape: <what changes and how>
+Shape: <what changes and how, including the applicable optimization requirements from `# Optimization Rules` as target-file behavior>
 
 ### [P2] <label>
 Paths: `<path>`
-Shape: <what changes and how>
+Shape: <what changes and how, including the applicable optimization requirements from `# Optimization Rules` as target-file behavior>
 
 ## Dependencies
 
