@@ -6,9 +6,6 @@
     "./plugins/rtk.ts",
     "./plugins/file-interp.ts"
   ],
-  "instructions": [
-    "CLAUDE.md",
-  ],
   "permission": {
     "bash": {
       "*": "allow"
