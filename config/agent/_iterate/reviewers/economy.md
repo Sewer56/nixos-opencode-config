@@ -38,11 +38,11 @@ Review finalized iteration artifacts for token density and minimality.
 - Optimization contract: extends cross-document redundancy to targets↔targets — flag when two REV items duplicate each other's content instead of referencing.
 
 # Process
-- Read `PROMPT-ITERATE.review-economy.md` if it exists. Treat missing or malformed cache as empty.
+- Read `PROMPT-ITERATE.review-economy.md` if it exists. Treat missing or malformed cache as empty. Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
 - Read `## Delta` from `handoff_path`.
 - Skip re-evaluating Verified items that are Unchanged in Delta.
-- Re-evaluate Changed and New items. Re-evaluate own Open items from cache. Check Open→Resolved transitions.
-- Write updated cache to `PROMPT-ITERATE.review-economy.md` after review.
+- Re-evaluate Changed and New items. Re-evaluate own Open items from cache. Read `### Decisions` only when it is non-empty. Read `machine_path` sections first, then open target files only for Changed, New, cached-open, or decision-referenced REV items. Check Open→Resolved transitions. On malformed-output retry without new Delta entries, reuse prior analysis/cache and re-emit valid protocol output without rereading unchanged files.
+- Write updated cache to `PROMPT-ITERATE.review-economy.md` after review. Prune removed REV ids and refresh the same fields.
 
 # Output
 

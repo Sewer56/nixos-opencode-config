@@ -61,7 +61,9 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - Each REV item uses one or more diff blocks grounded in the current file state. Frontmatter and content are different regions of the same file — combine into a single diff block when contiguous, use multiple blocks when scattered. Cover only changes needed — omit restatements of unchanged content. Write `machine_path` using the `# Templates` section below.
 
 ## 5. Run the review loop
-- Write `## Delta` to `handoff_path` before spawning reviewers. Delta lists each REV item as Unchanged, Changed, or New relative to the prior machine artifact.
+- Write `## Delta` to `handoff_path` before spawning reviewers and recompute it after every material revision.
+- Record each `REV-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields relative to the prior machine artifact.
+- Add artifact markers for `Source Context` and `Review Ledger` so reviewers can skip rereading unchanged artifacts.
 - After each full machine-artifact draft, run these reviewers in parallel, passing `context_path`, `handoff_path`, and `machine_path` to each:
   - `@_iterate/reviewers/correctness`
   - `@_iterate/reviewers/economy`
@@ -73,6 +75,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 Include:
 - Artifact paths (`context_path`, `handoff_path`, `machine_path`)
 - Iteration/delta summary from `## Delta` in handoff
+- Current `### Decisions` excerpt from handoff when it is non-empty
 - Finalize-time user notes if any
 
 Omit:
@@ -80,22 +83,23 @@ Omit:
 - Focus or check lists (reviewer agent files define their own `# Focus`)
 - Target file paths from REV items (`machine_path` already enumerates every target)
 - Role assignment ("You are a …") — OpenCode routes tasks to the correct agent automatically
+- Blanket read orders such as "read all three artifacts" or "read every REV target file" — reviewers decide what to open from Delta and cache state
 
 Wrong: "You are a correctness reviewer. Output # REVIEW with Decision/Findings/Verified. Focus: schema, permissions, cross-refs. Review files: config/agent/_iterate/finalize.md, …"
-Correct: "context_path: /abs/PROMPT-ITERATE.md | handoff_path: /abs/PROMPT-ITERATE.handoff.md | machine_path: /abs/PROMPT-ITERATE.machine.md | delta: REV-001 New"
+Correct: "context_path: /abs/PROMPT-ITERATE.md | handoff_path: /abs/PROMPT-ITERATE.handoff.md | machine_path: /abs/PROMPT-ITERATE.machine.md | delta: REV-001 Status=Changed Touched=config/agent/_iterate/finalize.md Why=Delta schema updated | decisions: None"
 
 - After each reviewer returns, validate its output:
   - Must start with `# REVIEW`.
   - Must contain `Decision: PASS | ADVISORY | BLOCKING`.
   - Must contain `## Findings` and `## Verified` headings.
-  - If validation fails: feed the specific error back to the reviewer
-    ("Output must start with '# REVIEW'. Got: …") and retry up to 2 times.
+  - If validation fails and Delta is unchanged: feed only the specific protocol error back to the reviewer, tell it to reuse prior analysis/cache, and retry up to 2 times without asking for rereads.
+  - If validation fails after a material revision changed Delta: include only the new Delta/Decision excerpt in the retry prompt and ask for a fresh protocol-compliant response.
   - If still malformed after retries: treat as BLOCKING with a synthetic
     finding noting the reviewer returned unparseable output.
 - Update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files.
 - Apply domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; STYLE → style reviewer; PERFORMANCE → performance reviewer. Arbitrate cross-domain conflicts.
 - Revise `machine_path` only where needed. Append one line to `## Revision History`.
-- Re-run all reviewers after every material revision.
+- Recompute `## Delta` in `handoff_path`, then re-run all reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
 - No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
@@ -175,7 +179,9 @@ Source Context: <absolute path to `PROMPT-ITERATE.md`>
 - Out of scope: <what this iteration intentionally leaves alone>
 
 ## Delta
-- REV-###: Unchanged | Changed | New
+- Source Context — Status: Unchanged | Changed | New; Touched: `PROMPT-ITERATE.md`; Why: <why reviewers do or do not need to reread source context>
+- Review Ledger — Status: Unchanged | Changed | New; Touched: `PROMPT-ITERATE.handoff.md`; Why: <why arbitration state changed or stayed stable>
+- REV-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
 
 ## Review Ledger
 Updated: <timestamp>

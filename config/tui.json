@@ -1,5 +1,8 @@
 {
   "$schema": "https://opencode.ai/tui.json",
   "theme": "catppuccin",
-  "scroll_speed": 1
+  "scroll_speed": 1,
+  "keybinds": {
+    "command_list": "ctrl+["
+  }
 }
