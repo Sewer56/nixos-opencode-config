@@ -31,10 +31,11 @@ Draft `PROMPT-ITERATE.md` for the `/iterate` command. Write only that file.
 
 # Config Root
 
-`CONFIG_ROOT`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config`
+`CONFIG_ROOT`: `config/`
+`LOCAL_ROOT`: `.opencode/`
 
-All command files: `CONFIG_ROOT/command/` subdirectories.
-All agent files: `CONFIG_ROOT/agent/` subdirectories and direct `.md` files.
+All command files: `CONFIG_ROOT/command/` subdirectories + `LOCAL_ROOT/command/` subdirectories.
+All agent files: `CONFIG_ROOT/agent/` subdirectories and direct `.md` files + `LOCAL_ROOT/agent/` subdirectories.
 Rules: `CONFIG_ROOT/rules/`
 Main config: `CONFIG_ROOT/opencode.json`
 
@@ -55,7 +56,7 @@ Extract from user input:
 ## 2. Discover
 
 Spawn `@codebase-explorer` to map:
-- Existing commands and agents in `CONFIG_ROOT`
+- Existing commands and agents in `CONFIG_ROOT` and `LOCAL_ROOT`
 - Conventions: frontmatter fields, permission patterns, naming, directory structure
 - Related files the target may reference or depend on
 - Ask for file paths if requesting full files
