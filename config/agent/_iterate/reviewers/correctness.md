@@ -33,6 +33,7 @@ Review finalized iteration artifacts for correctness, schema validity, and cross
 - Cross-references: no dangling file references. No "see the docs" without inlining the content. Every `REV-###` anchor points at a real section or frontmatter field in the target file.
 - Completeness: no placeholders, undefined fields, or unresolved ownership in `machine_path`.
 - Diff format: diff blocks parse correctly (balanced `+`/`-` lines, no stray markers); `Lines`, `Anchor`, and diff hunks reference valid content and ranges in the target file.
+- Ledger-file schema: Review Ledger in handoff contains only `### Decisions` for cross-domain arbitration. No `### Issues` subsection — domain-internal issue tracking stays in reviewer cache files.
 
 # Process
 - Read `PROMPT-ITERATE.review-correctness.md` if it exists. Treat missing or malformed cache as empty.

@@ -66,6 +66,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
   - `@_iterate/reviewers/correctness`
   - `@_iterate/reviewers/economy`
   - `@_iterate/reviewers/style`
+  - `@_iterate/reviewers/performance`
 - After each reviewer returns, validate its output:
   - Must start with `# REVIEW`.
   - Must contain `Decision: PASS | ADVISORY | BLOCKING`.
@@ -75,11 +76,21 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
   - If still malformed after retries: treat as BLOCKING with a synthetic
     finding noting the reviewer returned unparseable output.
 - Update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files.
-- Apply domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; STYLE → style reviewer. Arbitrate cross-domain conflicts.
+- Apply domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; STYLE → style reviewer; PERFORMANCE → performance reviewer. Arbitrate cross-domain conflicts.
 - Revise `machine_path` only where needed. Append one line to `## Revision History`.
 - Re-run all reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
 - No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
+
+# Optimization Rules
+
+Revisions produced by this iteration must follow:
+
+- **Reviewer cache + Delta**: targets that themselves run review loops or coordinate subagents include per-reviewer cache files and a Delta section in handoff so reviewers skip unchanged items on re-runs.
+- **Fixed output blocks**: machine-readable responses use fenced code blocks with `text` language tag. Never use `json`, `yaml`, or other tags for plain structured output.
+- **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
+- **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.
+- **Concise README-ITERATE.md**: when the iteration changes conventions or adds new artifacts, create a short reference file at `config/agent/_iterate/README-ITERATE.md`.
 
 # Output
 

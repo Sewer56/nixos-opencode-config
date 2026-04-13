@@ -83,6 +83,16 @@ Ask up to 10 questions in one batch only if answers would materially improve the
 - If latest user message explicitly confirms the draft is ready, return `Status: READY`.
 - Otherwise return `Status: DRAFT`.
 
+# Optimization Rules
+
+Targets produced by this iteration must follow:
+
+- **Reviewer cache + Delta**: when the target itself runs a review loop or coordinates subagents, include per-reviewer cache files and a Delta section so reviewers skip unchanged items on re-runs.
+- **Fixed output blocks**: machine-readable responses use fenced code blocks with `text` language tag. Never use `json`, `yaml`, or other tags for plain structured output.
+- **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
+- **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.
+- **Concise README-ITERATE.md**: when the iteration changes conventions or adds new artifacts, create a short reference file at `config/agent/_iterate/README-ITERATE.md`.
+
 # Command→Agent Composition
 
 When creating or refining command/agent pairs, understand how arguments flow:

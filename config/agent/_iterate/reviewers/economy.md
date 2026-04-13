@@ -35,6 +35,7 @@ Review finalized iteration artifacts for token density and minimality.
 - Wording optimization: flag when existing phrasing can be tightened without changing meaning. Prefer fewer tokens when semantic content is preserved. ~~'Make sure that you do not forget to include'~~ → 'Include'.
 - Diff quality: flag incomplete diffs, diffs that restate unchanged content from `context_path`, or diffs that could be expressed more compactly.
 - Cross-document redundancy: flag when an artifact re-states information available in another artifact or referenced file (all pairwise: context↔handoff, context↔machine, handoff↔machine, machine↔targets). Prefer referencing by section name or file path over re-quoting content.
+- Optimization contract: extends cross-document redundancy to targets↔targets — flag when two REV items duplicate each other's content instead of referencing.
 
 # Process
 - Read `PROMPT-ITERATE.review-economy.md` if it exists. Treat missing or malformed cache as empty.

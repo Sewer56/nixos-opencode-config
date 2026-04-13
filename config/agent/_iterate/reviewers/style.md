@@ -33,7 +33,8 @@ Review finalized iteration artifacts for instruction style quality.
 - Positive framing: each revision states what to do. ~~"Do not X"~~ → "Do Y." Lead with the desired action; omit prohibitions where an action suffices.
 - Negative examples: revisions that prescribe a style or format include a ~~wrong~~ example alongside the correct form. Use negative examples to demonstrate anti-patterns; keep surrounding instruction language positive.
 - Self-contained: each revision item usable without cross-referencing other files or external docs. Inline schemas, types, formats. Do not write "see the documentation" or "refer to the rules file".
-- Output format pinned: when a revision prescribes structured output, specify the exact format in a fenced code block with `text` language tag. Never use `json`, `yaml`, or other language tags for plain structured output — always `text`.
+- Output format pinned: when a revision or `REV-###` target prescribes structured output, specify the exact format in a fenced code block with `text` language tag. No loose format descriptions, no `json`/`yaml` tags for plain structured output — always `text`.
+- Fixed-output consistency: when multiple `REV-###` targets define the same structured output kind (e.g., review decisions), use identical format blocks. Divergent format blocks for the same kind are a style violation.
 
 # Process
 - Read `PROMPT-ITERATE.review-style.md` if it exists. Treat missing or malformed cache as empty.
