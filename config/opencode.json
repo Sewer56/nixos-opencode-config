@@ -1,6 +1,11 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": false,
+  "plugin": [
+    "./plugins/caveman.ts",
+    "./plugins/rtk.ts",
+    "./plugins/file-interp.ts"
+  ],
   "instructions": [
     "CLAUDE.md",
   ],
