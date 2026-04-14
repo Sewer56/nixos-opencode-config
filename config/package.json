@@ -14,6 +14,6 @@
     "install-types": "bun install"
   },
   "dependencies": {
-    "@opencode-ai/plugin": "0.0.0-production-202604132341"
+    "@opencode-ai/plugin": "0.0.0-production-202604141138"
   }
 }
