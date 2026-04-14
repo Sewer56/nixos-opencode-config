@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Inspects a plugin file, extracts its debug flag and service name, executes the plugin with debug enabled, and checks logs for issues
+description: Inspects a plugin file, extracts its debug flag and log path, executes the plugin with debug enabled, and checks co-located logs for issues
 permission:
   "*": deny
   read:
@@ -12,13 +12,9 @@ permission:
 hidden: false
 ---
 
-Inspect a plugin file, extract its debug flag and service name, execute it with debug enabled, and check logs for issues.
+Inspect a plugin file, extract its debug flag and log path, execute it with debug enabled, and check co-located logs for issues.
 
-# Input
-
-Pass the full plugin file path through unchanged — the user must supply an absolute path to the plugin TypeScript file.
-
-# Workflow
+# Process
 
 ## 1. Read the plugin file
 - Read the TypeScript file at the path the user provided.
@@ -28,41 +24,44 @@ Pass the full plugin file path through unchanged — the user must supply an abs
 - Capture the environment variable name (e.g. `FILE_INTERP_DEBUG`, `CAVEMAN_DEBUG`).
 - If no match is found, report that the plugin does not expose a debug flag and stop here without launching the command.
 
-## 3. Extract the service name
-- Search the file content for the service identifier inside `client.app.log` calls using the regex `service:\s*"([^"]+)"`.
-- Capture the service string (e.g. `file-interp`, `caveman`).
-- If no service name is found, default to the plugin filename stem (e.g. `file-interp` from `file-interp.ts`).
+## 3. Extract the log path
+- Search the file content for the plugin's log file path pattern using the regex `\.logs/([^/"]+)/debug\.log` or a `LOG_PATH` / `LOG_DIR` constant.
+- Derive the plugin name from the filename stem (e.g. `caveman` from `caveman.ts`) as fallback.
+- Construct the expected log path: `<plugin-dir>/.logs/<plugin-stem>/debug.log` (e.g. `config/plugins/.logs/caveman/debug.log`).
 
-## 4. Create the debug log directory
-- Run via bash: `mkdir -p /tmp/opencode-debug`
-
-## 5. Execute the plugin with debug enabled
+## 4. Execute the plugin with debug enabled
 - Build and execute the launch command:
   ```
-  <DEBUG_FLAG>=1 opencode -p . --model <MODEL> &> /tmp/opencode-debug/<service>-$(date +%s).log
+  <DEBUG_FLAG>=1 opencode -p . --model <MODEL>
   ```
 - Replace `<DEBUG_FLAG>` with the flag from step 2.
-- Replace `<service>` with the name from step 3.
 - Emit the command with `<MODEL>` as a literal placeholder.
 - Wait for the process to terminate before proceeding.
+- The plugin writes to its own co-located log file independently — no output redirection needed.
 
-## 6. Check the debug log
-- Read the temp log file created in step 5.
-- Grep for the service name to find plugin-produced entries.
+## 5. Check the co-located debug log
+- Read the log file at the path derived in step 3.
 - Report any entries at `error` or `warn` level as issues.
-- If the log file is empty or contains no entries for the service, note that the plugin produced no log output during the run.
+- If the log file does not exist or is empty, note that the plugin produced no log output during the run.
 
-## 7. Report results
+## 6. Report results
 - Return a structured summary of findings.
 
 # Output
+
 Return exactly:
 
 ```text
 Status: SUCCESS | NO_DEBUG_FLAG | NO_LOG_OUTPUT | FAIL
 Debug Flag: <flag-name> | None
-Service: <service-name> | None
+Plugin Name: <plugin-name> | None
+Log Path: <plugin-dir>/.logs/<plugin-name>/debug.log | N/A
 Issues: <count>
-Log Path: /tmp/opencode-debug/<service>-<timestamp>.log | N/A
 Summary: <one-line summary>
 ```
+
+---
+
+# Input
+
+Pass the full plugin file path through unchanged — the user must supply an absolute path to the plugin TypeScript file.
