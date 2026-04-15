@@ -26,6 +26,7 @@
       "permission": {
         "task": {
           "*": "deny",
+          "general": "allow",
           "mcp-search": "allow",
           "codebase-explorer": "allow"
         }
@@ -35,6 +36,7 @@
       "permission": {
         "task": {
           "*": "deny",
+          "general": "allow",
           "mcp-search": "allow",
           "codebase-explorer": "allow"
         }
