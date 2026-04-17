@@ -69,6 +69,7 @@ Review finalized iteration artifacts for correctness, schema validity, and cross
 - Ledger-file schema: Review Ledger in handoff contains only `### Decisions` for cross-domain arbitration. No `### Issues` subsection — domain-internal issue tracking stays in reviewer cache files.
 - Operational rule coverage: when a `REV-###` target runs a review loop, coordinates subagents, defines machine-readable output, or changes iterate conventions/artifacts, require the corresponding rule fragments to appear in that target revision: cache/Delta, shared coordination state, prompt-local structured-output instructions, short human-facing docs, and tight subagent inputs where applicable.
 - External-doc delegation: flag `REV-###` instructions that tell a target prompt or reviewer to consult external docs for operational behavior instead of stating the requirement directly.
+- Self-iteration enforcement completeness: when context contains `## Self-Iteration` with `Intent: rule-change`, block if any REV item updates `_iterate` text or documentation but no REV item updates enforcement-logic instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output.
 
 # Output
 

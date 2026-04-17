@@ -125,3 +125,24 @@ Omit:
 - Target file paths already enumerated in a shared artifact the callee receives
 - Blanket read orders — the callee uses Delta and cache state to choose what to
   open
+
+## Self-Iteration
+
+When `/iterate` targets `_iterate` agents, reviewers, or iterate commands, the draft agent detects self-iteration from target paths and classifies intent as `wording-only` or `rule-change`. Detection is path-based — no new flags or commands. Non-self iterations are unaffected.
+
+- **wording-only**: text clarifications with no enforcement-logic impact. Standard finalize and review flow.
+- **rule-change**: modifications to instructions governing future `/iterate` output. Requires at least one REV updating enforcement logic; the correctness reviewer blocks if missing.
+
+### wording-only example
+
+Request: "Clarify the description of Process step 3 in draft.md"
+
+Generated `## Self-Iteration`: `Intent: wording-only`, `Target-Scope: .opencode/agent/_iterate/draft.md`
+
+### rule-change example
+
+Request: "Add a new optimization rule to draft.md that reviewers must enforce"
+
+Generated `## Self-Iteration`: `Intent: rule-change`, `Target-Scope: .opencode/agent/_iterate/draft.md, .opencode/agent/_iterate/reviewers/correctness.md`
+
+The machine artifact must include a REV updating the reviewer focus list to enforce the new rule.

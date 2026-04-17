@@ -35,6 +35,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 ## 2. Deepen discovery only where needed
 - Start from the paths and shapes already present in `context_path`.
 - Consume `Overall Goal:` lines and `[P#]` labeled steps directly.
+- Read `## Self-Iteration` from `context_path` when present. For `wording-only` intent: proceed with standard finalize flow. For `rule-change` intent: apply the enforcement completeness gate in step 4.
 - Deepen discovery only where the confirmed context leaves concrete frontmatter fields, permission patterns, naming, cross-references, or output formats unresolved.
 - Infer which rules in `# Optimization Rules` apply to each confirmed target from its behavior: review loop, subagent coordination, machine-readable output, or convention/artifact changes.
 - Use `@codebase-explorer` for repo discovery first when needed.
@@ -51,6 +52,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - Each REV item uses one or more diff blocks grounded in the current file state. Frontmatter and content are different regions of the same file — combine into a single diff block when contiguous, use multiple blocks when scattered. Cover only changes needed — omit restatements of unchanged content. Write `machine_path` using the `# Templates` section below.
 - Apply only the relevant rules from `# Optimization Rules` to each target. Split those rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
 - Keep operational rules in the generated targets themselves. Do not delegate model-facing behavior to external docs.
+- When self-iteration intent is `rule-change`: verify at least one REV item updates enforcement-logic text (instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output). If no enforcement-logic REV exists, treat this as a fatal gap — add a REV item covering the missing enforcement-logic update rather than delegating to reviewers.
 
 ## 5. Run the review loop
 Follow the ordered steps below exactly, in order.
@@ -72,7 +74,8 @@ Follow the ordered steps below exactly, in order.
   - Artifact paths (`context_path`, `handoff_path`, `machine_path`)
   - Iteration/delta summary from `## Delta` in handoff
   - Current `### Decisions` excerpt from handoff when it is non-empty
-  - Finalize-time user notes if any
+   - Finalize-time user notes if any
+   - Self-iteration intent and target-scope from `context_path` `## Self-Iteration` section when present
 - Omit:
   - Output format (reviewer agent files define their own `# Output`)
   - Focus or check lists (reviewer agent files define their own `# Focus`)

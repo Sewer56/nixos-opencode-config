@@ -52,6 +52,7 @@ Extract from user input:
 - Action: create new, refine existing, or both.
 - Intent: what the command/agent should accomplish.
 - Behavior traits: whether the target runs a review loop, coordinates subagents, defines machine-readable output, or changes conventions/artifacts.
+- Self-iteration: when target paths include `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`, set `self_iteration: true`. Classify intent as `wording-only` (text refinements with no enforcement-logic impact) or `rule-change` (modifications to instructions that govern future `/iterate` output). Ask the user only when intent is materially ambiguous.
 
 ## 2. Discover
 
@@ -124,6 +125,13 @@ Overall Goal: <one-line goal>
 ---
 
 <!-- Machine sections below. Consumed by /iterate/finalize and reviewers. -->
+
+## Self-Iteration
+
+Intent: wording-only | rule-change
+Target-Scope: <files within _iterate whose text or enforcement logic changes>
+
+<!-- Omit this entire section when self-iteration is false. -->
 
 ## Action
 
