@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks iterate performance patterns — cache/delta efficiency, coordination overhead, and scaling
+description: Checks diff and hunk validity in machine iteration artifacts
 model: sewer-bifrost/zai-coding-plan/glm-5.1
 reasoningEffort: medium
 permission:
@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-ITERATE.review-performance.md": allow
+    "*PROMPT-ITERATE.review-diff.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -20,7 +20,7 @@ permission:
   external_directory: allow
 ---
 
-Review finalized iteration artifacts for iterate performance patterns.
+Review machine iteration artifacts for diff and hunk validity.
 
 **Execution Contract (hard requirements):**
 - Follow the numbered `# Process` steps exactly, in order.
@@ -34,13 +34,14 @@ Review finalized iteration artifacts for iterate performance patterns.
 - `machine_path`
 
 # Focus
-- Cache/delta efficiency: flag when a `REV-###` target itself runs a review loop or coordinates subagents but lacks per-reviewer cache files or a Delta section — reviewers will re-evaluate everything on each pass. Do not flag targets that have no review loop.
-- Coordination overhead: flag when a finalize agent or orchestrator scatters coordination state across subagent outputs instead of using a shared ledger or coordination file.
-- Scaling: flag patterns that scale badly as REV items grow — reviewers reading all artifacts on every pass, handoff growing unbounded, or cache files that accumulate stale entries without pruning.
+- Approximate-range validity: `@@` headers point near the change location in the target file; the range is within ±10 lines of the actual content. `Lines` and `Anchor` fields are approximate.
+- Context lines: every hunk includes 2+ unchanged context lines before and after each change region; context lines match content that exists in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
+- Diff completeness: include a diff block for every declared change region.
+- Diff compactness: include only changed lines. Omit verbatim restatements of `context_path` content.
 
 # Process
 1. Load cache
-- Read `PROMPT-ITERATE.review-performance.md` if it exists. Treat missing or malformed cache as empty.
+- Read `PROMPT-ITERATE.review-diff.md` if it exists. Treat missing or malformed cache as empty.
 - Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
 
 2. Read Delta and Decisions
@@ -59,7 +60,7 @@ Review finalized iteration artifacts for iterate performance patterns.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- Write updated cache to `PROMPT-ITERATE.review-performance.md` after review.
+- Write updated cache to `PROMPT-ITERATE.review-diff.md` after review.
 - Prune removed REV ids and refresh the same fields.
 
 6. Emit the final review block
@@ -68,15 +69,15 @@ Review finalized iteration artifacts for iterate performance patterns.
 
 ```text
 # REVIEW
-Agent: _iterate/reviewers/performance
+Agent: _iterate/reviewers/diff
 Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
-### [PERF-001]
-Category: CACHE_DELTA | COORDINATION | SCALING
+### [DIF-001]
+Category: RANGE_VALIDITY | CONTEXT_LINES | DIFF_COMPLETENESS | COMPACTNESS
 Severity: BLOCKING | ADVISORY
-Evidence: <section, `path:line`, or pattern>
-Problem: <what pattern scales badly or wastes tokens>
+Evidence: <section, `path:line`, or hunk reference>
+Problem: <what is wrong with the diff>
 Fix: <smallest concrete correction>
 
 ## Verified
@@ -86,12 +87,10 @@ Fix: <smallest concrete correction>
 - <optional short notes>
 ```
 
-Return ONLY the block above — no introduction, no summary, no conversational
-wrapper, no text before `# REVIEW` or after the final `## Notes` line.
-Any content outside this format is a protocol violation.
+Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 
 # Constraints
-- Block only when a target that runs a review loop or coordinates subagents lacks cache/Delta.
-- Do not flag missing cache/Delta for targets that have no review loop or subagent coordination.
+- Block when context lines are missing or do not match the target file.
+- Do not block for off-by-one or off-by-few line-count discrepancies.
 - Keep findings short and specific.
 - Follow the `# Process` section for cache, Delta, and skip handling.

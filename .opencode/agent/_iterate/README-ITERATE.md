@@ -96,9 +96,12 @@ Reviewers skip re-evaluating Unchanged items. They only check:
 
 Cache files:
 - `PROMPT-ITERATE.review-correctness.md`
-- `PROMPT-ITERATE.review-economy.md`
+- `PROMPT-ITERATE.review-wording.md`
 - `PROMPT-ITERATE.review-style.md`
 - `PROMPT-ITERATE.review-performance.md`
+- `PROMPT-ITERATE.review-dedup.md`
+- `PROMPT-ITERATE.review-diff.md`
+- `PROMPT-ITERATE.review-meta.md`
 
 ### Process Step Order
 
@@ -202,7 +205,7 @@ unaffected.
   get enforced. Standard finalize and review flow.
 - **rule-change**: modifications to rules that control future
   `/iterate` output. Requires at least one REV updating what rules
-  get enforced; the correctness reviewer blocks if missing.
+  get enforced; the meta reviewer blocks if missing.
 
 ### wording-only example
 

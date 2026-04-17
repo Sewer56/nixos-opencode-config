@@ -76,9 +76,12 @@ Follow the ordered steps below exactly, in order.
 2. Build reviewer prompts
 - After each full machine-artifact draft, run these reviewers in parallel:
   - `@_iterate/reviewers/correctness`
-  - `@_iterate/reviewers/economy`
+  - `@_iterate/reviewers/wording`
   - `@_iterate/reviewers/style`
   - `@_iterate/reviewers/performance`
+  - `@_iterate/reviewers/dedup`
+  - `@_iterate/reviewers/diff`
+  - `@_iterate/reviewers/meta`
 - Treat each reviewer prompt as scoped call data for the callee.
 - Include only:
   - Artifact paths (`context_path`, `handoff_path`, `machine_path`)
@@ -105,7 +108,7 @@ Follow the ordered steps below exactly, in order.
 
 5. Record decisions and apply domain ownership
 - Update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files.
-- Apply domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; STYLE → style reviewer; PERFORMANCE → performance reviewer. Arbitrate cross-domain conflicts.
+- Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; PERFORMANCE → performance; DEDUP → dedup; DIFF → diff; META → meta. Arbitrate cross-domain conflicts.
 
 6. Revise the machine artifact when findings require it
 - Revise `machine_path` only where needed.

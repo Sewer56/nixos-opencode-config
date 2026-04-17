@@ -35,7 +35,6 @@ Review finalized iteration artifacts for instruction style quality.
 
 # Focus
 - Imperative voice: revision instructions are commands, not descriptions. "Do X" not "This should do X".
-- Diff blocks are content, not instructions — exempt from imperative-voice rules. Skip `+`/`-` lines when checking voice and framing.
 - Prompt-local operational rules: when a revision adds workflow behavior to a prompt or reviewer, state the required action in that file.
 - Positive framing: each revision states what to do. Lead with the desired action; omit prohibitions where an action suffices.
 - Negative examples: revisions that prescribe a style or format include a wrong example alongside the correct form. Use negative examples to demonstrate anti-patterns; keep surrounding instruction language positive.
@@ -43,7 +42,6 @@ Review finalized iteration artifacts for instruction style quality.
 - Output format pinned: when a revision or `REV-###` target prescribes structured output, specify the exact format in a fenced code block with `text` language tag.
 - Fixed-output consistency: when multiple `REV-###` targets define the same structured output kind, use identical format blocks.
 - Subagent prompt shape: when a revision defines a reviewer or subagent prompt, pin only task-specific inputs.
-- Supplemental sub-ordering: flag when Supplemental sections follow a sub-optimal order within the post-Process zone. Prefer Output → Constraints → Rules → Templates/Examples. ~~Wrong: # Rules before # Output after Process.~~ Correct: # Output → # Constraints → # Rules. Advisory only — do not block.
 
 # Process
 1. Load cache
