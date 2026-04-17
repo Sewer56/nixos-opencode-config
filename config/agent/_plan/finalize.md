@@ -105,6 +105,7 @@ Summary: <one-line summary>
 - Only write planning artifacts `PROMPT-PLAN.handoff.md` and `PROMPT-PLAN.machine.md` during finalize.
 - Never modify product code while planning.
 - Never rewrite `PROMPT-PLAN.md` in this command.
+- Line numbers in diff headers and `Lines: ~start-end` fields are approximate per loaded rules; include 2+ unchanged context lines before and after each change region.
 - Keep `PROMPT-PLAN.machine.md` machine-first: stable headings, explicit refs, concrete file-level steps, and anchors that point at the current repo surface.
 - Keep `PROMPT-PLAN.handoff.md` factual and stable enough for the machine plan and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.

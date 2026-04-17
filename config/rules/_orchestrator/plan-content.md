@@ -4,5 +4,6 @@
 - No undefined helpers/types/symbols in snippets.
 - Insertions use normal code blocks with `Insert at: <anchor> (~start-end)`.
 - Edits/removals use `diff` blocks; deletions include `Remove lines: ~start-end`.
+- Line numbers in diff headers are approximate; include 2+ unchanged context lines before and after each change region. Context content is the authoritative locator.
 - Import changes use a dedicated import `diff` block.
 - If layout changes, include target tree and migration order.

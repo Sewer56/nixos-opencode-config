@@ -56,7 +56,7 @@ Write `API-AUDIT.md` to the repository root with these sections in order:
 - Reason: one sentence
 
 Diff:
-(unified diff - the exact source line before and after the visibility change)
+(unified diff - approximate source lines with 2+ context before and after the visibility change)
 ```
 
 **Correctly Public Items** - items promoted to KEEP PUBLIC by rules 1–6: `` `item_name` - reason (path:line) ``. Then one count line: `N items preclassified keep-public by collector (not individually listed)`.

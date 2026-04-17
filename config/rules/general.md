@@ -26,3 +26,5 @@ Use these rules for planning, implementation, and review unless a more specific 
 
 # Prefer src/package/installer.rs over src/utils/mod.rs
 ```
+
+Line numbers in diff hunks are approximate; context lines are the authoritative locator.

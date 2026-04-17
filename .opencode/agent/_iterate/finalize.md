@@ -144,7 +144,7 @@ Summary: <one-line summary>
 - Write only `PROMPT-ITERATE.handoff.md` and `PROMPT-ITERATE.machine.md` during finalize.
 - Modify only `PROMPT-ITERATE.handoff.md` and `PROMPT-ITERATE.machine.md` during finalize.
 - Read `PROMPT-ITERATE.md` as source of truth only; write to handoff and machine paths.
-- Keep `PROMPT-ITERATE.machine.md` diff-based: each REV item uses diff blocks grounded in the current file state with real line ranges and anchors. CREATE actions include full file content.
+- Keep `PROMPT-ITERATE.machine.md` diff-based: each REV item uses diff blocks grounded in the current file state with approximate line ranges and anchors per `# Rules`. CREATE actions include full file content.
 - Keep `PROMPT-ITERATE.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
 
@@ -153,13 +153,14 @@ Apply these rules when writing `machine_path`:
 
 - Write concrete values for every field and body — omit `...`, `TODO`, and comment-only stubs.
 - Specify the full path for every file reference: REV headings, `Evidence` fields, and diff block targets all use fully qualified paths from the project root (e.g. `config/agent/_iterate/finalize.md`, not `finalize.md`).
-- Reference only defined anchors and line ranges inside diff blocks.
+- Reference anchors and approximate line ranges inside diff blocks.
 - Insertions use normal code blocks with `Insert at: <anchor> (~start-end)`.
 - Edits/removals use `diff` blocks; deletions include `Remove lines: ~start-end`.
 - If frontmatter and content changes are contiguous, combine into a single diff block.
 - If changes are scattered across a file, use multiple diff blocks within one REV item.
 - CREATE actions include full file content in a normal code block (not a diff against empty).
 - Diff blocks target markdown files — use markdown-aware line references (headings, list items, fenced code blocks).
+- Line numbers in `@@` headers are approximate (±10 lines); include 2+ unchanged context lines before and after each change region so the implementer can locate changes by content matching rather than line counting.
 
 # Templates
 
@@ -235,7 +236,8 @@ Insert at: before | after | replace `<anchor or region>` | `None`
 Diff:
 
 ```diff
-<one or more diff blocks — use however many is most efficient.
+<one or more diff blocks — line numbers in @@ headers are approximate (±10);
+include 2+ unchanged context lines before and after each change region.
 a single block if changes are contiguous or frontmatter+content
 are close together; multiple blocks if scattered.>
 ```

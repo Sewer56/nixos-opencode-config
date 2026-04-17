@@ -88,7 +88,8 @@ Fix: <smallest concrete correction>
 <path/to/file>
 --- a/path/to/file
 +++ b/path/to/file
-@@ -N,M +N,M @@
+@@ -N,M +N,M @@  <!-- line numbers approximate; include 2+ unchanged
+context lines before and after each change -->
 -context
 +fix
 ```

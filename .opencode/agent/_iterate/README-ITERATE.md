@@ -25,6 +25,8 @@ and other similar workflows.
   — pass only what the called agent cannot derive from its own file
 - [Self-Iteration](#self-iteration)
   — path-based detection of wording-only vs rule-change self-iteration
+- [Approximate Diff Ranges](#approximate-diff-ranges)
+  — line numbers in diff headers are approximate; context lines are authoritative
 
 ## Section Ordering Convention
 
@@ -218,3 +220,14 @@ Generated `## Self-Iteration`: `Intent: rule-change`,
 
 The machine artifact must include a REV updating the reviewer focus
 list to enforce the new rule.
+
+## Approximate Diff Ranges
+
+All finalize agents and reviewers use standard `@@ -N,M +N,M @@`
+diff headers. Line numbers are approximate (±10 lines). Every hunk
+must include 2+ unchanged context lines before and after each change
+region so implementers locate changes by matching content rather than
+counting lines. Reviewers validate context content, not exact line
+counts — they block only when context lines are missing or do not
+match the target file, not for off-by-one or off-by-few line-count
+discrepancies.
