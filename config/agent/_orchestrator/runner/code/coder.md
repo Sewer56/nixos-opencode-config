@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Implements code changes and ensures all verification checks pass
-model: zai-coding-plan/glm-5.1
+model: sewer-bifrost/zai-coding-plan/glm-5.1
 permission:
   "*": deny
   read:

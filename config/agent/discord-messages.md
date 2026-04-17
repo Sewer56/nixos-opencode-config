@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Handles Discord message and channel operations through MCP tools.
-model: zai-coding-plan/glm-5.1
+model: sewer-bifrost/zai-coding-plan/glm-5.1
 permission:
   "*": deny
   discord_*: ask

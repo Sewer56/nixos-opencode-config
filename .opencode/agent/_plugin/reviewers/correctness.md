@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews plugin plans for fidelity, SDK type correctness, and standalone log/auto-load enforcement
-model: zai-coding-plan/glm-5.1
+model: sewer-bifrost/zai-coding-plan/glm-5.1
 reasoningEffort: medium
 permission:
   "*": deny

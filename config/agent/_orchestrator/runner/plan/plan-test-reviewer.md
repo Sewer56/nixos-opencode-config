@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates test design, deduplication, and parameterization opportunities
-model: zai-coding-plan/glm-5.1
+model: sewer-bifrost/zai-coding-plan/glm-5.1
 permission:
   "*": deny
   read:

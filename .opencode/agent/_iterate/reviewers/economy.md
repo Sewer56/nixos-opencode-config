@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks token density and minimality for iteration artifacts
-model: zai-coding-plan/glm-5.1
+model: sewer-bifrost/zai-coding-plan/glm-5.1
 reasoningEffort: medium
 permission:
   "*": deny

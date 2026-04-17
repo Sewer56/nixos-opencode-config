@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews plugin code for documentation coverage and returns doc diffs
-model: zai-coding-plan/glm-5.1
+model: sewer-bifrost/zai-coding-plan/glm-5.1
 reasoningEffort: medium
 permission:
   "*": deny

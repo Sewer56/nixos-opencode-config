@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks minimality and placement for finalized machine plans
-model: zai-coding-plan/glm-5.1
+model: sewer-bifrost/zai-coding-plan/glm-5.1
 permission:
   "*": deny
   read:
