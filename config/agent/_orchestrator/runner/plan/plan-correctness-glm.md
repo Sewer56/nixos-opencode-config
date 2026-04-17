@@ -33,7 +33,10 @@ Validate that the implementation plan will correctly and completely satisfy all 
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner
 - `ledger_path` (optional): absolute path to the current review ledger
-If `ledger_path` is provided, read the ledger from that path and use it as prior review context.
+
+## 1. Load Context
+
+Read `prompt_path` and `plan_path`. When `ledger_path` is provided, read the ledger from that path and use it as prior review context.
 
 ## 2. Blocking Criteria
 Mark an issue BLOCKING only when all present:

@@ -13,11 +13,9 @@ Add missing docs to the files specified by the user.
 $ARGUMENTS
 ```
 
-## Shared Rules
-
-- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
-
 ## Workflow
+
+`DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
 
 1. Read `DOCUMENTATION_RULES_PATH` once and use it as the documentation source of truth.
 

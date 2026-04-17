@@ -75,8 +75,7 @@ From discovery, determine:
 
 ## 4. Write context
 
-Write `context_path` using the template below. Populate every section from discovery and request analysis.
-Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator. Human zone must stay narrative — no file paths, no action labels, no status markers. Machine zone must stay operational — no prose explanations. Zero overlap between zones. In each `[P#]` `Shape:` line, state the applicable optimization requirements as target-file behavior and split them across the affected prompts or reviewers directly. Return only items requiring action.
+Write `context_path` using the template below. Populate every section from discovery and request analysis. Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator. Human zone must stay narrative — no file paths, no action labels, no status markers. Machine zone must stay operational — no prose explanations. Zero overlap between zones. In each `[P#]` `Shape:` line, state the applicable optimization requirements as target-file behavior and split them across the affected prompts or reviewers directly. Describe target-file sections in Inputs → Process → Supplemental order; note when the current file deviates. Omit `## User Request` when a command takes no arguments. Return only items requiring action.
 
 ## 5. Clarify
 
@@ -96,6 +95,7 @@ Targets produced by this iteration must follow. Carry only the applicable rules 
 - **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
 - **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.
 - **Concise human-facing docs**: when the iteration changes conventions or adds new artifacts, include a short documentation update for humans.
+- **Inline path variables**: when a section would contain only variable-to-path mappings (e.g. `RULES_DIR`, `DOCUMENTATION_RULES_PATH`), list those definitions at the start of the nearest Process or Workflow section instead of creating a separate section.
 - **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — paths, deltas, scoping. Never re-state output formats, focus lists, role assignments, or contracts the callee already defines.
 
 # Command→Agent Composition

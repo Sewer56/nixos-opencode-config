@@ -25,6 +25,11 @@ permission:
 
 Audit specific files or folders for items that are public/exported but should not be. Cross-reference usage across the entire repository. Produce a report with exact diffs.
 
+# Inputs
+
+- `$ARGUMENTS`: one or more file or directory paths to audit.
+- `repo_root`: determined from the working directory.
+
 # ORCHESTRATION
 
 ## 1. Resolve targets

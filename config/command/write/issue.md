@@ -12,6 +12,12 @@ Do one very quick repo pass before drafting:
 
 Then write the issue directly.
 
+## User Request
+
+```text
+$ARGUMENTS
+```
+
 ## Template Selection
 
 1. If repo issue templates exist, read them and choose the single best match for the user's request.
@@ -79,11 +85,3 @@ labels: [enhancement]
 - Write a tight initial issue draft that fits the chosen template.
 - Briefly state which template was used.
 - After writing the initial draft, offer an optional deep repo pass via `@general` to refine likely affected areas, solution shape, and risks.
-
-## User Request
-
-Treat the following as the user's issue request and draft from it:
-
-```text
-$ARGUMENTS
-```

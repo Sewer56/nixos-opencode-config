@@ -28,17 +28,6 @@ permission:
 
 Produce a reviewed error docs plan. Discover error-returning functions with missing or vague documentation. Draft specific error docs by tracing actual error paths. Write and review plan file until it passes. Return plan path for a separate apply session.
 
-# SHARED RULES
-
-- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
-- `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor`
-
-Read `DOCUMENTATION_RULES_PATH` once before starting. Source of truth for doc format and style.
-
-# Artifacts
-
-- `plan_path`: `PROMPT-ERROR-DOCS-PLAN.md` (repo root)
-
 # ORCHESTRATION
 
 ## 1. Discover structure
@@ -49,7 +38,7 @@ Spawn `@codebase-explorer` to map the repository:
 - Every module/crate boundary: Cargo.toml (Rust workspace members), package.json (Node). For Go: each directory containing `.go` files is a separate module.
 - Focus on library modules and application modules. Skip test-only fixtures.
 
-For each detected language, check if `lang-<language>-errors.txt` exists in `LANG_RULES_DIR`. Only languages with a matching rules file will be processed.
+For each detected language, check if `lang-<language>-errors.txt` exists in `LANG_RULES_DIR` (defined in `# SHARED RULES`). Only languages with a matching rules file will be processed.
 
 ## 2. Scope
 
@@ -81,7 +70,7 @@ Write `plan_path` using the template in `# Templates` below.
 
 For every `missing` or `vague` item from the collectors, draft the proposed error documentation using the `Traced Error Paths` from the collector output.
 
-For each item, read the matching `lang-<language>-errors.txt` from `LANG_RULES_DIR`. Apply:
+For each item, read the matching `lang-<language>-errors.txt` from `LANG_RULES_DIR` (defined in `# SHARED RULES`). Apply:
 
 - **Doc Format** section → write the proposed docs in the language's format
 - **Zero-Path Fallback** section → apply when the collector traced zero error paths
@@ -105,6 +94,17 @@ Loop until no findings of any severity remain or 10 iterations. If 3 consecutive
 - No findings: SUCCESS.
 - At cap with any BLOCKING finding: FAIL.
 - At cap with only ADVISORY findings: SUCCESS with risks.
+
+# SHARED RULES
+
+- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
+- `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor`
+
+Read `DOCUMENTATION_RULES_PATH` once before starting. Source of truth for doc format and style.
+
+# Artifacts
+
+- `plan_path`: `PROMPT-ERROR-DOCS-PLAN.md` (repo root)
 
 # Output
 

@@ -26,6 +26,15 @@ permission:
 
 Convert a confirmed iteration context into reviewed revision instructions. Write `PROMPT-ITERATE.handoff.md` and `PROMPT-ITERATE.machine.md`. Edit only `PROMPT-ITERATE.handoff.md` and `PROMPT-ITERATE.machine.md`.
 
+# Inputs
+- The latest user message may confirm the draft, provide finalize-time notes, or note changes since the draft.
+- Required local artifact: `PROMPT-ITERATE.md`
+
+# Artifacts
+- `context_path`: `PROMPT-ITERATE.md`
+- `handoff_path`: `PROMPT-ITERATE.handoff.md`
+- `machine_path`: `PROMPT-ITERATE.machine.md`
+
 # Process
 
 ## 1. Preconditions and source of truth
@@ -106,15 +115,6 @@ Follow the ordered steps below exactly, in order.
 - Loop until no findings of any severity remain or 10 iterations.
 - No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
-# Inputs
-- The latest user message may confirm the draft, provide finalize-time notes, or note changes since the draft.
-- Required local artifact: `PROMPT-ITERATE.md`
-
-# Artifacts
-- `context_path`: `PROMPT-ITERATE.md`
-- `handoff_path`: `PROMPT-ITERATE.handoff.md`
-- `machine_path`: `PROMPT-ITERATE.machine.md`
-
 # Optimization Rules
 
 Revisions produced by this iteration must follow. Apply only the relevant rules below to each generated target and reviewer prompt:
@@ -124,6 +124,7 @@ Revisions produced by this iteration must follow. Apply only the relevant rules 
 - **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
 - **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.
 - **Concise human-facing docs**: when the iteration changes conventions or adds new artifacts, include a short documentation update for humans.
+- **Inline path variables**: when a section would contain only variable-to-path mappings (e.g. `RULES_DIR`, `DOCUMENTATION_RULES_PATH`), list those definitions at the start of the nearest Process or Workflow section instead of creating a separate section.
 - **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — artifact paths, Delta/Decision excerpts, scoping, and user notes. Do not restate output formats, focus lists, role assignments, target paths already enumerated in shared artifacts, or blanket read orders.
 
 # Output

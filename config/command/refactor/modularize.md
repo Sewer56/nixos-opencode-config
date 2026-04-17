@@ -18,16 +18,6 @@ $ARGUMENTS
 
 Use the user input as the target scope (one or more files/directories).
 
-## Shared Rules
-
-- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
-- `GENERAL_RULES_PATH`: `general.md` relative to `RULES_DIR`
-- `DOCUMENTATION_RULES_PATH`: `documentation.md` relative to `RULES_DIR`
-- `PERFORMANCE_RULES_PATH`: `performance.md` relative to `RULES_DIR`
-- `TESTING_RULES_PATH`: `testing.md` relative to `RULES_DIR`
-- `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
-- `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
-
 ## Workflow
 
 1. Load shared rules
@@ -93,8 +83,18 @@ Say "go" to apply this plan, or suggest changes.
 - Summarize:
   - Files/modules created, removed, and moved
   - Symbol renames and final locations
-  - Any compatibility shims or intentional breaking changes
-  - Verification command results
+- Any compatibility shims or intentional breaking changes
+- Verification command results
+
+## Shared Rules
+
+- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
+- `GENERAL_RULES_PATH`: `general.md` relative to `RULES_DIR`
+- `DOCUMENTATION_RULES_PATH`: `documentation.md` relative to `RULES_DIR`
+- `PERFORMANCE_RULES_PATH`: `performance.md` relative to `RULES_DIR`
+- `TESTING_RULES_PATH`: `testing.md` relative to `RULES_DIR`
+- `TEST_PARAMETERIZATION_RULES_PATH`: `test-parameterization.md` relative to `RULES_DIR`
+- `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
 
 ## Example
 

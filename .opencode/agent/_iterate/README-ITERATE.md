@@ -3,15 +3,61 @@
 Reference for optimization patterns used by the `/iterate` workflow
 and other similar workflows.
 
-## Ordered-Step Placement
+- [Section Ordering Convention](#section-ordering-convention)
+  — Inputs → Process → Supplemental ordering for produced files
+- [Per-Reviewer Cache and Delta](#per-reviewer-cache-and-delta)
+  — each reviewer owns a cache file; skip unchanged items via Delta
+- [Read-on-Demand Reviewers](#read-on-demand-reviewers)
+  — reviewers open only changed, new, cached-open, or decision-referenced items
+- [Format-Only Retries](#format-only-retries)
+  — malformed-output retries reuse prior analysis, not rediscovery
+- [Fixed Output Format](#fixed-output-format)
+  — all reviewers return structured `# REVIEW` blocks in `text` fences
+- [No Duplicated Artifact Content](#no-duplicated-artifact-content)
+  — reference by section name or path, never re-state
+- [File-Based Coordination](#file-based-coordination)
+  — shared ledger for cross-domain arbitration, not scattered state
+- [Tight Subagent Inputs](#tight-subagent-inputs)
+  — pass only what the callee cannot derive from its own agent file
+- [Self-Iteration](#self-iteration)
+  — path-based detection of wording-only vs rule-change self-iteration
 
-Put ordered steps near the top of `/iterate/finalize` and iterate reviewer
-prompts.
-Keep the ordered step list contiguous.
-Move supporting reference material — inputs, focus notes, templates, and
-examples — below the ordered steps when the file shape allows it.
+## Section Ordering Convention
 
-For reviewers, use this order:
+All command and agent files produced by `/iterate` follow Inputs → Process →
+Supplemental section ordering.
+
+**Inputs zone** — what the agent/command receives:
+`# Inputs`, `# Artifacts`, `# Derived Paths`, `# Prerequisites`, `## User Input`
+
+**Process zone** — ordered steps and execution contracts:
+`# Process`, `# Workflow`, `## Workflow`
+
+**Supplemental zone** — everything else:
+`# Output`, `# Constraints`, `# Rules`, `# Focus`, `# Capabilities`, `# Safety`,
+`# Templates`, `# Examples`, `# Guidelines`, `# Defaults`, `# Blocking Criteria`,
+`# Issue Categories`
+
+Within Supplemental, prefer: Output → Constraints → Rules → Templates/Examples.
+This sub-ordering is advisory — minor variations acceptable.
+
+Exemptions:
+- Pure-proxy commands (frontmatter + `$ARGUMENTS` only)
+- Simple capability agents (role + Focus/Capabilities/Safety only)
+- `_iterate` reviewer files (Focus defines the review process and sits before
+  Process by design)
+
+Section heading style: `# Inputs` for agents, `## User Input` for commands.
+Keep existing heading levels; only reorder sections.
+
+Keep the ordered step list within Process contiguous. Move supporting reference
+material — inputs, focus notes, templates, and examples — below Process into
+Supplemental when the file shape allows it. Keep the output step last so the
+required review block or finalize status block remains the final answer.
+
+### Reviewer and finalize step order
+
+For reviewers, the canonical Process-zone step order:
 1. Load cache
 2. Read Delta and Decisions
 3. Reopen only Changed, New, cached-open, or decision-referenced REV items
@@ -19,10 +65,8 @@ For reviewers, use this order:
 5. Write cache
 6. Emit the required final output block
 
-Keep the output step last so the required review block or finalize status block
-remains the final answer.
-For finalize, keep the review-loop steps together in `# Process` and place prompt
-examples in the reference sections below the ordered steps.
+For finalize, keep the review-loop steps together in `# Process` and place
+prompt examples in the reference sections below the ordered steps.
 
 ## Per-Reviewer Cache and Delta
 

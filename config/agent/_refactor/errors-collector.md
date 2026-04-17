@@ -25,17 +25,11 @@ Enumerate all error-returning functions in one module, trace every error path in
 - `language`: language name as reported by `@codebase-explorer`
 - `repo_root`: absolute path to the repository root
 
-# Language Rules
-
-Language file directory: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor/`
-
-Read `lang-<language>-errors.txt` from that directory (e.g. `lang-rust-errors.txt`, `lang-typescript-errors.txt`). If the file does not exist for the given language, return only the summary block with a note: `No language rules for <language> — skipped.`
-
 # Workflow
 
 ## 1. Enumerate
 
-Find every **public** error-returning function in `target_path` using the detection and scope rules from the language file. Private and internal helpers are out of scope.
+Find every **public** error-returning function in `target_path` using the detection and scope rules from the language file (described in `# Language Rules`). Private and internal helpers are out of scope.
 
 For each function record: name, file path, line number, return type.
 
@@ -90,3 +84,9 @@ Specific (skipped): <count>
 ---END---
 ---COLLECTOR-END---
 ```
+
+# Language Rules
+
+Language file directory: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor/`
+
+Read `lang-<language>-errors.txt` from that directory (e.g. `lang-rust-errors.txt`, `lang-typescript-errors.txt`). If the file does not exist for the given language, return only the summary block with a note: `No language rules for <language> — skipped.`

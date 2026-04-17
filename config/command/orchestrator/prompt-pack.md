@@ -15,25 +15,9 @@ Use the input as either:
 
 If empty, use the current working directory.
 
-## Hard Rules
-- Start from the task description files. Do not invent tasks.
-- Do deep discovery before writing prompts.
-- Preserve task intent. Do not silently merge, split, drop, or reorder tasks in ways that change that intent.
-- If discovery finds a real blocker or a required reshape, stop and explain it instead of rewriting the task set.
-- Write machine-ready prompts that define outcomes, constraints, and evidence. Do not write implementation plans.
-- Every prompt must be standalone, include the context and file paths a fresh runner needs, and produce real code.
-- Review written prompt-pack files, not an in-memory draft.
-- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
-- Apply the shaping rules in this file and these shared rules relative to `RULES_DIR`:
-  - `general.md`
-  - `documentation.md`
-  - `performance.md`
-  - `testing.md`
-  - `test-parameterization.md`
-  - `code-placement.md`
-- The shared rule files are the source of truth for reusable code-writing guidance.
-
 ## Workflow
+
+Follow the rules described in `## Hard Rules` throughout all phases.
 
 ### Phase 1: Load task inputs
 - Resolve the input path or use the current working directory.
@@ -127,6 +111,24 @@ Prompt pack ready.
 Run `@_orchestrator` with `PROMPT-ORCHESTRATOR.md` to start execution.
 For a single prompt, use `@_orchestrator/runner`.
 ```
+
+## Hard Rules
+- Start from the task description files. Do not invent tasks.
+- Do deep discovery before writing prompts.
+- Preserve task intent. Do not silently merge, split, drop, or reorder tasks in ways that change that intent.
+- If discovery finds a real blocker or a required reshape, stop and explain it instead of rewriting the task set.
+- Write machine-ready prompts that define outcomes, constraints, and evidence. Do not write implementation plans.
+- Every prompt must be standalone, include the context and file paths a fresh runner needs, and produce real code.
+- Review written prompt-pack files, not an in-memory draft.
+- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
+- Apply the shaping rules in this file and these shared rules relative to `RULES_DIR`:
+  - `general.md`
+  - `documentation.md`
+  - `performance.md`
+  - `testing.md`
+  - `test-parameterization.md`
+  - `code-placement.md`
+- The shared rule files are the source of truth for reusable code-writing guidance.
 
 ## Prompt File Format: `PROMPT-NN-{title}.md`
 

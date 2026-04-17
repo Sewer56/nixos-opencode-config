@@ -25,6 +25,10 @@ permission:
 
 Audit every library module in the repository for items that are public/exported but should not be. Produce a report with exact diffs.
 
+# Inputs
+
+- `repo_root`: determined from the working directory.
+
 # ORCHESTRATION
 
 ## 1. Discover structure

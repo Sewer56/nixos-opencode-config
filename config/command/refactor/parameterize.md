@@ -18,12 +18,10 @@ Use `$ARGUMENTS` as one or more file or directory paths.
 
 If no target path is provided, stop and ask for an explicit path.
 
-## Shared Rules
-
-- `TESTING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/testing.md`
-- `TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/test-parameterization.md`
-
 ## Process
+
+`TESTING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/testing.md`
+`TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/test-parameterization.md`
 
 1. Read `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH` once and use them as the source of truth for duplicate-coverage expectations, case naming, and labels/comments.
 

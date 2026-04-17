@@ -27,24 +27,11 @@ Enumerate all public items in one module and count how many times each is used o
 - `repo_root`: absolute path to the repository root
 - `specific_paths`: (optional) list of absolute paths to specific files/directories within `target_path`. If provided and the module has more than 80 public items, enumerate only items whose file is within one of these paths and note the truncation in the summary.
 
-# Language-Specific Rules
-
-Language files are under `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_audit/`. Read the matching file before enumeration:
-
-- Rust → `lang-rust.txt`
-- TypeScript/JS → `lang-typescript.txt`
-- Python → `lang-python.txt`
-- Go → `lang-go.txt`
-- Java → `lang-java.txt`
-- Kotlin → `lang-kotlin.txt`
-
-Enumerate anything not fully private per the language file.
-
 # Workflow
 
 ## 1. Enumerate
 
-List every public item in `target_path` per the language file.
+List every public item in `target_path` per the language file (described in `# Language-Specific Rules`).
 
 Skip items inside `#[cfg(test)]` modules, `#[test]` functions, and test-only files (files matching the test patterns in the language file). These are only visible during test compilation and are not part of the production API surface.
 
@@ -129,3 +116,16 @@ Test-only External usage: <count>
 Enumeration: full | truncated (<enumerated> of <total> items)
 ---END---
 ```
+
+# Language-Specific Rules
+
+Language files are under `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_audit/`. Read the matching file before enumeration:
+
+- Rust → `lang-rust.txt`
+- TypeScript/JS → `lang-typescript.txt`
+- Python → `lang-python.txt`
+- Go → `lang-go.txt`
+- Java → `lang-java.txt`
+- Kotlin → `lang-kotlin.txt`
+
+Enumerate anything not fully private per the language file.

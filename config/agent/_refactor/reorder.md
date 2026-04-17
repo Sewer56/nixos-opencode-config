@@ -15,22 +15,10 @@ permission:
 
 Reorder declarations so reading top-to-bottom follows the call flow. This command is **plan-first** and requires explicit user confirmation before any code edits.
 
-## Shared Rules
-
-- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
-- `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
-
-## Ordering Rules
-
-1. **Visibility tier**: public/entry-point declarations before private/internal ones.
-2. **Reading order**: within each visibility tier, callers before callees.
-3. **Entry point first**: place the entry point (e.g. `main`, the primary exported function) first; then direct callees in the order called; then their callees, and so on.
-4. **Stability**: when two declarations have equal priority (same tier, no call dependency between them), preserve the existing relative order.
-
 ## Workflow
 
 1. Load shared rules
-- Read `CODE_PLACEMENT_RULES_PATH` once.
+- Read `CODE_PLACEMENT_RULES_PATH` once (defined in `## Shared Rules`).
 - Use it as the source of truth for ordering policy.
 
 2. Scope targets
@@ -45,7 +33,7 @@ Reorder declarations so reading top-to-bottom follows the call flow. This comman
 - Determine the visibility tier of each declaration (public/exported vs private/internal).
 - Build a call-dependency graph: note which declarations call which others.
 - Determine the entry point(s) (e.g. `main`, the module's primary public API).
-- Compute the target ordering using the ordering rules above.
+- Compute the target ordering using the rules described in `## Ordering Rules`.
 
 4. Draft a reorder plan (no file edits)
 - For each file, list the current declaration order (symbol names in file order).
@@ -91,6 +79,18 @@ Reorder declarations so reading top-to-bottom follows the call flow. This comman
 - Summarize files reordered and files already in order.
 - Summarize symbol movements per file.
 - Summarize verification command results.
+
+## Shared Rules
+
+- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
+- `CODE_PLACEMENT_RULES_PATH`: `code-placement.md` relative to `RULES_DIR`
+
+## Ordering Rules
+
+1. **Visibility tier**: public/entry-point declarations before private/internal ones.
+2. **Reading order**: within each visibility tier, callers before callees.
+3. **Entry point first**: place the entry point (e.g. `main`, the primary exported function) first; then direct callees in the order called; then their callees, and so on.
+4. **Stability**: when two declarations have equal priority (same tier, no call dependency between them), preserve the existing relative order.
 
 ## Constraints
 

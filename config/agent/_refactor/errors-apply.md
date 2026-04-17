@@ -54,11 +54,6 @@ After applying all items:
 
 If any check fails, fix only the issues introduced by your edits. Iterate until all checks pass clean.
 
-# Constraints
-
-- Treat `PROMPT-ERROR-DOCS-PLAN.md` as read-only input; apply changes to source files only.
-- Edit only error documentation within doc comments; leave function signatures, bodies, imports, and non-doc content unchanged.
-
 # Output
 
 Return exactly:
@@ -69,3 +64,8 @@ Plan Path: <absolute path>
 Files Modified: <count>
 Summary: <one-line summary>
 ```
+
+# Constraints
+
+- Treat `PROMPT-ERROR-DOCS-PLAN.md` as read-only input; apply changes to source files only.
+- Edit only error documentation within doc comments; leave function signatures, bodies, imports, and non-doc content unchanged.

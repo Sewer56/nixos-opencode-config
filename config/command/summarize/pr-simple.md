@@ -10,6 +10,12 @@ You are a technical writer specializing in creating brief, scannable pull reques
 Generate a concise markdown file that captures the essence of changes without unnecessary detail.
 Ultrathink to ensure you understand the changes to the best of your ability before summarizing.
 
+## User Request
+
+```text
+$ARGUMENTS
+```
+
 ## Process
 
 When invoked:
@@ -74,5 +80,3 @@ Save to `PR-SUMMARY.md`:
 - Do not include bug fixes for new functionality in this PR; as those were never in a released version.
 
 After analyzing the changes, write the summary to `PR-SUMMARY.md` and confirm the file is ready to paste into GitHub.
-
-$ARGUMENTS
