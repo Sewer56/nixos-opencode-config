@@ -47,6 +47,7 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 ## 2. Deepen discovery only where needed
 - Start from the paths and shapes already present in `context_path`.
 - Consume `Overall Goal:` lines and `[P#]` labeled steps directly.
+- `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers. Treat as draft-level guidance — ground REV diffs in actual file content.
 - Deepen discovery only where the confirmed context leaves frontmatter fields, permission patterns, naming, cross-references, or output formats unresolved.
 - Infer which optimization rules apply to each confirmed target from its behavior: review loop, subagent coordination, machine-readable output, or convention/artifact changes.
 - Use `@codebase-explorer` for repo discovery first when needed.

@@ -27,6 +27,8 @@ and other similar workflows.
   — path-based detection of wording-only vs rule-change self-iteration
 - [Approximate Diff Ranges](#approximate-diff-ranges)
   — line numbers in diff headers are approximate; context lines are authoritative
+- [Human-Friendly [P#] Items](#human-friendly-p-items)
+  — draft-stage items use explanation + diff with paths in diff headers
 
 ## Section Ordering Convention
 
@@ -231,3 +233,16 @@ counting lines. Reviewers validate context content, not exact line
 counts — they block only when context lines are missing or do not
 match the target file, not for off-by-one or off-by-few line-count
 discrepancies.
+
+## Human-Friendly [P#] Items
+
+Draft-stage `[P#]` items in `PROMPT-ITERATE.md`,
+`PROMPT-PLUGIN-PLAN.md`, and `PROMPT-PLAN.md` use free-form
+explanation + diff block with paths in diff headers.
+
+File paths appear in the diff block header (`--- a/<path>`).
+REFINE/UPDATE actions include the diff block. CREATE/ADD/INSERT
+actions use explanation only (or a code snippet for `_plan`).
+
+Format rules (approximate `@@` headers, 2+ context lines) follow
+the Approximate Diff Ranges convention above.

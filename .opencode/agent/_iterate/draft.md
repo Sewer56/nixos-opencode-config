@@ -75,7 +75,14 @@ From discovery, determine:
 
 ## 4. Write context
 
-Write `context_path` using the template below. Populate every section from discovery and request analysis. Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator. Human zone must stay narrative — no file paths, no action labels, no status markers. Machine zone must stay operational — no prose explanations. Zero overlap between zones. In each `[P#]` `Shape:` line, state the applicable optimization requirements as target-file behavior and split them across the affected prompts or reviewers directly. Describe target-file sections in Inputs → Process → Supplemental order; note when the current file deviates. Omit `## User Request` when a command takes no arguments. Return only items requiring action.
+Write `context_path` using the template below. Populate every section from discovery and request analysis.
+- Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator.
+- Human zone: narrative — no file paths, no action labels, no status markers.
+- Machine zone: operational — no prose explanations. Zero overlap between zones.
+- Each `[P#]` item is a free-form explanation followed by a diff block. File paths go in the diff block header (`--- a/<path>`).
+- REFINE: write explanation of intent, why, and applicable optimization rules as target-file behavior, then a unified diff block (`diff` fence, `@@` headers ±10, 2+ context lines per hunk).
+- CREATE: explanation only — no diff against empty.
+- Split optimization rules across affected prompts or reviewers. Describe target-file sections in Inputs → Process → Supplemental order. Omit `## User Request` when a command takes no arguments. Return only items requiring action.
 
 ## 5. Clarify
 
@@ -139,12 +146,25 @@ Target-Scope: <files within _iterate whose text or enforcement logic changes>
 create | refine | both
 
 ### [P1] <label>
-Paths: `<path>`
-Shape: <what changes and how, including the applicable optimization requirements from `# Optimization Rules` as target-file behavior>
+
+<free-form explanation of intent, why, and applicable optimization
+rules as target-file behavior>
+
+```diff
+<path>
+--- a/<path>
++++ b/<path>
+@@ -N,M +N,M @@
+ unchanged context
+-old content
++new content
+ unchanged context
+```
+
+<!-- CREATE actions: omit diff block. Explanation only. -->
 
 ### [P2] <label>
-Paths: `<path>`
-Shape: <what changes and how, including the applicable optimization requirements from `# Optimization Rules` as target-file behavior>
+<free-form explanation, or `None`>
 
 ## Dependencies
 
@@ -161,7 +181,9 @@ Shape: <what changes and how, including the applicable optimization requirements
 ## Evaluation Criteria
 
 Standard LLM-instruction quality criteria (token density, imperative voice, self-contained, positive framing, negative examples, schema correctness, permission consistency, minimal template) apply. Finalize agents and reviewers enforce these — do not repeat them here.
-Approximate diff ranges: when this iteration generates diff blocks, carry the Approximate diff ranges optimization rule into the Shape descriptions of affected [P#] items.
+Approximate diff ranges: diff blocks in `[P#]` items follow the Approximate diff ranges optimization rule — approximate `@@` headers (±10), 2+ context lines per hunk. Write the diff block; do not restate the rule text.
+ 
+ ````
 ````
 
 # Output

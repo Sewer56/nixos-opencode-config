@@ -57,6 +57,7 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
 
 ## 2. Deepen discovery only where needed
 - Start from the paths and shapes already present in `plan_path`.
+- `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers. Treat as draft-level guidance — ground implementation and test step diffs in actual file content.
 - Deepen discovery only where the confirmed plan still leaves concrete file placement, ownership, code shape, test coverage, verification commands, or external API details unresolved.
 - Use `@codebase-explorer` for repo discovery first when needed.
 - Use `@mcp-search` for external libraries or APIs first when needed.

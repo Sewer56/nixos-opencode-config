@@ -44,6 +44,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 ## 2. Deepen discovery only where needed
 - Start from the paths and shapes already present in `context_path`.
 - Consume `Overall Goal:` lines and `[P#]` labeled steps directly.
+- `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers (`--- a/<path>`). Treat the explanation and diff as draft-level guidance — ground REV diffs in actual file content.
 - Read `## Self-Iteration` from `context_path` when present. For `wording-only` intent: proceed with standard finalize flow. For `rule-change` intent: apply the enforcement completeness gate in step 4.
 - Deepen discovery only where the confirmed context leaves concrete frontmatter fields, permission patterns, naming, cross-references, or output formats unresolved.
 - Infer which rules in `# Optimization Rules` apply to each confirmed target from its behavior: review loop, subagent coordination, machine-readable output, or convention/artifact changes.

@@ -73,19 +73,28 @@ Overall Goal: <short line>
 ## Plan
 ### [P1] <short work chunk> - <short purpose>
 
-Paths: `path/to/file`, `path/to/other-file` | `None`
+<free-form explanation of intent and why>
 
-Shape:
+```diff
+path/to/file
+--- a/path/to/file
++++ b/path/to/file
+@@ -N,M +N,M @@
+ unchanged context
+-old content
++new content
+ unchanged context
+```
+
+<!-- ADD/INSERT on new files: use a code snippet instead of a diff: -->
 
 ```language
-<optional function signature, interface shape, route shape, or tiny placeholder snippet>
+<optional function signature, interface shape, or tiny placeholder snippet>
 ```
 
 ### [P2] <short work chunk> - <short purpose>
 
-Paths: `path/to/file` | `None`
-
-Shape: `None`
+<free-form explanation, or `None`>
 
 ## Open Questions
 - <question or `None`>

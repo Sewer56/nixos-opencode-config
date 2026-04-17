@@ -62,7 +62,8 @@ From discovery, determine:
 ## 4. Write context
 
 Write `context_path` using the template below. Populate every section from discovery and request analysis.
-Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator. Human zone stays narrative — no file paths, action labels, or status markers. Machine zone stays operational — no prose explanations. Zero overlap between zones. Return only items requiring action.
+Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator. Human zone stays narrative — no file paths, action labels, or status markers. Machine zone stays operational — no prose explanations. Zero overlap between zones.
+- Each `[P#]` item: free-form explanation + diff block (same convention as `_iterate/draft.md`). CREATE: explanation only. Return only items requiring action.
 
 ## 5. Clarify
 
@@ -206,8 +207,21 @@ Overall Goal: <one-line goal>
 create | refine
 
 ### [P1] <label>
-Paths: `<path>`
-Shape: <what changes and how>
+
+<free-form explanation of intent and why>
+
+```diff
+<path>
+--- a/<path>
++++ b/<path>
+@@ -N,M +N,M @@
+ unchanged context
+-old content
++new content
+ unchanged context
+```
+
+<!-- CREATE actions: omit diff block. Explanation only. -->
 
 ## Dependencies
 
