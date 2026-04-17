@@ -5,92 +5,90 @@ and other similar workflows.
 
 - [Section Ordering Convention](#section-ordering-convention)
   — Inputs → Process → Supplemental ordering for produced files
-- [Per-Reviewer Cache and Delta](#per-reviewer-cache-and-delta)
-  — each reviewer owns a cache file; skip unchanged items via Delta
-- [Read-on-Demand Reviewers](#read-on-demand-reviewers)
-  — reviewers open only changed, new, cached-open, or decision-referenced items
-- [Format-Only Retries](#format-only-retries)
-  — malformed-output retries reuse prior analysis, not rediscovery
+- [Cache and Delta](#cache-and-delta)
+  - [Mechanism](#mechanism)
+    — each reviewer owns a cache file; finalize writes the change list
+  - [Process Step Order](#process-step-order)
+    — reviewer step sequence: load → delta → select → inspect → cache → emit
+  - [Items to Re-Evaluate](#items-to-re-evaluate)
+    — reviewers open only changed, new, unresolved-finding, or
+      decision-referenced items
+  - [Malformed-Output Retries](#malformed-output-retries)
+    — fix format only; do not re-read files or redo analysis
 - [Fixed Output Format](#fixed-output-format)
   — all reviewers return structured `# REVIEW` blocks in `text` fences
 - [No Duplicated Artifact Content](#no-duplicated-artifact-content)
   — reference by section name or path, never re-state
 - [File-Based Coordination](#file-based-coordination)
-  — shared ledger for cross-domain arbitration, not scattered state
+  — one shared file for reviewer disagreements, not scattered state
 - [Tight Subagent Inputs](#tight-subagent-inputs)
-  — pass only what the callee cannot derive from its own agent file
+  — pass only what the called agent cannot derive from its own file
 - [Self-Iteration](#self-iteration)
   — path-based detection of wording-only vs rule-change self-iteration
 
 ## Section Ordering Convention
 
-All command and agent files produced by `/iterate` follow Inputs → Process →
-Supplemental section ordering.
+All command and agent files produced by `/iterate` follow
+Inputs → Process → Supplemental section ordering.
 
 **Inputs zone** — what the agent/command receives:
-`# Inputs`, `# Artifacts`, `# Derived Paths`, `# Prerequisites`, `## User Input`
+`# Inputs`, `# Artifacts`, `# Derived Paths`, `# Prerequisites`,
+`## User Input`
 
 **Process zone** — ordered steps and execution contracts:
 `# Process`, `# Workflow`, `## Workflow`
 
 **Supplemental zone** — everything else:
-`# Output`, `# Constraints`, `# Rules`, `# Focus`, `# Capabilities`, `# Safety`,
-`# Templates`, `# Examples`, `# Guidelines`, `# Defaults`, `# Blocking Criteria`,
-`# Issue Categories`
+`# Output`, `# Constraints`, `# Rules`, `# Focus`, `# Capabilities`,
+`# Safety`, `# Templates`, `# Examples`, `# Guidelines`, `# Defaults`,
+`# Blocking Criteria`, `# Issue Categories`
 
-Within Supplemental, prefer: Output → Constraints → Rules → Templates/Examples.
-This sub-ordering is advisory — minor variations acceptable.
+Within Supplemental, prefer: Output → Constraints → Rules →
+Templates/Examples. This sub-ordering is advisory — minor variations
+acceptable.
 
 Exemptions:
 - Pure-proxy commands (frontmatter + `$ARGUMENTS` only)
 - Simple capability agents (role + Focus/Capabilities/Safety only)
-- `_iterate` reviewer files (Focus defines the review process and sits before
-  Process by design)
+- `_iterate` reviewer files (Focus defines the review process and sits
+  before Process by design)
 
-Section heading style: `# Inputs` for agents, `## User Input` for commands.
-Keep existing heading levels; only reorder sections.
+Section heading style: `# Inputs` for agents, `## User Input` for
+commands. Keep existing heading levels; only reorder sections.
 
-Keep the ordered step list within Process contiguous. Move supporting reference
-material — inputs, focus notes, templates, and examples — below Process into
-Supplemental when the file shape allows it. Keep the output step last so the
-required review block or finalize status block remains the final answer.
+Keep the ordered step list within Process contiguous. Move supporting
+reference material — inputs, focus notes, templates, and examples —
+below Process into Supplemental when the file shape allows it. Keep the
+output step last so the required review block or finalize status block
+remains the final answer.
 
-### Reviewer and finalize step order
+## Cache and Delta
 
-For reviewers, the canonical Process-zone step order:
-1. Load cache
-2. Read Delta and Decisions
-3. Reopen only Changed, New, cached-open, or decision-referenced REV items
-4. Inspect only the selected `machine_path` sections and target files
-5. Write cache
-6. Emit the required final output block
+Applies only to targets that run a review loop or coordinate
+subagents.
 
-For finalize, keep the review-loop steps together in `# Process` and place
-prompt examples in the reference sections below the ordered steps.
+### Mechanism
 
-## Per-Reviewer Cache and Delta
+Each reviewer owns a cache file
+(`PROMPT-ITERATE.review-<domain>.md`). It reads the cache at start
+and writes at end.
 
-Applies only to targets that run a review loop or coordinate subagents.
-
-Each reviewer owns a cache file (`PROMPT-ITERATE.review-<domain>.md`). It reads
-the cache at start and writes at end.
-
-The finalize agent rewrites `## Delta` before the first review pass, then
-recomputes it after every material revision.
+The finalize agent rewrites `## Delta` before the first review pass,
+then recomputes it after every material revision.
 
 Each Delta entry records:
 - `Status`: Unchanged | Changed | New
 - `Touched`: path to the file that changed
 - `Why`: brief reason for the change
 
-Artifact markers for `Source Context` and `Review Ledger` let reviewers skip
-rereading unchanged artifacts.
+Artifact markers for `Source Context` and `Review Ledger` let
+reviewers skip rereading unchanged artifacts.
 
 Reviewers skip re-evaluating Unchanged items. They only check:
 - Changed items
 - New items
 - Decision-referenced items
-- Cached-open items
+- Items with unresolved findings from cache
 
 Cache files:
 - `PROMPT-ITERATE.review-correctness.md`
@@ -98,32 +96,49 @@ Cache files:
 - `PROMPT-ITERATE.review-style.md`
 - `PROMPT-ITERATE.review-performance.md`
 
-## Read-on-Demand Reviewers
+### Process Step Order
 
-Reviewers start from cache plus Delta. They carry forward cached `PASS` items
-with no open findings when their Delta state remains `Unchanged`.
+For reviewers, the Process-zone step order:
+1. Load cache
+2. Read Delta and Decisions
+3. Reopen only Changed, New, items with unresolved findings, or
+   decision-referenced REV items
+4. Inspect only the selected `machine_path` sections and target files
+5. Write cache
+6. Emit the required final output block
+
+For finalize, keep the review-loop steps together in `# Process` and
+place prompt examples in the reference sections below the ordered steps.
+
+### Items to Re-Evaluate
+
+Reviewers start from cache plus Delta. They carry forward cached
+`PASS` items with no open findings when their Delta state remains
+`Unchanged`.
 
 Read `machine_path` sections first. Then open target files only for:
 - Changed items
 - New items
-- Cached-open items
+- Items with unresolved findings from cache
 - Decision-referenced REV items
 
-## Format-Only Retries
+### Malformed-Output Retries
 
-Malformed-output retries are protocol fixes, not rediscovery.
+When a reviewer returns badly formatted output, fix the format only —
+do not re-read files or redo the analysis.
 
 If Delta and Decisions did not change:
 - Reuse prior analysis and cache
 - Re-emit valid output from the existing review state
 - Keep the retry format-only
 
-Re-read artifacts only when the retry includes new Delta or Decision entries.
+Re-read artifacts only when the retry includes new Delta or Decision
+entries.
 
 ## Fixed Output Format
 
-All iterate reviewers return structured output in fenced code blocks with `text`
-language tag.
+All reviewers return structured output in fenced code blocks with
+`text` language tag.
 
 Output must contain:
 - Starts with `# REVIEW`
@@ -144,49 +159,62 @@ Reference by section name or file path instead. Applies pairwise:
 
 ## File-Based Coordination
 
-When a finalize agent or orchestrator coordinates multiple subagents, use a
-shared ledger or coordination file for cross-domain arbitration.
+When multiple reviewers disagree, write decisions to one shared file
+instead of scattering them across reviewer outputs.
 
-Domain-internal issue tracking stays in reviewer cache files. The Review Ledger
-in handoff contains only `### Decisions`.
+Each reviewer tracks its own issues in its cache file. The handoff
+file stores only `### Decisions`.
 
 ## Tight Subagent Inputs
 
-Applies to any command or agent that spawns subagents (reviewers, explorers,
-etc.).
+Applies to any command or agent that spawns subagents (reviewers,
+explorers, etc.).
 
-The callee's agent file is the contract. The caller trusts it, not re-states it.
+The called agent's file is the contract — trust it, don't repeat it.
 
 Include:
-- Artifact paths the callee cannot discover on its own
-- Delta and Decision excerpts plus scoping context
+- Artifact paths the called agent cannot find on its own
+- Delta and Decision excerpts plus scope
 - User-supplied notes or arguments affecting the task
 
 Omit:
-- Output format — the callee's agent file already defines this
-- Focus/check lists — the callee's agent file already defines these
-- Role assignment — the callee's agent file already defines this
-- Target file paths already enumerated in a shared artifact the callee receives
-- Blanket read orders — the callee uses Delta and cache state to choose what to
-  open
+- Output format — the called agent's file already defines this
+- Focus/check lists — the called agent's file already defines these
+- Role assignment — the called agent's file already defines this
+- Target file paths already listed in a shared artifact the called
+  agent receives
+- Blanket read orders — the called agent uses Delta and cache state
+  to choose what to open
 
 ## Self-Iteration
 
-When `/iterate` targets `_iterate` agents, reviewers, or iterate commands, the draft agent detects self-iteration from target paths and classifies intent as `wording-only` or `rule-change`. Detection is path-based — no new flags or commands. Non-self iterations are unaffected.
+When `/iterate` targets `_iterate` agents, reviewers, or iterate
+commands, the draft agent detects self-iteration from target paths and
+classifies intent as `wording-only` or `rule-change`. Detection is
+path-based — no new flags or commands. Non-self iterations are
+unaffected.
 
-- **wording-only**: text clarifications with no enforcement-logic impact. Standard finalize and review flow.
-- **rule-change**: modifications to instructions governing future `/iterate` output. Requires at least one REV updating enforcement logic; the correctness reviewer blocks if missing.
+- **wording-only**: text clarifications with no effect on what rules
+  get enforced. Standard finalize and review flow.
+- **rule-change**: modifications to rules that control future
+  `/iterate` output. Requires at least one REV updating what rules
+  get enforced; the correctness reviewer blocks if missing.
 
 ### wording-only example
 
 Request: "Clarify the description of Process step 3 in draft.md"
 
-Generated `## Self-Iteration`: `Intent: wording-only`, `Target-Scope: .opencode/agent/_iterate/draft.md`
+Generated `## Self-Iteration`: `Intent: wording-only`,
+`Target-Scope: .opencode/agent/_iterate/draft.md`
 
 ### rule-change example
 
-Request: "Add a new optimization rule to draft.md that reviewers must enforce"
+Request: "Add a new optimization rule to draft.md that reviewers
+must enforce"
 
-Generated `## Self-Iteration`: `Intent: rule-change`, `Target-Scope: .opencode/agent/_iterate/draft.md, .opencode/agent/_iterate/reviewers/correctness.md`
+Generated `## Self-Iteration`: `Intent: rule-change`,
+`Target-Scope: .opencode/agent/_iterate/draft.md,
+.opencode/agent/_iterate/reviewers/correctness.md`
 
-The machine artifact must include a REV updating the reviewer focus list to enforce the new rule.
+The machine artifact must include a REV updating the reviewer focus
+list to enforce the new rule.
