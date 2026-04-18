@@ -77,7 +77,8 @@ subagents.
 
 Each reviewer owns a cache file
 (`PROMPT-ITERATE.review-<domain>.md`). It reads the cache at start
-and writes at end.
+and updates only changed entries at end. Full write only when the
+cache is missing or malformed.
 
 The finalize agent rewrites `## Delta` before the first review pass,
 then recomputes it after every material revision.
@@ -113,7 +114,7 @@ For reviewers, the Process-zone step order:
 3. Reopen only Changed, New, items with unresolved findings, or
    decision-referenced REV items
 4. Inspect only the selected `machine_path` sections and target files
-5. Write cache
+5. Update cache — only changed entries
 6. Emit the required final output block
 
 For finalize, keep the review-loop steps together in `# Process` and

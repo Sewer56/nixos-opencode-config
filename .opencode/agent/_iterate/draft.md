@@ -97,7 +97,7 @@ Ask up to 10 questions in one batch only if answers would materially improve the
 
 Targets produced by this iteration must follow. Carry only the applicable rules below into `PROMPT-ITERATE.md` as target-file behavior:
 
-- **Reviewer cache + Delta**: when the target itself runs a review loop or coordinates subagents, include per-reviewer cache files and a Delta section so reviewers skip unchanged items on re-runs.
+- **Reviewer cache + Delta**: when the target itself runs a review loop or coordinates subagents, include per-reviewer cache files and a Delta section so reviewers skip unchanged items on re-runs. Reviewers update only changed cache entries via targeted edits — preserve entries that are Unchanged and Verified unchanged.
 - **Fixed output blocks**: machine-readable responses use fenced code blocks with `text` language tag. Never use `json`, `yaml`, or other tags for plain structured output.
 - **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
 - **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.

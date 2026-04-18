@@ -144,7 +144,7 @@ Summary: <one-line summary>
 
 Revisions produced by this iteration must follow. Apply only the relevant rules below to each generated target and reviewer prompt:
 
-- **Reviewer cache + Delta**: targets that themselves run review loops or coordinate subagents include per-reviewer cache files and a Delta section in handoff so reviewers skip unchanged items on re-runs.
+- **Reviewer cache + Delta**: targets that themselves run review loops or coordinate subagents include per-reviewer cache files and a Delta section in handoff so reviewers skip unchanged items on re-runs. Reviewers update only changed cache entries via targeted edits — preserve entries that are Unchanged and Verified unchanged.
 - **Fixed output blocks**: machine-readable responses use fenced code blocks with `text` language tag. Never use `json`, `yaml`, or other tags for plain structured output.
 - **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
 - **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.

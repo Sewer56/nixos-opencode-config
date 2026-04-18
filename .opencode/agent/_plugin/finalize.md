@@ -147,7 +147,7 @@ Apply these rules when writing `machine_path`:
 
 Revisions produced by this finalize run must follow. Apply only the relevant rules below to each generated target and reviewer prompt:
 
-- **Reviewer cache + Delta**: targets that run review loops or coordinate subagents include per-reviewer cache files and a Delta section in handoff so reviewers skip unchanged items on re-runs.
+- **Reviewer cache + Delta**: targets that run review loops or coordinate subagents include per-reviewer cache files and a Delta section in handoff so reviewers skip unchanged items on re-runs. Reviewers update only changed cache entries via targeted edits — preserve entries that are Unchanged and Verified unchanged.
 - **Fixed output blocks**: use fenced code blocks with `text` language tag for plain structured output. ~~`json`/`yaml` tags for plain structured output~~ → `text` only.
 - **No duplicated content**: reference information from other artifacts by section name or file path. ~~Re-quoting content already in another artifact~~ → reference by section name.
 - **Shared ledger/file**: use a shared ledger or coordination file for orchestrator state when coordinating subagents. ~~Scattering coordination state across subagent outputs~~ → single shared file.

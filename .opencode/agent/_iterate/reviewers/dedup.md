@@ -62,8 +62,14 @@ Review finalized iteration artifacts for cross-document and cross-REV redundancy
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- Write updated cache to `PROMPT-ITERATE.review-dedup.md` after review.
-- Prune removed REV ids and refresh the same fields.
+- If `PROMPT-ITERATE.review-dedup.md` is missing or malformed: write the full cache file.
+- Otherwise: use targeted edits to update only entries that changed.
+  - Replace entries whose fields changed.
+  - Insert new entries in the appropriate section.
+  - Remove pruned REV ids.
+  - Move entries between sections when status transitions (e.g., Open → Resolved).
+- Always update the `Updated:` timestamp line.
+- Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
