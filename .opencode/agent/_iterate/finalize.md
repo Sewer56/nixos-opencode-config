@@ -85,7 +85,8 @@ Follow the ordered steps below exactly, in order.
   - `@_iterate/reviewers/dedup`
   - `@_iterate/reviewers/diff`
   - `@_iterate/reviewers/meta`
-- Treat each reviewer prompt as scoped call data for the callee.
+  - `@_iterate/reviewers/clarity`
+  - Treat each reviewer prompt as scoped call data for the callee.
 - Include only:
   - Artifact paths (`context_path`, `handoff_path`)
   - `rev_pattern`
@@ -104,7 +105,7 @@ Follow the ordered steps below exactly, in order.
 - Confirm the response starts with `# REVIEW`.
 - Confirm the response contains `Decision: PASS | ADVISORY | BLOCKING`.
 - Confirm the response contains `## Findings` and `## Verified` headings.
-- For diff-mandated reviewers (wording, dedup, style, correctness, diff): confirm each finding in `## Findings` contains a unified diff block for every finding. Treat missing diff blocks as a protocol violation requiring retry.
+- For diff-mandated reviewers (wording, dedup, style, correctness, diff, clarity): confirm each finding in `## Findings` contains a unified diff block for every finding. Treat missing diff blocks as a protocol violation requiring retry.
 - If the response remains malformed after retries, treat it as BLOCKING with a synthetic finding that notes the reviewer returned unparseable output.
 
 4. Retry malformed responses from the existing review state
@@ -113,7 +114,7 @@ Follow the ordered steps below exactly, in order.
 
 5. Record decisions and apply domain ownership
 - Update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files.
-- Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; PERFORMANCE → performance; DEDUP → dedup; DIFF → diff; META → meta. Arbitrate cross-domain conflicts.
+- Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; PERFORMANCE → performance; DEDUP → dedup; DIFF → diff; META → meta; CLARITY → clarity. Arbitrate cross-domain conflicts.
 
 6. Revise the machine artifact when findings require it
 - Revise REV files only where needed.

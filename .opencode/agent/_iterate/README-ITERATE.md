@@ -155,6 +155,7 @@ Cache files:
 - `PROMPT-ITERATE.review-dedup.md`
 - `PROMPT-ITERATE.review-diff.md`
 - `PROMPT-ITERATE.review-meta.md`
+- `PROMPT-ITERATE.review-clarity.md`
 
 ### Process Step Order
 
@@ -338,7 +339,7 @@ Two tiers:
 
 - **Diff-mandated**: the reviewer always knows the exact fix. Include
   a diff for every finding. Currently: wording, dedup, style,
-  correctness, diff (_iterate); documentation, errors (_plan);
+  correctness, diff, clarity (_iterate); documentation, errors (_plan);
   errors-reviewer (_refactor); plan-documentation-reviewer,
   plan-errors-reviewer (_orchestrator).
 
