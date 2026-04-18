@@ -11,6 +11,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-PLUGIN-PLAN.md": allow
+    "*PROMPT-PLUGIN-PLAN.draft-handoff.md": allow
   question: allow
   todowrite: allow
   external_directory: allow
@@ -21,6 +22,7 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "mcp-search": allow
+    "_plugin/reviewers/draft/*": allow
 ---
 
 Draft `PROMPT-PLUGIN-PLAN.md` for the `/plugin/draft` command.
@@ -32,6 +34,7 @@ Draft `PROMPT-PLUGIN-PLAN.md` for the `/plugin/draft` command.
 # Artifacts
 
 - `context_path`: `PROMPT-PLUGIN-PLAN.md` (current working directory)
+- `draft_handoff_path`: `PROMPT-PLUGIN-PLAN.draft-handoff.md` (current working directory)
 
 # Process
 
@@ -65,13 +68,57 @@ Write `context_path` using the template below. Populate every section from disco
 Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator. Human zone stays narrative — no file paths, action labels, or status markers. Machine zone stays operational — no prose explanations. Zero overlap between zones.
 - Each `[P#]` item: free-form explanation + diff block (same convention as `_iterate/draft.md`). CREATE: explanation only. Return only items requiring action.
 
-## 5. Clarify
+## 5. Run the draft review loop
+Follow the ordered steps below.
+
+1. Write and maintain `## Delta`
+- Write `draft_handoff_path` before the first reviewer pass.
+- Record each `[P#]` item as a compact entry with `Status:` and `Why:` fields.
+- Recompute `## Delta` after every material revision to `context_path`.
+
+2. Build reviewer prompts
+- After each draft, run these reviewers in parallel:
+  - `@_plugin/reviewers/draft/correctness`
+  - `@_plugin/reviewers/draft/wording`
+  - `@_plugin/reviewers/draft/style`
+  - `@_plugin/reviewers/draft/dedup`
+  - `@_plugin/reviewers/draft/clarity`
+- Include only:
+  - `context_path` and `draft_handoff_path`
+  - Iteration/delta summary from `## Delta`
+  - Current `### Decisions` excerpt when non-empty
+- Omit:
+  - Output format, focus/check lists, role assignment, blanket read orders
+
+3. Validate each reviewer response
+- Same validation as finalize: `# REVIEW` header, `Decision:`, `## Findings`, `## Verified`.
+- All 5 draft reviewers are diff-mandated.
+- Treat malformed output as BLOCKING after retries.
+
+4. Retry malformed responses from the existing review state
+- Same retry protocol as finalize.
+
+5. Record decisions and apply domain ownership
+- Update `### Decisions` in `draft_handoff_path`.
+- Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; DEDUP → dedup; CLARITY → clarity.
+
+6. Revise `PROMPT-PLUGIN-PLAN.md` when findings require it
+- Apply reviewer diffs via targeted edits; fall back to `Fix:` prose.
+- Recompute `## Delta`.
+
+7. Re-run or finish
+- Loop until no findings or 5 iterations.
+- No findings: proceed to Clarify. At cap: proceed with risks noted.
+- On re-entry (user explicitly requests re-review after a modification): recompute Delta for changed `[P#]` items, re-run this entire step. Reviewers skip Unchanged items via cache.
+
+## 6. Clarify
 
 Ask up to 10 questions in one batch only if answers would materially improve the context.
 
-## 6. Confirmation boundary
+## 7. Confirmation boundary
 
 - If latest user message explicitly confirms the draft is ready, return `Status: READY`.
+- When the user modifies the draft but does not request re-review, append a reminder: "Re-review available — say 'review' to re-run draft reviewers."
 - Otherwise return `Status: DRAFT`.
 
 # Output
@@ -87,7 +134,8 @@ Summary: <one-line summary>
 # Constraints
 
 - Write only `PROMPT-PLUGIN-PLAN.md`.
-- Modify only `PROMPT-PLUGIN-PLAN.md` while drafting.
+- Write `PROMPT-PLUGIN-PLAN.draft-handoff.md` during the review loop.
+- Write only `PROMPT-PLUGIN-PLAN.md` and `PROMPT-PLUGIN-PLAN.draft-handoff.md`. Do not modify other files.
 - Keep `PROMPT-PLUGIN-PLAN.md` compact and scannable.
 - Enforce the standalone log pattern: every plugin plan must include `.logs/<name>/debug.log` co-located logging, not `client.app.log`.
 - Enforce auto-loading: plugins in `config/plugins/` need no `opencode.json` registration.

@@ -11,6 +11,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-ITERATE.md": allow
+    "*PROMPT-ITERATE.draft-handoff.md": allow
   question: allow
   todowrite: allow
   external_directory: allow
@@ -21,6 +22,7 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "mcp-search": allow
+    "_iterate/reviewers/draft/*": allow
 ---
 
 Draft `PROMPT-ITERATE.md` for the `/iterate` command. Write only that file.
@@ -42,6 +44,7 @@ Main config: `CONFIG_ROOT/opencode.json`
 # Artifacts
 
 - `context_path`: `PROMPT-ITERATE.md` (current working directory)
+- `draft_handoff_path`: `PROMPT-ITERATE.draft-handoff.md` (current working directory)
 
 # Process
 
@@ -84,13 +87,66 @@ Write `context_path` using the template below. Populate every section from disco
 - CREATE: explanation only — no diff against empty.
 - Split optimization rules across affected prompts or reviewers. Describe target-file sections in Inputs → Process → Supplemental order. Omit `## User Request` when a command takes no arguments. Return only items requiring action.
 
-## 5. Clarify
+## 5. Run the draft review loop
+Follow the ordered steps below.
+
+1. Write and maintain `## Delta`
+- Write `draft_handoff_path` before the first reviewer pass.
+- Record each `[P#]` item as a compact entry with `Status:` and `Why:` fields relative to the prior draft state.
+- Recompute `## Delta` after every material revision to `context_path`.
+
+2. Build reviewer prompts
+- After each draft, run these reviewers in parallel:
+  - `@_iterate/reviewers/draft/correctness`
+  - `@_iterate/reviewers/draft/wording`
+  - `@_iterate/reviewers/draft/style`
+  - `@_iterate/reviewers/draft/dedup`
+  - `@_iterate/reviewers/draft/clarity`
+- Include only:
+  - `context_path` and `draft_handoff_path`
+  - Iteration/delta summary from `## Delta` in draft-handoff
+  - Current `### Decisions` excerpt from draft-handoff when non-empty
+- Omit:
+  - Output format — reviewer agents define their own `# Output`
+  - Focus or check lists — reviewer agents define their own `# Focus`
+  - Role assignment — OpenCode routes tasks automatically
+  - Blanket read orders — reviewers use Delta and cache state
+
+3. Validate each reviewer response
+- Confirm the response starts with `# REVIEW`.
+- Confirm the response contains `Decision: PASS | ADVISORY | BLOCKING`.
+- Confirm the response contains `## Findings` and `## Verified` headings.
+- All 5 draft reviewers are diff-mandated: confirm each finding contains a unified diff block.
+- Treat missing diff blocks as a protocol violation requiring retry.
+- If the response remains malformed after retries, treat it as BLOCKING with a synthetic finding that notes the reviewer returned unparseable output.
+
+4. Retry malformed responses from the existing review state
+- If validation fails and Delta plus Decisions are unchanged, send only the specific protocol error, tell the reviewer to reuse prior analysis/cache, and request a protocol-compliant re-emit.
+- If validation fails after a material revision changed Delta or Decisions, include only the new Delta/Decision excerpt and request a fresh protocol-compliant response.
+
+5. Record decisions and apply domain ownership
+- Update `### Decisions` in `draft_handoff_path` for cross-domain arbitration only.
+- Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; DEDUP → dedup; CLARITY → clarity. Arbitrate cross-domain conflicts.
+
+6. Revise `PROMPT-ITERATE.md` when findings require it
+- Revise `context_path` only where needed.
+- Apply reviewer diffs via targeted edits when present; fall back to `Fix:` prose otherwise.
+- Recompute `## Delta` in `draft_handoff_path`.
+
+7. Re-run or finish
+- Re-run all reviewers after every material revision.
+- Loop until no findings of any severity remain or 5 iterations.
+- No findings: proceed to Clarify. At cap: proceed to Clarify with risks noted.
+- On re-entry (user explicitly requests re-review after a modification): recompute Delta for changed `[P#]` items, re-run this entire step. Reviewers skip Unchanged items via cache.
+
+## 6. Clarify
 
 Ask up to 10 questions in one batch only if answers would materially improve the context.
 
-## 6. Confirmation boundary
+## 7. Confirmation boundary
 
 - If latest user message explicitly confirms the draft is ready, return `Status: READY`.
+- When the user modifies the draft but does not request re-review, append a reminder: "Re-review available — say 'review' to re-run draft reviewers."
 - Otherwise return `Status: DRAFT`.
 
 # Optimization Rules
@@ -163,6 +219,28 @@ rules as target-file behavior>
 ````
 ````
 
+## `PROMPT-ITERATE.draft-handoff.md`
+
+````markdown
+# Draft Review Handoff
+
+Source Context: <absolute path to `PROMPT-ITERATE.md`>
+
+## Delta
+
+- [P#] — Status: New | Changed | Unchanged; Why: <reason>
+
+## Review Ledger
+
+### Decisions
+
+#### [DEC-001]
+Type: DOMAIN_AUTHORITY | ARBITRATION
+Issue: <finding-id>
+Winner: <reviewer_name>
+Rationale: <why this view prevailed>
+````
+
 # Output
 
 Return exactly:
@@ -176,5 +254,6 @@ Summary: <one-line summary>
 # Constraints
 
 - Write only `PROMPT-ITERATE.md`.
-- Modify only `PROMPT-ITERATE.md` while drafting.
+- Write `PROMPT-ITERATE.draft-handoff.md` during the review loop.
+- Write only `PROMPT-ITERATE.md` and `PROMPT-ITERATE.draft-handoff.md`. Do not modify other files.
 - Keep `PROMPT-ITERATE.md` compact and scannable.

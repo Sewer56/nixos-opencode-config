@@ -9,6 +9,21 @@ Reference for the `/plugin/draft` → `/plugin/finalize` → `/plugin/implement`
 3. `/plugin/implement` — Apply the machine plan, type-check, then debug-iterate until the plugin loads cleanly.
 4. `/plugin/debug` — Inspect an existing plugin's debug flag and log path, run with debug enabled, check the co-located log file for issues.
 
+## Draft Review
+
+The draft agent runs 5 reviewers in `reviewers/draft/` before presenting
+the plan to the user:
+- `correctness` — plan template structure, diff header paths, plugin constraints
+- `dedup` — human/machine zone overlap, `[P#]` cross-item redundancy
+- `wording` — token density, bullet atomicity
+- `style` — imperative voice, positive framing
+- `clarity` — undefined jargon, opaque references
+
+Coordination: `PROMPT-PLUGIN-PLAN.draft-handoff.md` (Delta + Decisions).
+Cache: `PROMPT-PLUGIN-PLAN.draft-review-<domain>.md`. Iteration cap: 5.
+Re-review runs automatically on the initial write; after user modifications
+the agent reminds that re-review is available on request.
+
 ## Reviewers
 
 The finalize agent runs four reviewers in parallel:

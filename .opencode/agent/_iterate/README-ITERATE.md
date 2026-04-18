@@ -17,6 +17,11 @@ and other similar workflows.
       decision-referenced items
   - [Malformed-Output Retries](#malformed-output-retries)
     — fix format only; do not re-read files or redo analysis
+- [Draft Review Loop](#draft-review-loop)
+  - [Draft Reviewers](#draft-reviewers)
+    — five reviewers for the draft phase; applies to _iterate, _plugin, _plan
+  - [Draft Coordination](#draft-coordination)
+    — lightweight handoff + per-reviewer cache for each workflow's draft loop
 - [Fixed Output Format](#fixed-output-format)
   — all reviewers return structured `# REVIEW` blocks in `text` fences
 - [No Duplicated Artifact Content](#no-duplicated-artifact-content)
@@ -195,6 +200,46 @@ If Delta and Decisions did not change:
 
 Re-read artifacts only when the retry includes new Delta or Decision
 entries.
+
+## Draft Review Loop
+
+Applies to the draft agents in `_iterate`, `_plugin`, and `_plan`.
+Mirrors the finalize review loop with a simpler artifact shape and a
+subset of reviewers.
+
+### Draft Reviewers
+
+Five reviewers in each workflow's `reviewers/draft/` directory:
+- `correctness` — template structure, diff header paths, domain-specific constraints
+- `dedup` — human/machine zone overlap, `[P#]` cross-item redundancy
+- `wording` — token density, bullet atomicity, cross-section restatement
+- `style` — imperative voice (machine zone), positive framing, self-contained items
+- `clarity` — undefined jargon, compound-term compression, opaque references
+
+Omitted from all draft loops: `diff` (draft diffs are guidance-level),
+`performance` (no cache/delta to audit in the reviewed artifact),
+`meta` (self-iteration enforcement is a finalize concern).
+
+All 5 draft reviewers are diff-mandated. Cache keyed by `[P#]` item.
+
+### Draft Coordination
+
+Each draft agent writes `<artifact>.draft-handoff.md` as a lightweight
+coordination file containing Delta and Decisions — no Raw Request,
+Summary, or Scope (those live in the draft artifact itself).
+
+Cache files: `<artifact>.draft-review-<domain>.md`.
+
+Iteration cap: 5 (vs. 10 for finalize). The draft is smaller and will
+undergo finalize review; lower cap suffices.
+
+### Re-review After User Modifications
+
+The review loop runs automatically on the initial write only. After a
+user modifies the draft, the agent appends a reminder that re-review is
+available. Re-review triggers only on explicit user request (e.g.,
+"review", "re-review"). On re-entry, Delta is recomputed for changed
+`[P#]` items — reviewers skip Unchanged items via cache.
 
 ## Fixed Output Format
 

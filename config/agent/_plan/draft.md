@@ -12,6 +12,7 @@ permission:
     "*": deny
     "PROMPT-PLAN.md": allow
     "*PROMPT-PLAN.md": allow
+    "*PROMPT-PLAN.draft-handoff.md": allow
   question: allow
   todowrite: allow
   external_directory: allow
@@ -21,7 +22,8 @@ permission:
   task: {
     "*": "deny",
     "codebase-explorer": "allow",
-    "mcp-search": "allow"
+    "mcp-search": "allow",
+    "_plan/reviewers/draft/*": "allow"
   }
   # bash: deny
   # webfetch: deny
@@ -40,6 +42,7 @@ Create and maintain a collaborative human-first plan. Write only `PROMPT-PLAN.md
 
 # Artifacts
 - `plan_path`: `PROMPT-PLAN.md`
+- `draft_handoff_path`: `PROMPT-PLAN.draft-handoff.md`
 
 # Process
 
@@ -63,52 +66,57 @@ Create and maintain a collaborative human-first plan. Write only `PROMPT-PLAN.md
 - Keep snippets basic and brief. They are illustrative, not binding implementation instructions.
 - Leave unresolved human decisions in `## Open Questions`.
 
-Use this structure for `plan_path`:
+## 4. Run the draft review loop
+Follow the ordered steps below.
 
-````markdown
-# Task Plan
+1. Write and maintain `## Delta`
+- Write `draft_handoff_path` before the first reviewer pass.
+- Record each `[P#]` item as a compact entry with `Status:` and `Why:` fields.
+- Recompute `## Delta` after every material revision to `plan_path`.
 
-Overall Goal: <short line>
+2. Build reviewer prompts
+- After each draft, run these reviewers in parallel:
+  - `@_plan/reviewers/draft/correctness`
+  - `@_plan/reviewers/draft/wording`
+  - `@_plan/reviewers/draft/style`
+  - `@_plan/reviewers/draft/dedup`
+  - `@_plan/reviewers/draft/clarity`
+- Include only:
+  - `plan_path` and `draft_handoff_path`
+  - Iteration/delta summary from `## Delta`
+  - Current `### Decisions` excerpt when non-empty
+- Omit:
+  - Output format, focus/check lists, role assignment, blanket read orders
 
-## Plan
-### [P1] <short work chunk> - <short purpose>
+3. Validate each reviewer response
+- Same validation as finalize: `# REVIEW` header, `Decision:`, `## Findings`, `## Verified`.
+- All 5 draft reviewers are diff-mandated.
+- Treat malformed output as BLOCKING after retries.
 
-<free-form explanation of intent and why>
+4. Retry malformed responses from the existing review state
+- Same retry protocol as finalize.
 
-```diff
-path/to/file
---- a/path/to/file
-+++ b/path/to/file
- unchanged context
--old content
-+new content
- unchanged context
-```
+5. Record decisions and apply domain ownership
+- Update `### Decisions` in `draft_handoff_path`.
+- Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; DEDUP → dedup; CLARITY → clarity.
 
-<!-- ADD/INSERT on new files: use a code snippet instead of a diff: -->
+6. Revise `PROMPT-PLAN.md` when findings require it
+- Apply reviewer diffs via targeted edits; fall back to `Fix:` prose.
+- Recompute `## Delta`.
 
-```language
-<optional function signature, interface shape, or tiny placeholder snippet>
-```
+7. Re-run or finish
+- Loop until no findings or 5 iterations.
+- No findings: proceed to Clarify. At cap: proceed with risks noted.
+- On re-entry (user explicitly requests re-review after a modification): recompute Delta for changed `[P#]` items, re-run this entire step. Reviewers skip Unchanged items via cache.
 
-### [P2] <short work chunk> - <short purpose>
-
-<free-form explanation, or `None`>
-
-## Open Questions
-- <question or `None`>
-
-## Decisions
-- <scope choice or `None`>
-````
-
-## 4. Clarify only when needed
+## 5. Clarify only when needed
 - If the request is too ambiguous to outline responsibly, ask only the missing question or questions.
 - Otherwise, prefer writing the best grounded draft and recording unresolved items in `## Open Questions`.
 
-## 5. Confirmation boundary
+## 6. Confirmation boundary
 - If the latest user message explicitly confirms the draft is ready for machine planning, do not continue into machine planning.
 - Return `Status: READY` so the user can run `/plan/finalize`.
+- When the user modifies the draft but does not request re-review, append a reminder: "Re-review available — say 'review' to re-run draft reviewers."
 - Otherwise return `Status: DRAFT`.
 
 # Output
@@ -122,6 +130,8 @@ Summary: <one-line summary>
 
 # Constraints
 - Only write planning artifact `PROMPT-PLAN.md`.
+- Write `PROMPT-PLAN.draft-handoff.md` during the review loop.
+- Write only `PROMPT-PLAN.md` and `PROMPT-PLAN.draft-handoff.md`. Do not modify other files.
 - Never modify product code while drafting.
 - Keep `PROMPT-PLAN.md` human-first: short, scannable, and easy to discuss with the user.
 - Keep user-facing responses brief and factual.
