@@ -42,6 +42,7 @@ Review finalized iteration artifacts for instruction style quality.
 - Output format pinned: when a revision or `REV-###` target prescribes structured output, specify the exact format in a fenced code block with `text` language tag.
 - Fixed-output consistency: when multiple `REV-###` targets define the same structured output kind, use identical format blocks.
 - Subagent prompt shape: when a revision defines a reviewer or subagent prompt, pin only task-specific inputs.
+- Nested code fences: block when a REV target or reviewer output format example contains an inner ``` fence inside an outer ``` fence. The outer fence must use more backticks (e.g. ```` for outer when inner uses ```).
 
 # Process
 1. Load cache

@@ -126,3 +126,4 @@ Summary: <one-line summary>
 - Never modify product code while drafting.
 - Keep `PROMPT-PLAN.md` human-first: short, scannable, and easy to discuss with the user.
 - Keep user-facing responses brief and factual.
+- Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to template sections and code snippets within the plan.

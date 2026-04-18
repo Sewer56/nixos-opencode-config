@@ -38,6 +38,7 @@ Review machine iteration artifacts for diff and hunk validity.
 - Context lines: every hunk includes 2+ unchanged context lines before and after each change region; context lines match content that exists in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
 - Diff completeness: include a diff block for every declared change region.
 - Diff compactness: include only changed lines. Omit verbatim restatements of `context_path` content.
+- Nested code fences: block when a diff block inside `machine_path` sits within an outer fenced code block that uses the same number of backticks as the inner diff fence. The outer fence must use more backticks.
 
 # Process
 1. Load cache

@@ -91,6 +91,7 @@ Summary: <one-line summary>
 - Keep `PROMPT-PLUGIN-PLAN.md` compact and scannable.
 - Enforce the standalone log pattern: every plugin plan must include `.logs/<name>/debug.log` co-located logging, not `client.app.log`.
 - Enforce auto-loading: plugins in `config/plugins/` need no `opencode.json` registration.
+- Enforce nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block.
 
 ---
 

@@ -153,6 +153,7 @@ Revisions produced by this finalize run must follow. Apply only the relevant rul
 - **Shared ledger/file**: use a shared ledger or coordination file for orchestrator state when coordinating subagents. ~~Scattering coordination state across subagent outputs~~ → single shared file.
 - **Concise human-facing docs**: include a short documentation update for humans when the iteration changes conventions or adds new artifacts.
 - **Tight subagent inputs**: pass only artifact paths, Delta/Decision excerpts, scoping, and user notes to subagents. ~~Re-stating output formats, focus lists, role assignments, target paths already enumerated in shared artifacts, or blanket read orders~~ → pass only what the callee cannot derive from its own agent file.
+- **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to templates, machine-artifact diff blocks, and reviewer output format examples.
 
 # Reference Paths
 

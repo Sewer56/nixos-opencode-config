@@ -71,7 +71,7 @@ Review plugin code for documentation coverage and return doc diffs.
 
 # Output
 
-```text
+````text
 # REVIEW
 Agent: _plugin/reviewers/documentation
 Decision: PASS | ADVISORY | BLOCKING
@@ -100,7 +100,7 @@ context lines before and after each change -->
 
 ## Notes
 - <optional short notes>
-```
+````
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

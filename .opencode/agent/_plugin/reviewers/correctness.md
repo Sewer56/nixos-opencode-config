@@ -73,10 +73,11 @@ Review plugin plans for correctness, fidelity, and SDK type validity.
 - **Log handling**: `client.app.log` usage for debug output in generated plugin code is BLOCKING. Standalone file pattern required.
 - **Approximate-range validity**: `@@` headers in `## Diff` sections point near the change location in the target file; the range is within ±10 lines of the actual content.
 - **Diff context**: every hunk in `## Diff` sections includes 2+ unchanged context lines before and after each change region; context lines match content in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
+- **Nested code fences**: block when a REV target contains an inner ``` fence inside an outer ``` fence. The outer fence must use more backticks (e.g. ```` for outer when inner uses ```).
 
 # Output
 
-```text
+````text
 # REVIEW
 Agent: _plugin/reviewers/correctness
 Decision: PASS | ADVISORY | BLOCKING
@@ -104,7 +105,7 @@ Fix: <smallest concrete correction>
 
 ## Notes
 - <optional short notes>
-```
+````
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 
