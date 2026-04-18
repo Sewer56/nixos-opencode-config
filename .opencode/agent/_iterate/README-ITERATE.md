@@ -20,8 +20,10 @@ and other similar workflows.
 - [Fixed Output Format](#fixed-output-format)
   — all reviewers return structured `# REVIEW` blocks in `text` fences
 - [No Duplicated Artifact Content](#no-duplicated-artifact-content)
-  — reference by section name or path, never re-state
-- [File-Based Coordination](#file-based-coordination)
+   — reference by section name or path, never re-state
+ - [Rules-File Scope and Independence](#rules-file-scope-and-independence)
+   — rules files define scope; targets reference, not duplicate; rules files stand alone
+ - [File-Based Coordination](#file-based-coordination)
   — one shared file for reviewer disagreements, not scattered state
 - [Tight Subagent Inputs](#tight-subagent-inputs)
   — pass only what the called agent cannot derive from its own file
@@ -212,6 +214,27 @@ Reference by section name or file path instead. Applies pairwise:
 - handoff ↔ machine
 - machine ↔ targets
 - targets ↔ targets
+ 
+## Rules-File Scope and Independence
+
+Two principles that prevent redundancy in rules-file usage:
+
+**Rules-scope principle:** A rules file defines the scope, criteria, and
+requirements for its domain. Agents and reviewers that import a rules file
+must reference it — not re-state its content in their own Focus, Constraints,
+or Blocking Criteria sections. Violations are flagged by `dedup`
+(`RULES_SCOPE_REDUNDANCY`, blocking).
+
+**Rules-file independence principle:** Each rules file is loaded
+independently by reference. No rules file may import, reference, or
+cross-link another rules file. Violations are flagged by `dedup`
+(`RULES_FILE_INDEPENDENCE`, blocking).
+
+Within a single target, the same concept restated across Focus, Blocking
+Criteria, and Constraints is flagged by `wording`
+(`CROSS_SECTION_RESTATEMENT`, blocking) — state once in the most specific
+section and reference from others. This is an internal-tightness concern
+(wording's domain), not a between-artifact duplication (dedup's domain).
 
 ## File-Based Coordination
 

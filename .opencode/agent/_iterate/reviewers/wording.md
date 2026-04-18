@@ -34,11 +34,13 @@ Review finalized iteration artifacts for LLM instruction wording quality.
 - `rev_pattern` (e.g., `PROMPT-ITERATE.rev.*.md`)
 
 # Focus
-- Token density: every sentence in REV file revision instructions carries weight. No filler, hedging, "please note", "it's important to", "make sure to", "ensure that". Every word earns its place.
-- Minimal template: no sections that add zero value. If a section would be empty, omit it.
-- Wording optimization: flag phrasing that can be tightened without changing meaning. Prefer fewer tokens when semantic content is preserved. Flat instruction structure — avoid deeply nested conditionals.
-- Bullet atomicity: each Focus, Process, or Constraint item expresses one checkable condition. Split multi-condition bullets that pack distinct rules, exceptions, and sub-conditions into a single paragraph. Wrong: one bullet containing condition + scope + exception + secondary rule. Correct: separate bullet per checkable condition. Advisory only — do not block.
-
+(All items BLOCKING unless marked ADVISORY.)
+- Token density: no filler, hedging, "please note", "it's important to", "make sure to", "ensure that". Every word earns its place.
+- Minimal template: omit sections that add zero value.
+- Wording optimization: flag phrasing that can be tightened without changing meaning. Prefer fewer tokens; flat instruction structure. ADVISORY — block only for egregious inflation.
+- Bullet atomicity: one checkable condition per Focus, Process, or Constraint item. Split multi-condition bullets. ADVISORY.
+- Cross-section restatement: flag when the same concept, exclusion, or rule appears in multiple sections of a single target. State once in the most specific section; others reference it.
+ 
 # Process
 1. Load cache
 - Read `PROMPT-ITERATE.review-wording.md` if it exists. Treat missing or malformed cache as empty.
@@ -81,7 +83,7 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [WRD-001]
-Category: TOKEN_DENSITY | MINIMAL_TEMPLATE | WORDING_OPTIMIZATION | BULLET_ATOMICITY
+Category: TOKEN_DENSITY | MINIMAL_TEMPLATE | WORDING_OPTIMIZATION | BULLET_ATOMICITY | CROSS_SECTION_RESTATEMENT
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what is unnecessarily verbose or poorly structured>
@@ -97,7 +99,6 @@ Fix: <smallest simplification>
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 
 # Constraints
-- Block only when revision instructions clearly exceed what the confirmed context requires — filler phrases, empty sections, or wording that inflates token count without adding information.
-- Do not block for concise but complete instructions.
+- Do not block for concise but complete instructions, or when different sections reference the same concept for different analytical purposes.
 - Keep findings short and specific.
 - Follow the `# Process` section for cache, Delta, and skip handling.

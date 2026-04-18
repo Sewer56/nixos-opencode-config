@@ -34,13 +34,16 @@ Review finalized iteration artifacts for cross-document and cross-REV redundancy
 - `rev_pattern` (e.g., `PROMPT-ITERATE.rev.*.md`)
 
 # Focus
-- Cross-document: flag when an artifact re-states information available in another artifact or referenced file. Prefer referencing by section name or file path over re-quoting content.
+(All items BLOCKING unless marked ADVISORY.)
+- Cross-document: flag when an artifact re-states information available in another artifact or referenced file. Prefer referencing by path or section name.
 - Cross-REV: flag when two REV items duplicate each other's content instead of referencing.
-- Rule splitting: flag when a `REV-###` copies the full optimization contract into multiple targets instead of placing only the relevant rule fragments in each prompt or reviewer.
-- Frontmatter-import redundancy: flag when frontmatter in a `REV-###` target duplicates content already provided by an imported or parent file. Prefer referencing the import.
-- Human-doc vs model-doc: when a `REV-###` adds or updates human-facing docs, keep them short and do not duplicate that prose in model-facing prompt instructions.
-- Subagent input economy: flag caller prompts that restate callee-owned output formats, focus/check lists, role assignments, target paths already enumerated in REV Index, or blanket read orders.
-
+- Rule splitting: flag when a REV copies the full optimization contract into multiple targets instead of only the relevant fragments per target.
+- Frontmatter-import redundancy: flag when REV frontmatter duplicates content from an imported or parent file.
+- Human-doc vs model-doc: flag when a REV adds human-facing docs and duplicates that prose in model-facing instructions.
+- Subagent input economy: flag when caller prompts restate callee-owned output formats, focus/check lists, role assignments, paths from REV Index, or blanket read orders.
+- Rules-scope redundancy: flag when a target restates scope, criteria, or requirements from an imported rules file. The rules file is the scope — reference, don't duplicate.
+- Rules-file independence: flag when a rules file references, imports, or cross-links another rules file. Each must stand alone.
+ 
 # Process
 1. Load cache
 - Read `PROMPT-ITERATE.review-dedup.md` if it exists. Treat missing or malformed cache as empty.
@@ -83,7 +86,7 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [DUP-001]
-Category: CROSS_DOCUMENT | CROSS_REV | RULE_SPLITTING | FRONTMATTER_IMPORT | HUMAN_DOC_DUPLICATION | SUBAGENT_INPUT_REDUNDANCY
+Category: CROSS_DOCUMENT | CROSS_REV | RULE_SPLITTING | FRONTMATTER_IMPORT | HUMAN_DOC_DUPLICATION | SUBAGENT_INPUT_REDUNDANCY | RULES_SCOPE_REDUNDANCY | RULES_FILE_INDEPENDENCE
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what is duplicated that should be referenced>
@@ -99,7 +102,6 @@ Fix: <smallest deduplication>
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 
 # Constraints
-- Block only when revision instructions duplicate full rule contracts across targets, copy human-facing documentation into model-facing prompts, or re-state content available in shared artifacts without adding information.
 - Do not block for concise references that serve clarity.
 - Keep findings short and specific.
 - Follow the `# Process` section for cache, Delta, and skip handling.
