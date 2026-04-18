@@ -84,7 +84,7 @@ Rules: `/home/sewer/opencode/config/rules/errors.md`.
 
 # Output
 
-````text
+`````text
 # REVIEW
 Agent: _plan/reviewers/errors
 Decision: PASS | ADVISORY | BLOCKING
@@ -96,15 +96,25 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-+new error section
+++replacement error section with per-variant bullets
+ unchanged context
+```
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+`````
 
 # Constraints
 - Keep findings short and specific.
 - Read your own `PROMPT-PLAN.review-errors.md` cache before reviewing. Do not reopen Resolved items without new concrete evidence.
+- Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact `# Errors` section to add or fix.
 - Follow the `# Process` section for cache, Delta, and skip handling.

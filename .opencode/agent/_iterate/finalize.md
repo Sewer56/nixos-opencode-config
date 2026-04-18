@@ -104,6 +104,7 @@ Follow the ordered steps below exactly, in order.
 - Confirm the response starts with `# REVIEW`.
 - Confirm the response contains `Decision: PASS | ADVISORY | BLOCKING`.
 - Confirm the response contains `## Findings` and `## Verified` headings.
+- For diff-mandated reviewers (wording, dedup, style, correctness, diff): confirm each finding in `## Findings` contains a unified diff block for every finding. Treat missing diff blocks as a protocol violation requiring retry.
 - If the response remains malformed after retries, treat it as BLOCKING with a synthetic finding that notes the reviewer returned unparseable output.
 
 4. Retry malformed responses from the existing review state
@@ -116,6 +117,7 @@ Follow the ordered steps below exactly, in order.
 
 6. Revise the machine artifact when findings require it
 - Revise REV files only where needed.
+- Apply reviewer diffs via targeted edits when present; fall back to `Fix:` prose otherwise.
 - Append one line to `## Revision History`.
 
 7. Re-run or finish
@@ -156,6 +158,7 @@ Revisions produced by this iteration must follow. Apply only the relevant rules 
 - **Inline path variables**: when a section would contain only variable-to-path mappings (e.g. `RULES_DIR`, `DOCUMENTATION_RULES_PATH`), list those definitions at the start of the nearest Process or Workflow section instead of creating a separate section.
 - **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — artifact paths, Delta/Decision excerpts, scoping, and user notes. Do not restate output formats, focus lists, role assignments, target paths already enumerated in shared artifacts, or blanket read orders.
 - **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to templates, machine-artifact diff blocks, reviewer output format examples, and any generated target that nests code fences.
+- **Reviewer diff output**: reviewers that can determine the exact text replacement for a finding must include a unified diff block inline after the finding's `Fix:` field. When the fix is conceptual rather than concrete, omit the diff and rely on `Fix:` prose only.
 
 # Rules
 Apply these rules when writing REV files:

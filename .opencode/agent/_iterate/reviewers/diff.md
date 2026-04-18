@@ -87,13 +87,22 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or hunk reference>
 Problem: <what is wrong with the diff>
 Fix: <smallest concrete correction>
+```diff
+<path/to/rev/file>
+--- a/<path/to/rev/file>
++++ b/<path/to/rev/file>
+ unchanged context
+-invalid hunk or missing context
++corrected hunk with proper context
+ unchanged context
+```
 
 ## Verified
 - <REV-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-```
+````
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 
@@ -101,4 +110,5 @@ Return ONLY the block above — no introduction, no summary, no conversational w
 - Block when context lines are missing or do not match the target file.
 - Do not block for off-by-one or off-by-few line-count discrepancies.
 - Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` field targeting the affected REV file with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

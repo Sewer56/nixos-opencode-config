@@ -97,15 +97,25 @@ Severity: BLOCKING | ADVISORY
 Evidence: <plan section or `path:line`>
 Problem: <what is unnecessarily broad or misplaced>
 Fix: <smallest simplification>
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-+unnecessary expansion beyond scope
+++minimal scoped replacement
+ unchanged context
+```
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-```
+````
 
 # Constraints
 - Block only when the plan clearly exceeds confirmed scope.
 - Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
+- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., inlining a helper, removing an unnecessary file). Omit the diff when the finding is a debatable abstraction choice with no single correct replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

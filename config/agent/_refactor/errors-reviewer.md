@@ -59,10 +59,19 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
+```diff
+<path/to/plan/item/file>
+--- a/<path/to/plan/item/file>
++++ b/<path/to/plan/item/file>
+ unchanged context
+-+proposed error docs with vague trigger
+++proposed error docs with concrete trigger
+ unchanged context
+```
 
 ## Notes
 - <optional short notes>
-```
+````
 
 # Constraints
 
@@ -70,3 +79,4 @@ Fix: <smallest concrete correction>
 - Do not block for minor wording preferences when specificity and format are correct.
 - Cite source file evidence when grounding a finding.
 - Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` field targeting the affected plan item with the exact proposed docs to add or fix.

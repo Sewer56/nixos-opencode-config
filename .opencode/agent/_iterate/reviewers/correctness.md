@@ -89,13 +89,22 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
+```diff
+<path/to/rev/file>
+--- a/<path/to/rev/file>
++++ b/<path/to/rev/file>
+ unchanged context
+-incorrect field or value
++correct field or value
+ unchanged context
+```
 
 ## Verified
 - <REV-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-```
+````
 
 Return ONLY the block above — no introduction, no summary, no conversational
 wrapper, no text before `# REVIEW` or after the final `## Notes` line.
@@ -106,4 +115,5 @@ Any content outside this format is a protocol violation.
 - Do not block for minor wording preferences when schema and cross-references are valid.
 - Cite file paths and specific frontmatter fields or sections as evidence.
 - Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` field targeting the affected REV file with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

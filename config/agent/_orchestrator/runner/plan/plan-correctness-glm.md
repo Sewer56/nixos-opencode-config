@@ -135,7 +135,7 @@ Focus areas for correctness review:
 
 Return findings in structured format:
 
-```
+```text
 # REVIEW PACKET
 Agent: plan-correctness-glm
 Phase: plan
@@ -164,13 +164,22 @@ Summary: Undefined helper function in plan
 Why It Matters: Coder will need to invent implementation details
 Requested Fix: Define validate_token() signature and location, or reference existing implementation
 Acceptance Criteria: All referenced symbols are defined or mapped to existing code
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-+undefined symbol referenced
+++defined symbol or mapped to existing code
+ unchanged context
+```
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - Brief observations for other reviewers or planner
-```
+````
 
 # Constraints
 - Follow the `# Process` section for cache, Delta, and skip handling.
@@ -181,3 +190,4 @@ Acceptance Criteria: All referenced symbols are defined or mapped to existing co
 - Focus on correctness and completeness, not minimality (economy reviewer handles that)
 - Treat documentation gaps as correctness issues only when they make a stated requirement or acceptance criterion unprovable
 - Be explicit about requirement gaps - they are always blocking
+- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., replacing placeholders, defining undefined symbols, adding missing imports). Omit the diff when the finding is a requirement gap or conceptual concern with no single correct replacement.

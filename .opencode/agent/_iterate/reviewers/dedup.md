@@ -91,17 +91,27 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what is duplicated that should be referenced>
 Fix: <smallest deduplication>
+```diff
+<path/to/rev/file>
+--- a/<path/to/rev/file>
++++ b/<path/to/rev/file>
+ unchanged context
+-duplicated content
++reference to source section or file
+ unchanged context
+```
 
 ## Verified
 - <REV-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-```
+````
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 
 # Constraints
 - Do not block for concise references that serve clarity.
 - Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` field targeting the affected REV file with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

@@ -33,6 +33,8 @@ and other similar workflows.
   — `Lines: ~<start>-<end>` locates changes; context is authoritative
 - [Human-Friendly [P#] Items](#human-friendly-p-items)
   — draft-stage items use explanation + diff with paths in diff headers
+- [Reviewer Diff Output](#reviewer-diff-output)
+  — reviewers include inline unified diffs after Fix:; two tiers: diff-mandated and diff-when-exact
 - [Focus-as-Scope](#focus-as-scope)
   — Focus is the reviewer scope boundary; meta enforces no overlap
 
@@ -326,3 +328,38 @@ Each reviewer's `# Focus` defines what it checks — anything not
 listed is out of scope. The meta reviewer blocks when a Focus item
 is broad enough to overlap another reviewer's domain, prompting
 the author to narrow or split it.
+
+## Reviewer Diff Output
+
+Reviewers that can determine the exact text replacement for a finding
+include a unified diff block inline after the finding's `Fix:` field.
+
+Two tiers:
+
+- **Diff-mandated**: the reviewer always knows the exact fix. Include
+  a diff for every finding. Currently: wording, dedup, style,
+  correctness, diff (_iterate); documentation, errors (_plan);
+  errors-reviewer (_refactor); plan-documentation-reviewer,
+  plan-errors-reviewer (_orchestrator).
+
+- **Diff-when-exact**: the reviewer knows the exact fix when the
+  finding is concrete. Include a diff when the fix is concrete; omit
+  when the finding is conceptual. Currently: performance, meta
+  (_iterate); correctness, tests, economy, performance (_plan);
+  plan-test-reviewer, plan-economy-reviewer,
+  plan-performance-reviewer, plan-correctness-gpt5,
+  plan-correctness-glm (_orchestrator).
+
+- **No diff**: reviewers that cannot determine exact text (runtime
+  validation, conceptual gaps) omit the diff and rely on `Fix:` prose
+  only.
+
+The `Fix:` field is retained as a short summary; the inline diff
+provides the authoritative exact change when present. The finalize
+agent consumes reviewer diffs as the authoritative revision source,
+applying them via targeted edits. When no diff is present, finalize
+falls back to interpreting `Fix:` prose. For diff-mandated reviewers,
+finalize validates that each finding contains a diff block.
+
+Outer code fences use one more backtick than the inner ```diff fence
+(per the Nested code fences optimization).

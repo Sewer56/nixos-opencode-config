@@ -100,17 +100,27 @@ Severity: BLOCKING | ADVISORY
 Evidence: <plan section or `path:line`>
 Problem: <material performance risk>
 Fix: <smallest correction>
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-+N+1 query pattern
+++batch query or eager loading
+ unchanged context
+```
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-```
+````
 
 # Constraints
 - If the plan is not performance-sensitive, return `PASS` with `Performance Sensitive: NO`.
 - If a performance finding depends on the repo surface, cite repo evidence.
 - Block only for material performance risks, not micro-optimizations.
 - Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
+- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., replacing an N+1 pattern with a batch query, adding a missing index). Omit the diff when the finding is a performance budget concern with no single correct implementation.
 - Follow the `# Process` section for cache, Delta, and skip handling.

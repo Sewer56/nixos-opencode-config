@@ -183,7 +183,7 @@ ADVISORY for:
 
 # Output
 
-```
+```text
 # REVIEW PACKET
 Agent: plan-performance-reviewer
 Phase: plan
@@ -205,6 +205,15 @@ Summary: Database query inside loop creates N+1 query pattern
 Why It Matters: Performance degrades linearly with user count; will fail at scale
 Requested Fix: Use batch query to fetch all user details in one query, or use eager loading
 Acceptance Criteria: Single query or JOIN fetches all required data
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-+N+1 query pattern
+++batch query or eager loading
+ unchanged context
+```
 
 ### [PERF-002]
 Category: PERF_DATA
@@ -222,7 +231,7 @@ Acceptance Criteria: No unnecessary cloning of large data structures
 
 ## Notes
 - Performance context for other reviewers
-```
+````
 
 # Constraints
 - If no performance-sensitive areas detected, return PASS with brief note
@@ -231,3 +240,4 @@ Acceptance Criteria: No unnecessary cloning of large data structures
 - Correctness reviewer validates that performance changes don't break correctness
 - Economy reviewer validates that performance optimizations don't add unnecessary complexity
 - Only flag performance issues that materially impact the workload
+- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., replacing an N+1 pattern with a batch query, adding a missing index). Omit the diff when the finding is a performance budget concern with no single correct implementation.

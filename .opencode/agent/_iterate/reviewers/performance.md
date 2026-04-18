@@ -85,13 +85,22 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or pattern>
 Problem: <what pattern scales badly or wastes tokens>
 Fix: <smallest concrete correction>
+```diff
+<path/to/rev/file>
+--- a/<path/to/rev/file>
++++ b/<path/to/rev/file>
+ unchanged context
+-pattern that scales badly
++efficient replacement pattern
+ unchanged context
+```
 
 ## Verified
 - <REV-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-```
+````
 
 Return ONLY the block above — no introduction, no summary, no conversational
 wrapper, no text before `# REVIEW` or after the final `## Notes` line.
@@ -101,4 +110,5 @@ Any content outside this format is a protocol violation.
 - Block only when a target that runs a review loop or coordinates subagents lacks cache/Delta.
 - Do not flag missing cache/Delta for targets that have no review loop or subagent coordination.
 - Keep findings short and specific.
+- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., adding missing cache/Delta sections, restructuring coordination files). Omit the diff when the finding is a conceptual scaling concern with no single correct replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

@@ -106,7 +106,7 @@ If any are missing, downgrade to ADVISORY.
 
 # Output
 
-```
+```text
 # REVIEW PACKET
 Agent: plan-documentation-reviewer
 Phase: plan
@@ -124,16 +124,26 @@ Summary: Required in-source docs are not planned concretely
 Why It Matters: The coder would need to invent documentation scope and content
 Requested Fix: Show the intended module and required API doc block/comment directly in the relevant implementation step snippet or diff
 Acceptance Criteria: The affected implementation step includes concrete doc snippets or diffs that satisfy the rules
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-+new doc content
+++replacement doc content
+ unchanged context
+```
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - Brief observations for other reviewers or planner
-```
+````
 
 # Constraints
 - Follow the `# Process` section for cache, Delta, and skip handling.
 - Block for "Review Blocking Criteria" violations in the rule doc listed in Focus.
 - Do not block for minor wording preferences when required coverage is already concrete
 - Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact doc block or section to add or replace.

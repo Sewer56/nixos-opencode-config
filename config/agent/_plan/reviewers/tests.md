@@ -97,12 +97,22 @@ Severity: BLOCKING | ADVISORY
 Evidence: <plan section, requirement, or `path:line`>
 Problem: <missing coverage or unnecessary duplication>
 Fix: <smallest useful test-plan correction>
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-+proposed test step
+++corrected test step with proper coverage
+ unchanged context
+```
 
 ## Notes
 - <optional short notes>
-```
+````
 
 # Constraints
 - Focus on behavior, not implementation-detail tests.
 - Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
+- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., adding missing test steps, merging duplicate tests, parameterizing similar cases). Omit the diff when the finding is a coverage assessment with no single correct test plan.
 - Follow the `# Process` section for cache, Delta, and skip handling.

@@ -86,13 +86,22 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what self-policing rule is violated>
 Fix: <smallest concrete correction>
+```diff
+<path/to/rev/file>
+--- a/<path/to/rev/file>
++++ b/<path/to/rev/file>
+ unchanged context
+-missing enforcement-logic update
++enforcement-logic instruction added
+ unchanged context
+```
 
 ## Verified
 - <REV-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-```
+````
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 
@@ -102,3 +111,5 @@ Return ONLY the block above — no introduction, no summary, no conversational w
 - Keep findings short and specific.
 - Follow the `# Process` section for cache, Delta, and skip handling.
 - Block when an `_iterate` reviewer Focus item overlaps another reviewer's domain.
+- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., adding missing enforcement-logic text, reordering sections). Omit the diff when the finding is a conceptual self-policing concern with no single correct replacement.
+- Block when a REV adds inline diff output to a reviewer but no REV adds a constraint telling that reviewer to produce diffs for every finding or for concrete fixes.

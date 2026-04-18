@@ -103,13 +103,22 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-undefined symbol or placeholder
++defined symbol or concrete value
+ unchanged context
+```
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-```
+````
 
 # Constraints
 - Block only for real fidelity, coverage, grounding, or structure failures.
@@ -118,4 +127,5 @@ Fix: <smallest concrete correction>
 - If a grounding finding depends on the repo surface, cite repo evidence.
 - Keep findings short and specific.
 - Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
+- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., replacing placeholders, fixing undefined symbols, adding missing anchors). Omit the diff when the finding is a fidelity gap or traceability concern with no single correct replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

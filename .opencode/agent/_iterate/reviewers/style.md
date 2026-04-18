@@ -91,13 +91,22 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what violates the style criterion>
 Fix: <smallest concrete correction>
+```diff
+<path/to/rev/file>
+--- a/<path/to/rev/file>
++++ b/<path/to/rev/file>
+ unchanged context
+-prose description or passive voice
++imperative command
+ unchanged context
+```
 
 ## Verified
 - <REV-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-```
+````
 
 Return ONLY the block above — no introduction, no summary, no conversational
 wrapper, no text before `# REVIEW` or after the final `## Notes` line.
@@ -107,4 +116,5 @@ Any content outside this format is a protocol violation.
 - Block for persistent imperative-voice violations, missing negative examples where they matter, unpinned output formats, operational rules delegated to external docs, subagent prompts that re-state callee-owned role/output/focus contracts instead of task-specific inputs, or instruction language that leads with prohibitions instead of actions.
 - Do not block for minor wording when instructions are already imperative, positive-framing, and self-contained.
 - Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` field targeting the affected REV file with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

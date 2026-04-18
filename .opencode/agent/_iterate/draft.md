@@ -106,6 +106,7 @@ Targets produced by this iteration must follow. Carry only the applicable rules 
 - **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — paths, deltas, scoping. Never re-state output formats, focus lists, role assignments, or contracts the callee already defines.
 - **Line-location convention**: `Lines: ~<start>-<end> | None` locates changes in REV and step files (`~` ≈ ±10 lines). Hunks include 2+ context lines before and after each change; context is the authoritative locator. Reviewers validate content, not counts. Propagates to `/iterate`-generated targets writing diffs.
 - **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to templates, examples, and all diff blocks inside fenced code blocks.
+- **Reviewer diff output**: reviewers that can determine the exact text replacement for a finding must include a unified diff block inline after the finding's `Fix:` field. When the fix is conceptual rather than concrete, omit the diff and rely on `Fix:` prose only.
 
 # Command→Agent Composition
 

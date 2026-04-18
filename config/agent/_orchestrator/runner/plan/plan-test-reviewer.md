@@ -139,7 +139,7 @@ ADVISORY for:
 
 # Output
 
-```
+```text
 # REVIEW PACKET
 Agent: plan-test-reviewer
 Phase: plan
@@ -157,6 +157,15 @@ Summary: New validation logic has no test coverage
 Why It Matters: Cannot verify correctness or prevent regression
 Requested Fix: Add test steps covering valid token, invalid token, expired token, malformed token
 Acceptance Criteria: Tests exist for all token validation paths
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-+proposed test step
+++corrected test step with proper coverage
+ unchanged context
+```
 
 ### [REDUNDANT-001]
 Category: TEST_REDUNDANCY
@@ -179,13 +188,22 @@ Summary: Six tests should be one parameterized test
 Why It Matters: the rules strongly prefer parameterized tests for multiple inputs on same logic
 Requested Fix: Merge into one test with #[case::valid(...), #[case::invalid(...), etc.
 Acceptance Criteria: One test with six descriptive cases
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-+six separate test steps
+++one parameterized test with six cases
+ unchanged context
+```
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - Observations for other reviewers
-```
+````
 
 # Constraints
 - Ensure sufficient coverage exists before flagging style issues
@@ -193,3 +211,4 @@ Acceptance Criteria: One test with six descriptive cases
 - This reviewer owns duplicate coverage and parameterization findings
 - If economy flagged economy issues, focus on test design quality
 - Priority: coverage > deduplication > parameterization style
+- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., adding missing test steps, merging duplicate tests, parameterizing similar cases). Omit the diff when the finding is a coverage assessment with no single correct test plan.

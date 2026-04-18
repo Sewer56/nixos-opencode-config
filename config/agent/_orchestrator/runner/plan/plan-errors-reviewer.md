@@ -87,7 +87,7 @@ Rules: `/home/sewer/opencode/config/rules/errors.md`.
 
 # Output
 
-````text
+`````text
 # REVIEW PACKET
 Agent: plan-errors-reviewer
 Phase: plan
@@ -105,13 +105,22 @@ Summary: Required `# Errors` section is not planned
 Why It Matters: The coder would need to invent error documentation scope and specificity
 Requested Fix: Show the intended `# Errors` section with per-variant bullets in the relevant implementation step snippet or diff
 Acceptance Criteria: The affected implementation step includes a concrete `# Errors` section satisfying the rules
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-+old step content
+++replacement step content with # Errors section
+ unchanged context
+```
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - Brief observations for other reviewers or planner
-````
+`````
 
 # Blocking Criteria
 Mark BLOCKING only when all present:
@@ -133,3 +142,4 @@ If any are missing, downgrade to ADVISORY.
 # Constraints
 - Follow the `# Process` section for cache, Delta, and skip handling.
 - Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact `# Errors` section to add or fix.

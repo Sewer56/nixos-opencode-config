@@ -97,17 +97,27 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
+```diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-+new doc content
+++replacement doc content
+ unchanged context
+```
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-```
+````
 
 # Constraints
 - Block for "Review Blocking Criteria" violations in the rules
 - Do not block for minor wording preferences when the required coverage is explicit and concrete.
 - Keep findings short and specific.
 - Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
+- Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact doc block or section to add or replace.
 - Follow the `# Process` section for cache, Delta, and skip handling.
