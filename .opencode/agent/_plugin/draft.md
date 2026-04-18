@@ -215,7 +215,6 @@ create | refine
 <path>
 --- a/<path>
 +++ b/<path>
-@@ -N,M +N,M @@
  unchanged context
 -old content
 +new content

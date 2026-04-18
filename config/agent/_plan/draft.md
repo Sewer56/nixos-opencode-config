@@ -79,7 +79,6 @@ Overall Goal: <short line>
 path/to/file
 --- a/path/to/file
 +++ b/path/to/file
-@@ -N,M +N,M @@
  unchanged context
 -old content
 +new content

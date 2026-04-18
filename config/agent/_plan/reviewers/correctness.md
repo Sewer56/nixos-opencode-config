@@ -83,7 +83,7 @@ Review a finalized machine plan for correctness, completeness, and fidelity to t
 - Structure: `plan_path` stays human-readable, and step files use the required stable headings and explicit refs.
 - Grounding: read the repo files named in `## Settled Facts`, `## External Symbols`, `## Implementation Steps`, and `## Test Steps` before judging them.
 - Completeness: no placeholders, missing anchors, undefined helpers, or unresolved ownership remain.
-- Approximate-range validity: `@@` headers in implementation and test step diffs point near the change location; the range is within ±10 lines. `Lines: ~start-end` fields are approximate.
+- Line-location validity: `Lines: ~start-end` fields in step files point near the change location; the range is within ±10 lines.
 - Diff context: every hunk in implementation and test step diffs includes 2+ unchanged context lines before and after each change region; context lines match content in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
 - Nested code fences: block when a REV target contains an inner ``` fence inside an outer ``` fence. The outer fence must use more backticks (e.g. ```` for outer when inner uses ```). Prevents markdown rendering breaks in the machine plan.
 

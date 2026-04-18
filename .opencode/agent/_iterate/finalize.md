@@ -140,7 +140,7 @@ Summary: <one-line summary>
 - Write only `PROMPT-ITERATE.handoff.md` and files under `PROMPT-ITERATE.rev/` during finalize.
 - Modify only `PROMPT-ITERATE.handoff.md` and files under `PROMPT-ITERATE.rev/` during finalize.
 - Read `PROMPT-ITERATE.md` as source of truth only; write to handoff and machine paths.
-- Keep each REV file in `rev_dir` diff-based: diff blocks grounded in current file state with approximate line ranges and anchors per `# Rules`. CREATE actions include full file content.
+- Keep each REV file in `rev_dir` diff-based: diff blocks grounded in current file state with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
 - Keep `PROMPT-ITERATE.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
 
@@ -169,7 +169,7 @@ Apply these rules when writing REV files in `rev_dir`:
 - If changes are scattered across a file, use multiple diff blocks within one REV item.
 - CREATE actions include full file content in a normal code block (not a diff against empty).
 - Diff blocks target markdown files — use markdown-aware line references (headings, list items, fenced code blocks).
-- Line numbers in `@@` headers are approximate (±10 lines); include 2+ unchanged context lines before and after each change region so the implementer can locate changes by content matching rather than line counting.
+- `Lines: ~` in the REV header indicates approximate location; include 2+ context lines before and after each change.
 
 # Templates
 
@@ -247,8 +247,8 @@ Insert at: before | after | replace `<anchor or region>` | `None`
 Diff:
 
 ```diff
-<one or more diff blocks — line numbers in @@ headers are approximate (±10);
-include 2+ unchanged context lines before and after each change region.
+<one or more diff blocks — include 2+ context
+lines before and after each change.
 a single block if changes are contiguous or frontmatter+content
 are close together; multiple blocks if scattered.>
 ```

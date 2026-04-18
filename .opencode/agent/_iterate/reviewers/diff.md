@@ -34,7 +34,7 @@ Review machine iteration artifacts for diff and hunk validity.
 - `rev_dir`
 
 # Focus
-- Approximate-range validity: `@@` headers point near the change location in the target file; the range is within ±10 lines of the actual content. `Lines` and `Anchor` fields are approximate.
+- Line-location validity: `Lines: ~<start>-<end>` fields point near the change location in the target file; the range is within ±10 lines of the actual content. `Anchor` fields are approximate.
 - Context lines: every hunk includes 2+ unchanged context lines before and after each change region; context lines match content that exists in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
 - Diff completeness: include a diff block for every declared change region.
 - Diff compactness: include only changed lines. Omit verbatim restatements of `context_path` content.

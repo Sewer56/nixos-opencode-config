@@ -125,7 +125,7 @@ Summary: <one-line summary>
 - Write only `PROMPT-PLUGIN-PLAN.handoff.md` and files under `PROMPT-PLUGIN-PLAN.rev/` during finalize.
 - Modify only those files during finalize.
 - Read `PROMPT-PLUGIN-PLAN.md` as source of truth only; write to handoff and machine paths.
-- Keep each REV file in `rev_dir` diff-based with approximate line ranges and anchors per `# Rules`. CREATE actions include full file content.
+- Keep each REV file in `rev_dir` diff-based with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
 - Keep `PROMPT-PLUGIN-PLAN.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
 
 # Rules
@@ -134,14 +134,14 @@ Apply these rules when writing REV files in `rev_dir`:
 
 - Write concrete values for every field and body — omit `...`, `TODO`, and comment-only stubs.
 - Specify the full path for every file reference: REV headings, `Evidence` fields, and diff block targets all use fully qualified paths from the project root.
-- Reference anchors and approximate line ranges inside diff blocks.
+- Reference anchors and approximate location via `Lines: ~<start>-<end> | None` in the REV header.
 - Insertions use normal code blocks with `Insert at: <anchor> (~start-end)`.
 - Edits/removals use `diff` blocks; deletions include `Remove lines: ~start-end`.
 - If frontmatter and content changes are contiguous, combine into a single diff block.
 - If changes are scattered across a file, use multiple diff blocks within one REV item.
 - CREATE actions include full file content in a normal code block (not a diff against empty).
 - Diff blocks target markdown files — use markdown-aware line references (headings, list items, fenced code blocks).
-- Line numbers in `@@` headers are approximate (±10 lines); include 2+ unchanged context lines before and after each change region so the implementer can locate changes by content matching rather than line counting.
+- `Lines: ~` in the REV header indicates approximate location; include 2+ context lines before and after each change.
 
 ---
 

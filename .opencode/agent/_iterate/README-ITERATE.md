@@ -27,8 +27,8 @@ and other similar workflows.
   — pass only what the called agent cannot derive from its own file
 - [Self-Iteration](#self-iteration)
   — path-based detection of wording-only vs rule-change self-iteration
-- [Approximate Diff Ranges](#approximate-diff-ranges)
-  — line numbers in diff headers are approximate; context lines are authoritative
+ - [Line-location Convention](#line-location-convention)
+  — `Lines: ~<start>-<end>` locates changes; context is authoritative
 - [Human-Friendly [P#] Items](#human-friendly-p-items)
   — draft-stage items use explanation + diff with paths in diff headers
 - [Focus-as-Scope](#focus-as-scope)
@@ -276,16 +276,14 @@ Generated `## Self-Iteration`: `Intent: rule-change`,
 The machine artifact must include a REV updating the reviewer focus
 list to enforce the new rule.
 
-## Approximate Diff Ranges
+## Line-location Convention
 
-All finalize agents and reviewers use standard `@@ -N,M +N,M @@`
-diff headers. Line numbers are approximate (±10 lines). Every hunk
-must include 2+ unchanged context lines before and after each change
-region so implementers locate changes by matching content rather than
-counting lines. Reviewers validate context content, not exact line
-counts — they block only when context lines are missing or do not
-match the target file, not for off-by-one or off-by-few line-count
-discrepancies.
+All finalize agents and reviewers use `Lines: ~<start>-<end> | None`
+as the sole line-location indicator in REV and step files
+(`~` ≈ ±10 lines). Hunks include 2+ context lines before and
+after each change; context is the authoritative locator.
+Reviewers validate content, not counts — block only when context
+lines are missing or do not match the target file.
 
 ## Human-Friendly [P#] Items
 
@@ -297,8 +295,8 @@ File paths appear in the diff block header (`--- a/<path>`).
 REFINE/UPDATE actions include the diff block. CREATE/ADD/INSERT
 actions use explanation only (or a code snippet for `_plan`).
 
-Format rules (approximate `@@` headers, 2+ context lines) follow
-the Approximate Diff Ranges convention above.
+Format rules (2+ context lines per hunk) follow
+the Line-location Convention above.
 
 ## Focus-as-Scope
 
