@@ -100,6 +100,7 @@ Aggregation:
 - Dedupe findings and keep IDs for unchanged root causes.
 - Assign new IDs only to new issues.
 - Apply domain ownership rules.
+- Update `## Delta` in `ledger_path`: record each issue as a compact entry with `Status:`, `Touched:`, and `Why:` fields relative to the prior review pass. Recompute after every material revision.
 - Write `ledger_path` on every review pass.
 
 Decision:
@@ -147,6 +148,7 @@ Notes:
 Aggregation:
 - Parse all REVIEW PACKET outputs.
 - Keep existing IDs and assign new IDs only to new code-phase issues.
+- Update `## Delta` in `ledger_path`: record each issue as a compact entry with `Status:`, `Touched:`, and `Why:` fields relative to the prior review pass. Recompute after every material revision.
 - Write `ledger_path` on every review pass.
 
 Decision:
@@ -271,7 +273,9 @@ Write to `PROMPT-REQUIREMENTS-UNMET.md`:
 # REVIEW LEDGER
 Phase: plan | code
 Created: <timestamp>
-Updated: <timestamp>
+
+## Delta
+- REQ-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
 
 ## Issues
 

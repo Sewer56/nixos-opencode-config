@@ -57,7 +57,7 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 ## 3. Write the handoff file
 - Rewrite `handoff_path` from scratch for this run.
 - Preserve the latest consolidated user request verbatim under `## Raw Request`.
-- Write `handoff_path` using these sections: `# Iteration Handoff` (with `Source Context` path), `## Raw Request` (verbatim text block), `## Supplementary Context` (bullet list or `None`), `## Constraints` (bullet list or `None`), `## Success Criteria` (bullet list or `None`), `## Scope` (in/out bullets), `## Delta` (per-REV entries with `Status:`, `Touched:`, `Why:` fields plus Source Context and Review Ledger markers), `## Review Ledger` (timestamp + `### Decisions` subsection for cross-domain arbitration only).
+- Write `handoff_path` using these sections: `# Iteration Handoff` (with `Source Context` path), `## Raw Request` (verbatim text block), `## Supplementary Context` (bullet list or `None`), `## Constraints` (bullet list or `None`), `## Success Criteria` (bullet list or `None`), `## Scope` (in/out bullets), `## Delta` (per-REV entries with `Status:`, `Touched:`, `Why:` fields plus Source Context and Review Ledger markers), `## Review Ledger` (`### Decisions` subsection for cross-domain arbitration only).
 
 ## 4. Write the machine artifact
 - Derive discrete `REV-###` items from the confirmed context and handoff.

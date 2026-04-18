@@ -119,19 +119,6 @@ Follow the ordered steps below exactly, in order.
 - Loop until no findings of any severity remain or 10 iterations.
 - No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
-# Optimization Rules
-
-Revisions produced by this iteration must follow. Apply only the relevant rules below to each generated target and reviewer prompt:
-
-- **Reviewer cache + Delta**: targets that themselves run review loops or coordinate subagents include per-reviewer cache files and a Delta section in handoff so reviewers skip unchanged items on re-runs.
-- **Fixed output blocks**: machine-readable responses use fenced code blocks with `text` language tag. Never use `json`, `yaml`, or other tags for plain structured output.
-- **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
-- **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.
-- **Concise human-facing docs**: when the iteration changes conventions or adds new artifacts, include a short documentation update for humans.
-- **Inline path variables**: when a section would contain only variable-to-path mappings (e.g. `RULES_DIR`, `DOCUMENTATION_RULES_PATH`), list those definitions at the start of the nearest Process or Workflow section instead of creating a separate section.
-- **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — artifact paths, Delta/Decision excerpts, scoping, and user notes. Do not restate output formats, focus lists, role assignments, target paths already enumerated in shared artifacts, or blanket read orders.
-- **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to templates, machine-artifact diff blocks, reviewer output format examples, and any generated target that nests code fences.
-
 # Output
 
 Return exactly:
@@ -152,6 +139,19 @@ Summary: <one-line summary>
 - Keep `PROMPT-ITERATE.machine.md` diff-based: each REV item uses diff blocks grounded in the current file state with approximate line ranges and anchors per `# Rules`. CREATE actions include full file content.
 - Keep `PROMPT-ITERATE.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
+
+# Optimization Rules
+
+Revisions produced by this iteration must follow. Apply only the relevant rules below to each generated target and reviewer prompt:
+
+- **Reviewer cache + Delta**: targets that themselves run review loops or coordinate subagents include per-reviewer cache files and a Delta section in handoff so reviewers skip unchanged items on re-runs.
+- **Fixed output blocks**: machine-readable responses use fenced code blocks with `text` language tag. Never use `json`, `yaml`, or other tags for plain structured output.
+- **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
+- **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.
+- **Concise human-facing docs**: when the iteration changes conventions or adds new artifacts, include a short documentation update for humans.
+- **Inline path variables**: when a section would contain only variable-to-path mappings (e.g. `RULES_DIR`, `DOCUMENTATION_RULES_PATH`), list those definitions at the start of the nearest Process or Workflow section instead of creating a separate section.
+- **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — artifact paths, Delta/Decision excerpts, scoping, and user notes. Do not restate output formats, focus lists, role assignments, target paths already enumerated in shared artifacts, or blanket read orders.
+- **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to templates, machine-artifact diff blocks, reviewer output format examples, and any generated target that nests code fences.
 
 # Rules
 Apply these rules when writing `machine_path`:
@@ -204,7 +204,6 @@ Source Context: <absolute path to `PROMPT-ITERATE.md`>
 - REV-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
 
 ## Review Ledger
-Updated: <timestamp>
 
 ### Decisions
 

@@ -76,12 +76,14 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
 - Write `machine_plan_path` using the `# Templates` section below.
 
 ## 5. Run the review loop
+- Write and maintain `## Delta` in `handoff_path` before the first reviewer pass. Record each `REQ-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields. Add artifact markers for `Source Plan` and `Review Ledger`. Recompute `## Delta` after every material revision.
 - After each full machine-plan draft, run these reviewers in parallel, passing `handoff_path`, `plan_path`, and `machine_plan_path` to each reviewer:
   - `@_plan/reviewers/correctness`
   - `@_plan/reviewers/documentation`
   - `@_plan/reviewers/economy`
   - `@_plan/reviewers/tests`
   - `@_plan/reviewers/performance`
+- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`, `machine_plan_path`), Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, and finalize-time user notes. Reviewers define their own output format, focus lists, role assignments, and target paths.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: CORRECTNESS → correctness reviewer; DOCS → documentation reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer. Arbitrate cross-domain conflicts.
 - Do not reopen RESOLVED issues without new concrete evidence.
@@ -111,6 +113,17 @@ Summary: <one-line summary>
 - Keep `PROMPT-PLAN.machine.md` machine-first: stable headings, explicit refs, concrete file-level steps, and anchors that point at the current repo surface.
 - Keep `PROMPT-PLAN.handoff.md` factual and stable enough for the machine plan and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
+
+# Rules
+
+Apply the rules below:
+
+/home/sewer/opencode/config/rules/general.md
+/home/sewer/opencode/config/rules/code-placement.md
+/home/sewer/opencode/config/rules/documentation.md
+/home/sewer/opencode/config/rules/testing.md
+/home/sewer/opencode/config/rules/test-parameterization.md
+/home/sewer/opencode/config/rules/performance.md
 
 # Templates
 
@@ -151,11 +164,15 @@ Source Plan: <absolute path to `PROMPT-PLAN.md`>
 - In scope: <what this plan covers>
 - Out of scope: <what this plan intentionally leaves alone>
 
+## Delta
+- Source Plan — Status: Unchanged | Changed | New; Touched: `PROMPT-PLAN.md`; Why: <why reviewers do or do not need to reread source plan>
+- Review Ledger — Status: Unchanged | Changed | New; Touched: `PROMPT-PLAN.handoff.md`; Why: <why arbitration state changed or stayed stable>
+- REQ-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
+
 ## Clarifications
 - See Open Questions and Decisions in source plan
 
 ## Review Ledger
-Updated: <timestamp>
 
 ### Issues
 
@@ -280,14 +297,3 @@ Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
 ## Verification Commands
 - `<command>`: <why it should be run>
 ````
-
-# Rules
-
-Apply the rules below:
-
-/home/sewer/opencode/config/rules/general.md
-/home/sewer/opencode/config/rules/code-placement.md
-/home/sewer/opencode/config/rules/documentation.md
-/home/sewer/opencode/config/rules/testing.md
-/home/sewer/opencode/config/rules/test-parameterization.md
-/home/sewer/opencode/config/rules/performance.md
