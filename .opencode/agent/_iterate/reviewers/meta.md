@@ -31,7 +31,7 @@ Review finalized iteration artifacts for iterate-system self-policing.
 # Inputs
 - `context_path`
 - `handoff_path`
-- `rev_dir`
+- `rev_pattern` (e.g., `PROMPT-ITERATE.rev.*.md`)
 
 # Focus
 - Self-iteration enforcement completeness: when context contains `## Self-Iteration` with `Intent: rule-change`, block if any REV updates `_iterate` text or documentation but no REV updates enforcement-logic instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output. Includes enforcing the Line-location convention: block when a REV writes diff blocks but no REV updates a reviewer to enforce `Lines: ~` validity and context-line requirements.
@@ -55,7 +55,7 @@ Review finalized iteration artifacts for iterate-system self-policing.
 
 4. Inspect selected content
 - Read handoff for Summary, Dependencies, and REV Index.
-- Read selected REV files from `rev_dir` in one batch (files named `NNN.md`).
+- Read selected REV files matching `rev_pattern` in one batch.
 - Open target files only for the REV items selected in step 3.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.

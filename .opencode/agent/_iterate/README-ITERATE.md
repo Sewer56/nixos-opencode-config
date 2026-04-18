@@ -43,28 +43,27 @@ Applies to all finalize pipelines: `_iterate`, `_plugin`, `_plan`, and
 
 The `machine.md` artifact is eliminated. Handoff absorbs its content:
 Summary, Revision History, and REV/Step Index. All actionable diff/step
-content lives in individual files under `rev_dir` or `step_dir`.
+content lives in individual files matching `rev_pattern` or `step_pattern`.
 
-Consumers read: handoff (single coordination document) + per-item files
-from `rev_dir`/`step_dir`. No second coordination file.
+Consumers read: handoff (single coordination document) + per-item files matching the pattern.
 
 ### File Layout
 
 - `PROMPT-ITERATE.handoff.md` — coordination document with Summary,
   Revision History, REV Index, Delta, and Review Ledger
-- `PROMPT-ITERATE.rev/001.md` — first revision item
-- `PROMPT-ITERATE.rev/002.md` — second revision item
+- `PROMPT-ITERATE.rev.001.md` — first revision item
+- `PROMPT-ITERATE.rev.002.md` — second revision item
 - (gaps are valid; deleted items leave holes in numbering)
 
-For `_plugin`: same pattern with `PROMPT-PLUGIN-PLAN.rev/`.
+For `_plugin`: same pattern with `PROMPT-PLUGIN-PLAN.rev.*.md`.
 
 For `_plan`: implementation and test steps split into
-`PROMPT-PLAN.step/I1.md`, `PROMPT-PLAN.step/T1.md`, etc.
+`PROMPT-PLAN.step.I1.md`, `PROMPT-PLAN.step.T1.md`, etc.
 Requirements, mapping, trace matrix, and external symbols stay in
 the handoff.
 
 For `_orchestrator`: the planner splits steps into
-`PROMPT-NN-*-PLAN.step/I1.md`, `PROMPT-NN-*-PLAN.step/T1.md`, etc.
+`PROMPT-NN-*-PLAN.step.I1.md`, `PROMPT-NN-*-PLAN.step.T1.md`, etc.
 
 ### Stable Numbering
 
@@ -160,7 +159,7 @@ For reviewers, the Process-zone step order:
 2. Read Delta and Decisions
 3. Reopen only Changed, New, items with unresolved findings, or
    decision-referenced REV items
-4. Read the REV Index from handoff, then read selected REV files from `rev_dir`
+4. Read the REV Index from handoff, then read selected REV files matching `rev_pattern`
 5. Update cache — only changed entries
 6. Emit the required final output block
 
@@ -173,7 +172,7 @@ Reviewers start from cache plus Delta. They carry forward cached
 `PASS` items with no open findings when their Delta state remains
 `Unchanged`.
 
-Read the REV Index from handoff first. Then read selected REV files from `rev_dir`. Open target files only for:
+Read the REV Index from handoff first. Then read selected REV files matching `rev_pattern`. Open target files only for:
 - Changed items
 - New items
 - Items with unresolved findings from cache

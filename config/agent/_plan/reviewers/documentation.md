@@ -40,7 +40,7 @@ Review a finalized machine plan's documentation work.
 # Inputs
 - `handoff_path`
 - `plan_path`
-- `step_dir`
+- `step_pattern` (e.g., `PROMPT-PLAN.step.*.md`)
 
 # Process
 1. Load cache
@@ -58,7 +58,7 @@ Review a finalized machine plan's documentation work.
 
 4. Inspect selected content
 - Read `handoff_path` for summary, requirements, Step Index, and dependency mapping.
-- Read selected step files from `step_dir` in one batch.
+- Read selected step files matching `step_pattern` in one batch.
 - Open target files only for the selected items.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
@@ -77,7 +77,7 @@ Review a finalized machine plan's documentation work.
 - Emit the `# REVIEW` block from `# Output`.
 
 # Focus
-- Review the changed scope described by step files in `step_dir`.
+- Review the changed scope described by step files matching `step_pattern`.
 - Compare against current repo docs when any documented surface is being moved, renamed, or replaced.
 - Read only the repo files needed to ground those checks.
 

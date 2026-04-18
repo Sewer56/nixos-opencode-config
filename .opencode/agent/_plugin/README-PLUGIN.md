@@ -5,7 +5,7 @@ Reference for the `/plugin/draft` → `/plugin/finalize` → `/plugin/implement`
 ## Command Pipeline
 
 1. `/plugin/draft` — Write `PROMPT-PLUGIN-PLAN.md` describing the plugin, its hooks, and constraints.
-2. `/plugin/finalize` — Convert the confirmed plan into a reviewed machine plan. Writes `PROMPT-PLUGIN-PLAN.handoff.md` (includes manifest) and individual REV files under `PROMPT-PLUGIN-PLAN.rev/`. Runs 4 diff-returning reviewers.
+2. `/plugin/finalize` — Convert the confirmed plan into a reviewed machine plan. Writes `PROMPT-PLUGIN-PLAN.handoff.md` (includes manifest) and individual REV files as `PROMPT-PLUGIN-PLAN.rev.*.md`. Runs 4 diff-returning reviewers.
 3. `/plugin/implement` — Apply the machine plan, type-check, then debug-iterate until the plugin loads cleanly.
 4. `/plugin/debug` — Inspect an existing plugin's debug flag and log path, run with debug enabled, check the co-located log file for issues.
 
@@ -36,7 +36,7 @@ Plugins placed in `config/plugins/` are automatically discovered and loaded by O
 
 The finalize agent writes a single handoff (`PROMPT-PLUGIN-PLAN.handoff.md`)
 with Summary, Revision History, REV Index, Delta, and Review Ledger, plus
-individual REV files under `PROMPT-PLUGIN-PLAN.rev/`. No separate
+individual REV files as `PROMPT-PLUGIN-PLAN.rev.*.md`. No separate
 `machine.md`. Reviewers read only the REV files that Delta marks as
 Changed or New. Implementers read the handoff, then each REV file in
 order. Stable numbering: gaps are valid, no renumbering.

@@ -11,7 +11,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-ITERATE.handoff.md": allow
-    "*PROMPT-ITERATE.rev/*": allow
+    "*PROMPT-ITERATE.rev.*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -24,7 +24,7 @@ permission:
     "_iterate/reviewers/*": allow
 ---
 
-Convert a confirmed iteration context into reviewed revision instructions. Write `PROMPT-ITERATE.handoff.md` and individual REV files under `PROMPT-ITERATE.rev/`. Edit only those files. No separate `machine.md` — handoff absorbs the manifest role.
+Convert a confirmed iteration context into reviewed revision instructions. Write `PROMPT-ITERATE.handoff.md` and individual REV files matching `PROMPT-ITERATE.rev.*.md`. Edit only those files. No separate `machine.md` — handoff absorbs the manifest role.
 
 # Inputs
 - The latest user message may confirm the draft, provide finalize-time notes, or note changes since the draft.
@@ -33,7 +33,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 # Artifacts
 - `context_path`: `PROMPT-ITERATE.md`
 - `handoff_path`: `PROMPT-ITERATE.handoff.md`
-- `rev_dir`: `PROMPT-ITERATE.rev/`
+- `rev_pattern`: `PROMPT-ITERATE.rev.*.md`
 
 # Process
 
@@ -62,7 +62,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - Each REV item uses one or more diff blocks grounded in the current file state. Frontmatter and content are different regions of the same file — combine into a single diff block when contiguous, use multiple blocks when scattered. Cover only changes needed — omit restatements of unchanged content.
 - Stable numbering: number items sequentially from 001. If a REV is removed during revision, leave the gap — do not renumber other items.
 - Write `handoff_path` using the `# Templates` section (handoff now includes Summary, Revision History, and REV Index).
-- Write each REV item to its own file under `rev_dir` using the `# Templates` section.
+- Write each REV item to its own file matching `rev_pattern` using the `# Templates` section.
 - Apply only the relevant rules from `# Optimization Rules` to each target. Split those rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
 - Keep operational rules in the generated targets themselves. Do not delegate model-facing behavior to external docs.
 - When self-iteration intent is `rule-change`: verify at least one REV item updates enforcement-logic text (instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output). If no enforcement-logic REV exists, treat this as a fatal gap — add a REV item covering the missing enforcement-logic update rather than delegating to reviewers.
@@ -88,7 +88,7 @@ Follow the ordered steps below exactly, in order.
 - Treat each reviewer prompt as scoped call data for the callee.
 - Include only:
   - Artifact paths (`context_path`, `handoff_path`)
-  - `rev_dir` path
+  - `rev_pattern`
   - Iteration/delta summary from `## Delta` in handoff
   - Current `### Decisions` excerpt from handoff when it is non-empty
   - Finalize-time user notes if any
@@ -115,7 +115,7 @@ Follow the ordered steps below exactly, in order.
 - Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; PERFORMANCE → performance; DEDUP → dedup; DIFF → diff; META → meta. Arbitrate cross-domain conflicts.
 
 6. Revise the machine artifact when findings require it
-- Revise REV files in `rev_dir` only where needed.
+- Revise REV files only where needed.
 - Append one line to `## Revision History`.
 
 7. Re-run or finish
@@ -131,16 +131,16 @@ Return exactly:
 Status: SUCCESS | INCOMPLETE | FAIL
 Context Path: <absolute path>
 Handoff Path: <absolute path>
-Rev Dir: <absolute path>
+Rev Pattern: <e.g. PROMPT-ITERATE.rev.*.md>
 Review Iterations: <n>
 Summary: <one-line summary>
 ```
 
 # Constraints
-- Write only `PROMPT-ITERATE.handoff.md` and files under `PROMPT-ITERATE.rev/` during finalize.
-- Modify only `PROMPT-ITERATE.handoff.md` and files under `PROMPT-ITERATE.rev/` during finalize.
+- Write only `PROMPT-ITERATE.handoff.md` and files matching `PROMPT-ITERATE.rev.*.md` during finalize.
+- Modify only `PROMPT-ITERATE.handoff.md` and files matching `PROMPT-ITERATE.rev.*.md` during finalize.
 - Read `PROMPT-ITERATE.md` as source of truth only; write to handoff and machine paths.
-- Keep each REV file in `rev_dir` diff-based: diff blocks grounded in current file state with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
+- Keep each REV file diff-based: diff blocks grounded in current file state with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
 - Keep `PROMPT-ITERATE.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
 
@@ -158,7 +158,7 @@ Revisions produced by this iteration must follow. Apply only the relevant rules 
 - **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to templates, machine-artifact diff blocks, reviewer output format examples, and any generated target that nests code fences.
 
 # Rules
-Apply these rules when writing REV files in `rev_dir`:
+Apply these rules when writing REV files:
 
 - Write concrete values for every field and body — omit `...`, `TODO`, and comment-only stubs.
 - Specify the full path for every file reference: REV headings, `Evidence` fields, and diff block targets all use fully qualified paths from the project root (e.g. `config/agent/_iterate/finalize.md`, not `finalize.md`).
@@ -212,8 +212,8 @@ Source Context: <absolute path to `PROMPT-ITERATE.md`>
 
 | REV | Target | Action | File |
 | --- | ------ | ------ | ---- |
-| REV-001 | `path/to/file` | CREATE | `001.md` |
-| REV-002 | `path/to/file` | UPDATE | `002.md` |
+| REV-001 | `path/to/file` | CREATE | `PROMPT-ITERATE.rev.001.md` |
+| REV-002 | `path/to/file` | UPDATE | `PROMPT-ITERATE.rev.002.md` |
 
 ## Delta
 - Source Context — Status: Unchanged | Changed | New; Touched: `PROMPT-ITERATE.md`; Why: <why reviewers do or do not need to reread source context>
@@ -231,9 +231,9 @@ Winner: <reviewer_name>
 Rationale: <why this view prevailed>
 ````
 
-## `PROMPT-ITERATE.rev/` directory
+## `PROMPT-ITERATE.rev.*.md` files
 
-Each file `NNN.md` contains one revision item:
+Each file `PROMPT-ITERATE.rev.NNN.md` contains one revision item:
 
 ````markdown
 # REV-NNN: `path/to/file`

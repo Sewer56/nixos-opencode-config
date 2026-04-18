@@ -41,7 +41,7 @@ Validate that the implementation plan covers documentation requirements concrete
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner
 - `ledger_path` (optional): absolute path to the current review ledger
-- `step_dir`: directory for individual step files adjacent to `plan_path`
+- `step_pattern`: file pattern for individual step files adjacent to `plan_path` (e.g., `PROMPT-??-*-PLAN.step.*.md`)
 
 # Process
 
@@ -61,7 +61,7 @@ Validate that the implementation plan covers documentation requirements concrete
 4. Inspect selected content
 - Read `prompt_path` for mission, requirements, and constraints.
 - Read the manifest at `plan_path` for summary, requirements, Step Index, and dependency mapping.
-- Read selected step files from `step_dir` in one batch.
+- Read selected step files matching `step_pattern` in one batch.
 - Open target files only for the selected items.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.

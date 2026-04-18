@@ -63,7 +63,7 @@ You only update ledger and unmet requirements files. Follow the `Workflow` direc
 - `requirements_path` = `<prompt_path_parent>/PROMPT-PRD-REQUIREMENTS.md` if it exists
 - `unmet_requirements_path` = `<prompt_path_parent>/PROMPT-REQUIREMENTS-UNMET.md`
 - `ledger_path` = `<prompt_path_without_extension>-REVIEW-LEDGER.md`
-- `step_dir` = `<prompt_path_without_extension>-PLAN.step/`
+- `step_pattern` = `<prompt_path_without_extension>-PLAN.step.*.md`
 
 ## Workflow
 
@@ -88,9 +88,9 @@ Run all 6 plan reviewers in parallel:
 
 Inputs:
 - `prompt_path`
-- `plan_path`
-- `step_dir`
-- `ledger_path` when `ledger_path` already exists
+  - `plan_path`
+  - `step_pattern`
+  - `ledger_path` when `ledger_path` already exists
 - Cache file paths: each reviewer writes to `<plan_stem>-PLAN.review-<domain>.md`.
 
 Notes:
@@ -116,7 +116,7 @@ Decision:
 - Inputs:
   - `prompt_path`
   - `plan_path`
-  - `step_dir`
+  - `step_pattern`
   - task intent
   - `ledger_path`
 - Parse:

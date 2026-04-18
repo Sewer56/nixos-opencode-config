@@ -45,7 +45,7 @@ Review plugin code for documentation coverage and return doc diffs.
 
 4. Inspect selected content
 - Read handoff for Summary, Dependencies, and REV Index.
-- Read selected REV files from `rev_dir` in one batch (files named `NNN.md`).
+- Read selected REV files matching `rev_pattern` in one batch.
 - Open target files only for the selected REV items.
 - Read `DOCUMENTATION_RULES_PATH` (`config/rules/documentation.md`) as source of truth for doc rules.
 - Check Open→Resolved transitions.
@@ -67,7 +67,7 @@ Review plugin code for documentation coverage and return doc diffs.
 # Inputs
 - `context_path`
 - `handoff_path`
-- `rev_dir`
+- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
 
 # Focus
 

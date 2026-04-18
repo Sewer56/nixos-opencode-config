@@ -41,7 +41,7 @@ Review a finalized machine plan for correctness, completeness, and fidelity to t
 # Inputs
 - `handoff_path`
 - `plan_path`
-- `step_dir`
+- `step_pattern` (e.g., `PROMPT-PLAN.step.*.md`)
 
 # Process
 1. Load cache
@@ -59,7 +59,7 @@ Review a finalized machine plan for correctness, completeness, and fidelity to t
 
 4. Inspect selected content
 - Read `handoff_path` for summary, requirements, Step Index, and dependency mapping (all plan content is in handoff now).
-- Read selected step files from `step_dir` in one batch (I1.md, I2.md, T1.md, T2.md, etc.).
+- Read selected step files matching `step_pattern` in one batch.
 - Open target files only for the selected items.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.

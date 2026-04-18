@@ -31,7 +31,7 @@ Review finalized iteration artifacts for correctness, schema validity, and cross
 # Inputs
 - `context_path`
 - `handoff_path`
-- `rev_dir`
+- `rev_pattern` (e.g., `PROMPT-ITERATE.rev.*.md`)
 
 # Focus
 - Schema: frontmatter in each `REV-###` target matches the command or agent schema exactly. Required fields present. No invented fields. YAML parses correctly.
@@ -58,7 +58,7 @@ Review finalized iteration artifacts for correctness, schema validity, and cross
 
 4. Inspect selected content
 - Read handoff for Summary, Dependencies, and REV Index.
-- Read selected REV files from `rev_dir` in one batch (files named `NNN.md`).
+- Read selected REV files matching `rev_pattern` in one batch.
 - Open target files only for the REV items selected in step 3.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.

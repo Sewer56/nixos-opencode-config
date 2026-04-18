@@ -41,7 +41,7 @@ Validate performance-critical aspects of the implementation plan. Only review wh
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner
 - `ledger_path` (optional): absolute path to the current review ledger
-- `step_dir`: directory for individual step files adjacent to `plan_path`
+- `step_pattern`: file pattern for individual step files adjacent to `plan_path` (e.g., `PROMPT-??-*-PLAN.step.*.md`)
 
 # Process
 
@@ -61,7 +61,7 @@ Validate performance-critical aspects of the implementation plan. Only review wh
 4. Inspect selected content
 - Read `prompt_path` for mission, requirements, and constraints.
 - Read the manifest at `plan_path` for summary, requirements, Step Index, and dependency mapping.
-- Read all selected step files from `step_dir` in one batch.
+- Read all selected step files matching `step_pattern` in one batch.
 - Identify if plan involves performance-sensitive work (concurrency, large data processing, algorithmic changes, database patterns, caching, memory-heavy operations).
 - Open target files only for the selected items.
 - Check Open→Resolved transitions.

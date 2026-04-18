@@ -12,7 +12,7 @@ permission:
     "*": deny
     "PROMPT-PLAN.handoff.md": allow
     "*PROMPT-PLAN.handoff.md": allow
-    "*PROMPT-PLAN.step/*": allow
+    "*PROMPT-PLAN.step.*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -34,7 +34,7 @@ permission:
   # skill: deny
 ---
 
-Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.handoff.md` (includes manifest) and individual step files under `PROMPT-PLAN.step/`. No separate `machine.md`.
+Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.handoff.md` (includes manifest) and individual step files matching `PROMPT-PLAN.step.*.md`. No separate `machine.md`.
 
 # Inputs
 - The latest user message may confirm the draft, provide small finalize-time notes, or point out changes since the draft.
@@ -44,7 +44,7 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
 # Artifacts
 - `plan_path`: `PROMPT-PLAN.md`
 - `handoff_path`: `PROMPT-PLAN.handoff.md`
-- `step_dir`: `PROMPT-PLAN.step/`
+- `step_pattern`: `PROMPT-PLAN.step.*.md`
 
 # Process
 
@@ -74,22 +74,22 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
 - Ground each implementation and test step in the current repo surface with a real file path, an anchor, repo evidence, and a short code snippet or diff.
 - Stable numbering: number implementation steps (I#) and test steps (T#) sequentially. If a step is removed during revision, leave the gap — do not renumber other items.
 - Write `handoff_path` with all plan content (manifest merges the former machine.md content).
-- Write each implementation step and test step to its own file under `step_dir`.
+- Write each implementation step and test step to its own file matching `step_pattern`.
 
 ## 5. Run the review loop
 - Write and maintain `## Delta` in `handoff_path` before the first reviewer pass. Record each `REQ-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields. Add artifact markers for `Source Plan` and `Review Ledger`. Recompute `## Delta` after every material revision.
 - Also record each I# and T# step as a Delta entry so reviewers can skip Unchanged step files.
-- After each full machine-plan draft, run these reviewers in parallel, passing `handoff_path`, `plan_path`, and `step_dir` to each reviewer:
+- After each full machine-plan draft, run these reviewers in parallel, passing `handoff_path`, `plan_path`, and `step_pattern` to each reviewer:
   - `@_plan/reviewers/correctness`
   - `@_plan/reviewers/documentation`
   - `@_plan/reviewers/economy`
   - `@_plan/reviewers/tests`
   - `@_plan/reviewers/performance`
-- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_dir` path, Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, and finalize-time user notes. Reviewers define their own output format, focus lists, role assignments, and target paths.
+- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, and finalize-time user notes. Reviewers define their own output format, focus lists, role assignments, and target paths.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: CORRECTNESS → correctness reviewer; DOCS → documentation reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer. Arbitrate cross-domain conflicts.
 - Do not reopen RESOLVED issues without new concrete evidence.
-- Revise step files in `step_dir` only where needed. Append one line to `## Revision History`.
+- Revise step files only where needed. Append one line to `## Revision History`.
 - Re-run all reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
 - No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
@@ -101,18 +101,18 @@ Return exactly:
 Status: SUCCESS | INCOMPLETE | FAIL
 Plan Path: <absolute path>
 Handoff Path: <absolute path>
-Step Dir: <absolute path>
+Step Pattern: <e.g. PROMPT-PLAN.step.*.md>
 Review Iterations: <n>
 Summary: <one-line summary>
 ```
 
 # Constraints
-- Only write planning artifacts `PROMPT-PLAN.handoff.md` and files under `PROMPT-PLAN.step/` during finalize.
+- Only write planning artifacts `PROMPT-PLAN.handoff.md` and files matching `PROMPT-PLAN.step.*.md` during finalize.
 - Never modify product code while planning.
 - Never rewrite `PROMPT-PLAN.md` in this command.
-- Within each step file in `step_dir`, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
+- Within each step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
 - Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to machine-plan templates, diff blocks, and reviewer output format examples.
-- Keep `PROMPT-PLAN.handoff.md` machine-first: stable headings, explicit refs, concrete file-level steps, and anchors that point at the current repo surface. Step files in `step_dir` follow the same machine-first discipline.
+- Keep `PROMPT-PLAN.handoff.md` machine-first: stable headings, explicit refs, concrete file-level steps, and anchors that point at the current repo surface. Step files follow the same machine-first discipline.
 - Keep `PROMPT-PLAN.handoff.md` factual and stable enough for the machine plan and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
 
@@ -217,8 +217,8 @@ Source Plan: <absolute path to `PROMPT-PLAN.md`>
 
 | Step | Target | Action | File |
 | ---- | ------ | ------ | ---- |
-| I1 | `path/to/file` | UPDATE | `I1.md` |
-| T1 | `path/to/test` | INSERT | `T1.md` |
+| I1 | `path/to/file` | UPDATE | `PROMPT-PLAN.step.I1.md` |
+| T1 | `path/to/test` | INSERT | `PROMPT-PLAN.step.T1.md` |
 
 ## Verification Commands
 - `<command>`: <why it should be run>
@@ -247,11 +247,11 @@ Winner: <reviewer_name>
 Rationale: <why this view prevailed>
 ````
 
-## `PROMPT-PLAN.step/` directory
+## `PROMPT-PLAN.step.*.md` files
 
-Implementation and test step content lives in individual files:
+Implementation and test step content lives in individual files matching `step_pattern`:
 
-### `I1.md` (Implementation Step)
+### `PROMPT-PLAN.step.I1.md` (Implementation Step)
 
 ````markdown
 # I1: `path/to/file`
@@ -279,7 +279,7 @@ Dependencies: None | I#
 Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
 ````
 
-### `T1.md` (Test Step)
+### `PROMPT-PLAN.step.T1.md` (Test Step)
 
 ````markdown
 # T1: `path/to/test-or-module`

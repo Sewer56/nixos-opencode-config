@@ -41,14 +41,14 @@ think
 
 # Derived Paths
 - `coder_notes_path` = `<prompt_path_without_extension>-CODER-NOTES.md`
-- `step_dir` = `<plan_path without -PLAN.md>.step/`
+- `step_pattern` = `<plan_path without -PLAN.md>.step.*.md`
 
 # Workflow
 
 1. Read requirements and plan
 - Read `prompt_path` for mission, requirements, and constraints.
 - Read the manifest at `plan_path` for the Step Index and summary.
-- Read all step files from `step_dir` in one batch (I1 → `I1.md`, T1 → `T1.md`).
+- Read all step files matching `step_pattern` in one batch.
 - Apply implementation steps in order, then test steps in order.
 - Use orchestrator context.
 

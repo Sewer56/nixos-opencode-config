@@ -24,7 +24,7 @@ Apply a finalized plugin machine plan, type-check, then debug-iterate until the 
 ## Phase 1: Apply the machine plan
 
 - Read `PROMPT-PLUGIN-PLAN.handoff.md` for the REV Index and plan context.
-- Read all REV files from `PROMPT-PLUGIN-PLAN.rev/` in one batch (REV-001 → `001.md`).
+- Read all REV files matching `PROMPT-PLUGIN-PLAN.rev.*.md` in one batch.
 - Apply every REV item: create/update plugin `.ts` files, add any helper files.
 - Write all files to disk. Plugins go in `config/plugins/` where they are auto-loaded — no `opencode.json` registration step.
 

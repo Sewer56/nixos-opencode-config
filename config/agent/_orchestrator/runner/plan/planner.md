@@ -17,7 +17,7 @@ permission:
     "*": deny
     "*PROMPT-??-*.md": allow
     "*PROMPT-FINDING-*.md": allow
-    "*PROMPT-??-*.step/*": allow
+    "*PROMPT-??-*.step.*.md": allow
     "*PROMPT-??-*-CODER-NOTES.md": deny
     "*PROMPT-??-*-REVIEW-LEDGER.md": deny
     "*PROMPT-ORCHESTRATOR*.md": deny
@@ -45,7 +45,7 @@ Create a complete implementation plan in a separate plan file. Use `@mcp-search`
 # Inputs
 - `prompt_path`: absolute path to PROMPT-NN-*.md file
 - `revision_notes` (optional): feedback from plan review or coder escalation
-- `step_dir`: directory for individual step files, derived from `plan_path` by replacing `-PLAN.md` with `.step/`
+- `step_pattern`: file pattern for individual step files, derived from `plan_path` by replacing `-PLAN.md` with `.step.*.md`
 - Expect structured entries when available: issue ID, severity, confidence, fix_specificity, source, evidence, requested fix, `acceptance_criteria`
 
 # Process
@@ -98,7 +98,7 @@ Build the sections mandated by the rules.
 
 6. Write Plan File
 - Create or update `<prompt_filename>-PLAN.md` as a manifest.
-- Write each implementation step and test step to its own file under `step_dir` (e.g., `I1.md`, `T1.md`).
+- Write each implementation step and test step to its own file matching `step_pattern`.
 - Requirements, mapping, trace matrix, external symbols, and verification commands stay in the manifest.
 - Example: `PROMPT-01-auth.md` -> `PROMPT-01-auth-PLAN.md`
 - If revising, place `## Reviewer Concerns (Revision)` at the top of the plan (immediately after `# Plan`)

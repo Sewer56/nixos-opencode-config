@@ -45,7 +45,7 @@ Review plugin code for error-handling coverage and standalone log pattern compli
 
 4. Inspect selected content
 - Read handoff for Summary, Dependencies, and REV Index.
-- Read selected REV files from `rev_dir` in one batch (files named `NNN.md`).
+- Read selected REV files matching `rev_pattern` in one batch.
 - Open target files only for the selected REV items.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
@@ -66,7 +66,7 @@ Review plugin code for error-handling coverage and standalone log pattern compli
 # Inputs
 - `context_path`
 - `handoff_path`
-- `rev_dir`
+- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
 
 # Focus
 

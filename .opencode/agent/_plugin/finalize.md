@@ -11,7 +11,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-PLUGIN-PLAN.handoff.md": allow
-    "*PROMPT-PLUGIN-PLAN.rev/*": allow
+    "*PROMPT-PLUGIN-PLAN.rev.*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -36,7 +36,7 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 # Artifacts
 - `context_path`: `PROMPT-PLUGIN-PLAN.md`
 - `handoff_path`: `PROMPT-PLUGIN-PLAN.handoff.md`
-- `rev_dir`: `PROMPT-PLUGIN-PLAN.rev/`
+- `rev_pattern`: `PROMPT-PLUGIN-PLAN.rev.*.md`
 
 # Process
 
@@ -57,17 +57,18 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 ## 3. Write the handoff file
 - Rewrite `handoff_path` from scratch for this run.
 - Preserve the latest consolidated user request verbatim under `## Raw Request`.
-- Write `handoff_path` using these sections: `# Iteration Handoff` (with `Source Context` path), `## Raw Request` (verbatim text block), `## Supplementary Context` (bullet list or `None`), `## Constraints` (bullet list or `None`), `## Success Criteria` (bullet list or `None`), `## Scope` (in/out bullets), `## Delta` (per-REV entries with `Status:`, `Touched:`, `Why:` fields plus Source Context and Review Ledger markers), `## Review Ledger` (`### Decisions` subsection for cross-domain arbitration only).
+- Write `handoff_path` using the `# Templates` section below.
 
 ## 4. Write the machine artifact
 - Derive discrete `REV-###` items from the confirmed context and handoff.
 - Stable numbering: number items sequentially from 001. If a REV is removed during revision, leave the gap — do not renumber other items.
-- Write `handoff_path` with Summary, Revision History, REV Index, Delta, and Review Ledger sections (merged manifest).
-- Write each REV item to its own file under `rev_dir`. Use the `# Rules` diff-block mechanics for combining, scattering, insertions, and deletions within each file.
+- Write `handoff_path` using the `# Templates` section (handoff now includes Summary, Revision History, and REV Index).
+- Write each REV item to its own file matching `rev_pattern` using the `# Templates` section.
 - Apply only the relevant optimization rules to each target. Split rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
 - Embed operational rules directly in generated targets.
 
 ## 5. Run the review loop
+Follow the ordered steps below exactly, in order.
 
 1. Write and maintain `## Delta`
 - Write `## Delta` to `handoff_path` before the first reviewer pass.
@@ -81,30 +82,31 @@ Convert a confirmed plugin plan into reviewed machine instructions.
   - `@_plugin/reviewers/reorder`
   - `@_plugin/reviewers/documentation`
   - `@_plugin/reviewers/correctness`
-- Include only: artifact paths (`context_path`, `handoff_path`), `rev_dir` path, Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, finalize-time user notes.
-- Omit: output format, focus lists, target file paths, role assignments, blanket read orders — reviewers define their own contracts.
+- Treat each reviewer prompt as scoped call data for the callee.
+- Include only: artifact paths (`context_path`, `handoff_path`), `rev_pattern`, Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, finalize-time user notes.
+- Omit: output format (reviewer agent files define their own `# Output`), focus lists (reviewer agent files define their own `# Focus`), target file paths from REV items (REV Index in handoff enumerates every target), role assignment ("You are a …" — OpenCode routes tasks to the correct agent automatically), blanket read orders such as "read all three artifacts" or "read every REV target file" — reviewers decide what to open from Delta, cache state, and Decisions.
 
 3. Validate each reviewer response
 - Confirm the response starts with `# REVIEW`.
 - Confirm the response contains `Decision: PASS | ADVISORY | BLOCKING`.
 - Confirm the response contains `## Findings` and `## Verified` headings.
-- If the response remains malformed after retries, treat it as BLOCKING with a synthetic finding.
+- If the response remains malformed after retries, treat it as BLOCKING with a synthetic finding that notes the reviewer returned unparseable output.
 
-4. Retry malformed responses
-- If validation fails and Delta plus Decisions are unchanged, send only the specific protocol error and request re-emit from existing review state.
-- If validation fails after a material revision changed Delta or Decisions, include only the new Delta/Decision excerpt and request a fresh response.
+4. Retry malformed responses from the existing review state
+- If validation fails and Delta plus Decisions are unchanged, send only the specific protocol error, tell the reviewer to reuse prior analysis/cache, and request a protocol-compliant re-emit from the existing review state.
+- If validation fails after a material revision changed Delta or Decisions, include only the new Delta/Decision excerpt in the retry prompt and request a fresh protocol-compliant response.
 
 5. Record decisions and apply domain ownership
-- Update `### Decisions` in `handoff_path` for cross-domain arbitration only.
-- Apply domain ownership: ERRORS → errors reviewer; REORDER → reorder reviewer; DOCUMENTATION → documentation reviewer; CORRECTNESS → correctness reviewer.
+- Update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files.
+- Apply domain ownership: ERRORS → errors reviewer; REORDER → reorder reviewer; DOCUMENTATION → documentation reviewer; CORRECTNESS → correctness reviewer. Arbitrate cross-domain conflicts.
 
 6. Revise the machine artifact when findings require it
-- Revise REV files in `rev_dir` only where needed.
+- Revise REV files only where needed.
 - Append one line to `## Revision History`.
 
 7. Re-run or finish
 - Re-run all reviewers after every material revision.
-- Loop until no findings remain or 10 iterations.
+- Loop until no findings of any severity remain or 10 iterations.
 - No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
 # Output
@@ -115,22 +117,22 @@ Return exactly:
 Status: SUCCESS | INCOMPLETE | FAIL
 Context Path: <absolute path>
 Handoff Path: <absolute path>
-Rev Dir: <absolute path>
+Rev Pattern: <e.g. PROMPT-PLUGIN-PLAN.rev.*.md>
 Review Iterations: <n>
 Summary: <one-line summary>
 ```
 
 # Constraints
 
-- Write only `PROMPT-PLUGIN-PLAN.handoff.md` and files under `PROMPT-PLUGIN-PLAN.rev/` during finalize.
+- Write only `PROMPT-PLUGIN-PLAN.handoff.md` and files matching `PROMPT-PLUGIN-PLAN.rev.*.md` during finalize.
 - Modify only those files during finalize.
 - Read `PROMPT-PLUGIN-PLAN.md` as source of truth only; write to handoff and machine paths.
-- Keep each REV file in `rev_dir` diff-based with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
+- Keep each REV file diff-based with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
 - Keep `PROMPT-PLUGIN-PLAN.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
 
 # Rules
 
-Apply these rules when writing REV files in `rev_dir`:
+Apply these rules when writing REV files:
 
 - Write concrete values for every field and body — omit `...`, `TODO`, and comment-only stubs.
 - Specify the full path for every file reference: REV headings, `Evidence` fields, and diff block targets all use fully qualified paths from the project root.
@@ -163,4 +165,92 @@ Revisions produced by this finalize run must follow. Apply only the relevant rul
 - Tool helper: `opencode-source/packages/plugin/src/tool.ts`
 - Shell types: `opencode-source/packages/plugin/src/shell.ts`
 - TUI types: `opencode-source/packages/plugin/src/tui.ts`
-- Existing plugins: `config/plugins/*.ts`
+- Existing plugins: `config/plugins/`
+
+# Templates
+
+## `PROMPT-PLUGIN-PLAN.handoff.md`
+
+````markdown
+# Iteration Handoff
+
+Source Context: <absolute path to `PROMPT-PLUGIN-PLAN.md`>
+
+## Raw Request
+
+```text
+<verbatim user request or current consolidated request>
+```
+
+## Supplementary Context
+- <repo fact, boundary, or pattern not already in source context Discovery>
+- <or `None`>
+
+## Constraints
+- <explicit user or repo constraint>
+- <or `None`>
+
+## Success Criteria
+- <what must be true when the work is done>
+- <or `None`>
+
+## Scope
+- In scope: <what this iteration covers>
+- Out of scope: <what this iteration intentionally leaves alone>
+
+## Summary
+- <brief goal and shape of the change>
+
+## Revision History
+- Iteration 1: Initial draft.
+
+## REV Index
+
+| REV | Target | Action | File |
+| --- | ------ | ------ | ---- |
+| REV-001 | `path/to/file` | CREATE | `PROMPT-PLUGIN-PLAN.rev.001.md` |
+| REV-002 | `path/to/file` | UPDATE | `PROMPT-PLUGIN-PLAN.rev.002.md` |
+
+## Delta
+- Source Context — Status: Unchanged | Changed | New; Touched: `PROMPT-PLUGIN-PLAN.md`; Why: <why reviewers do or do not need to reread source context>
+- Review Ledger — Status: Unchanged | Changed | New; Touched: `PROMPT-PLUGIN-PLAN.handoff.md`; Why: <why arbitration state changed or stayed stable>
+- REV-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
+
+## Review Ledger
+
+### Decisions
+
+#### [DEC-001]
+Type: DOMAIN_AUTHORITY | ARBITRATION
+Issue: COR-001
+Winner: <reviewer_name>
+Rationale: <why this view prevailed>
+````
+
+## `PROMPT-PLUGIN-PLAN.rev.*.md` files
+
+Each file `PROMPT-PLUGIN-PLAN.rev.NNN.md` contains one revision item:
+
+````markdown
+# REV-NNN: `path/to/file`
+
+Action: CREATE | UPDATE | DELETE
+Why: <why this file changes>
+Anchor: `<existing section or frontmatter field>` | `None`
+Lines: ~<start>-<end> | `None`
+Insert at: before | after | replace `<anchor or region>` | `None`
+
+Diff:
+
+```diff
+<one or more diff blocks — include 2+ context
+lines before and after each change.
+a single block if changes are contiguous or frontmatter+content
+are close together; multiple blocks if scattered.>
+```
+
+Changes:
+- <summary for quick scanning>
+Dependencies: None | REV#
+Evidence: `path/to/file:line`
+````
