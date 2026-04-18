@@ -151,6 +151,38 @@
         }
       }
     },
+    "wafer": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Wafer Pass",
+      "options": {
+        "baseURL": "https://pass.wafer.ai/v1",
+        "apiKey": "{file:/home/sewer/.secrets/wafer-key}"
+      },
+      "models": {
+        "Qwen3.5-397B-A17B": {
+          "name": "Qwen3.5-397B-A17B",
+          "family": "qwen",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": { "input": 0, "output": 0 },
+          "limit": { "context": 262144, "output": 131072 },
+          "modalities": { "input": ["text"], "output": ["text"] }
+        },
+        "GLM-5.1": {
+          "name": "GLM-5.1",
+          "family": "glm",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": { "input": 0, "output": 0 },
+          "limit": { "context": 202752, "output": 131072 },
+          "modalities": { "input": ["text"], "output": ["text"] }
+        }
+      }
+    },
     "github-copilot": {
       "options": {
         "reasoningSummary": "concise"
