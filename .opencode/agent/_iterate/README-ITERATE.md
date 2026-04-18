@@ -29,6 +29,8 @@ and other similar workflows.
   — line numbers in diff headers are approximate; context lines are authoritative
 - [Human-Friendly [P#] Items](#human-friendly-p-items)
   — draft-stage items use explanation + diff with paths in diff headers
+- [Focus-as-Scope](#focus-as-scope)
+  — Focus is the reviewer scope boundary; meta enforces no overlap
 
 ## Section Ordering Convention
 
@@ -249,3 +251,10 @@ actions use explanation only (or a code snippet for `_plan`).
 
 Format rules (approximate `@@` headers, 2+ context lines) follow
 the Approximate Diff Ranges convention above.
+
+## Focus-as-Scope
+
+Each reviewer's `# Focus` defines what it checks — anything not
+listed is out of scope. The meta reviewer blocks when a Focus item
+is broad enough to overlap another reviewer's domain, prompting
+the author to narrow or split it.
