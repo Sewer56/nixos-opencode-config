@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks iterate performance patterns — cache/delta efficiency, coordination overhead, and scaling
-model: sewer-bifrost/zai-coding-plan/glm-5.1
+model: minimax-coding-plan/MiniMax-M2.7
 reasoningEffort: medium
 permission:
   "*": deny

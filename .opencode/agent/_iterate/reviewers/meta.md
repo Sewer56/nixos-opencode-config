@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks iterate self-policing — self-iteration enforcement and section ordering conventions
-model: sewer-bifrost/zai-coding-plan/glm-5.1
+model: minimax-coding-plan/MiniMax-M2.7
 reasoningEffort: medium
 permission:
   "*": deny
