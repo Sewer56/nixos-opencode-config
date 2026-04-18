@@ -31,14 +31,14 @@ Review machine iteration artifacts for diff and hunk validity.
 # Inputs
 - `context_path`
 - `handoff_path`
-- `machine_path`
+- `rev_dir`
 
 # Focus
 - Approximate-range validity: `@@` headers point near the change location in the target file; the range is within ±10 lines of the actual content. `Lines` and `Anchor` fields are approximate.
 - Context lines: every hunk includes 2+ unchanged context lines before and after each change region; context lines match content that exists in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
 - Diff completeness: include a diff block for every declared change region.
 - Diff compactness: include only changed lines. Omit verbatim restatements of `context_path` content.
-- Nested code fences: block when a diff block inside `machine_path` sits within an outer fenced code block that uses the same number of backticks as the inner diff fence. The outer fence must use more backticks.
+- Nested code fences: block when a diff block inside a REV file sits within an outer fenced code block that uses the same number of backticks as the inner diff fence. The outer fence must use more backticks.
 
 # Process
 1. Load cache
@@ -55,7 +55,8 @@ Review machine iteration artifacts for diff and hunk validity.
 - Re-evaluate own Open items from cache and decision-referenced REV items.
 
 4. Inspect selected content
-- Read only the `machine_path` sections for the REV items selected in step 3.
+- Read handoff for Summary, Dependencies, and REV Index.
+- Read selected REV files from `rev_dir` in one batch (files named `NNN.md`).
 - Open target files only for the REV items selected in step 3.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.

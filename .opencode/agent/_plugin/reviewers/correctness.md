@@ -44,7 +44,8 @@ Review plugin plans for correctness, fidelity, and SDK type validity.
 - Re-evaluate own Open items from cache and decision-referenced REV items.
 
 4. Inspect selected content
-- Read only the `machine_path` sections for the selected REV items.
+- Read handoff for Summary, Dependencies, and REV Index.
+- Read selected REV files from `rev_dir` in one batch (files named `NNN.md`).
 - Open target files only for the selected REV items.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
@@ -65,13 +66,13 @@ Review plugin plans for correctness, fidelity, and SDK type validity.
 # Inputs
 - `context_path`
 - `handoff_path`
-- `machine_path`
+- `rev_dir`
 
 # Focus
 
-- **Fidelity**: explicit goals, constraints, scope, and clarified decisions in `handoff_path` and `context_path` remain represented in `machine_path`.
-- **Requirements**: every `REQ-###` in `machine_path` maps to concrete implementation refs.
-- **Structure**: `machine_path` uses the required stable headings and explicit refs.
+- **Fidelity**: explicit goals, constraints, scope, and clarified decisions in `handoff_path` and `context_path` remain represented in REV files.
+- **Requirements**: every `REQ-###` in REV files maps to concrete implementation refs.
+- **Structure**: REV files use the required stable headings and explicit refs.
 - **SDK types**: hook names match the SDK `Hooks` interface. Plugin signature is valid (`export const XxxPlugin: Plugin = async (input) => { ... }`).
 - **Frontmatter**: schema validity in REV target frontmatter fields.
 - **Completeness**: no placeholders (`...`, `TODO`, `FIXME`), missing anchors, or undefined helpers.

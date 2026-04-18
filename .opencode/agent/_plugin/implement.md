@@ -23,7 +23,8 @@ Apply a finalized plugin machine plan, type-check, then debug-iterate until the 
 
 ## Phase 1: Apply the machine plan
 
-- Read `PROMPT-PLUGIN-PLAN.machine.md` as the source of truth.
+- Read `PROMPT-PLUGIN-PLAN.handoff.md` for the REV Index and plan context.
+- Read all REV files from `PROMPT-PLUGIN-PLAN.rev/` in one batch (REV-001 → `001.md`).
 - Apply every REV item: create/update plugin `.ts` files, add any helper files.
 - Write all files to disk. Plugins go in `config/plugins/` where they are auto-loaded — no `opencode.json` registration step.
 
@@ -49,7 +50,7 @@ Return exactly:
 
 ```text
 Status: SUCCESS | TYPE_ERRORS | DEBUG_FAIL
-Plan Path: <absolute path to PROMPT-PLUGIN-PLAN.machine.md>
+Plan Path: <absolute path to PROMPT-PLUGIN-PLAN.handoff.md>
 Files Written: <count>
 Type Check: PASS | FAIL
 Debug Iterations: <n>
@@ -62,4 +63,4 @@ Summary: <one-line summary>
 
 # Input
 
-Pass the path to the finalized machine plan. The user must supply an absolute path to `PROMPT-PLUGIN-PLAN.machine.md`.
+Pass the path to the finalized handoff. The user must supply an absolute path to `PROMPT-PLUGIN-PLAN.handoff.md`.

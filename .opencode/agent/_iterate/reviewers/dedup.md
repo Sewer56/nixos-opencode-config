@@ -31,7 +31,7 @@ Review finalized iteration artifacts for cross-document and cross-REV redundancy
 # Inputs
 - `context_path`
 - `handoff_path`
-- `machine_path`
+- `rev_dir`
 
 # Focus
 - Cross-document: flag when an artifact re-states information available in another artifact or referenced file. Prefer referencing by section name or file path over re-quoting content.
@@ -39,7 +39,7 @@ Review finalized iteration artifacts for cross-document and cross-REV redundancy
 - Rule splitting: flag when a `REV-###` copies the full optimization contract into multiple targets instead of placing only the relevant rule fragments in each prompt or reviewer.
 - Frontmatter-import redundancy: flag when frontmatter in a `REV-###` target duplicates content already provided by an imported or parent file. Prefer referencing the import.
 - Human-doc vs model-doc: when a `REV-###` adds or updates human-facing docs, keep them short and do not duplicate that prose in model-facing prompt instructions.
-- Subagent input economy: flag caller prompts that restate callee-owned output formats, focus/check lists, role assignments, target paths already available via `machine_path`, or blanket read orders.
+- Subagent input economy: flag caller prompts that restate callee-owned output formats, focus/check lists, role assignments, target paths already enumerated in REV Index, or blanket read orders.
 
 # Process
 1. Load cache
@@ -56,7 +56,8 @@ Review finalized iteration artifacts for cross-document and cross-REV redundancy
 - Re-evaluate own Open items from cache and decision-referenced REV items.
 
 4. Inspect selected content
-- Read only the `machine_path` sections for the REV items selected in step 3.
+- Read handoff for Summary, Dependencies, and REV Index.
+- Read selected REV files from `rev_dir` in one batch (files named `NNN.md`).
 - Open target files only for the REV items selected in step 3.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.

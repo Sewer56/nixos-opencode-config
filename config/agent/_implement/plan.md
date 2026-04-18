@@ -12,7 +12,7 @@ permission:
     "*": allow
     "*PROMPT-PLAN.md": deny
     "*PROMPT-PLAN.handoff.md": deny
-    "*PROMPT-PLAN.machine.md": deny
+    "*PROMPT-PLAN.step/*": deny
   grep: allow
   glob: allow
   list: allow
@@ -27,21 +27,23 @@ permission:
 Implement a finalized machine plan with an automated review loop.
 
 # Prerequisites
-- `PROMPT-PLAN.machine.md` must exist (from `/plan/finalize`).
+- `PROMPT-PLAN.handoff.md` must exist (from `/plan/finalize`). Plan content is in handoff; implementation/test steps are in `PROMPT-PLAN.step/`.
 
 # Workflow
 
 ## 1. Read the machine plan
-- Read `PROMPT-PLAN.machine.md` (required).
-- It links to the source plan and handoff for additional context if needed.
+- Read `PROMPT-PLAN.handoff.md` (required) for plan metadata, requirements, and Step Index.
+- It links to the source plan for additional context if needed.
+- Implementation and test steps live in individual files under `PROMPT-PLAN.step/`. Read all step files in one batch.
 
 ## 2. Implement
-- Follow the machine plan's `## Implementation Steps` and `## Test Steps` in order.
+- Follow implementation steps in order: for each I# step in the handoff's Step Index, apply the step from the corresponding file in `PROMPT-PLAN.step/` (e.g., I1 → `I1.md`).
+- After all implementation steps, follow test steps in order: for each T# step in the Step Index, apply the step from the corresponding file in `PROMPT-PLAN.step/` (e.g., T1 → `T1.md`).
 - Run formatter, linter, build, and tests after each cohesive group of changes.
 - Iterate until all checks pass clean.
 
 ## 3. Review
-- Spawn `@_implement/plan-reviewer`, passing the machine plan path.
+- Spawn `@_implement/plan-reviewer`, passing the handoff path.
 - Wait for the review packet.
 
 ## 4. Loop
@@ -50,7 +52,7 @@ Implement a finalized machine plan with an automated review loop.
 
 ## 5. Report
 - Return final status. No auto-commit.
-- Never modify plan artifacts (`PROMPT-PLAN.md`, `PROMPT-PLAN.handoff.md`, `PROMPT-PLAN.machine.md`).
+- Never modify plan artifacts (`PROMPT-PLAN.md`, `PROMPT-PLAN.handoff.md`, files under `PROMPT-PLAN.step/`).
 
 # Output
 Return exactly:

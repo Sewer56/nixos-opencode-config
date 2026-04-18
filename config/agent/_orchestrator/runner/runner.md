@@ -63,6 +63,7 @@ You only update ledger and unmet requirements files. Follow the `Workflow` direc
 - `requirements_path` = `<prompt_path_parent>/PROMPT-PRD-REQUIREMENTS.md` if it exists
 - `unmet_requirements_path` = `<prompt_path_parent>/PROMPT-REQUIREMENTS-UNMET.md`
 - `ledger_path` = `<prompt_path_without_extension>-REVIEW-LEDGER.md`
+- `step_dir` = `<prompt_path_without_extension>-PLAN.step/`
 
 ## Workflow
 
@@ -88,8 +89,9 @@ Run all 6 plan reviewers in parallel:
 Inputs:
 - `prompt_path`
 - `plan_path`
+- `step_dir`
 - `ledger_path` when `ledger_path` already exists
-- Nothing else.
+- Cache file paths: each reviewer writes to `<plan_stem>-PLAN.review-<domain>.md`.
 
 Notes:
 - Reviewers read fixed rule paths directly. Do not pass rule file paths as inputs.
@@ -101,6 +103,7 @@ Aggregation:
 - Assign new IDs only to new issues.
 - Apply domain ownership rules.
 - Update `## Delta` in `ledger_path`: record each issue as a compact entry with `Status:`, `Touched:`, and `Why:` fields relative to the prior review pass. Recompute after every material revision.
+- Also record each I# and T# step as a Delta entry so reviewers can skip Unchanged step files.
 - Write `ledger_path` on every review pass.
 
 Decision:
@@ -113,6 +116,7 @@ Decision:
 - Inputs:
   - `prompt_path`
   - `plan_path`
+  - `step_dir`
   - task intent
   - `ledger_path`
 - Parse:

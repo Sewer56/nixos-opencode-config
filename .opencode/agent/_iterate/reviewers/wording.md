@@ -31,10 +31,10 @@ Review finalized iteration artifacts for LLM instruction wording quality.
 # Inputs
 - `context_path`
 - `handoff_path`
-- `machine_path`
+- `rev_dir`
 
 # Focus
-- Token density: every sentence in `machine_path` revision instructions carries weight. No filler, hedging, "please note", "it's important to", "make sure to", "ensure that". Every word earns its place.
+- Token density: every sentence in REV file revision instructions carries weight. No filler, hedging, "please note", "it's important to", "make sure to", "ensure that". Every word earns its place.
 - Minimal template: no sections that add zero value. If a section would be empty, omit it.
 - Wording optimization: flag phrasing that can be tightened without changing meaning. Prefer fewer tokens when semantic content is preserved. Flat instruction structure — avoid deeply nested conditionals.
 - Bullet atomicity: each Focus, Process, or Constraint item expresses one checkable condition. Split multi-condition bullets that pack distinct rules, exceptions, and sub-conditions into a single paragraph. Wrong: one bullet containing condition + scope + exception + secondary rule. Correct: separate bullet per checkable condition. Advisory only — do not block.
@@ -54,7 +54,8 @@ Review finalized iteration artifacts for LLM instruction wording quality.
 - Re-evaluate own Open items from cache and decision-referenced REV items.
 
 4. Inspect selected content
-- Read only the `machine_path` sections for the REV items selected in step 3.
+- Read handoff for Summary, Dependencies, and REV Index.
+- Read selected REV files from `rev_dir` in one batch (files named `NNN.md`).
 - Open target files only for the REV items selected in step 3.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.

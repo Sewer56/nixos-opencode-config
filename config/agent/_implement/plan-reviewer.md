@@ -26,9 +26,10 @@ Review an implementation against a finalized machine plan.
 - Machine plan path (passed by caller).
 
 # Process
-1. Read the machine plan at the given path.
-2. Inspect all changes via `git diff`.
-3. Validate:
+1. Read the handoff at the given path for plan metadata, requirements, and Step Index.
+2. Read all step files from `PROMPT-PLAN.step/` in one batch.
+3. Inspect all changes via `git diff`.
+4. Validate:
 - Plan objectives met: each implementation step has corresponding changes.
 - Implementation fidelity: changes match the code shape and anchors described in the plan.
 - No severe regression: no obviously broken logic, removed safety checks, or unintended scope creep.

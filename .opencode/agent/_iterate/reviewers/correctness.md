@@ -31,13 +31,13 @@ Review finalized iteration artifacts for correctness, schema validity, and cross
 # Inputs
 - `context_path`
 - `handoff_path`
-- `machine_path`
+- `rev_dir`
 
 # Focus
 - Schema: frontmatter in each `REV-###` target matches the command or agent schema exactly. Required fields present. No invented fields. YAML parses correctly.
 - Permission consistency: agent `permission` frontmatter in each `REV-###` is self-consistent. Required permission keys present. `task` entries reference existing subagent names. Command `agent:` references an existing agent name.
 - Cross-references: no dangling file references. No "see the docs" without inlining the content. Every `REV-###` anchor points at a real section or frontmatter field in the target file.
-- Completeness: no placeholders, undefined fields, or unresolved ownership in `machine_path`.
+- Completeness: no placeholders, undefined fields, or unresolved ownership in REV files.
 - Ledger-file schema: Review Ledger in handoff contains only `### Decisions` for cross-domain arbitration. No `### Issues` subsection — domain-internal issue tracking stays in reviewer cache files.
 - Operational rule coverage: when a `REV-###` target runs a review loop, coordinates subagents, defines machine-readable output, or changes iterate conventions/artifacts, verify the corresponding rule fragments exist in the target file, not the diff block — cache/Delta, shared coordination state, prompt-local structured-output instructions, short human-facing docs, and tight subagent inputs. ~~Wrong: checking `@@` line marker accuracy in diff blocks.~~
 - External-doc delegation: flag `REV-###` instructions that tell a target prompt or reviewer to consult external docs for operational behavior instead of stating the requirement directly.
@@ -57,7 +57,8 @@ Review finalized iteration artifacts for correctness, schema validity, and cross
 - Re-evaluate own Open items from cache and decision-referenced REV items.
 
 4. Inspect selected content
-- Read only the `machine_path` sections for the REV items selected in step 3.
+- Read handoff for Summary, Dependencies, and REV Index.
+- Read selected REV files from `rev_dir` in one batch (files named `NNN.md`).
 - Open target files only for the REV items selected in step 3.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.

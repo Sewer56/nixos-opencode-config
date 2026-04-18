@@ -11,7 +11,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-PLUGIN-PLAN.handoff.md": allow
-    "*PROMPT-PLUGIN-PLAN.machine.md": allow
+    "*PROMPT-PLUGIN-PLAN.rev/*": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -36,7 +36,7 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 # Artifacts
 - `context_path`: `PROMPT-PLUGIN-PLAN.md`
 - `handoff_path`: `PROMPT-PLUGIN-PLAN.handoff.md`
-- `machine_path`: `PROMPT-PLUGIN-PLAN.machine.md`
+- `rev_dir`: `PROMPT-PLUGIN-PLAN.rev/`
 
 # Process
 
@@ -61,9 +61,11 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 
 ## 4. Write the machine artifact
 - Derive discrete `REV-###` items from the confirmed context and handoff.
+- Stable numbering: number items sequentially from 001. If a REV is removed during revision, leave the gap — do not renumber other items.
+- Write `handoff_path` with Summary, Revision History, REV Index, Delta, and Review Ledger sections (merged manifest).
+- Write each REV item to its own file under `rev_dir`. Use the `# Rules` diff-block mechanics for combining, scattering, insertions, and deletions within each file.
 - Apply only the relevant optimization rules to each target. Split rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
 - Embed operational rules directly in generated targets.
-- Follow diff-block mechanics in `# Rules` for combining, scattering, insertions, and deletions.
 
 ## 5. Run the review loop
 
@@ -79,7 +81,7 @@ Convert a confirmed plugin plan into reviewed machine instructions.
   - `@_plugin/reviewers/reorder`
   - `@_plugin/reviewers/documentation`
   - `@_plugin/reviewers/correctness`
-- Include only: artifact paths (`context_path`, `handoff_path`, `machine_path`), Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, finalize-time user notes.
+- Include only: artifact paths (`context_path`, `handoff_path`), `rev_dir` path, Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, finalize-time user notes.
 - Omit: output format, focus lists, target file paths, role assignments, blanket read orders — reviewers define their own contracts.
 
 3. Validate each reviewer response
@@ -97,7 +99,7 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 - Apply domain ownership: ERRORS → errors reviewer; REORDER → reorder reviewer; DOCUMENTATION → documentation reviewer; CORRECTNESS → correctness reviewer.
 
 6. Revise the machine artifact when findings require it
-- Revise `machine_path` only where needed.
+- Revise REV files in `rev_dir` only where needed.
 - Append one line to `## Revision History`.
 
 7. Re-run or finish
@@ -113,22 +115,22 @@ Return exactly:
 Status: SUCCESS | INCOMPLETE | FAIL
 Context Path: <absolute path>
 Handoff Path: <absolute path>
-Machine Path: <absolute path>
+Rev Dir: <absolute path>
 Review Iterations: <n>
 Summary: <one-line summary>
 ```
 
 # Constraints
 
-- Write only `PROMPT-PLUGIN-PLAN.handoff.md` and `PROMPT-PLUGIN-PLAN.machine.md` during finalize.
-- Modify only those two files during finalize.
+- Write only `PROMPT-PLUGIN-PLAN.handoff.md` and files under `PROMPT-PLUGIN-PLAN.rev/` during finalize.
+- Modify only those files during finalize.
 - Read `PROMPT-PLUGIN-PLAN.md` as source of truth only; write to handoff and machine paths.
-- Keep `PROMPT-PLUGIN-PLAN.machine.md` diff-based: each REV item uses diff blocks grounded in the current file state with approximate line ranges and anchors per `# Rules`. CREATE actions include full file content.
+- Keep each REV file in `rev_dir` diff-based with approximate line ranges and anchors per `# Rules`. CREATE actions include full file content.
 - Keep `PROMPT-PLUGIN-PLAN.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
 
 # Rules
 
-Apply these rules when writing `machine_path`:
+Apply these rules when writing REV files in `rev_dir`:
 
 - Write concrete values for every field and body — omit `...`, `TODO`, and comment-only stubs.
 - Specify the full path for every file reference: REV headings, `Evidence` fields, and diff block targets all use fully qualified paths from the project root.

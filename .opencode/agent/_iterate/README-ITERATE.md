@@ -3,6 +3,8 @@
 Reference for optimization patterns used by the `/iterate` workflow
 and other similar workflows.
 
+- [Split REV Files](#split-rev-files)
+  — each revision item in its own file; handoff absorbs machine.md
 - [Section Ordering Convention](#section-ordering-convention)
   — Inputs → Process → Supplemental ordering for produced files
 - [Cache and Delta](#cache-and-delta)
@@ -31,6 +33,51 @@ and other similar workflows.
   — draft-stage items use explanation + diff with paths in diff headers
 - [Focus-as-Scope](#focus-as-scope)
   — Focus is the reviewer scope boundary; meta enforces no overlap
+
+## Split REV Files
+
+Applies to all finalize pipelines: `_iterate`, `_plugin`, `_plan`, and
+`_orchestrator`.
+
+### No Separate machine.md
+
+The `machine.md` artifact is eliminated. Handoff absorbs its content:
+Summary, Revision History, and REV/Step Index. All actionable diff/step
+content lives in individual files under `rev_dir` or `step_dir`.
+
+Consumers read: handoff (single coordination document) + per-item files
+from `rev_dir`/`step_dir`. No second coordination file.
+
+### File Layout
+
+- `PROMPT-ITERATE.handoff.md` — coordination document with Summary,
+  Revision History, REV Index, Delta, and Review Ledger
+- `PROMPT-ITERATE.rev/001.md` — first revision item
+- `PROMPT-ITERATE.rev/002.md` — second revision item
+- (gaps are valid; deleted items leave holes in numbering)
+
+For `_plugin`: same pattern with `PROMPT-PLUGIN-PLAN.rev/`.
+
+For `_plan`: implementation and test steps split into
+`PROMPT-PLAN.step/I1.md`, `PROMPT-PLAN.step/T1.md`, etc.
+Requirements, mapping, trace matrix, and external symbols stay in
+the handoff.
+
+For `_orchestrator`: the planner splits steps into
+`PROMPT-NN-*-PLAN.step/I1.md`, `PROMPT-NN-*-PLAN.step/T1.md`, etc.
+
+### Stable Numbering
+
+Items are numbered sequentially. If an item is removed during finalize's
+internal revision loop, the gap is left in place — no renumbering.
+Gaps (e.g., 001, 003, 005) are valid.
+
+### Consumption Pattern
+
+Reviewers and implementers read handoff first for context and the
+index, then read all needed individual files in parallel (issue all
+read calls in one batch). This avoids loading all revision content
+into context when only a subset changed, and minimizes round-trips.
 
 ## Section Ordering Convention
 
@@ -113,7 +160,7 @@ For reviewers, the Process-zone step order:
 2. Read Delta and Decisions
 3. Reopen only Changed, New, items with unresolved findings, or
    decision-referenced REV items
-4. Inspect only the selected `machine_path` sections and target files
+4. Read the REV Index from handoff, then read selected REV files from `rev_dir`
 5. Update cache — only changed entries
 6. Emit the required final output block
 
@@ -126,7 +173,7 @@ Reviewers start from cache plus Delta. They carry forward cached
 `PASS` items with no open findings when their Delta state remains
 `Unchanged`.
 
-Read `machine_path` sections first. Then open target files only for:
+Read the REV Index from handoff first. Then read selected REV files from `rev_dir`. Open target files only for:
 - Changed items
 - New items
 - Items with unresolved findings from cache

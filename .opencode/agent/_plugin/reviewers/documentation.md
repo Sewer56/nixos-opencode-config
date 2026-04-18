@@ -44,7 +44,8 @@ Review plugin code for documentation coverage and return doc diffs.
 - Re-evaluate own Open items from cache and decision-referenced REV items.
 
 4. Inspect selected content
-- Read only the `machine_path` sections for the selected REV items.
+- Read handoff for Summary, Dependencies, and REV Index.
+- Read selected REV files from `rev_dir` in one batch (files named `NNN.md`).
 - Open target files only for the selected REV items.
 - Read `DOCUMENTATION_RULES_PATH` (`config/rules/documentation.md`) as source of truth for doc rules.
 - Check Open→Resolved transitions.
@@ -66,7 +67,7 @@ Review plugin code for documentation coverage and return doc diffs.
 # Inputs
 - `context_path`
 - `handoff_path`
-- `machine_path`
+- `rev_dir`
 
 # Focus
 

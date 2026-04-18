@@ -36,18 +36,20 @@ think
 
 # Inputs
 - `prompt_path`: requirements and objectives
-- `plan_path`: implementation plan from planner (contains `## Implementation Steps` and `## Test Steps`)
+- `plan_path`: implementation plan manifest from planner (Step Index references individual step files)
 - Orchestrator context: task intent and notes from prior phases
 
 # Derived Paths
 - `coder_notes_path` = `<prompt_path_without_extension>-CODER-NOTES.md`
+- `step_dir` = `<plan_path without -PLAN.md>.step/`
 
 # Workflow
 
 1. Read requirements and plan
 - Read `prompt_path` for mission, requirements, and constraints.
-- Read `plan_path` for `## Implementation Steps` and `## Test Steps`.
-- Follow `## Implementation Steps` and `## Test Steps` exactly.
+- Read the manifest at `plan_path` for the Step Index and summary.
+- Read all step files from `step_dir` in one batch (I1 → `I1.md`, T1 → `T1.md`).
+- Apply implementation steps in order, then test steps in order.
 - Use orchestrator context.
 
 2. Implement changes
