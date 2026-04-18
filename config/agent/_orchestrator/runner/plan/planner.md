@@ -169,7 +169,7 @@ Final message must contain:
 
 # Rules
 
-Apply the rules below:
+Load all rule files below in parallel. Apply them:
 
 /home/sewer/opencode/config/rules/_orchestrator/plan-content.md
 /home/sewer/opencode/config/rules/general.md
@@ -178,5 +178,6 @@ Apply the rules below:
 /home/sewer/opencode/config/rules/test-parameterization.md
 /home/sewer/opencode/config/rules/code-placement.md
 /home/sewer/opencode/config/rules/documentation.md
+/home/sewer/opencode/config/rules/errors.md
 /home/sewer/opencode/config/rules/_orchestrator/orchestration-plan.md
 /home/sewer/opencode/config/rules/_orchestrator/orchestration-revision.md

@@ -144,7 +144,7 @@ Details: <commit report summary or amending note>
 
 # Rules
 
-Apply the rules below:
+Load all rule files below in parallel. Apply them:
 
 /home/sewer/opencode/config/rules/_orchestrator/plan-content.md
 /home/sewer/opencode/config/rules/general.md

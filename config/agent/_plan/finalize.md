@@ -82,12 +82,13 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
 - After each full machine-plan draft, run these reviewers in parallel, passing `handoff_path`, `plan_path`, and `step_pattern` to each reviewer:
   - `@_plan/reviewers/correctness`
   - `@_plan/reviewers/documentation`
+  - `@_plan/reviewers/errors`
   - `@_plan/reviewers/economy`
   - `@_plan/reviewers/tests`
   - `@_plan/reviewers/performance`
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, and finalize-time user notes. Reviewers define their own output format, focus lists, role assignments, and target paths.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
-- Apply domain ownership: CORRECTNESS → correctness reviewer; DOCS → documentation reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer. Arbitrate cross-domain conflicts.
+- Apply domain ownership: CORRECTNESS → correctness reviewer; DOCS → documentation reviewer; ERR → errors reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer. Arbitrate cross-domain conflicts.
 - Do not reopen RESOLVED issues without new concrete evidence.
 - Revise step files only where needed. Append one line to `## Revision History`.
 - Re-run all reviewers after every material revision.
@@ -118,11 +119,12 @@ Summary: <one-line summary>
 
 # Rules
 
-Apply the rules below:
+Load all rule files below in parallel. Apply them:
 
 /home/sewer/opencode/config/rules/general.md
 /home/sewer/opencode/config/rules/code-placement.md
 /home/sewer/opencode/config/rules/documentation.md
+/home/sewer/opencode/config/rules/errors.md
 /home/sewer/opencode/config/rules/testing.md
 /home/sewer/opencode/config/rules/test-parameterization.md
 /home/sewer/opencode/config/rules/performance.md
@@ -229,7 +231,7 @@ Source Plan: <absolute path to `PROMPT-PLAN.md`>
 
 #### [COR-001]
 Id: COR-001
-Domain: CORRECTNESS | DOCS | ECONOMY | TEST | PERF
+Domain: CORRECTNESS | DOCS | ERR | ECONOMY | TEST | PERF
 Source: _plan/reviewers/correctness
 Severity: BLOCKING | ADVISORY
 Status: OPEN | RESOLVED | DEFERRED

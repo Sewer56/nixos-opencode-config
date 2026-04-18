@@ -25,6 +25,7 @@ permission:
     "_orchestrator/runner/plan/plan-correctness-gpt5": "allow"
     "_orchestrator/runner/plan/plan-correctness-glm": "allow"
     "_orchestrator/runner/plan/plan-documentation-reviewer": "allow"
+    "_orchestrator/runner/plan/plan-errors-reviewer": "allow"
     "_orchestrator/runner/plan/plan-economy-reviewer": "allow"
     "_orchestrator/runner/plan/plan-test-reviewer": "allow"
     "_orchestrator/runner/plan/plan-performance-reviewer": "allow"
@@ -78,13 +79,14 @@ You only update ledger and unmet requirements files. Follow the `Workflow` direc
    - If different, rename with `mv`, update `plan_path`, stop on failure.
 
 ### Phase 2: Plan Review
-Run all 6 plan reviewers in parallel:
+Run all 7 plan reviewers in parallel:
 1. `@_orchestrator/runner/plan/plan-correctness-gpt5`
 2. `@_orchestrator/runner/plan/plan-correctness-glm`
 3. `@_orchestrator/runner/plan/plan-documentation-reviewer`
-4. `@_orchestrator/runner/plan/plan-economy-reviewer`
-5. `@_orchestrator/runner/plan/plan-test-reviewer`
-6. `@_orchestrator/runner/plan/plan-performance-reviewer`
+4. `@_orchestrator/runner/plan/plan-errors-reviewer`
+5. `@_orchestrator/runner/plan/plan-economy-reviewer`
+6. `@_orchestrator/runner/plan/plan-test-reviewer`
+7. `@_orchestrator/runner/plan/plan-performance-reviewer`
 
 Inputs:
 - `prompt_path`
@@ -211,6 +213,7 @@ Iterations: <n>
 | Correctness (GPT-5) | PASS/BLOCKING/ADVISORY | X        | Y        |
 | Correctness (GLM)   | PASS/BLOCKING/ADVISORY | X        | Y        |
 | Documentation       | PASS/BLOCKING/ADVISORY | X        | Y        |
+| Errors              | PASS/BLOCKING/ADVISORY | X        | Y        |
 | Economy             | PASS/BLOCKING/ADVISORY | X        | Y        |
 | Test Design         | PASS/BLOCKING/ADVISORY | X        | Y        |
 | Performance         | PASS/BLOCKING/ADVISORY | X        | Y        |
@@ -266,6 +269,7 @@ Write to `PROMPT-REQUIREMENTS-UNMET.md`:
 ### Domain Ownership
 - `REQ-*`, `COMPLETENESS`, `REVISION`: correctness reviewers
 - `DOCS`: documentation reviewer
+- `ERR`: errors reviewer
 - `ECONOMY`, `PLACEMENT`: economy reviewer
 - `TEST_*` in plan phase: test reviewer
 - `PERF_*`: performance reviewer

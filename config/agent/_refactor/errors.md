@@ -98,9 +98,10 @@ Loop until no findings of any severity remain or 10 iterations. If 3 consecutive
 # SHARED RULES
 
 - `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
+- `ERROR_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/errors.md`
 - `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor`
 
-Read `DOCUMENTATION_RULES_PATH` once before starting. Source of truth for doc format and style.
+Read `DOCUMENTATION_RULES_PATH` and `ERROR_RULES_PATH` once before starting. `DOCUMENTATION_RULES_PATH` is source of truth for doc format and style. `ERROR_RULES_PATH` is source of truth for `# Errors` section requirements and blocking criteria.
 
 # Artifacts
 

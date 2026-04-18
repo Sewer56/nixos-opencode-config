@@ -133,7 +133,7 @@ Do not escalate for straightforward errors you can fix. Escalate early if stuck.
 
 # Rules
 
-Apply the rules below:
+Load all rule files below in parallel. Apply them:
 
 /home/sewer/opencode/config/rules/general.md
 /home/sewer/opencode/config/rules/code-placement.md
