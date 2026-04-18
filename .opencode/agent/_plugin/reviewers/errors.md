@@ -71,6 +71,7 @@ Review plugin code for error-handling coverage and standalone log pattern compli
 # Focus
 
 - **Coverage**: every hook callback and async path in generated plugin code has error handling (try/catch). Missing error paths are BLOCKING.
+- **Doc coverage**: every public error-returning API has an `@throws` tag or `# Errors` section documenting each error variant with a specific trigger.
 - **Specificity**: vague catch-all handlers without specific error types are ADVISORY.
 - **Swallowed errors**: flag `catch(() => {})`, `catch {}`, async rejections silently dropped as BLOCKING.
 - **Log handling**: debug logging uses the standalone file pattern (writes to `<plugin-dir>/.logs/<name>/debug.log`). Any use of `client.app.log` for debug output is BLOCKING.
@@ -111,6 +112,7 @@ Return ONLY the block above — no introduction, no summary, no conversational w
 # Constraints
 
 - Block for missing error handling in hook callbacks, swallowed errors, or `client.app.log` debug usage.
+- Block for missing `@throws` tags or `# Errors` sections on public error-returning APIs.
 - Treat minor wording preferences as PASS when specificity and coverage are correct.
 - Cite source file evidence when grounding a finding.
 - Keep findings short and specific.

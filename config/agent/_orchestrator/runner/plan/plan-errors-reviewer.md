@@ -80,7 +80,7 @@ Validate that the implementation plan covers error documentation requirements co
 - Emit the `# REVIEW PACKET` block from `# Output`.
 
 # Focus
-- Review `# Errors` sections in the changed scope described by the plan.
+- Own all `# Errors` section concerns (existence, placement, format, specificity, completeness) in the changed scope described by the plan.
 - Read only the repo files needed to ground those checks.
 
 Rules: `/home/sewer/opencode/config/rules/errors.md`.

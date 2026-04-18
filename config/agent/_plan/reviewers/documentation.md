@@ -79,6 +79,7 @@ Review a finalized machine plan's documentation work.
 # Focus
 - Review the changed scope described by step files matching `step_pattern`.
 - Compare against current repo docs when any documented surface is being moved, renamed, or replaced.
+- Do not review `# Errors` sections — those are fully owned by another reviewer.
 - Read only the repo files needed to ground those checks.
 
 Rules: `/home/sewer/opencode/config/rules/documentation.md`.

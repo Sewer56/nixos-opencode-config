@@ -72,6 +72,7 @@ Review plugin code for documentation coverage and return doc diffs.
 # Focus
 
 - **Coverage**: every exported plugin has a JSDoc module header. Every hook callback has a doc comment. `# Usage`, `# Public API`, `# Hooks` sections present.
+- Do not review `@throws` tags or `# Errors` sections — those are fully owned by another reviewer.
 - **Specificity**: debug flag documented (e.g. `Set XXX_DEBUG=1 to enable logging`).
 - **Fidelity**: standalone log path documented (e.g. `Set XXX_DEBUG=1 to enable logging to <plugin-dir>/.logs/<name>/debug.log`).
 - Read `DOCUMENTATION_RULES_PATH` (`config/rules/documentation.md`) as source of truth.

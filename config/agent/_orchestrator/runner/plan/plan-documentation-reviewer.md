@@ -81,6 +81,7 @@ Validate that the implementation plan covers documentation requirements concrete
 
 # Focus
 - Review the changed scope described by the plan.
+- Do not review `# Errors` sections — those are fully owned by another reviewer.
 - Verify each relevant implementation step satisfies the "Review Blocking Criteria" section in the rules.
 - Read only the repo files needed to ground those checks.
 
@@ -99,7 +100,7 @@ If any are missing, downgrade to ADVISORY.
 ### Documentation Issues
 **Category**: DOCS
 **Types**:
-- MISSING_REQUIRED_DOCS: required docs are not planned
+- MISSING_REQUIRED_DOCS: required non-error docs are not planned
 - MISSING_API_EXAMPLE: requested example is not planned on the API docs
 - VAGUE_DOC_PLAN: docs are only described abstractly
 - DOC_CONTENT_DROP: meaningful existing docs would be lost

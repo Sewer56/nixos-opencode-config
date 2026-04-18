@@ -77,7 +77,7 @@ Review a finalized machine plan's error documentation.
 - Emit the `# REVIEW` block from `# Output`.
 
 # Focus
-- Review `# Errors` sections in the changed scope described by step files matching `step_pattern`.
+- Own all `# Errors` section concerns (existence, placement, format, specificity, completeness) in the changed scope described by step files matching `step_pattern`.
 - Read only the repo files needed to ground those checks.
 
 Rules: `/home/sewer/opencode/config/rules/errors.md`.
@@ -116,5 +116,6 @@ Fix: <smallest concrete correction>
 # Constraints
 - Keep findings short and specific.
 - Read your own `PROMPT-PLAN.review-errors.md` cache before reviewing. Do not reopen Resolved items without new concrete evidence.
+- Flag missing `# Errors` sections on public error-returning APIs as BLOCKING per the errors rules.
 - Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact `# Errors` section to add or fix.
 - Follow the `# Process` section for cache, Delta, and skip handling.
