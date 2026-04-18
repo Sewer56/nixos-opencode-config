@@ -272,7 +272,6 @@ Write to `PROMPT-REQUIREMENTS-UNMET.md`:
 ```markdown
 # REVIEW LEDGER
 Phase: plan | code
-Created: <timestamp>
 
 ## Delta
 - REQ-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
