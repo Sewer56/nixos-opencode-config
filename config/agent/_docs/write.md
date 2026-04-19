@@ -103,4 +103,5 @@ Summary: <one-line summary>
 - Do not modify files outside the target paths unless explicitly requested.
 - Respect scope boundaries: do not edit frozen regions. Reject reviewer diffs that land in frozen regions.
 - Wrap prose at 80–100 characters per line. Code blocks and URLs are exempt.
+- Insert a blank line before the first bullet item when a list follows prose, and between adjacent bullet items whenever either wraps past one line; tight single-line lists (flags, enums) need no inter-item spacing.
 - This command writes end-user-facing documentation (guides, READMEs, mkdocs pages). It does NOT add doc comments to source code — that is `/refactor/document`.
