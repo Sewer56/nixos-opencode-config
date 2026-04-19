@@ -76,24 +76,37 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
 - Write `handoff_path` with all plan content (manifest merges the former machine.md content).
 - Write each implementation step and test step to its own file matching `step_pattern`.
 
-## 5. Run the review loop
+## Phase Structure
+- Review loop structure: a core phase (correctness/economy/tests/performance) runs first; after it passes, a polish phase (documentation/errors) runs with independent Delta tracking and iteration limits.
+
+## 5. Run the core review loop
 - Write and maintain `## Delta` in `handoff_path` before the first reviewer pass. Record each `REQ-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields. Add artifact markers for `Source Plan` and `Review Ledger`. Recompute `## Delta` after every material revision.
 - Also record each I# and T# step as a Delta entry so reviewers can skip Unchanged step files.
-- After each full machine-plan draft, run these reviewers in parallel, passing `handoff_path`, `plan_path`, and `step_pattern` to each reviewer:
+- After each full machine-plan draft, run these core reviewers in parallel, passing `handoff_path`, `plan_path`, and `step_pattern` to each reviewer:
   - `@_plan/reviewers/correctness`
-  - `@_plan/reviewers/documentation`
-  - `@_plan/reviewers/errors`
   - `@_plan/reviewers/economy`
   - `@_plan/reviewers/tests`
   - `@_plan/reviewers/performance`
-- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, and finalize-time user notes. Reviewers define their own output format, focus lists, role assignments, and target paths.
+- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern` (a glob pattern matching I# and T# step file paths to scope the review), Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, and finalize-time user notes. Reviewers define their own output format, focus lists, role assignments, and target paths.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
-- Apply domain ownership: CORRECTNESS → correctness reviewer; DOCS → documentation reviewer; ERR → errors reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer. Arbitrate cross-domain conflicts.
+- Apply core domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer. Arbitrate cross-domain conflicts.
 - Do not reopen RESOLVED issues without new concrete evidence.
 - Revise step files only where needed. Append one line to `## Revision History`.
-- Re-run all reviewers after every material revision.
+- Re-run core reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
-- No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
+  No findings: proceed to polish phase. At cap: FAIL if BLOCKING, proceed to polish with risks if only ADVISORY.
+
+## 6. Run the polish review loop
+- Update `## Delta` in `handoff_path`. Mark all core-reviewed items as Unchanged. Set `Why: core phase passed`.
+- Run these polish reviewers in parallel, passing `handoff_path`, `plan_path`, and `step_pattern` to each reviewer:
+  - `@_plan/reviewers/documentation`
+  - `@_plan/reviewers/errors`
+- Include the same task-specific data as the core phase: artifact paths, `step_pattern`, Delta summary, current `### Decisions` excerpt, and finalize-time user notes.
+- Update the `## Review Ledger` in `handoff_path` for polish findings. Apply polish domain ownership: DOCS → documentation reviewer; ERR → errors reviewer. Arbitrate cross-domain conflicts.
+- Apply polish reviewer diffs to step files. Append one line to `## Revision History`.
+- Re-run polish reviewers after every material revision.
+- Loop until no findings of any severity remain or 10 iterations.
+  No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
 # Output
 Return exactly:
@@ -123,8 +136,6 @@ Load all rule files below in parallel. Apply them:
 
 /home/sewer/opencode/config/rules/general.md
 /home/sewer/opencode/config/rules/code-placement.md
-/home/sewer/opencode/config/rules/documentation.md
-/home/sewer/opencode/config/rules/errors.md
 /home/sewer/opencode/config/rules/testing.md
 /home/sewer/opencode/config/rules/test-parameterization.md
 /home/sewer/opencode/config/rules/performance.md
@@ -272,11 +283,10 @@ Import diff:
 
 Code Shape:
 
-Use the target file language or `diff`. Follow doc shape rules.
+Use the target file language or `diff`.
 
 Changes:
 - <concrete code change>
-- <explicit doc update when docs are in scope>
 Dependencies: None | I#
 Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
 ````
@@ -301,7 +311,7 @@ Import diff:
 
 Code shape:
 
-Use the target file language or `diff`. Follow doc shape rules.
+Use the target file language or `diff`.
 
 Changes:
 - <specific checks>

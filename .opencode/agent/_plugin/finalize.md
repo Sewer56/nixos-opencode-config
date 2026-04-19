@@ -67,47 +67,33 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 - Apply only the relevant optimization rules to each target. Split rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
 - Embed operational rules directly in generated targets.
 
+## Phase Structure
+- Review loop structure: a core phase (correctness) runs first; after it passes, a polish phase (documentation/errors/reorder) runs with independent Delta tracking and iteration limits.
+
 ## 5. Run the review loop
 Follow the ordered steps below exactly, in order.
 
-1. Write and maintain `## Delta`
-- Write `## Delta` to `handoff_path` before the first reviewer pass.
-- Record each `REV-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields.
-- Add artifact markers for `Source Context` and `Review Ledger` so reviewers skip rereading unchanged artifacts.
-- Recompute `## Delta` after every material revision.
-
-2. Build reviewer prompts
-- After each full machine-artifact draft, run these reviewers in parallel:
-  - `@_plugin/reviewers/errors`
-  - `@_plugin/reviewers/reorder`
-  - `@_plugin/reviewers/documentation`
-  - `@_plugin/reviewers/correctness`
-- Treat each reviewer prompt as scoped call data for the callee.
-- Include only: artifact paths (`context_path`, `handoff_path`), `rev_pattern`, Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, finalize-time user notes.
-- Omit: output format (reviewer agent files define their own `# Output`), focus lists (reviewer agent files define their own `# Focus`), target file paths from REV items (REV Index in handoff enumerates every target), role assignment ("You are a …" — OpenCode routes tasks to the correct agent automatically), blanket read orders such as "read all three artifacts" or "read every REV target file" — reviewers decide what to open from Delta, cache state, and Decisions.
-
-3. Validate each reviewer response
-- Confirm the response starts with `# REVIEW`.
-- Confirm the response contains `Decision: PASS | ADVISORY | BLOCKING`.
-- Confirm the response contains `## Findings` and `## Verified` headings.
-- If the response remains malformed after retries, treat it as BLOCKING with a synthetic finding that notes the reviewer returned unparseable output.
-
-4. Retry malformed responses from the existing review state
-- If validation fails and Delta plus Decisions are unchanged, send only the specific protocol error, tell the reviewer to reuse prior analysis/cache, and request a protocol-compliant re-emit from the existing review state.
-- If validation fails after a material revision changed Delta or Decisions, include only the new Delta/Decision excerpt in the retry prompt and request a fresh protocol-compliant response.
-
-5. Record decisions and apply domain ownership
-- Update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files.
-- Apply domain ownership: ERRORS → errors reviewer; REORDER → reorder reviewer; DOCUMENTATION → documentation reviewer; CORRECTNESS → correctness reviewer. Arbitrate cross-domain conflicts.
-
-6. Revise the machine artifact when findings require it
-- Revise REV files only where needed.
-- Append one line to `## Revision History`.
-
-7. Re-run or finish
-- Re-run all reviewers after every material revision.
+### Core review
+- Write and maintain `## Delta`: write to `handoff_path` before the first reviewer pass; record each `REV-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields; add artifact markers for `Source Context` and `Review Ledger`; recompute after every material revision.
+- Build core reviewer prompts: after each full machine-artifact draft, run `@_plugin/reviewers/correctness` in parallel. Treat each reviewer prompt as scoped call data. Include only: artifact paths (`context_path`, `handoff_path`), `rev_pattern` (a glob pattern matching REV target file paths to scope the review), Delta summary, current `### Decisions` excerpt when non-empty, finalize-time user notes. Omit: output format, focus lists, target file paths from REV items, role assignment, blanket read orders — reviewers decide what to open from Delta, cache state, and Decisions.
+- Validate each reviewer response: confirm `# REVIEW` header, `Decision: PASS | ADVISORY | BLOCKING`, `## Findings` and `## Verified` headings. If malformed after retries, treat as BLOCKING with a synthetic finding.
+- Retry malformed responses: if validation fails and Delta plus Decisions are unchanged, send only the protocol error and request re-emit; if Delta or Decisions changed, include only the new excerpt and request fresh response.
+- Record decisions: update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files. Core domain ownership: CORRECTNESS → correctness reviewer.
+- Revise the machine artifact when findings require it: revise REV files only where needed; append one line to `## Revision History`.
+- Re-run core reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
-- No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
+  No findings: proceed to polish review. At cap: FAIL if BLOCKING, proceed to polish with risks if only ADVISORY.
+
+### Polish review
+- Update `## Delta` in `handoff_path`. Mark all core-reviewed items as Unchanged. Set `Why: core phase passed`.
+- Build polish reviewer prompts: run `@_plugin/reviewers/documentation`, `@_plugin/reviewers/errors`, and `@_plugin/reviewers/reorder` in parallel. Include the same task-specific data as the core phase.
+- Validate each reviewer response (same criteria as core).
+- Retry malformed responses (same protocol as core).
+- Record decisions: update `### Decisions` in `handoff_path` for cross-domain arbitration. Polish domain ownership: DOCUMENTATION → documentation reviewer; ERRORS → errors reviewer; REORDER → reorder reviewer.
+- Apply polish reviewer diffs to REV files. Append one line to `## Revision History`.
+- Re-run polish reviewers after every material revision.
+- Loop until no findings of any severity remain or 10 iterations.
+  No findings: SUCCESS. At cap: FAIL if BLOCKING, proceed to output with risks if only ADVISORY.
 
 # Output
 

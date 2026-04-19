@@ -94,6 +94,7 @@ Create a complete implementation plan in a separate plan file. Use `@mcp-search`
  5. Draft Complete Plan
 Build the sections mandated by the rules.
 - Make each implementation and test step concrete enough that the coder is not deciding module or file placement, visibility, dependency or config changes, documentation scope, or missing test work.
+- Do not include API documentation or `# Errors` sections in step files. Documentation is added by the polish review phase.
 - Stable numbering: number implementation steps (I#) and test steps (T#) sequentially. If a step is removed during revision, leave the gap — do not renumber other items.
 
 6. Write Plan File
@@ -177,7 +178,5 @@ Load all rule files below in parallel. Apply them:
 /home/sewer/opencode/config/rules/testing.md
 /home/sewer/opencode/config/rules/test-parameterization.md
 /home/sewer/opencode/config/rules/code-placement.md
-/home/sewer/opencode/config/rules/documentation.md
-/home/sewer/opencode/config/rules/errors.md
 /home/sewer/opencode/config/rules/_orchestrator/orchestration-plan.md
 /home/sewer/opencode/config/rules/_orchestrator/orchestration-revision.md

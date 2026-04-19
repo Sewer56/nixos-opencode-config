@@ -78,21 +78,20 @@ You only update ledger and unmet requirements files. Follow the `Workflow` direc
    - It must be `<prompt_path_without_extension>-PLAN.md`.
    - If different, rename with `mv`, update `plan_path`, stop on failure.
 
+### Phase Structure
+- Phase 2 review loop structure: a core phase (correctness/economy/tests/performance) runs first; after it passes, a polish phase (documentation/errors) runs with independent Delta tracking and iteration limits.
+
 ### Phase 2: Plan Review
-Run all 7 plan reviewers in parallel:
+#### Phase 2a: Core Plan Review
+Run the 5 core plan reviewers in parallel:
 1. `@_orchestrator/runner/plan/plan-correctness-gpt5`
 2. `@_orchestrator/runner/plan/plan-correctness-glm`
-3. `@_orchestrator/runner/plan/plan-documentation-reviewer`
-4. `@_orchestrator/runner/plan/plan-errors-reviewer`
-5. `@_orchestrator/runner/plan/plan-economy-reviewer`
-6. `@_orchestrator/runner/plan/plan-test-reviewer`
-7. `@_orchestrator/runner/plan/plan-performance-reviewer`
+3. `@_orchestrator/runner/plan/plan-economy-reviewer`
+4. `@_orchestrator/runner/plan/plan-test-reviewer`
+5. `@_orchestrator/runner/plan/plan-performance-reviewer`
 
 Inputs:
 - `prompt_path`
-  - `plan_path`
-  - `step_pattern`
-  - `ledger_path` when `ledger_path` already exists
 - Cache file paths: each reviewer writes to `<plan_stem>-PLAN.review-<domain>.md`.
 
 Notes:
@@ -103,14 +102,30 @@ Aggregation:
 - Parse all REVIEW PACKET outputs.
 - Dedupe findings and keep IDs for unchanged root causes.
 - Assign new IDs only to new issues.
-- Apply domain ownership rules.
+- Apply core domain ownership: `REQ-*`, `COMPLETENESS`, `REVISION` → correctness reviewers; `ECONOMY`, `PLACEMENT` → economy reviewer; `TEST_*` → test reviewer; `PERF_*` → performance reviewer.
 - Update `## Delta` in `ledger_path`: record each issue as a compact entry with `Status:`, `Touched:`, and `Why:` fields relative to the prior review pass. Recompute after every material revision.
 - Also record each I# and T# step as a Delta entry so reviewers can skip Unchanged step files.
 - Write `ledger_path` on every review pass.
 
 Decision:
-- **APPROVE**: no open findings remain.
+- **APPROVE**: no open findings remain → proceed to Phase 2b.
 - **REVISE**: any finding remains. Build `revision_notes` from all open entries (BLOCKING first).
+- Max 10 iterations. At cap: FAIL if BLOCKING remains, proceed to Phase 2b if only ADVISORY.
+
+#### Phase 2b: Polish Plan Review
+Run the 2 polish plan reviewers in parallel:
+1. `@_orchestrator/runner/plan/plan-documentation-reviewer`
+2. `@_orchestrator/runner/plan/plan-errors-reviewer`
+
+Inputs: same as Phase 2a. Cache file paths: same convention.
+
+Notes: same as Phase 2a, plus: core-reviewed items are Unchanged in Delta; polish reviewers skip them via cache.
+
+Aggregation: same protocol as Phase 2a, except domain ownership changes to `DOCS` → documentation reviewer and `ERR` → errors reviewer, and Delta marks all core-reviewed items as Unchanged before recording polish findings.
+
+Decision:
+- **APPROVE**: no open findings remain → proceed to Phase 3.
+- **REVISE**: any finding remains. Apply polish reviewer diffs to step files. Build `revision_notes` from open entries (BLOCKING first).
 - Max 10 iterations. At cap: FAIL if BLOCKING remains, continue if only ADVISORY.
 
 ### Phase 3: Implementation
@@ -206,14 +221,15 @@ Ledger: <ledger_path>
 ## Plan Review
 Status: APPROVED | FAILED
 Iterations: <n>
+Core Iterations: <n> | Polish Iterations: <n>
 
 ### Specialist Findings Summary
 | Reviewer            | Decision               | Blocking | Advisory |
 | ------------------- | ---------------------- | -------- | -------- |
 | Correctness (GPT-5) | PASS/BLOCKING/ADVISORY | X        | Y        |
 | Correctness (GLM)   | PASS/BLOCKING/ADVISORY | X        | Y        |
-| Documentation       | PASS/BLOCKING/ADVISORY | X        | Y        |
-| Errors              | PASS/BLOCKING/ADVISORY | X        | Y        |
+| Documentation (2b)  | PASS/BLOCKING/ADVISORY | X        | Y        |
+| Errors (2b)         | PASS/BLOCKING/ADVISORY | X        | Y        |
 | Economy             | PASS/BLOCKING/ADVISORY | X        | Y        |
 | Test Design         | PASS/BLOCKING/ADVISORY | X        | Y        |
 | Performance         | PASS/BLOCKING/ADVISORY | X        | Y        |
@@ -268,12 +284,12 @@ Write to `PROMPT-REQUIREMENTS-UNMET.md`:
 
 ### Domain Ownership
 - `REQ-*`, `COMPLETENESS`, `REVISION`: correctness reviewers
-- `DOCS`: documentation reviewer
-- `ERR`: errors reviewer
 - `ECONOMY`, `PLACEMENT`: economy reviewer
 - `TEST_*` in plan phase: test reviewer
 - `PERF_*`: performance reviewer
 - `TEST_*` in code phase: test-integrity reviewer
+- `DOCS`: documentation reviewer (Phase 2b polish)
+- `ERR`: errors reviewer (Phase 2b polish)
 - Cross-domain conflicts: runner arbitrates
 
 ### Ledger Schema
