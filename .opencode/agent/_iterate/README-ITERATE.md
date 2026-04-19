@@ -19,7 +19,8 @@ and other similar workflows.
     — fix format only; do not re-read files or redo analysis
 - [Draft Review Loop](#draft-review-loop)
   - [Draft Reviewers](#draft-reviewers)
-    — five reviewers for the draft phase; applies to _iterate, _plugin, _plan
+    — non-overlapping reviewers: no gaps, bounded LLM instruction
+    sets, iteration as safety net; applies to _iterate, _plugin, _plan
   - [Draft Coordination](#draft-coordination)
     — lightweight handoff + per-reviewer cache for each workflow's draft loop
 - [Fixed Output Format](#fixed-output-format)
@@ -212,14 +213,34 @@ subset of reviewers.
 
 ### Draft Reviewers
 
-Five reviewers in each workflow's `reviewers/draft/` directory:
+The core optimization is **multiple domain-specific reviewers with
+non-overlapping scope** — each reviewer owns a distinct domain, and no
+two reviewers check the same concern. This works because:
+
+- **No gaps** — without cross-cutting overlap, every concern has exactly
+  one enforcer; no competing verdicts
+
+- **Better LLM compliance** — a focused scope per reviewer avoids the
+  partial-quality adherence that occurs when too many rules compete for
+  attention in a single prompt
+
+- **Iteration as safety net** — the loop compensates for single-pass
+  misses by any individual reviewer
+
+This principle propagates: the commands and agents produced by the draft
+loop also use non-overlapping reviewer sets. The exact reviewer count is
+not mandated; it scales with the artifact's domain breadth. `_plugin`
+and `_plan` follow the same principle with their own domain-specific
+sets.
+
+Five reviewers in `_iterate`'s `reviewers/draft/` directory:
 - `correctness` — template structure, diff header paths, domain-specific constraints
-- `dedup` — human/machine zone overlap, `[P#]` cross-item redundancy
+- `dedup` — human/machine zone overlap (human = narrative, machine = operational), `[P#]` cross-item redundancy
 - `wording` — token density, bullet atomicity, cross-section restatement
 - `style` — imperative voice (machine zone), positive framing, self-contained items
 - `clarity` — undefined jargon, compound-term compression, opaque references
 
-Omitted from all draft loops: `diff` (draft diffs are guidance-level),
+Omitted from all draft loops: `diff` (draft diffs serve only as guidance),
 `performance` (no cache/delta to audit in the reviewed artifact),
 `meta` (self-iteration enforcement is a finalize concern).
 
