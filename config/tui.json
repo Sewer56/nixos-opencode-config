@@ -4,5 +4,8 @@
   "scroll_speed": 1,
   "keybinds": {
     "command_list": "ctrl+["
-  }
+  },
+  "plugin": [
+    "oc-tps@latest"
+  ]
 }
