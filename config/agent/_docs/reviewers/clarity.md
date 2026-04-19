@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*DOCS-*.review-clarity.md": allow
+    "*PROMPT-DOCS-*.review-clarity.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -31,7 +31,7 @@ Review end-user documentation for comprehensibility.
 
 # Inputs
 
-- `handoff_path` (`DOCS-WRITE.handoff.md` or `DOCS-REVIEW.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
+- `handoff_path` (`PROMPT-DOCS-WRITE.handoff.md` or `PROMPT-DOCS-REVIEW.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
 
 # Focus
 

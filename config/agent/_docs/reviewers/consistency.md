@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*DOCS-*.review-consistency.md": allow
+    "*PROMPT-DOCS-*.review-consistency.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -32,7 +32,7 @@ Review end-user documentation for cross-page coherence.
 
 # Inputs
 
-- `handoff_path` (`DOCS-WRITE.handoff.md` or `DOCS-REVIEW.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
+- `handoff_path` (`PROMPT-DOCS-WRITE.handoff.md` or `PROMPT-DOCS-REVIEW.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
 
 # Focus
 

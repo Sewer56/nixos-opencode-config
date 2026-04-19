@@ -43,11 +43,11 @@ When invoked:
 
 5. Quickly analyze the diff output to understand their core purpose.
 
-6. Generate a `PR-SUMMARY.md` file with a concise summary.
+6. Generate a `PROMPT-PR-SUMMARY.md` file with a concise summary.
 
 # Output Format
 
-Save to `PR-SUMMARY.md`:
+Save to `PROMPT-PR-SUMMARY.md`:
 
 ```markdown
 ## Summary
@@ -79,4 +79,4 @@ Save to `PR-SUMMARY.md`:
 - No emojis or formatting flourishes
 - Do not include bug fixes for new functionality in this PR; as those were never in a released version.
 
-After analyzing the changes, write the summary to `PR-SUMMARY.md` and confirm the file is ready to paste into GitHub.
+After analyzing the changes, write the summary to `PROMPT-PR-SUMMARY.md` and confirm the file is ready to paste into GitHub.

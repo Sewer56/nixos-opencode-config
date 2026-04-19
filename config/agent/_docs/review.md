@@ -30,8 +30,8 @@ Review existing end-user-facing documentation and apply fixes with a four-review
 
 # Artifacts
 
-- `handoff_path`: `DOCS-REVIEW.handoff.md`
-- Reviewer cache pattern: `DOCS-REVIEW.review-<domain>.md`
+- `handoff_path`: `PROMPT-DOCS-REVIEW.handoff.md`
+- Reviewer cache pattern: `PROMPT-DOCS-REVIEW.review-<domain>.md`
 
 # Process
 
@@ -53,11 +53,11 @@ Record in `handoff_path` under `## Change Plan`: per-file scope levels, frozen r
 
 ## 5. Run review loop
 
-Same as `/docs/write` step 6 (max 5 iterations, steps a–f). Cache prefix: `DOCS-REVIEW`.
+Same as `/docs/write` step 6 (max 5 iterations, steps a–f). Cache prefix: `PROMPT-DOCS-REVIEW`.
 
 ## 6. Handle feedback
 
-Same as `/docs/write` step 7. Cache prefix: `DOCS-REVIEW`.
+Same as `/docs/write` step 7. Cache prefix: `PROMPT-DOCS-REVIEW`.
 
 # Output
 
@@ -70,7 +70,7 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Write only the target documentation files, `DOCS-REVIEW.handoff.md`, and `DOCS-REVIEW.review-*.md`.
+- Write only the target documentation files, `PROMPT-DOCS-REVIEW.handoff.md`, and `PROMPT-DOCS-REVIEW.review-*.md`.
 - Do not modify files outside the target paths unless explicitly requested.
 - Respect scope boundaries: do not edit frozen regions. Reject reviewer diffs that land in frozen regions.
 - Wrap prose at 80–100 characters per line. Code blocks and URLs are exempt.

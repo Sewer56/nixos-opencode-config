@@ -10,7 +10,7 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "API-AUDIT.md": allow
+    "PROMPT-API-AUDIT.md": allow
   grep: allow
   glob: allow
   list: allow

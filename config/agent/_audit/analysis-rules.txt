@@ -40,7 +40,7 @@ For every candidate, use the collector's Restriction Hint to determine the targe
 
 # Report
 
-Write `API-AUDIT.md` to the repository root with these sections in order:
+Write `PROMPT-API-AUDIT.md` to the repository root with these sections in order:
 
 **Summary** - scope, languages, modules, total public items, candidates by confidence (high/medium/low), correctly public (including collector-preclassified keep-public), needs review.
 
@@ -79,5 +79,5 @@ Top candidates:
   API-001: item_name (path:line) - High
   ...
 
-Full report: ./API-AUDIT.md
+Full report: ./PROMPT-API-AUDIT.md
 ```
