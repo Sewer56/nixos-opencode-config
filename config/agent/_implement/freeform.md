@@ -23,7 +23,7 @@ permission:
 
 Implement a plan from conversation context with an automated review loop.
 
-# Prerequisites
+# Inputs
 - A plan already exists in the conversation (from opencode's built-in plan mode).
 
 # Workflow
@@ -36,25 +36,20 @@ Implement a plan from conversation context with an automated review loop.
 - Run formatter, linter, build, and tests after each cohesive group of changes.
 - Iterate until all checks pass clean.
 
-## 3. Write context sidecar
-- Write `PROMPT-FREEFORM-CONTEXT.md` in the current working directory.
-- Populate from this session:
-  - `## Request`: original user request (verbatim or summarized).
-  - `## Plan Summary`: what was planned from conversation context.
-  - `## Changes Made`: files changed and what was done in each.
-  - `## Notes`: additional context or `None`.
-
-## 4. Review
-- Spawn `@_implement/freeform-reviewer`, passing:
-  - `context_path`: absolute path to `PROMPT-FREEFORM-CONTEXT.md`
+## 3. Review
+- Spawn `@_implement/freeform-reviewer`, passing inline:
+  - `## Request`: original user request (verbatim or summarized)
+  - `## Plan Summary`: what was planned from conversation context
+  - `## Changes Made`: files changed and what was done in each
+  - `## Notes`: additional context or `None`
 - Wait for the review packet.
 
-## 5. Loop
-- If any findings (BLOCKING or ADVISORY): fix all, update `PROMPT-FREEFORM-CONTEXT.md` `## Changes Made`, re-run reviewer.
+## 4. Loop
+- If any findings (BLOCKING or ADVISORY): fix all, re-run reviewer with updated inline context.
 - Repeat until reviewer returns `Decision: PASS` or 5 iterations reached.
 - At cap with any findings remaining: FAIL.
 
-## 6. Report
+## 5. Report
 - Return final status. No auto-commit.
 
 # Output

@@ -15,6 +15,10 @@ permission:
   list: allow
   bash: allow
   external_directory: allow
+  edit:
+    "*PROMPT-ERROR-DOCS.cache.md": allow
+  write:
+    "*PROMPT-ERROR-DOCS.cache.md": allow
 ---
 
 Enumerate all error-returning functions in one module, trace every error path in each function body, and classify the existing error documentation.
@@ -24,10 +28,18 @@ Enumerate all error-returning functions in one module, trace every error path in
 - `target_path`: absolute path to the module root, crate directory, or source file
 - `language`: language name as reported by `@codebase-explorer`
 - `repo_root`: absolute path to the repository root
+- `cache_path`: absolute path to `PROMPT-ERROR-DOCS.cache.md`
+
+# Focus
+- Exhaustive enumeration of public error-returning functions
+- Accurate tracing of every reachable error path
+- Correct classification per language rules
 
 # Workflow
 
 ## 1. Enumerate
+
+Read `cache_path` if it exists. Skip functions already present in the cache (matching file path + function name).
 
 Find every **public** error-returning function in `target_path` using the detection and scope rules from the language file (described in `# Language Rules`). Private and internal helpers are out of scope.
 
@@ -51,39 +63,38 @@ Do **not** emit per-item blocks for `specific` functions. Omit them entirely; re
 
 ## 4. Return
 
-EMIT exactly one response wrapped with structural markers. Begin with `---COLLECTOR-START---`, end with `---COLLECTOR-END---`. Do NOT split across responses.
+Write to `cache_path` using the `## PROMPT-ERROR-DOCS.cache.md` template from `config/agent/_refactor/errors.md`:
+- If the file does not exist, write it from the template.
+- If it exists, use targeted edits to insert new items into `## Items` and update the summary counts.
+- Do not modify items already in the cache.
 
-### Per-item block
+EMIT a review block summarizing what was found:
 
-```
----COLLECTOR-START---
----ITEM---
+```text
+# REVIEW
+Agent: _refactor/errors-collector
+Decision: PASS
+
+## Findings
+### [ITEM-###]
+Category: NEW_ITEM | UPDATED_ITEM
 Function: <name>
 File: <relative_path:line>
-Language: <language>
-Returns: <full return type signature>
-Current Errors Doc: <verbatim copy of existing # Errors or @throws section, or "NONE">
 Classification: missing | vague
-Traced Error Paths:
-  - Variant: <Error::Foo>, Trigger: <specific condition from body>
-  - Variant: <Error::Bar>, Trigger: <specific condition from body>
-  (When zero paths were traced, write: `Traced Error Paths: (none)`)
----END---
+Traced Paths: <count>
+
+## Summary
+- Module: <target_path>
+- Language: <language>
+- New items: <count>
+- Total items in cache: <count>
 ```
 
-### Summary block
+- `Decision: PASS` when the scan is complete and cache is updated. Single-run per module — the reviewer's coverage cross-check verifies exhaustiveness.
 
-```
----SUMMARY---
-Module: <target_path>
-Language: <language>
-Total Error-Returning Functions: <count>
-Missing: <count>
-Vague: <count>
-Specific (skipped): <count>
----END---
----COLLECTOR-END---
-```
+# Malformed-Output Retry
+
+If the caller reports that the output does not start with `# REVIEW`, reuse the existing cache state and re-emit a protocol-compliant response. Do not re-read source files that have already been traced — their results are in the cache.
 
 # Language Rules
 

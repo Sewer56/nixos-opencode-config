@@ -118,8 +118,8 @@ ADVISORY for:
 
 ## 5. Output Format
 
-```
-# REVIEW PACKET
+```text
+# REVIEW
 Agent: code-test-integrity-reviewer
 Phase: code
 Decision: PASS | ADVISORY | BLOCKING
@@ -128,6 +128,9 @@ Decision: PASS | ADVISORY | BLOCKING
 - Compilation: [PASS | FAIL]
 - Execution: [PASS | PARTIAL | FAIL] - X passed, Y failed
 - Coverage: [PASS | PARTIAL | FAIL] - Z% of new code
+
+## Verified
+- <list items checked with no issues found>
 
 ## Findings
 

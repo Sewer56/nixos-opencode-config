@@ -37,11 +37,9 @@ Create commits that match this repository's existing style for completed work.
 
 think
 
-# Input Format
-
-You will receive context and requirements from the orchestrator, including:
-- Primary prompt file path (standalone, contains mission, requirements, and plan)
-- A short bulleted list of changes describing what was implemented, validated, and reviewed
+# Inputs
+- `changes`: short bulleted list of changes describing what was implemented, validated, and reviewed
+- `commit_style` (optional): override commit style (auto-detected from git log when absent)
 
 # Process
 

@@ -87,7 +87,7 @@ Verify PRD requirements against completed work. Write only the validation report
 # Output
 Write the report to `PROMPT-ORCHESTRATOR.validation.md`, then return the same report:
 
-```
+```text
 # REQUIREMENTS FINAL VALIDATION
 Status: PASS | PARTIAL | FAIL
 

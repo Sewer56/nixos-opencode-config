@@ -35,7 +35,7 @@ Validate that tests are well-designed, non-redundant, and follow parameterizatio
 - Follow the numbered `# Process` steps exactly, in order.
 - Use Delta, cache state, and `### Decisions` to decide which items to reopen.
 - Write the reviewer cache before the final response.
-- Use only the `# REVIEW PACKET` block from `# Output` as the final answer.
+- Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -77,7 +77,7 @@ Validate that tests are well-designed, non-redundant, and follow parameterizatio
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
-- Emit the `# REVIEW PACKET` block from `# Output`.
+- Emit the `# REVIEW` block from `# Output`.
 
 # Focus
 
@@ -140,7 +140,7 @@ ADVISORY for:
 # Output
 
 ```text
-# REVIEW PACKET
+# REVIEW
 Agent: plan-test-reviewer
 Phase: plan
 Decision: PASS | ADVISORY | BLOCKING
@@ -152,6 +152,7 @@ Category: TEST_COVERAGE
 Type: MISSING_COVERAGE
 Severity: BLOCKING
 Confidence: HIGH
+Lines: ~<start>-<end> | None
 Evidence: Implementation step for src/auth.rs adds new token validation, but no test steps validate token validation
 Summary: New validation logic has no test coverage
 Why It Matters: Cannot verify correctness or prevent regression
@@ -172,6 +173,7 @@ Category: TEST_REDUNDANCY
 Type: DUPLICATE_TEST
 Severity: BLOCKING
 Confidence: HIGH
+Lines: ~<start>-<end> | None
 Evidence: Test steps include both `test_parse_empty` and `test_parse_empty_string` for the same parser
 Summary: Two tests for same empty input behavior
 Why It Matters: Wastes CI time, increases maintenance, confusing for future devs
@@ -183,6 +185,7 @@ Category: TEST_PARAMETERIZATION
 Type: SHOULD_PARAMETERIZE
 Severity: BLOCKING
 Confidence: HIGH
+Lines: ~<start>-<end> | None
 Evidence: Six separate test steps for parse_json_valid, parse_json_invalid, parse_json_null, parse_json_empty_array, parse_json_nested, parse_json_malformed
 Summary: Six tests should be one parameterized test
 Why It Matters: the rules strongly prefer parameterized tests for multiple inputs on same logic

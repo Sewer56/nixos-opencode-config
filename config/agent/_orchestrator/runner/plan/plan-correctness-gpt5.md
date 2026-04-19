@@ -36,7 +36,7 @@ Validate that the implementation plan will correctly and completely satisfy all 
 - Follow the numbered `# Process` steps exactly, in order.
 - Use Delta, cache state, and `### Decisions` to decide which items to reopen.
 - Write the reviewer cache before the final response.
-- Use only the `# REVIEW PACKET` block from `# Output` as the final answer.
+- Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -77,7 +77,7 @@ Validate that the implementation plan will correctly and completely satisfy all 
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
-- Emit the `# REVIEW PACKET` block from `# Output`.
+- Emit the `# REVIEW` block from `# Output`.
 
 # Focus
 
@@ -137,7 +137,7 @@ Focus areas for correctness review:
 Return findings in structured format:
 
 ```text
-# REVIEW PACKET
+# REVIEW
 Agent: plan-correctness-gpt5
 Phase: plan
 Decision: PASS | ADVISORY | BLOCKING
@@ -149,6 +149,7 @@ Category: REQ-###
 Type: MISSING
 Severity: BLOCKING
 Confidence: HIGH
+Lines: ~<start>-<end> | None
 Evidence: Plan section "Implementation Steps" has no entries for REQ-001
 Summary: Requirement for user authentication has no implementation steps
 Why It Matters: The plan cannot satisfy the PRD without auth implementation
@@ -160,6 +161,7 @@ Category: COMPLETENESS
 Type: UNDEFINED_SYMBOL
 Severity: BLOCKING
 Confidence: HIGH
+Lines: ~<start>-<end> | None
 Evidence: Step 3 references `validate_token()` which is not defined
 Summary: Undefined helper function in plan
 Why It Matters: Coder will need to invent implementation details

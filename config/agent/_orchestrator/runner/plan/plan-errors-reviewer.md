@@ -35,7 +35,7 @@ Validate that the implementation plan covers error documentation requirements co
 - Follow the numbered `# Process` steps exactly, in order.
 - Use Delta, cache state, and `### Decisions` to decide which items to reopen.
 - Write the reviewer cache before the final response.
-- Use only the `# REVIEW PACKET` block from `# Output` as the final answer.
+- Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -77,7 +77,7 @@ Validate that the implementation plan covers error documentation requirements co
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
-- Emit the `# REVIEW PACKET` block from `# Output`.
+- Emit the `# REVIEW` block from `# Output`.
 
 # Focus
 - Own all `# Errors` section concerns (existence, placement, format, specificity, completeness) in the changed scope described by the plan.
@@ -88,7 +88,7 @@ Rules: `/home/sewer/opencode/config/rules/errors.md`.
 # Output
 
 `````text
-# REVIEW PACKET
+# REVIEW
 Agent: plan-errors-reviewer
 Phase: plan
 Decision: PASS | ADVISORY | BLOCKING
@@ -100,6 +100,7 @@ Category: ERRS
 Type: MISSING_ERRORS_SECTION | VAGUE_ERROR_BULLET | INCOMPLETE_ERROR_ENUM
 Severity: BLOCKING
 Confidence: HIGH
+Lines: ~<start>-<end> | None
 Evidence: Plan step `I4` for `src/paths.ts` does not include a `# Errors` section for the public error-returning function
 Summary: Required `# Errors` section is not planned
 Why It Matters: The coder would need to invent error documentation scope and specificity
@@ -143,3 +144,4 @@ If any are missing, downgrade to ADVISORY.
 - Follow the `# Process` section for cache, Delta, and skip handling.
 - Keep findings short and specific.
 - Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact `# Errors` section to add or fix.
+- Self-iteration detection: this reviewer may re-encounter its own prior output when reading cache files. Treat cached findings as stale until re-verified against current Delta.

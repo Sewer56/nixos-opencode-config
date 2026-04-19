@@ -26,7 +26,7 @@ permission:
 
 Implement a finalized machine plan with an automated review loop.
 
-# Prerequisites
+# Inputs
 - `PROMPT-PLAN.handoff.md` must exist (from `/plan/finalize`). Plan content is in handoff; implementation/test steps are in individual files matching `PROMPT-PLAN.step.*.md`.
 
 # Workflow

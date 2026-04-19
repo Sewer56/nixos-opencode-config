@@ -35,7 +35,7 @@ Validate that the plan represents the smallest correct implementation. Enforce m
 - Follow the numbered `# Process` steps exactly, in order.
 - Use Delta, cache state, and `### Decisions` to decide which items to reopen.
 - Write the reviewer cache before the final response.
-- Use only the `# REVIEW PACKET` block from `# Output` as the final answer.
+- Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -77,7 +77,7 @@ Validate that the plan represents the smallest correct implementation. Enforce m
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
-- Emit the `# REVIEW PACKET` block from `# Output`.
+- Emit the `# REVIEW` block from `# Output`.
 
 # Focus
 
@@ -125,7 +125,7 @@ ADVISORY for:
 # Output
 
 ```text
-# REVIEW PACKET
+# REVIEW
 Agent: plan-economy-reviewer
 Phase: plan
 Decision: PASS | ADVISORY | BLOCKING
@@ -137,6 +137,7 @@ Category: ECONOMY
 Type: UNNECESSARY_FILE
 Severity: BLOCKING
 Confidence: HIGH
+Lines: ~<start>-<end> | None
 Evidence: Plan proposes new file `src/utils/token_helper.rs` for single 3-line function
 Summary: Creating a new file for a trivial helper
 Why It Matters: Increases module complexity without ownership benefit

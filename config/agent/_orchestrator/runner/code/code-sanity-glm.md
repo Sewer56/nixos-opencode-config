@@ -34,15 +34,18 @@ Validate that implementation satisfies the objectives. Narrow sanity gate only.
 - `plan_path`: approved implementation plan
 - `coder_notes_path`: notes from coder implementation
 - `ledger_path` (optional): absolute path to the current review ledger
+- `cache_path` (optional): absolute path to review cache file
 
 # Process
 
 ## 1. Load Context
+- Read `cache_path` if provided. Treat missing or malformed cache as empty.
 - Read `prompt_path` for objectives and requirements
 - Read `plan_path` for approved implementation
 - Read `coder_notes_path`
 - If `ledger_path` is provided, read the ledger from that path
 - Read changed files via `git status --porcelain` and git diff
+- Skip files marked Verified unchanged in the cache
 - Read full changed files for context
 - Use coder notes as verification context
 - Do not rerun formatter, lint, build, or tests
@@ -127,11 +130,20 @@ ADVISORY for:
 
 ## 6. Output Format
 
-```
-# REVIEW PACKET
+### Write Cache
+If `cache_path` is provided, write each reviewed file's Verified/finding state to `cache_path` before emitting the output block. Use targeted edits if the file exists; create it otherwise.
+
+### Malformed-Output Retry
+If the caller reports that the output does not conform to the `# REVIEW` protocol, reuse prior analysis/cache and re-emit a protocol-compliant response.
+
+```text
+# REVIEW
 Agent: code-sanity-glm
-Phase: code
+Cache: <cache_path or "none">
 Decision: PASS | ADVISORY | BLOCKING
+
+## Verified
+- <list items checked with no issues found>
 
 ## Implementation Fidelity
 - Plan Adherence: [PASS | PARTIAL | FAIL]

@@ -7,11 +7,13 @@ agent: build
 
 Write a clear commit for the current changes. Additional user instructions (if present):
 
+## User Input
+
 ```
 $ARGUMENTS
 ```
 
-## Process
+# Process
 
 1. Run `git diff` to understand what changed
 2. **Submodule check**: If changes are in a submodule directory:

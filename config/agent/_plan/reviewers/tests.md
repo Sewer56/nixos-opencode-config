@@ -107,6 +107,9 @@ Fix: <smallest useful test-plan correction>
  unchanged context
 ```
 
+## Verified
+- <list items checked with no issues found>
+
 ## Notes
 - <optional short notes>
 ````

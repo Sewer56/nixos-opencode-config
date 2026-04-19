@@ -35,7 +35,7 @@ Validate performance-critical aspects of the implementation plan. Only review wh
 - Follow the numbered `# Process` steps exactly, in order.
 - Use Delta, cache state, and `### Decisions` to decide which items to reopen.
 - Write the reviewer cache before the final response.
-- Use only the `# REVIEW PACKET` block from `# Output` as the final answer.
+- Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -78,7 +78,7 @@ Validate performance-critical aspects of the implementation plan. Only review wh
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
-- Emit the `# REVIEW PACKET` block from `# Output`.
+- Emit the `# REVIEW` block from `# Output`.
 
 # Focus
 
@@ -184,7 +184,7 @@ ADVISORY for:
 # Output
 
 ```text
-# REVIEW PACKET
+# REVIEW
 Agent: plan-performance-reviewer
 Phase: plan
 Decision: PASS | ADVISORY | BLOCKING
@@ -200,6 +200,7 @@ Category: PERF_DATABASE
 Type: N_PLUS_ONE
 Severity: BLOCKING
 Confidence: HIGH
+Lines: ~<start>-<end> | None
 Evidence: Implementation Step 4 loops over users and calls `get_user_details()` which queries DB per user
 Summary: Database query inside loop creates N+1 query pattern
 Why It Matters: Performance degrades linearly with user count; will fail at scale
@@ -241,3 +242,4 @@ Acceptance Criteria: No unnecessary cloning of large data structures
 - Economy reviewer validates that performance optimizations don't add unnecessary complexity
 - Only flag performance issues that materially impact the workload
 - Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., replacing an N+1 pattern with a batch query, adding a missing index). Omit the diff when the finding is a performance budget concern with no single correct implementation.
+- Self-iteration detection: this reviewer may re-encounter its own prior output when reading cache files. Treat cached findings as stale until re-verified against current Delta.

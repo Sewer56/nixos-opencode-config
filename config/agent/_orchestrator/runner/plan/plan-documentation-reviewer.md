@@ -35,7 +35,7 @@ Validate that the implementation plan covers documentation requirements concrete
 - Follow the numbered `# Process` steps exactly, in order.
 - Use Delta, cache state, and `### Decisions` to decide which items to reopen.
 - Write the reviewer cache before the final response.
-- Use only the `# REVIEW PACKET` block from `# Output` as the final answer.
+- Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
 - `prompt_path`: requirements and objectives
@@ -77,7 +77,7 @@ Validate that the implementation plan covers documentation requirements concrete
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
-- Emit the `# REVIEW PACKET` block from `# Output`.
+- Emit the `# REVIEW` block from `# Output`.
 
 # Focus
 - Review the changed scope described by the plan.
@@ -108,7 +108,7 @@ If any are missing, downgrade to ADVISORY.
 # Output
 
 ```text
-# REVIEW PACKET
+# REVIEW
 Agent: plan-documentation-reviewer
 Phase: plan
 Decision: PASS | ADVISORY | BLOCKING
@@ -120,6 +120,7 @@ Category: DOCS
 Type: MISSING_REQUIRED_DOCS
 Severity: BLOCKING
 Confidence: HIGH
+Lines: ~<start>-<end> | None
 Evidence: Plan step `I4` for `src/paths.ts` only says `update docs` and does not show the required module or API doc block
 Summary: Required in-source docs are not planned concretely
 Why It Matters: The coder would need to invent documentation scope and content
@@ -148,3 +149,4 @@ Acceptance Criteria: The affected implementation step includes concrete doc snip
 - Do not block for minor wording preferences when required coverage is already concrete
 - Keep findings short and specific.
 - Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact doc block or section to add or replace.
+- Self-iteration detection: this reviewer may re-encounter its own prior output when reading cache files. Treat cached findings as stale until re-verified against current Delta.

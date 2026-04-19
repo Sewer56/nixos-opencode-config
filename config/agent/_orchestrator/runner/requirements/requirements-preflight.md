@@ -67,7 +67,7 @@ Verify PRD requirements map to prompt files before orchestration.
 # Output
 Return this report:
 
-```
+```text
 # REQUIREMENTS PREFLIGHT
 
 Status: PASS | PARTIAL | FAIL

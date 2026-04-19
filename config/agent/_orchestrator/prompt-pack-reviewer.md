@@ -35,6 +35,7 @@ Review a written orchestrator prompt pack for correctness.
 - `orchestrator_path`: absolute path to `PROMPT-ORCHESTRATOR.md`
 - `source_paths` (optional): absolute paths to the original task files, split files, and source documents used to build the pack
 - `original_context` (optional): raw user request text or a short summary of the original ask when available
+- `cache_path` (optional): absolute path to review cache file
 
 # Defaults
 - `PROMPT_PACK_COMMAND_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/command/orchestrator/prompt-pack.md`
@@ -42,6 +43,7 @@ Review a written orchestrator prompt pack for correctness.
 # Process
 
 ## 1. Load Context
+- Read `cache_path` if provided. Treat missing or malformed cache as empty.
 - Read `PROMPT_PACK_COMMAND_PATH`.
 - Read `requirements_path` and `orchestrator_path`.
 - Read every path in `source_paths` when provided.
@@ -90,8 +92,14 @@ ADVISORY for:
 
 ## 4. Output Format
 
-```
-# REVIEW PACKET
+### Write Cache
+If `cache_path` is provided, write each reviewed item's Verified/finding state to `cache_path` before emitting the output block. Use targeted edits if the file exists; create it otherwise.
+
+### Malformed-Output Retry
+If the caller reports that the output does not conform to the `# REVIEW` protocol, reuse prior analysis/cache and re-emit a protocol-compliant response.
+
+```text
+# REVIEW
 Agent: prompt-pack-reviewer
 Phase: prompt-pack
 Decision: PASS | ADVISORY | BLOCKING
@@ -103,6 +111,7 @@ Category: PACK_STRUCTURE
 Type: PACK_MISMATCH
 Severity: BLOCKING
 Confidence: HIGH
+Lines: ~<start>-<end> | None
 Evidence: `PROMPT-ORCHESTRATOR.md` lists `PROMPT-03-cache.md`, but no such prompt file exists
 Summary: Orchestrator index and prompt files disagree
 Why It Matters: Runner cannot execute the intended prompt set reliably
@@ -114,11 +123,15 @@ Category: SOURCE_FIDELITY
 Type: TASK_INTENT_DRIFT
 Severity: BLOCKING
 Confidence: HIGH
+Lines: ~<start>-<end> | None
 Evidence: Input task describes one migration, but prompt pack splits it into two unrelated prompts without justification
 Summary: Prompt pack changes task intent
 Why It Matters: Downstream execution will solve the wrong problem
 Requested Fix: Restore the original task boundary or document a real blocker and stop
 Acceptance Criteria: Prompt boundaries match the source task intent
+
+## Verified
+- <list items checked with no issues found>
 
 ## Notes
 - Short observations for the builder

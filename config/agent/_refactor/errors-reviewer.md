@@ -21,11 +21,11 @@ Review an error docs plan for correctness and completeness before it is applied 
 
 # Inputs
 
-- `plan_path`: absolute path to `PROMPT-ERROR-DOCS-PLAN.md`
+- `cache_path`: absolute path to `PROMPT-ERROR-DOCS.cache.md`
 
 # Focus
 
-Read `plan_path` fully. Read the lang rules file for each language in the plan. Then read each source file named in `## Items`. Apply all checks below.
+Read `cache_path` fully. Read the lang rules file for each language in the cache. Then read each source file named in `## Items`. Apply all checks below.
 
 For each source file read, also note every public error-returning function per the lang file's **Detection** and **Scope** rules (match each file to its language via the plan items' `**Language:**` field). After reading all files, compare against the plan's item list. Any function that should be in the plan but is absent is a coverage gap.
 
@@ -50,12 +50,17 @@ Read `lang-<language>-errors.txt` once per language. Use its **Detection**, **Sc
 ```text
 # REVIEW
 Agent: _refactor/errors-reviewer
+Cache: <cache_path>
 Decision: PASS | ADVISORY | BLOCKING
+
+## Verified
+- <list items checked with no issues found>
 
 ## Findings
 ### [ERR-001]
 Category: COVERAGE | SPECIFICITY | FORMAT | FIDELITY
 Severity: BLOCKING | ADVISORY
+Lines: ~<start>-<end> | None
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
@@ -72,6 +77,10 @@ Fix: <smallest concrete correction>
 ## Notes
 - <optional short notes>
 ````
+
+# Malformed-Output Retry
+
+If the caller reports that the output does not conform to the `# REVIEW` protocol, reuse the prior analysis and cache state. Re-emit a protocol-compliant response. Do not re-read source files that were already analyzed.
 
 # Constraints
 
