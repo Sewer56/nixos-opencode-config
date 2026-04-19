@@ -20,7 +20,7 @@ permission:
   task:
     "*": "deny"
     "codebase-explorer": "allow"
-    "_audit/api-collector": "allow"
+    "_audit/collector": "allow"
 ---
 
 Audit specific files or folders for items that are public/exported but should not be. Cross-reference usage across the entire repository. Produce a report with exact diffs.
@@ -49,7 +49,7 @@ If no valid source paths remain after resolution, stop and tell the user.
 
 ## 2. Collect
 
-Group resolved paths by parent module and language. When a module directory contains source files in multiple languages, group by (parent module, language) so each language gets its own collector. Spawn one `@_audit/api-collector` per group in a single parallel call.
+Group resolved paths by parent module and language. When a module directory contains source files in multiple languages, group by (parent module, language) so each language gets its own collector. Spawn one `@_audit/collector` per group in a single parallel call.
 
 Per collector, pass:
 

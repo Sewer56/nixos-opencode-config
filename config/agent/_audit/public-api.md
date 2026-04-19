@@ -20,7 +20,7 @@ permission:
   task:
     "*": "deny"
     "codebase-explorer": "allow"
-    "_audit/api-collector": "allow"
+    "_audit/collector": "allow"
 ---
 
 Audit every library module in the repository for items that are public/exported but should not be. Produce a report with exact diffs.
@@ -43,7 +43,7 @@ Only library modules are audited. Skip binaries, applications, and test-only fix
 
 ## 2. Collect
 
-Spawn one `@_audit/api-collector` per (library module, language) pair in a single parallel call. When a module directory contains markers for multiple languages (e.g. a Python package with Rust extensions), spawn one collector per language with the same `target_path` but different `language` values. For Go, each package directory is a separate collector invocation. Skip Go packages under `internal/` directories (compiler-enforced private; no items to audit).
+Spawn one `@_audit/collector` per (library module, language) pair in a single parallel call. When a module directory contains markers for multiple languages (e.g. a Python package with Rust extensions), spawn one collector per language with the same `target_path` but different `language` values. For Go, each package directory is a separate collector invocation. Skip Go packages under `internal/` directories (compiler-enforced private; no items to audit).
 
 Per collector, pass:
 
