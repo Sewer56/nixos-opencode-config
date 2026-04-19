@@ -14,7 +14,7 @@ and other similar workflows.
     — reviewer step sequence: load → delta → select → inspect → cache → emit
   - [Items to Re-Evaluate](#items-to-re-evaluate)
     — reviewers open only changed, new, unresolved-finding, or
-      decision-referenced items
+    decision-referenced items
   - [Malformed-Output Retries](#malformed-output-retries)
     — fix format only; do not re-read files or redo analysis
 - [Draft Review Loop](#draft-review-loop)
@@ -25,21 +25,24 @@ and other similar workflows.
 - [Fixed Output Format](#fixed-output-format)
   — all reviewers return structured `# REVIEW` blocks in `text` fences
 - [No Duplicated Artifact Content](#no-duplicated-artifact-content)
-   — reference by section name or path, never re-state
- - [Rules-File Scope and Independence](#rules-file-scope-and-independence)
-   — rules files define scope; targets reference, not duplicate; rules files stand alone
- - [File-Based Coordination](#file-based-coordination)
+  — reference by section name or path, never re-state
+- [Rules-File Scope and Independence](#rules-file-scope-and-independence)
+  — rules files define scope; targets reference, not duplicate; rules files
+  stand alone
+- [File-Based Coordination](#file-based-coordination)
   — one shared file for reviewer disagreements, not scattered state
 - [Tight Subagent Inputs](#tight-subagent-inputs)
   — pass only what the called agent cannot derive from its own file
 - [Self-Iteration](#self-iteration)
   — path-based detection of wording-only vs rule-change self-iteration
- - [Line-location Convention](#line-location-convention)
+- [Line-location Convention](#line-location-convention)
   — `Lines: ~<start>-<end>` locates changes; context is authoritative
 - [Human-Friendly [P#] Items](#human-friendly-p-items)
   — draft-stage items use explanation + diff with paths in diff headers
 - [Reviewer Diff Output](#reviewer-diff-output)
-  — reviewers include inline unified diffs after Fix:; two tiers: diff-mandated and diff-when-exact
+  — reviewers include inline unified diffs after Fix:; two tiers:
+  diff-mandated (always include diff) and diff-when-exact (include diff
+  when fix is concrete)
 - [Focus-as-Scope](#focus-as-scope)
   — Focus is the reviewer scope boundary; meta enforces no overlap
 
@@ -258,9 +261,8 @@ Do not re-state information available in another artifact.
 
 Reference by section name or file path instead. Applies pairwise:
 - context ↔ handoff
-- context ↔ machine
-- handoff ↔ machine
-- machine ↔ targets
+- context ↔ targets
+- handoff ↔ targets
 - targets ↔ targets
  
 ## Rules-File Scope and Independence
@@ -343,7 +345,7 @@ Generated `## Self-Iteration`: `Intent: rule-change`,
 `Target-Scope: .opencode/agent/_iterate/draft.md,
 .opencode/agent/_iterate/reviewers/correctness.md`
 
-The machine artifact must include a REV updating the reviewer focus
+The handoff must include a REV updating the reviewer focus
 list to enforce the new rule.
 
 ## Line-location Convention
@@ -352,14 +354,14 @@ All finalize agents and reviewers use `Lines: ~<start>-<end> | None`
 as the sole line-location indicator in REV and step files
 (`~` ≈ ±10 lines). Hunks include 2+ context lines before and
 after each change; context is the authoritative locator.
-Reviewers validate content, not counts — block only when context
-lines are missing or do not match the target file.
+Reviewers validate content, not counts — flag a BLOCKING finding
+only when context lines are missing or do not match the target file.
 
 ## Human-Friendly [P#] Items
 
-Draft-stage `[P#]` items in `PROMPT-ITERATE.md`,
-`PROMPT-PLUGIN-PLAN.md`, and `PROMPT-PLAN.md` use free-form
-explanation + diff block with paths in diff headers.
+Draft-stage `[P#]` items (numbered placeholders like `[P1]`, `[P2]`) in
+`PROMPT-ITERATE.md`, `PROMPT-PLUGIN-PLAN.md`, and `PROMPT-PLAN.md` use
+free-form explanation + diff block with paths in diff headers.
 
 File paths appear in the diff block header (`--- a/<path>`).
 REFINE/UPDATE actions include the diff block. CREATE/ADD/INSERT
@@ -380,25 +382,22 @@ the author to narrow or split it.
 Reviewers that can determine the exact text replacement for a finding
 include a unified diff block inline after the finding's `Fix:` field.
 
-Two tiers:
-
-- **Diff-mandated**: the reviewer always knows the exact fix. Include
-  a diff for every finding. Currently: wording, dedup, style,
-  correctness, diff, clarity (_iterate); documentation, errors (_plan);
+- **Diff-mandated**: every finding — the reviewer always knows the
+  exact fix. Currently: wording, dedup, style, correctness, diff,
+  clarity (_iterate); documentation, errors (_plan);
   errors-reviewer (_refactor); plan-documentation-reviewer,
   plan-errors-reviewer (_orchestrator).
 
-- **Diff-when-exact**: the reviewer knows the exact fix when the
-  finding is concrete. Include a diff when the fix is concrete; omit
+- **Diff-when-exact**: include a diff when the fix is concrete; omit
   when the finding is conceptual. Currently: performance, meta
   (_iterate); correctness, tests, economy, performance (_plan);
   plan-test-reviewer, plan-economy-reviewer,
   plan-performance-reviewer, plan-correctness-gpt5,
   plan-correctness-glm (_orchestrator).
 
-- **No diff**: reviewers that cannot determine exact text (runtime
-  validation, conceptual gaps) omit the diff and rely on `Fix:` prose
-  only.
+- **No diff**: the reviewer cannot determine exact text (runtime
+  validation, conceptual gaps); omit the diff and rely on `Fix:`
+  prose only.
 
 The `Fix:` field is retained as a short summary; the inline diff
 provides the authoritative exact change when present. The finalize
