@@ -12,7 +12,7 @@ permission:
     "*": allow
   write:
     "*": deny
-    "*PROMPT-ERROR-DOCS.cache.md": allow
+    "*PROMPT-ERROR-DOCS*.md": allow
   bash: allow
   grep: allow
   glob: allow
@@ -53,25 +53,28 @@ Read the user message. If it contains file or directory paths, restrict collecto
 ## 3. Collect
 
 Spawn one `@_refactor/errors-collector` per (library or application module, language) pair in a single parallel call.
+Derive a per-collector cache path: `PROMPT-ERROR-DOCS.<module_name>.cache.md` where `<module_name>` is the last path component of `target_path` (e.g. `src` → `PROMPT-ERROR-DOCS.src.cache.md`). Each collector writes to its own file — no concurrent writes to a shared file.
 
 Per collector, pass:
 
 - `target_path`: absolute path to the module root
 - `language`: language name as reported by `@codebase-explorer`
 - `repo_root`: absolute path to the repository root
-- `cache_path`: absolute path to `PROMPT-ERROR-DOCS.cache.md`
+- `cache_path`: absolute path to the per-collector `PROMPT-ERROR-DOCS.<module_name>.cache.md`
 
 ## 4. Gate
 
-Wait for ALL collectors to return. Each collector writes its items to `cache_path` and returns `Decision: PASS`.
+Wait for ALL collectors to return. Each collector writes its items to its per-module `cache_path` and returns `Decision: PASS`.
 
 For each collector that reported new items (New items > 0 in its summary), re-spawn with the same `target_path`, `language`, `repo_root`, and `cache_path`. Each collector skips functions already in the cache. Wait for all re-spawned collectors to return.
 
 - If any re-spawned collector reports new items, repeat for those collectors only.
-- If all re-spawned collectors report zero new items, coverage is complete. Proceed to step 5.
+- If all re-spawned collectors report zero new items, coverage is complete.
 
 **Wrong**: Waiting for one round only and proceeding regardless of whether collectors found new items.
 **Correct**: Re-spawn collectors with new items, wait, repeat. Proceed only when all re-spawned collectors return zero new items.
+
+After convergence, merge per-collector caches into the unified cache (`PROMPT-ERROR-DOCS.cache.md`): concatenate all `## Items` entries, merge `## Settled Facts` (deduplicate by ID), and sum the `## Summary` counts. Delete per-collector cache files after merging.
 
 ## 5. Apply corrections
 
@@ -98,7 +101,8 @@ Spawn `@_refactor/errors-reviewer`, passing `cache_path`. Wait for the review pa
 
 # Artifacts
 
-- `cache_path`: `PROMPT-ERROR-DOCS.cache.md` (repo root)
+- `cache_path`: `PROMPT-ERROR-DOCS.cache.md` (repo root, unified after convergence)
+- `collector_cache_paths`: `PROMPT-ERROR-DOCS.<module_name>.cache.md` (one per collector, deleted after merge)
 
 # Output
 
@@ -114,10 +118,10 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Only write `PROMPT-ERROR-DOCS.cache.md` during this command.
+- Only write per-collector cache files while collectors are running. Write the unified cache only after the gate converges.
 - Never modify product code while collecting.
 - Apply corrections only after the gate converges.
-- Treat `PROMPT-ERROR-DOCS.cache.md` as read-only after the gate converges.
+- Treat the unified `PROMPT-ERROR-DOCS.cache.md` as read-only after the gate converges; reviewer may update it.
 
 # Templates
 

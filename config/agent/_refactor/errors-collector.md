@@ -16,9 +16,9 @@ permission:
   bash: allow
   external_directory: allow
   edit:
-    "*PROMPT-ERROR-DOCS.cache.md": allow
+    "*PROMPT-ERROR-DOCS*.md": allow
   write:
-    "*PROMPT-ERROR-DOCS.cache.md": allow
+    "*PROMPT-ERROR-DOCS*.md": allow
 ---
 
 Enumerate all error-returning functions in one module, trace every error path in each function body, and classify the existing error documentation.
@@ -28,7 +28,7 @@ Enumerate all error-returning functions in one module, trace every error path in
 - `target_path`: absolute path to the module root, crate directory, or source file
 - `language`: language name as reported by `@codebase-explorer`
 - `repo_root`: absolute path to the repository root
-- `cache_path`: absolute path to `PROMPT-ERROR-DOCS.cache.md`
+- `cache_path`: absolute path to the per-module cache file (e.g. `PROMPT-ERROR-DOCS.<module_name>.cache.md`). Each collector receives its own file — no concurrent writes to a shared cache.
 
 # Focus
 - Exhaustive enumeration of public error-returning functions
