@@ -26,7 +26,7 @@ permission:
     "_refactor/errors-reviewer": "allow"
 ---
 
-Discover error-returning functions with missing or vague documentation. Trace error paths, draft documentation, apply corrections to source files, and verify via review loop.
+Discover error-returning functions with missing or vague documentation. Trace error paths, draft documentation, verify coverage via collector convergence (re-spawn until stable), apply corrections, and review.
 
 # Workflow
 
@@ -44,7 +44,7 @@ Spawn `@codebase-explorer` to map the repository:
 - Every module/crate boundary: Cargo.toml (Rust workspace members), package.json (Node). For Go: each directory containing `.go` files is a separate module.
 - Focus on library modules and application modules. Skip test-only fixtures.
 
-For each detected language, check if `lang-<language>-errors.txt` exists in `LANG_RULES_DIR` (defined in `# Artifacts`). Only languages with a matching rules file will be processed.
+For each detected language, check if `lang-<language>-errors.txt` exists in `LANG_RULES_DIR` (defined in `# Workflow`). Only languages with a matching rules file will be processed.
 
 ## 2. Scope
 
@@ -63,11 +63,15 @@ Per collector, pass:
 
 ## 4. Gate
 
-Wait for ALL collectors to return before proceeding. Do not begin any analysis until every collector has reported.
-
 Wait for ALL collectors to return. Each collector writes its items to `cache_path` and returns `Decision: PASS`.
 
-Do not re-spawn collectors. Completeness is verified by the reviewer's coverage cross-check (step 6).
+For each collector that reported new items (New items > 0 in its summary), re-spawn with the same `target_path`, `language`, `repo_root`, and `cache_path`. Each collector skips functions already in the cache. Wait for all re-spawned collectors to return.
+
+- If any re-spawned collector reports new items, repeat for those collectors only.
+- If all re-spawned collectors report zero new items, coverage is complete. Proceed to step 5.
+
+**Wrong**: Waiting for one round only and proceeding regardless of whether collectors found new items.
+**Correct**: Re-spawn collectors with new items, wait, repeat. Proceed only when all re-spawned collectors return zero new items.
 
 ## 5. Apply corrections
 
@@ -85,7 +89,6 @@ After applying all items, run formatter, linter, build, and tests. Iterate until
 Spawn `@_refactor/errors-reviewer`, passing `cache_path`. Wait for the review packet.
 
 - If findings (BLOCKING or ADVISORY): revise the applied docs in source files, update the cache, populate `## Delta` with the list of items revised in this iteration, re-run reviewer.
-- If the reviewer reports a COVERAGE gap (missing function not in cache), re-spawn the collector for that module with the same `cache_path`, then re-apply and re-review.
 - Loop until no findings of any severity remain or 10 iterations.
 - At cap with only ADVISORY findings: SUCCESS with risks.
 
@@ -104,6 +107,7 @@ Return exactly:
 ```text
 Status: SUCCESS | INCOMPLETE | FAIL
 Cache Path: <absolute path>
+Coverage Iterations: <n>
 Review Iterations: <n>
 Summary: <one-line summary>
 ```
@@ -112,8 +116,8 @@ Summary: <one-line summary>
 
 - Only write `PROMPT-ERROR-DOCS.cache.md` during this command.
 - Never modify product code while collecting.
-- Apply corrections only after all collectors return.
-- Treat `PROMPT-ERROR-DOCS.cache.md` as read-only after collectors return; reviewer may update it.
+- Apply corrections only after the gate converges.
+- Treat `PROMPT-ERROR-DOCS.cache.md` as read-only after the gate converges.
 
 # Templates
 

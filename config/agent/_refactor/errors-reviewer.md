@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews error docs plan for coverage, specificity, format, and fidelity
+description: Reviews applied error docs for specificity, format, and fidelity
 model: synthetic/hf:zai-org/GLM-5.1
 reasoningEffort: medium
 permission:
@@ -17,7 +17,7 @@ permission:
   external_directory: allow
 ---
 
-Review an error docs plan for correctness and completeness before it is applied to source files.
+Review applied error docs for correctness — verify the primary agent applied cache items faithfully and that the docs meet quality standards.
 
 # Inputs
 
@@ -25,25 +25,22 @@ Review an error docs plan for correctness and completeness before it is applied 
 
 # Focus
 
-Read `cache_path` fully. Read the lang rules file for each language in the cache. Then read each source file named in `## Items`. Apply all checks below.
+Read `cache_path` fully. Read the lang rules file for each language in the cache. If `## Delta` is non-empty, read and verify only the source files for items listed in `## Delta`; read all source files in `## Items` only when `## Delta` is absent or empty (first pass). Apply all checks below.
 
-For each source file read, also note every public error-returning function per the lang file's **Detection** and **Scope** rules (match each file to its language via the plan items' `**Language:**` field). After reading all files, compare against the plan's item list. Any function that should be in the plan but is absent is a coverage gap.
-
-1. **Coverage**:
-   - Every plan item corresponds to a real error-returning function at the named path and line.
-   - No plan item is missing a `**Proposed:**` section.
-   - **Same-file cross-check**: every public error-returning function in each source file (per lang rules) is either in the plan or already classified `specific` per the lang file's **Classification** table. Functions that are `missing` or `vague` but absent from the plan are BLOCKING gaps.
+1. **Application fidelity**: each source file's applied error docs match the `**Proposed:**` section from the corresponding cache item. Nothing was dropped, mangled, or partially applied. Function names, file paths, and line numbers in the cache match source.
 2. **Specificity**: each `**Proposed:**` section has one bullet per traced error path. Variant names are exact (match source code). Triggers are plain-language and predictable from inputs/state alone — no vague triggers like "if an error occurs".
 3. **Format**: proposed docs match the doc format from the matching lang rules file.
 4. **Zero-path fallback**: when `Traced Error Paths: (none)`, the proposed docs apply the Zero-Path Fallback from the lang file.
 5. **No placeholders**: no TODO, TBD, FIXME, or vague stubs in `**Proposed:**` sections.
-6. **Fidelity**: `**Current:**` matches the verbatim source docs (or is "NONE" when truly absent). Function names, file paths, line numbers match source.
+
+**Wrong**: Scanning source files for functions not in the cache and flagging them as coverage gaps.
+**Correct**: Verify the applied docs in source files match the `**Proposed:**` sections in the cache.
 
 # Language Rules Directory
 
 `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor`
 
-Read `lang-<language>-errors.txt` once per language. Use its **Detection**, **Scope**, **Doc Format**, **Classification**, and **Zero-Path Fallback** sections to ground all checks for that language's items.
+Read `lang-<language>-errors.txt` once per language, per `# Focus`.
 
 # Output
 
@@ -58,7 +55,7 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [ERR-001]
-Category: COVERAGE | SPECIFICITY | FORMAT | FIDELITY
+Category: SPECIFICITY | FORMAT | FIDELITY
 Severity: BLOCKING | ADVISORY
 Lines: ~<start>-<end> | None
 Evidence: <section, `path:line`, or missing element>
@@ -84,8 +81,8 @@ If the caller reports that the output does not conform to the `# REVIEW` protoco
 
 # Constraints
 
-- Block for real coverage gaps, wrong variant names, format violations, or missing zero-path fallbacks.
+- Block for wrong variant names, format violations, or missing zero-path fallbacks.
 - Do not block for minor wording preferences when specificity and format are correct.
 - Cite source file evidence when grounding a finding.
 - Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` field targeting the affected plan item with the exact proposed docs to add or fix.
+- `Lines: ~` values must be valid range specifiers (`~<start>-<end>`) matching the diff context; every `Lines:` reference must have corresponding unchanged lines in the accompanying diff.

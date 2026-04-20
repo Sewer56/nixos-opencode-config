@@ -90,7 +90,7 @@ Traced Paths: <count>
 - Total items in cache: <count>
 ```
 
-- `Decision: PASS` when the scan is complete and cache is updated. Single-run per module — the reviewer's coverage cross-check verifies exhaustiveness.
+- `Decision: PASS` when the scan is complete and cache is updated. The primary agent re-runs collectors until convergence (step 4), verifying exhaustiveness.
 
 # Malformed-Output Retry
 
