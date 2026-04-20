@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews applied error docs for specificity, format, and fidelity
-model: synthetic/hf:zai-org/GLM-5.1
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 reasoningEffort: medium
 permission:
   "*": deny

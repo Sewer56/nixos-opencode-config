@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Enumerates error-returning functions in one module, traces error paths, and classifies error docs
-model: synthetic/hf:zai-org/GLM-5.1
+model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
 permission:
   "*": deny
   read:
