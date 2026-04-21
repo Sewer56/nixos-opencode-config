@@ -90,15 +90,21 @@ Write `ticket_path` from scratch for this run. Apply the ticket template with th
 ``````markdown
 ## Summary
 
-<one-paragraph overview of what the issue is and why it matters>
+2–3 short sentences.
+State what the issue is, then why it matters.
 
 ## Current State
 
-<what exists now before the change — current packages, versions, file locations, existing patterns. Include when the ticket describes a change to something that already exists>
+- <one fact per bullet — a single package, version, file, or pattern>
+- <one fact per bullet>
 
 ## Evidence
 
-<code snippets, links, lockfile excerpts, or other supporting material>
+One-sentence lead-in, then data only.
+
+```<lang>
+<code block, table, or file excerpt>
+```
 
 ## Options
 
@@ -187,6 +193,24 @@ Section inclusion rules:
 - **Example fixes**: include when the ticket involves replacing code patterns with known alternatives.
 - **Current State** ≠ **Evidence**: Current State describes what exists now; Evidence provides supporting proof (lockfile entries, code snippets, URLs).
 
+### Conciseness and formatting
+
+Prose density:
+- One idea per sentence. Use simple sentences.
+- One idea per bullet. Split multi-clause bullets into separate items.
+- Convert inline enumerations of three or more items to bullet lists.
+- Limit the Summary to three sentences.
+
+Whitespace:
+- Insert a blank line before every bullet list that follows prose.
+- Insert a blank line between multi-line bullet items.
+- Omit inter-item spacing for compact single-line items.
+- Insert a blank line between sections.
+
+Evidence vs narrative:
+- Put data (code, tables, file excerpts, URLs) in Evidence sections. Put narrative in Current State or Summary.
+- When Evidence has a prose lead-in, keep it to one sentence before the data.
+
 ## 6. Run review loop
 
 Max 5 iterations.
@@ -226,5 +250,7 @@ Summary: <one-line summary>
 - Distinguish Current State from Evidence as defined in Section inclusion rules.
 - When Options exists, Checklist must include a step to select and record the chosen option.
 - Follow bullet-spacing and prose-wrap conventions — see `_ticket/reviewers/wording.md` Focus for details.
+- Enforce the "Conciseness and formatting" subsection rules as hard constraints.
+- Wrap prose at ~80 characters per line.
 - Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```).
 - Keep user-facing responses brief and factual.
