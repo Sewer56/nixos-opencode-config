@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for reader engagement and structural quality
-model: wafer/GLM-5.1
+model: sewer-bifrost/wafer-ai/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

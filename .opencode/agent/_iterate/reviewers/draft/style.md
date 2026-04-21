@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks imperative voice, positive framing, self-contained items, output format pinning, and nested code fences in iteration draft artifacts
-model: wafer/GLM-5.1
+model: sewer-bifrost/wafer-ai/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for cross-page coherence — broken links, terminology drift, and content duplication
-model: wafer/GLM-5.1
+model: sewer-bifrost/wafer-ai/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks for undefined jargon, compound-term compression, and opaque references in iteration draft artifacts
-model: wafer/GLM-5.1
+model: sewer-bifrost/wafer-ai/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

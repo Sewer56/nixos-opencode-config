@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks template structure, diff headers, and snippet illustrativeness in plan draft artifacts
-model: minimax-coding-plan/MiniMax-M2.7
+model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
 reasoningEffort: medium
 permission:
   "*": deny

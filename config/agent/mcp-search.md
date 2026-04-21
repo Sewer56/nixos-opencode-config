@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Use this for third-party library research and repository documentation analysis.
-model: wafer/GLM-5.1
+model: sewer-bifrost/wafer-ai/GLM-5.1
 permission:
   "*": deny
   read:

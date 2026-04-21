@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks cross-item redundancy, zone overlap, and plugin knowledge restatement in plugin draft artifacts
-model: minimax-coding-plan/MiniMax-M2.7
+model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
 reasoningEffort: medium
 permission:
   "*": deny

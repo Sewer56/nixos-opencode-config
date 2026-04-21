@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks that behavior-governing instructions are self-contained and understandable without prior project knowledge
-model: minimax-coding-plan/MiniMax-M2.7
+model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
 reasoningEffort: medium
 permission:
   "*": deny

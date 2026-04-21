@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks template structure, diff headers, rule application, and zone separation in iteration draft artifacts
-model: wafer/GLM-5.1
+model: sewer-bifrost/wafer-ai/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny
