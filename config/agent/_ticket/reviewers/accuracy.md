@@ -38,7 +38,10 @@ Review ticket drafts for factual accuracy. Check file path validity, evidence-cl
 - **Code path validity**: file paths and symbol references in Scope and Evidence must exist in the repo or be clearly marked as proposed. BLOCKING for referenced paths that do not exist without a "proposed" qualifier.
 - **Evidence-claim alignment**: code snippets, lockfile excerpts, and links must actually support the adjacent claim. BLOCKING when evidence contradicts or does not support the claim.
 - **UI navigation precision**: "Where in UI" or "Reproduction Steps" steps must be specific enough to reproduce (e.g., "Active game → Mods → Header toolbar → Categories" ✓, "In the app" ✗). BLOCKING for vague navigation; ADVISORY for navigation that is specific but unverified.
-- **External link plausibility**: URLs in Evidence should follow a recognizable pattern (GitHub, npm, docs site). ADVISORY for unusual or unverifiable URLs — the agent cannot fetch external pages at review time.
+- **External link plausibility**: URLs in Evidence and Options should follow a recognizable pattern (GitHub, npm, docs site). BLOCKING for Options URLs that do not resolve to a recognizable package repository or registry. ADVISORY for unusual or unverifiable URLs elsewhere — the agent cannot fetch external pages at review time.
+- **Options version plausibility**: version numbers and peer ranges cited in Options must follow the package's known versioning pattern. BLOCKING for versions that contradict documented release history; ADVISORY for versions that are plausible but unverified.
+- **Options fork/activity verification**: maintained forks cited in Options must have recognizable repository URLs (GitHub, GitLab, npm). BLOCKING for fork URLs that do not resolve to a recognizable pattern; ADVISORY for forks with plausible URLs but uncertain activity.
+- **Options completeness**: each option must include enough information to compare (version or link, tradeoff). BLOCKING for options that omit version or link when the ticket discusses dependency changes.
 - Exclusions: this reviewer checks factual grounding only — it does not re-check jargon (clarity), prose quality (wording), or section presence (completeness). Findings that belong to another domain are ADVISORY pointers only.
 
 # Process
@@ -85,7 +88,7 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [ACC-NNN]
-Category: CODE_PATH_VALIDITY | EVIDENCE_CLAIM_ALIGNMENT | UI_NAVIGATION_PRECISION | EXTERNAL_LINK_PLAUSIBILITY
+Category: CODE_PATH_VALIDITY | EVIDENCE_CLAIM_ALIGNMENT | UI_NAVIGATION_PRECISION | EXTERNAL_LINK_PLAUSIBILITY | OPTIONS_VERSION_PLAUSIBILITY | OPTIONS_FORK_VERIFICATION | OPTIONS_COMPLETENESS
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or reference>
 Problem: <what factual inaccuracy or unsupported claim degrades the ticket>

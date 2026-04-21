@@ -41,36 +41,72 @@ Draft a company-facing issue ticket with a four-reviewer loop.
 
 ## 1. Parse request
 
-Extract the ticket intent and which sections the user's description implies. Not every ticket needs all six sections — include sections the description supports and omit sections with no meaningful content. Always include Summary and Acceptance Criteria.
+Extract the ticket intent and which sections the user's description implies. Not every ticket needs sections — include sections when the request or research produces meaningful content for them. Always include Summary and Acceptance Criteria.
 
-Ticket sections:
+Ticket sections (include when the request or research produces meaningful content):
 1. **Summary** — one-paragraph overview of what the issue is and why it matters.
-2. **Evidence** — code snippets, links, lockfile excerpts, or other supporting material.
-3. **Where in UI** (or **Reproduction Steps** for bugs) — user-friendly navigation steps to reach the affected screen or feature. Use "Reproduction Steps" when the ticket describes a bug; use "Where in UI" for features or general navigation.
-4. **Scope** — which files, modules, or components need changes. Omit when the ticket does not involve code changes.
-5. **Checklist** — ordered steps to resolve the issue. Each item is actionable and self-contained.
-6. **Acceptance Criteria** — verifiable conditions that must be true when the issue is resolved.
+2. **Current State** — what exists now before the change: current packages, versions, file locations, existing patterns.
+3. **Evidence** — code snippets, links, lockfile excerpts, or other supporting material.
+4. **Options** — numbered alternatives with version/link, one-line tradeoff each, and a "Current leaning" line. Include when multiple paths forward exist.
+5. **Where in UI** (or **Reproduction Steps** for bugs) — user-friendly navigation steps. Use "Reproduction Steps" for bugs; use "Where in UI" for features or general navigation.
+6. **How to find** — regex, search path, and plain-English meaning for locating affected code.
+7. **Example fixes** — before/after code patterns showing the replacement direction.
+8. **Scope** — files that need changes and why, plus read-only references. Changed files get a justification; read-only files listed without. Omit when the ticket does not involve code changes.
+9. **Checklist** — ordered steps to resolve the issue. Each item is actionable and self-contained.
+10. **Acceptance Criteria** — verifiable conditions that must be true when the issue is resolved. Always include.
+11. **Risks / gotchas** — known pitfalls or risks for the implementer.
+12. **Out of scope** — explicit exclusions to prevent scope creep.
+13. **Not affected** — explicit non-concerns to prevent false assumptions.
 
 ## 2. Discover
 
-Spawn `@codebase-explorer` to map relevant files, repo structure, and existing patterns for the request. Spawn `@mcp-search` if the request involves external APIs or libraries the ticket must reference.
+Spawn `@codebase-explorer` to map relevant files, repo structure, and existing patterns for the request.
 
-## 3. Read evidence
+## 3. Research
+
+When the request involves a dependency, library, tool, or external package decision, spawn `@mcp-search` with targeted research queries. Not every ticket needs external research — skip this step when the request is internal-only.
+
+Research queries to run (pick those relevant to the request):
+
+- **Current version**: pinned version, peer dependency range, current lockfile entry.
+- **Latest stable version**: newest version and its peer range compatibility.
+- **Maintained forks**: name, URL, peer range, recent commit activity. Compare API surface against current usage.
+- **Popular alternatives**: packages in the same category, their peer ranges, and adoption signals.
+- **Deprecation notices**: official deprecation status, migration guides, breaking-change notes.
+- **Upgrade path**: changelog or migration guide between current and target version.
+
+Collect findings into structured Options entries: each option gets a name, version/link, and one-line tradeoff. Include "status quo" as an option when relevant.
+
+When research is done, proceed to Step 4.
+
+## 4. Read evidence
 
 Read the files surfaced by discovery that matter to the ticket. Gather code snippets, file paths, configuration excerpts, or other evidence needed to ground the ticket in repository facts.
 
-## 4. Write ticket
+## 5. Write ticket
 
-Write `ticket_path` from scratch for this run. Apply the ticket template with the sections the user's request implies. Each section must be self-contained and actionable.
+Write `ticket_path` from scratch for this run. Apply the ticket template with the sections the user's request implies. Each section must be self-contained and actionable. Include a section only when the request or research produces meaningful content for it.
 
-````markdown
+``````markdown
 ## Summary
 
 <one-paragraph overview of what the issue is and why it matters>
 
+## Current State
+
+<what exists now before the change — current packages, versions, file locations, existing patterns. Include when the ticket describes a change to something that already exists>
+
 ## Evidence
 
 <code snippets, links, lockfile excerpts, or other supporting material>
+
+## Options
+
+1. **<Option name>** — <version, link>. <one-line tradeoff>.
+2. **<Option name>** — <version, link>. <one-line tradeoff>.
+3. **Status quo** — <current version, link>. <one-line tradeoff>.
+
+Current leaning: <which option and why, or "compare X against Y before choosing">
 
 ## Where in UI
 
@@ -79,9 +115,46 @@ Write `ticket_path` from scratch for this run. Apply the ticket template with th
 1. <navigation step>
 2. <navigation step>
 
+## How to find
+
+Regex:
+
+```text
+<pattern>
+```
+
+Search path:
+
+```text
+<directory or file glob>
+```
+
+Plain-English meaning:
+- <what the matches represent>
+
+## Example fixes
+
+### Case 1: <short description>
+
+Current pattern:
+
+```<lang>
+<before>
+```
+
+Better direction:
+
+```<lang>
+<after>
+```
+
+Simple meaning:
+- <one-line plain-English explanation>
+
 ## Scope
 
 - `<path/to/file>` — <what changes and why>
+- `<path/to/file>` (read-only)
 
 ## Checklist
 
@@ -92,9 +165,29 @@ Write `ticket_path` from scratch for this run. Apply the ticket template with th
 
 - <verifiable condition>
 - <verifiable condition>
-````
 
-## 5. Run review loop
+## Risks / gotchas
+
+- <known pitfall or risk>
+
+## Out of scope
+
+- <explicit exclusion>
+
+## Not affected
+
+- <explicit non-concern>
+``````
+
+Section inclusion rules:
+- **Always include**: Summary, Acceptance Criteria.
+- **Include when the request or research produces content**: Current State, Evidence, Options, Where in UI / Reproduction Steps, Scope, How to find, Example fixes, Checklist, Risks / gotchas, Out of scope, Not affected.
+- **Options**: include when research surfaces multiple paths forward, or when the user's request implies a dependency/tool/library decision. Always include "Status quo" as an option when Options exists, unless the request is to remove something that has no continuation path.
+- **How to find**: include when the ticket involves searching for patterns (regex, grep targets).
+- **Example fixes**: include when the ticket involves replacing code patterns with known alternatives.
+- **Current State** ≠ **Evidence**: Current State describes what exists now; Evidence provides supporting proof (lockfile entries, code snippets, URLs).
+
+## 6. Run review loop
 
 Max 5 iterations.
 
@@ -112,7 +205,7 @@ f. Apply reviewer diffs via targeted edits to `ticket_path`; fall back to `Fix:`
 
 g. Recompute Delta. Re-run all reviewers after every material revision (any substantive change to ticket content — not cosmetic changes like whitespace or typo corrections). Loop until no findings or 5 iterations.
 
-## 6. Handle feedback
+## 7. Handle feedback
 
 On explicit confirmation: return `Status: READY`. On user feedback: apply changes, update Delta, re-run review loop. Otherwise return `Status: DRAFT` with reminder: "Re-review available — say 'review' to re-run reviewers."
 
@@ -128,7 +221,10 @@ Summary: <one-line summary>
 
 - Write only `TICKET.md`, `TICKET.draft-handoff.md`, and `TICKET.draft-review-*.md`.
 - Treat the user's request as the source of truth for which sections apply.
-- Summary and Acceptance Criteria must always exist. Other sections are optional based on the request.
+- Summary and Acceptance Criteria must always exist. Options must exist per Section inclusion rules above. Current State should exist when the ticket describes a change to something that already exists. Other sections are conditional based on the request.
+- Options must include a "Current leaning" line when multiple options exist.
+- Distinguish Current State from Evidence as defined in Section inclusion rules.
+- When Options exists, Checklist must include a step to select and record the chosen option.
 - Follow bullet-spacing and prose-wrap conventions — see `_ticket/reviewers/wording.md` Focus for details.
 - Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```).
 - Keep user-facing responses brief and factual.

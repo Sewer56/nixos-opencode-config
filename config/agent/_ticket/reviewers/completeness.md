@@ -36,11 +36,15 @@ Review ticket drafts for completeness. Flag missing required sections, untestabl
 # Focus
 
 - **Summary hook**: the Summary section must state what the issue is and why it matters in the first sentence. BLOCKING when the Summary buries the point in context or preamble.
-- **Required sections present**: Summary and Acceptance Criteria must always exist. Evidence, Where in UI (or Reproduction Steps), and Checklist should exist when the user's description implies them — flag as BLOCKING when clearly implied but missing, ADVISORY when ambiguous. Scope is always optional.
+- **Required sections present**: Summary and Acceptance Criteria must always exist. Options must exist per the Options presence Focus item below. Current State must exist per the Current State presence Focus item below. Evidence, Where in UI (or Reproduction Steps), and Checklist should exist when the user's description implies them — flag as BLOCKING when clearly implied but missing, ADVISORY when ambiguous. Scope is always optional.
 - **Acceptance criteria verifiability**: each criterion must be a concrete, testable statement (e.g., "No active dependency on X" ✓, "Code is improved" ✗). BLOCKING for vague or untestable criteria.
 - **Checklist actionability**: each checklist item must describe a concrete action, not an outcome. BLOCKING for items like "Fix the bug" without a hint of approach; ADVISORY for slightly vague but directional items.
 - **Evidence sufficiency**: when Evidence exists, it must directly support the Summary. BLOCKING for contradictory or irrelevant evidence; ADVISORY for tangentially related evidence.
 - **Cross-section consistency**: Checklist and Scope must not contradict each other; Acceptance Criteria must align with Checklist. BLOCKING for direct contradictions.
+- **Options presence**: when the request involves a dependency, library, tool, or external package decision, Options must exist with at least two alternatives and a "Current leaning" line. BLOCKING when the request clearly requires a choice between paths but Options is missing; ADVISORY when the need for Options is ambiguous.
+- **Options tradeoff quality**: each option must state a concrete tradeoff, not just a label. BLOCKING for options that say only "use X" without explaining why or what it costs.
+- **Current State presence**: when the ticket describes a change to something that already exists, Current State must describe what exists now. BLOCKING when clearly implied but missing.
+- **Options-Checklist linkage**: when Options exists, Checklist must include a step to select and record the chosen option. BLOCKING when missing.
 
 # Process
 
@@ -85,7 +89,7 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [CMP-NNN]
-Category: SUMMARY_HOOK | REQUIRED_SECTIONS | ACCEPTANCE_CRITERIA_VERIFIABILITY | CHECKLIST_ACTIONABILITY | EVIDENCE_SUFFICIENCY | CROSS_SECTION_CONSISTENCY
+Category: SUMMARY_HOOK | REQUIRED_SECTIONS | ACCEPTANCE_CRITERIA_VERIFIABILITY | CHECKLIST_ACTIONABILITY | EVIDENCE_SUFFICIENCY | CROSS_SECTION_CONSISTENCY | OPTIONS_PRESENCE | OPTIONS_TRADEOFF_QUALITY | CURRENT_STATE_PRESENCE | OPTIONS_CHECKLIST_LINKAGE
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or structural pattern>
 Problem: <what completeness issue degrades the ticket>
