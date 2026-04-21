@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Use this for third-party library research and repository documentation analysis.
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: wafer/GLM-5.1
 permission:
   "*": deny
   read:
