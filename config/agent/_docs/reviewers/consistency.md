@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for cross-page coherence — broken links, terminology drift, and content duplication
-model: minimax-coding-plan/MiniMax-M2.7
+model: wafer/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

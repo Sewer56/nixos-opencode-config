@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks cross-item redundancy and zone overlap in iteration draft artifacts
-model: minimax-coding-plan/MiniMax-M2.7
+model: wafer/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

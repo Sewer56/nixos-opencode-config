@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for comprehensibility — undefined jargon, ambiguous language, and opaque references
-model: minimax-coding-plan/MiniMax-M2.7
+model: wafer/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

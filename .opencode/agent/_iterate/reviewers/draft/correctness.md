@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks template structure, diff headers, rule application, and zone separation in iteration draft artifacts
-model: minimax-coding-plan/MiniMax-M2.7
+model: wafer/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny
