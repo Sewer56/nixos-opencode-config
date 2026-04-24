@@ -53,11 +53,23 @@ Record in `handoff_path` under `## Change Plan`: per-file scope levels, frozen r
 
 ## 5. Run review loop
 
-Same as `/docs/write` step 6 (max 5 iterations, steps a–f). Cache prefix: `PROMPT-DOCS-REVIEW`.
+Max 5 iterations.
+
+a. Write `handoff_path` with scope, per-file Delta, and Change Plan before first reviewer pass. Per-file Delta entries track: file path, sections changed, scope level.
+
+b. Run four reviewers in parallel: `@_docs/reviewers/clarity`, `@_docs/reviewers/wording`, `@_docs/reviewers/engagement`, `@_docs/reviewers/consistency`. Pass only: `handoff_path`, Delta summary, current Decisions excerpt when non-empty. Reviewers read the actual documentation files and use the handoff to determine which files and sections are in scope.
+
+c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified`. All 4 reviewers are diff-mandated — confirm each finding contains a unified diff block. Treat missing diffs as protocol violation requiring retry.
+
+d. Record decisions in `handoff_path` for cross-domain arbitration. Apply domain ownership: CLARITY → clarity; WORDING → wording; ENGAGEMENT → engagement; CONSISTENCY → consistency.
+
+e. Apply reviewer diffs via targeted edits; fall back to `Fix:` prose. Reject diffs in frozen regions (see Constraints).
+
+f. Recompute Delta. Re-run all reviewers after every material revision (any substantive change to doc content — not cosmetic fixes like whitespace or typo corrections). Loop until no findings or 5 iterations.
 
 ## 6. Handle feedback
 
-Same as `/docs/write` step 7. Cache prefix: `PROMPT-DOCS-REVIEW`.
+On explicit confirmation: return `Status: READY`. On user feedback: apply changes, update Delta, re-run review loop. Otherwise return `Status: DRAFT` with reminder: "Re-review available — say 'review' to re-run reviewers."
 
 # Output
 

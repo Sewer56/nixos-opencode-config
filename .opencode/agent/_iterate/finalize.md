@@ -21,7 +21,7 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "mcp-search": allow
-    "_iterate/reviewers/*": allow
+    "_iterate/finalize-reviewers/*": allow
 ---
 
 Convert a confirmed iteration context into reviewed revision instructions. Write `PROMPT-ITERATE.handoff.md` and individual REV files matching `PROMPT-ITERATE.rev.*.md`. Edit only those files. No separate `machine.md` — handoff absorbs the manifest role.
@@ -78,14 +78,14 @@ Follow the ordered steps below exactly, in order.
 
 2. Build reviewer prompts
 - After each full machine-artifact draft, run these reviewers in parallel:
-  - `@_iterate/reviewers/correctness`
-  - `@_iterate/reviewers/wording`
-  - `@_iterate/reviewers/style`
-  - `@_iterate/reviewers/performance`
-  - `@_iterate/reviewers/dedup`
-  - `@_iterate/reviewers/diff`
-  - `@_iterate/reviewers/meta`
-  - `@_iterate/reviewers/clarity`
+  - `@_iterate/finalize-reviewers/correctness`
+  - `@_iterate/finalize-reviewers/wording`
+  - `@_iterate/finalize-reviewers/style`
+  - `@_iterate/finalize-reviewers/performance`
+  - `@_iterate/finalize-reviewers/dedup`
+  - `@_iterate/finalize-reviewers/diff`
+  - `@_iterate/finalize-reviewers/meta`
+  - `@_iterate/finalize-reviewers/clarity`
   - Treat each reviewer prompt as scoped call data for the callee.
 - Include only:
   - Artifact paths (`context_path`, `handoff_path`)

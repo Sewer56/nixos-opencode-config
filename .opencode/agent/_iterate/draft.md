@@ -22,7 +22,7 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "mcp-search": allow
-    "_iterate/reviewers/draft/*": allow
+    "_iterate/draft-reviewers/*": allow
 ---
 
 Draft `PROMPT-ITERATE.md` for the `/iterate` command. Write only that file.
@@ -97,11 +97,11 @@ Follow the ordered steps below.
 
 2. Build reviewer prompts
 - After each draft, run these reviewers in parallel:
-  - `@_iterate/reviewers/draft/correctness`
-  - `@_iterate/reviewers/draft/wording`
-  - `@_iterate/reviewers/draft/style`
-  - `@_iterate/reviewers/draft/dedup`
-  - `@_iterate/reviewers/draft/clarity`
+  - `@_iterate/draft-reviewers/correctness`
+  - `@_iterate/draft-reviewers/wording`
+  - `@_iterate/draft-reviewers/style`
+  - `@_iterate/draft-reviewers/dedup`
+  - `@_iterate/draft-reviewers/clarity`
 - Include only:
   - `context_path` and `draft_handoff_path`
   - Iteration/delta summary from `## Delta` in draft-handoff

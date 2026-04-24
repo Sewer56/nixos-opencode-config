@@ -22,7 +22,7 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "mcp-search": allow
-    "_plugin/reviewers/draft/*": allow
+    "_plugin/draft-reviewers/*": allow
 ---
 
 Draft `PROMPT-PLUGIN-PLAN.md` for the `/plugin/draft` command.
@@ -78,11 +78,11 @@ Follow the ordered steps below.
 
 2. Build reviewer prompts
 - After each draft, run these reviewers in parallel:
-  - `@_plugin/reviewers/draft/correctness`
-  - `@_plugin/reviewers/draft/wording`
-  - `@_plugin/reviewers/draft/style`
-  - `@_plugin/reviewers/draft/dedup`
-  - `@_plugin/reviewers/draft/clarity`
+  - `@_plugin/draft-reviewers/correctness`
+  - `@_plugin/draft-reviewers/wording`
+  - `@_plugin/draft-reviewers/style`
+  - `@_plugin/draft-reviewers/dedup`
+  - `@_plugin/draft-reviewers/clarity`
 - Include only:
   - `context_path` and `draft_handoff_path`
   - Iteration/delta summary from `## Delta`

@@ -23,7 +23,7 @@ permission:
     "*": "deny",
     "codebase-explorer": "allow",
     "mcp-search": "allow",
-    "_plan/reviewers/draft/*": "allow"
+    "_plan/draft-reviewers/*": "allow"
   }
   # bash: deny
   # webfetch: deny
@@ -76,11 +76,11 @@ Follow the ordered steps below.
 
 2. Build reviewer prompts
 - After each draft, run these reviewers in parallel:
-  - `@_plan/reviewers/draft/correctness`
-  - `@_plan/reviewers/draft/wording`
-  - `@_plan/reviewers/draft/style`
-  - `@_plan/reviewers/draft/dedup`
-  - `@_plan/reviewers/draft/clarity`
+  - `@_plan/draft-reviewers/correctness`
+  - `@_plan/draft-reviewers/wording`
+  - `@_plan/draft-reviewers/style`
+  - `@_plan/draft-reviewers/dedup`
+  - `@_plan/draft-reviewers/clarity`
 - Include only:
   - `plan_path` and `draft_handoff_path`
   - Iteration/delta summary from `## Delta`

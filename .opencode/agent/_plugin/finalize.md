@@ -21,10 +21,10 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "mcp-search": allow
-    "_plugin/reviewers/errors": allow
-    "_plugin/reviewers/reorder": allow
-    "_plugin/reviewers/documentation": allow
-    "_plugin/reviewers/correctness": allow
+    "_plugin/finalize-reviewers/errors": allow
+    "_plugin/finalize-reviewers/reorder": allow
+    "_plugin/finalize-reviewers/documentation": allow
+    "_plugin/finalize-reviewers/correctness": allow
 ---
 
 Convert a confirmed plugin plan into reviewed machine instructions.
@@ -75,7 +75,7 @@ Follow the ordered steps below exactly, in order.
 
 ### Core review
 - Write and maintain `## Delta`: write to `handoff_path` before the first reviewer pass; record each `REV-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields; add artifact markers for `Source Context` and `Review Ledger`; recompute after every material revision.
-- Build core reviewer prompts: after each full machine-artifact draft, run `@_plugin/reviewers/correctness` in parallel. Treat each reviewer prompt as scoped call data. Include only: artifact paths (`context_path`, `handoff_path`), `rev_pattern` (a glob pattern matching REV target file paths to scope the review), Delta summary, current `### Decisions` excerpt when non-empty, finalize-time user notes. Omit: output format, focus lists, target file paths from REV items, role assignment, blanket read orders — reviewers decide what to open from Delta, cache state, and Decisions.
+- Build core reviewer prompts: after each full machine-artifact draft, run `@_plugin/finalize-reviewers/correctness` in parallel. Treat each reviewer prompt as scoped call data. Include only: artifact paths (`context_path`, `handoff_path`), `rev_pattern` (a glob pattern matching REV target file paths to scope the review), Delta summary, current `### Decisions` excerpt when non-empty, finalize-time user notes. Omit: output format, focus lists, target file paths from REV items, role assignment, blanket read orders — reviewers decide what to open from Delta, cache state, and Decisions.
 - Validate each reviewer response: confirm `# REVIEW` header, `Decision: PASS | ADVISORY | BLOCKING`, `## Findings` and `## Verified` headings. If malformed after retries, treat as BLOCKING with a synthetic finding.
 - Retry malformed responses: if validation fails and Delta plus Decisions are unchanged, send only the protocol error and request re-emit; if Delta or Decisions changed, include only the new excerpt and request fresh response.
 - Record decisions: update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files. Core domain ownership: CORRECTNESS → correctness reviewer.
@@ -86,7 +86,7 @@ Follow the ordered steps below exactly, in order.
 
 ### Polish review
 - Update `## Delta` in `handoff_path`. Mark all core-reviewed items as Unchanged. Set `Why: core phase passed`.
-- Build polish reviewer prompts: run `@_plugin/reviewers/documentation`, `@_plugin/reviewers/errors`, and `@_plugin/reviewers/reorder` in parallel. Include the same task-specific data as the core phase.
+- Build polish reviewer prompts: run `@_plugin/finalize-reviewers/documentation`, `@_plugin/finalize-reviewers/errors`, and `@_plugin/finalize-reviewers/reorder` in parallel. Include the same task-specific data as the core phase.
 - Validate each reviewer response (same criteria as core).
 - Retry malformed responses (same protocol as core).
 - Record decisions: update `### Decisions` in `handoff_path` for cross-domain arbitration. Polish domain ownership: DOCUMENTATION → documentation reviewer; ERRORS → errors reviewer; REORDER → reorder reviewer.

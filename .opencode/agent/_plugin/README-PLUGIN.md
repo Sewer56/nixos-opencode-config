@@ -11,7 +11,7 @@ Reference for the `/plugin/draft` → `/plugin/finalize` → `/plugin/implement`
 
 ## Draft Review
 
-The draft agent runs 5 reviewers in `reviewers/draft/` before presenting
+The draft agent runs 5 reviewers in `draft-reviewers/` before presenting
 the plan to the user:
 - `correctness` — plan template structure, diff header paths, plugin constraints
 - `dedup` — human/machine zone overlap, `[P#]` cross-item redundancy
@@ -28,10 +28,10 @@ the agent reminds that re-review is available on request.
 
 The finalize agent runs four reviewers in parallel:
 
-- `_plugin/reviewers/errors` — Error-handling coverage, swallowed errors, standalone log pattern compliance.
-- `_plugin/reviewers/reorder` — Declaration ordering (entry point first, callers before callees).
-- `_plugin/reviewers/documentation` — JSDoc coverage, debug flag docs, log path docs.
-- `_plugin/reviewers/correctness` — Plan fidelity, SDK type correctness, no `client.app.log`, no unnecessary `opencode.json` registration.
+- `_plugin/finalize-reviewers/errors` — Error-handling coverage, swallowed errors, standalone log pattern compliance.
+- `_plugin/finalize-reviewers/reorder` — Declaration ordering (entry point first, callers before callees).
+- `_plugin/finalize-reviewers/documentation` — JSDoc coverage, debug flag docs, log path docs.
+- `_plugin/finalize-reviewers/correctness` — Plan fidelity, SDK type correctness, no `client.app.log`, no unnecessary `opencode.json` registration.
 
 Each reviewer returns a `## Diff` section with unified diffs so the implement agent can apply fixes mechanically.
 

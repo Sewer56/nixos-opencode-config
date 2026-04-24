@@ -233,7 +233,7 @@ not mandated; it scales with the artifact's domain breadth. `_plugin`
 and `_plan` follow the same principle with their own domain-specific
 sets.
 
-Five reviewers in `_iterate`'s `reviewers/draft/` directory:
+Five reviewers in `_iterate`'s `draft-reviewers/` directory:
 - `correctness` — template structure, diff header paths, domain-specific constraints
 - `dedup` — human/machine zone overlap (human = narrative, machine = operational), `[P#]` cross-item redundancy
 - `wording` — token density, bullet atomicity, cross-section restatement
@@ -364,7 +364,7 @@ must enforce"
 
 Generated `## Self-Iteration`: `Intent: rule-change`,
 `Target-Scope: .opencode/agent/_iterate/draft.md,
-.opencode/agent/_iterate/reviewers/correctness.md`
+.opencode/agent/_iterate/finalize-reviewers/correctness.md`
 
 The handoff must include a REV updating the reviewer focus
 list to enforce the new rule.
