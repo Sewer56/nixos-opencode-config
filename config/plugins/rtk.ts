@@ -7,6 +7,20 @@ import type { Plugin } from "@opencode-ai/plugin"
 // which is the single source of truth (src/discover/registry.rs).
 // To add or change rewrite rules, edit the Rust registry — not this file.
 
+const SKIP_PATTERNS: Array<[RegExp, string]> = [
+  [/^\s*curl(?:\s|$)/, "curl already efficient"],
+  [/^\s*git\s+diff(?:\s|$)/, "git diff needs raw output"],
+]
+
+function shouldSkip(command: string): boolean {
+  for (const [pattern, reason] of SKIP_PATTERNS) {
+    if (pattern.test(command)) {
+      return true
+    }
+  }
+  return false
+}
+
 export const RtkOpenCodePlugin: Plugin = async ({ $ }) => {
   try {
     await $`which rtk`.quiet()
@@ -24,7 +38,7 @@ export const RtkOpenCodePlugin: Plugin = async ({ $ }) => {
 
       const command = (args as Record<string, unknown>).command
       if (typeof command !== "string" || !command) return
-      if (/^\s*curl(?:\s|$)/.test(command)) return
+      if (shouldSkip(command)) return
 
       try {
         const result = await $`rtk rewrite ${command}`.quiet().nothrow()
