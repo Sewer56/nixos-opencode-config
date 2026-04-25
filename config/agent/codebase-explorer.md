@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Explores codebase structure, patterns, and implementation details.
-model: sewer-bifrost/wafer-ai/GLM-5.1
+model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
 permission:
   "*": deny
   read:
