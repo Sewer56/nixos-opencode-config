@@ -61,8 +61,8 @@ Review a finalized machine plan's end-user documentation work (D# steps).
   - Insert new entries in the appropriate section.
   - Remove pruned item ids.
   - Move entries between sections when status transitions.
-- Always update the `Updated:` timestamp line.
-- Leave entries whose content has not changed exactly as they are.
+  - Always update the `Updated:` timestamp line.
+  - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
@@ -88,11 +88,11 @@ Review a finalized machine plan's end-user documentation work (D# steps).
 
 `````text
 # REVIEW
-Agent: _plan/finalize-reviewers/end-user-documentation
+Agent: _plan/finalize-eudoc-reviewers/end-user-documentation
 Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
-### [EUDOC-001]
+### [EUDOC-NNN]
 Category: COVERAGE | SPECIFICITY | FROZEN_REGIONS
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>

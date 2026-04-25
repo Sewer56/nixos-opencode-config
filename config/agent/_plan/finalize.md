@@ -22,7 +22,8 @@ permission:
     "*": "deny",
     "codebase-explorer": "allow",
     "mcp-search": "allow",
-    "_plan/finalize-reviewers/*": "allow"
+    "_plan/finalize-reviewers/*": "allow",
+    "_plan/finalize-eudoc-reviewers/*": "allow"
   }
   # bash: deny
   # question: deny
@@ -101,11 +102,15 @@ Convert a confirmed human plan into a reviewed machine plan. Write `PROMPT-PLAN.
 ## 6. Run the polish review loop
 - Update `## Delta` in `handoff_path`. Mark all core-reviewed items as Unchanged. Set `Why: core phase passed`.
 - Run these polish reviewers in parallel, passing `handoff_path`, `plan_path`, and `step_pattern` to each reviewer:
-  - `@_plan/finalize-reviewers/end-user-documentation`
+  - `@_plan/finalize-eudoc-reviewers/end-user-documentation`
   - `@_plan/finalize-reviewers/documentation`
   - `@_plan/finalize-reviewers/errors`
+  - `@_plan/finalize-eudoc-reviewers/clarity`
+  - `@_plan/finalize-eudoc-reviewers/wording`
+  - `@_plan/finalize-eudoc-reviewers/engagement`
+  - `@_plan/finalize-eudoc-reviewers/consistency`
 - Include the same task-specific data as the core phase: artifact paths, `step_pattern`, Delta summary, current `### Decisions` excerpt, and finalize-time user notes.
-- Update the `## Review Ledger` in `handoff_path` for polish findings. Apply end-user-doc domain ownership: EUDOC → end-user-documentation reviewer. Arbitrate cross-domain conflicts with DOCS and ERR.
+- Update the `## Review Ledger` in `handoff_path` for polish findings. Apply eudoc domain ownership: EUDOC → end-user-documentation; ECLR → eudoc/clarity; EWRD → eudoc/wording; EENG → eudoc/engagement; ECNS → eudoc/consistency. Arbitrate cross-domain conflicts with DOCS and ERR.
 - Apply polish reviewer diffs to step files. Append one line to `## Revision History`.
 - Re-run polish reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
