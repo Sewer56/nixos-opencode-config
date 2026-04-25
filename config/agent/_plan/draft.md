@@ -52,7 +52,7 @@ Create and maintain a collaborative human-first plan. Write only `PROMPT-PLAN.md
 
 ## 2. Do lightweight discovery
 - Run `@codebase-explorer` and `@mcp-search` in parallel before reading local files yourself.
-- Ask `@codebase-explorer` for the relevant local files, repo boundaries, ownership, and existing patterns for the request.
+- Ask `@codebase-explorer` for the relevant local files, repo boundaries, ownership, existing patterns, and documentation surfaces (READMEs, wiki pages, guides, changelogs, nav configs) for the request.
 - Ask `@mcp-search` to fetch the external libraries, APIs, or docs that matter to the request, or report that none are needed.
 - After those subagents return, read the files and external facts they surfaced that matter to the human draft.
 - Keep discovery lightweight: gather only the repo context needed for a grounded outline, clear scope choices, and sensible open questions.
@@ -65,6 +65,7 @@ Create and maintain a collaborative human-first plan. Write only `PROMPT-PLAN.md
 - Good snippet types: function signatures, interface/type shapes, route shapes, and tiny placeholder code blocks.
 - Keep snippets basic and brief. They are illustrative, not binding implementation instructions.
 - Leave unresolved human decisions in `## Open Questions`.
+- When a `[P#]` item changes code that end-user documentation references, add a corresponding `[P#]` item for the documentation update or creation. When a `[P#]` item adds user-facing surface that has no existing documentation, add a `[P#]` item to create it. State the doc file path and what changes.
 
 ## 4. Run the draft review loop
 Follow the ordered steps below.
@@ -77,6 +78,7 @@ Follow the ordered steps below.
 2. Build reviewer prompts
 - After each draft, run these reviewers in parallel:
   - `@_plan/draft-reviewers/correctness`
+  - `@_plan/draft-reviewers/documentation`
   - `@_plan/draft-reviewers/wording`
   - `@_plan/draft-reviewers/style`
   - `@_plan/draft-reviewers/dedup`
@@ -90,7 +92,7 @@ Follow the ordered steps below.
 
 3. Validate each reviewer response
 - Same validation as finalize: `# REVIEW` header, `Decision:`, `## Findings`, `## Verified`.
-- All 5 draft reviewers are diff-mandated.
+- All 6 draft reviewers are diff-mandated.
 - Treat malformed output as BLOCKING after retries.
 
 4. Retry malformed responses from the existing review state
@@ -98,7 +100,7 @@ Follow the ordered steps below.
 
 5. Record decisions and apply domain ownership
 - Update `### Decisions` in `draft_handoff_path`.
-- Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; DEDUP → dedup; CLARITY → clarity.
+- Apply domain ownership: CORRECTNESS → correctness; DOC → documentation; WORDING → wording; STYLE → style; DEDUP → dedup; CLARITY → clarity.
 
 6. Revise `PROMPT-PLAN.md` when findings require it
 - Apply reviewer diffs via targeted edits; fall back to `Fix:` prose.
