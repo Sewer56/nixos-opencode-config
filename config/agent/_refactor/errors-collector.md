@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Enumerates error-returning functions in one module, traces error paths, and classifies error docs
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
 permission:
   "*": deny
   read:

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews implementation against a machine plan
-model: fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo
+model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
 permission:
   "*": deny
   read:

@@ -95,59 +95,7 @@
         "reasoningSummary": "concise"
       }
     },
-    "fireworks-ai": {
-      "models": {
-        "accounts/fireworks/routers/minimax-m2p7": {
-          "name": "Minimax M2.7 (Maybe FirePass)",
-          "family": "glm",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 196608,
-            "output": 131072
-          },
-          "modalities": {
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "accounts/fireworks/routers/kimi-k2p6": {
-          "name": "Kimi K2.6 (Maybe FirePass)",
-          "family": "kimi",
-          "attachment": true,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0.00000095,
-            "output": 0.000004
-          },
-          "limit": {
-            "context": 262144,
-            "output": 131072
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        }
-      }
-    },
+
     "github-copilot": {
       "options": {
         "reasoningSummary": "concise"
