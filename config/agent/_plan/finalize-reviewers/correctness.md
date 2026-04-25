@@ -122,7 +122,7 @@ Fix: <smallest concrete correction>
 
 # Constraints
 - Block only for real fidelity, coverage, grounding, or structure failures.
-- Treat documentation gaps as correctness issues only when they make a stated requirement or acceptance criterion unprovable.
+- Documentation quality is out of scope; do not flag doc gaps here.
 - Treat missing or malformed handoff structure as blocking.
 - If a grounding finding depends on the repo surface, cite repo evidence.
 - Keep findings short and specific.

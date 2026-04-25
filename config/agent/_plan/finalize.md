@@ -272,7 +272,7 @@ Import diff:
 
 Code Shape:
 
-Use the target file language or `diff`.
+Use the target file language or `diff`. Generate code only.
 
 Changes:
 - <concrete code change>
@@ -300,7 +300,7 @@ Import diff:
 
 Code shape:
 
-Use the target file language or `diff`.
+Use the target file language or `diff`. Generate code only.
 
 Changes:
 - <specific checks>
