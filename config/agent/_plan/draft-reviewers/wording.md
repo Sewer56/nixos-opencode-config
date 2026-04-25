@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks token density, filler, hedging, and bullet atomicity in plan draft artifacts (human zone exempt)
-model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
+model: sewer-bifrost/wafer-ai/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

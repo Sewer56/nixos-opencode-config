@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews written orchestrator prompt-pack files for correctness and fidelity
-model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
+model: sewer-bifrost/wafer-ai/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny
