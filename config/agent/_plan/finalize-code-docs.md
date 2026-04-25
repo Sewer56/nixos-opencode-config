@@ -61,7 +61,7 @@ Review and revise code-adjacent documentation (API references, inline comments, 
 - Run these reviewers in parallel:
   - `@_plan/finalize-reviewers/documentation`
   - `@_plan/finalize-reviewers/errors`
-- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, and user notes.
+- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: DOCS → documentation reviewer; ERR → errors reviewer. Arbitrate cross-domain conflicts.
 - Apply reviewer diffs to existing I# and T# step files only. Append one line to `## Revision History`.

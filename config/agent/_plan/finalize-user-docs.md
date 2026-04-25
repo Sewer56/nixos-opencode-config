@@ -78,7 +78,7 @@ Generate and review end-user documentation steps for a finalized machine plan. R
   - `@_plan/finalize-eudoc-reviewers/wording`
   - `@_plan/finalize-eudoc-reviewers/engagement`
   - `@_plan/finalize-eudoc-reviewers/consistency`
-- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, Delta summary from `## Delta`, current `### Decisions` excerpt when non-empty, and user notes.
+- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply end-user documentation domain ownership: EUDOC → end-user-documentation; ECLR → clarity; EWRD → wording; EENG → engagement; ECNS → consistency. Arbitrate cross-domain conflicts.
 - Apply reviewer diffs to D# step files only. Append one line to `## Revision History`.

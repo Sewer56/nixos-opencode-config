@@ -74,7 +74,7 @@ Max 5 iterations.
 
 a. Write `handoff_path` with scope, Delta, and search findings before first reviewer pass.
 
-b. Run four reviewers in parallel: `@_branding/reviewers/clarity`, `@_branding/reviewers/distinctiveness`, `@_branding/reviewers/positioning`, `@_branding/reviewers/availability`. Pass only: `branding_path`, `handoff_path`, Delta summary, scope boundaries (in-scope/out-of-scope constraints), user notes, and Decisions excerpt when non-empty. Reviewers read `BRANDING.md` and use the handoff to determine what changed.
+b. Run four reviewers in parallel: `@_branding/reviewers/clarity`, `@_branding/reviewers/distinctiveness`, `@_branding/reviewers/positioning`, `@_branding/reviewers/availability`. Pass only: `branding_path`, `handoff_path`, scope boundaries (in-scope/out-of-scope constraints), and user notes. Reviewers read `BRANDING.md` and use the handoff to determine what changed.
 
 c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified`. All 4 reviewers are diff-mandated — confirm each finding contains a unified diff block. Treat missing diffs as protocol violation requiring retry.
 

@@ -107,7 +107,7 @@ Max 5 iterations.
 
 a. Write `ticket-splits/<slug>/TICKET.draft-handoff.md` with per-section Delta before the first reviewer pass. Per-section Delta entries track: section name, status (New/Changed/Unchanged), and reason.
 
-b. Run four reviewers in parallel: `@_ticket/reviewers/clarity`, `@_ticket/reviewers/wording`, `@_ticket/reviewers/completeness`, `@_ticket/reviewers/accuracy`. Pass only: `ticket_path` (`ticket-splits/<slug>/TICKET.md`), `draft_handoff_path` (`ticket-splits/<slug>/TICKET.draft-handoff.md`), Delta summary, current Decisions excerpt when non-empty.
+b. Run four reviewers in parallel: `@_ticket/reviewers/clarity`, `@_ticket/reviewers/wording`, `@_ticket/reviewers/completeness`, `@_ticket/reviewers/accuracy`. Pass only: `ticket_path` (`ticket-splits/<slug>/TICKET.md`) and `draft_handoff_path` (`ticket-splits/<slug>/TICKET.draft-handoff.md`).
 
 c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified`.
 

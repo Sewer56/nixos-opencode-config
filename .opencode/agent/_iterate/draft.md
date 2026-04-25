@@ -104,8 +104,6 @@ Follow the ordered steps below.
   - `@_iterate/draft-reviewers/clarity`
 - Include only:
   - `context_path` and `draft_handoff_path`
-  - Iteration/delta summary from `## Delta` in draft-handoff
-  - Current `### Decisions` excerpt from draft-handoff when non-empty
 - Omit:
   - Output format — reviewer agents define their own `# Output`
   - Focus or check lists — reviewer agents define their own `# Focus`

@@ -85,8 +85,6 @@ Follow the ordered steps below.
   - `@_plugin/draft-reviewers/clarity`
 - Include only:
   - `context_path` and `draft_handoff_path`
-  - Iteration/delta summary from `## Delta`
-  - Current `### Decisions` excerpt when non-empty
 - Omit:
   - Output format, focus/check lists, role assignment, blanket read orders
 

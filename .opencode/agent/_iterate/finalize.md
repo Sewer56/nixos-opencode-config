@@ -90,8 +90,6 @@ Follow the ordered steps below exactly, in order.
 - Include only:
   - Artifact paths (`context_path`, `handoff_path`)
   - `rev_pattern`
-  - Iteration/delta summary from `## Delta` in handoff
-  - Current `### Decisions` excerpt from handoff when it is non-empty
   - Finalize-time user notes if any
   - Self-iteration intent and target-scope from `context_path` `## Self-Iteration` section when present
 - Omit:
