@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks error documentation coverage and specificity for finalized machine plans
+description: Reviews error documentation coverage and specificity for direct documentation workflow source files
 model: sewer-bifrost/wafer-ai/GLM-5.1
 permission:
   "*": deny
@@ -15,23 +15,13 @@ permission:
   list: allow
   todowrite: allow
   edit:
-    "*PROMPT-PLAN.review-errors.md": allow
+    "*PROMPT-DOC-COVERAGE.review-errors.md": allow
   external_directory: allow
-  # edit: deny
-  # bash: deny
-  # task: deny
-  # question: deny
-  # webfetch: deny
-  # websearch: deny
-  # codesearch: deny
-  # lsp: deny
-  # doom_loop: deny
-  # skill: deny
 ---
 
-Review a finalized machine plan's error documentation.
+Review error documentation coverage and specificity for direct documentation workflow source files.
 
-**Execution Contract (hard requirements):**
+**Execution Contract:**
 - Follow the numbered `# Process` steps exactly, in order.
 - Use Delta, cache state, and `### Decisions` to decide which items to reopen.
 - Write the reviewer cache before the final response.
@@ -39,13 +29,11 @@ Review a finalized machine plan's error documentation.
 
 # Inputs
 - `handoff_path`
-- `plan_path`
-- `step_pattern` (e.g., `PROMPT-PLAN.step.*.md`)
 
 # Process
 1. Load cache
-- Read `PROMPT-PLAN.review-errors.md` if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per item (REQ, I#, T#) with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+- Read `PROMPT-DOC-COVERAGE.review-errors.md` if it exists. Treat missing or malformed cache as empty.
+- Treat the cache as one record per source file with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
 
 2. Read Delta and Decisions
 - Read `## Delta` from `handoff_path`.
@@ -57,14 +45,14 @@ Review a finalized machine plan's error documentation.
 - Re-evaluate own Open items from cache and decision-referenced items.
 
 4. Inspect selected content
-- Read `handoff_path` for summary, requirements, Step Index, and dependency mapping.
-- Read selected step files matching `step_pattern` in one batch.
+- Read `handoff_path` for `## Target Files` and `## Review Ledger`.
+- Read selected target source files in one batch.
 - Open target files only for the selected items.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If `PROMPT-PLAN.review-errors.md` is missing or malformed: write the full cache file.
+- If `PROMPT-DOC-COVERAGE.review-errors.md` is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.
@@ -77,29 +65,30 @@ Review a finalized machine plan's error documentation.
 - Emit the `# REVIEW` block from `# Output`.
 
 # Focus
-- Own all `# Errors` section concerns (existence, placement, format, specificity, completeness) in the changed scope described by step files matching `step_pattern`.
+- Own all `# Errors` section concerns (existence, placement, format, specificity, completeness) on public error-returning APIs in in-scope source files listed in `## Target Files`.
 - Read only the repo files needed to ground those checks.
 
 Rules: `/home/sewer/opencode/config/rules/errors.md`.
 
 # Output
 
-`````text
+```text
 # REVIEW
-Agent: _plan/finalize-reviewers/errors
+Agent: _refactor/document-reviewers/errors
 Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
-### [ERR-001]
+### [DERR-NNN]
 Category: COVERAGE | SPECIFICITY | FIDELITY
 Severity: BLOCKING | ADVISORY
-Evidence: <section, `path:line`, or missing element>
+Evidence: <`path:line`, or missing element>
+Lines: ~<start line>-<end line> | None
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
 ```diff
-<path/to/step/file>
---- a/<path/to/step/file>
-+++ b/<path/to/step/file>
+<path/to/source/file>
+--- a/<path/to/source/file>
++++ b/<path/to/source/file>
  unchanged context
 -+new error section
 ++replacement error section with per-variant bullets
@@ -107,15 +96,15 @@ Fix: <smallest concrete correction>
 ```
 
 ## Verified
-- <I#/T#>: <item description — unchanged items that remain verified>
+- <path>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-`````
+```
 
 # Constraints
 - Keep findings short and specific.
-- Read your own `PROMPT-PLAN.review-errors.md` cache before reviewing. Do not reopen Resolved items without new concrete evidence.
+- Read your own `PROMPT-DOC-COVERAGE.review-errors.md` cache before reviewing. Do not reopen Resolved items without new concrete evidence.
 - Flag missing `# Errors` sections on public error-returning APIs as BLOCKING per the errors rules.
-- Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact `# Errors` section to add or fix.
+- Include a unified diff after every finding's `Fix:` field targeting the affected source file with the exact `# Errors` section to add or fix.
 - Follow the `# Process` section for cache, Delta, and skip handling.

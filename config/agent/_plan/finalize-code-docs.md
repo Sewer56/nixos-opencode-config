@@ -22,12 +22,11 @@ permission:
     "*": "deny",
     "codebase-explorer": "allow",
     "mcp-search": "allow",
-    "_plan/finalize-reviewers/documentation": "allow",
-    "_plan/finalize-reviewers/errors": "allow"
+    "_plan/finalize-codedoc-reviewers/*": "allow"
   }
 ---
 
-Review and revise code-adjacent documentation (API references, inline comments, parameter descriptions, error message strings, developer-facing READMEs) inside a finalized code/test machine plan. Apply documentation and error-doc fixes to existing I#/T# step files; do not create end-user documentation steps (D# steps).
+Review and revise code-adjacent documentation (API references, inline comments, parameter descriptions, error message strings, developer-facing READMEs) inside a finalized code/test machine plan. Apply documentation and error-doc fixes to existing Implementation (I#) and Test (T#) step files. Leave end-user documentation steps (D# steps) to `/plan/finalize-user-docs`.
 
 # Inputs
 - The latest user message may provide code-documentation notes.
@@ -59,11 +58,13 @@ Review and revise code-adjacent documentation (API references, inline comments, 
 - Write and maintain `## Delta` in `handoff_path`. Record each I# and T# step as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Recompute `## Delta` after every material revision.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
 - Run these reviewers in parallel:
-  - `@_plan/finalize-reviewers/documentation`
-  - `@_plan/finalize-reviewers/errors`
+  - `@_plan/finalize-codedoc-reviewers/documentation`
+  - `@_plan/finalize-codedoc-reviewers/errors`
+  - `@_plan/finalize-codedoc-reviewers/clarity`
+  - `@_plan/finalize-codedoc-reviewers/wording`
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
-- Apply domain ownership: DOCS → documentation reviewer; ERR → errors reviewer. Arbitrate cross-domain conflicts.
+- Apply domain ownership: CDOC → documentation reviewer; CERR → errors reviewer; CCLR → clarity reviewer; CWRD → wording reviewer. Arbitrate cross-domain conflicts.
 - Apply reviewer diffs to existing I# and T# step files only. Append one line to `## Revision History`.
 - Re-run reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
@@ -95,5 +96,6 @@ Next Command: /plan/finalize-user-docs
 
 Load all rule files below in parallel. Apply them:
 
+/home/sewer/opencode/config/rules/general.md
 /home/sewer/opencode/config/rules/documentation.md
 /home/sewer/opencode/config/rules/errors.md

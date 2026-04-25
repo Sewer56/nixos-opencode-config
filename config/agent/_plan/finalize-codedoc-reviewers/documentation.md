@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks documentation coverage and specificity for finalized machine plans
+description: Checks code-adjacent documentation coverage and specificity for finalized machine plans
 model: sewer-bifrost/wafer-ai/GLM-5.1
 permission:
   "*": deny
@@ -15,23 +15,13 @@ permission:
   list: allow
   todowrite: allow
   edit:
-    "*PROMPT-PLAN.review-documentation.md": allow
+    "*PROMPT-PLAN.review-codedoc-documentation.md": allow
   external_directory: allow
-  # edit: deny
-  # bash: deny
-  # task: deny
-  # question: deny
-  # webfetch: deny
-  # websearch: deny
-  # codesearch: deny
-  # lsp: deny
-  # doom_loop: deny
-  # skill: deny
 ---
 
-Review a finalized machine plan's documentation work.
+Review a finalized machine plan's code-adjacent documentation work.
 
-**Execution Contract (hard requirements):**
+**Execution Contract:**
 - Follow the numbered `# Process` steps exactly, in order.
 - Use Delta, cache state, and `### Decisions` to decide which items to reopen.
 - Write the reviewer cache before the final response.
@@ -44,7 +34,7 @@ Review a finalized machine plan's documentation work.
 
 # Process
 1. Load cache
-- Read `PROMPT-PLAN.review-documentation.md` if it exists. Treat missing or malformed cache as empty.
+- Read `PROMPT-PLAN.review-codedoc-documentation.md` if it exists. Treat missing or malformed cache as empty.
 - Treat the cache as one record per item (REQ, I#, T#) with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
 
 2. Read Delta and Decisions
@@ -64,7 +54,7 @@ Review a finalized machine plan's documentation work.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If `PROMPT-PLAN.review-documentation.md` is missing or malformed: write the full cache file.
+- If `PROMPT-PLAN.review-codedoc-documentation.md` is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.
@@ -77,9 +67,9 @@ Review a finalized machine plan's documentation work.
 - Emit the `# REVIEW` block from `# Output`.
 
 # Focus
-- Review the changed scope described by step files matching `step_pattern`.
+- Review code-adjacent documentation changes described by Implementation (I#) and Test (T#) step files matching `step_pattern`.
 - Compare against current repo docs when any documented surface is being moved, renamed, or replaced.
-- Do not review `# Errors` sections — those are fully owned by another reviewer.
+- Scope findings to required-documentation coverage, placement, specificity, and fidelity; leave `# Errors` sections and readability-only issues to their owning reviewers.
 - Read only the repo files needed to ground those checks.
 
 Rules: `/home/sewer/opencode/config/rules/documentation.md`.
@@ -88,11 +78,11 @@ Rules: `/home/sewer/opencode/config/rules/documentation.md`.
 
 ```text
 # REVIEW
-Agent: _plan/finalize-reviewers/documentation
+Agent: _plan/finalize-codedoc-reviewers/documentation
 Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
-### [DOC-001]
+### [CDOC-001]
 Category: COVERAGE | SPECIFICITY | FIDELITY
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
@@ -113,7 +103,7 @@ Fix: <smallest concrete correction>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 # Constraints
 - Block for "Review Blocking Criteria" violations in the rules
