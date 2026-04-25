@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Orchestrates a single prompt end-to-end with specialist reviewers
-model: sewer-bifrost/zai-coding-plan/glm-5.1
+model: sewer-bifrost/wafer-ai/GLM-5.1
 permission:
   "*": deny
   read:

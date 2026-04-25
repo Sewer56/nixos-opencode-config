@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews plugin code for declaration ordering and returns reorder diffs
-model: sewer-bifrost/zai-coding-plan/glm-5.1
+model: sewer-bifrost/wafer-ai/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

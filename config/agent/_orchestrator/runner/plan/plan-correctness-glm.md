@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates plan completeness, correctness, and requirements coverage (GLM)
-model: sewer-bifrost/zai-coding-plan/glm-5.1
+model: sewer-bifrost/wafer-ai/GLM-5.1
 permission:
   "*": deny
   read:
