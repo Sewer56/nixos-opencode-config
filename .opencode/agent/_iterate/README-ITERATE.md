@@ -44,6 +44,9 @@ and other similar workflows.
   — reviewers include inline unified diffs after Fix:; two tiers:
   diff-mandated (always include diff) and diff-when-exact (include diff
   when fix is concrete)
+- [Dead Code](#dead-code)
+  — dedicated dead-code reviewers detect post-diff reachability
+  gaps; finalize agents add cleanup items in the next iteration
 - [Focus-as-Scope](#focus-as-scope)
   — Focus is the reviewer scope boundary; meta enforces no overlap
 
@@ -162,6 +165,7 @@ with `Why: no content change`. The cache does not store `delta_state`.
 
 Cache files:
 - `PROMPT-ITERATE.review-correctness.md`
+- `PROMPT-ITERATE.review-dead-code.md`
 - `PROMPT-ITERATE.review-wording.md`
 - `PROMPT-ITERATE.review-style.md`
 - `PROMPT-ITERATE.review-performance.md`
@@ -414,8 +418,9 @@ include a unified diff block inline after the finding's `Fix:` field.
   plan-errors-reviewer (_orchestrator).
 
 - **Diff-when-exact**: include a diff when the fix is concrete; omit
-  when the finding is conceptual. Currently: performance, meta
-  (_iterate); correctness, tests, economy, performance (_plan);
+  when the finding is conceptual. Currently: performance, meta,
+  dead-code (_iterate); dead-code (_plugin); correctness, tests,
+  economy, performance, dead-code (_plan);
   plan-test-reviewer, plan-economy-reviewer,
   plan-performance-reviewer, plan-correctness-gpt5,
   plan-correctness-glm (_orchestrator).
@@ -433,3 +438,27 @@ finalize validates that each finding contains a diff block.
 
 Outer code fences use one more backtick than the inner ```diff fence
 (per the Nested code fences optimization).
+
+## Dead Code
+
+Applies to all finalize pipelines: `_iterate`, `_plugin`, and `_plan`.
+
+### Mechanism
+
+Each pipeline has a dedicated dead-code reviewer that owns this
+domain exclusively. Finalize agents write items without tracing;
+the reviewer detects missing cleanup and blocks. Cleanup items
+are added in the next iteration via the standard review loop.
+
+When the dead-code reviewer detects a REV or step item that deletes,
+replaces, or redirects code, it traces what becomes dead after the
+diffs are applied. See the dead-code reviewer files (`_iterate`,
+`_plugin`, `_plan` `finalize-reviewers/dead-code.md`) for the full
+detection process, category enumeration, and cross-file rules.
+
+### Why a Dedicated Reviewer
+
+Dead-code tracing needs full file reads and cross-file import
+analysis — heavier than correctness's structural checks. A
+dedicated reviewer keeps correctness lean. One extra iteration
+with Delta/cache is cheaper than a full trace on every write pass.

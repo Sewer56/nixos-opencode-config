@@ -87,6 +87,7 @@ Follow the ordered steps below exactly, in order.
   - `@_iterate/finalize-reviewers/diff`
   - `@_iterate/finalize-reviewers/meta`
   - `@_iterate/finalize-reviewers/clarity`
+  - `@_iterate/finalize-reviewers/dead-code`
   - Treat each reviewer prompt as scoped call data for the callee.
 - Include only:
   - Artifact paths (`context_path`, `handoff_path`)
@@ -113,7 +114,7 @@ Follow the ordered steps below exactly, in order.
 
 5. Record decisions and apply domain ownership
 - Update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files.
-- Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; PERFORMANCE → performance; DEDUP → dedup; DIFF → diff; META → meta; CLARITY → clarity. Arbitrate cross-domain conflicts.
+- Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; PERFORMANCE → performance; DEDUP → dedup; DIFF → diff; META → meta; CLARITY → clarity; DEAD_CODE → dead-code. Arbitrate cross-domain conflicts.
 
 6. Revise the machine artifact when findings require it
 - Revise REV files only where needed.

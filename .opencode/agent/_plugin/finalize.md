@@ -25,6 +25,7 @@ permission:
     "_plugin/finalize-reviewers/reorder": allow
     "_plugin/finalize-reviewers/documentation": allow
     "_plugin/finalize-reviewers/correctness": allow
+    "_plugin/finalize-reviewers/dead-code": allow
 ---
 
 Convert a confirmed plugin plan into reviewed machine instructions.
@@ -75,10 +76,10 @@ Follow the ordered steps below exactly, in order.
 
 ### Core review
 - Write and maintain `## Delta`: write to `handoff_path` before the first reviewer pass; record each `REV-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields; add artifact markers for `Source Context` and `Review Ledger`; recompute after every material revision.
-- Build core reviewer prompts: after each full machine-artifact draft, run `@_plugin/finalize-reviewers/correctness` in parallel. Treat each reviewer prompt as scoped call data. Include only: artifact paths (`context_path`, `handoff_path`), `rev_pattern` (a glob pattern matching REV target file paths to scope the review), and finalize-time user notes. Omit: output format, focus lists, target file paths from REV items, role assignment, blanket read orders — reviewers decide what to open from Delta, cache state, and Decisions.
+- Build core reviewer prompts: after each full machine-artifact draft, run `@_plugin/finalize-reviewers/correctness` and `@_plugin/finalize-reviewers/dead-code` in parallel. Treat each reviewer prompt as scoped call data. Include only: artifact paths (`context_path`, `handoff_path`), `rev_pattern` (a glob pattern matching REV target file paths to scope the review), and finalize-time user notes. Omit: output format, focus lists, target file paths from REV items, role assignment, blanket read orders — reviewers decide what to open from Delta, cache state, and Decisions.
 - Validate each reviewer response: confirm `# REVIEW` header, `Decision: PASS | ADVISORY | BLOCKING`, `## Findings` and `## Verified` headings. If malformed after retries, treat as BLOCKING with a synthetic finding.
 - Retry malformed responses: if validation fails and Delta plus Decisions are unchanged, send only the protocol error and request re-emit; if Delta or Decisions changed, include only the new excerpt and request fresh response.
-- Record decisions: update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files. Core domain ownership: CORRECTNESS → correctness reviewer.
+- Record decisions: update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files. Core domain ownership: CORRECTNESS → correctness reviewer; DEAD_CODE → dead-code reviewer.
 - Revise the machine artifact when findings require it: revise REV files only where needed; append one line to `## Revision History`.
 - Re-run core reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.

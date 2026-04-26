@@ -25,7 +25,8 @@ permission:
     "_plan/finalize-reviewers/correctness": "allow",
     "_plan/finalize-reviewers/economy": "allow",
     "_plan/finalize-reviewers/tests": "allow",
-    "_plan/finalize-reviewers/performance": "allow"
+    "_plan/finalize-reviewers/performance": "allow",
+    "_plan/finalize-reviewers/dead-code": "allow"
   }
   # bash: deny
   # question: deny
@@ -87,9 +88,10 @@ Convert a confirmed human plan into a reviewed code and test machine plan. Write
   - `@_plan/finalize-reviewers/economy`
   - `@_plan/finalize-reviewers/tests`
   - `@_plan/finalize-reviewers/performance`
+  - `@_plan/finalize-reviewers/dead-code`
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern` (a glob pattern matching I# and T# step file paths to scope the review), and finalize-time user notes. Reviewers define their own output format, focus lists, role assignments, and target paths.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
-- Apply core domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer. Arbitrate cross-domain conflicts.
+- Apply core domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer; DEAD_CODE → dead-code reviewer. Arbitrate cross-domain conflicts.
 - Do not reopen RESOLVED issues without new concrete evidence.
 - Revise step files only where needed. Append one line to `## Revision History`.
 - Re-run core reviewers after every material revision.
