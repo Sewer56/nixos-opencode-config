@@ -43,7 +43,7 @@
       }
     },
     "general": {
-      "model": "sewer-bifrost/minimax-coding-plan/MiniMax-M2.7",
+      "model": "sewer-axonhub/MiniMax-M2.7",
       "permission": {
         "task": {
           "*": "deny",
@@ -95,69 +95,21 @@
         "reasoningSummary": "concise"
       }
     },
-
     "github-copilot": {
       "options": {
         "reasoningSummary": "concise"
       }
     },
-    "sewer-bifrost": {
+    "sewer-axonhub": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Sewer Bifrost",
+      "name": "Sewer AxonHub",
       "options": {
-        "baseURL": "{file:/home/sewer/.secrets/bifrost-url}"
+        "baseURL": "{file:/home/sewer/.secrets/axonhub-url}",
+        "apiKey": "{file:/home/sewer/.secrets/axonhub-key}"
       },
       "models": {
-        "zai-coding-plan/glm-4.5": {
-          "name": "GLM-4.5 (Z.AI)",
-          "family": "glm",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 131072,
-            "output": 65536
-          },
-          "modalities": {
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "zai-coding-plan/glm-4.5-air": {
-          "name": "GLM-4.5 Air (Z.AI)",
-          "family": "glm",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 131072,
-            "output": 65536
-          },
-          "modalities": {
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "zai-coding-plan/glm-4.6": {
-          "name": "GLM-4.6 (Z.AI)",
+        "glm-5-turbo": {
+          "name": "glm-5-turbo",
           "family": "glm",
           "attachment": false,
           "reasoning": true,
@@ -180,8 +132,8 @@
             ]
           }
         },
-        "zai-coding-plan/glm-4.7": {
-          "name": "GLM-4.7 (Z.AI)",
+        "GLM-5.1": {
+          "name": "GLM-5.1",
           "family": "glm",
           "attachment": false,
           "reasoning": true,
@@ -192,7 +144,7 @@
             "output": 0
           },
           "limit": {
-            "context": 204800,
+            "context": 202752,
             "output": 131072
           },
           "modalities": {
@@ -204,80 +156,8 @@
             ]
           }
         },
-        "zai-coding-plan/glm-5": {
-          "name": "GLM-5 (Z.AI)",
-          "family": "glm",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 204800,
-            "output": 131072
-          },
-          "modalities": {
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "zai-coding-plan/glm-5-turbo": {
-          "name": "GLM-5 Turbo (Z.AI)",
-          "family": "glm",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 204800,
-            "output": 131072
-          },
-          "modalities": {
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "zai-coding-plan/glm-5.1": {
-          "name": "GLM-5.1 (Z.AI)",
-          "family": "glm",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 204800,
-            "output": 131072
-          },
-          "modalities": {
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "zai-coding-plan/glm-5v-turbo": {
-          "name": "GLM-5V Turbo (Z.AI)",
+        "glm-5v-turbo": {
+          "name": "glm-5v-turbo",
           "family": "glm",
           "attachment": true,
           "reasoning": true,
@@ -303,8 +183,32 @@
             ]
           }
         },
-        "minimax-coding-plan/MiniMax-M2": {
-          "name": "MiniMax-M2 (MiniMax)",
+        "Kimi-K2.5": {
+          "name": "Kimi-K2.5",
+          "family": "kimi",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 262144,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "MiniMax-M2.7": {
+          "name": "MiniMax-M2.7",
           "family": "minimax",
           "attachment": false,
           "reasoning": true,
@@ -315,7 +219,107 @@
             "output": 0
           },
           "limit": {
-            "context": 196608,
+            "context": 204800,
+            "output": 131072
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "Qwen3.5-397B-A17B": {
+          "name": "Qwen3.5-397B-A17B",
+          "family": "qwen",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 262144,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "video"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "wafer/GLM-5.1": {
+          "name": "GLM-5.1 (Wafer)",
+          "family": "wafer",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 202752,
+            "output": 131072
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "wafer/Qwen3.5-397B-A17B": {
+          "name": "Qwen3.5-397B-A17B (Wafer)",
+          "family": "wafer",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 262144,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/deepseek-ai/DeepSeek-R1-0528": {
+          "name": "deepseek-ai/DeepSeek-R1-0528 (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 128000,
             "output": 128000
           },
           "modalities": {
@@ -327,7 +331,407 @@
             ]
           }
         },
-        "minimax-coding-plan/MiniMax-M2.1": {
+        "syn/deepseek-ai/DeepSeek-V3": {
+          "name": "deepseek-ai/DeepSeek-V3 (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 128000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/deepseek-ai/DeepSeek-V3.2": {
+          "name": "deepseek-ai/DeepSeek-V3.2 (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 162816,
+            "output": 8000
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/meta-llama/Llama-3.3-70B-Instruct": {
+          "name": "meta-llama/Llama-3.3-70B-Instruct (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 128000,
+            "output": 32768
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/MiniMaxAI/MiniMax-M2.5": {
+          "name": "MiniMaxAI/MiniMax-M2.5 (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 191488,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/moonshotai/Kimi-K2.5": {
+          "name": "moonshotai/Kimi-K2.5 (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 262144,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/nvidia/Kimi-K2.5-NVFP4": {
+          "name": "nvidia/Kimi-K2.5-NVFP4 (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 262144,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4": {
+          "name": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4 (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 262144,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/openai/gpt-oss-120b": {
+          "name": "openai/gpt-oss-120b (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 128000,
+            "output": 32768
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/Qwen/Qwen3-235B-A22B-Thinking-2507": {
+          "name": "Qwen/Qwen3-235B-A22B-Thinking-2507 (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 256000,
+            "output": 32000
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "syn/Qwen/Qwen3-Coder-480B-A35B-Instruct": {
+          "name": "Qwen/Qwen3-Coder-480B-A35B-Instruct (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": false,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 256000,
+            "output": 32000
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/Qwen/Qwen3.5-397B-A17B": {
+          "name": "Qwen/Qwen3.5-397B-A17B (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 262144,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/zai-org/GLM-4.7": {
+          "name": "zai-org/GLM-4.7 (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/zai-org/GLM-4.7-Flash": {
+          "name": "zai-org/GLM-4.7-Flash (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 200000,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/zai-org/GLM-5": {
+          "name": "zai-org/GLM-5 (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 200000,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "syn/zai-org/GLM-5.1": {
+          "name": "zai-org/GLM-5.1 (Synthetic)",
+          "family": "synthetic",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 200000,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "structured_output": true
+        },
+        "minimax/MiniMax-M2": {
+          "name": "MiniMax-M2 (MiniMax)",
+          "family": "minimax",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 204800,
+            "output": 131072
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "minimax/MiniMax-M2.1": {
           "name": "MiniMax-M2.1 (MiniMax)",
           "family": "minimax",
           "attachment": false,
@@ -351,7 +755,7 @@
             ]
           }
         },
-        "minimax-coding-plan/MiniMax-M2.5": {
+        "minimax/MiniMax-M2.5": {
           "name": "MiniMax-M2.5 (MiniMax)",
           "family": "minimax",
           "attachment": false,
@@ -375,8 +779,8 @@
             ]
           }
         },
-        "minimax-coding-plan/MiniMax-M2.5-highspeed": {
-          "name": "MiniMax-M2.5 Highspeed (MiniMax)",
+        "minimax/MiniMax-M2.5-highspeed": {
+          "name": "MiniMax-M2.5-highspeed (MiniMax)",
           "family": "minimax",
           "attachment": false,
           "reasoning": true,
@@ -399,7 +803,7 @@
             ]
           }
         },
-        "minimax-coding-plan/MiniMax-M2.7": {
+        "minimax/MiniMax-M2.7": {
           "name": "MiniMax-M2.7 (MiniMax)",
           "family": "minimax",
           "attachment": false,
@@ -423,8 +827,8 @@
             ]
           }
         },
-        "minimax-coding-plan/MiniMax-M2.7-highspeed": {
-          "name": "MiniMax-M2.7 Highspeed (MiniMax)",
+        "minimax/MiniMax-M2.7-highspeed": {
+          "name": "MiniMax-M2.7-highspeed (MiniMax)",
           "family": "minimax",
           "attachment": false,
           "reasoning": true,
@@ -447,47 +851,67 @@
             ]
           }
         },
-        "wafer-ai/Qwen3.5-397B-A17B": {
-          "name": "Qwen3.5 397B A17B (Wafer)",
-          "family": "qwen",
-          "attachment": true,
+        "zai/glm-4.5": {
+          "name": "glm-4.5 (Z.AI)",
+          "family": "zai",
+          "attachment": false,
           "reasoning": true,
           "temperature": true,
           "tool_call": true,
-          "structured_output": true,
           "cost": {
             "input": 0,
             "output": 0
           },
           "limit": {
-            "context": 262144,
+            "context": 131072,
             "output": 65536
           },
           "modalities": {
             "input": [
-              "text",
-              "image",
-              "video"
+              "text"
             ],
             "output": [
               "text"
             ]
           }
         },
-        "wafer-ai/GLM-5.1": {
-          "name": "GLM-5.1 (Wafer)",
-          "family": "glm",
+        "zai/glm-4.5-air": {
+          "name": "glm-4.5-air (Z.AI)",
+          "family": "zai",
           "attachment": false,
           "reasoning": true,
           "temperature": true,
           "tool_call": true,
-          "structured_output": true,
           "cost": {
             "input": 0,
             "output": 0
           },
           "limit": {
-            "context": 202752,
+            "context": 131072,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "zai/glm-4.6": {
+          "name": "glm-4.6 (Z.AI)",
+          "family": "zai",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "limit": {
+            "context": 204800,
             "output": 131072
           },
           "modalities": {
@@ -499,9 +923,9 @@
             ]
           }
         },
-        "synthetic/hf:deepseek-ai/DeepSeek-V3.1": {
-          "name": "DeepSeek V3.1 (Synthetic)",
-          "family": "deepseek",
+        "zai/glm-4.7": {
+          "name": "glm-4.7 (Z.AI)",
+          "family": "zai",
           "attachment": false,
           "reasoning": true,
           "temperature": true,
@@ -511,8 +935,8 @@
             "output": 0
           },
           "limit": {
-            "context": 128000,
-            "output": 128000
+            "context": 204800,
+            "output": 131072
           },
           "modalities": {
             "input": [
@@ -523,9 +947,9 @@
             ]
           }
         },
-        "synthetic/hf:deepseek-ai/DeepSeek-R1-0528": {
-          "name": "DeepSeek R1 (0528)",
-          "family": "deepseek-thinking",
+        "zai/glm-5": {
+          "name": "glm-5 (Z.AI)",
+          "family": "zai",
           "attachment": false,
           "reasoning": true,
           "temperature": true,
@@ -535,8 +959,8 @@
             "output": 0
           },
           "limit": {
-            "context": 128000,
-            "output": 128000
+            "context": 204800,
+            "output": 131072
           },
           "modalities": {
             "input": [
@@ -547,9 +971,9 @@
             ]
           }
         },
-        "synthetic/hf:moonshotai/Kimi-K2.5": {
-          "name": "Kimi K2.5 (Synthetic)",
-          "family": "kimi",
+        "zai/glm-5-turbo": {
+          "name": "glm-5-turbo (Z.AI)",
+          "family": "zai",
           "attachment": false,
           "reasoning": true,
           "temperature": true,
@@ -559,24 +983,23 @@
             "output": 0
           },
           "limit": {
-            "context": 262144,
-            "output": 65536
+            "context": 204800,
+            "output": 131072
           },
           "modalities": {
             "input": [
-              "text",
-              "image"
+              "text"
             ],
             "output": [
               "text"
             ]
           }
         },
-        "synthetic/hf:Qwen/Qwen3-Coder-480B-A35B-Instruct": {
-          "name": "Qwen3 Coder 480B (Synthetic)",
-          "family": "qwen",
+        "zai/glm-5.1": {
+          "name": "glm-5.1 (Z.AI)",
+          "family": "zai",
           "attachment": false,
-          "reasoning": false,
+          "reasoning": true,
           "temperature": true,
           "tool_call": true,
           "cost": {
@@ -584,8 +1007,8 @@
             "output": 0
           },
           "limit": {
-            "context": 256000,
-            "output": 32000
+            "context": 204800,
+            "output": 131072
           },
           "modalities": {
             "input": [
@@ -596,11 +1019,11 @@
             ]
           }
         },
-        "synthetic/hf:meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8": {
-          "name": "Llama-4-Maverick-17B-128E-Instruct-FP8 (Synthetic)",
-          "family": "llama",
+        "zai/glm-5v-turbo": {
+          "name": "glm-5v-turbo (Z.AI)",
+          "family": "zai",
           "attachment": true,
-          "reasoning": false,
+          "reasoning": true,
           "temperature": true,
           "tool_call": true,
           "cost": {
@@ -608,62 +1031,15 @@
             "output": 0
           },
           "limit": {
-            "context": 524000,
-            "output": 4096
+            "context": 200000,
+            "output": 131072
           },
           "modalities": {
             "input": [
               "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "synthetic/hf:openai/gpt-oss-120b": {
-          "name": "GPT OSS 120B (Synthetic)",
-          "family": "gpt-oss",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 128000,
-            "output": 32768
-          },
-          "modalities": {
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
-        "synthetic/hf:zai-org/GLM-5.1": {
-          "name": "GLM-5.1 (Synthetic)",
-          "family": "glm",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "structured_output": true,
-          "cost": {
-            "input": 0,
-            "output": 0
-          },
-          "limit": {
-            "context": 196608,
-            "output": 65536
-          },
-          "modalities": {
-            "input": [
-              "text"
+              "image",
+              "video",
+              "pdf"
             ],
             "output": [
               "text"
@@ -673,8 +1049,7 @@
       }
     }
   },
-  // Disable paste summary. Paste whole thing.
   "experimental": {
-    "disable_paste_summary": true,
-  },
+    "disable_paste_summary": true
+  }
 }
