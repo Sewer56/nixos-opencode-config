@@ -66,7 +66,6 @@ rule application, and human/machine zone separation.
   - Insert new entries in the appropriate section.
   - Remove pruned `[P#]` ids.
   - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Always update the `Updated:` timestamp line.
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
