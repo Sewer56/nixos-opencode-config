@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation D# steps for cross-page coherence — broken links, terminology drift, and content duplication
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/MiniMax-M2.7
 permission:
   "*": deny
   read:

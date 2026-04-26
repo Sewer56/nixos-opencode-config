@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for wording quality — sentence flow, passive voice, filler, and wordiness
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/MiniMax-M2.7
 reasoningEffort: medium
 permission:
   "*": deny

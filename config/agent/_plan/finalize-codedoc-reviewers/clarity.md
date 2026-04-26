@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews code-adjacent documentation in I#/T# steps for comprehensibility — undefined jargon, ambiguous language, and opaque references
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/MiniMax-M2.7
 permission:
   "*": deny
   read:
