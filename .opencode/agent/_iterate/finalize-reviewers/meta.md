@@ -35,14 +35,14 @@ Review finalized iteration artifacts for iterate-system self-policing.
 
 # Focus
 - Self-iteration enforcement completeness: when context contains `## Self-Iteration` with `Intent: rule-change`, block if any REV updates `_iterate` text or documentation but no REV updates enforcement-logic instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output. Includes enforcing the Line-location convention: block when a REV writes diff blocks but no REV updates a reviewer to enforce `Lines: ~` validity and context-line requirements.
-- Section ordering: block when a REV target has sections outside the Inputs → Process → Supplemental convention. Examples: Rules or Focus between Inputs and Process, Inputs after Process, Process before Inputs. Omit `## User Request` when a command takes no arguments. Exempt: pure-proxy commands, simple capability agents, `_iterate` reviewer files (Focus defines the review process and sits before Process by design).
+- Section ordering: block when a REV target has sections outside the Inputs → Process → Supplemental convention. Examples: Rules or Focus between Inputs and Process, Inputs after Process, Process before Inputs. Omit `## User Request` when a command takes no arguments. Exempt: pure-proxy commands, simple capability agents, all reviewer files (Focus defines the review process and sits before Process by design).
 - Supplemental sub-ordering: flag when Supplemental sections follow a sub-optimal order within the post-Process zone. Prefer Output → Constraints → Rules → Templates/Examples. ~~Wrong: # Rules before # Output after Process.~~ Correct: # Output → # Constraints → # Rules. Advisory only — do not block.
 - Focus-as-scope: `# Focus` is the reviewer's scope boundary — reviewers check only what Focus enumerates. Block when a REV targets an `_iterate` reviewer whose Focus item is broad enough to overlap another reviewer's domain (e.g., a correctness Focus bullet that could encompass diff-content validation). Prompt the author to split or narrow the item.
 
 # Process
 1. Load cache
 - Read `PROMPT-ITERATE.review-meta.md` if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+- Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
 - Read `## Delta` from `handoff_path`.
@@ -67,7 +67,6 @@ Review finalized iteration artifacts for iterate-system self-policing.
   - Insert new entries in the appropriate section.
   - Remove pruned REV ids.
   - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Always update the `Updated:` timestamp line.
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block

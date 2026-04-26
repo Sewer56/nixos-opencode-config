@@ -47,7 +47,7 @@ Validate performance-critical aspects of the implementation plan. Only review wh
 
 1. Load cache
 - Read `<plan_stem>-PLAN.review-performance.md` if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per item (REQ, I#, T#) with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+- Treat the cache as one record per item (REQ, I#, T#) with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
 - Read `## Delta` from `ledger_path`.
@@ -74,7 +74,6 @@ Validate performance-critical aspects of the implementation plan. Only review wh
   - Insert new entries in the appropriate section.
   - Remove pruned item ids.
   - Move entries between sections when status transitions.
-- Always update the `Updated:` timestamp line.
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block

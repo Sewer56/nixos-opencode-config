@@ -53,7 +53,7 @@ Review end-user documentation for comprehensibility.
 
 1. Load cache
 - Derive cache path from `handoff_path`: replace `handoff.md` with `review-clarity.md`. Read the cache file if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per target file with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+- Treat the cache as one record per target file with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read handoff
 - Read `## Change Plan` for per-file scope levels and frozen regions.
@@ -79,7 +79,6 @@ Review end-user documentation for comprehensibility.
   - Insert new entries in the appropriate section.
   - Remove pruned file entries.
   - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Always update the `Updated:` timestamp line.
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block

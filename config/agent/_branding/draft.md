@@ -73,6 +73,7 @@ Write `BRANDING.md` before starting the review loop.
 Max 5 iterations.
 
 a. Write `handoff_path` with scope, Delta, and search findings before first reviewer pass.
+   Track per-section Delta entries with: section name, status (New/Changed/Unchanged), and reason.
 
 b. Run four reviewers in parallel: `@_branding/reviewers/clarity`, `@_branding/reviewers/distinctiveness`, `@_branding/reviewers/positioning`, `@_branding/reviewers/availability`. Pass only: `branding_path`, `handoff_path`, scope boundaries (in-scope/out-of-scope constraints), and user notes. Reviewers read `BRANDING.md` and use the handoff to determine what changed.
 

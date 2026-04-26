@@ -32,7 +32,7 @@ Review plugin code for declaration ordering and return reorder diffs.
 
 1. Load cache
 - Read `PROMPT-PLUGIN-PLAN.review-reorder.md` if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+- Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
 - Read `## Delta` from `handoff_path`.
@@ -57,7 +57,6 @@ Review plugin code for declaration ordering and return reorder diffs.
   - Insert new entries in the appropriate section.
   - Remove pruned REV ids.
   - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Always update the `Updated:` timestamp line.
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block

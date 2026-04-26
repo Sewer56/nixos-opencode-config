@@ -56,6 +56,7 @@ Review and revise code-adjacent documentation (API references, inline comments, 
 
 ## 3. Run the code-documentation review loop
 - Write and maintain `## Delta` in `handoff_path`. Record each I# and T# step as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Recompute `## Delta` after every material revision.
+- Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
 - Run these reviewers in parallel:
   - `@_plan/finalize-codedoc-reviewers/documentation`

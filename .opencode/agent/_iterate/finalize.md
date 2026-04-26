@@ -73,6 +73,7 @@ Follow the ordered steps below exactly, in order.
 1. Write and maintain `## Delta`
 - Write `## Delta` to `handoff_path` before the first reviewer pass.
 - Record each `REV-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields relative to the prior machine artifact.
+- Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Add artifact markers for `Source Context` and `Review Ledger` so reviewers can skip rereading unchanged artifacts.
 - Recompute `## Delta` after every material revision.
 

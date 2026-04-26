@@ -46,7 +46,7 @@ Validate that the implementation plan will correctly and completely satisfy all 
 # Process
 1. Load cache
 - Read `<plan_stem>-PLAN.review-correctness-glm.md` if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per item (REQ, I#, T#) with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+- Treat the cache as one record per item (REQ, I#, T#) with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
 - Read `## Delta` from `ledger_path`.
@@ -72,7 +72,6 @@ Validate that the implementation plan will correctly and completely satisfy all 
   - Insert new entries in the appropriate section.
   - Remove pruned item ids.
   - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Always update the `Updated:` timestamp line.
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block

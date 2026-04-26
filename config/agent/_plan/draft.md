@@ -73,6 +73,7 @@ Follow the ordered steps below.
 1. Write and maintain `## Delta`
 - Write `draft_handoff_path` before the first reviewer pass.
 - Record each `[P#]` item as a compact entry with `Status:` and `Why:` fields.
+- Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Recompute `## Delta` after every material revision to `plan_path`.
 
 2. Build reviewer prompts

@@ -115,7 +115,7 @@ acceptable.
 Exemptions:
 - Pure-proxy commands (frontmatter + `$ARGUMENTS` only)
 - Simple capability agents (role + Focus/Capabilities/Safety only)
-- `_iterate` reviewer files (Focus defines the review process and sits
+- All reviewer files (Focus defines the review process and sits
   before Process by design)
 
 Section heading style: `# Inputs` for agents, `## User Input` for
@@ -155,6 +155,10 @@ Reviewers skip re-evaluating Unchanged items. They only check:
 - New items
 - Decision-referenced items
 - Items with unresolved findings from cache
+
+The caller (draft or finalize agent) owns Delta status. Caller agents must
+include every item in Delta, marking unchanged items as `Unchanged`
+with `Why: no content change`. The cache does not store `delta_state`.
 
 Cache files:
 - `PROMPT-ITERATE.review-correctness.md`

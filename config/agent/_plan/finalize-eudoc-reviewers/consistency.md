@@ -48,7 +48,7 @@ Exclusions: API reference pages, changelogs.
 
 1. Load cache
 - Read `PROMPT-PLAN.review-eudoc-consistency.md` if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per D# step pair with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+- Treat the cache as one record per D# step pair with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
 - Read `## Delta` from `handoff_path`.
@@ -76,7 +76,6 @@ Exclusions: API reference pages, changelogs.
   - Insert new entries in the appropriate section.
   - Remove pruned item ids.
   - Move entries between sections when status transitions.
-  - Always update the `Updated:` timestamp line.
   - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block

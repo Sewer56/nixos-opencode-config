@@ -46,7 +46,7 @@ Review branding for availability.
 
 1. Load cache
 - Derive cache path from `handoff_path`: replace the `.handoff.md` suffix with `.review-availability.md`. Read the cache file if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per candidate name with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+- Treat the cache as one record per candidate name with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read handoff
 - Read `## Delta` for change tracking.
@@ -72,7 +72,6 @@ Review branding for availability.
   - Insert new entries in the appropriate section.
   - Remove pruned entries.
   - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Always update the `Updated:` timestamp line.
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block

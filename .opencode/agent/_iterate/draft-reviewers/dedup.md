@@ -42,7 +42,7 @@ Review iteration draft artifacts for cross-item redundancy and zone overlap.
 # Process
 1. Load cache
 - Read `PROMPT-ITERATE.draft-review-dedup.md` if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per `[P#]` with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+- Treat the cache as one record per `[P#]` with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
 - Read `## Delta` from `draft_handoff_path`.

@@ -56,6 +56,7 @@ Record in `handoff_path` under `## Change Plan`: per-file scope levels, frozen r
 Max 5 iterations.
 
 a. Write `handoff_path` with scope, per-file Delta, and Change Plan before first reviewer pass. Per-file Delta entries track: file path, sections changed, scope level.
+   Include `Status: New | Changed | Unchanged` in each entry. Mark unchanged files as `Unchanged`.
 
 b. Run four reviewers in parallel: `@_docs/reviewers/clarity`, `@_docs/reviewers/wording`, `@_docs/reviewers/engagement`, `@_docs/reviewers/consistency`. Pass only: `handoff_path`. Reviewers read the actual documentation files and use the handoff to determine which files and sections are in scope.
 

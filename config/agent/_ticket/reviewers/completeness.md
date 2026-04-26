@@ -50,7 +50,7 @@ Review ticket drafts for completeness. Flag missing required sections, untestabl
 
 1. Load cache
 - Derive cache path from `draft_handoff_path`: replace `handoff.md` with `review-completeness.md`. Read the cache file if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per ticket section with fields `last_decision`, `open_findings`, `evidence`, `delta_state`, and `verified`.
+- Treat the cache as one record per ticket section with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read handoff
 - Read `## Delta` for per-section change tracking.
@@ -74,7 +74,6 @@ Review ticket drafts for completeness. Flag missing required sections, untestabl
   - Insert new entries in the appropriate section.
   - Remove pruned section entries.
   - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Always update the `Updated:` timestamp line.
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
