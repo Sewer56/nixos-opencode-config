@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews branding for clarity — pronunciation, spelling, memorability, awkward word shape, and ambiguous meaning
-model: sewer-bifrost/wafer-ai/GLM-5.1
+model: sewer-axonhub/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews ticket drafts for factual accuracy — code path validity, evidence-claim alignment, UI navigation precision, and external link plausibility
-model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
+model: sewer-axonhub/MiniMax-M2.7
 reasoningEffort: medium
 permission:
   "*": deny

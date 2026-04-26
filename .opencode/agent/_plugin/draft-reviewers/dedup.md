@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks cross-item redundancy, zone overlap, and plugin knowledge restatement in plugin draft artifacts
-model: sewer-bifrost/wafer-ai/GLM-5.1
+model: sewer-axonhub/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

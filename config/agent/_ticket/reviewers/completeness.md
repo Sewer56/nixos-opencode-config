@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews ticket drafts for completeness — section presence, acceptance criteria verifiability, checklist actionability, evidence sufficiency, and cross-section consistency
-model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
+model: sewer-axonhub/MiniMax-M2.7
 reasoningEffort: medium
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews plugin code for documentation coverage and returns doc diffs
-model: sewer-bifrost/wafer-ai/GLM-5.1
+model: sewer-axonhub/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

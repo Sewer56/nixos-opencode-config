@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces complete implementation plans with task list and symbol map
-model: sewer-bifrost/wafer-ai/GLM-5.1
+model: sewer-axonhub/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

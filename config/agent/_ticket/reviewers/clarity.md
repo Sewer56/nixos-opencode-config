@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews ticket drafts for comprehensibility — undefined jargon, compound-term compression, opaque references, and acronyms without expansion
-model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
+model: sewer-axonhub/MiniMax-M2.7
 reasoningEffort: medium
 permission:
   "*": deny

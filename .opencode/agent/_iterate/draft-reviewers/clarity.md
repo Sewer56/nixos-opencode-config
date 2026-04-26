@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks for undefined jargon, compound-term compression, and opaque references in iteration draft artifacts
-model: sewer-bifrost/minimax-coding-plan/MiniMax-M2.7
+model: sewer-axonhub/MiniMax-M2.7
 reasoningEffort: medium
 permission:
   "*": deny

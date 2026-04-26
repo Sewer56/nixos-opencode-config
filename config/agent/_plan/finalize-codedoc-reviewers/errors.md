@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks code-adjacent error documentation coverage and specificity for finalized machine plans
-model: sewer-bifrost/wafer-ai/GLM-5.1
+model: sewer-axonhub/GLM-5.1
 permission:
   "*": deny
   read:

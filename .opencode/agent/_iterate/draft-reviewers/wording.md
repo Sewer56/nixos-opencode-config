@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks token density, filler, hedging, bullet atomicity, and cross-section restatement in iteration draft artifacts
-model: sewer-bifrost/wafer-ai/GLM-5.1
+model: sewer-axonhub/GLM-5.1
 reasoningEffort: medium
 permission:
   "*": deny

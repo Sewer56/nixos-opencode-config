@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates PRD requirement coverage across prompt files (preflight)
-model: sewer-bifrost/wafer-ai/GLM-5.1
+model: sewer-axonhub/GLM-5.1
 permission:
   "*": deny
   read:

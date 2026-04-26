@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews implementation against a machine plan
-model: sewer-bifrost/wafer-ai/GLM-5.1
+model: sewer-axonhub/GLM-5.1
 permission:
   "*": deny
   read:
