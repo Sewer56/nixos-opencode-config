@@ -8,8 +8,8 @@ import type { Plugin } from "@opencode-ai/plugin"
 // To add or change rewrite rules, edit the Rust registry — not this file.
 
 const SKIP_PATTERNS: Array<[RegExp, string]> = [
-  [/^\s*curl(?:\s|$)/, "curl already efficient"],
-  [/^\s*git\s+diff(?:\s|$)/, "git diff needs raw output"],
+  [/(?:^|[|;&]|\$\()\s*curl\b/, "curl breaks when rewritten"],
+  [/(?:^|[|;&]|\$\()\s*git\s+diff(?:\s|$|[|;&)])/, "git diff breaks when rewritten"],
 ]
 
 function shouldSkip(command: string): boolean {
