@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews plugin plans for fidelity, SDK type correctness, and standalone log/auto-load enforcement
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

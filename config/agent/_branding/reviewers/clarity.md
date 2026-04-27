@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews branding for clarity — pronunciation, spelling, memorability, awkward word shape, and ambiguous meaning
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/MiniMax-M2.7  # LOW
 reasoningEffort: medium
 permission:
   "*": deny

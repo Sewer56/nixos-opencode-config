@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks cross-document and cross-REV redundancy in iteration artifacts
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

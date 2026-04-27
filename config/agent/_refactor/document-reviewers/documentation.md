@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews documentation coverage and specificity for direct documentation workflow source files
-model: sewer-axonhub/MiniMax-M2.7
+model: sewer-axonhub/MiniMax-M2.7  # LOW
 permission:
   "*": deny
   read:

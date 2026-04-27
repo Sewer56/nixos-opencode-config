@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews branding for availability — domain, package, handle, trademark, and ecosystem caveats
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

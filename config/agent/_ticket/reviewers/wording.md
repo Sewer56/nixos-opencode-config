@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews ticket drafts for wording and structural quality — sentence flow, passive voice, filler, wordiness, terminology consistency, no-fluff, scannability, and bullet formatting
-model: sewer-axonhub/MiniMax-M2.7
+model: sewer-axonhub/MiniMax-M2.7  # LOW
 reasoningEffort: medium
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews code-adjacent documentation in I#/T# steps for comprehensibility — undefined jargon, ambiguous language, and opaque references
-model: sewer-axonhub/MiniMax-M2.7
+model: sewer-axonhub/MiniMax-M2.7  # LOW
 permission:
   "*": deny
   read:

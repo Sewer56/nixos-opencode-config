@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks cross-item redundancy, zone overlap, and plugin knowledge restatement in plugin draft artifacts
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/MiniMax-M2.7  # LOW
 reasoningEffort: medium
 permission:
   "*": deny

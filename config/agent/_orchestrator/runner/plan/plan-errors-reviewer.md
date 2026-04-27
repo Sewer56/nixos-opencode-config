@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates plan error documentation coverage and specificity
-model: sewer-axonhub/MiniMax-M2.7
+model: sewer-axonhub/MiniMax-M2.7  # LOW
 permission:
   "*": deny
   read:

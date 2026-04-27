@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks code-adjacent documentation coverage and specificity for finalized machine plans
-model: sewer-axonhub/MiniMax-M2.7
+model: sewer-axonhub/MiniMax-M2.7  # LOW
 permission:
   "*": deny
   read:

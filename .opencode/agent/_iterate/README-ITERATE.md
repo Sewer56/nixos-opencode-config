@@ -169,7 +169,6 @@ with `Why: no content change`. The cache does not store `delta_state`.
 
 Cache files:
 - `PROMPT-ITERATE.review-correctness.md`
-- `PROMPT-ITERATE.review-dead-code.md`
 - `PROMPT-ITERATE.review-wording.md`
 - `PROMPT-ITERATE.review-style.md`
 - `PROMPT-ITERATE.review-performance.md`
@@ -422,8 +421,8 @@ include a unified diff block inline after the finding's `Fix:` field.
   plan-errors-reviewer (_orchestrator).
 
 - **Diff-when-exact**: include a diff when the fix is concrete; omit
-  when the finding is conceptual. Currently: performance, meta,
-  dead-code (_iterate); dead-code (_plugin); correctness, tests,
+  when the finding is conceptual. Currently: performance, meta
+  (_iterate); dead-code (_plugin); correctness, tests,
   economy, performance, dead-code (_plan);
   plan-test-reviewer, plan-economy-reviewer,
   plan-performance-reviewer, plan-correctness-gpt5,
@@ -445,7 +444,7 @@ Outer code fences use one more backtick than the inner ```diff fence
 
 ## Dead Code
 
-Applies to all finalize pipelines: `_iterate`, `_plugin`, and `_plan`.
+Applies to finalize pipelines: `_plugin` and `_plan`.
 
 ### Mechanism
 
@@ -456,8 +455,8 @@ are added in the next iteration via the standard review loop.
 
 When the dead-code reviewer detects a REV or step item that deletes,
 replaces, or redirects code, it traces what becomes dead after the
-diffs are applied. See the dead-code reviewer files (`_iterate`,
-`_plugin`, `_plan` `finalize-reviewers/dead-code.md`) for the full
+diffs are applied. See the dead-code reviewer files (`_plugin`,
+`_plan` `finalize-reviewers/dead-code.md`) for the full
 detection process, category enumeration, and cross-file rules.
 
 ### Why a Dedicated Reviewer

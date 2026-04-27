@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks test coverage and test minimality for finalized machine plans
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
   read:

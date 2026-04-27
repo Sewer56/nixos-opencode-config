@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews code-adjacent documentation in source files for wording quality — sentence flow, passive voice, filler, and wordiness
-model: sewer-axonhub/MiniMax-M2.7
+model: sewer-axonhub/MiniMax-M2.7  # LOW
 permission:
   "*": deny
   read:

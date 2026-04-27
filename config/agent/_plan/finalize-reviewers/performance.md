@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks performance-sensitive decisions in finalized machine plans
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
   read:

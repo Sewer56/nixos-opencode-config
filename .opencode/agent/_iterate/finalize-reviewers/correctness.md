@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks schema, frontmatter, permissions, and cross-references for iteration artifacts
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

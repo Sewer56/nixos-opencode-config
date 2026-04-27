@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates plan completeness, correctness, and requirements coverage (GLM)
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
   read:

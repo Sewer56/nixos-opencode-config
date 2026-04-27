@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks iterate self-policing — self-iteration enforcement and section ordering conventions
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks template structure, diff headers, and snippet illustrativeness in plan draft artifacts
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks iterate performance patterns — cache/delta efficiency, coordination overhead, and scaling
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

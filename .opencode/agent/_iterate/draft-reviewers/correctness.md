@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks template structure, diff headers, rule application, and zone separation in iteration draft artifacts
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

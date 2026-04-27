@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Validates implementation against objectives (GLM)
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
   read:

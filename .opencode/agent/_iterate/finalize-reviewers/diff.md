@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks diff and hunk validity in machine iteration artifacts
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/MiniMax-M2.7  # LOW
 reasoningEffort: medium
 permission:
   "*": deny
