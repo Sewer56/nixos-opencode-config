@@ -30,6 +30,13 @@ Review error documentation coverage and specificity for direct documentation wor
 # Inputs
 - `handoff_path`
 
+# Focus
+- Own all `# Errors` section concerns (existence, placement, format, specificity, completeness) on public error-returning APIs in in-scope source files listed in `## Target Files`.
+- When a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence. Per-hunk labels are the authoritative locators.
+- Read only the repo files needed to ground those checks.
+
+Rules: `/home/sewer/opencode/config/rules/errors.md`.
+
 # Process
 1. Load cache
 - Read `PROMPT-DOC-COVERAGE.review-errors.md` if it exists. Treat missing or malformed cache as empty.
@@ -62,12 +69,6 @@ Review error documentation coverage and specificity for direct documentation wor
 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
-
-# Focus
-- Own all `# Errors` section concerns (existence, placement, format, specificity, completeness) on public error-returning APIs in in-scope source files listed in `## Target Files`.
-- Read only the repo files needed to ground those checks.
-
-Rules: `/home/sewer/opencode/config/rules/errors.md`.
 
 # Output
 

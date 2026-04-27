@@ -44,6 +44,8 @@ Review plugin plans for correctness, fidelity, and SDK type validity.
 - **Auto-load**: flag unnecessary `opencode.json` registration for plugins in `config/plugins/` as ADVISORY.
 - **Log handling**: `client.app.log` usage for debug output in generated plugin code is BLOCKING. Standalone file pattern required.
 - **Line-location validity**: `Lines: ~<start>-<end>` fields in REV files point near the change location in the target file; the range is within ±10 lines of the actual content.
+- **Per-hunk line labels**: each diff block within a REV must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Missing labels are BLOCKING.
+- **Focused `Lines:` ranges**: header `Lines: ~` must list the comma-separated union of hunk ranges. Full-file ranges are BLOCKING when the change is localized. Valid only for CREATE/DELETE actions.
 - **Diff context**: every hunk in `## Diff` sections includes 2+ unchanged context lines before and after each change region; context lines match content in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
 - **Nested code fences**: block when a REV target contains an inner ``` fence inside an outer ``` fence. The outer fence must use more backticks (e.g. ```` for outer when inner uses ```).
 

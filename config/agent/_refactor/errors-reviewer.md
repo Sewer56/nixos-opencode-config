@@ -32,6 +32,7 @@ Read `cache_path` fully. Read the lang rules file for each language in the cache
 3. **Format**: proposed docs match the doc format from the matching lang rules file.
 4. **Zero-path fallback**: when `Traced Error Paths: (none)`, the proposed docs apply the Zero-Path Fallback from the lang file.
 5. **No placeholders**: no TODO, TBD, FIXME, or vague stubs in `**Proposed:**` sections.
+6. **Per-hunk line labels**: when a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence. Per-hunk labels are the authoritative locators.
 
 **Wrong**: Scanning source files for functions not in the cache and flagging them as coverage gaps.
 **Correct**: Verify the applied docs in source files match the `**Proposed:**` sections in the cache.

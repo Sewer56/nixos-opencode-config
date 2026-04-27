@@ -104,6 +104,8 @@ Summary: <one-line summary>
 - Never modify product code while planning.
 - Never rewrite `PROMPT-PLAN.md`.
 - Within each D# step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
+- Each diff block within a D# step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Per-hunk labels are the authoritative locators.
+- Full-file `Lines:` ranges are invalid for localized changes — use only for NEW actions that add complete files.
 - Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner.
 - Keep user-facing responses brief and factual.
 

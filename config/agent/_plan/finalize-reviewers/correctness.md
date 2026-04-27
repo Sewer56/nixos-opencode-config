@@ -50,6 +50,8 @@ Review a finalized machine plan for correctness, completeness, and fidelity to t
 - Grounding: read the repo files named in `## Settled Facts`, `## External Symbols`, `## Implementation Steps`, and `## Test Steps` before judging them.
 - Completeness: no placeholders, missing anchors, undefined helpers, or unresolved ownership remain.
 - Line-location validity: `Lines: ~start-end` fields in step files point near the change location; the range is within ±10 lines.
+- Per-hunk line labels: each diff block within a step file must carry its own `Lines: ~start-end` label. Missing labels are BLOCKING.
+- Focused `Lines:` ranges: header `Lines: ~` must list the comma-separated union of hunk ranges. Full-file ranges are BLOCKING when the change is localized. Valid only for ADD/NEW actions that add complete files.
 - Diff context: every hunk in implementation and test step diffs includes 2+ unchanged context lines before and after each change region; context lines match content in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
 - Nested code fences: block when a REV target contains an inner ``` fence inside an outer ``` fence. The outer fence must use more backticks (e.g. ```` for outer when inner uses ```). Prevents markdown rendering breaks in the machine plan.
 

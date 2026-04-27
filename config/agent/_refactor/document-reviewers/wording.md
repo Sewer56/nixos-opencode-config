@@ -41,6 +41,7 @@ Review code-adjacent documentation in source files for wording quality.
 - **Filler**: hedging ("please note", "it's important to", "make sure to", "ensure that", "simply", "just"), weasel words ("arguably", "possibly", "might want to"). BLOCKING.
 - **Wordiness**: phrasing that can be tightened without losing meaning. Replace with concise alternative. ADVISORY — block only for egregious inflation.
 - **Terminology consistency**: different terms used for the same concept within a single source file (e.g., "configuration" vs "config" vs "settings"). BLOCKING when genuinely ambiguous; ADVISORY for stylistic variation. Cross-file terminology drift is outside this reviewer's scope.
+- **Per-hunk line labels**: when a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence. Per-hunk labels are the authoritative locators.
 
 # Process
 

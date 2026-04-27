@@ -128,9 +128,10 @@ Apply these rules when writing REV files:
 - Edits/removals use `diff` blocks; deletions include `Remove lines: ~start-end`.
 - If frontmatter and content changes are contiguous, combine into a single diff block.
 - If changes are scattered across a file, use multiple diff blocks within one REV item.
+- Each diff block within a REV must carry its own `Lines: ~start-end` label so implementers can read targeted ranges. Place the label as a bold line (`**Lines: ~start-end**`) immediately before the diff fence.
 - CREATE actions include full file content in a normal code block (not a diff against empty).
 - Diff blocks target markdown files — use markdown-aware line references (headings, list items, fenced code blocks).
-- `Lines: ~` in the REV header indicates approximate location; include 2+ context lines before and after each change.
+- `Lines: ~` in the REV header lists the comma-separated union of hunk ranges for quick scanning. Per-hunk labels are the authoritative locators. Full-file ranges are invalid for localized changes — use only for CREATE/DELETE actions. Include 2+ context lines before and after each change.
 
 ---
 
@@ -225,15 +226,22 @@ Action: CREATE | UPDATE | DELETE
 Why: <why this file changes>
 Anchor: `<existing section or frontmatter field>` | `None`
 Lines: ~<start>-<end> | `None`
+     (comma-separated union of hunk ranges for quick scanning)
 Insert at: before | after | replace `<anchor or region>` | `None`
 
 Diff:
 
+**Lines: ~<start>-<end>**
+
 ```diff
-<one or more diff blocks — include 2+ context
-lines before and after each change.
-a single block if changes are contiguous or frontmatter+content
-are close together; multiple blocks if scattered.>
+<diff block — include 2+ context lines before and after
+each change.>
+```
+
+**Lines: ~<start>-<end>**
+
+```diff
+<additional diff block if changes are scattered>
 ```
 
 Changes:
@@ -241,3 +249,4 @@ Changes:
 Dependencies: None | REV#
 Evidence: `path/to/file:line`
 ````
+

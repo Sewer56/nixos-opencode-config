@@ -41,6 +41,7 @@ Review code-adjacent documentation in source files for comprehensibility.
 - **Compound-term compression**: compressed phrases that sacrifice comprehension (e.g., "hot-reload DX pipeline"). Replace with expanded meaning. BLOCKING.
 - **Opaque reference**: "follow the X pattern" where X is not standard and not defined in the same file. Replace with inline explanation or link. BLOCKING.
 - **Acronym without expansion**: acronyms used without expansion on first use in the file. ADVISORY for universally known acronyms (HTML, CSS); BLOCKING for project-specific acronyms.
+- **Per-hunk line labels**: when a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence. Per-hunk labels are the authoritative locators.
 - Exclusions (ADVISORY only — do not block):
   - common programming terms
   - exact code identifiers (preserve them as-is)

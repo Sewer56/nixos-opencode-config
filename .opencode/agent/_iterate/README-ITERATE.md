@@ -69,6 +69,8 @@ Consumers read: handoff (single coordination document) + per-item files matching
   Revision History, REV Index, Delta, and Review Ledger
 - `PROMPT-ITERATE.rev.001.md` — first revision item
 - `PROMPT-ITERATE.rev.002.md` — second revision item
+-  (each diff block within a REV carries its own `Lines: ~`
+   label so implementers read targeted ranges)
 - (gaps are valid; deleted items leave holes in numbering)
 
 For `_plugin`: same pattern with `PROMPT-PLUGIN-PLAN.rev.*.md`.
@@ -383,8 +385,14 @@ list to enforce the new rule.
 ## Line-location Convention
 
 All finalize agents and reviewers use `Lines: ~<start>-<end> | None`
-as the sole line-location indicator in REV and step files
-(`~` ≈ ±10 lines). Hunks include 2+ context lines before and
+as the header-level indicator in REV and step files
+(`~` ≈ ±10 lines). The header `Lines: ~` lists the
+comma-separated union of all hunk ranges; each diff block
+carries its own `Lines: ~start-end` label (`**Lines: ~start-end**`
+before the diff fence). Per-hunk labels are the authoritative
+locators; full-file ranges apply only to CREATE/DELETE actions.
+See `_iterate/finalize.md # Rules` and `_iterate/draft.md # Optimization Rules`
+for the prescriptive rules agents follow. Hunks include 2+ context lines before and
 after each change; context is the authoritative locator.
 Reviewers validate content, not counts — flag a BLOCKING finding
 only when context lines are missing or do not match the target file.

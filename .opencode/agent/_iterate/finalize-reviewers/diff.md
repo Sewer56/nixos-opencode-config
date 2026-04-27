@@ -35,6 +35,8 @@ Review machine iteration artifacts for diff and hunk validity.
 
 # Focus
 - Line-location validity: `Lines: ~<start>-<end>` fields point near the change location in the target file; the range is within ±10 lines of the actual content. `Anchor` fields are approximate.
+- Per-hunk line labels: each diff block within a REV must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Missing labels are BLOCKING (DIFF_COMPLETENESS).
+- Focused `Lines:` ranges: header `Lines: ~` must list the comma-separated union of hunk ranges. Full-file ranges like `Lines: ~1-258` are BLOCKING when the change is localized (RANGE_VALIDITY). Valid only for CREATE/DELETE actions.
 - Context lines: every hunk includes 2+ unchanged context lines before and after each change region; context lines match content that exists in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
 - Diff completeness: include a diff block for every declared change region.
 - Diff compactness: include only changed lines. Omit verbatim restatements of `context_path` content.

@@ -30,6 +30,15 @@ Review documentation coverage and specificity for direct documentation workflow 
 # Inputs
 - `handoff_path`
 
+# Focus
+- Review documentation coverage, placement, specificity, and fidelity on in-scope source files listed in `## Target Files`.
+- Compare against current repo docs when any documented surface is being moved, renamed, or replaced.
+- Scope findings to required-documentation coverage, placement, specificity, and fidelity; leave `# Errors` sections and readability-only issues to their owning reviewers.
+- When a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence. Per-hunk labels are the authoritative locators.
+- Read only the repo files needed to ground those checks.
+
+Rules: `/home/sewer/opencode/config/rules/documentation.md`.
+
 # Process
 1. Load cache
 - Read `PROMPT-DOC-COVERAGE.review-documentation.md` if it exists. Treat missing or malformed cache as empty.
@@ -62,14 +71,6 @@ Review documentation coverage and specificity for direct documentation workflow 
 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
-
-# Focus
-- Review documentation coverage, placement, specificity, and fidelity on in-scope source files listed in `## Target Files`.
-- Compare against current repo docs when any documented surface is being moved, renamed, or replaced.
-- Scope findings to required-documentation coverage, placement, specificity, and fidelity; leave `# Errors` sections and readability-only issues to their owning reviewers.
-- Read only the repo files needed to ground those checks.
-
-Rules: `/home/sewer/opencode/config/rules/documentation.md`.
 
 # Output
 

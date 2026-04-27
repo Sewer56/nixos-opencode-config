@@ -83,6 +83,7 @@ Write `context_path` using the template below. Populate every section from disco
 - Human zone: narrative — no file paths, no action labels, no status markers.
 - Machine zone: operational — no prose explanations. Zero overlap between zones.
 - Each `[P#]` item is a free-form explanation followed by a diff block. File paths go in the diff block header (`--- a/<path>`).
+- When a `[P#]` item contains multiple diff blocks (scattered changes across one file), label each block with its own `Lines: ~start-end` range so implementers and the finalize agent can read targeted ranges.
 - REFINE: write explanation of intent, why, and applicable optimization rules as target-file behavior, then a unified diff block (`diff` fence, 2+ context lines per hunk).
 - CREATE: explanation only — no diff against empty.
 - Split optimization rules across affected prompts or reviewers. Describe target-file sections in Inputs → Process → Supplemental order. Omit `## User Request` when a command takes no arguments. Return only items requiring action.
@@ -160,6 +161,7 @@ Targets produced by this iteration must follow. Carry only the applicable rules 
 - **Inline path variables**: when a section would contain only variable-to-path mappings (e.g. `RULES_DIR`, `DOCUMENTATION_RULES_PATH`), list those definitions at the start of the nearest Process or Workflow section instead of creating a separate section.
 - **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — paths, deltas, scoping. Never re-state output formats, focus lists, role assignments, or contracts the callee already defines.
 - **Line-location convention**: `Lines: ~<start>-<end> | None` locates changes in REV and step files (`~` ≈ ±10 lines). Hunks include 2+ context lines before and after each change; context is the authoritative locator. Reviewers validate content, not counts. Propagates to `/iterate`-generated targets writing diffs.
+- **Per-hunk line labels**: when a `[P#]` item, REV, or step file contains multiple diff blocks, each must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Header `Lines: ~` lists the comma-separated union of hunk ranges. Full-file ranges are invalid for localized changes — produce focused per-hunk ranges instead.
 - **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to templates, examples, and all diff blocks inside fenced code blocks.
 - **Reviewer diff output**: reviewers that can determine the exact text replacement for a finding must include a unified diff block inline after the finding's `Fix:` field. When the fix is conceptual rather than concrete, omit the diff and rely on `Fix:` prose only.
 

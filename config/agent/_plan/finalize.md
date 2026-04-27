@@ -116,6 +116,8 @@ Next Command: /plan/finalize-code-docs
 - Never modify product code while planning.
 - Never rewrite `PROMPT-PLAN.md` in this command.
 - Within each step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
+- Each diff block within a step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). The step header `Lines: ~` lists the comma-separated union of hunk ranges. Per-hunk labels are the authoritative locators.
+- Full-file `Lines:` ranges are invalid for localized changes — use only for ADD actions that add complete files.
 - Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to machine-plan templates, diff blocks, and reviewer output format examples.
 - Keep `PROMPT-PLAN.handoff.md` machine-first: stable headings, explicit refs, concrete file-level steps, and anchors that point at the current repo surface. Step files follow the same machine-first discipline.
 - Keep `PROMPT-PLAN.handoff.md` factual and stable enough for the machine plan and reviewers to use without rereading the whole conversation.
