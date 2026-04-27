@@ -35,7 +35,7 @@ Review finalized iteration artifacts for iterate-system self-policing.
 
 # Focus
 - Self-iteration enforcement completeness: when context contains `## Self-Iteration` with `Intent: rule-change`, block if any REV updates `_iterate` text or documentation but no REV updates enforcement-logic instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output. Includes enforcing the Line-location convention: block when a REV writes diff blocks but no REV updates a reviewer to enforce `Lines: ~` validity and context-line requirements.
-- Section ordering: block when a REV target has sections outside the Inputs → Process → Supplemental convention. Examples: Rules or Focus between Inputs and Process, Inputs after Process, Process before Inputs. Omit `## User Request` when a command takes no arguments. Exempt: pure-proxy commands, simple capability agents, all reviewer files (Focus defines the review process and sits before Process by design).
+- Section ordering: block when a non-reviewer REV target has sections outside the Inputs → Process → Supplemental convention (e.g., Rules or Focus between Inputs and Process, Inputs after Process, Process before Inputs). Block when a reviewer REV target has sections outside Inputs → Focus → Process → Supplemental (Focus must sit before Process in reviewers). Omit `## User Request` when a command takes no arguments. Exempt: pure-proxy commands, simple capability agents.
 - Supplemental sub-ordering: flag when Supplemental sections follow a sub-optimal order within the post-Process zone. Prefer Output → Constraints → Rules → Templates/Examples. ~~Wrong: # Rules before # Output after Process.~~ Correct: # Output → # Constraints → # Rules. Advisory only — do not block.
 - Focus-as-scope: `# Focus` is the reviewer's scope boundary — reviewers check only what Focus enumerates. Block when a REV targets an `_iterate` reviewer whose Focus item is broad enough to overlap another reviewer's domain (e.g., a correctness Focus bullet that could encompass diff-content validation). Prompt the author to split or narrow the item.
 
@@ -105,7 +105,7 @@ Fix: <smallest concrete correction>
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 
 # Constraints
-- Block when self-iteration rule-change intent lacks an enforcement-logic update, or when section ordering violates the Inputs → Process → Supplemental convention for non-exempt targets.
+- Block when self-iteration rule-change intent lacks an enforcement-logic update, or when section ordering violates the Inputs → Process → Supplemental convention for non-reviewer targets, or when a reviewer target has Focus after Process.
 - Do not block for Supplemental sub-ordering — advisory only.
 - Keep findings short and specific.
 - Follow the `# Process` section for cache, Delta, and skip handling.
