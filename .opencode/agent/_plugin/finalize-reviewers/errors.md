@@ -28,6 +28,19 @@ Review plugin code for error-handling coverage and standalone log pattern compli
 - Write the reviewer cache before the final response.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
+# Inputs
+- `context_path`
+- `handoff_path`
+- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
+
+# Focus
+
+- **Coverage**: every hook callback and async path in generated plugin code has error handling (try/catch). Missing error paths are BLOCKING.
+- **Doc coverage**: every public error-returning API has an `@throws` tag or `# Errors` section documenting each error variant with a specific trigger.
+- **Specificity**: vague catch-all handlers without specific error types are ADVISORY.
+- **Swallowed errors**: flag `catch(() => {})`, `catch {}`, async rejections silently dropped as BLOCKING.
+- **Log handling**: debug logging uses the standalone file pattern (writes to `<plugin-dir>/.logs/<name>/debug.log`). Any use of `client.app.log` for debug output is BLOCKING.
+
 # Process
 
 1. Load cache
@@ -61,19 +74,6 @@ Review plugin code for error-handling coverage and standalone log pattern compli
 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
-
-# Inputs
-- `context_path`
-- `handoff_path`
-- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
-
-# Focus
-
-- **Coverage**: every hook callback and async path in generated plugin code has error handling (try/catch). Missing error paths are BLOCKING.
-- **Doc coverage**: every public error-returning API has an `@throws` tag or `# Errors` section documenting each error variant with a specific trigger.
-- **Specificity**: vague catch-all handlers without specific error types are ADVISORY.
-- **Swallowed errors**: flag `catch(() => {})`, `catch {}`, async rejections silently dropped as BLOCKING.
-- **Log handling**: debug logging uses the standalone file pattern (writes to `<plugin-dir>/.logs/<name>/debug.log`). Any use of `client.app.log` for debug output is BLOCKING.
 
 # Output
 

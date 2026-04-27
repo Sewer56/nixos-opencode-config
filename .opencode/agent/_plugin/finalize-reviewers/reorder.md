@@ -28,6 +28,18 @@ Review plugin code for declaration ordering and return reorder diffs.
 - Write the reviewer cache before the final response.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
+# Inputs
+- `context_path`
+- `handoff_path`
+- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
+
+# Focus
+
+- **Visibility tier**: public/entry-point declarations before private helpers.
+- **Call order**: callers before callees within each visibility tier.
+- **Entry point first**: `export const XxxPlugin` appears first in the file, then hooks in order of registration, then helper functions.
+- **Stability**: when two declarations have equal priority, preserve existing relative order.
+
 # Process
 
 1. Load cache
@@ -61,18 +73,6 @@ Review plugin code for declaration ordering and return reorder diffs.
 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
-
-# Inputs
-- `context_path`
-- `handoff_path`
-- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
-
-# Focus
-
-- **Visibility tier**: public/entry-point declarations before private helpers.
-- **Call order**: callers before callees within each visibility tier.
-- **Entry point first**: `export const XxxPlugin` appears first in the file, then hooks in order of registration, then helper functions.
-- **Stability**: when two declarations have equal priority, preserve existing relative order.
 
 # Output
 

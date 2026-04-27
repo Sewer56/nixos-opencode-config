@@ -107,9 +107,13 @@ Inputs → Process → Supplemental section ordering.
 `# Process`, `# Workflow`, `## Workflow`
 
 **Supplemental zone** — everything else:
-`# Output`, `# Constraints`, `# Rules`, `# Focus`, `# Capabilities`,
+`# Output`, `# Constraints`, `# Rules`, `# Capabilities`,
 `# Safety`, `# Templates`, `# Examples`, `# Guidelines`, `# Defaults`,
 `# Blocking Criteria`, `# Issue Categories`
+
+`# Focus` sits in the Inputs zone for reviewer files (before Process,
+per the reviewer exemption below). For non-reviewer files, Focus is
+Supplemental.
 
 Within Supplemental, prefer: Output → Constraints → Rules →
 Templates/Examples. This sub-ordering is advisory — minor variations

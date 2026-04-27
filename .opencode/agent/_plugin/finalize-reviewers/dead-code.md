@@ -28,6 +28,11 @@ Detect dead code in finalized plugin artifacts. When a REV item deletes, replace
 - Write the reviewer cache before the final response.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
+# Inputs
+- `context_path`
+- `handoff_path`
+- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
+
 # Focus
 - Dead code detection: when a REV item deletes, replaces, or redirects code, identify newly-dead code that the REV set does not clean up.
 - Unused imports: imports whose only usage was the deleted code.

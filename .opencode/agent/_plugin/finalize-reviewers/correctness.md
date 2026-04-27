@@ -28,6 +28,25 @@ Review plugin plans for correctness, fidelity, and SDK type validity.
 - Write the reviewer cache before the final response.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
+# Inputs
+- `context_path`
+- `handoff_path`
+- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
+
+# Focus
+
+- **Fidelity**: explicit goals, constraints, scope, and clarified decisions in `handoff_path` and `context_path` remain represented in REV files.
+- **Requirements**: every `REQ-###` in REV files maps to concrete implementation refs.
+- **Structure**: REV files use the required stable headings and explicit refs.
+- **SDK types**: hook names match the SDK `Hooks` interface. Plugin signature is valid (`export const XxxPlugin: Plugin = async (input) => { ... }`).
+- **Frontmatter**: schema validity in REV target frontmatter fields.
+- **Completeness**: no placeholders (`...`, `TODO`, `FIXME`), missing anchors, or undefined helpers.
+- **Auto-load**: flag unnecessary `opencode.json` registration for plugins in `config/plugins/` as ADVISORY.
+- **Log handling**: `client.app.log` usage for debug output in generated plugin code is BLOCKING. Standalone file pattern required.
+- **Line-location validity**: `Lines: ~<start>-<end>` fields in REV files point near the change location in the target file; the range is within ±10 lines of the actual content.
+- **Diff context**: every hunk in `## Diff` sections includes 2+ unchanged context lines before and after each change region; context lines match content in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
+- **Nested code fences**: block when a REV target contains an inner ``` fence inside an outer ``` fence. The outer fence must use more backticks (e.g. ```` for outer when inner uses ```).
+
 # Process
 
 1. Load cache
@@ -61,25 +80,6 @@ Review plugin plans for correctness, fidelity, and SDK type validity.
 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
-
-# Inputs
-- `context_path`
-- `handoff_path`
-- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
-
-# Focus
-
-- **Fidelity**: explicit goals, constraints, scope, and clarified decisions in `handoff_path` and `context_path` remain represented in REV files.
-- **Requirements**: every `REQ-###` in REV files maps to concrete implementation refs.
-- **Structure**: REV files use the required stable headings and explicit refs.
-- **SDK types**: hook names match the SDK `Hooks` interface. Plugin signature is valid (`export const XxxPlugin: Plugin = async (input) => { ... }`).
-- **Frontmatter**: schema validity in REV target frontmatter fields.
-- **Completeness**: no placeholders (`...`, `TODO`, `FIXME`), missing anchors, or undefined helpers.
-- **Auto-load**: flag unnecessary `opencode.json` registration for plugins in `config/plugins/` as ADVISORY.
-- **Log handling**: `client.app.log` usage for debug output in generated plugin code is BLOCKING. Standalone file pattern required.
-- **Line-location validity**: `Lines: ~<start>-<end>` fields in REV files point near the change location in the target file; the range is within ±10 lines of the actual content.
-- **Diff context**: every hunk in `## Diff` sections includes 2+ unchanged context lines before and after each change region; context lines match content in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
-- **Nested code fences**: block when a REV target contains an inner ``` fence inside an outer ``` fence. The outer fence must use more backticks (e.g. ```` for outer when inner uses ```).
 
 # Output
 

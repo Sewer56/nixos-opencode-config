@@ -42,6 +42,13 @@ Review a machine plan's test strategy.
 - `plan_path`
 - `step_pattern` (e.g., `PROMPT-PLAN.step.*.md`)
 
+# Focus
+- Acceptance lens: planned tests should prove the stated acceptance criteria.
+- Judge coverage, duplication, and parameterization.
+- Read the referenced repo tests or nearby test modules before judging placement and coverage, then use `handoff_path` and `plan_path` to confirm that test coverage still matches the confirmed human intent.
+
+Rules (read in parallel from `/home/sewer/opencode/config/rules/`): `testing.md`, `test-parameterization.md`.
+
 # Process
 1. Load cache
 - Read `PROMPT-PLAN.review-tests.md` if it exists. Treat missing or malformed cache as empty.
@@ -74,13 +81,6 @@ Review a machine plan's test strategy.
 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
-
-# Focus
-- Acceptance lens: planned tests should prove the stated acceptance criteria.
-- Judge coverage, duplication, and parameterization.
-- Read the referenced repo tests or nearby test modules before judging placement and coverage, then use `handoff_path` and `plan_path` to confirm that test coverage still matches the confirmed human intent.
-
-Rules (read in parallel from `/home/sewer/opencode/config/rules/`): `testing.md`, `test-parameterization.md`.
 
 # Output
 

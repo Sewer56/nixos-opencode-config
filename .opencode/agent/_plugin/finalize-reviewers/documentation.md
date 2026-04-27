@@ -28,6 +28,19 @@ Review plugin code for documentation coverage and return doc diffs.
 - Write the reviewer cache before the final response.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
+# Inputs
+- `context_path`
+- `handoff_path`
+- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
+
+# Focus
+
+- **Coverage**: every exported plugin has a JSDoc module header. Every hook callback has a doc comment. `# Usage`, `# Public API`, `# Hooks` sections present.
+- Do not review `@throws` tags or `# Errors` sections — those are fully owned by another reviewer.
+- **Specificity**: debug flag documented (e.g. `Set XXX_DEBUG=1 to enable logging`).
+- **Fidelity**: standalone log path documented (e.g. `Set XXX_DEBUG=1 to enable logging to <plugin-dir>/.logs/<name>/debug.log`).
+- Read `DOCUMENTATION_RULES_PATH` (`config/rules/documentation.md`) as source of truth.
+
 # Process
 
 1. Load cache
@@ -62,19 +75,6 @@ Review plugin code for documentation coverage and return doc diffs.
 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
-
-# Inputs
-- `context_path`
-- `handoff_path`
-- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
-
-# Focus
-
-- **Coverage**: every exported plugin has a JSDoc module header. Every hook callback has a doc comment. `# Usage`, `# Public API`, `# Hooks` sections present.
-- Do not review `@throws` tags or `# Errors` sections — those are fully owned by another reviewer.
-- **Specificity**: debug flag documented (e.g. `Set XXX_DEBUG=1 to enable logging`).
-- **Fidelity**: standalone log path documented (e.g. `Set XXX_DEBUG=1 to enable logging to <plugin-dir>/.logs/<name>/debug.log`).
-- Read `DOCUMENTATION_RULES_PATH` (`config/rules/documentation.md`) as source of truth.
 
 # Output
 

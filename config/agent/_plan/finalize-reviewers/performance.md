@@ -42,6 +42,13 @@ Review only the performance-sensitive parts of a machine plan.
 - `plan_path`
 - `step_pattern` (e.g., `PROMPT-PLAN.step.*.md`)
 
+# Focus
+- Trigger: only review deeply if the plan touches performance-sensitive work.
+- Hunt: algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, or missing validation that could cause material performance issues.
+- Read the referenced repo code before judging performance risk, then use `handoff_path` and `plan_path` only to verify that the machine plan did not introduce performance-sensitive scope beyond the confirmed plan.
+
+Rules: `/home/sewer/opencode/config/rules/performance.md`.
+
 # Process
 1. Load cache
 - Read `PROMPT-PLAN.review-performance.md` if it exists. Treat missing or malformed cache as empty.
@@ -74,13 +81,6 @@ Review only the performance-sensitive parts of a machine plan.
 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
-
-# Focus
-- Trigger: only review deeply if the plan touches performance-sensitive work.
-- Hunt: algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, or missing validation that could cause material performance issues.
-- Read the referenced repo code before judging performance risk, then use `handoff_path` and `plan_path` only to verify that the machine plan did not introduce performance-sensitive scope beyond the confirmed plan.
-
-Rules: `/home/sewer/opencode/config/rules/performance.md`.
 
 # Output
 

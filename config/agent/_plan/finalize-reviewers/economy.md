@@ -42,6 +42,13 @@ Review a machine plan for minimality and placement.
 - `plan_path`
 - `step_pattern` (e.g., `PROMPT-PLAN.step.*.md`)
 
+# Focus
+- Economy lens: flag only clear unnecessary expansion beyond the confirmed human intent in `handoff_path` and `plan_path`. Judge minimality and placement.
+- Leave detailed test quality to the test reviewer.
+- Read the referenced repo files first and use `handoff_path` and `plan_path` only to judge whether the machine plan grew beyond the confirmed human intent.
+
+Rules (read in parallel from `/home/sewer/opencode/config/rules/`): `general.md`, `code-placement.md`.
+
 # Process
 1. Load cache
 - Read `PROMPT-PLAN.review-economy.md` if it exists. Treat missing or malformed cache as empty.
@@ -74,13 +81,6 @@ Review a machine plan for minimality and placement.
 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
-
-# Focus
-- Economy lens: flag only clear unnecessary expansion beyond the confirmed human intent in `handoff_path` and `plan_path`. Judge minimality and placement.
-- Leave detailed test quality to the test reviewer.
-- Read the referenced repo files first and use `handoff_path` and `plan_path` only to judge whether the machine plan grew beyond the confirmed human intent.
-
-Rules (read in parallel from `/home/sewer/opencode/config/rules/`): `general.md`, `code-placement.md`.
 
 # Output
 
