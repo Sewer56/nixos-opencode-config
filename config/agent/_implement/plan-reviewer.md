@@ -27,7 +27,7 @@ Review an implementation against a finalized machine plan.
 
 # Process
 1. Read the handoff at the given path for plan metadata, requirements, and Step Index.
-2. Read all step files matching `PROMPT-PLAN.step.*.md` in one batch.
+2. Read all files listed in the handoff index's File column in one batch.
 3. Inspect all changes via `git diff`.
 4. Validate:
 - Plan objectives met: each implementation step has corresponding changes.
