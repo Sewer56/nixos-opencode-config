@@ -26,16 +26,19 @@ permission:
 
 Implements a finalized machine plan with automated review.
 
-# Standing Rules
-- When a step specifies line ranges, read only those ranges. Do not read full files unless the step requires it.
-
 # Prerequisite
 `PROMPT-PLAN.handoff.md` must exist (produced by `/plan/finalize`).
 
 # Steps
 
 ## 1. Load
-Read `PROMPT-PLAN.handoff.md` for metadata and Step Index. For each step file listed in the Step Index's File column, read only the line ranges the step specifies.
+Read `PROMPT-PLAN.handoff.md` for metadata and Step Index. For each step file listed in the Step Index's File column, extract `Lines:` ranges and compute read parameters before issuing any read call:
+
+1. Parse each `Lines: ~<start>-<end>` range
+2. Compute: `offset = <start>`, `limit = <end> - <start> + 1`
+3. Issue read with those `offset`/`limit` values only
+
+Full-file reads on files carrying `Lines:` ranges are prohibited.
 
 ## 2. Implement
 Apply steps in Step Index order. After each cohesive group of changes: format, lint, build, test. Iterate until all checks pass.
