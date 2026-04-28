@@ -131,3 +131,7 @@ Return exactly:
 Status: SUCCESS | INCOMPLETE | FAIL
 Iterations: <n>
 Summary: <one-line summary>
+
+## Constraint
+
+Run autonomously to completion. Do not stop until all steps are implemented.
