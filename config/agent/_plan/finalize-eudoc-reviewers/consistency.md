@@ -15,7 +15,7 @@ permission:
   list: allow
   todowrite: allow
   edit:
-    "*PROMPT-PLAN.review-eudoc-consistency.md": allow
+    "*PROMPT-PLAN*.review-eudoc-consistency.md": allow
   external_directory: allow
   task: deny
 ---
@@ -31,9 +31,9 @@ Review a finalized machine plan's end-user documentation steps (D#) for cross-pa
 - When only one D# step is in scope, skip with PASS — consistency requires multiple pages.
 
 # Inputs
-- `handoff_path`
-- `plan_path`
-- `step_pattern` (e.g., `PROMPT-PLAN.step.*.md`)
+- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
+- `plan_path` (e.g., `<artifact_base>.draft.md`)
+- `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
 
@@ -47,7 +47,7 @@ Exclusions: API reference pages, changelogs.
 # Process
 
 1. Load cache
-- Read `PROMPT-PLAN.review-eudoc-consistency.md` if it exists. Treat missing or malformed cache as empty.
+- Cache: `PROMPT-PLAN-auth-refactor.handoff.md` → `PROMPT-PLAN-auth-refactor.review-eudoc-consistency.md`. Read if exists; treat missing/malformed as empty.
 - Treat the cache as one record per D# step pair with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
@@ -70,7 +70,7 @@ Exclusions: API reference pages, changelogs.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If `PROMPT-PLAN.review-eudoc-consistency.md` is missing or malformed: write the full cache file.
+- If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.

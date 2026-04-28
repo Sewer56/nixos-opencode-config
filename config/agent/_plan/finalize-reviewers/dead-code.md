@@ -16,7 +16,7 @@ permission:
   list: allow
   todowrite: allow
   edit:
-    "*PROMPT-PLAN.review-dead-code.md": allow
+    "*PROMPT-PLAN*.review-dead-code.md": allow
   external_directory: allow
 ---
 
@@ -29,9 +29,9 @@ Detect dead code in finalized plan artifacts. When an implementation or test ste
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
-- `handoff_path`
-- `plan_path`
-- `step_pattern` (e.g., `PROMPT-PLAN.step.*.md`)
+- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
+- `plan_path` (e.g., `<artifact_base>.draft.md`)
+- `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
 - Dead code detection: when an implementation or test step deletes, replaces, or redirects code, identify newly-dead code that the step set does not clean up.
@@ -45,7 +45,7 @@ Detect dead code in finalized plan artifacts. When an implementation or test ste
 
 # Process
 1. Load cache
-- Read `PROMPT-PLAN.review-dead-code.md` if it exists. Treat missing or malformed cache as empty.
+- Cache: `PROMPT-PLAN-auth-refactor.handoff.md` → `PROMPT-PLAN-auth-refactor.review-dead-code.md`. Read if exists; treat missing/malformed as empty.
 - Treat the cache as one record per item (REQ, I#, T#) with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
@@ -70,7 +70,7 @@ Detect dead code in finalized plan artifacts. When an implementation or test ste
 - When the reviewer is retried due to malformed output and no new Delta or Decision entries have been added, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If `PROMPT-PLAN.review-dead-code.md` is missing or malformed: write the full cache file.
+- If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.

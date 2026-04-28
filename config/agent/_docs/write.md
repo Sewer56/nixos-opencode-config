@@ -30,8 +30,8 @@ Write or substantially rewrite end-user-facing documentation with a four-reviewe
 
 # Artifacts
 
-- `handoff_path`: `PROMPT-DOCS-WRITE.handoff.md`
-- Reviewer cache pattern: `PROMPT-DOCS-WRITE.review-<domain>.md`
+- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-DOCS-WRITE-<slug>`.
+- `handoff_path`: `<artifact_base>.handoff.md`
 
 # Process
 
@@ -100,7 +100,7 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Write only the target documentation files, `PROMPT-DOCS-WRITE.handoff.md`, and `PROMPT-DOCS-WRITE.review-*.md`.
+- Write only the target documentation files, `<artifact_base>.handoff.md`, and `<artifact_base>.review-*.md`.
 - Do not modify files outside the target paths unless explicitly requested.
 - Respect scope boundaries: do not edit frozen regions. Reject reviewer diffs that land in frozen regions.
 - Wrap prose at 80–100 characters per line. Code blocks and URLs are exempt.

@@ -10,9 +10,9 @@ permission:
     "*.env.example": allow
   edit:
     "*": allow
-    "*PROMPT-PLAN.md": deny
-    "*PROMPT-PLAN.handoff.md": deny
-    "*PROMPT-PLAN.*.*.md": deny
+    "*PROMPT-PLAN*.draft.md": deny
+    "*PROMPT-PLAN*.handoff.md": deny
+    "*PROMPT-PLAN*.step.*.md": deny
   grep: allow
   glob: allow
   list: allow

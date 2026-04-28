@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-PLUGIN-PLAN.review-dead-code.md": allow
+    "*PROMPT-PLUGIN-PLAN*.review-dead-code.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -29,9 +29,9 @@ Detect dead code in finalized plugin artifacts. When a STEP item deletes, replac
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
-- `context_path`
-- `handoff_path`
-- `step_pattern` (e.g., `PROMPT-PLUGIN-PLAN.step.*.md`)
+- `context_path` (e.g., `<artifact_base>.draft.md`)
+- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
+- `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
 - Dead code detection: when a STEP item deletes, replaces, or redirects code, identify newly-dead code that the STEP set does not clean up.
@@ -46,7 +46,7 @@ Detect dead code in finalized plugin artifacts. When a STEP item deletes, replac
 # Process
 
 1. Load cache
-- Read `PROMPT-PLUGIN-PLAN.review-dead-code.md` if it exists. Treat missing or malformed cache as empty.
+- Cache: `PROMPT-PLUGIN-PLAN-opencode-config.handoff.md` → `PROMPT-PLUGIN-PLAN-opencode-config.review-dead-code.md`. Read if exists. Treat missing or malformed cache as empty.
 - Treat the cache as one record per STEP with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
@@ -71,7 +71,7 @@ Detect dead code in finalized plugin artifacts. When a STEP item deletes, replac
 - When the reviewer is retried due to malformed output and no new Delta or Decision entries have been added, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If `PROMPT-PLUGIN-PLAN.review-dead-code.md` is missing or malformed: write the full cache file.
+- If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.

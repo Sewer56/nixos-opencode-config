@@ -30,8 +30,8 @@ Review existing end-user-facing documentation and apply fixes with a four-review
 
 # Artifacts
 
-- `handoff_path`: `PROMPT-DOCS-REVIEW.handoff.md`
-- Reviewer cache pattern: `PROMPT-DOCS-REVIEW.review-<domain>.md`
+- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-DOCS-REVIEW-<slug>`.
+- `handoff_path`: `<artifact_base>.handoff.md`
 
 # Process
 
@@ -83,7 +83,7 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Write only the target documentation files, `PROMPT-DOCS-REVIEW.handoff.md`, and `PROMPT-DOCS-REVIEW.review-*.md`.
+- Write only the target documentation files, `<artifact_base>.handoff.md`, and `<artifact_base>.review-*.md`.
 - Do not modify files outside the target paths unless explicitly requested.
 - Respect scope boundaries: do not edit frozen regions. Reject reviewer diffs that land in frozen regions.
 - Wrap prose at 80–100 characters per line. Code blocks and URLs are exempt.

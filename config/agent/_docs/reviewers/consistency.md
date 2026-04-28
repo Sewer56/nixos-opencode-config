@@ -32,7 +32,7 @@ Review end-user documentation for cross-page coherence.
 
 # Inputs
 
-- `handoff_path` (`PROMPT-DOCS-WRITE.handoff.md` or `PROMPT-DOCS-REVIEW.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
+- `handoff_path` (`<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
 
 # Focus
 
@@ -46,7 +46,7 @@ Exclusions: single-file scope (skip entirely — PASS), API reference pages, cha
 # Process
 
 1. Load cache
-- Derive cache path from `handoff_path`: replace `handoff.md` with `review-consistency.md`. Read the cache file if it exists. Treat missing or malformed cache as empty.
+- Cache: `PROMPT-DOCS-WRITE-api-reference.handoff.md` → `PROMPT-DOCS-WRITE-api-reference.review-consistency.md`. Read the cache file if it exists. Treat missing or malformed cache as empty.
 - Treat the cache as one record per target file pair with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read handoff
@@ -68,7 +68,7 @@ Exclusions: single-file scope (skip entirely — PASS), API reference pages, cha
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If the cache file is missing or malformed: write the full cache file.
+- If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.

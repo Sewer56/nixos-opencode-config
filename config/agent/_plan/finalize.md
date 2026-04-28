@@ -10,9 +10,8 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "PROMPT-PLAN.handoff.md": allow
-    "*PROMPT-PLAN.handoff.md": allow
-    "*PROMPT-PLAN.step.*.md": allow
+    "*PROMPT-PLAN*.handoff.md": allow
+    "*PROMPT-PLAN*.step.*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -38,22 +37,25 @@ permission:
   # skill: deny
 ---
 
-Convert a confirmed human plan into a reviewed code and test machine plan. Write `PROMPT-PLAN.handoff.md` (includes manifest) and individual implementation/test step files matching `PROMPT-PLAN.step.*.md`. No separate `machine.md`.
+Convert a confirmed human plan into a reviewed code and test machine plan. Write `<artifact_base>.handoff.md` (handoff, includes manifest) and individual implementation/test step files matching `<artifact_base>.step.*.md`. No separate `machine.md`.
 
 # Inputs
 - The latest user message may confirm the draft, provide small finalize-time notes, or point out changes since the draft.
+- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
 - Required local artifacts for this run:
-  - `PROMPT-PLAN.md`
+  - `<artifact_base>.draft.md`
 
 # Artifacts
-- `plan_path`: `PROMPT-PLAN.md`
-- `handoff_path`: `PROMPT-PLAN.handoff.md`
-- `step_pattern`: `PROMPT-PLAN.step.*.md`
+- `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
+- `plan_path`: `<artifact_base>.draft.md`
+- `handoff_path`: `<artifact_base>.handoff.md`
+- `step_pattern`: `<artifact_base>.step.*.md`
 
 # Process
 
 ## 1. Preconditions and source of truth
-- Read `plan_path`.
+- Derive `artifact_base` from `slug` as `PROMPT-PLAN-<slug>`. All artifact paths derive from `artifact_base`.
+- Read `plan_path` (`<artifact_base>.draft.md`).
 - Treat `plan_path` and any explicit finalize-time notes from the latest user message as the source of truth for this run.
 - Treat the `/plan/finalize` invocation itself as the confirmation boundary.
 - Do not rewrite `plan_path`.
@@ -90,6 +92,7 @@ Convert a confirmed human plan into a reviewed code and test machine plan. Write
   - `@_plan/finalize-reviewers/performance`
   - `@_plan/finalize-reviewers/dead-code`
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern` (a glob pattern matching I# and T# step file paths to scope the review), and finalize-time user notes. Reviewers define their own output format, focus lists, role assignments, and target paths.
+  - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply core domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer; DEAD_CODE → dead-code reviewer. Arbitrate cross-domain conflicts.
 - Do not reopen RESOLVED issues without new concrete evidence.
@@ -103,24 +106,24 @@ Return exactly:
 
 ```text
 Status: SUCCESS | INCOMPLETE | FAIL
-Plan Path: <absolute path>
-Handoff Path: <absolute path>
-Step Pattern: <e.g. PROMPT-PLAN.step.*.md>
+Plan Path: <absolute path to `<artifact_base>.draft.md`>
+Handoff Path: <absolute path to `<artifact_base>.handoff.md`>
+Step Pattern: `<artifact_base>.step.*.md`
 Review Iterations: <n>
 Summary: <one-line summary>
 Next Command: /plan/finalize-code-docs
 ```
 
 # Constraints
-- Only write planning artifacts `PROMPT-PLAN.handoff.md` and I#/T# step files matching `PROMPT-PLAN.step.*.md` during finalize.
+- Only write planning artifacts `<artifact_base>.handoff.md` and I#/T# step files matching `<artifact_base>.step.*.md` during finalize.
 - Never modify product code while planning.
-- Never rewrite `PROMPT-PLAN.md` in this command.
+- Never rewrite `<artifact_base>.draft.md` in this command.
 - Within each step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
 - Each diff block within a step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). The step header `Lines: ~` lists the comma-separated union of hunk ranges. Per-hunk labels are the authoritative locators.
 - Full-file `Lines:` ranges are invalid for localized changes — use only for ADD actions that add complete files.
 - Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to machine-plan templates, diff blocks, and reviewer output format examples.
-- Keep `PROMPT-PLAN.handoff.md` machine-first: stable headings, explicit refs, concrete file-level steps, and anchors that point at the current repo surface. Step files follow the same machine-first discipline.
-- Keep `PROMPT-PLAN.handoff.md` factual and stable enough for the machine plan and reviewers to use without rereading the whole conversation.
+- Keep `<artifact_base>.handoff.md` machine-first: stable headings, explicit refs, concrete file-level steps, and anchors that point at the current repo surface. Step files follow the same machine-first discipline.
+- Keep `<artifact_base>.handoff.md` factual and stable enough for the machine plan and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
 
 # Rules
@@ -135,12 +138,12 @@ Load all rule files below in parallel. Apply them:
 
 # Templates
 
-## `PROMPT-PLAN.handoff.md`
+## `<artifact_base>.handoff.md`
 
 ````markdown
 # Plan Handoff
 
-Source Plan: <absolute path to `PROMPT-PLAN.md`>
+Source Plan: <absolute path to `<artifact_base>.draft.md`>
 
 ## Raw Request
 
@@ -173,8 +176,8 @@ Source Plan: <absolute path to `PROMPT-PLAN.md`>
 - Out of scope: <what this plan intentionally leaves alone>
 
 ## Delta
-- Source Plan — Status: Unchanged | Changed | New; Touched: `PROMPT-PLAN.md`; Why: <why reviewers do or do not need to reread source plan>
-- Review Ledger — Status: Unchanged | Changed | New; Touched: `PROMPT-PLAN.handoff.md`; Why: <why arbitration state changed or stayed stable>
+- Source Plan — Status: Unchanged | Changed | New; Touched: `<artifact_base>.draft.md`; Why: <why reviewers do or do not need to reread source plan>
+- Review Ledger — Status: Unchanged | Changed | New; Touched: `<artifact_base>.handoff.md`; Why: <why arbitration state changed or stayed stable>
 - REQ-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
 
 ## Clarifications
@@ -223,8 +226,8 @@ Source Plan: <absolute path to `PROMPT-PLAN.md`>
 
 | Step | Target | Action | File |
 | ---- | ------ | ------ | ---- |
-| I1 | `path/to/file` | UPDATE | `PROMPT-PLAN.step.I1.md` |
-| T1 | `path/to/test` | INSERT | `PROMPT-PLAN.step.T1.md` |
+| I1 | `path/to/file` | UPDATE | `<artifact_base>.step.I1.md` |
+| T1 | `path/to/test` | INSERT | `<artifact_base>.step.T1.md` |
 
 ## Verification Commands
 - `<command>`: <why it should be run>
@@ -253,11 +256,11 @@ Winner: <reviewer_name>
 Rationale: <why this view prevailed>
 ````
 
-## `PROMPT-PLAN.step.*.md` files
+## `<artifact_base>.step.*.md` files
 
 Implementation and test step content lives in individual files matching `step_pattern`:
 
-### `PROMPT-PLAN.step.I1.md` (Implementation Step)
+### `<artifact_base>.step.I1.md` (Implementation Step)
 
 ````markdown
 # I1: `path/to/file`
@@ -284,7 +287,7 @@ Dependencies: None | I#
 Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
 ````
 
-### `PROMPT-PLAN.step.T1.md` (Test Step)
+### `<artifact_base>.step.T1.md` (Test Step)
 
 ````markdown
 # T1: `path/to/test-or-module`

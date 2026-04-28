@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-PLAN.draft-review-documentation.md": allow
+    "*PROMPT-PLAN*.draft.review-documentation.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -29,8 +29,8 @@ Review plan draft artifacts for documentation coverage and specificity.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
-- `context_path` (the draft artifact, e.g. `PROMPT-PLAN.md`)
-- `draft_handoff_path` (e.g. `PROMPT-PLAN.draft-handoff.md`)
+- `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
+- `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Focus
 - Coverage: check that each `[P#]` item changing code that end-user documentation references has a corresponding `[P#]` item for the documentation update or creation.
@@ -40,7 +40,7 @@ Review plan draft artifacts for documentation coverage and specificity.
 
 # Process
 1. Load cache
-- Read `PROMPT-PLAN.draft-review-documentation.md` if it exists. Treat missing or malformed cache as empty.
+- Cache: `PROMPT-PLAN-auth-refactor.draft.handoff.md` → `PROMPT-PLAN-auth-refactor.draft.review-documentation.md`. Read if exists; treat missing/malformed as empty.
 - Treat the cache as one record per `[P#]` with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
@@ -58,7 +58,7 @@ Review plan draft artifacts for documentation coverage and specificity.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If `PROMPT-PLAN.draft-review-documentation.md` is missing or malformed: write the full cache file.
+- If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.
@@ -84,9 +84,9 @@ Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
 ```diff
-PROMPT-PLAN.md
---- a/PROMPT-PLAN.md
-+++ b/PROMPT-PLAN.md
+<artifact_base>.draft.md
+--- a/<artifact_base>.draft.md
++++ b/<artifact_base>.draft.md
  unchanged context
 -missing doc [P#] item
 +added doc [P#] item with file path and change description

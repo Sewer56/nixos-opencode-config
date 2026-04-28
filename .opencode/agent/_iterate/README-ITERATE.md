@@ -65,23 +65,35 @@ Consumers read: handoff (single coordination document) + per-item files matching
 
 ### File Layout
 
-- `PROMPT-ITERATE.handoff.md` — coordination document with Summary,
+- `<artifact_base>.handoff.md` — coordination document (finalize handoff) with Summary,
   Revision History, Step Index, Delta, and Review Ledger
-- `PROMPT-ITERATE.step.001.md` — first revision item
-- `PROMPT-ITERATE.step.002.md` — second revision item
+- `<artifact_base>.step.001.md` — first revision item
+- `<artifact_base>.step.002.md` — second revision item
 -  (each diff block within a STEP carries its own `Lines: ~`
     label so implementers read targeted ranges)
 - (gaps are valid; deleted items leave holes in numbering)
 
-For `_plugin`: same pattern with `PROMPT-PLUGIN-PLAN.step.*.md`.
+For `_plugin`: same pattern with `<artifact_base>.step.*.md` where `artifact_base` = `PROMPT-PLUGIN-PLAN-<slug>`.
 
 For `_plan`: implementation and test steps split into
-`PROMPT-PLAN.step.I1.md`, `PROMPT-PLAN.step.T1.md`, etc.
+`<artifact_base>.step.I1.md`, `<artifact_base>.step.T1.md`, etc. where `artifact_base` = `PROMPT-PLAN-<slug>`.
 Requirements, mapping, trace matrix, and external symbols stay in
 the handoff.
 
 For `_orchestrator`: the planner splits steps into
-`PROMPT-NN-*-PLAN.step.I1.md`, `PROMPT-NN-*-PLAN.step.T1.md`, etc.
+`PROMPT-NN-*-PLAN.step.I1.md`, etc.
+
+### Slug Derivation
+
+Each draft agent derives a 2–3 word slug from the request context;
+the slug becomes part of `artifact_base`. See each agent's `# Artifacts`
+for the pipeline-specific `artifact_base` derivation.
+
+### Phase Segments
+
+Draft-phase files use `.draft.` as a dot-separated segment; finalize-phase
+files lack the `.draft.` segment. See each agent's `# Artifacts` and `# Constraints`
+for the complete file layout per pipeline.
 
 ### Stable Numbering
 
@@ -170,14 +182,15 @@ include every item in Delta, marking unchanged items as `Unchanged`
 with `Why: no content change`. The cache does not store `delta_state`.
 
 Cache files:
-- `PROMPT-ITERATE.review-correctness.md`
-- `PROMPT-ITERATE.review-wording.md`
-- `PROMPT-ITERATE.review-style.md`
-- `PROMPT-ITERATE.review-performance.md`
-- `PROMPT-ITERATE.review-dedup.md`
-- `PROMPT-ITERATE.review-diff.md`
-- `PROMPT-ITERATE.review-meta.md`
-- `PROMPT-ITERATE.review-clarity.md`
+- `<artifact_base>.review-correctness.md`
+- `<artifact_base>.review-wording.md`
+- `<artifact_base>.review-style.md`
+- `<artifact_base>.review-performance.md`
+- `<artifact_base>.review-dedup.md`
+- `<artifact_base>.review-diff.md`
+- `<artifact_base>.review-meta.md`
+- `<artifact_base>.review-clarity.md`
+- `<artifact_base>.review-dead-code.md`
 
 ### Process Step Order
 
@@ -261,11 +274,11 @@ All 5 draft reviewers are diff-mandated. Cache keyed by `[P#]` item.
 
 ### Draft Coordination
 
-Each draft agent writes `<artifact>.draft-handoff.md` as a lightweight
+Each draft agent writes `<artifact_base>.draft.handoff.md` as a lightweight
 coordination file containing Delta and Decisions — no Raw Request,
 Summary, or Scope (those live in the draft artifact itself).
 
-Cache files: `<artifact>.draft-review-<domain>.md`.
+Cache files: `<artifact_base>.draft.review-<domain>.md`.
 
 Iteration cap: 5 (vs. 10 for finalize). The draft is smaller and will
 undergo finalize review; lower cap suffices.
@@ -400,7 +413,7 @@ only when context lines are missing or do not match the target file.
 ## Human-Friendly [P#] Items
 
 Draft-stage `[P#]` items (numbered placeholders like `[P1]`, `[P2]`) in
-`PROMPT-ITERATE.md`, `PROMPT-PLUGIN-PLAN.md`, and `PROMPT-PLAN.md` use
+`<artifact_base>.draft.md` (across all pipelines) use
 free-form explanation + diff block with paths in diff headers.
 
 File paths appear in the diff block header (`--- a/<path>`).

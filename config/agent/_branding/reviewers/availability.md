@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-BRANDING-*.review-availability.md": allow
+    "*PROMPT-BRANDING*.draft.review-availability.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -30,7 +30,7 @@ Review branding for availability.
 
 # Inputs
 
-- `handoff_path` (`PROMPT-BRANDING-DRAFT.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `@mcp-search` runs.
+- `handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `@mcp-search` runs.
 
 # Focus
 
@@ -59,7 +59,7 @@ Review branding for availability.
 - Re-evaluate own Open entries from cache and decision-referenced entries.
 
 4. Inspect selected content
-- Read `BRANDING.md` for in-scope sections (Candidate Shortlist, Top Recommendation, Risk and Availability Notes, Next Checks).
+- Read `<artifact_base>.draft.md` for in-scope sections (Candidate Shortlist, Top Recommendation, Risk and Availability Notes, Next Checks).
 - Cross-reference search findings from the handoff for external availability data.
 - Apply each Focus check to candidate names and the Risk and Availability Notes section.
 - Check Open→Resolved transitions.
@@ -92,9 +92,9 @@ Evidence: <section, `path:line`, or field>
 Problem: <what availability issue creates risk or misleading claims>
 Fix: <concrete correction or addition>
 ```diff
-BRANDING.md
---- a/BRANDING.md
-+++ b/BRANDING.md
+<artifact_base>.draft.md
+--- a/<artifact_base>.draft.md
++++ b/<artifact_base>.draft.md
   unchanged context
 -missing or risky availability claim
 +qualified claim or disclaimer
@@ -116,5 +116,5 @@ Return ONLY the block above — no introduction, no summary, no conversational w
 - Do not block for domain, social-handle, or ecosystem check gaps alone — ADVISORY only (unless a collision is confirmed).
 - Treat live availability as provisional unless the handoff records an explicit external check via `@mcp-search`.
 - Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` field targeting `BRANDING.md` with the exact text replacement.
+- Include a unified diff after every finding's `Fix:` field targeting `<artifact_base>.draft.md` with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

@@ -10,8 +10,8 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "*PROMPT-ITERATE.handoff.md": allow
-    "*PROMPT-ITERATE.step.*.md": allow
+    "*PROMPT-ITERATE*.handoff.md": allow
+    "*PROMPT-ITERATE*.step.*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -24,21 +24,25 @@ permission:
     "_iterate/finalize-reviewers/*": allow
 ---
 
-Convert a confirmed iteration context into reviewed revision instructions. Write `PROMPT-ITERATE.handoff.md` and individual STEP files matching `PROMPT-ITERATE.step.*.md`. Edit only those files. No separate `machine.md` — handoff absorbs the manifest role.
+Convert a confirmed iteration context into reviewed revision instructions. Write `<artifact_base>.handoff.md` (handoff) and individual STEP files matching `<artifact_base>.step.*.md`. Edit only those files. No separate `machine.md` — handoff absorbs the manifest role.
 
 # Inputs
 - The latest user message may confirm the draft, provide finalize-time notes, or note changes since the draft.
-- Required local artifact: `PROMPT-ITERATE.md`
+- Derive `slug` from the request context as a 2–3 word identifier for this run. Derive `artifact_base` as `PROMPT-ITERATE-<slug>`.
+- Required local artifact: `<artifact_base>.draft.md`
 
 # Artifacts
-- `context_path`: `PROMPT-ITERATE.md`
-- `handoff_path`: `PROMPT-ITERATE.handoff.md`
-- `step_pattern`: `PROMPT-ITERATE.step.*.md`
+- `artifact_base`: `PROMPT-ITERATE-<slug>` (derived from `slug`)
+- `context_path`: `<artifact_base>.draft.md`
+- `handoff_path`: `<artifact_base>.handoff.md`
+- `step_pattern`: `<artifact_base>.step.*.md`
 
 # Process
 
 ## 1. Preconditions and source of truth
-- Read `context_path` as the source of truth, supplemented only by any explicit finalize-time notes from the latest user message.
+- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-ITERATE-<slug>`. All artifact paths derive from `artifact_base`.
+- Read `context_path` (`<artifact_base>.draft.md`) as the source of truth, supplemented only by any explicit finalize-time notes from the latest user message.
+- When `## Self-Iteration` is absent but any STEP target path matches `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`, infer `Intent: rule-change` and apply the enforcement completeness gate in step 4.
 - Treat the `/iterate/finalize` invocation as the confirmation boundary.
 
 ## 2. Deepen discovery only where needed
@@ -66,6 +70,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - Apply only the relevant rules from `# Optimization Rules` to each target. Split those rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
 - Keep operational rules in the generated targets themselves. Do not delegate model-facing behavior to external docs.
 - When self-iteration intent is `rule-change`: verify at least one STEP item updates enforcement-logic text (instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output). If no enforcement-logic STEP exists, treat this as a fatal gap — add a STEP item covering the missing enforcement-logic update rather than delegating to reviewers.
+- **Artifact naming convention**: for draft+finalize command/agent pairs, enforce `PROMPT-<PIPELINE>-<slug>` base names with dot-separated phase segments (`.draft.` for draft-phase, no segment for finalize). Wrong: `.draft-handoff.md` (hyphen before `handoff`). Correct: `.draft.handoff.md`.
 
 ## 5. Run the review loop
 Follow the ordered steps below exactly, in order.
@@ -89,8 +94,8 @@ Follow the ordered steps below exactly, in order.
   - `@_iterate/finalize-reviewers/clarity`
   - Treat each reviewer prompt as scoped call data for the callee.
 - Include only:
-  - Artifact paths (`context_path`, `handoff_path`)
-   - `step_pattern`
+  - Artifact paths (`context_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`)
+  - `step_pattern` = `<artifact_base>.step.*.md`
   - Finalize-time user notes if any
   - Self-iteration intent and target-scope from `context_path` `## Self-Iteration` section when present
 - Omit:
@@ -131,20 +136,21 @@ Return exactly:
 
 ```text
 Status: SUCCESS | INCOMPLETE | FAIL
-Context Path: <absolute path>
-Handoff Path: <absolute path>
-Step Pattern: <e.g. PROMPT-ITERATE.step.*.md>
+Context Path: <absolute path to `<artifact_base>.draft.md`>
+Handoff Path: <absolute path to `<artifact_base>.handoff.md`>
+Step Pattern: `<artifact_base>.step.*.md`
 Review Iterations: <n>
 Summary: <one-line summary>
 ```
 
 # Constraints
-- Write only `PROMPT-ITERATE.handoff.md` and files matching `PROMPT-ITERATE.step.*.md` during finalize.
-- Modify only `PROMPT-ITERATE.handoff.md` and files matching `PROMPT-ITERATE.step.*.md` during finalize.
-- Read `PROMPT-ITERATE.md` as source of truth only; write to handoff and machine paths.
+- Write only `<artifact_base>.handoff.md` and files matching `<artifact_base>.step.*.md` during finalize.
+- Modify only `<artifact_base>.handoff.md` and files matching `<artifact_base>.step.*.md` during finalize.
+- Read `<artifact_base>.draft.md` as source of truth only; write to handoff and machine paths.
 - Keep each STEP file diff-based: diff blocks grounded in current file state with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
-- Keep `PROMPT-ITERATE.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
+- Keep `<artifact_base>.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
+- Artifact naming convention: for draft+finalize command/agent pairs, use `PROMPT-<PIPELINE>-<slug>` base names with dot-separated phase segments (`.draft.` for draft-phase, no segment for finalize). Wrong: `.draft-handoff.md`. Correct: `.draft.handoff.md`.
 
 # Optimization Rules
 
@@ -177,12 +183,12 @@ Apply these rules when writing STEP files:
 
 # Templates
 
-## `PROMPT-ITERATE.handoff.md`
+## `<artifact_base>.handoff.md`
 
 ````markdown
 # Iteration Handoff
 
-Source Context: <absolute path to `PROMPT-ITERATE.md`>
+Source Context: <absolute path to `<artifact_base>.draft.md`>
 
 ## Raw Request
 
@@ -216,12 +222,12 @@ Source Context: <absolute path to `PROMPT-ITERATE.md`>
 
 | STEP | Target | Action | File |
 | ---- | ------ | ------ | ---- |
-| STEP-001 | `path/to/file` | CREATE | `PROMPT-ITERATE.step.001.md` |
-| STEP-002 | `path/to/file` | UPDATE | `PROMPT-ITERATE.step.002.md` |
+| STEP-001 | `path/to/file` | CREATE | `<artifact_base>.step.001.md` |
+| STEP-002 | `path/to/file` | UPDATE | `<artifact_base>.step.002.md` |
 
 ## Delta
-- Source Context — Status: Unchanged | Changed | New; Touched: `PROMPT-ITERATE.md`; Why: <why reviewers do or do not need to reread source context>
-- Review Ledger — Status: Unchanged | Changed | New; Touched: `PROMPT-ITERATE.handoff.md`; Why: <why arbitration state changed or stayed stable>
+- Source Context — Status: Unchanged | Changed | New; Touched: `<artifact_base>.draft.md`; Why: <why reviewers do or do not need to reread source context>
+- Review Ledger — Status: Unchanged | Changed | New; Touched: `<artifact_base>.handoff.md`; Why: <why arbitration state changed or stayed stable>
 - STEP-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
 
 ## Review Ledger
@@ -235,9 +241,9 @@ Winner: <reviewer_name>
 Rationale: <why this view prevailed>
 ````
 
-## `PROMPT-ITERATE.step.*.md` files
+## `<artifact_base>.step.*.md` files
 
-Each file `PROMPT-ITERATE.step.NNN.md` contains one revision item:
+Each file `<artifact_base>.step.NNN.md` contains one revision item:
 
 ````markdown
 # STEP-NNN: `path/to/file`

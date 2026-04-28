@@ -10,9 +10,8 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "PROMPT-PLAN.handoff.md": allow
-    "*PROMPT-PLAN.handoff.md": allow
-    "*PROMPT-PLAN.step.*.md": allow
+    "*PROMPT-PLAN*.handoff.md": allow
+    "*PROMPT-PLAN*.step.*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -30,15 +29,17 @@ Review and revise code-adjacent documentation (API references, inline comments, 
 
 # Inputs
 - The latest user message may provide code-documentation notes.
+- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
 - Required local artifacts for this run:
-  - `PROMPT-PLAN.md`
-  - `PROMPT-PLAN.handoff.md`
-  - existing I#/T# files matching `PROMPT-PLAN.step.*.md`
+  - `<artifact_base>.draft.md`
+  - `<artifact_base>.handoff.md`
+  - existing I#/T# files matching `<artifact_base>.step.*.md`
 
 # Artifacts
-- `plan_path`: `PROMPT-PLAN.md`
-- `handoff_path`: `PROMPT-PLAN.handoff.md`
-- `step_pattern`: `PROMPT-PLAN.step.*.md`
+- `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
+- `plan_path`: `<artifact_base>.draft.md`
+- `handoff_path`: `<artifact_base>.handoff.md`
+- `step_pattern`: `<artifact_base>.step.*.md`
 
 # Process
 
@@ -64,6 +65,7 @@ Review and revise code-adjacent documentation (API references, inline comments, 
   - `@_plan/finalize-codedoc-reviewers/clarity`
   - `@_plan/finalize-codedoc-reviewers/wording`
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
+  - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: CDOC → documentation reviewer; CERR → errors reviewer; CCLR → clarity reviewer; CWRD → wording reviewer. Arbitrate cross-domain conflicts.
 - Apply reviewer diffs to existing I# and T# step files only. Append one line to `## Revision History`.
@@ -76,19 +78,19 @@ Return exactly:
 
 ```text
 Status: SUCCESS | INCOMPLETE | FAIL
-Plan Path: <absolute path>
-Handoff Path: <absolute path>
-Step Pattern: <e.g. PROMPT-PLAN.step.*.md>
+Plan Path: <absolute path to `<artifact_base>.draft.md`>
+Handoff Path: <absolute path to `<artifact_base>.handoff.md`>
+Step Pattern: `<artifact_base>.step.*.md`
 Review Iterations: <n>
 Summary: <one-line summary>
 Next Command: /plan/finalize-user-docs
 ```
 
 # Constraints
-- Only modify `PROMPT-PLAN.handoff.md` and existing I#/T# step files matching `PROMPT-PLAN.step.*.md`.
+- Only modify `<artifact_base>.handoff.md` and existing I#/T# step files matching `<artifact_base>.step.*.md`.
 - Never create D# step files.
 - Never modify product code while planning.
-- Never rewrite `PROMPT-PLAN.md`.
+- Never rewrite `<artifact_base>.draft.md`.
 - Within each step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
 - Each diff block within a step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Per-hunk labels are the authoritative locators.
 - Full-file `Lines:` ranges are invalid for localized changes — use only for ADD actions that add complete files.

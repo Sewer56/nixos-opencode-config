@@ -10,8 +10,8 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "*PROMPT-PLUGIN-PLAN.handoff.md": allow
-    "*PROMPT-PLUGIN-PLAN.step.*.md": allow
+    "*PROMPT-PLUGIN-PLAN*.handoff.md": allow
+    "*PROMPT-PLUGIN-PLAN*.step.*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -28,21 +28,24 @@ permission:
     "_plugin/finalize-reviewers/dead-code": allow
 ---
 
-Convert a confirmed plugin plan into reviewed machine instructions.
+Convert a confirmed plugin plan into reviewed machine instructions. Derive `artifact_base` from `slug` as `PROMPT-PLUGIN-PLAN-<slug>`.
 
 # Inputs
 - The latest user message may confirm the plan, provide finalize-time notes, or note changes since the draft.
-- Required local artifact: `PROMPT-PLUGIN-PLAN.md`
+- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLUGIN-PLAN-<slug>`.
+- Required local artifact: `<artifact_base>.draft.md`
 
 # Artifacts
-- `context_path`: `PROMPT-PLUGIN-PLAN.md`
-- `handoff_path`: `PROMPT-PLUGIN-PLAN.handoff.md`
-- `step_pattern`: `PROMPT-PLUGIN-PLAN.step.*.md`
+- `artifact_base`: `PROMPT-PLUGIN-PLAN-<slug>` (derived from `slug`)
+- `context_path`: `<artifact_base>.draft.md`
+- `handoff_path`: `<artifact_base>.handoff.md`
+- `step_pattern`: `<artifact_base>.step.*.md`
 
 # Process
 
 ## 1. Preconditions and source of truth
-- Read `context_path` (`PROMPT-PLUGIN-PLAN.md`) as the source of truth, supplemented only by any explicit finalize-time notes from the latest user message.
+- Derive `artifact_base` from `slug` as `PROMPT-PLUGIN-PLAN-<slug>`. All artifact paths derive from `artifact_base`.
+- Read `context_path` (`<artifact_base>.draft.md`) as the source of truth, supplemented only by any explicit finalize-time notes from the latest user message.
 - Treat the `/plugin/finalize` invocation as the confirmation boundary.
 
 ## 2. Deepen discovery only where needed
@@ -77,6 +80,7 @@ Follow the ordered steps below exactly, in order.
 ### Core review
 - Write and maintain `## Delta`: write to `handoff_path` before the first reviewer pass; record each `STEP-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields; add artifact markers for `Source Context` and `Review Ledger`; recompute after every material revision.
 - Build core reviewer prompts: after each full machine-artifact draft, run `@_plugin/finalize-reviewers/correctness` and `@_plugin/finalize-reviewers/dead-code` in parallel. Treat each reviewer prompt as scoped call data. Include only: artifact paths (`context_path`, `handoff_path`), `step_pattern` (a glob pattern matching STEP target file paths to scope the review), and finalize-time user notes. Omit: output format, focus lists, target file paths from STEP items, role assignment, blanket read orders — reviewers decide what to open from Delta, cache state, and Decisions.
+  - `context_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
 - Validate each reviewer response: confirm `# REVIEW` header, `Decision: PASS | ADVISORY | BLOCKING`, `## Findings` and `## Verified` headings. If malformed after retries, treat as BLOCKING with a synthetic finding.
 - Retry malformed responses: if validation fails and Delta plus Decisions are unchanged, send only the protocol error and request re-emit; if Delta or Decisions changed, include only the new excerpt and request fresh response.
 - Record decisions: update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files. Core domain ownership: CORRECTNESS → correctness reviewer; DEAD_CODE → dead-code reviewer.
@@ -102,20 +106,20 @@ Return exactly:
 
 ```text
 Status: SUCCESS | INCOMPLETE | FAIL
-Context Path: <absolute path>
-Handoff Path: <absolute path>
-Step Pattern: <e.g. PROMPT-PLUGIN-PLAN.step.*.md>
+Context Path: <absolute path to `<artifact_base>.draft.md`>
+Handoff Path: <absolute path to `<artifact_base>.handoff.md`>
+Step Pattern: `<artifact_base>.step.*.md`
 Review Iterations: <n>
 Summary: <one-line summary>
 ```
 
 # Constraints
 
-- Write only `PROMPT-PLUGIN-PLAN.handoff.md` and files matching `PROMPT-PLUGIN-PLAN.step.*.md` during finalize.
+- Write only `<artifact_base>.handoff.md` and files matching `<artifact_base>.step.*.md` during finalize.
 - Modify only those files during finalize.
-- Read `PROMPT-PLUGIN-PLAN.md` as source of truth only; write to handoff and machine paths.
+- Read `<artifact_base>.draft.md` as source of truth only; write to handoff and machine paths.
 - Keep each STEP file diff-based with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
-- Keep `PROMPT-PLUGIN-PLAN.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
+- Keep `<artifact_base>.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
 
 # Rules
 
@@ -157,12 +161,12 @@ Revisions produced by this finalize run must follow. Apply only the relevant rul
 
 # Templates
 
-## `PROMPT-PLUGIN-PLAN.handoff.md`
+## `<artifact_base>.handoff.md`
 
 ````markdown
 # Iteration Handoff
 
-Source Context: <absolute path to `PROMPT-PLUGIN-PLAN.md`>
+Source Context: <absolute path to `<artifact_base>.draft.md`>
 
 ## Raw Request
 
@@ -196,12 +200,12 @@ Source Context: <absolute path to `PROMPT-PLUGIN-PLAN.md`>
 
 | STEP | Target | Action | File |
 | ---- | ------ | ------ | ---- |
-| STEP-001 | `path/to/file` | CREATE | `PROMPT-PLUGIN-PLAN.step.001.md` |
-| STEP-002 | `path/to/file` | UPDATE | `PROMPT-PLUGIN-PLAN.step.002.md` |
+| STEP-001 | `path/to/file` | CREATE | `<artifact_base>.step.001.md` |
+| STEP-002 | `path/to/file` | UPDATE | `<artifact_base>.step.002.md` |
 
 ## Delta
-- Source Context — Status: Unchanged | Changed | New; Touched: `PROMPT-PLUGIN-PLAN.md`; Why: <why reviewers do or do not need to reread source context>
-- Review Ledger — Status: Unchanged | Changed | New; Touched: `PROMPT-PLUGIN-PLAN.handoff.md`; Why: <why arbitration state changed or stayed stable>
+- Source Context — Status: Unchanged | Changed | New; Touched: `<artifact_base>.draft.md`; Why: <why reviewers do or do not need to reread source context>
+- Review Ledger — Status: Unchanged | Changed | New; Touched: `<artifact_base>.handoff.md`; Why: <why arbitration state changed or stayed stable>
 - STEP-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
 
 ## Review Ledger
@@ -215,9 +219,9 @@ Winner: <reviewer_name>
 Rationale: <why this view prevailed>
 ````
 
-## `PROMPT-PLUGIN-PLAN.step.*.md` files
+## `<artifact_base>.step.*.md` files
 
-Each file `PROMPT-PLUGIN-PLAN.step.NNN.md` contains one revision item:
+Each file `<artifact_base>.step.NNN.md` contains one revision item:
 
 ````markdown
 # STEP-NNN: `path/to/file`

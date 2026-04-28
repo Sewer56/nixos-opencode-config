@@ -10,9 +10,8 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "PROMPT-PLAN.md": allow
-    "*PROMPT-PLAN.md": allow
-    "*PROMPT-PLAN.draft-handoff.md": allow
+    "*PROMPT-PLAN*.draft.md": allow
+    "*PROMPT-PLAN*.draft.handoff.md": allow
   question: allow
   todowrite: allow
   external_directory: allow
@@ -34,20 +33,22 @@ permission:
   # skill: deny
 ---
 
-Create and maintain a collaborative human-first plan. Write only `PROMPT-PLAN.md`.
+Create and maintain a collaborative human-first plan. Write only `<artifact_base>.draft.md`.
 
 # Inputs
 - The user request or requirements list for this run.
+- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
 - Later messages in the same conversation may answer questions, request edits, or explicitly confirm the draft is ready for machine planning.
 
 # Artifacts
-- `plan_path`: `PROMPT-PLAN.md`
-- `draft_handoff_path`: `PROMPT-PLAN.draft-handoff.md`
+- `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
+- `plan_path`: `<artifact_base>.draft.md`
+- `draft_handoff_path`: `<artifact_base>.draft.handoff.md`
 
 # Process
 
 ## 1. Start from the request
-- Rewrite `plan_path` from scratch for this run.
+- Derive `artifact_base` from `slug` as `PROMPT-PLAN-<slug>`. All artifact paths derive from `artifact_base`. Rewrite `plan_path` from scratch for this run.
 - Treat the user's explicit requirements, constraints, and answers in this conversation as the source of truth.
 
 ## 2. Do lightweight discovery
@@ -71,7 +72,7 @@ Create and maintain a collaborative human-first plan. Write only `PROMPT-PLAN.md
 Follow the ordered steps below.
 
 1. Write and maintain `## Delta`
-- Write `draft_handoff_path` before the first reviewer pass.
+- Write `draft_handoff_path` (`<artifact_base>.draft.handoff.md`) before the first reviewer pass.
 - Record each `[P#]` item as a compact entry with `Status:` and `Why:` fields.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Recompute `## Delta` after every material revision to `plan_path`.
@@ -85,7 +86,7 @@ Follow the ordered steps below.
   - `@_plan/draft-reviewers/dedup`
   - `@_plan/draft-reviewers/clarity`
 - Include only:
-  - `plan_path` and `draft_handoff_path`
+  - `plan_path` (`<artifact_base>.draft.md`) and `draft_handoff_path` (`<artifact_base>.draft.handoff.md`)
 - Omit:
   - Output format, focus/check lists, role assignment, blanket read orders
 
@@ -101,7 +102,7 @@ Follow the ordered steps below.
 - Update `### Decisions` in `draft_handoff_path`.
 - Apply domain ownership: CORRECTNESS → correctness; DOC → documentation; WORDING → wording; STYLE → style; DEDUP → dedup; CLARITY → clarity.
 
-6. Revise `PROMPT-PLAN.md` when findings require it
+6. Revise `<artifact_base>.draft.md` when findings require it
 - Apply reviewer diffs via targeted edits; fall back to `Fix:` prose.
 - Recompute `## Delta`.
 
@@ -125,15 +126,15 @@ Return exactly:
 
 ```text
 Status: DRAFT | READY
-Plan Path: <absolute path>
+Plan Path: <absolute path to `<artifact_base>.draft.md`>
 Summary: <one-line summary>
 ```
 
 # Constraints
-- Only write planning artifact `PROMPT-PLAN.md`.
-- Write `PROMPT-PLAN.draft-handoff.md` during the review loop.
-- Write only `PROMPT-PLAN.md` and `PROMPT-PLAN.draft-handoff.md`. Do not modify other files.
+- Only write planning artifact `<artifact_base>.draft.md`.
+- Write `<artifact_base>.draft.handoff.md` during the review loop.
+- Write only `<artifact_base>.draft.md` and `<artifact_base>.draft.handoff.md`. Do not modify other files.
 - Never modify product code while drafting.
-- Keep `PROMPT-PLAN.md` human-first: short, scannable, and easy to discuss with the user.
+- Keep `<artifact_base>.draft.md` human-first: short, scannable, and easy to discuss with the user.
 - Keep user-facing responses brief and factual.
 - Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to template sections and code snippets within the plan.

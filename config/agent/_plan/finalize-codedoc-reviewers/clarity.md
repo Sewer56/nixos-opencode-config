@@ -15,7 +15,7 @@ permission:
   list: allow
   todowrite: allow
   edit:
-    "*PROMPT-PLAN.review-codedoc-clarity.md": allow
+    "*PROMPT-PLAN*.review-codedoc-clarity.md": allow
   external_directory: allow
   task: deny
 ---
@@ -30,9 +30,9 @@ Review a finalized machine plan's code-adjacent documentation (I#/T# steps) for 
 - Only generate findings on in-scope I# and T# steps.
 
 # Inputs
-- `handoff_path`
-- `plan_path`
-- `step_pattern` (e.g., `PROMPT-PLAN.step.*.md`)
+- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
+- `plan_path` (e.g., `<artifact_base>.draft.md`)
+- `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
 
@@ -52,7 +52,7 @@ Review a finalized machine plan's code-adjacent documentation (I#/T# steps) for 
 # Process
 
 1. Load cache
-- Read `PROMPT-PLAN.review-codedoc-clarity.md` if it exists. Treat missing or malformed cache as empty.
+- Cache: `PROMPT-PLAN-auth-refactor.handoff.md` → `PROMPT-PLAN-auth-refactor.review-codedoc-clarity.md`. Read if exists; treat missing/malformed as empty.
 - Treat the cache as one record per item (I#, T#) with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
@@ -73,7 +73,7 @@ Review a finalized machine plan's code-adjacent documentation (I#/T# steps) for 
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If `PROMPT-PLAN.review-codedoc-clarity.md` is missing or malformed: write the full cache file.
+- If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.

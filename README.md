@@ -45,6 +45,17 @@ Or skip planning and implement directly with `/implement/freeform`.
 
 Split a large plan into sub-prompts with `/plan/split`.
 
+**Iterate & Plugin**
+
+- `/iterate/draft` - draft an iteration context for commands and agents
+- `/iterate/finalize` - convert a confirmed iteration context into revision instructions
+- `/plugin/draft` - draft a plugin implementation plan
+- `/plugin/finalize` - convert a confirmed plugin plan into a machine plan
+
+> Draft and finalize agents derive a 2–3 word slug from the request
+> context to name their artifacts (e.g., `PROMPT-PLAN-auth-refactor`).
+> Draft and finalize for the same work use the same slug internally.
+
 **Orchestrate multi-step work** - Build a prompt pack, then run it:
 
 1. `/orchestrator/prompt-pack` - generate orchestrator files from task descriptions
@@ -72,6 +83,8 @@ Split a large plan into sub-prompts with `/plan/split`.
 
 - `/commit` - generate a conventional commit
 - `/summarize/pr-simple` - simple PR summary
+- `/ticket/draft` - draft a company-facing issue ticket
+- `/branding/draft` - draft project names and brand direction
 - `/write/issue` - write a GitHub issue
 
 ### Rules

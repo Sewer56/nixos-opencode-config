@@ -10,8 +10,8 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "*TICKET.md": allow
-    "*TICKET.draft-handoff.md": allow
+    "*PROMPT-TICKET*.draft.md": allow
+    "*PROMPT-TICKET*.draft.handoff.md": allow
   question: allow
   todowrite: allow
   external_directory: allow
@@ -36,9 +36,9 @@ Split a parent ticket into cohort-based sub-tickets with review loops.
 - `parent_path`: resolved from user input
 - `parent_dir`: directory containing the parent ticket
 - `splits_dir`: `<parent_dir>/ticket-splits/` (derived — create if absent)
-- Sub-ticket path: `<parent_dir>/ticket-splits/<slug>/TICKET.md`
-- Sub-ticket handoff: `<parent_dir>/ticket-splits/<slug>/TICKET.draft-handoff.md`
-- Sub-ticket review cache: `<parent_dir>/ticket-splits/<slug>/TICKET.draft-review-<domain>.md`
+- Sub-ticket path: `<parent_dir>/ticket-splits/<slug>/<artifact_base>.draft.md` where `artifact_base` = `PROMPT-TICKET-<subslug>`
+- Sub-ticket handoff: `<parent_dir>/ticket-splits/<slug>/<artifact_base>.draft.handoff.md`
+- Sub-ticket review cache: `<parent_dir>/ticket-splits/<slug>/<artifact_base>.draft.review-<domain>.md`
 
 # Process
 
@@ -73,7 +73,7 @@ Create `<parent_dir>/ticket-splits/<slug>/` where `<slug>` is a filesystem-safe 
 
 ### b. Write initial sub-ticket
 
-Write `ticket-splits/<slug>/TICKET.md` using the full ticket format from `_ticket/draft.md` — same sections, same inclusion rules. Add a "Parent" section at the top before Summary:
+Write `ticket-splits/<slug>/<artifact_base>.draft.md` using the full ticket format from `_ticket/draft.md` — same sections, same inclusion rules. Add a "Parent" section at the top before Summary:
 
 ```text
 ## Parent
@@ -105,23 +105,23 @@ Read files surfaced by discovery and research. Update the sub-ticket with ground
 
 Max 5 iterations.
 
-a. Write `ticket-splits/<slug>/TICKET.draft-handoff.md` with per-section Delta before the first reviewer pass. Per-section Delta entries track: section name, status (New/Changed/Unchanged), and reason.
+a. Write `ticket-splits/<slug>/<artifact_base>.draft.handoff.md` with per-section Delta before the first reviewer pass. Per-section Delta entries track: section name, status (New/Changed/Unchanged), and reason.
 
-b. Run four reviewers in parallel: `@_ticket/reviewers/clarity`, `@_ticket/reviewers/wording`, `@_ticket/reviewers/completeness`, `@_ticket/reviewers/accuracy`. Pass only: `ticket_path` (`ticket-splits/<slug>/TICKET.md`) and `draft_handoff_path` (`ticket-splits/<slug>/TICKET.draft-handoff.md`).
+b. Run four reviewers in parallel: `@_ticket/reviewers/clarity`, `@_ticket/reviewers/wording`, `@_ticket/reviewers/completeness`, `@_ticket/reviewers/accuracy`. Pass only: `ticket_path` (`ticket-splits/<slug>/<artifact_base>.draft.md`) and `draft_handoff_path` (`ticket-splits/<slug>/<artifact_base>.draft.handoff.md`).
 
 c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified`.
 
 d. Confirm each finding contains a unified diff block. Treat missing diffs as protocol violation requiring retry.
 
-e. Record decisions in `ticket-splits/<slug>/TICKET.draft-handoff.md` for cross-domain arbitration. Grant each reviewer final authority in its category (CLARITY → clarity; WORDING → wording; COMPLETENESS → completeness; ACCURACY → accuracy).
+e. Record decisions in `ticket-splits/<slug>/<artifact_base>.draft.handoff.md` for cross-domain arbitration. Grant each reviewer final authority in its category (CLARITY → clarity; WORDING → wording; COMPLETENESS → completeness; ACCURACY → accuracy).
 
-f. Apply reviewer diffs via targeted edits to `ticket-splits/<slug>/TICKET.md`; fall back to `Fix:` prose.
+f. Apply reviewer diffs via targeted edits to `ticket-splits/<slug>/<artifact_base>.draft.md`; fall back to `Fix:` prose.
 
 g. Recompute Delta. Re-run all reviewers after every material revision. Loop until no findings or 5 iterations.
 
 ### g. Finalize sub-ticket
 
-Finalize the sub-ticket in place at `ticket-splits/<slug>/TICKET.md` after the review loop completes.
+Finalize the sub-ticket in place at `ticket-splits/<slug>/<artifact_base>.draft.md` after the review loop completes.
 
 ## 6. Update parent ticket
 
@@ -130,7 +130,7 @@ After all sub-tickets are processed, read the parent ticket and append a "Child 
 ```text
 ## Child tickets
 
-- `ticket-splits/<slug>/TICKET.md` — <cohort name>
+- `ticket-splits/<slug>/<artifact_base>.draft.md` — <cohort name>
 ```
 
 One bullet per sub-ticket, using the final filename and cohort name.
@@ -145,13 +145,13 @@ On explicit confirmation: return `Status: READY`. On user feedback: apply change
 Status: DRAFT | READY
 Parent: <parent ticket path>
 Sub-tickets:
-- <cohort-name>: ticket-splits/<slug>/TICKET.md
+- <cohort-name>: ticket-splits/<slug>/<artifact_base>.draft.md
 Summary: <one-line summary>
 ```
 
 # Constraints
 
-- Write sub-tickets as `ticket-splits/<slug>/TICKET.md` under a single `ticket-splits/` directory next to the parent ticket.
+- Write sub-tickets as `ticket-splits/<slug>/<artifact_base>.draft.md` under a single `ticket-splits/` directory next to the parent ticket.
 - Each sub-ticket uses the full ticket format from `_ticket/draft.md` with a "Parent" section added at the top before Summary.
 - Sub-tickets run their own discovery and research steps — same as drafting a ticket from scratch.
 - Use the same four reviewers as the draft agent: clarity, wording, completeness, accuracy.

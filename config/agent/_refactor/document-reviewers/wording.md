@@ -15,7 +15,7 @@ permission:
   list: allow
   todowrite: allow
   edit:
-    "*PROMPT-DOC-COVERAGE.review-wording.md": allow
+    "*PROMPT-DOC-COVERAGE-*.review-wording.md": allow
   external_directory: allow
   task: deny
 ---
@@ -46,7 +46,7 @@ Review code-adjacent documentation in source files for wording quality.
 # Process
 
 1. Load cache
-- Read `PROMPT-DOC-COVERAGE.review-wording.md` if it exists. Treat missing or malformed cache as empty.
+- Cache: `PROMPT-DOC-COVERAGE-extract-utils.handoff.md` → `PROMPT-DOC-COVERAGE-extract-utils.review-wording.md`. Read if exists. Treat missing or malformed cache as empty.
 - Treat the cache as one record per source file with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
@@ -66,7 +66,7 @@ Review code-adjacent documentation in source files for wording quality.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If `PROMPT-DOC-COVERAGE.review-wording.md` is missing or malformed: write the full cache file.
+- If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.

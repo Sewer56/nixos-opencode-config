@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Drafts a PROMPT-PLUGIN-PLAN.md for OpenCode plugin development
+description: Drafts a PROMPT-PLUGIN-PLAN-<slug>.draft.md plugin plan for OpenCode plugin development
 permission:
   "*": deny
   read:
@@ -10,8 +10,8 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "*PROMPT-PLUGIN-PLAN.md": allow
-    "*PROMPT-PLUGIN-PLAN.draft-handoff.md": allow
+    "*PROMPT-PLUGIN-PLAN*.draft.md": allow
+    "*PROMPT-PLUGIN-PLAN*.draft.handoff.md": allow
   question: allow
   todowrite: allow
   external_directory: allow
@@ -25,16 +25,18 @@ permission:
     "_plugin/draft-reviewers/*": allow
 ---
 
-Draft `PROMPT-PLUGIN-PLAN.md` for the `/plugin/draft` command.
+Draft `<artifact_base>.draft.md` for the `/plugin/draft` command.
 
 # Inputs
 
 - User request describing what plugin to create or iterate on.
+- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLUGIN-PLAN-<slug>`.
 
 # Artifacts
 
-- `context_path`: `PROMPT-PLUGIN-PLAN.md` (current working directory)
-- `draft_handoff_path`: `PROMPT-PLUGIN-PLAN.draft-handoff.md` (current working directory)
+- `artifact_base`: `PROMPT-PLUGIN-PLAN-<slug>` (derived from `slug`)
+- `context_path`: `<artifact_base>.draft.md` (current working directory)
+- `draft_handoff_path`: `<artifact_base>.draft.handoff.md` (current working directory)
 
 # Process
 
@@ -64,7 +66,7 @@ From discovery, determine:
 
 ## 4. Write context
 
-Write `context_path` using the template below. Populate every section from discovery and request analysis.
+Write `context_path` using the template below. Derive `artifact_base` from `slug` as `PROMPT-PLUGIN-PLAN-<slug>`. All artifact paths derive from `artifact_base`. Populate every section from discovery and request analysis.
 Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator. Human zone stays narrative — no file paths, action labels, or status markers. Machine zone stays operational — no prose explanations. Zero overlap between zones.
 - Each `[P#]` item: free-form explanation + diff block (same convention as `_iterate/draft.md`). CREATE: explanation only. Return only items requiring action.
 
@@ -101,7 +103,7 @@ Follow the ordered steps below.
 - Update `### Decisions` in `draft_handoff_path`.
 - Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; DEDUP → dedup; CLARITY → clarity.
 
-6. Revise `PROMPT-PLUGIN-PLAN.md` when findings require it
+6. Revise `<artifact_base>.draft.md` when findings require it
 - Apply reviewer diffs via targeted edits; fall back to `Fix:` prose.
 - Recompute `## Delta`.
 
@@ -132,10 +134,10 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Write only `PROMPT-PLUGIN-PLAN.md`.
-- Write `PROMPT-PLUGIN-PLAN.draft-handoff.md` during the review loop.
-- Write only `PROMPT-PLUGIN-PLAN.md` and `PROMPT-PLUGIN-PLAN.draft-handoff.md`. Do not modify other files.
-- Keep `PROMPT-PLUGIN-PLAN.md` compact and scannable.
+- Write only `<artifact_base>.draft.md`.
+- Write `<artifact_base>.draft.handoff.md` during the review loop.
+- Write only `<artifact_base>.draft.md` and `<artifact_base>.draft.handoff.md`. Do not modify other files.
+- Keep `<artifact_base>.draft.md` compact and scannable.
 - Enforce the standalone log pattern: every plugin plan must include `.logs/<name>/debug.log` co-located logging, not `client.app.log`.
 - Enforce auto-loading: plugins in `config/plugins/` need no `opencode.json` registration.
 - Enforce nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block.
@@ -231,7 +233,7 @@ cd config/ && bun run typecheck
 - TypeScript config: `config/tsconfig.json`
 - Dependencies: `config/package.json`
 
-# Template: `PROMPT-PLUGIN-PLAN.md`
+# Template: `<artifact_base>.draft.md`
 
 ````markdown
 # Plugin Plan

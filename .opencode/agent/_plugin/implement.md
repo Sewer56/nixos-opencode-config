@@ -23,8 +23,8 @@ Apply a finalized plugin machine plan, type-check, then debug-iterate until the 
 
 ## Phase 1: Apply the machine plan
 
-- Read `PROMPT-PLUGIN-PLAN.handoff.md` for the Step Index and plan context.
-- Read all STEP files matching `PROMPT-PLUGIN-PLAN.step.*.md` in one batch.
+- Read `<artifact_base>.handoff.md` for the Step Index and plan context, where `artifact_base` = `PROMPT-PLUGIN-PLAN-<slug>`.
+- Read all STEP files matching `<artifact_base>.step.*.md` in one batch.
 - Apply every STEP item: create/update plugin `.ts` files, add any helper files.
 - Write all files to disk. Plugins go in `config/plugins/` where they are auto-loaded — no `opencode.json` registration step.
 
@@ -50,7 +50,7 @@ Return exactly:
 
 ```text
 Status: SUCCESS | TYPE_ERRORS | DEBUG_FAIL
-Plan Path: <absolute path to PROMPT-PLUGIN-PLAN.handoff.md>
+Plan Path: <absolute path to `<artifact_base>.handoff.md`>
 Files Written: <count>
 Type Check: PASS | FAIL
 Debug Iterations: <n>
@@ -63,4 +63,4 @@ Summary: <one-line summary>
 
 # Input
 
-Pass the path to the finalized handoff. The user must supply an absolute path to `PROMPT-PLUGIN-PLAN.handoff.md`.
+Pass the path to the finalized handoff. The user must supply an absolute path to `<artifact_base>.handoff.md` (where `artifact_base` = `PROMPT-PLUGIN-PLAN-<slug>`).

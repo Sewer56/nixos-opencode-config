@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-BRANDING-*.review-distinctiveness.md": allow
+    "*PROMPT-BRANDING*.draft.review-distinctiveness.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -30,7 +30,7 @@ Review branding for distinctiveness.
 
 # Inputs
 
-- `handoff_path` (`PROMPT-BRANDING-DRAFT.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `@mcp-search` runs.
+- `handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `@mcp-search` runs.
 
 # Focus
 
@@ -57,7 +57,7 @@ Review branding for distinctiveness.
 - Re-evaluate own Open entries from cache and decision-referenced entries.
 
 4. Inspect selected content
-- Read `BRANDING.md` for in-scope sections (Candidate Shortlist, Top Recommendation, Risk and Availability Notes).
+- Read `<artifact_base>.draft.md` for in-scope sections (Candidate Shortlist, Top Recommendation, Risk and Availability Notes).
 - Cross-reference search findings from the handoff for external collisions.
 - Apply each Focus check to candidate names.
 - Check Open→Resolved transitions.
@@ -90,9 +90,9 @@ Evidence: <section, `path:line`, or field>
 Problem: <what distinctiveness issue undermines the name choice>
 Fix: <concrete correction or alternative>
 ```diff
-BRANDING.md
---- a/BRANDING.md
-+++ b/BRANDING.md
+<artifact_base>.draft.md
+--- a/<artifact_base>.draft.md
++++ b/<artifact_base>.draft.md
   unchanged context
 -generic or colliding name
 +distinctive alternative
@@ -113,5 +113,5 @@ Return ONLY the block above — no introduction, no summary, no conversational w
 - Block for generic names, overused suffixes, and exact or confusingly similar duplicates with existing projects.
 - Do not block for near-duplicates within the candidate list or weak searchability alone — ADVISORY only.
 - Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` field targeting `BRANDING.md` with the exact text replacement.
+- Include a unified diff after every finding's `Fix:` field targeting `<artifact_base>.draft.md` with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

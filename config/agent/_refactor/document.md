@@ -12,7 +12,7 @@ permission:
     "*": allow
   write:
     "*": deny
-    "*PROMPT-DOC-COVERAGE*.md": allow
+    "*PROMPT-DOC-COVERAGE-*.md": allow
   bash: allow
   grep: allow
   glob: allow
@@ -33,8 +33,9 @@ Discover, add, and review missing code documentation in source files.
 - `GENERAL_RULES_PATH`: `/home/sewer/opencode/config/rules/general.md`
 - `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
 - `ERROR_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/errors.md`
-- `handoff_path`: `PROMPT-DOC-COVERAGE.handoff.md`
-- Reviewer cache pattern: `PROMPT-DOC-COVERAGE.review-<domain>.md`
+- Derive `slug` from the request context as a 2–3 word identifier for this run.
+- `artifact_base`: `PROMPT-DOC-COVERAGE-<slug>` (derived from `slug`)
+- `handoff_path`: `<artifact_base>.handoff.md`
 
 Read `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, and `ERROR_RULES_PATH` once before starting.
 
@@ -54,7 +55,7 @@ Read `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, and `ERROR_RULES_PATH` on
 ## 3. Apply documentation edits
 
 - Add the documentation required by the rule files to in-scope source files.
-- Constrain edits to target source files and `PROMPT-DOC-COVERAGE*.md`.
+- Constrain edits to target source files and `PROMPT-DOC-COVERAGE-*.md`.
 - Preserve runtime behavior; make only documentation-specific changes.
 - Run obvious formatters or linters for touched files.
 
@@ -91,14 +92,14 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Constrain edits to target source files and `PROMPT-DOC-COVERAGE*.md`.
+- Constrain edits to target source files and `PROMPT-DOC-COVERAGE-*.md`.
 - Preserve runtime behavior; make only documentation-specific changes.
 - Use outer fences with more backticks than inner fences in templates and examples.
 - Keep user-facing responses brief and factual.
 
 # Templates
 
-## `PROMPT-DOC-COVERAGE.handoff.md`
+## `<artifact_base>.handoff.md`
 
 ```markdown
 # Documentation Coverage Handoff

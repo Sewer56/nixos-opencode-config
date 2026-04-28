@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*TICKET.draft-review-accuracy.md": allow
+    "*PROMPT-TICKET*.draft.review-accuracy.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -30,8 +30,8 @@ Review ticket drafts for factual accuracy. Check file path validity, evidence-cl
 
 # Inputs
 
-- `ticket_path` (`TICKET.md`) — the ticket draft to review.
-- `draft_handoff_path` (`TICKET.draft-handoff.md`) — contains `## Delta` with per-section change tracking.
+- `ticket_path` (`<artifact_base>.draft.md`) — the ticket draft to review.
+- `draft_handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` with per-section change tracking.
 
 # Focus
 
@@ -47,7 +47,7 @@ Review ticket drafts for factual accuracy. Check file path validity, evidence-cl
 # Process
 
 1. Load cache
-- Derive cache path from `draft_handoff_path`: replace `handoff.md` with `review-accuracy.md`. Read the cache file if it exists. Treat missing or malformed cache as empty.
+- Cache: `PROMPT-TICKET-login-bug.draft.handoff.md` → `PROMPT-TICKET-login-bug.draft.review-accuracy.md`. Read the cache file if it exists. Treat missing or malformed cache as empty.
 - Treat the cache as one record per ticket section with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read handoff
@@ -93,9 +93,9 @@ Evidence: <section, `path:line`, or reference>
 Problem: <what factual inaccuracy or unsupported claim degrades the ticket>
 Fix: <corrected path, evidence, or navigation>
 ```diff
-<path/to/TICKET.md>
---- a/<path/to/TICKET.md>
-+++ b/<path/to/TICKET.md>
+<path/to/<artifact_base>.draft.md>
+--- a/<path/to/<artifact_base>.draft.md>
++++ b/<path/to/<artifact_base>.draft.md>
   unchanged context
 -inaccurate path, claim, or navigation
 +corrected content

@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-BRANDING-*.review-positioning.md": allow
+    "*PROMPT-BRANDING*.draft.review-positioning.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -30,7 +30,7 @@ Review branding for positioning.
 
 # Inputs
 
-- `handoff_path` (`PROMPT-BRANDING-DRAFT.handoff.md`) — contains `## Delta` for change tracking and `### Decisions` for cross-domain arbitration.
+- `handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking and `### Decisions` for cross-domain arbitration.
 
 # Focus
 
@@ -58,7 +58,7 @@ Review branding for positioning.
 - Re-evaluate own Open entries from cache and decision-referenced entries.
 
 4. Inspect selected content
-- Read `BRANDING.md` for in-scope sections (Project Read, Naming Criteria, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone, Visual Direction).
+- Read `<artifact_base>.draft.md` for in-scope sections (Project Read, Naming Criteria, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone, Visual Direction).
 - Apply each Focus check to evaluate positioning coherence.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
@@ -90,9 +90,9 @@ Evidence: <section, `path:line`, or field>
 Problem: <what positioning issue undermines brand coherence>
 Fix: <concrete correction or alternative>
 ```diff
-BRANDING.md
---- a/BRANDING.md
-+++ b/BRANDING.md
+<artifact_base>.draft.md
+--- a/<artifact_base>.draft.md
++++ b/<artifact_base>.draft.md
   unchanged context
 -misaligned name or messaging
 +coherent alternative
@@ -113,5 +113,5 @@ Return ONLY the block above — no introduction, no summary, no conversational w
 - Block for purpose mismatch, audience mismatch, emotional tone inconsistency, tagline-message disconnect, and value-name disconnect.
 - Do not block for weak brand story or extensibility limitations alone — ADVISORY only.
 - Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` field targeting `BRANDING.md` with the exact text replacement.
+- Include a unified diff after every finding's `Fix:` field targeting `<artifact_base>.draft.md` with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

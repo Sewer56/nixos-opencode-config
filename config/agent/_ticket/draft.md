@@ -10,8 +10,8 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "TICKET.md": allow
-    "*TICKET.draft-handoff.md": allow
+    "*PROMPT-TICKET*.draft.md": allow
+    "*PROMPT-TICKET*.draft.handoff.md": allow
   question: allow
   todowrite: allow
   external_directory: allow
@@ -30,12 +30,13 @@ Draft a company-facing issue ticket with a four-reviewer loop.
 # Inputs
 
 - The user message contains the ticket request: what the issue is, context, and any specific sections or evidence to include.
+- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-TICKET-<slug>`.
 
 # Artifacts
 
-- `ticket_path`: `TICKET.md`
-- `draft_handoff_path`: `TICKET.draft-handoff.md`
-- Reviewer cache pattern: `TICKET.draft-review-<domain>.md`
+- `artifact_base`: `PROMPT-TICKET-<slug>` (derived from `slug`)
+- `ticket_path`: `<artifact_base>.draft.md`
+- `draft_handoff_path`: `<artifact_base>.draft.handoff.md`
 
 # Process
 
@@ -85,7 +86,7 @@ Read the files surfaced by discovery that matter to the ticket. Gather code snip
 
 ## 5. Write ticket
 
-Write `ticket_path` from scratch for this run. Apply the ticket template with the sections the user's request implies. Each section must be self-contained and actionable. Include a section only when the request or research produces meaningful content for it.
+Derive `artifact_base` from `slug` as `PROMPT-TICKET-<slug>`. All artifact paths derive from `artifact_base`. Write `ticket_path` from scratch for this run. Apply the ticket template with the sections the user's request implies. Each section must be self-contained and actionable. Include a section only when the request or research produces meaningful content for it.
 
 ``````markdown
 ## Summary
@@ -243,7 +244,7 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Write only `TICKET.md`, `TICKET.draft-handoff.md`, and `TICKET.draft-review-*.md`.
+- Write only `<artifact_base>.draft.md`, `<artifact_base>.draft.handoff.md`, and `<artifact_base>.draft.review-*.md`.
 - Treat the user's request as the source of truth for which sections apply.
 - Summary and Acceptance Criteria must always exist. Options must exist per Section inclusion rules above. Current State should exist when the ticket describes a change to something that already exists. Other sections are conditional based on the request.
 - Options must include a "Current leaning" line when multiple options exist.

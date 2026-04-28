@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-BRANDING-*.review-clarity.md": allow
+    "*PROMPT-BRANDING*.draft.review-clarity.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -30,7 +30,7 @@ Review branding for clarity.
 
 # Inputs
 
-- `handoff_path` (`PROMPT-BRANDING-DRAFT.handoff.md`) — contains `## Delta` for change tracking and `### Decisions` for cross-domain arbitration.
+- `handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking and `### Decisions` for cross-domain arbitration.
 
 # Focus
 
@@ -58,7 +58,7 @@ Review branding for clarity.
 - Re-evaluate own Open entries from cache and decision-referenced entries.
 
 4. Inspect selected content
-- Read `BRANDING.md` for in-scope sections (Candidate Shortlist, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone).
+- Read `<artifact_base>.draft.md` for in-scope sections (Candidate Shortlist, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone).
 - Apply each Focus check to candidate names and brand messaging.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
@@ -90,9 +90,9 @@ Evidence: <section, `path:line`, or field>
 Problem: <what clarity issue degrades the name or brand promise>
 Fix: <concrete correction or alternative>
 ```diff
-BRANDING.md
---- a/BRANDING.md
-+++ b/BRANDING.md
+<artifact_base>.draft.md
+--- a/<artifact_base>.draft.md
++++ b/<artifact_base>.draft.md
   unchanged context
 -unclear name or messaging
 +clearer alternative
@@ -112,5 +112,5 @@ Return ONLY the block above — no introduction, no summary, no conversational w
 
 - Apply the severity tiers in `# Focus`.
 - Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` field targeting `BRANDING.md` with the exact text replacement.
+- Include a unified diff after every finding's `Fix:` field targeting `<artifact_base>.draft.md` with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

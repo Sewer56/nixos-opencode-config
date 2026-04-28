@@ -16,7 +16,7 @@ permission:
   list: allow
   todowrite: allow
   edit:
-    "*PROMPT-PLAN.review-correctness.md": allow
+    "*PROMPT-PLAN*.review-correctness.md": allow
   external_directory: allow
   # edit: deny
   # bash: deny
@@ -39,9 +39,9 @@ Review a finalized machine plan for correctness, completeness, and fidelity to t
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
-- `handoff_path`
-- `plan_path`
-- `step_pattern` (e.g., `PROMPT-PLAN.step.*.md`)
+- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
+- `plan_path` (e.g., `<artifact_base>.draft.md`)
+- `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
 - Fidelity: explicit goals, constraints, scope, and clarified decisions in `handoff_path` and `plan_path` remain represented in step files.
@@ -59,7 +59,7 @@ Rules (read in parallel from `/home/sewer/opencode/config/rules/`): `general.md`
 
 # Process
 1. Load cache
-- Read `PROMPT-PLAN.review-correctness.md` if it exists. Treat missing or malformed cache as empty.
+- Cache: `PROMPT-PLAN-auth-refactor.handoff.md` → `PROMPT-PLAN-auth-refactor.review-correctness.md`. Read if exists; treat missing/malformed as empty.
 - Treat the cache as one record per item (REQ, I#, T#) with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
@@ -79,7 +79,7 @@ Rules (read in parallel from `/home/sewer/opencode/config/rules/`): `general.md`
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If `PROMPT-PLAN.review-correctness.md` is missing or malformed: write the full cache file.
+- If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.

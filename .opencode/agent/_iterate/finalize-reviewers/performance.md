@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-ITERATE.review-performance.md": allow
+    "*PROMPT-ITERATE*.review-performance.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -29,9 +29,9 @@ Review finalized iteration artifacts for iterate performance patterns.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
-- `context_path`
-- `handoff_path`
-- `step_pattern` (e.g., `PROMPT-ITERATE.step.*.md`)
+- `context_path` (e.g., `<artifact_base>.draft.md`)
+- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
+- `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
 - Cache/delta efficiency: flag when a `STEP-###` target itself runs a review loop or coordinates subagents but lacks per-reviewer cache files or a Delta section — reviewers will re-evaluate everything on each pass. Do not flag targets that have no review loop.
@@ -40,7 +40,7 @@ Review finalized iteration artifacts for iterate performance patterns.
 
 # Process
 1. Load cache
-- Read `PROMPT-ITERATE.review-performance.md` if it exists. Treat missing or malformed cache as empty.
+- Cache: `PROMPT-ITERATE-my-run.handoff.md` → `PROMPT-ITERATE-my-run.review-performance.md`. Read if exists; treat missing/malformed as empty.
 - Treat the cache as one record per STEP with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
@@ -60,7 +60,7 @@ Review finalized iteration artifacts for iterate performance patterns.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If `PROMPT-ITERATE.review-performance.md` is missing or malformed: write the full cache file.
+- If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.

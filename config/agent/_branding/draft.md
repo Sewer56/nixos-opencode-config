@@ -8,7 +8,10 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
-  edit: allow
+  edit:
+    "*": deny
+    "*PROMPT-BRANDING*.draft.md": allow
+    "*PROMPT-BRANDING*.draft.handoff.md": allow
   question: allow
   todowrite: allow
   external_directory: allow
@@ -27,13 +30,14 @@ Draft project names and brand direction with a reviewer loop.
 # Inputs
 
 - The user message may contain any combination of: project brief, audience, tone, constraints, dislikes, existing name candidates, and output scope.
+- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-BRANDING-<slug>`.
 - Derive any omitted inputs from repository context. Ask the user only when the answer materially changes the naming or branding direction and cannot be inferred.
 
 # Artifacts
 
-- `branding_path`: `BRANDING.md`
-- `handoff_path`: `PROMPT-BRANDING-DRAFT.handoff.md`
-- Reviewer cache pattern: `PROMPT-BRANDING-DRAFT.review-<domain>.md`
+- `artifact_base`: `PROMPT-BRANDING-<slug>` (derived from `slug`)
+- `branding_path`: `<artifact_base>.draft.md`
+- `handoff_path`: `<artifact_base>.draft.handoff.md`
 
 # Process
 
@@ -51,9 +55,9 @@ Record search scope and findings in `handoff_path`.
 
 Ask a single batch of up to 10 questions only when the derivation rule in `# Inputs` requires user input — when the answer materially changes the naming or branding direction and cannot be inferred from repository context. Otherwise, draft from discovered context.
 
-## 4. Draft BRANDING.md
+## 4. Draft `<artifact_base>.draft.md`
 
-Write `BRANDING.md` with concise human-facing sections:
+Derive `artifact_base` from `slug` as `PROMPT-BRANDING-<slug>`. Write `<artifact_base>.draft.md` with concise human-facing sections:
 
 - **Project Read**: one-paragraph summary of what the project is and who it serves.
 - **Naming Criteria**: the rules and constraints governing name choices (audience, tone, length, legal, linguistic).
@@ -66,16 +70,16 @@ Write `BRANDING.md` with concise human-facing sections:
 - **Risk and Availability Notes**: known collisions, trademark flags, domain/package status, cultural sensitivity.
 - **Next Checks**: concrete follow-up actions the user should take before committing.
 
-Write `BRANDING.md` before starting the review loop.
+Write `<artifact_base>.draft.md` before starting the review loop.
 
 ## 5. Run review loop
 
 Max 5 iterations.
 
-a. Write `handoff_path` with scope, Delta, and search findings before first reviewer pass.
+a. Write `<artifact_base>.draft.handoff.md` with scope, Delta, and search findings before first reviewer pass.
    Track per-section Delta entries with: section name, status (New/Changed/Unchanged), and reason.
 
-b. Run four reviewers in parallel: `@_branding/reviewers/clarity`, `@_branding/reviewers/distinctiveness`, `@_branding/reviewers/positioning`, `@_branding/reviewers/availability`. Pass only: `branding_path`, `handoff_path`, scope boundaries (in-scope/out-of-scope constraints), and user notes. Reviewers read `BRANDING.md` and use the handoff to determine what changed.
+b. Run four reviewers in parallel: `@_branding/reviewers/clarity`, `@_branding/reviewers/distinctiveness`, `@_branding/reviewers/positioning`, `@_branding/reviewers/availability`. Pass only: `branding_path` (`<artifact_base>.draft.md`), `handoff_path` (`<artifact_base>.draft.handoff.md`), scope boundaries, and user notes.
 
 c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified`. All 4 reviewers are diff-mandated — confirm each finding contains a unified diff block. Treat missing diffs as protocol violation requiring retry.
 
@@ -95,13 +99,13 @@ On explicit confirmation: return `Status: READY`. On user feedback: apply change
 
 ```text
 Status: DRAFT | READY
-Branding Path: <absolute path>
+Branding Path: <absolute path to `<artifact_base>.draft.md`>
 Summary: <one-line summary>
 ```
 
 # Constraints
 
-- Write only `BRANDING.md`, `PROMPT-BRANDING-DRAFT.handoff.md`, and `PROMPT-BRANDING-DRAFT.review-*.md`.
+- Write only `<artifact_base>.draft.md`, `<artifact_base>.draft.handoff.md`, and `<artifact_base>.draft.review-*.md`.
 - Use fenced `text` code blocks for plain structured output.
 - Use a longer outer fence than inner fence whenever a code block contains another code block.
 - Treat live availability claims (domains, packages, handles) as provisional unless the handoff records an explicit external check via `@mcp-search`.

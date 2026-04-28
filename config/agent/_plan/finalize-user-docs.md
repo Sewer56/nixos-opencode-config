@@ -10,10 +10,8 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "PROMPT-PLAN.handoff.md": allow
-    "*PROMPT-PLAN.handoff.md": allow
-    "PROMPT-PLAN.step.D*.md": allow
-    "*PROMPT-PLAN.step.D*.md": allow
+    "*PROMPT-PLAN*.handoff.md": allow
+    "*PROMPT-PLAN*.step.D*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -31,15 +29,17 @@ Generate and review end-user documentation steps for a finalized machine plan. R
 
 # Inputs
 - The latest user message may provide user-documentation notes.
+- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
 - Required local artifacts for this run:
-  - `PROMPT-PLAN.md`
-  - `PROMPT-PLAN.handoff.md`
-  - existing I#/T# files matching `PROMPT-PLAN.step.*.md`
+  - `<artifact_base>.draft.md`
+  - `<artifact_base>.handoff.md`
+  - existing I#/T# files matching `<artifact_base>.step.*.md`
 
 # Artifacts
-- `plan_path`: `PROMPT-PLAN.md`
-- `handoff_path`: `PROMPT-PLAN.handoff.md`
-- `step_pattern`: `PROMPT-PLAN.step.*.md`
+- `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
+- `plan_path`: `<artifact_base>.draft.md`
+- `handoff_path`: `<artifact_base>.handoff.md`
+- `step_pattern`: `<artifact_base>.step.*.md`
 
 # Process
 
@@ -79,6 +79,7 @@ Generate and review end-user documentation steps for a finalized machine plan. R
   - `@_plan/finalize-eudoc-reviewers/engagement`
   - `@_plan/finalize-eudoc-reviewers/consistency`
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
+  - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply end-user documentation domain ownership: EUDOC → end-user-documentation; ECLR → clarity; EWRD → wording; EENG → engagement; ECNS → consistency. Arbitrate cross-domain conflicts.
 - Apply reviewer diffs to D# step files only. Append one line to `## Revision History`.
@@ -91,18 +92,18 @@ Return exactly:
 
 ```text
 Status: SUCCESS | INCOMPLETE | FAIL
-Plan Path: <absolute path>
-Handoff Path: <absolute path>
-Step Pattern: <e.g. PROMPT-PLAN.step.*.md>
+Plan Path: <absolute path to `<artifact_base>.draft.md`>
+Handoff Path: <absolute path to `<artifact_base>.handoff.md`>
+Step Pattern: `<artifact_base>.step.*.md`
 Review Iterations: <n>
 Summary: <one-line summary>
 ```
 
 # Constraints
-- Only modify `PROMPT-PLAN.handoff.md` and D# step files matching `PROMPT-PLAN.step.D*.md` or `*PROMPT-PLAN.step.D*.md`.
+- Only modify `<artifact_base>.handoff.md` and D# step files matching `<artifact_base>.step.D*.md`.
 - Do not modify I# or T# step files.
 - Never modify product code while planning.
-- Never rewrite `PROMPT-PLAN.md`.
+- Never rewrite `<artifact_base>.draft.md`.
 - Within each D# step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
 - Each diff block within a D# step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Per-hunk labels are the authoritative locators.
 - Full-file `Lines:` ranges are invalid for localized changes — use only for NEW actions that add complete files.
@@ -117,7 +118,7 @@ Load all rule files below in parallel. Apply them:
 
 # Templates
 
-## `PROMPT-PLAN.step.D1.md` (Documentation Step)
+## `<artifact_base>.step.D1.md` (Documentation Step)
 
 ````markdown
 # D1: `path/to/documentation-file`

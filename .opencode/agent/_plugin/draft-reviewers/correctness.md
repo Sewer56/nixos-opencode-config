@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-PLUGIN-PLAN.draft-review-correctness.md": allow
+    "*PROMPT-PLUGIN-PLAN*.draft.review-correctness.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -30,8 +30,8 @@ and plugin-specific constraints.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
-- `context_path` (the draft artifact, e.g. `PROMPT-PLUGIN-PLAN.md`)
-- `draft_handoff_path` (e.g. `PROMPT-PLUGIN-PLAN.draft-handoff.md`)
+- `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
+- `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Focus
 - Template structure: required sections present — Overall Goal, Open Questions, Decisions, Action with `[P#]` items, Dependencies, Discovery. Omit Open Questions or Decisions only when explicitly marked `None`.
@@ -40,7 +40,7 @@ and plugin-specific constraints.
 
 # Process
 1. Load cache
-- Read `PROMPT-PLUGIN-PLAN.draft-review-correctness.md` if it exists. Treat missing or malformed cache as empty.
+- Cache: `PROMPT-PLUGIN-PLAN-opencode-config.draft.handoff.md` → `PROMPT-PLUGIN-PLAN-opencode-config.draft.review-correctness.md`. Read if exists. Treat missing or malformed cache as empty.
 - Treat the cache as one record per `[P#]` with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
@@ -58,7 +58,7 @@ and plugin-specific constraints.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- If `PROMPT-PLUGIN-PLAN.draft-review-correctness.md` is missing or malformed: write the full cache file.
+- If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.
@@ -84,9 +84,9 @@ Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
 ```diff
-PROMPT-PLUGIN-PLAN.md
---- a/PROMPT-PLUGIN-PLAN.md
-+++ b/PROMPT-PLUGIN-PLAN.md
+<artifact_base>.draft.md
+--- a/<artifact_base>.draft.md
++++ b/<artifact_base>.draft.md
  unchanged context
 -incorrect content
 +correct content

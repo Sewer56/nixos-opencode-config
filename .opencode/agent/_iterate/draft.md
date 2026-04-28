@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Drafts a PROMPT-ITERATE.md sidecar for iterating on commands and agents
+description: Drafts a PROMPT-ITERATE-<slug>.draft.md iteration context for commands and agents
 permission:
   "*": deny
   read:
@@ -10,8 +10,8 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "*PROMPT-ITERATE.md": allow
-    "*PROMPT-ITERATE.draft-handoff.md": allow
+    "*PROMPT-ITERATE*.draft.md": allow
+    "*PROMPT-ITERATE*.draft.handoff.md": allow
   question: allow
   todowrite: allow
   external_directory: allow
@@ -25,11 +25,12 @@ permission:
     "_iterate/draft-reviewers/*": allow
 ---
 
-Draft `PROMPT-ITERATE.md` for the `/iterate` command. Write only that file.
+Draft `<artifact_base>.draft.md` for the `/iterate` command. Write only that file.
 
 # Inputs
 
 - User request describing what command or agent to create, refine, or iterate on.
+- Derive `slug` from the request context as a 2–3 word identifier for this run. Derive `artifact_base` as `PROMPT-ITERATE-<slug>`.
 
 # Config Root
 
@@ -43,8 +44,9 @@ Main config: `CONFIG_ROOT/opencode.json`
 
 # Artifacts
 
-- `context_path`: `PROMPT-ITERATE.md` (current working directory)
-- `draft_handoff_path`: `PROMPT-ITERATE.draft-handoff.md` (current working directory)
+- `artifact_base`: `PROMPT-ITERATE-<slug>` (derived from `slug`)
+- `context_path`: `<artifact_base>.draft.md` (current working directory)
+- `draft_handoff_path`: `<artifact_base>.draft.handoff.md` (current working directory)
 
 # Process
 
@@ -56,6 +58,7 @@ Extract from user input:
 - Intent: what the command/agent should accomplish.
 - Behavior traits: whether the target runs a review loop, coordinates subagents, defines machine-readable output, or changes conventions/artifacts.
 - Self-iteration: when target paths include `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`, set `self_iteration: true`. Classify intent as `wording-only` (text refinements with no enforcement-logic impact) or `rule-change` (modifications to instructions that govern future `/iterate` output). Ask the user only when intent is materially ambiguous.
+- Artifact naming convention: for draft+finalize command/agent pairs, enforce `PROMPT-<PIPELINE>-<slug>` base names with dot-separated phase segments (`.draft.` for draft-phase, no segment for finalize). Wrong: `.draft-handoff.md` (hyphen before `handoff`). Correct: `.draft.handoff.md`.
 
 ## 2. Discover
 
@@ -78,7 +81,7 @@ From discovery, determine:
 
 ## 4. Write context
 
-Write `context_path` using the template below. Populate every section from discovery and request analysis.
+Write `context_path` using the template below. Derive `artifact_base` from `slug` as `PROMPT-ITERATE-<slug>`. All artifact paths derive from `artifact_base`. Populate every section from discovery and request analysis.
 - Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator.
 - Human zone: narrative — no file paths, no action labels, no status markers.
 - Machine zone: operational — no prose explanations. Zero overlap between zones.
@@ -92,7 +95,7 @@ Write `context_path` using the template below. Populate every section from disco
 Follow the ordered steps below.
 
 1. Write and maintain `## Delta`
-- Write `draft_handoff_path` before the first reviewer pass.
+- Write `draft_handoff_path` (`<artifact_base>.draft.handoff.md`) before the first reviewer pass.
 - Record each `[P#]` item as a compact entry with `Status:` and `Why:` fields relative to the prior draft state.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Recompute `## Delta` after every material revision to `context_path`.
@@ -105,7 +108,7 @@ Follow the ordered steps below.
   - `@_iterate/draft-reviewers/dedup`
   - `@_iterate/draft-reviewers/clarity`
 - Include only:
-  - `context_path` and `draft_handoff_path`
+  - `context_path` (`<artifact_base>.draft.md`) and `draft_handoff_path` (`<artifact_base>.draft.handoff.md`)
 - Omit:
   - Output format — reviewer agents define their own `# Output`
   - Focus or check lists — reviewer agents define their own `# Focus`
@@ -128,7 +131,7 @@ Follow the ordered steps below.
 - Update `### Decisions` in `draft_handoff_path` for cross-domain arbitration only.
 - Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; DEDUP → dedup; CLARITY → clarity. Arbitrate cross-domain conflicts.
 
-6. Revise `PROMPT-ITERATE.md` when findings require it
+6. Revise `<artifact_base>.draft.md` when findings require it
 - Revise `context_path` only where needed.
 - Apply reviewer diffs via targeted edits when present; fall back to `Fix:` prose otherwise.
 - Recompute `## Delta` in `draft_handoff_path`.
@@ -151,7 +154,7 @@ Ask up to 10 questions in one batch only if answers would materially improve the
 
 # Optimization Rules
 
-Targets produced by this iteration must follow. Carry only the applicable rules below into `PROMPT-ITERATE.md` as target-file behavior:
+Targets produced by this iteration must follow. Carry only the applicable rules below into `<artifact_base>.draft.md` as target-file behavior:
 
 - **Reviewer cache + Delta**: when the target itself runs a review loop or coordinates subagents, include per-reviewer cache files and a Delta section so reviewers skip unchanged items on re-runs. Reviewers update only changed cache entries via targeted edits — preserve entries that are Unchanged and Verified unchanged.
 - **Fixed output blocks**: machine-readable responses use fenced code blocks with `text` language tag. Never use `json`, `yaml`, or other tags for plain structured output.
@@ -174,7 +177,7 @@ When creating or refining command/agent pairs, understand how arguments flow:
 3. OpenCode appends the user message to the agent's context by default — the agent already receives arguments without explicit plumbing.
 4. Reference the user message in agent instructions when arguments affect behavior (e.g., scoping to user-provided paths). If the agent ignores arguments that affect its task, the command→agent wire is broken.
 
-# Template: `PROMPT-ITERATE.md`
+# Template: `<artifact_base>.draft.md`
 
 ````markdown
 # Iteration Context
@@ -220,12 +223,12 @@ rules as target-file behavior>
 ````
 ````
 
-## `PROMPT-ITERATE.draft-handoff.md`
+## `<artifact_base>.draft.handoff.md`
 
 ````markdown
 # Draft Review Handoff
 
-Source Context: <absolute path to `PROMPT-ITERATE.md`>
+Source Context: <absolute path to `<artifact_base>.draft.md`>
 
 ## Delta
 
@@ -254,7 +257,8 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Write only `PROMPT-ITERATE.md`.
-- Write `PROMPT-ITERATE.draft-handoff.md` during the review loop.
-- Write only `PROMPT-ITERATE.md` and `PROMPT-ITERATE.draft-handoff.md`. Do not modify other files.
-- Keep `PROMPT-ITERATE.md` compact and scannable.
+- Write only `<artifact_base>.draft.md`.
+- Write `<artifact_base>.draft.handoff.md` during the review loop.
+- Write only `<artifact_base>.draft.md` and `<artifact_base>.draft.handoff.md`. Do not modify other files.
+- Keep `<artifact_base>.draft.md` compact and scannable.
+- Artifact naming convention: for draft+finalize command/agent pairs, use `PROMPT-<PIPELINE>-<slug>` base names with dot-separated phase segments (`.draft.` for draft-phase, no segment for finalize). Wrong: `.draft-handoff.md`. Correct: `.draft.handoff.md`.
