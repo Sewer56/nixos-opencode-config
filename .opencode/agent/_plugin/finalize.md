@@ -11,7 +11,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-PLUGIN-PLAN.handoff.md": allow
-    "*PROMPT-PLUGIN-PLAN.rev.*.md": allow
+    "*PROMPT-PLUGIN-PLAN.step.*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -37,7 +37,7 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 # Artifacts
 - `context_path`: `PROMPT-PLUGIN-PLAN.md`
 - `handoff_path`: `PROMPT-PLUGIN-PLAN.handoff.md`
-- `rev_pattern`: `PROMPT-PLUGIN-PLAN.rev.*.md`
+- `step_pattern`: `PROMPT-PLUGIN-PLAN.step.*.md`
 
 # Process
 
@@ -48,7 +48,7 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 ## 2. Deepen discovery only where needed
 - Start from the paths and shapes already present in `context_path`.
 - Consume `Overall Goal:` lines and `[P#]` labeled steps directly.
-- `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers. Treat as draft-level guidance — ground REV diffs in actual file content.
+- `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers. Treat as draft-level guidance — ground STEP diffs in actual file content.
 - Deepen discovery only where the confirmed context leaves frontmatter fields, permission patterns, naming, cross-references, or output formats unresolved.
 - Infer which optimization rules apply to each confirmed target from its behavior: review loop, subagent coordination, machine-readable output, or convention/artifact changes.
 - Use `@codebase-explorer` for repo discovery first when needed.
@@ -61,10 +61,10 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 - Write `handoff_path` using the `# Templates` section below.
 
 ## 4. Write the machine artifact
-- Derive discrete `REV-###` items from the confirmed context and handoff.
-- Stable numbering: number items sequentially from 001. If a REV is removed during revision, leave the gap — do not renumber other items.
-- Write `handoff_path` using the `# Templates` section (handoff now includes Summary, Revision History, and REV Index).
-- Write each REV item to its own file matching `rev_pattern` using the `# Templates` section.
+- Derive discrete `STEP-###` items from the confirmed context and handoff.
+- Stable numbering: number items sequentially from 001. If a STEP is removed during revision, leave the gap — do not renumber other items.
+- Write `handoff_path` using the `# Templates` section (handoff now includes Summary, Revision History, and Step Index).
+- Write each STEP item to its own file matching `step_pattern` using the `# Templates` section.
 - Apply only the relevant optimization rules to each target. Split rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
 - Embed operational rules directly in generated targets.
 
@@ -75,12 +75,12 @@ Convert a confirmed plugin plan into reviewed machine instructions.
 Follow the ordered steps below exactly, in order.
 
 ### Core review
-- Write and maintain `## Delta`: write to `handoff_path` before the first reviewer pass; record each `REV-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields; add artifact markers for `Source Context` and `Review Ledger`; recompute after every material revision.
-- Build core reviewer prompts: after each full machine-artifact draft, run `@_plugin/finalize-reviewers/correctness` and `@_plugin/finalize-reviewers/dead-code` in parallel. Treat each reviewer prompt as scoped call data. Include only: artifact paths (`context_path`, `handoff_path`), `rev_pattern` (a glob pattern matching REV target file paths to scope the review), and finalize-time user notes. Omit: output format, focus lists, target file paths from REV items, role assignment, blanket read orders — reviewers decide what to open from Delta, cache state, and Decisions.
+- Write and maintain `## Delta`: write to `handoff_path` before the first reviewer pass; record each `STEP-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields; add artifact markers for `Source Context` and `Review Ledger`; recompute after every material revision.
+- Build core reviewer prompts: after each full machine-artifact draft, run `@_plugin/finalize-reviewers/correctness` and `@_plugin/finalize-reviewers/dead-code` in parallel. Treat each reviewer prompt as scoped call data. Include only: artifact paths (`context_path`, `handoff_path`), `step_pattern` (a glob pattern matching STEP target file paths to scope the review), and finalize-time user notes. Omit: output format, focus lists, target file paths from STEP items, role assignment, blanket read orders — reviewers decide what to open from Delta, cache state, and Decisions.
 - Validate each reviewer response: confirm `# REVIEW` header, `Decision: PASS | ADVISORY | BLOCKING`, `## Findings` and `## Verified` headings. If malformed after retries, treat as BLOCKING with a synthetic finding.
 - Retry malformed responses: if validation fails and Delta plus Decisions are unchanged, send only the protocol error and request re-emit; if Delta or Decisions changed, include only the new excerpt and request fresh response.
 - Record decisions: update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files. Core domain ownership: CORRECTNESS → correctness reviewer; DEAD_CODE → dead-code reviewer.
-- Revise the machine artifact when findings require it: revise REV files only where needed; append one line to `## Revision History`.
+- Revise the machine artifact when findings require it: revise STEP files only where needed; append one line to `## Revision History`.
 - Re-run core reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
   No findings: proceed to polish review. At cap: FAIL if BLOCKING, proceed to polish with risks if only ADVISORY.
@@ -91,7 +91,7 @@ Follow the ordered steps below exactly, in order.
 - Validate each reviewer response (same criteria as core).
 - Retry malformed responses (same protocol as core).
 - Record decisions: update `### Decisions` in `handoff_path` for cross-domain arbitration. Polish domain ownership: DOCUMENTATION → documentation reviewer; ERRORS → errors reviewer; REORDER → reorder reviewer.
-- Apply polish reviewer diffs to REV files. Append one line to `## Revision History`.
+- Apply polish reviewer diffs to STEP files. Append one line to `## Revision History`.
 - Re-run polish reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
   No findings: SUCCESS. At cap: FAIL if BLOCKING, proceed to output with risks if only ADVISORY.
@@ -104,34 +104,34 @@ Return exactly:
 Status: SUCCESS | INCOMPLETE | FAIL
 Context Path: <absolute path>
 Handoff Path: <absolute path>
-Rev Pattern: <e.g. PROMPT-PLUGIN-PLAN.rev.*.md>
+Step Pattern: <e.g. PROMPT-PLUGIN-PLAN.step.*.md>
 Review Iterations: <n>
 Summary: <one-line summary>
 ```
 
 # Constraints
 
-- Write only `PROMPT-PLUGIN-PLAN.handoff.md` and files matching `PROMPT-PLUGIN-PLAN.rev.*.md` during finalize.
+- Write only `PROMPT-PLUGIN-PLAN.handoff.md` and files matching `PROMPT-PLUGIN-PLAN.step.*.md` during finalize.
 - Modify only those files during finalize.
 - Read `PROMPT-PLUGIN-PLAN.md` as source of truth only; write to handoff and machine paths.
-- Keep each REV file diff-based with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
+- Keep each STEP file diff-based with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
 - Keep `PROMPT-PLUGIN-PLAN.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
 
 # Rules
 
-Apply these rules when writing REV files:
+Apply these rules when writing STEP files:
 
 - Write concrete values for every field and body — omit `...`, `TODO`, and comment-only stubs.
-- Specify the full path for every file reference: REV headings, `Evidence` fields, and diff block targets all use fully qualified paths from the project root.
-- Reference anchors and approximate location via `Lines: ~<start>-<end> | None` in the REV header.
+- Specify the full path for every file reference: STEP headings, `Evidence` fields, and diff block targets all use fully qualified paths from the project root.
+- Reference anchors and approximate location via `Lines: ~<start>-<end> | None` in the STEP header.
 - Insertions use normal code blocks with `Insert at: <anchor> (~start-end)`.
 - Edits/removals use `diff` blocks; deletions include `Remove lines: ~start-end`.
 - If frontmatter and content changes are contiguous, combine into a single diff block.
-- If changes are scattered across a file, use multiple diff blocks within one REV item.
-- Each diff block within a REV must carry its own `Lines: ~start-end` label so implementers can read targeted ranges. Place the label as a bold line (`**Lines: ~start-end**`) immediately before the diff fence.
+- If changes are scattered across a file, use multiple diff blocks within one STEP item.
+- Each diff block within a STEP must carry its own `Lines: ~start-end` label so implementers can read targeted ranges. Place the label as a bold line (`**Lines: ~start-end**`) immediately before the diff fence.
 - CREATE actions include full file content in a normal code block (not a diff against empty).
 - Diff blocks target markdown files — use markdown-aware line references (headings, list items, fenced code blocks).
-- `Lines: ~` in the REV header lists the comma-separated union of hunk ranges for quick scanning. Per-hunk labels are the authoritative locators. Full-file ranges are invalid for localized changes — use only for CREATE/DELETE actions. Include 2+ context lines before and after each change.
+- `Lines: ~` in the STEP header lists the comma-separated union of hunk ranges for quick scanning. Per-hunk labels are the authoritative locators. Full-file ranges are invalid for localized changes — use only for CREATE/DELETE actions. Include 2+ context lines before and after each change.
 
 ---
 
@@ -192,17 +192,17 @@ Source Context: <absolute path to `PROMPT-PLUGIN-PLAN.md`>
 ## Revision History
 - Iteration 1: Initial draft.
 
-## REV Index
+## Step Index
 
-| REV | Target | Action | File |
-| --- | ------ | ------ | ---- |
-| REV-001 | `path/to/file` | CREATE | `PROMPT-PLUGIN-PLAN.rev.001.md` |
-| REV-002 | `path/to/file` | UPDATE | `PROMPT-PLUGIN-PLAN.rev.002.md` |
+| STEP | Target | Action | File |
+| ---- | ------ | ------ | ---- |
+| STEP-001 | `path/to/file` | CREATE | `PROMPT-PLUGIN-PLAN.step.001.md` |
+| STEP-002 | `path/to/file` | UPDATE | `PROMPT-PLUGIN-PLAN.step.002.md` |
 
 ## Delta
 - Source Context — Status: Unchanged | Changed | New; Touched: `PROMPT-PLUGIN-PLAN.md`; Why: <why reviewers do or do not need to reread source context>
 - Review Ledger — Status: Unchanged | Changed | New; Touched: `PROMPT-PLUGIN-PLAN.handoff.md`; Why: <why arbitration state changed or stayed stable>
-- REV-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
+- STEP-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
 
 ## Review Ledger
 
@@ -215,12 +215,12 @@ Winner: <reviewer_name>
 Rationale: <why this view prevailed>
 ````
 
-## `PROMPT-PLUGIN-PLAN.rev.*.md` files
+## `PROMPT-PLUGIN-PLAN.step.*.md` files
 
-Each file `PROMPT-PLUGIN-PLAN.rev.NNN.md` contains one revision item:
+Each file `PROMPT-PLUGIN-PLAN.step.NNN.md` contains one revision item:
 
 ````markdown
-# REV-NNN: `path/to/file`
+# STEP-NNN: `path/to/file`
 
 Action: CREATE | UPDATE | DELETE
 Why: <why this file changes>
@@ -246,7 +246,7 @@ each change.>
 
 Changes:
 - <summary for quick scanning>
-Dependencies: None | REV#
+Dependencies: None | STEP#
 Evidence: `path/to/file:line`
 ````
 

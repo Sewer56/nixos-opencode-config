@@ -11,7 +11,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-ITERATE.handoff.md": allow
-    "*PROMPT-ITERATE.rev.*.md": allow
+    "*PROMPT-ITERATE.step.*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -24,7 +24,7 @@ permission:
     "_iterate/finalize-reviewers/*": allow
 ---
 
-Convert a confirmed iteration context into reviewed revision instructions. Write `PROMPT-ITERATE.handoff.md` and individual REV files matching `PROMPT-ITERATE.rev.*.md`. Edit only those files. No separate `machine.md` — handoff absorbs the manifest role.
+Convert a confirmed iteration context into reviewed revision instructions. Write `PROMPT-ITERATE.handoff.md` and individual STEP files matching `PROMPT-ITERATE.step.*.md`. Edit only those files. No separate `machine.md` — handoff absorbs the manifest role.
 
 # Inputs
 - The latest user message may confirm the draft, provide finalize-time notes, or note changes since the draft.
@@ -33,7 +33,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 # Artifacts
 - `context_path`: `PROMPT-ITERATE.md`
 - `handoff_path`: `PROMPT-ITERATE.handoff.md`
-- `rev_pattern`: `PROMPT-ITERATE.rev.*.md`
+- `step_pattern`: `PROMPT-ITERATE.step.*.md`
 
 # Process
 
@@ -44,7 +44,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 ## 2. Deepen discovery only where needed
 - Start from the paths and shapes already present in `context_path`.
 - Consume `Overall Goal:` lines and `[P#]` labeled steps directly.
-- `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers (`--- a/<path>`). Treat the explanation and diff as draft-level guidance — ground REV diffs in actual file content.
+- `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers (`--- a/<path>`). Treat the explanation and diff as draft-level guidance — ground STEP diffs in actual file content.
 - Read `## Self-Iteration` from `context_path` when present. For `wording-only` intent: proceed with standard finalize flow. For `rule-change` intent: apply the enforcement completeness gate in step 4.
 - Deepen discovery only where the confirmed context leaves concrete frontmatter fields, permission patterns, naming, cross-references, or output formats unresolved.
 - Infer which rules in `# Optimization Rules` apply to each confirmed target from its behavior: review loop, subagent coordination, machine-readable output, or convention/artifact changes.
@@ -58,21 +58,21 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - Write `handoff_path` using the `# Templates` section below.
 
 ## 4. Write the machine artifact
-- Derive discrete `REV-###` items from the confirmed context and handoff.
-- Each REV item uses one or more diff blocks grounded in the current file state. Frontmatter and content combine into a single diff block when contiguous; use multiple blocks when scattered. Each diff block must carry its own `Lines: ~start-end` label (see template). Cover only changes needed — omit restatements of unchanged content.
-- Stable numbering: number items sequentially from 001. If a REV is removed during revision, leave the gap — do not renumber other items.
-- Write `handoff_path` using the `# Templates` section (handoff now includes Summary, Revision History, and REV Index).
-- Write each REV item to its own file matching `rev_pattern` using the `# Templates` section.
+- Derive discrete `STEP-###` items from the confirmed context and handoff.
+- Each STEP item uses one or more diff blocks grounded in the current file state. Frontmatter and content combine into a single diff block when contiguous; use multiple blocks when scattered. Each diff block must carry its own `Lines: ~start-end` label (see template). Cover only changes needed — omit restatements of unchanged content.
+- Stable numbering: number items sequentially from 001. If a STEP is removed during revision, leave the gap — do not renumber other items.
+- Write `handoff_path` using the `# Templates` section (handoff now includes Summary, Revision History, and Step Index).
+- Write each STEP item to its own file matching `step_pattern` using the `# Templates` section.
 - Apply only the relevant rules from `# Optimization Rules` to each target. Split those rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
 - Keep operational rules in the generated targets themselves. Do not delegate model-facing behavior to external docs.
-- When self-iteration intent is `rule-change`: verify at least one REV item updates enforcement-logic text (instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output). If no enforcement-logic REV exists, treat this as a fatal gap — add a REV item covering the missing enforcement-logic update rather than delegating to reviewers.
+- When self-iteration intent is `rule-change`: verify at least one STEP item updates enforcement-logic text (instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output). If no enforcement-logic STEP exists, treat this as a fatal gap — add a STEP item covering the missing enforcement-logic update rather than delegating to reviewers.
 
 ## 5. Run the review loop
 Follow the ordered steps below exactly, in order.
 
 1. Write and maintain `## Delta`
 - Write `## Delta` to `handoff_path` before the first reviewer pass.
-- Record each `REV-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields relative to the prior machine artifact.
+- Record each `STEP-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields relative to the prior machine artifact.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Add artifact markers for `Source Context` and `Review Ledger` so reviewers can skip rereading unchanged artifacts.
 - Recompute `## Delta` after every material revision.
@@ -90,15 +90,15 @@ Follow the ordered steps below exactly, in order.
   - Treat each reviewer prompt as scoped call data for the callee.
 - Include only:
   - Artifact paths (`context_path`, `handoff_path`)
-  - `rev_pattern`
+   - `step_pattern`
   - Finalize-time user notes if any
   - Self-iteration intent and target-scope from `context_path` `## Self-Iteration` section when present
 - Omit:
   - Output format (reviewer agent files define their own `# Output`)
   - Focus or check lists (reviewer agent files define their own `# Focus`)
-  - Target file paths from REV items (REV Index in handoff enumerates every target)
+  - Target file paths from STEP items (Step Index in handoff enumerates every target)
   - Role assignment ("You are a …") — OpenCode routes tasks to the correct agent automatically
-  - Blanket read orders such as "read all three artifacts" or "read every REV target file" — reviewers decide what to open from Delta, cache state, and Decisions
+  - Blanket read orders such as "read all three artifacts" or "read every STEP target file" — reviewers decide what to open from Delta, cache state, and Decisions
 
 3. Validate each reviewer response
 - Confirm the response starts with `# REVIEW`.
@@ -116,7 +116,7 @@ Follow the ordered steps below exactly, in order.
 - Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; PERFORMANCE → performance; DEDUP → dedup; DIFF → diff; META → meta; CLARITY → clarity. Arbitrate cross-domain conflicts.
 
 6. Revise the machine artifact when findings require it
-- Revise REV files only where needed.
+- Revise STEP files only where needed.
 - Apply reviewer diffs via targeted edits when present; fall back to `Fix:` prose otherwise.
 - Append one line to `## Revision History`.
 
@@ -133,16 +133,16 @@ Return exactly:
 Status: SUCCESS | INCOMPLETE | FAIL
 Context Path: <absolute path>
 Handoff Path: <absolute path>
-Rev Pattern: <e.g. PROMPT-ITERATE.rev.*.md>
+Step Pattern: <e.g. PROMPT-ITERATE.step.*.md>
 Review Iterations: <n>
 Summary: <one-line summary>
 ```
 
 # Constraints
-- Write only `PROMPT-ITERATE.handoff.md` and files matching `PROMPT-ITERATE.rev.*.md` during finalize.
-- Modify only `PROMPT-ITERATE.handoff.md` and files matching `PROMPT-ITERATE.rev.*.md` during finalize.
+- Write only `PROMPT-ITERATE.handoff.md` and files matching `PROMPT-ITERATE.step.*.md` during finalize.
+- Modify only `PROMPT-ITERATE.handoff.md` and files matching `PROMPT-ITERATE.step.*.md` during finalize.
 - Read `PROMPT-ITERATE.md` as source of truth only; write to handoff and machine paths.
-- Keep each REV file diff-based: diff blocks grounded in current file state with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
+- Keep each STEP file diff-based: diff blocks grounded in current file state with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
 - Keep `PROMPT-ITERATE.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
 
@@ -161,19 +161,19 @@ Revisions produced by this iteration must follow. Apply only the relevant rules 
 - **Reviewer diff output**: reviewers that can determine the exact text replacement for a finding must include a unified diff block inline after the finding's `Fix:` field. When the fix is conceptual rather than concrete, omit the diff and rely on `Fix:` prose only.
 
 # Rules
-Apply these rules when writing REV files:
+Apply these rules when writing STEP files:
 
 - Write concrete values for every field and body — omit `...`, `TODO`, and comment-only stubs.
-- Specify the full path for every file reference: REV headings, `Evidence` fields, and diff block targets all use fully qualified paths from the project root (e.g. `config/agent/_iterate/finalize.md`, not `finalize.md`).
+- Specify the full path for every file reference: STEP headings, `Evidence` fields, and diff block targets all use fully qualified paths from the project root (e.g. `config/agent/_iterate/finalize.md`, not `finalize.md`).
 - Reference anchors and approximate line ranges inside diff blocks.
 - Insertions use normal code blocks with `Insert at: <anchor> (~start-end)`.
 - Edits/removals use `diff` blocks; deletions include `Remove lines: ~start-end`.
 - If frontmatter and content changes are contiguous, combine into a single diff block.
-- If changes are scattered across a file, use multiple diff blocks within one REV item.
-- Each diff block within a REV must carry its own `Lines: ~start-end` label so implementers can read targeted ranges. Place the label as a bold line (`**Lines: ~start-end**`) immediately before the diff fence.
+- If changes are scattered across a file, use multiple diff blocks within one STEP item.
+- Each diff block within a STEP must carry its own `Lines: ~start-end` label so implementers can read targeted ranges. Place the label as a bold line (`**Lines: ~start-end**`) immediately before the diff fence.
 - CREATE actions include full file content in a normal code block (not a diff against empty).
 - Diff blocks target markdown files — use markdown-aware line references (headings, list items, fenced code blocks).
-- `Lines: ~` in the REV header lists the comma-separated union of all hunk ranges (e.g. `Lines: ~5-10, ~45-52, ~200-210`) for quick scanning. Per-hunk labels are the authoritative locators. Full-file ranges like `Lines: ~1-258` are invalid for localized changes — use only for CREATE/DELETE actions. Include 2+ context lines before and after each change.
+- `Lines: ~` in the STEP header lists the comma-separated union of all hunk ranges (e.g. `Lines: ~5-10, ~45-52, ~200-210`) for quick scanning. Per-hunk labels are the authoritative locators. Full-file ranges like `Lines: ~1-258` are invalid for localized changes — use only for CREATE/DELETE actions. Include 2+ context lines before and after each change.
 
 # Templates
 
@@ -212,17 +212,17 @@ Source Context: <absolute path to `PROMPT-ITERATE.md`>
 ## Revision History
 - Iteration 1: Initial draft.
 
-## REV Index
+## Step Index
 
-| REV | Target | Action | File |
-| --- | ------ | ------ | ---- |
-| REV-001 | `path/to/file` | CREATE | `PROMPT-ITERATE.rev.001.md` |
-| REV-002 | `path/to/file` | UPDATE | `PROMPT-ITERATE.rev.002.md` |
+| STEP | Target | Action | File |
+| ---- | ------ | ------ | ---- |
+| STEP-001 | `path/to/file` | CREATE | `PROMPT-ITERATE.step.001.md` |
+| STEP-002 | `path/to/file` | UPDATE | `PROMPT-ITERATE.step.002.md` |
 
 ## Delta
 - Source Context — Status: Unchanged | Changed | New; Touched: `PROMPT-ITERATE.md`; Why: <why reviewers do or do not need to reread source context>
 - Review Ledger — Status: Unchanged | Changed | New; Touched: `PROMPT-ITERATE.handoff.md`; Why: <why arbitration state changed or stayed stable>
-- REV-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
+- STEP-### — Status: Unchanged | Changed | New; Touched: `path/from/project/root`; Why: <smallest reason this item changed>
 
 ## Review Ledger
 
@@ -235,12 +235,12 @@ Winner: <reviewer_name>
 Rationale: <why this view prevailed>
 ````
 
-## `PROMPT-ITERATE.rev.*.md` files
+## `PROMPT-ITERATE.step.*.md` files
 
-Each file `PROMPT-ITERATE.rev.NNN.md` contains one revision item:
+Each file `PROMPT-ITERATE.step.NNN.md` contains one revision item:
 
 ````markdown
-# REV-NNN: `path/to/file`
+# STEP-NNN: `path/to/file`
 
 Action: CREATE | UPDATE | DELETE
 Why: <why this file changes>
@@ -267,7 +267,7 @@ each change.>
 
 Changes:
 - <summary for quick scanning>
-Dependencies: None | REV#
+Dependencies: None | STEP#
 Evidence: `path/to/file:line`
 ````
 

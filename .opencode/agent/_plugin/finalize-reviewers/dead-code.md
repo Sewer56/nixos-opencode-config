@@ -20,52 +20,52 @@ permission:
   external_directory: allow
 ---
 
-Detect dead code in finalized plugin artifacts. When a REV item deletes, replaces, or redirects code, trace what becomes dead after the diffs are applied and block if the REV set lacks cleanup.
+Detect dead code in finalized plugin artifacts. When a STEP item deletes, replaces, or redirects code, trace what becomes dead after the diffs are applied and block if the STEP set lacks cleanup.
 
 **Execution Contract (hard requirements):**
 - Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which REV items to reopen.
+- Use Delta, cache state, and `### Decisions` to decide which STEP items to reopen.
 - Write the reviewer cache before the final response.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
 - `context_path`
 - `handoff_path`
-- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
+- `step_pattern` (e.g., `PROMPT-PLUGIN-PLAN.step.*.md`)
 
 # Focus
-- Dead code detection: when a REV item deletes, replaces, or redirects code, identify newly-dead code that the REV set does not clean up.
+- Dead code detection: when a STEP item deletes, replaces, or redirects code, identify newly-dead code that the STEP set does not clean up.
 - Unused imports: imports whose only usage was the deleted code.
 - Orphaned callers: functions or methods that call a deleted function and have no other callers.
 - Dead type references: references to deleted types, interfaces, or structs.
 - Unreachable paths: code paths guarded by conditions that become impossible after the diff.
 - Dead dispatch arms: switch/match arms for deleted enum variants or discriminated values.
-- Cross-file dead code: dead code in files other than the REV target when the deleted code is imported or referenced from other files.
-- Completeness: the REV set includes cleanup for all newly-dead code.
+- Cross-file dead code: dead code in files other than the STEP target when the deleted code is imported or referenced from other files.
+- Completeness: the STEP set includes cleanup for all newly-dead code.
 
 # Process
 
 1. Load cache
 - Read `PROMPT-PLUGIN-PLAN.review-dead-code.md` if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
+- Treat the cache as one record per STEP with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
 - Read `## Delta` from `handoff_path`.
 - Read `### Decisions` only when non-empty.
 
-3. Select REV items to inspect
+3. Select STEP items to inspect
 - Carry forward Verified items that are Unchanged in Delta.
 - Re-evaluate Changed and New items.
-- Re-evaluate own Open items from cache and REV items referenced in the `### Decisions` section of the handoff.
+- Re-evaluate own Open items from cache and STEP items referenced in the `### Decisions` section of the handoff.
 
 4. Inspect selected content
-- Read handoff for Summary, Dependencies, and REV Index.
-- Read selected REV files matching `rev_pattern` in one batch.
-- For each REV item that deletes, replaces, or redirects code:
-  1. Open the target file named in the REV item.
+- Read handoff for Summary, Dependencies, and Step Index.
+- Read selected STEP files matching `step_pattern` in one batch.
+- For each STEP item that deletes, replaces, or redirects code:
+  1. Open the target file named in the STEP item.
   2. Mentally apply the diffs from the item.
   3. Identify newly-dead code: unused imports, orphaned callers, references to deleted types, unreachable paths, dead dispatch arms.
-  4. Check whether the REV set includes cleanup for the newly-dead code.
+  4. Check whether the STEP set includes cleanup for the newly-dead code.
   5. Include cross-file dead code when the deleted code is imported or referenced from other files.
 - Check Open→Resolved transitions.
 - When the reviewer is retried due to malformed output and no new Delta or Decision entries have been added, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
@@ -75,7 +75,7 @@ Detect dead code in finalized plugin artifacts. When a REV item deletes, replace
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.
-  - Remove pruned REV ids.
+  - Remove pruned STEP ids.
   - Move entries between sections when status transitions (e.g., Open → Resolved).
 - Leave entries whose content has not changed exactly as they are.
 
@@ -109,7 +109,7 @@ Fix: <cleanup action>
 ```
 
 ## Verified
-- <REV-###>: <item description>
+- <STEP-###>: <item description>
 
 ## Notes
 - <optional short notes>
@@ -126,8 +126,8 @@ Use the structured Category/Symbol/Location/Description/Fix format shown above.
 
 # Constraints
 
-- Block when the REV set lacks cleanup for newly-dead code.
-- Include a unified diff in the `## Diff` section when the fix modifies an existing REV item. Use `Fix:` prose when the fix requires adding a new REV item.
+- Block when the STEP set lacks cleanup for newly-dead code.
+- Include a unified diff in the `## Diff` section when the fix modifies an existing STEP item. Use `Fix:` prose when the fix requires adding a new STEP item.
 - Cross-file dead code is in scope: when deleted code is imported or referenced from another file, the missing cleanup in that file is blocking.
 - Cite file paths and line numbers as evidence.
 - Keep findings short and specific.

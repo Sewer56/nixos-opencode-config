@@ -3,7 +3,7 @@
 Reference for optimization patterns used by the `/iterate` workflow
 and other similar workflows.
 
-- [Split REV Files](#split-rev-files)
+- [Split STEP Files](#split-step-files)
   — each revision item in its own file; handoff absorbs machine.md
 - [Section Ordering Convention](#section-ordering-convention)
   — Inputs → Process → Supplemental ordering for produced files
@@ -50,7 +50,7 @@ and other similar workflows.
 - [Focus-as-Scope](#focus-as-scope)
   — Focus is the reviewer scope boundary; meta enforces no overlap
 
-## Split REV Files
+## Split STEP Files
 
 Applies to all finalize pipelines: `_iterate`, `_plugin`, `_plan`, and
 `_orchestrator`.
@@ -58,22 +58,22 @@ Applies to all finalize pipelines: `_iterate`, `_plugin`, `_plan`, and
 ### No Separate machine.md
 
 The `machine.md` artifact is eliminated. Handoff absorbs its content:
-Summary, Revision History, and REV/Step Index. All actionable diff/step
-content lives in individual files matching `rev_pattern` or `step_pattern`.
+Summary, Revision History, and Step Index. All actionable diff/step
+content lives in individual files matching `step_pattern` or `step_pattern`.
 
 Consumers read: handoff (single coordination document) + per-item files matching the pattern.
 
 ### File Layout
 
 - `PROMPT-ITERATE.handoff.md` — coordination document with Summary,
-  Revision History, REV Index, Delta, and Review Ledger
-- `PROMPT-ITERATE.rev.001.md` — first revision item
-- `PROMPT-ITERATE.rev.002.md` — second revision item
--  (each diff block within a REV carries its own `Lines: ~`
-   label so implementers read targeted ranges)
+  Revision History, Step Index, Delta, and Review Ledger
+- `PROMPT-ITERATE.step.001.md` — first revision item
+- `PROMPT-ITERATE.step.002.md` — second revision item
+-  (each diff block within a STEP carries its own `Lines: ~`
+    label so implementers read targeted ranges)
 - (gaps are valid; deleted items leave holes in numbering)
 
-For `_plugin`: same pattern with `PROMPT-PLUGIN-PLAN.rev.*.md`.
+For `_plugin`: same pattern with `PROMPT-PLUGIN-PLAN.step.*.md`.
 
 For `_plan`: implementation and test steps split into
 `PROMPT-PLAN.step.I1.md`, `PROMPT-PLAN.step.T1.md`, etc.
@@ -185,8 +185,8 @@ For reviewers, the Process-zone step order:
 1. Load cache
 2. Read Delta and Decisions
 3. Reopen only Changed, New, items with unresolved findings, or
-   decision-referenced REV items
-4. Read the REV Index from handoff, then read selected REV files matching `rev_pattern`
+   decision-referenced STEP items
+4. Read the Step Index from handoff, then read selected STEP files matching `step_pattern`
 5. Update cache — only changed entries
 6. Emit the required final output block
 
@@ -199,11 +199,11 @@ Reviewers start from cache plus Delta. They carry forward cached
 `PASS` items with no open findings when their Delta state remains
 `Unchanged`.
 
-Read the REV Index from handoff first. Then read selected REV files matching `rev_pattern`. Open target files only for:
+Read the Step Index from handoff first. Then read selected STEP files matching `step_pattern`. Open target files only for:
 - Changed items
 - New items
 - Items with unresolved findings from cache
-- Decision-referenced REV items
+- Decision-referenced STEP items
 
 ### Malformed-Output Retries
 
@@ -360,7 +360,7 @@ unaffected.
 - **wording-only**: text clarifications with no effect on what rules
   get enforced. Standard finalize and review flow.
 - **rule-change**: modifications to rules that control future
-  `/iterate` output. Requires at least one REV updating what rules
+  `/iterate` output. Requires at least one STEP updating what rules
   get enforced; the meta reviewer blocks if missing.
 
 ### wording-only example
@@ -379,13 +379,13 @@ Generated `## Self-Iteration`: `Intent: rule-change`,
 `Target-Scope: .opencode/agent/_iterate/draft.md,
 .opencode/agent/_iterate/finalize-reviewers/correctness.md`
 
-The handoff must include a REV updating the reviewer focus
+The handoff must include a STEP updating the reviewer focus
 list to enforce the new rule.
 
 ## Line-location Convention
 
 All finalize agents and reviewers use `Lines: ~<start>-<end> | None`
-as the header-level indicator in REV and step files
+as the header-level indicator in STEP files
 (`~` ≈ ±10 lines). The header `Lines: ~` lists the
 comma-separated union of all hunk ranges; each diff block
 carries its own `Lines: ~start-end` label (`**Lines: ~start-end**`
@@ -461,7 +461,7 @@ domain exclusively. Finalize agents write items without tracing;
 the reviewer detects missing cleanup and blocks. Cleanup items
 are added in the next iteration via the standard review loop.
 
-When the dead-code reviewer detects a REV or step item that deletes,
+When the dead-code reviewer detects a STEP item that deletes,
 replaces, or redirects code, it traces what becomes dead after the
 diffs are applied. See the dead-code reviewer files (`_plugin`,
 `_plan` `finalize-reviewers/dead-code.md`) for the full

@@ -24,43 +24,43 @@ Review finalized iteration artifacts for correctness, schema validity, and cross
 
 **Execution Contract (hard requirements):**
 - Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which REV items to reopen.
+- Use Delta, cache state, and `### Decisions` to decide which STEP items to reopen.
 - Write the reviewer cache before the final response.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
 - `context_path`
 - `handoff_path`
-- `rev_pattern` (e.g., `PROMPT-ITERATE.rev.*.md`)
+- `step_pattern` (e.g., `PROMPT-ITERATE.step.*.md`)
 
 # Focus
-- Schema: frontmatter in each `REV-###` target matches the command or agent schema exactly. Required fields present. No invented fields. YAML parses correctly.
-- Permission consistency: agent `permission` frontmatter in each `REV-###` is self-consistent. Required permission keys present. `task` entries reference existing subagent names. Command `agent:` references an existing agent name.
-- Cross-references: no dangling file references. No "see the docs" without inlining the content. Every `REV-###` anchor points at a real section or frontmatter field in the target file.
-- Completeness: no placeholders, undefined fields, or unresolved ownership in REV files.
+- Schema: frontmatter in each `STEP-###` target matches the command or agent schema exactly. Required fields present. No invented fields. YAML parses correctly.
+- Permission consistency: agent `permission` frontmatter in each `STEP-###` is self-consistent. Required permission keys present. `task` entries reference existing subagent names. Command `agent:` references an existing agent name.
+- Cross-references: no dangling file references. No "see the docs" without inlining the content. Every `STEP-###` anchor points at a real section or frontmatter field in the target file.
+- Completeness: no placeholders, undefined fields, or unresolved ownership in STEP files.
 - Ledger-file schema: Review Ledger in handoff contains only `### Decisions` for cross-domain arbitration. No `### Issues` subsection — domain-internal issue tracking stays in reviewer cache files.
-- Operational rule coverage: when a `REV-###` target runs a review loop, coordinates subagents, defines machine-readable output, or changes iterate conventions/artifacts, verify the corresponding rule fragments exist in the target file, not the diff block — cache/Delta, shared coordination state, prompt-local structured-output instructions, short human-facing docs, and tight subagent inputs.
-- External-doc delegation: flag `REV-###` instructions that tell a target prompt or reviewer to consult external docs for operational behavior instead of stating the requirement directly.
-- Per-hunk label rule coverage: when a REV target is a finalize or draft agent that emits diff blocks, verify the target file contains the per-hunk `Lines: ~start-end` label rule and the focused-ranges rule. Missing rule text is BLOCKING. (Enforcement of labels on individual REV diff blocks belongs to the diff reviewer.)
+- Operational rule coverage: when a `STEP-###` target runs a review loop, coordinates subagents, defines machine-readable output, or changes iterate conventions/artifacts, verify the corresponding rule fragments exist in the target file, not the diff block — cache/Delta, shared coordination state, prompt-local structured-output instructions, short human-facing docs, and tight subagent inputs.
+- External-doc delegation: flag `STEP-###` instructions that tell a target prompt or reviewer to consult external docs for operational behavior instead of stating the requirement directly.
+- Per-hunk label rule coverage: when a STEP target is a finalize or draft agent that emits diff blocks, verify the target file contains the per-hunk `Lines: ~start-end` label rule and the focused-ranges rule. Missing rule text is BLOCKING. (Enforcement of labels on individual STEP diff blocks belongs to the diff reviewer.)
 
 # Process
 1. Load cache
 - Read `PROMPT-ITERATE.review-correctness.md` if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
+- Treat the cache as one record per STEP with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
 - Read `## Delta` from `handoff_path`.
 - Read `### Decisions` only when it is non-empty.
 
-3. Select REV items to inspect
+3. Select STEP items to inspect
 - Carry forward Verified items that are Unchanged in Delta.
 - Re-evaluate Changed and New items.
-- Re-evaluate own Open items from cache and decision-referenced REV items.
+- Re-evaluate own Open items from cache and decision-referenced STEP items.
 
 4. Inspect selected content
-- Read handoff for Summary, Dependencies, and REV Index.
-- Read selected REV files matching `rev_pattern` in one batch.
-- Open target files only for the REV items selected in step 3.
+- Read handoff for Summary, Dependencies, and Step Index.
+- Read selected STEP files matching `step_pattern` in one batch.
+- Open target files only for the STEP items selected in step 3.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
@@ -69,7 +69,7 @@ Review finalized iteration artifacts for correctness, schema validity, and cross
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.
-  - Remove pruned REV ids.
+  - Remove pruned STEP ids.
   - Move entries between sections when status transitions (e.g., Open → Resolved).
 - Leave entries whose content has not changed exactly as they are.
 
@@ -100,7 +100,7 @@ Fix: <smallest concrete correction>
 ```
 
 ## Verified
-- <REV-###>: <item description — unchanged items that remain verified>
+- <STEP-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
@@ -115,5 +115,5 @@ Any content outside this format is a protocol violation.
 - Do not block for minor wording preferences when schema and cross-references are valid.
 - Cite file paths and specific frontmatter fields or sections as evidence.
 - Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` field targeting the affected REV file with the exact text replacement.
+- Include a unified diff after every finding's `Fix:` field targeting the affected STEP file with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

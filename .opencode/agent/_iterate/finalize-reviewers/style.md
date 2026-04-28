@@ -24,14 +24,14 @@ Review finalized iteration artifacts for instruction style quality.
 
 **Execution Contract (hard requirements):**
 - Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which REV items to reopen.
+- Use Delta, cache state, and `### Decisions` to decide which STEP items to reopen.
 - Write the reviewer cache before the final response.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
 - `context_path`
 - `handoff_path`
-- `rev_pattern` (e.g., `PROMPT-ITERATE.rev.*.md`)
+- `step_pattern` (e.g., `PROMPT-ITERATE.step.*.md`)
 
 # Focus
 - Imperative voice: revision instructions are commands, not descriptions. "Do X" not "This should do X".
@@ -39,29 +39,29 @@ Review finalized iteration artifacts for instruction style quality.
 - Positive framing: each revision states what to do. Lead with the desired action; omit prohibitions where an action suffices.
 - Negative examples: revisions that prescribe a style or format include a wrong example alongside the correct form. Use negative examples to demonstrate anti-patterns; keep surrounding instruction language positive.
 - Self-contained: each revision item usable without cross-referencing other files or external docs. Inline schemas, types, formats.
-- Output format pinned: when a revision or `REV-###` target prescribes structured output, specify the exact format in a fenced code block with `text` language tag.
-- Fixed-output consistency: when multiple `REV-###` targets define the same structured output kind, use identical format blocks.
+- Output format pinned: when a revision or `STEP-###` target prescribes structured output, specify the exact format in a fenced code block with `text` language tag.
+- Fixed-output consistency: when multiple `STEP-###` targets define the same structured output kind, use identical format blocks.
 - Subagent prompt shape: when a revision defines a reviewer or subagent prompt, pin only task-specific inputs.
-- Nested code fences: block when a REV target or reviewer output format example contains an inner ``` fence inside an outer ``` fence. The outer fence must use more backticks (e.g. ```` for outer when inner uses ```).
+- Nested code fences: block when a STEP target or reviewer output format example contains an inner ``` fence inside an outer ``` fence. The outer fence must use more backticks (e.g. ```` for outer when inner uses ```).
 
 # Process
 1. Load cache
 - Read `PROMPT-ITERATE.review-style.md` if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
+- Treat the cache as one record per STEP with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
 - Read `## Delta` from `handoff_path`.
 - Read `### Decisions` only when it is non-empty.
 
-3. Select REV items to inspect
+3. Select STEP items to inspect
 - Carry forward Verified items that are Unchanged in Delta.
 - Re-evaluate Changed and New items.
-- Re-evaluate own Open items from cache and decision-referenced REV items.
+- Re-evaluate own Open items from cache and decision-referenced STEP items.
 
 4. Inspect selected content
-- Read handoff for Summary, Dependencies, and REV Index.
-- Read selected REV files matching `rev_pattern` in one batch.
-- Open target files only for the REV items selected in step 3.
+- Read handoff for Summary, Dependencies, and Step Index.
+- Read selected STEP files matching `step_pattern` in one batch.
+- Open target files only for the STEP items selected in step 3.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
@@ -70,7 +70,7 @@ Review finalized iteration artifacts for instruction style quality.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.
-  - Remove pruned REV ids.
+  - Remove pruned STEP ids.
   - Move entries between sections when status transitions (e.g., Open → Resolved).
 - Leave entries whose content has not changed exactly as they are.
 
@@ -101,7 +101,7 @@ Fix: <smallest concrete correction>
 ```
 
 ## Verified
-- <REV-###>: <item description — unchanged items that remain verified>
+- <STEP-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
@@ -115,5 +115,5 @@ Any content outside this format is a protocol violation.
 - Block for persistent imperative-voice violations, missing negative examples where they matter, unpinned output formats, operational rules delegated to external docs, subagent prompts that re-state callee-owned role/output/focus contracts instead of task-specific inputs, or instruction language that leads with prohibitions instead of actions.
 - Do not block for minor wording when instructions are already imperative, positive-framing, and self-contained.
 - Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` field targeting the affected REV file with the exact text replacement.
+- Include a unified diff after every finding's `Fix:` field targeting the affected STEP file with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

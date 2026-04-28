@@ -24,14 +24,14 @@ Review plugin code for documentation coverage and return doc diffs.
 
 **Execution Contract (hard requirements):**
 - Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which REV items to reopen.
+- Use Delta, cache state, and `### Decisions` to decide which STEP items to reopen.
 - Write the reviewer cache before the final response.
 - Use only the `# REVIEW` block from `# Output` as the final answer.
 
 # Inputs
 - `context_path`
 - `handoff_path`
-- `rev_pattern` (e.g., `PROMPT-PLUGIN-PLAN.rev.*.md`)
+- `step_pattern` (e.g., `PROMPT-PLUGIN-PLAN.step.*.md`)
 
 # Focus
 
@@ -45,21 +45,21 @@ Review plugin code for documentation coverage and return doc diffs.
 
 1. Load cache
 - Read `PROMPT-PLUGIN-PLAN.review-documentation.md` if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per REV with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
+- Treat the cache as one record per STEP with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
 - Read `## Delta` from `handoff_path`.
 - Read `### Decisions` only when non-empty.
 
-3. Select REV items to inspect
+3. Select STEP items to inspect
 - Carry forward Verified items that are Unchanged in Delta.
 - Re-evaluate Changed and New items.
-- Re-evaluate own Open items from cache and decision-referenced REV items.
+- Re-evaluate own Open items from cache and decision-referenced STEP items.
 
 4. Inspect selected content
-- Read handoff for Summary, Dependencies, and REV Index.
-- Read selected REV files matching `rev_pattern` in one batch.
-- Open target files only for the selected REV items.
+- Read handoff for Summary, Dependencies, and Step Index.
+- Read selected STEP files matching `step_pattern` in one batch.
+- Open target files only for the selected STEP items.
 - Read `DOCUMENTATION_RULES_PATH` (`config/rules/documentation.md`) as source of truth for doc rules.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
@@ -69,7 +69,7 @@ Review plugin code for documentation coverage and return doc diffs.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
   - Insert new entries in the appropriate section.
-  - Remove pruned REV ids.
+  - Remove pruned STEP ids.
   - Move entries between sections when status transitions (e.g., Open → Resolved).
 - Leave entries whose content has not changed exactly as they are.
 
@@ -101,7 +101,7 @@ Fix: <smallest concrete correction>
 ```
 
 ## Verified
-- <REV-###>: <item description>
+- <STEP-###>: <item description>
 
 ## Notes
 - <optional short notes>
