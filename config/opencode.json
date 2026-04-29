@@ -39,7 +39,7 @@
       }
     },
     "general": {
-      "model": "sewer-axonhub/MiniMax-M2.7",
+      "model": "sewer-axonhub/GLM-5.1",
       "permission": {
         "task": {
           "*": "deny",
