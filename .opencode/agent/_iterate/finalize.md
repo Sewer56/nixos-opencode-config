@@ -21,7 +21,7 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "mcp-search": allow
-    "_optimization/selector": allow
+    "_iterate/optimization-selector": allow
     "_iterate/finalize-reviewers/*": allow
 ---
 
@@ -52,7 +52,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers (`--- a/<path>`). Treat the explanation and diff as draft-level guidance — ground STEP diffs in actual file content.
 - Read `## Self-Iteration` from `context_path` when present. For `wording-only` intent: proceed with standard finalize flow. For `rule-change` intent: apply the enforcement completeness gate in step 4.
 - Deepen discovery only where the confirmed context leaves concrete frontmatter fields, permission patterns, naming, cross-references, or output formats unresolved.
-- Call `@_optimization/selector` with the confirmed target summary, target paths, and inferred behavior traits.
+- Call `@_iterate/optimization-selector` with the confirmed target summary, target paths, and inferred behavior traits.
 - Use the selector result as the source of truth for applicable shared optimization requirements.
 - If selector fails, read `.opencode/WORKFLOW-OPTIMIZATIONS.md` directly and choose patterns manually.
 - Use `@codebase-explorer` for repo discovery first when needed.
@@ -158,7 +158,7 @@ Summary: <one-line summary>
 # Optimization Catalog
 
 - Approved shared patterns live in `.opencode/WORKFLOW-OPTIMIZATIONS.md`.
-- `@_optimization/selector` chooses which patterns apply.
+- `@_iterate/optimization-selector` chooses which patterns apply.
 - Generated targets must absorb the selected behavior directly. Do not offload model-facing rules into external docs only.
 
 # Rules

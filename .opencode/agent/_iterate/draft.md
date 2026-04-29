@@ -22,7 +22,7 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "mcp-search": allow
-    "_optimization/selector": allow
+    "_iterate/optimization-selector": allow
     "_iterate/draft-reviewers/*": allow
 ---
 
@@ -78,7 +78,7 @@ From discovery, determine:
 - For new files: correct directory and naming convention.
 - For existing files: current state and gaps vs. request intent.
 - Dependencies: does the command need an agent that doesn't exist yet?
-- Call `@_optimization/selector` with the target summary, target paths, and behavior traits from step 1.
+- Call `@_iterate/optimization-selector` with the target summary, target paths, and behavior traits from step 1.
 - Use the selector result as the source of truth for applicable shared optimization requirements.
 - If selector fails, read `.opencode/WORKFLOW-OPTIMIZATIONS.md` directly and choose patterns manually.
 
@@ -158,7 +158,7 @@ Ask up to 10 questions in one batch only if answers would materially improve the
 # Optimization Catalog
 
 - Approved shared patterns live in `.opencode/WORKFLOW-OPTIMIZATIONS.md`.
-- `@_optimization/selector` chooses which patterns apply.
+- `@_iterate/optimization-selector` chooses which patterns apply.
 - Carry only selected pattern behavior into `<artifact_base>.draft.md`. Do not paste whole-catalog text into the artifact.
 
 # Command→Agent Composition

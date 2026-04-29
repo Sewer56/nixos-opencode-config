@@ -20,7 +20,7 @@ pipeline playbook, not the shared optimization catalog.
 ## Shared Optimization Selection
 
 - `_iterate/draft` and `_iterate/finalize` call
-  `@_optimization/selector`.
+  `@_iterate/optimization-selector`.
 - Selector reads `.opencode/WORKFLOW-OPTIMIZATIONS.md` and returns only the
   approved patterns matching target behavior traits.
 - Generated targets should absorb only the selected rule fragments. Do not
