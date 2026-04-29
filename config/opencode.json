@@ -105,7 +105,7 @@
       },
       "models": {
         "glm-5-turbo": {
-          "name": "glm-5-turbo",
+          "name": "GLM-5-Turbo",
           "family": "glm",
           "attachment": false,
           "reasoning": true,
@@ -153,7 +153,7 @@
           }
         },
         "glm-5v-turbo": {
-          "name": "glm-5v-turbo",
+          "name": "GLM-5V-Turbo",
           "family": "glm",
           "attachment": true,
           "reasoning": true,
@@ -504,7 +504,7 @@
           "structured_output": true
         },
         "syn/openai/gpt-oss-120b": {
-          "name": "gpt-oss-120b (Synthetic)",
+          "name": "GPT-Oss-120B (Synthetic)",
           "family": "synthetic",
           "attachment": false,
           "reasoning": true,
@@ -776,7 +776,7 @@
           }
         },
         "minimax/MiniMax-M2.5-highspeed": {
-          "name": "MiniMax-M2.5-highspeed (MiniMax)",
+          "name": "MiniMax-M2.5-Highspeed (MiniMax)",
           "family": "minimax",
           "attachment": false,
           "reasoning": true,
@@ -824,7 +824,7 @@
           }
         },
         "minimax/MiniMax-M2.7-highspeed": {
-          "name": "MiniMax-M2.7-highspeed (MiniMax)",
+          "name": "MiniMax-M2.7-Highspeed (MiniMax)",
           "family": "minimax",
           "attachment": false,
           "reasoning": true,
@@ -848,7 +848,7 @@
           }
         },
         "zai/glm-4.5": {
-          "name": "glm-4.5 (Z.AI)",
+          "name": "GLM-4.5 (Z.AI)",
           "family": "zai",
           "attachment": false,
           "reasoning": true,
@@ -872,7 +872,7 @@
           }
         },
         "zai/glm-4.5-air": {
-          "name": "glm-4.5-air (Z.AI)",
+          "name": "GLM-4.5-Air (Z.AI)",
           "family": "zai",
           "attachment": false,
           "reasoning": true,
@@ -896,7 +896,7 @@
           }
         },
         "zai/glm-4.6": {
-          "name": "glm-4.6 (Z.AI)",
+          "name": "GLM-4.6 (Z.AI)",
           "family": "zai",
           "attachment": false,
           "reasoning": true,
@@ -920,7 +920,7 @@
           }
         },
         "zai/glm-4.7": {
-          "name": "glm-4.7 (Z.AI)",
+          "name": "GLM-4.7 (Z.AI)",
           "family": "zai",
           "attachment": false,
           "reasoning": true,
@@ -944,7 +944,7 @@
           }
         },
         "zai/glm-5": {
-          "name": "glm-5 (Z.AI)",
+          "name": "GLM-5 (Z.AI)",
           "family": "zai",
           "attachment": false,
           "reasoning": true,
@@ -968,7 +968,7 @@
           }
         },
         "zai/glm-5-turbo": {
-          "name": "glm-5-turbo (Z.AI)",
+          "name": "GLM-5-Turbo (Z.AI)",
           "family": "zai",
           "attachment": false,
           "reasoning": true,
@@ -992,7 +992,7 @@
           }
         },
         "zai/glm-5.1": {
-          "name": "glm-5.1 (Z.AI)",
+          "name": "GLM-5.1 (Z.AI)",
           "family": "zai",
           "attachment": false,
           "reasoning": true,
@@ -1016,7 +1016,7 @@
           }
         },
         "zai/glm-5v-turbo": {
-          "name": "glm-5v-turbo (Z.AI)",
+          "name": "GLM-5V-Turbo (Z.AI)",
           "family": "zai",
           "attachment": true,
           "reasoning": true,
