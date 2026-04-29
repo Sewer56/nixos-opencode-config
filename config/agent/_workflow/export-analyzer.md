@@ -18,20 +18,33 @@ permission:
 Review machine-first export bundles and surface workflow optimization moves.
 
 # Inputs
-- `export_path`: absolute path to one export bundle
-- `export_digest`: compact root-session digest produced by `python3 tools/workflow-optimize/export_digest.py <export_path>`
+- `export_path`: absolute path to export directory (from `opencode-sessions export --out`)
+- `export_digest`: compact digest produced by `python3 tools/workflow-optimize/export_digest.py <export_path>`
 - `goal`: optimization goal
 - `target_command`: normalized target command name
 - `files_under_test`: repo-relative workflow files the caller is willing to change
 
+# Export format
+
+The export is an `opencode-sessions` directory bundle:
+
+```
+<export_path>/index.json           — totals, token_efficiency, tree, session_index, tool_rollup, hotspots
+<export_path>/sessions/<sess>/summary.json — per-session totals, runtime, children, tool_rollup, file_access_rollup
+<export_path>/sessions/<sess>/turns.compact.jsonl
+<export_path>/sessions/<sess>/messages.compact.jsonl
+<export_path>/sessions/<sess>/tool_calls.jsonl
+<export_path>/sessions/<sess>/children/<child>/summary.json
+```
+
 # Process
 1. Start from `export_digest`. Do not read export-local `README.md` by default.
-2. Read root `summary.json` first.
-3. Read root `turns.compact.jsonl` only when `summary.json` is insufficient for waste, cost, or hot-turn analysis.
-4. Read root `messages.compact.jsonl` only when chronology, final assistant wording, or prompt-restatement evidence is needed.
-5. Read child `summary.json` files only when `export_digest` says child sessions exist or root files show stale refs / errors / reviewer spread worth checking.
-6. Read `index.json` only if `export_digest` is missing, inconsistent, or insufficient.
-7. Open deeper files only when compact layers are insufficient.
+2. Read `index.json` for totals, token efficiency, session index, tool rollup, and hotspots.
+3. Read root session `summary.json` (path from `digest.tree.summary_file` or `digest.export_dir + /sessions/...`) for session narrative, file access rollup, tool rollup, and child links.
+4. Read `turns.compact.jsonl` only when `summary.json` is insufficient for waste, cost, or hot-turn analysis.
+5. Read `messages.compact.jsonl` only when chronology, final assistant wording, or prompt-restatement evidence is needed.
+6. Read child `summary.json` files only when `digest` says child sessions exist or root files show stale refs / errors / reviewer spread worth checking.
+7. Open deeper files (`turns.jsonl`, `messages.jsonl`, `artifacts/`) only when compact layers are insufficient.
 8. Identify workflow waste signals:
    - high-cost low-value or waste turns
    - repeated reads / rediscovery

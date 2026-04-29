@@ -20,6 +20,8 @@ permission:
     ".opencode/**": allow
     "tools/workflow-optimize/**": allow
     "*PROMPT-WORKFLOW-OPTIMIZE-*.md": allow
+    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/.opencode/WORKFLOW-OPTIMIZATIONS.md": allow
+    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/.opencode/WORKFLOW-OPTIMIZATION-CANDIDATES.md": allow
   bash: allow
   glob: allow
   grep: allow
@@ -64,9 +66,10 @@ Run exact workflow optimization experiments against local OpenCode command and a
 - `run_meta`: `<events_dir>/run-###.meta.json`
 - `exports_dir`: `<runtime_root>/exports/`
 - `db_path`: active OpenCode SQLite path resolved with `opencode db path`
+- `opencode_sessions_bin`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/tools/opencode-sessions/target/release/opencode-sessions`
 - `task_case_index`: ordered list of task cases for multi-task experiments
-- `optimization_catalog`: `.opencode/WORKFLOW-OPTIMIZATIONS.md`
-- `optimization_candidates`: `.opencode/WORKFLOW-OPTIMIZATION-CANDIDATES.md`
+- `optimization_catalog`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/.opencode/WORKFLOW-OPTIMIZATIONS.md`
+- `optimization_candidates`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/.opencode/WORKFLOW-OPTIMIZATION-CANDIDATES.md`
 
 # Process
 
@@ -95,6 +98,7 @@ Run exact workflow optimization experiments against local OpenCode command and a
   - `## Baseline`
   - `## Quality Gate`
   - `## Runs`
+  - `## Discarded Attempts`
   - `## Hypotheses`
   - `## Best Current Strategy`
   - `## Rejected Changes`
@@ -123,7 +127,6 @@ Run exact workflow optimization experiments against local OpenCode command and a
   - `Task Case`
   - `Result`
   - `Export Path`
-  - `Events`
   - `Elapsed`
   - `Tokens`
   - `Tool Calls`
@@ -139,25 +142,34 @@ Run exact workflow optimization experiments against local OpenCode command and a
   - biggest scope-leak finding
 
 ## 3. Run exact experiment cycle
+- Before each run (including baseline), clean target-command artifacts from workspace:
+  - Remove files matching the command's artifact patterns (e.g., for `plan/finalize`: `PROMPT-PLAN-*.handoff.md`, `PROMPT-PLAN-*.step.*.md`, `PROMPT-PLAN-*.review-*.md`).
+  - Derive cleanup globs from the target command's artifact naming convention.
+  - Record cleanup action in experiment log.
+  - If cleanup fails (files locked), warn and continue — do not block the run.
 - For each run, execute all task cases sequentially. Never in parallel.
 - For each task case, call shared helper:
   - `python3 tools/workflow-optimize/run_opencode.py --run <n> --task <label> --command <cli_command> --title <title> [--model <model>] [--file <path>]... --prompt <prompt> --meta-out <run_meta>`
 - `cli_command` must be slashless, eg `plan/finalize`, not `/plan/finalize`.
 - Keep same selected model across baseline and candidate runs unless model choice itself is experiment variable.
 - Use fresh session titles that include slug + run number + task label when task set has multiple cases.
-- The helper already handles JSON streaming, compact metadata capture, first top-level `sessionID`, and one-line completion output. The helper inserts `--` before the message positional when calling `opencode run` to prevent yargs flag misparse.
-- If helper exits non-zero, record failure in `experiment_log` and stop current run.
+- The helper exits 0 only when the session completed successfully (`reason: "stop"` in the final `step_finish` event). Any other exit means the session was interrupted, errored, or failed.
+- If helper exits non-zero, the run is **discarded** — record in `## Discarded Attempts` (one line: session ID + failure reason). Do not export or analyze. Do not record in `## Runs`. Stop current run, proceed to next.
 
 ## 4. Export exact session
 - Export exact captured `sessionID` with:
-  - `cargo run --manifest-path tools/opencode-sessions/Cargo.toml -- --db "<db_path>" export --out "<exports_dir>" <sessionID>`
+  - `<opencode_sessions_bin> --db "<db_path>" export --out "<exports_dir>" <sessionID>`
+- `opencode_sessions_bin` is `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/tools/opencode-sessions/target/release/opencode-sessions`. Always use the full absolute path.
+- The tool creates an auto-named subdirectory under `<exports_dir>`. Capture the printed output path.
 - Save each export under `<exports_dir>`.
+- After export, check `session_status` in the export's `index.json` (`root_session_status` field). If `error` or `abandoned`, the run is **discarded** — move from `## Runs` to `## Discarded Attempts`. Do not analyze.
 - Record run number, `sessionID`, and export path in `experiment_log`.
 - Never use "latest session" heuristics. Current optimizer session is also active.
 
 ## 5. Analyze export bundle
 - Before calling analyzer, run:
   - `python3 tools/workflow-optimize/export_digest.py <export_path>`
+- `export_path` is the auto-named subdirectory created by `opencode-sessions export` (contains `index.json`, `sessions/`, etc.).
 - Pass analyzer only: export path, export digest, goal, target command, and files under test.
 - Do not make main iterator read full `README.md` or full `index.json` unless digest is missing or clearly inconsistent.
 - Do not skip analyzer because run is validation-only. Analyzer may still return `HOLD`, but export bundle must be reviewed.
@@ -168,11 +180,14 @@ Run exact workflow optimization experiments against local OpenCode command and a
 - Prefer changes that improve at least one of: quality reliability, elapsed time, or token/cost efficiency without hurting higher-priority metrics.
 - For experiment harness bugs, fix harness first before judging target workflow. Do not attribute harness-caused waste to target command.
 - Prefer thin command templates when agent already owns workflow logic. Command markdown becomes command-expanded user content; duplicating agent instructions there wastes tokens and can create conflicting guidance.
-- When a finding may generalize beyond the current target, update `.opencode/WORKFLOW-OPTIMIZATION-CANDIDATES.md`:
+- When a finding may generalize beyond the current target, update `optimization_candidates`:
   - append next `CAND-###` entry or update existing matching entry
   - record status (`DRAFT` or `TESTING`), scope guess, source experiment log, and evidence still needed
   - mark `LOCAL_ONLY` when evidence points to workflow-specific value only
-- Promote into `.opencode/WORKFLOW-OPTIMIZATIONS.md` only when evidence is strong enough for reuse (for example: validated across multiple workflows/task sets, or clearly cross-cutting harness behavior with low downside). When promoted, update candidate status to `ADOPTED`.
+- Promote into `optimization_catalog` only when evidence is strong enough for reuse (for example: validated across multiple workflows/task sets, or clearly cross-cutting harness behavior with low downside). When promoted, update candidate status to `ADOPTED`, add `OPT-###` to catalog, and update trait matrix if applicable.
+- After a **PASS** run that refutes a prior assumption (e.g., per-file steps looked wasteful but actually reduce reviewer context), record it as a `CAND-###` with a `Counter-Intuition` note explaining why naive expectation was wrong and what evidence shows instead.
+- Never modify optimization catalog or candidates during discarded or failed runs.
+- Always use full absolute paths when writing to `optimization_catalog` and `optimization_candidates`.
 - Good targets:
   - tighter subagent inputs
   - shared ledgers or cache files
@@ -237,6 +252,17 @@ Run exact workflow optimization experiments against local OpenCode command and a
   - two consecutive runs produce no noticeable improvement
   - `Max Runs` reached
   - target workflow becomes unstable
+  - 3 consecutive runs are discarded (stability problem)
+
+## 10. Discarded attempt handling
+- A run is **discarded** when any of:
+  - `run_opencode.py` exits non-zero (interrupted, errored, exception)
+  - `run_opencode.py` reports status other than `COMPLETED`
+  - Export `root_session_status` is `error` or `abandoned`
+- Discarded runs go in `## Discarded Attempts` — one line per attempt: `Run N: session=<id> reason=<short reason>`
+- Do not export, analyze, or compare discarded runs.
+- Do not count discarded runs toward the `Max Runs` cap.
+- If 3 consecutive runs are discarded, stop the experiment — something is broken.
 
 # Output
 

@@ -28,6 +28,7 @@ Related files:
 | path-only helper sections | OPT-011 |
 | failure-path validation | OPT-014 |
 | export/session analysis | OPT-015, OPT-016 |
+| subagent review of partial plan | OPT-018 |
 | nested `opencode run --format json` harness | OPT-017 |
 
 ## Approved Patterns
@@ -150,3 +151,10 @@ Related files:
 - Skip When: raw full event stream is explicitly requested for debugging.
 - Carry-In: use wrapper/helper that streams JSON lines, captures first top-level `sessionID`, writes compact metadata, and prints one short completion line.
 - Expected Gain: prevents bulky parent-session archives and preserves exact session identity.
+
+### OPT-018 — Per-File Step Scoping Reduces Reviewer Context
+- Scope: cross-workflow
+- Apply When: subagents review subsets of a machine plan and the plan has multiple steps.
+- Skip When: plan is trivial (1–2 steps) or there is only one reviewer that reads everything.
+- Carry-In: keep each implementation/test step in its own file; use `## Delta` to guide reviewers to read only Changed/New step files; do not merge step files to reduce tool calls — the saved reads cost less than the inflated context of a monolithic plan.
+- Expected Gain: smaller reviewer context windows, less scope leakage, lower total token cost despite more tool calls.

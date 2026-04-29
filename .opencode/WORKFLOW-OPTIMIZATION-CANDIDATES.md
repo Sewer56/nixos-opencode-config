@@ -49,3 +49,14 @@ Staging area for ideas not yet proven enough for `.opencode/WORKFLOW-OPTIMIZATIO
 - Evidence Needed: confirm quality holds while tokens/elapsed drop on at least two finalize pipelines.
 - Promotion Target: `.opencode/WORKFLOW-OPTIMIZATIONS.md`
 - Notes: approved catalog already has broad `OPT-012`; this candidate decides whether stronger, more explicit gating policy should become shared default.
+
+### CAND-003 — Per-File Step Scoping Reduces Reviewer Context
+- Status: ADOPTED → OPT-018
+- Scope Guess: cross-workflow
+- First Seen In: `PROMPT-WORKFLOW-OPTIMIZE-plan-finalize.md` (baseline analysis)
+- Problem: Naive intuition says splitting machine plans into many small step files is wasteful (more files to read). Reviewer appeared to "waste" reads by reading each step file individually. But per-file steps let each reviewer read only files relevant to its domain (Delta-guided skip of Unchanged items). A monolithic plan forces every reviewer to hold the entire plan — including steps outside their domain — inflating context and inviting scope leakage.
+- Proposed Change: Keep per-file step scoping as default. Do not merge step files to "save reads." The reads are cheaper than the inflated context window of a monolithic plan.
+- Why It Might Generalize: Any workflow where subagents review subsets of a plan benefit from file-per-step scoping.
+- Evidence Needed: N/A — promoted to OPT-018 based on baseline reviewer-spread evidence.
+- Promotion Target: `.opencode/WORKFLOW-OPTIMIZATIONS.md` → OPT-018
+- Notes: Counter-intuition. Per-file reads cost more tool calls but save far more context tokens than they spend.

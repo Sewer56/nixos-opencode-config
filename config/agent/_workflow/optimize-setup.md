@@ -28,7 +28,7 @@ Normalize workflow-optimize input and return small experiment brief.
    - Support one target command with many task cases, or repeated task cases that each name their own target command.
    - If `Tasks:` is missing, create one implicit task case from the top-level command + prompt.
    - If required prompt text is missing, return `NEEDS_INPUT`.
-   - Default `Model` to `sewer-axonhub/zai/glm-5.1`.
+   - Default `Model` to `sewer-axonhub/wafer/GLM-5.1`.
    - Default `Goal` to reducing rediscovery, repeated reads, loose subagent scope, elapsed time, and token/cost waste while preserving result quality.
    - Default `Max Runs` to `10`.
 2. Normalize each target command.
