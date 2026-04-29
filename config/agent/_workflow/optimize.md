@@ -5,23 +5,10 @@ permission:
   "*": deny
   read:
     "*": allow
-    "*.env": deny
-    "*.env.*": deny
-    "*.env.example": allow
   edit:
-    "*": deny
-    "config/**": allow
-    ".opencode/**": allow
-    "tools/workflow-optimize/**": allow
-    "*PROMPT-WORKFLOW-OPTIMIZE-*.md": allow
+    "*": allow
   write:
-    "*": deny
-    "config/**": allow
-    ".opencode/**": allow
-    "tools/workflow-optimize/**": allow
-    "*PROMPT-WORKFLOW-OPTIMIZE-*.md": allow
-    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/.opencode/WORKFLOW-OPTIMIZATIONS.md": allow
-    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/.opencode/WORKFLOW-OPTIMIZATION-CANDIDATES.md": allow
+    "*": allow
   bash: allow
   glob: allow
   grep: allow
