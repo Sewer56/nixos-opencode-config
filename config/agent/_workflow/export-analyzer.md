@@ -15,7 +15,7 @@ permission:
   external_directory: allow
 ---
 
-Review machine-first export bundles and surface workflow optimization moves.
+Review machine-first export bundles and surface workflow optimization moves. Focus on reviewer/subagent output token waste when present.
 
 # Inputs
 - `export_path`: absolute path to export directory (from `opencode-sessions export --out`)
@@ -40,31 +40,36 @@ The export is an `opencode-sessions` directory bundle:
 # Process
 1. Start from `export_digest`. Do not read export-local `README.md` by default.
 2. Read `index.json` for totals, token efficiency, session index, tool rollup, and hotspots.
-3. Read root session `summary.json` (path from `digest.tree.summary_file` or `digest.export_dir + /sessions/...`) for session narrative, file access rollup, tool rollup, and child links.
-4. Read `turns.compact.jsonl` only when `summary.json` is insufficient for waste, cost, or hot-turn analysis.
-5. Read `messages.compact.jsonl` only when chronology, final assistant wording, or prompt-restatement evidence is needed.
-6. Read child `summary.json` files only when `digest` says child sessions exist or root files show stale refs / errors / reviewer spread worth checking.
-7. Open deeper files (`turns.jsonl`, `messages.jsonl`, `artifacts/`) only when compact layers are insufficient.
+3. Read root session `summary.json` for session narrative, file access rollup, tool rollup, and child links.
+4. **For reviewer-heavy workflows**: read EACH child session `summary.json` to extract per-reviewer metrics:
+   - output tokens per reviewer
+   - tool calls per reviewer
+   - duration per reviewer
+   - error patterns per reviewer
+   - This is critical for reviewer-focused optimization.
+5. Read `turns.compact.jsonl` only when summary is insufficient.
+6. Read `messages.compact.jsonl` only when chronology or wording evidence is needed.
+7. Read child `turns.compact.jsonl` only when per-reviewer output token breakdown is needed.
 8. Identify workflow waste signals:
+   - **reviewer output token volume** (primary signal — how much the reviewer wrote)
+   - **reviewer re-reading** (same file read multiple times in one reviewer session)
+   - **cross-reviewer redundant reads** (same file read by multiple reviewers)
+   - **reviewer scope leakage** (time/tokens spent outside assigned domain)
+   - **reviewer rule file waste** (reading rule files that could be inlined)
+   - **reviewer cache misses** (reading cache files that don't exist)
    - high-cost low-value or waste turns
-   - repeated reads / rediscovery
-   - overwritten edits with low durable value
-   - child-session not-found errors or stale-export fallout
-   - prompts that likely pass too much repeated context
-   - missing shared ledgers / cache artifacts / delta rules
-   - weak stop conditions causing long loops
-   - repeated re-thinking across messages or subagents
+   - repeated context restatement across messages
    - token-heavy context rebuilds with little progress
-   - reviewer/subagent time discrepancy
-   - reviewer/subagent scope leakage (reading or reasoning outside assigned domain)
-9. Include metrics that help compare quality, performance, and cost together:
-   - elapsed time when available
-   - input/output/cache tokens
-   - tool-call volume
-   - stable efficiency indicators like repeated reads, repeated context restatement, and subagent rediscovery
-   - reviewer duration spread and per-reviewer tool/token skew when child sessions exist
-10. Tie every recommendation to local workflow files only. Prefer prompt/rule/cache changes over product-code changes.
+   - missing shared context / pre-inlined content
+   - weak stop conditions causing long review loops
+9. Include per-reviewer breakdown in metrics:
+   - output tokens per reviewer domain
+   - duration per reviewer domain
+   - tool calls per reviewer domain
+   - quality of findings (blocking vs advisory vs pass)
+10. Tie every recommendation to local workflow files only.
 11. Keep findings compact. No more than 5 hypotheses.
+12. **Prioritize hypotheses by expected reviewer output token reduction.**
 
 # Output
 
@@ -87,12 +92,16 @@ Export Path: <absolute path>
 - Stale Child Refs: yes | no
 - Reviewer Spread: <summary or n/a>
 
+## Reviewer Output Breakdown
+- <reviewer_name>: output_tokens=<n>, duration=<ms>, tools=<n>, findings=<blocking>/<advisory>/<pass>
+- (one line per reviewer)
+
 ## Findings
 - [F1] <workflow waste signal> | Evidence: <file/turn/field>
 - None
 
 ## Hypotheses
-- [H1] Target: <repo-relative path> | Change: <exact workflow change> | Expected Gain: <metric> | Evidence: <finding refs>
+- [H1] Target: <repo-relative path> | Change: <exact workflow change> | Expected Output Token Reduction: <n or %> | Evidence: <finding refs>
 - None
 
 ## Best Next Move

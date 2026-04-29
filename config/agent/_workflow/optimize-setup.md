@@ -24,13 +24,14 @@ Normalize workflow-optimize input and return small experiment brief.
 # Process
 1. Parse user request.
    - Accept compact `/command prompt` or labeled fields.
-   - Optional fields: `Goal`, `Model`, `Max Runs`, `Tasks`, `Files`.
-   - Support one target command with many task cases, or repeated task cases that each name their own target command.
-   - If `Tasks:` is missing, create one implicit task case from the top-level command + prompt.
-   - If required prompt text is missing, return `NEEDS_INPUT`.
-   - Default `Model` to `sewer-axonhub/wafer/GLM-5.1`.
-   - Default `Goal` to reducing rediscovery, repeated reads, loose subagent scope, elapsed time, and token/cost waste while preserving result quality.
-   - Default `Max Runs` to `10`.
+    - Optional fields: `Goal`, `Model`, `Max Batches`, `Samples`, `Tasks`, `Files`.
+    - Support one target command with many task cases, or repeated task cases that each name their own target command.
+    - If `Tasks:` is missing, create one implicit task case from the top-level command + prompt.
+    - If required prompt text is missing, return `NEEDS_INPUT`.
+    - Default `Model` to `sewer-axonhub/wafer/GLM-5.1`.
+    - Default `Goal` to reducing reviewer output tokens, repeated reads, reviewer re-thinking, and total token/cost waste while preserving result quality.
+    - Default `Max Batches` to `10`.
+    - Default `Samples` to `3` (for multi-sample averaging to handle LLM non-determinism).
 2. Normalize each target command.
    - Strip leading `/`.
    - Keep slash-separated CLI form like `plan/finalize`.
@@ -57,7 +58,8 @@ Question: <text | None>
 Primary Command: /<command> | Mixed | None
 Model: <model>
 Goal: <one line>
-Max Runs: <n>
+Max Batches: <n>
+Samples: <n>
 Slug Hint: <slug> | None
 
 ## Command Surface
