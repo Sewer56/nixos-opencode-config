@@ -36,7 +36,7 @@ Review iteration draft artifacts for cross-item redundancy and zone overlap.
 (All items BLOCKING unless marked ADVISORY.)
 - Zone overlap: flag when the human zone repeats information from the machine zone or vice versa. Human zone is narrative; machine zone is operational. Zero overlap.
 - Cross-item: flag when two `[P#]` items duplicate each other's content instead of referencing.
-- Rule restatement: flag when an optimization rule description in a `[P#]` item restates a rule already defined in the draft agent's Optimization Rules section. Reference the rule name instead.
+- Rule restatement: flag when an optimization rule description in a `[P#]` item restates a rule already selected from the shared optimization catalog. Reference the rule name instead.
 - Cross-section: flag when the same concept, exclusion, or rule appears in multiple sections within a single `[P#]` item. State once; reference from other locations.
 
 # Process

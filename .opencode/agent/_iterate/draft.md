@@ -22,6 +22,7 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "mcp-search": allow
+    "_optimization/selector": allow
     "_iterate/draft-reviewers/*": allow
 ---
 
@@ -77,7 +78,9 @@ From discovery, determine:
 - For new files: correct directory and naming convention.
 - For existing files: current state and gaps vs. request intent.
 - Dependencies: does the command need an agent that doesn't exist yet?
-- Applicable optimization requirements from `# Optimization Rules`: which rules the target files must satisfy based on the behavior traits above.
+- Call `@_optimization/selector` with the target summary, target paths, and behavior traits from step 1.
+- Use the selector result as the source of truth for applicable shared optimization requirements.
+- If selector fails, read `.opencode/WORKFLOW-OPTIMIZATIONS.md` directly and choose patterns manually.
 
 ## 4. Write context
 
@@ -87,7 +90,7 @@ Write `context_path` using the template below. Derive `artifact_base` from `slug
 - Machine zone: operational — no prose explanations. Zero overlap between zones.
 - Each `[P#]` item is a free-form explanation followed by a diff block. File paths go in the diff block header (`--- a/<path>`).
 - When a `[P#]` item contains multiple diff blocks (scattered changes across one file), label each block with its own `Lines: ~start-end` range so implementers and the finalize agent can read targeted ranges.
-- REFINE: write explanation of intent, why, and applicable optimization rules as target-file behavior, then a unified diff block (`diff` fence, 2+ context lines per hunk).
+- REFINE: write explanation of intent, why, and selected optimization patterns as target-file behavior, then a unified diff block (`diff` fence, 2+ context lines per hunk).
 - CREATE: explanation only — no diff against empty.
 - Split optimization rules across affected prompts or reviewers. Describe target-file sections in Inputs → Process → Supplemental order. Omit `## User Request` when a command takes no arguments. Return only items requiring action.
 
@@ -152,21 +155,11 @@ Ask up to 10 questions in one batch only if answers would materially improve the
 - When the user modifies the draft but does not request re-review, append a reminder: "Re-review available — say 'review' to re-run draft reviewers."
 - Otherwise return `Status: DRAFT`.
 
-# Optimization Rules
+# Optimization Catalog
 
-Targets produced by this iteration must follow. Carry only the applicable rules below into `<artifact_base>.draft.md` as target-file behavior:
-
-- **Reviewer cache + Delta**: when the target itself runs a review loop or coordinates subagents, include per-reviewer cache files and a Delta section so reviewers skip unchanged items on re-runs. Reviewers update only changed cache entries via targeted edits — preserve entries that are Unchanged and Verified unchanged.
-- **Fixed output blocks**: machine-readable responses use fenced code blocks with `text` language tag. Never use `json`, `yaml`, or other tags for plain structured output.
-- **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
-- **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.
-- **Concise human-facing docs**: when the iteration changes conventions or adds new artifacts, include a short documentation update for humans.
-- **Inline path variables**: when a section would contain only variable-to-path mappings (e.g. `RULES_DIR`, `DOCUMENTATION_RULES_PATH`), list those definitions at the start of the nearest Process or Workflow section instead of creating a separate section.
-- **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — paths, deltas, scoping. Never re-state output formats, focus lists, role assignments, or contracts the callee already defines.
-- **Line-location convention**: `Lines: ~<start>-<end> | None` locates changes in STEP files (`~` ≈ ±10 lines). Hunks include 2+ context lines before and after each change; context is the authoritative locator. Reviewers validate content, not counts. Propagates to `/iterate`-generated targets writing diffs.
-- **Per-hunk line labels**: when a `[P#]` item, STEP file contains multiple diff blocks, each must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Header `Lines: ~` lists the comma-separated union of hunk ranges. Full-file ranges are invalid for localized changes — produce focused per-hunk ranges instead.
-- **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to templates, examples, and all diff blocks inside fenced code blocks.
-- **Reviewer diff output**: reviewers that can determine the exact text replacement for a finding must include a unified diff block inline after the finding's `Fix:` field. When the fix is conceptual rather than concrete, omit the diff and rely on `Fix:` prose only.
+- Approved shared patterns live in `.opencode/WORKFLOW-OPTIMIZATIONS.md`.
+- `@_optimization/selector` chooses which patterns apply.
+- Carry only selected pattern behavior into `<artifact_base>.draft.md`. Do not paste whole-catalog text into the artifact.
 
 # Command→Agent Composition
 

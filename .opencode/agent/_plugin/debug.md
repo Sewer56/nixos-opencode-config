@@ -9,7 +9,6 @@ permission:
   glob: allow
   list: allow
   bash: allow
-hidden: false
 ---
 
 Inspect a plugin file, extract its debug flag and log path, execute it with debug enabled, and check co-located logs for issues.

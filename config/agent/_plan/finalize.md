@@ -44,6 +44,7 @@ Convert a confirmed human plan into a reviewed code and test machine plan. Write
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
 - Required local artifacts for this run:
   - `<artifact_base>.draft.md`
+- If request does not identify exact draft path or slug, you may use one targeted glob for `PROMPT-PLAN-*.draft.md` in current workspace to disambiguate. Do not broaden search beyond that precondition check.
 
 # Artifacts
 - `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
@@ -54,13 +55,38 @@ Convert a confirmed human plan into a reviewed code and test machine plan. Write
 # Process
 
 ## 1. Preconditions and source of truth
-- Derive `artifact_base` from `slug` as `PROMPT-PLAN-<slug>`. All artifact paths derive from `artifact_base`.
-- Read `plan_path` (`<artifact_base>.draft.md`).
+
+**⚠ PRECONDITION GATE: Do not load rule files, read repo files, or run any tool calls beyond Step 1a until `plan_path` is confirmed.**
+
+### Step 1a — Resolve draft path (one tool call maximum)
+- If latest user message names exact `PROMPT-PLAN-*.draft.md` path, use it directly. Skip glob.
+- Else if latest user message or command arguments clearly imply `slug`, derive `artifact_base` as `PROMPT-PLAN-<slug>` and use `<artifact_base>.draft.md`. Skip glob.
+- Else run exactly ONE glob for `PROMPT-PLAN-*.draft.md` in current workspace.
+  - If exactly one match exists → proceed to Step 1b.
+  - If zero matches exist → IMMEDIATELY output the FAIL template below. Do NOT run any additional globs, reads, searches, or rule loads. Do NOT broaden or retry the pattern. Stop.
+  - If multiple matches exist → IMMEDIATELY output the FAIL template below with "multiple drafts" reason. Stop.
+
+**FAIL output template (use verbatim when precondition fails):**
+```
+Status: FAIL
+Plan Path: N/A
+Handoff Path: N/A
+Step Pattern: N/A
+Review Iterations: 0
+Summary: <"No PROMPT-PLAN-*.draft.md file found" or "Multiple draft files found, specify slug or path">
+Next Command: /plan/draft
+```
+
+### Step 1b — Confirm draft and load rules (only after Step 1a succeeds)
+- Derive `artifact_base` from resolved path. All artifact paths derive from `artifact_base`.
+- Read `plan_path` (`<artifact_base>.draft.md`). If read fails or file is missing, return `Status: FAIL` and stop.
+- NOW load rule files listed in `# Rules` section below. Read them in parallel.
 - Treat `plan_path` and any explicit finalize-time notes from the latest user message as the source of truth for this run.
 - Treat the `/plan/finalize` invocation itself as the confirmation boundary.
 - Do not rewrite `plan_path`.
 
 ## 2. Deepen discovery only where needed
+- Only enter this phase after `plan_path` is resolved and read successfully.
 - Start from the paths and shapes already present in `plan_path`.
 - `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers. Ground implementation and test step diffs in actual file content.
 - Deepen discovery only where the confirmed plan still leaves concrete file placement, ownership, code shape, test coverage, verification commands, or external API details unresolved.
@@ -85,19 +111,27 @@ Convert a confirmed human plan into a reviewed code and test machine plan. Write
 ## 5. Run the code/test review loop
 - Write and maintain `## Delta` in `handoff_path` before the first reviewer pass. Record each `REQ-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields. Add artifact markers for `Source Plan` and `Review Ledger`. Recompute `## Delta` after every material revision.
 - Also record each I# and T# step as a Delta entry so reviewers can skip Unchanged step files.
-- After each full machine-plan draft, run these reviewers in parallel, passing `handoff_path`, `plan_path`, and `step_pattern` to each reviewer:
-  - `@_plan/finalize-reviewers/correctness`
-  - `@_plan/finalize-reviewers/economy`
-  - `@_plan/finalize-reviewers/tests`
-  - `@_plan/finalize-reviewers/performance`
-  - `@_plan/finalize-reviewers/dead-code`
-- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern` (a glob pattern matching I# and T# step file paths to scope the review), and finalize-time user notes. Reviewers define their own output format, focus lists, role assignments, and target paths.
-  - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
-- Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
+- Before each reviewer pass, derive `reviewer_set` from current plan shape:
+  - Always include `@_plan/finalize-reviewers/correctness`.
+  - Always include `@_plan/finalize-reviewers/tests`.
+  - Include `@_plan/finalize-reviewers/economy` only when plan has more than 3 total I#/T# steps, more than 1 requirement, or any step updates/removes existing code or tests.
+  - Include `@_plan/finalize-reviewers/performance` only when requirements, settled facts, or step targets indicate performance-sensitive work (hot paths, loops, queries, batching, caching, concurrency, large data, latency-sensitive code).
+  - Include `@_plan/finalize-reviewers/dead-code` only when any step action is `UPDATE` or `REMOVE`, or a diff deletes/replaces/redirects existing code or tests.
+  - For trivial plans (<=3 total I#/T# steps, 1 requirement, pure `ADD`/`INSERT` actions, no performance-sensitive work), `reviewer_set` should normally collapse to correctness + tests only.
+- After each full machine-plan draft, run only `reviewer_set` in parallel, passing `handoff_path`, `plan_path`, and `step_pattern` to each selected reviewer.
+- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern` (a glob pattern matching I# and T# step file paths to scope the review), finalize-time user notes, current step count, action mix (`ADD`/`INSERT`/`UPDATE`/`REMOVE`), and any relevant trigger flags (performance-sensitive yes/no, deletion-or-replacement yes/no).
+- Add explicit scope boundary to each reviewer prompt:
+  - reviewer must assess only its own domain
+  - if a concern belongs to another reviewer, mention it at most once in `## Notes` without deep investigation
+  - skip broad repo exploration unless required by its own focus contract
+  - prefer changed items from `## Delta`; do not re-evaluate unchanged items without new evidence
+- Use prompt wording that lets trivial reviewers self-skip fast, eg performance reviewer can return PASS quickly when performance-sensitive flag is false.
+- `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
+- Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED. Do not create placeholder entries for reviewers that were intentionally skipped by `reviewer_set`.
 - Apply core domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer; DEAD_CODE → dead-code reviewer. Arbitrate cross-domain conflicts.
 - Do not reopen RESOLVED issues without new concrete evidence.
 - Revise step files only where needed. Append one line to `## Revision History`.
-- Re-run core reviewers after every material revision.
+- Recompute `reviewer_set` and re-run selected reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.
   No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
@@ -128,7 +162,7 @@ Next Command: /plan/finalize-code-docs
 
 # Rules
 
-Load all rule files below in parallel. Apply them:
+Load all rule files below in parallel (only after Step 1b confirms plan_path). Apply them:
 
 /home/sewer/opencode/config/rules/general.md
 /home/sewer/opencode/config/rules/code-placement.md

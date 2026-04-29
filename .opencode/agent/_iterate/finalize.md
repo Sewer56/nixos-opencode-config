@@ -21,6 +21,7 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "mcp-search": allow
+    "_optimization/selector": allow
     "_iterate/finalize-reviewers/*": allow
 ---
 
@@ -51,7 +52,9 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers (`--- a/<path>`). Treat the explanation and diff as draft-level guidance — ground STEP diffs in actual file content.
 - Read `## Self-Iteration` from `context_path` when present. For `wording-only` intent: proceed with standard finalize flow. For `rule-change` intent: apply the enforcement completeness gate in step 4.
 - Deepen discovery only where the confirmed context leaves concrete frontmatter fields, permission patterns, naming, cross-references, or output formats unresolved.
-- Infer which rules in `# Optimization Rules` apply to each confirmed target from its behavior: review loop, subagent coordination, machine-readable output, or convention/artifact changes.
+- Call `@_optimization/selector` with the confirmed target summary, target paths, and inferred behavior traits.
+- Use the selector result as the source of truth for applicable shared optimization requirements.
+- If selector fails, read `.opencode/WORKFLOW-OPTIMIZATIONS.md` directly and choose patterns manually.
 - Use `@codebase-explorer` for repo discovery first when needed.
 - Use `@mcp-search` for external libraries or APIs only when needed.
 - Read the files surfaced by discovery that matter to the machine artifact.
@@ -67,7 +70,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - Stable numbering: number items sequentially from 001. If a STEP is removed during revision, leave the gap — do not renumber other items.
 - Write `handoff_path` using the `# Templates` section (handoff now includes Summary, Revision History, and Step Index).
 - Write each STEP item to its own file matching `step_pattern` using the `# Templates` section.
-- Apply only the relevant rules from `# Optimization Rules` to each target. Split those rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
+- Apply only the selected patterns from `# Optimization Catalog` to each target. Split those rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
 - Keep operational rules in the generated targets themselves. Do not delegate model-facing behavior to external docs.
 - When self-iteration intent is `rule-change`: verify at least one STEP item updates enforcement-logic text (instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output). If no enforcement-logic STEP exists, treat this as a fatal gap — add a STEP item covering the missing enforcement-logic update rather than delegating to reviewers.
 - **Artifact naming convention**: for draft+finalize command/agent pairs, enforce `PROMPT-<PIPELINE>-<slug>` base names with dot-separated phase segments (`.draft.` for draft-phase, no segment for finalize). Wrong: `.draft-handoff.md` (hyphen before `handoff`). Correct: `.draft.handoff.md`.
@@ -152,19 +155,11 @@ Summary: <one-line summary>
 - Keep user-facing responses brief and factual.
 - Artifact naming convention: for draft+finalize command/agent pairs, use `PROMPT-<PIPELINE>-<slug>` base names with dot-separated phase segments (`.draft.` for draft-phase, no segment for finalize). Wrong: `.draft-handoff.md`. Correct: `.draft.handoff.md`.
 
-# Optimization Rules
+# Optimization Catalog
 
-Revisions produced by this iteration must follow. Apply only the relevant rules below to each generated target and reviewer prompt:
-
-- **Reviewer cache + Delta**: targets that themselves run review loops or coordinate subagents include per-reviewer cache files and a Delta section in handoff so reviewers skip unchanged items on re-runs. Reviewers update only changed cache entries via targeted edits — preserve entries that are Unchanged and Verified unchanged.
-- **Fixed output blocks**: machine-readable responses use fenced code blocks with `text` language tag. Never use `json`, `yaml`, or other tags for plain structured output.
-- **No duplicated content**: do not re-state information already in another artifact. Reference by section name or file path instead.
-- **Shared ledger/file**: when an orchestrator coordinates subagents, use a shared ledger or coordination file — do not scatter coordination state across subagent outputs.
-- **Concise human-facing docs**: when the iteration changes conventions or adds new artifacts, include a short documentation update for humans.
-- **Inline path variables**: when a section would contain only variable-to-path mappings (e.g. `RULES_DIR`, `DOCUMENTATION_RULES_PATH`), list those definitions at the start of the nearest Process or Workflow section instead of creating a separate section.
-- **Tight subagent inputs**: when a target command or agent spawns subagents, pass only data the callee cannot derive from its own agent file — artifact paths, Delta/Decision excerpts, scoping, and user notes. Do not restate output formats, focus lists, role assignments, target paths already enumerated in shared artifacts, or blanket read orders.
-- **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to templates, machine-artifact diff blocks, reviewer output format examples, and any generated target that nests code fences.
-- **Reviewer diff output**: reviewers that can determine the exact text replacement for a finding must include a unified diff block inline after the finding's `Fix:` field. When the fix is conceptual rather than concrete, omit the diff and rely on `Fix:` prose only.
+- Approved shared patterns live in `.opencode/WORKFLOW-OPTIMIZATIONS.md`.
+- `@_optimization/selector` chooses which patterns apply.
+- Generated targets must absorb the selected behavior directly. Do not offload model-facing rules into external docs only.
 
 # Rules
 Apply these rules when writing STEP files:
@@ -276,6 +271,3 @@ Changes:
 Dependencies: None | STEP#
 Evidence: `path/to/file:line`
 ````
-
-
-

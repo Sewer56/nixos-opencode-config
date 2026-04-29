@@ -1,488 +1,104 @@
-# Iterate Optimizations
-
-Reference for optimization patterns used by the `/iterate` workflow
-and other similar workflows.
-
-- [Split STEP Files](#split-step-files)
-  — each revision item in its own file; handoff absorbs machine.md
-- [Section Ordering Convention](#section-ordering-convention)
-  — Inputs → Process → Supplemental ordering for produced files
-- [Cache and Delta](#cache-and-delta)
-  - [Mechanism](#mechanism)
-    — each reviewer owns a cache file; finalize writes the change list
-  - [Process Step Order](#process-step-order)
-    — reviewer step sequence: load → delta → select → inspect → cache → emit
-  - [Items to Re-Evaluate](#items-to-re-evaluate)
-    — reviewers open only changed, new, unresolved-finding, or
-    decision-referenced items
-  - [Malformed-Output Retries](#malformed-output-retries)
-    — fix format only; do not re-read files or redo analysis
-- [Draft Review Loop](#draft-review-loop)
-  - [Draft Reviewers](#draft-reviewers)
-    — non-overlapping reviewers: no gaps, bounded LLM instruction
-    sets, iteration as safety net; applies to _iterate, _plugin, _plan
-  - [Draft Coordination](#draft-coordination)
-    — lightweight handoff + per-reviewer cache for each workflow's draft loop
-- [Fixed Output Format](#fixed-output-format)
-  — all reviewers return structured `# REVIEW` blocks in `text` fences
-- [No Duplicated Artifact Content](#no-duplicated-artifact-content)
-  — reference by section name or path, never re-state
-- [Rules-File Scope and Independence](#rules-file-scope-and-independence)
-  — rules files define scope; targets reference, not duplicate; rules files
-  stand alone
-- [File-Based Coordination](#file-based-coordination)
-  — one shared file for reviewer disagreements, not scattered state
-- [Tight Subagent Inputs](#tight-subagent-inputs)
-  — pass only what the called agent cannot derive from its own file
-- [Self-Iteration](#self-iteration)
-  — path-based detection of wording-only vs rule-change self-iteration
-- [Line-location Convention](#line-location-convention)
-  — `Lines: ~<start>-<end>` locates changes; context is authoritative
-- [Human-Friendly [P#] Items](#human-friendly-p-items)
-  — draft-stage items use explanation + diff with paths in diff headers
-- [Reviewer Diff Output](#reviewer-diff-output)
-  — reviewers include inline unified diffs after Fix:; two tiers:
-  diff-mandated (always include diff) and diff-when-exact (include diff
-  when fix is concrete)
-- [Dead Code](#dead-code)
-  — dedicated dead-code reviewers detect post-diff reachability
-  gaps; finalize agents add cleanup items in the next iteration
-- [Focus-as-Scope](#focus-as-scope)
-  — Focus is the reviewer scope boundary; meta enforces no overlap
-
-## Split STEP Files
-
-Applies to all finalize pipelines: `_iterate`, `_plugin`, `_plan`, and
-`_orchestrator`.
-
-### No Separate machine.md
-
-The `machine.md` artifact is eliminated. Handoff absorbs its content:
-Summary, Revision History, and Step Index. All actionable diff/step
-content lives in individual files matching `step_pattern` or `step_pattern`.
-
-Consumers read: handoff (single coordination document) + per-item files matching the pattern.
-
-### File Layout
-
-- `<artifact_base>.handoff.md` — coordination document (finalize handoff) with Summary,
-  Revision History, Step Index, Delta, and Review Ledger
-- `<artifact_base>.step.001.md` — first revision item
-- `<artifact_base>.step.002.md` — second revision item
--  (each diff block within a STEP carries its own `Lines: ~`
-    label so implementers read targeted ranges)
-- (gaps are valid; deleted items leave holes in numbering)
-
-For `_plugin`: same pattern with `<artifact_base>.step.*.md` where `artifact_base` = `PROMPT-PLUGIN-PLAN-<slug>`.
-
-For `_plan`: implementation and test steps split into
-`<artifact_base>.step.I1.md`, `<artifact_base>.step.T1.md`, etc. where `artifact_base` = `PROMPT-PLAN-<slug>`.
-Requirements, mapping, trace matrix, and external symbols stay in
-the handoff.
-
-For `_orchestrator`: the planner splits steps into
-`PROMPT-NN-*-PLAN.step.I1.md`, etc.
-
-### Slug Derivation
-
-Each draft agent derives a 2–3 word slug from the request context;
-the slug becomes part of `artifact_base`. See each agent's `# Artifacts`
-for the pipeline-specific `artifact_base` derivation.
-
-### Phase Segments
-
-Draft-phase files use `.draft.` as a dot-separated segment; finalize-phase
-files lack the `.draft.` segment. See each agent's `# Artifacts` and `# Constraints`
-for the complete file layout per pipeline.
-
-### Stable Numbering
-
-Items are numbered sequentially. If an item is removed during finalize's
-internal revision loop, the gap is left in place — no renumbering.
-Gaps (e.g., 001, 003, 005) are valid.
-
-### Consumption Pattern
-
-Reviewers and implementers read handoff first for context and the
-index, then read all needed individual files in parallel (issue all
-read calls in one batch). This avoids loading all revision content
-into context when only a subset changed, and minimizes round-trips.
-
-## Section Ordering Convention
-
-All command and agent files produced by `/iterate` follow
-Inputs → Process → Supplemental section ordering.
-
-**Inputs zone** — what the agent/command receives:
-`# Inputs`, `# Artifacts`, `# Derived Paths`, `# Prerequisites`,
-`## User Input`
-
-**Process zone** — ordered steps and execution contracts:
-`# Process`, `# Workflow`, `## Workflow`
-
-**Supplemental zone** — everything else:
-`# Output`, `# Constraints`, `# Rules`, `# Capabilities`,
-`# Safety`, `# Templates`, `# Examples`, `# Guidelines`, `# Defaults`,
-`# Blocking Criteria`, `# Issue Categories`
-
-`# Focus` sits in the Inputs zone for reviewer files (before Process,
-per the reviewer exemption below). For non-reviewer files, Focus is
-Supplemental.
-
-Within Supplemental, prefer: Output → Constraints → Rules →
-Templates/Examples. This sub-ordering is advisory — minor variations
-acceptable.
-
-Exemptions:
-- Pure-proxy commands (frontmatter + `$ARGUMENTS` only)
-- Simple capability agents (role + Focus/Capabilities/Safety only)
-- All reviewer files (Focus defines the review process and sits
-  before Process by design)
+# Iterate Workflow Playbook
 
-Section heading style: `# Inputs` for agents, `## User Input` for
-commands. Keep existing heading levels; only reorder sections.
+Reference for iterate-specific flow. Shared optimization patterns live in:
 
-Keep the ordered step list within Process contiguous. Move supporting
-reference material — inputs, focus notes, templates, and examples —
-below Process into Supplemental when the file shape allows it. Keep the
-output step last so the required review block or finalize status block
-remains the final answer.
+- `.opencode/WORKFLOW-OPTIMIZATIONS.md` — approved reusable patterns
+- `.opencode/WORKFLOW-OPTIMIZATION-CANDIDATES.md` — ideas still being tested
 
-## Cache and Delta
+`_iterate/draft` and `_iterate/finalize` should treat this file as the
+pipeline playbook, not the shared optimization catalog.
 
-Applies only to targets that run a review loop or coordinate
-subagents.
+## Pipeline
 
-### Mechanism
+1. `/iterate/draft` — write `PROMPT-ITERATE-<slug>.draft.md` plus
+   `PROMPT-ITERATE-<slug>.draft.handoff.md`
+2. `/iterate/finalize` — convert confirmed draft into
+   `PROMPT-ITERATE-<slug>.handoff.md` plus `PROMPT-ITERATE-<slug>.step.*.md`
+3. Draft reviewers live in `_iterate/draft-reviewers/`
+4. Finalize reviewers live in `_iterate/finalize-reviewers/`
 
-Each reviewer owns a cache file
-(`PROMPT-ITERATE.review-<domain>.md`). It reads the cache at start
-and updates only changed entries at end. Full write only when the
-cache is missing or malformed.
+## Shared Optimization Selection
 
-The finalize agent rewrites `## Delta` before the first review pass,
-then recomputes it after every material revision.
+- `_iterate/draft` and `_iterate/finalize` call
+  `@_optimization/selector`.
+- Selector reads `.opencode/WORKFLOW-OPTIMIZATIONS.md` and returns only the
+  approved patterns matching target behavior traits.
+- Generated targets should absorb only the selected rule fragments. Do not
+  copy whole catalog text into draft or finalize artifacts.
 
-Each Delta entry records:
-- `Status`: Unchanged | Changed | New
-- `Touched`: path to the file that changed
-- `Why`: brief reason for the change
-
-Artifact markers for `Source Context` and `Review Ledger` let
-reviewers skip rereading unchanged artifacts.
+## Iterate-Only Conventions
 
-Reviewers skip re-evaluating Unchanged items. They only check:
-- Changed items
-- New items
-- Decision-referenced items
-- Items with unresolved findings from cache
+### Self-Iteration
 
-The caller (draft or finalize agent) owns Delta status. Caller agents must
-include every item in Delta, marking unchanged items as `Unchanged`
-with `Why: no content change`. The cache does not store `delta_state`.
+- If target paths include `.opencode/agent/_iterate/**` or
+  `.opencode/command/iterate/**`, set `self_iteration: true`.
+- Classify intent as:
+  - `wording-only` — text refinement with no enforcement-logic effect
+  - `rule-change` — changes to instructions that govern future `/iterate`
+    output
+- `rule-change` finalize runs must include at least one STEP that updates
+  enforcement logic, not only wording around it.
 
-Cache files:
-- `<artifact_base>.review-correctness.md`
-- `<artifact_base>.review-wording.md`
-- `<artifact_base>.review-style.md`
-- `<artifact_base>.review-performance.md`
-- `<artifact_base>.review-dedup.md`
-- `<artifact_base>.review-diff.md`
-- `<artifact_base>.review-meta.md`
-- `<artifact_base>.review-clarity.md`
-- `<artifact_base>.review-dead-code.md`
+### Draft Artifact Shape
 
-### Process Step Order
+- `artifact_base` = `PROMPT-ITERATE-<slug>`
+- draft context = `<artifact_base>.draft.md`
+- draft handoff = `<artifact_base>.draft.handoff.md`
+- Draft items use `[P#]` labels with free-form explanation followed by a diff
+  block.
 
-For reviewers, the Process-zone step order:
-1. Load cache
-2. Read Delta and Decisions
-3. Reopen only Changed, New, items with unresolved findings, or
-   decision-referenced STEP items
-4. Read the Step Index from handoff, then read selected STEP files matching `step_pattern`
-5. Update cache — only changed entries
-6. Emit the required final output block
+### Finalize Artifact Shape
 
-For finalize, keep the review-loop steps together in `# Process` and
-place prompt examples in the reference sections below the ordered steps.
+- finalize handoff = `<artifact_base>.handoff.md`
+- machine steps = `<artifact_base>.step.*.md`
+- no separate `machine.md`
+- handoff carries Summary, Revision History, Step Index, Delta, and review
+  coordination state
 
-### Items to Re-Evaluate
+### Artifact Naming
 
-Reviewers start from cache plus Delta. They carry forward cached
-`PASS` items with no open findings when their Delta state remains
-`Unchanged`.
+- Use `PROMPT-<PIPELINE>-<slug>` base names.
+- Draft phase uses `.draft.` as a dot-separated segment.
+- Finalize phase drops the `.draft.` segment.
+- Wrong: `.draft-handoff.md`
+- Correct: `.draft.handoff.md`
 
-Read the Step Index from handoff first. Then read selected STEP files matching `step_pattern`. Open target files only for:
-- Changed items
-- New items
-- Items with unresolved findings from cache
-- Decision-referenced STEP items
+### Diff Conventions
 
-### Malformed-Output Retries
+- Use full repo-relative paths in diff headers.
+- Use `Lines: ~start-end` locators.
+- When one item has multiple hunks, each hunk gets its own `Lines:` label.
+- STEP header `Lines:` is a union summary; per-hunk labels are authoritative.
+- Keep 2+ context lines around each diff hunk.
 
-When a reviewer returns badly formatted output, fix the format only —
-do not re-read files or redo the analysis.
+### Reviewer Diff Output
 
-If Delta and Decisions did not change:
-- Reuse prior analysis and cache
-- Re-emit valid output from the existing review state
-- Keep the retry format-only
+- When reviewer can determine exact replacement text, include inline unified
+  diff after `Fix:`.
+- When fix is conceptual, keep `Fix:` prose only.
 
-Re-read artifacts only when the retry includes new Delta or Decision
-entries.
+## Review Loops
 
-## Draft Review Loop
+### Draft Loop
 
-Applies to the draft agents in `_iterate`, `_plugin`, and `_plan`.
-Mirrors the finalize review loop with a simpler artifact shape and a
-subset of reviewers.
+- draft reviewers: correctness, wording, style, dedup, clarity
+- coordination file: `<artifact_base>.draft.handoff.md`
+- reviewers receive only artifact paths; they derive the rest from their own
+  prompts plus Delta/cache state
+- if user edits draft without asking for re-review, remind that re-review is
+  available on request
 
-### Draft Reviewers
+### Finalize Loop
 
-The core optimization is **multiple domain-specific reviewers with
-non-overlapping scope** — each reviewer owns a distinct domain, and no
-two reviewers check the same concern. This works because:
+- finalize reviewers live in `_iterate/finalize-reviewers/`
+- handoff owns Delta and decisions
+- reviewers reopen only changed, new, unresolved, or decision-referenced
+  items
 
-- **No gaps** — without cross-cutting overlap, every concern has exactly
-  one enforcer; no competing verdicts
+## When to Read What
 
-- **Better LLM compliance** — a focused scope per reviewer avoids the
-  partial-quality adherence that occurs when too many rules compete for
-  attention in a single prompt
-
-- **Iteration as safety net** — the loop compensates for single-pass
-  misses by any individual reviewer
-
-This principle propagates: the commands and agents produced by the draft
-loop also use non-overlapping reviewer sets. The exact reviewer count is
-not mandated; it scales with the artifact's domain breadth. `_plugin`
-and `_plan` follow the same principle with their own domain-specific
-sets.
-
-Five reviewers in `_iterate`'s `draft-reviewers/` directory:
-- `correctness` — template structure, diff header paths, domain-specific constraints
-- `dedup` — human/machine zone overlap (human = narrative, machine = operational), `[P#]` cross-item redundancy
-- `wording` — token density, bullet atomicity, cross-section restatement
-- `style` — imperative voice (machine zone), positive framing, self-contained items
-- `clarity` — undefined jargon, compound-term compression, opaque references
-
-Omitted from all draft loops: `diff` (draft diffs serve only as guidance),
-`performance` (no cache/delta to audit in the reviewed artifact),
-`meta` (self-iteration enforcement is a finalize concern).
-
-All 5 draft reviewers are diff-mandated. Cache keyed by `[P#]` item.
-
-### Draft Coordination
-
-Each draft agent writes `<artifact_base>.draft.handoff.md` as a lightweight
-coordination file containing Delta and Decisions — no Raw Request,
-Summary, or Scope (those live in the draft artifact itself).
-
-Cache files: `<artifact_base>.draft.review-<domain>.md`.
-
-Iteration cap: 5 (vs. 10 for finalize). The draft is smaller and will
-undergo finalize review; lower cap suffices.
-
-### Re-review After User Modifications
-
-The review loop runs automatically on the initial write only. After a
-user modifies the draft, the agent appends a reminder that re-review is
-available. Re-review triggers only on explicit user request (e.g.,
-"review", "re-review"). On re-entry, Delta is recomputed for changed
-`[P#]` items — reviewers skip Unchanged items via cache.
-
-## Fixed Output Format
-
-All reviewers return structured output in fenced code blocks with
-`text` language tag.
-
-Output must contain:
-- Starts with `# REVIEW`
-- `Decision: PASS | ADVISORY | BLOCKING`
-- `## Findings` heading
-- `## Verified` heading
-
-## No Duplicated Artifact Content
-
-Do not re-state information available in another artifact.
-
-Reference by section name or file path instead. Applies pairwise:
-- context ↔ handoff
-- context ↔ targets
-- handoff ↔ targets
-- targets ↔ targets
- 
-## Rules-File Scope and Independence
-
-Two principles that prevent redundancy in rules-file usage:
-
-**Rules-scope principle:** A rules file defines the scope, criteria, and
-requirements for its domain. Agents and reviewers that import a rules file
-must reference it — not re-state its content in their own Focus, Constraints,
-or Blocking Criteria sections. Violations are flagged by `dedup`
-(`RULES_SCOPE_REDUNDANCY`, blocking).
-
-**Rules-file independence principle:** Each rules file is loaded
-independently by reference. No rules file may import, reference, or
-cross-link another rules file. Violations are flagged by `dedup`
-(`RULES_FILE_INDEPENDENCE`, blocking).
-
-Within a single target, the same concept restated across Focus, Blocking
-Criteria, and Constraints is flagged by `wording`
-(`CROSS_SECTION_RESTATEMENT`, blocking) — state once in the most specific
-section and reference from others. This is an internal-tightness concern
-(wording's domain), not a between-artifact duplication (dedup's domain).
-
-## File-Based Coordination
-
-When multiple reviewers disagree, write decisions to one shared file
-instead of scattering them across reviewer outputs.
-
-Each reviewer tracks its own issues in its cache file. The handoff
-file stores only `### Decisions`.
-
-## Tight Subagent Inputs
-
-Applies to any command or agent that spawns subagents (reviewers,
-explorers, etc.).
-
-The called agent's file is the contract — trust it, don't repeat it.
-
-Include:
-- Artifact paths the called agent cannot find on its own
-- Delta and Decision excerpts plus scope
-- User-supplied notes or arguments affecting the task
-
-Omit:
-- Output format — the called agent's file already defines this
-- Focus/check lists — the called agent's file already defines these
-- Role assignment — the called agent's file already defines this
-- Target file paths already listed in a shared artifact the called
-  agent receives
-- Blanket read orders — the called agent uses Delta and cache state
-  to choose what to open
-
-## Self-Iteration
-
-When `/iterate` targets `_iterate` agents, reviewers, or iterate
-commands, the draft agent detects self-iteration from target paths and
-classifies intent as `wording-only` or `rule-change`. Detection is
-path-based — no new flags or commands. Non-self iterations are
-unaffected.
-
-- **wording-only**: text clarifications with no effect on what rules
-  get enforced. Standard finalize and review flow.
-- **rule-change**: modifications to rules that control future
-  `/iterate` output. Requires at least one STEP updating what rules
-  get enforced; the meta reviewer blocks if missing.
-
-### wording-only example
-
-Request: "Clarify the description of Process step 3 in draft.md"
-
-Generated `## Self-Iteration`: `Intent: wording-only`,
-`Target-Scope: .opencode/agent/_iterate/draft.md`
-
-### rule-change example
-
-Request: "Add a new optimization rule to draft.md that reviewers
-must enforce"
-
-Generated `## Self-Iteration`: `Intent: rule-change`,
-`Target-Scope: .opencode/agent/_iterate/draft.md,
-.opencode/agent/_iterate/finalize-reviewers/correctness.md`
-
-The handoff must include a STEP updating the reviewer focus
-list to enforce the new rule.
-
-## Line-location Convention
-
-All finalize agents and reviewers use `Lines: ~<start>-<end> | None`
-as the header-level indicator in STEP files
-(`~` ≈ ±10 lines). The header `Lines: ~` lists the
-comma-separated union of all hunk ranges; each diff block
-carries its own `Lines: ~start-end` label (`**Lines: ~start-end**`
-before the diff fence). Per-hunk labels are the authoritative
-locators; full-file ranges apply only to CREATE/DELETE actions.
-See `_iterate/finalize.md # Rules` and `_iterate/draft.md # Optimization Rules`
-for the prescriptive rules agents follow. Hunks include 2+ context lines before and
-after each change; context is the authoritative locator.
-Reviewers validate content, not counts — flag a BLOCKING finding
-only when context lines are missing or do not match the target file.
-
-## Human-Friendly [P#] Items
-
-Draft-stage `[P#]` items (numbered placeholders like `[P1]`, `[P2]`) in
-`<artifact_base>.draft.md` (across all pipelines) use
-free-form explanation + diff block with paths in diff headers.
-
-File paths appear in the diff block header (`--- a/<path>`).
-REFINE/UPDATE actions include the diff block. CREATE/ADD/INSERT
-actions use explanation only (or a code snippet for `_plan`).
-
-Format rules (2+ context lines per hunk) follow
-the Line-location Convention above.
-
-## Focus-as-Scope
-
-Each reviewer's `# Focus` defines what it checks — anything not
-listed is out of scope. The meta reviewer blocks when a Focus item
-is broad enough to overlap another reviewer's domain, prompting
-the author to narrow or split it.
-
-## Reviewer Diff Output
-
-Reviewers that can determine the exact text replacement for a finding
-include a unified diff block inline after the finding's `Fix:` field.
-
-- **Diff-mandated**: every finding — the reviewer always knows the
-  exact fix. Currently: wording, dedup, style, correctness, diff,
-  clarity (_iterate); documentation, errors (_plan);
-  errors-reviewer (_refactor); plan-documentation-reviewer,
-  plan-errors-reviewer (_orchestrator).
-
-- **Diff-when-exact**: include a diff when the fix is concrete; omit
-  when the finding is conceptual. Currently: performance, meta
-  (_iterate); dead-code (_plugin); correctness, tests,
-  economy, performance, dead-code (_plan);
-  plan-test-reviewer, plan-economy-reviewer,
-  plan-performance-reviewer, plan-correctness-gpt5,
-  plan-correctness-glm (_orchestrator).
-
-- **No diff**: the reviewer cannot determine exact text (runtime
-  validation, conceptual gaps); omit the diff and rely on `Fix:`
-  prose only.
-
-The `Fix:` field is retained as a short summary; the inline diff
-provides the authoritative exact change when present. The finalize
-agent consumes reviewer diffs as the authoritative revision source,
-applying them via targeted edits. When no diff is present, finalize
-falls back to interpreting `Fix:` prose. For diff-mandated reviewers,
-finalize validates that each finding contains a diff block.
-
-Outer code fences use one more backtick than the inner ```diff fence
-(per the Nested code fences optimization).
-
-## Dead Code
-
-Applies to finalize pipelines: `_plugin` and `_plan`.
-
-### Mechanism
-
-Each pipeline has a dedicated dead-code reviewer that owns this
-domain exclusively. Finalize agents write items without tracing;
-the reviewer detects missing cleanup and blocks. Cleanup items
-are added in the next iteration via the standard review loop.
-
-When the dead-code reviewer detects a STEP item that deletes,
-replaces, or redirects code, it traces what becomes dead after the
-diffs are applied. See the dead-code reviewer files (`_plugin`,
-`_plan` `finalize-reviewers/dead-code.md`) for the full
-detection process, category enumeration, and cross-file rules.
-
-### Why a Dedicated Reviewer
-
-Dead-code tracing needs full file reads and cross-file import
-analysis — heavier than correctness's structural checks. A
-dedicated reviewer keeps correctness lean. One extra iteration
-with Delta/cache is cheaper than a full trace on every write pass.
+- Read this file for iterate-only artifact and self-iteration rules.
+- Read `.opencode/WORKFLOW-OPTIMIZATIONS.md` for shared optimization
+  patterns.
+- Read `.opencode/WORKFLOW-OPTIMIZATION-CANDIDATES.md` only when evaluating
+  whether a new pattern should stay local or become shared.

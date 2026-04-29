@@ -2,6 +2,10 @@
 
 Reference for the `/plugin/draft` → `/plugin/finalize` → `/plugin/implement` → `/plugin/debug` pipeline.
 
+Shared workflow optimization patterns live in `.opencode/WORKFLOW-OPTIMIZATIONS.md`.
+Use this README for plugin-specific pipeline behavior; use the shared catalog
+for reusable prompt and workflow patterns.
+
 ## Command Pipeline
 
 1. `/plugin/draft` — Write `<artifact_base>.draft.md` describing the plugin, its hooks, and constraints.
