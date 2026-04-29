@@ -45,7 +45,7 @@ def build_argv(args: argparse.Namespace) -> list[str]:
         argv.extend(["--model", args.model])
     for file_path in args.files:
         argv.extend(["--file", file_path])
-    argv.append(args.prompt)
+    argv.extend(["--", args.prompt])
     return argv
 
 

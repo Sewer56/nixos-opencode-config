@@ -145,7 +145,7 @@ Run exact workflow optimization experiments against local OpenCode command and a
 - `cli_command` must be slashless, eg `plan/finalize`, not `/plan/finalize`.
 - Keep same selected model across baseline and candidate runs unless model choice itself is experiment variable.
 - Use fresh session titles that include slug + run number + task label when task set has multiple cases.
-- The helper already handles JSON streaming, compact metadata capture, first top-level `sessionID`, and one-line completion output.
+- The helper already handles JSON streaming, compact metadata capture, first top-level `sessionID`, and one-line completion output. The helper inserts `--` before the message positional when calling `opencode run` to prevent yargs flag misparse.
 - If helper exits non-zero, record failure in `experiment_log` and stop current run.
 
 ## 4. Export exact session
