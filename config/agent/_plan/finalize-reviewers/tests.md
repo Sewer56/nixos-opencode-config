@@ -10,77 +10,49 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
-  grep: allow
-  glob: allow
-  list: allow
-  todowrite: allow
   edit:
     "*PROMPT-PLAN*.review-tests.md": allow
+  list: allow
+  todowrite: allow
   external_directory: allow
-  # edit: deny
-  # bash: deny
-  # task: deny
-  # question: deny
-  # webfetch: deny
-  # websearch: deny
-  # codesearch: deny
-  # lsp: deny
-  # doom_loop: deny
-  # skill: deny
 ---
 
-Review a machine plan's test strategy.
-
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which items to reopen.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
+Review a machine plan's test strategy. Initial review only — re-review handled by dedicated agent.
 
 # Inputs
-- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
-- `plan_path` (e.g., `<artifact_base>.draft.md`)
-- `step_pattern` (e.g., `<artifact_base>.step.*.md`)
+
+- `handoff_path`, `plan_path`, `step_paths`, `cache_path`
 
 # Focus
-- Acceptance lens: planned tests should prove the stated acceptance criteria.
+- Acceptance lens: planned tests should prove stated acceptance criteria.
 - Judge coverage, duplication, and parameterization.
-- Read the referenced repo tests or nearby test modules before judging placement and coverage, then use `handoff_path` and `plan_path` to confirm that test coverage still matches the confirmed human intent.
-
-Rules (read in parallel from `/home/sewer/opencode/config/rules/`): `testing.md`, `test-parameterization.md`.
+- Trust step file diffs and handoff snapshots. Only open repo test files for specific verification needs.
 
 # Process
-1. Load cache
-- Cache: `PROMPT-PLAN-auth-refactor.handoff.md` → `PROMPT-PLAN-auth-refactor.review-tests.md`. Read if exists; treat missing/malformed as empty.
-- Treat the cache as one record per item (REQ, I#, T#) with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
+1. Read `handoff_path` for Delta, Review Ledger, Decisions.
+2. Read `step_paths` in one batch. Only open repo test files for specific verification needs.
+3. Perform full test-strategy audit.
+4. Write `cache_path` with `## Verified Observations` (with grounding snapshots) and `## Findings`.
+5. Emit `# REVIEW` block.
 
-2. Read Delta and Decisions
-- Read `## Delta` from `handoff_path`.
-- Read `### Decisions` only when non-empty.
+# Cache file format
 
-3. Select items to inspect
-- Carry forward Verified items that are Unchanged in Delta.
-- Re-evaluate Changed and New items.
-- Re-evaluate own Open items from cache and decision-referenced items.
+````markdown
+# Review Cache: tests
 
-4. Inspect selected content
-- Read `handoff_path` for summary, requirements, Step Index, and dependency mapping.
-- Read selected step files matching `step_pattern` in one batch.
-- Open target files only for the selected items.
-- Check Open→Resolved transitions.
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
+## Verified Observations
+- <step-id>: <what was verified, with grounding snapshot — one line each>
 
-5. Update cache
-- If the derived cache file is missing or malformed: write the full cache file.
-- Otherwise: use targeted edits to update only entries that changed.
-  - Replace entries whose fields changed.
-  - Insert new entries in the appropriate section.
-  - Remove pruned item ids.
-  - Move entries between sections when status transitions.
-- Leave entries whose content has not changed exactly as they are.
+## Findings
 
-6. Emit the final review block
-- Emit the `# REVIEW` block from `# Output`.
+### [TST-NNN]
+Status: OPEN | RESOLVED
+Category: COVERAGE | REDUNDANCY | PARAMETERIZATION | PLACEMENT
+Severity: BLOCKING | ADVISORY
+Problem: <one line>
+Fix: <one line or diff>
+Resolution: <only for RESOLVED>
+````
 
 # Output
 
@@ -95,7 +67,7 @@ Category: COVERAGE | REDUNDANCY | PARAMETERIZATION | PLACEMENT
 Severity: BLOCKING | ADVISORY
 Evidence: <plan section, requirement, or `path:line`>
 Problem: <missing coverage or unnecessary duplication>
-Fix: <smallest useful test-plan correction>
+Fix: <smallest useful test-plan correction; include unified diff below when concrete>
 ```diff
 <path/to/step/file>
 --- a/<path/to/step/file>
@@ -107,14 +79,15 @@ Fix: <smallest useful test-plan correction>
 ```
 
 ## Verified
-- <list items checked with no issues found>
+- <changed/open I#/T# only>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 # Constraints
+- Read `handoff_path`, `plan_path`, all `step_paths`, rules. Full audit. Write cache.
+- PASS: Decision + `## Findings` with `(none)` + `## Verified` listing changed/open items only.
 - Focus on behavior, not implementation-detail tests.
-- Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
-- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., adding missing test steps, merging duplicate tests, parameterizing similar cases). Omit the diff when the finding is a coverage assessment with no single correct test plan.
-- Follow the `# Process` section for cache, Delta, and skip handling.
+- Include unified diff after `Fix:` when concrete. Omit for coverage assessments.
+- Verified observations MUST include grounding snapshots.

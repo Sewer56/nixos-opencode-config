@@ -18,7 +18,6 @@ Domain workflows (git, PRs) go in `supplemental/*.txt`.
 | todowrite | Replace the full todo list. | ~25 |
 | webfetch | Fetch one URL. HTML is converted to Markdown and JSON is pretty-printed. | ~70 |
 | websearch | Web search. Current year: {{year}} — use for recent/current event queries. | ~75 |
-| codesearch | Search programming docs, APIs, libraries. Returns code examples and references. | ~80 |
 | question | Ask user a question. Returns selected labels. Use `multiple: true` for multi-select. Custom answer enabled by default. | ~100 |
 | lsp | Language Server Protocol code intelligence. | ~45 |
 | apply_patch | Apply a multi-file patch. Envelope: `*** Begin Patch` / `*** End Patch`. Operations: Add File, Delete File, Update File (with context_line, +/- prefix). | ~150 |

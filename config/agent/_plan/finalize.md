@@ -19,22 +19,13 @@ permission:
   list: allow
   task: {
     "*": "deny",
-    "codebase-explorer": "allow",
     "mcp-search": "allow",
-    "_plan/finalize-reviewers/correctness": "allow",
-    "_plan/finalize-reviewers/economy": "allow",
+    "_plan/finalize-reviewers/audit": "allow",
+    "_plan/finalize-reviewers/audit-rereview": "allow",
     "_plan/finalize-reviewers/tests": "allow",
-    "_plan/finalize-reviewers/performance": "allow",
-    "_plan/finalize-reviewers/dead-code": "allow"
+    "_plan/finalize-reviewers/tests-rereview": "allow",
+    "_plan/finalize-reviewers/performance": "allow"
   }
-  # bash: deny
-  # question: deny
-  # webfetch: deny
-  # websearch: deny
-  # codesearch: deny
-  # lsp: deny
-  # doom_loop: deny
-  # skill: deny
 ---
 
 Convert a confirmed human plan into a reviewed code and test machine plan. Write `<artifact_base>.handoff.md` (handoff, includes manifest) and individual implementation/test step files matching `<artifact_base>.step.*.md`. No separate `machine.md`.
@@ -51,6 +42,9 @@ Convert a confirmed human plan into a reviewed code and test machine plan. Write
 - `plan_path`: `<artifact_base>.draft.md`
 - `handoff_path`: `<artifact_base>.handoff.md`
 - `step_pattern`: `<artifact_base>.step.*.md`
+- Cache paths (written by reviewers on initial review, read by rereview agents on re-review):
+  - `<artifact_base>.review-audit.md`
+  - `<artifact_base>.review-tests.md`
 
 # Process
 
@@ -80,7 +74,6 @@ Next Command: /plan/draft
 ### Step 1b — Confirm draft and load rules (only after Step 1a succeeds)
 - Derive `artifact_base` from resolved path. All artifact paths derive from `artifact_base`.
 - Read `plan_path` (`<artifact_base>.draft.md`). If read fails or file is missing, return `Status: FAIL` and stop.
-- NOW load rule files listed in `# Rules` section below. Read them in parallel.
 - Treat `plan_path` and any explicit finalize-time notes from the latest user message as the source of truth for this run.
 - Treat the `/plan/finalize` invocation itself as the confirmation boundary.
 - Do not rewrite `plan_path`.
@@ -90,7 +83,7 @@ Next Command: /plan/draft
 - Start from the paths and shapes already present in `plan_path`.
 - `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers. Ground implementation and test step diffs in actual file content.
 - Deepen discovery only where the confirmed plan still leaves concrete file placement, ownership, code shape, test coverage, verification commands, or external API details unresolved.
-- Use `@codebase-explorer` for repo discovery first when needed.
+- Use direct targeted `glob`/`grep`/`read` for repo discovery when needed. Do not dispatch explorer helper subagents for this workflow; avoid helper-agent output unless direct discovery cannot answer a concrete placement/anchor question.
 - Use `@mcp-search` for external libraries or APIs first when needed.
 - Only after that initial search is complete, read the files and external facts they surfaced that matter to the machine plan.
 
@@ -111,27 +104,49 @@ Next Command: /plan/draft
 ## 5. Run the code/test review loop
 - Write and maintain `## Delta` in `handoff_path` before the first reviewer pass. Record each `REQ-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields. Add artifact markers for `Source Plan` and `Review Ledger`. Recompute `## Delta` after every material revision.
 - Also record each I# and T# step as a Delta entry so reviewers can skip Unchanged step files.
-- Before each reviewer pass, derive `reviewer_set` from current plan shape:
-  - Always include `@_plan/finalize-reviewers/correctness`.
+- Before initial reviewer pass, derive `reviewer_set`:
+  - Always include `@_plan/finalize-reviewers/audit`.
   - Always include `@_plan/finalize-reviewers/tests`.
-  - Include `@_plan/finalize-reviewers/economy` only when plan has more than 3 total I#/T# steps, more than 1 requirement, or any step updates/removes existing code or tests.
-  - Include `@_plan/finalize-reviewers/performance` only when requirements, settled facts, or step targets indicate performance-sensitive work (hot paths, loops, queries, batching, caching, concurrency, large data, latency-sensitive code).
-  - Include `@_plan/finalize-reviewers/dead-code` only when any step action is `UPDATE` or `REMOVE`, or a diff deletes/replaces/redirects existing code or tests.
-  - For trivial plans (<=3 total I#/T# steps, 1 requirement, pure `ADD`/`INSERT` actions, no performance-sensitive work), `reviewer_set` should normally collapse to correctness + tests only.
-- After each full machine-plan draft, run only `reviewer_set` in parallel, passing `handoff_path`, `plan_path`, and `step_pattern` to each selected reviewer.
-- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern` (a glob pattern matching I# and T# step file paths to scope the review), finalize-time user notes, current step count, action mix (`ADD`/`INSERT`/`UPDATE`/`REMOVE`), and any relevant trigger flags (performance-sensitive yes/no, deletion-or-replacement yes/no).
+  - Include `@_plan/finalize-reviewers/performance` only when `## Review Focus` or Step Index includes performance-sensitive changes (algorithm changes, N+1 patterns, concurrency, db queries). Skip for UI/config/docs/text-only plans.
+
+### 5a. Initial reviewer dispatch (full reviewers)
+- Pass `handoff_path`, `plan_path`, and `cache_path` to each selected reviewer.
+- **Curate step paths per reviewer domain:**
+  - Audit: all step paths (I# + T#).
+  - Tests: test step paths (T#) + implementation steps that directly affect test assertions/coverage. Do NOT include steps that only change UI, config, docs, or non-testable surface.
+  - Performance (if dispatched): all step paths.
+- Pre-inline essential context:
+  - For tests: existing test structure summary (framework, file location, current test count) + relevant REQ acceptance criteria.
+  - For audit and performance: no special pre-inlining needed.
+- Full reviewers handle INITIAL review only. They write cache files with grounding snapshots.
+
+### 5b. Re-review dispatch (dedicated rereview agents, after fixes)
+- After applying fixes, dispatch dedicated rereview agents — NOT the full reviewers:
+  - If audit had BLOCKING findings or audit-domain steps changed: dispatch `@_plan/finalize-reviewers/audit-rereview`.
+  - If tests had BLOCKING findings or test-domain steps changed: dispatch `@_plan/finalize-reviewers/tests-rereview`.
+  - Performance: never re-dispatched (PASS or ADVISORY-only; ADVISORY recorded as DEFERRED).
+- Pass to rereview agent:
+  - `cache_path` (required — the initial review cache with grounding snapshots)
+  - `changed_step_paths` (only step files that changed)
+  - `resolved_finding_ids`, `unresolved_finding_ids`, `finding_resolution_ledger`
+- Do NOT pass `handoff_path` or `plan_path` to rereview agents.
+- Rereview agents: read cache → read changed steps → verify fixes → check for new issues → update cache → emit REVIEW.
+- If the cache file does not exist (initial review write failed), fall back to re-dispatching the full reviewer with structural withhold.
+
+### 5c. Review loop control
+- For advisory-only findings from rereview agents, record as DEFERRED. Do not revise or re-run solely to clear advisory-only findings unless they affect explicit acceptance criteria or hard user constraints.
 - Add explicit scope boundary to each reviewer prompt:
   - reviewer must assess only its own domain
   - if a concern belongs to another reviewer, mention it at most once in `## Notes` without deep investigation
   - skip broad repo exploration unless required by its own focus contract
   - prefer changed items from `## Delta`; do not re-evaluate unchanged items without new evidence
-- Use prompt wording that lets trivial reviewers self-skip fast, eg performance reviewer can return PASS quickly when performance-sensitive flag is false.
 - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
-- Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED. Do not create placeholder entries for reviewers that were intentionally skipped by `reviewer_set`.
-- Apply core domain ownership: CORRECTNESS → correctness reviewer; ECONOMY → economy reviewer; TEST → tests reviewer; PERF → performance reviewer; DEAD_CODE → dead-code reviewer. Arbitrate cross-domain conflicts.
+- Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
+- Apply core domain ownership: AUDIT → audit reviewer; TEST → tests reviewer; PERF → performance reviewer. Arbitrate cross-domain conflicts.
 - Do not reopen RESOLVED issues without new concrete evidence.
 - Revise step files only where needed. Append one line to `## Revision History`.
-- Recompute `reviewer_set` and re-run selected reviewers after every material revision.
+- **PASS-stays-PASS gate:** Do not re-dispatch a reviewer that returned PASS with 0 findings unless revisions address a domain that overlaps with its focus. AUDIT covers fidelity+structure+completeness+economy+dead-code; TESTS covers test coverage; PERF covers performance.
+- Recompute `reviewer_set` and re-run only reviewers with BLOCKING findings or domains touched by BLOCKING fixes, using dedicated rereview agents (5b). Advisory-only reviewers are recorded as DEFERRED and carried forward.
 - Loop until no findings of any severity remain or 10 iterations.
   No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
@@ -160,15 +175,7 @@ Next Command: /plan/finalize-code-docs
 - Keep `<artifact_base>.handoff.md` factual and stable enough for the machine plan and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
 
-# Rules
 
-Load all rule files below in parallel (only after Step 1b confirms plan_path). Apply them:
-
-/home/sewer/opencode/config/rules/general.md
-/home/sewer/opencode/config/rules/code-placement.md
-/home/sewer/opencode/config/rules/testing.md
-/home/sewer/opencode/config/rules/test-parameterization.md
-/home/sewer/opencode/config/rules/performance.md
 
 # Templates
 
@@ -270,10 +277,10 @@ Source Plan: <absolute path to `<artifact_base>.draft.md`>
 
 ### Issues
 
-#### [COR-001]
-Id: COR-001
-Domain: CORRECTNESS | ECONOMY | TEST | PERF
-Source: _plan/finalize-reviewers/correctness
+#### [AUD-001]
+Id: AUD-001
+Domain: AUDIT | TEST | PERF
+Source: _plan/finalize-reviewers/audit
 Severity: BLOCKING | ADVISORY
 Status: OPEN | RESOLVED | DEFERRED
 Evidence: <section or path:line>
@@ -285,7 +292,7 @@ Acceptance Criteria: <testable closure condition>
 
 #### [DEC-001]
 Type: DOMAIN_AUTHORITY | ARBITRATION
-Issue: COR-001
+Issue: AUD-001
 Winner: <reviewer_name>
 Rationale: <why this view prevailed>
 ````

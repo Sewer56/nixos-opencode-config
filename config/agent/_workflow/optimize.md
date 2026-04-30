@@ -20,6 +20,7 @@ permission:
     ".opencode/workflow-optimize/**/exports/**": deny
   list: allow
   question: allow
+  external_directory: allow
   task:
     "*": deny
     "codebase-explorer": allow
@@ -40,11 +41,19 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 - No todo lists. State in `experiment_log` only.
 
 # Key Principles
-- **LLMs are non-deterministic.** Same prompt + same files → different token counts, different reviewer findings, different iteration counts. Single-run comparisons are unreliable. Always use 3+ samples and compare averages.
-- **Reviewers are the bottleneck.** They re-read files, re-process rules, re-state context every call. Optimizing reviewer output tokens (what they write) and reasoning tokens (what they think) has the highest ROI.
-- **Text constraints are unreliable.** Models ignore soft instructions like "don't grep X". Use permission-level blocks where possible. For structural changes, modify the workflow itself (what gets passed, what gets read) rather than adding more instructions.
-- **Prompt weight has a cost.** Every line added to a reviewer prompt is processed every call. Adding 50 lines of optimization instructions can increase tokens more than the waste they prevent. Prefer removing instructions over adding them.
-- **Radical changes beat incremental ones.** Instead of adding a "please don't re-read" instruction, restructure so re-reading is unnecessary (pre-inline the content). Instead of adding "grep scope rules", add permission denies.
+- **Multi-sample averaging required.** LLM output is non-deterministic. Always run 3 samples per batch, compare batch averages, not single runs.
+- **Writes are the bottleneck.** Reviewer output tokens (what they write) and reasoning tokens (what they think) are the primary cost. Optimize these first. Reads (input tokens) are secondary.
+- **Structural over instructional.** Soft text constraints ("don't re-read X", "keep it short") are ignored. Restructure the workflow instead: embed relevant content directly in the prompt, permission-block paths, withhold files from dispatch.
+- **Less is more.** Every prompt line costs tokens every invocation. Remove instructions over adding them. Compress reviewer agent files to domain + output format + scope boundary only.
+- **Radical over incremental.** Instead of patching with more instructions, restructure to make wasteful behavior impossible. Pre-inline content instead of begging models not to re-read it.
+- **Flatten reviewer output spread.** Wall-clock is gated by the slowest (highest-output) reviewer. Splitting a heavy reviewer into targeted sub-agents improves balance. Duplicated reads are acceptable; the win is in writes.
+- **Token-only cross-batch comparison.** Elapsed time varies with provider load and routing. Only output, reasoning, and input tokens are reliable metrics across batches.
+- **Iteration caps: moderate is fine.** Caps of 5+ are acceptable; caps of 3 or lower are not acceptable. Stop rules still needed for instability detection.
+- **Simplify rules, don't delete them.** Preserve quality gates and required rule enforcement. Make rules shorter, LLM-optimized, and easier to process — but don't remove required coverage.
+- **Fix diffs over prose.** When a finding has a concrete correction, output a unified diff after `Fix:`. Use prose only for conceptual findings with no single correct replacement.
+- **Shared agents are shared risk.** Don't globally optimize agents other workflows use unless the win is broadly safe. Prefer task-tailored agents.
+- **No user in the loop.** There is no human checking in. Do not pause to ask questions or wait for approval. Keep iterating autonomously through the full batch budget until a hard stop rule fires. Report results briefly — one line per batch suffices.
+
 
 # Shared helpers
 - `@_workflow/optimize-setup` — normalize input, resolve workflow files
@@ -85,9 +94,10 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 - Quality gate comparison priorities:
   1. Quality (hard gate — PASS required)
   2. Reviewer output tokens (primary cost metric — tokens the reviewer wrote)
-  3. Reviewer reasoning tokens (thinking/reasoning cost)
-  4. Reviewer input tokens (context loading cost)
-  5. Total tokens
+  3. Reviewer balance / max reviewer output tokens (wall-clock proxy)
+  4. Reviewer reasoning tokens (thinking/reasoning cost)
+  5. Total tokens (output + reasoning + input)
+  6. Reviewer input tokens (context loading cost — lowest priority)
 
 ## 3. Run parallel batch experiments
 - For each batch (including baseline), clean target artifacts from ALL git worktrees and the main working tree.
@@ -115,6 +125,7 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
   - `avg_reasoning_tokens` (reasoning/thinking cost)
   - `avg_input_tokens` (context loading cost)
   - `avg_total_tokens`
+  - `max_reviewer_output_tokens` and per-reviewer output spread (wall-clock/balance proxy)
   - `avg_tool_calls`
   - `sample_spread` (max-min range for each metric — measures non-determinism)
 - Also extract per-child-session (reviewer) metrics from export digests:
@@ -134,17 +145,18 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 ## 6. Form radical hypothesis batch
 - Prefer structural changes over instruction additions. Estimate impact on reviewer output tokens for every hypothesis — that is the primary cost axis.
 - **Any approach is valid.** The examples below are known-effective patterns from prior experiments, not a constraint set. Novel strategies encouraged if they reduce reviewer output tokens while preserving quality.
-- Example strategies (ranked by expected reviewer output token reduction from prior data):
-  1. **Pre-inline source content** (eliminates 30-60% of reviewer reads + re-statement)
-  2. **Compress reviewer agent files** (strip rules, examples, verbose process → keep domain + output format + scope boundary only)
-  3. **Permission-level blocks** (.opencode/** deny, remove external_directory, deny unused tools)
-  4. **Output budget** (cap REVIEW block to ≤300 words, one-line findings, no prose)
-  5. **Cache-primary re-reviews** (pass cache as main input, "verify only listed fixes resolve")
-  6. **Inline rule summaries** (replace "read 5 rule files" with 10 lines of inlined rules)
-  7. **Selective reruns** (only re-run reviewers with BLOCKING findings; ADVISORY → DEFERRED)
-  8. **Early-stop** (BLOCKING found → emit REVIEW immediately, stop exploring)
-  9. **Cheaper reviewer models** (dead-code on MiniMax already; can tests/economy go cheaper?)
-  10. **Merge trivial reviewers** (economy always PASS → inline 2-3 sentences into correctness)
+- Proven strategies (prefer these first):
+  1. **Structural withhold on re-review** — don't pass human-written source documents on re-review. Pass only machine-generated structural context (index, delta, ledger) that the reviewer needs to locate and assess changes. Reviewer reads its own cache first, then structural context, then changed items. Cuts re-review output ~39% and reasoning ~44%.
+  2. **Compress reviewer agent files** — strip verbose process steps, keep only domain focus + output format + scope boundary. Cuts prompt size ~43-55%.
+  3. **Cache-primary re-reviews** — write verified observations with grounding snapshots on initial review; re-review trusts cached observations for unchanged steps.
+  4. **Domain-step curation** — don't pass all items to every reviewer. Each reviewer gets only the items relevant to its domain (e.g., tests reviewer gets test items + implementation items affecting assertions, not UI/config-only items).
+  5. **ADVISORY-only deferral** — don't re-run review loop solely to clear advisory findings. Record as DEFERRED, carry forward.
+  6. **Cheaper models for narrow or simple tasks** — use `# LOW` models for narrow-scope or mechanically simple reviewers (e.g., dead-code detection, format checks). Tag model lines with `# LOW` / `# MED` / `# HIGH`.
+- Ineffective (avoid):
+  - Soft output budgets / word caps — models ignore them.
+  - Pre-inlining entire rule files into prompts — increases prompt weight, models write more.
+  - Iteration caps below 5 — stop convergence.
+  - Naive reviewer splits that each re-read the full source documents independently.
 - Change ONE coherent batch per iteration. That batch can contain multiple related changes.
 - For each hypothesis, estimate impact on reviewer output tokens specifically.
 
@@ -158,8 +170,8 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 - Compare batch averages, not single runs.
 - Quality gate is hard gate — candidate must match or beat baseline on quality.
 - Primary comparison: `avg_output_tokens` (tokens reviewers wrote).
-- Secondary: `avg_reasoning_tokens`, `avg_input_tokens`, `avg_total_tokens`, reviewer spread.
-- A batch wins only if its average output tokens are meaningfully lower (≥10% reduction) while quality holds.
+- Secondary: `avg_reasoning_tokens`, `avg_input_tokens`, `avg_total_tokens`, and reviewer balance (max reviewer output tokens + spread).
+- A batch wins if its average output tokens are meaningfully lower (≥10% reduction) while quality holds. A small average-token regression can still win when max reviewer output drops significantly.
 - If spread is very wide (max-min > 50% of avg), the metric is too noisy to be reliable — look for more stable structural metrics instead.
 - Stop after 2 consecutive batches with no noticeable improvement, or at `Max Batches` (default 10).
 
