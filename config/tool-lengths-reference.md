@@ -20,7 +20,10 @@ Domain workflows (git, PRs) go in `supplemental/*.txt`.
 | websearch | Web search. Current year: {{year}} — use for recent/current event queries. | ~75 |
 | question | Ask user a question. Returns selected labels. Use `multiple: true` for multi-select. Custom answer enabled by default. | ~100 |
 | lsp | Language Server Protocol code intelligence. | ~45 |
-| apply_patch | Apply a multi-file patch. Envelope: `*** Begin Patch` / `*** End Patch`. Operations: Add File, Delete File, Update File (with context_line, +/- prefix). | ~150 |
+| apply_patch | Apply a multi-file patch. Envelope: `*** Begin Patch` / `*** End Patch`. Operations: Add File, Delete File, Update File (with `*** Move to: <new>` for renames). Within Update: `@@ context_line`, `+` new, `-` removed, plain for context. | ~330 |
+| skill | Load a specialized skill when the task at hand matches one of the skills listed in the system prompt. Use this tool to inject the skill's instructions and resources into current conversation. The output may contain detailed workflow guidance as well as references to scripts, files, etc in the same directory as the skill. The skill name must match one of the skills listed in your system prompt. | ~400 |
+| plan-enter | Suggest switching to plan agent. Call for complex tasks, research before implementation, multi-file/architecture decisions. Not for simple tasks or when the user wants immediate implementation. | ~195 |
+| plan-exit | Exit plan agent after plan is written and questions resolved. Not before plan is finalized or with unanswered questions. | ~120 |
 
 ## System prompt builder sections (system-prompt-builder.ts)
 

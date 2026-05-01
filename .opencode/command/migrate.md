@@ -39,9 +39,9 @@ You are rebasing the `production` branch in `opencode-source/` onto a new upstre
 - Update `config/prompt-metrics.log` — replace the `[last-migration]` section with new data
 
 ## Step 8: Regression checks — STOP if any fail
-- TOTAL tokens must be under 4,600. If over, report immediately and do NOT proceed.
+- Compare TOTAL tokens against previous migration in `config/prompt-metrics.log`. If TOTAL increased, report immediately and do NOT proceed.
 - `bash.txt` must be under 100 chars (single sentence schema description, like all other tool .txt files)
-- Any tool `.txt` file over 150 chars is a regression. Long guidance belongs in `system-prompt-builder.ts`, not `.txt` files.
+- Tool `.txt` files: keep schema descriptions short. Some tools (apply_patch, skill, plan-enter) need slightly longer descriptions to explain their envelope/format. That's fine as long as TOTAL tokens don't increase.
 - Compare against reference in `config/tool-lengths-reference.md`
 
 ## Architecture reference (for conflict resolution)
