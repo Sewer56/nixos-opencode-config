@@ -152,9 +152,13 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
   4. **Domain-step curation** — don't pass all items to every reviewer. Each reviewer gets only the items relevant to its domain (e.g., tests reviewer gets test items + implementation items affecting assertions, not UI/config-only items).
   5. **ADVISORY-only deferral** — don't re-run review loop solely to clear advisory findings. Record as DEFERRED, carry forward.
   6. **Cheaper models for narrow or simple tasks** — use `# LOW` models for narrow-scope or mechanically simple reviewers (e.g., dead-code detection, format checks). Tag model lines with `# LOW` / `# MED` / `# HIGH`.
-  7. **Merge reviewers with overlapping file reads** — when two reviewers both read all step files (e.g., correctness + scope), merge into one. Eliminates duplicate dispatch, duplicate handoff reads, and cross-reviewer scope leakage. The merged reviewer must cover all domains the originals did. For larger plans, the orchestrator can conditionally split.
+  7. **Merge reviewers with overlapping file reads** — when two reviewers both read all step files (e.g., correctness + scope), merge into one. Eliminates duplicate dispatch, duplicate handoff reads, and cross-reviewer scope leakage. The merged reviewer must cover all domains the originals did. For larger plans, the orchestrator can conditionally split. **If merge increases per-reviewer output too much, split back — but try the merge first.**
   8. **Pre-discovery explorer for shared caching** — dispatch a task-tailored explorer subagent before writing the machine plan. The explorer reads the draft, surveys all touched files, and returns a compact structured manifest (files, symbols, test locations, observations). The orchestrator uses this manifest instead of doing its own discovery, and pre-inlines relevant sections into reviewer prompts. More output tokens from the explorer, but LESS total tokens because: (a) reviewers don't independently re-discover the same files, (b) explorer output is cached and shared, (c) orchestrator reasoning drops since it receives structured facts instead of open-ended discovery. Only deny source-file reads when absolutely necessary — plans can target any file type, and blanket denial breaks review quality.
   9. **Serial final-gate reviewers** — run inexpensive but always-valuable checks (like performance) after the main review loop converges. Prevents wasted reviews on plans that will be revised by BLOCKING findings. Reduces total reviewer dispatches.
+  10. **Compress orchestrator prompt** — the orchestrator agent file itself is prompt tokens. Strip verbose descriptions, use terse imperative language, remove examples that don't apply.
+  11. **Pre-create cache stubs** — write empty `{}` cache files for all reviewers before the first batch. Eliminates not-found errors on first pass.
+  12. **Compress reviewer output format** — remove optional sections (`## Notes`), shorten agent names in output header, use single-line `## Verified` format. Small per-reviewer savings that compound.
+  13. **Remove Execution Contract block from reviewers** — the "Execution Contract (hard requirements)" block in reviewer agent files is redundant with the Process section. Removing it saves ~5 lines per reviewer and reduces prompt bloat.
 - Ineffective (avoid):
   - Soft output budgets / word caps — models ignore them.
   - Pre-inlining entire rule files into prompts — increases prompt weight, models write more.
@@ -163,8 +167,9 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
   - Naive reviewer splits that each re-read the full source documents independently.
   - Ultra-compressed prompts (stripping >50% of instructions) — removes structure models need, increases wandering.
   - Permission-denying source files with broad patterns like `"*": deny` — blocks the read tool entirely.
-  - `reasoningEffort` tags — have no effect on some providers (e.g., GLM). Reasoning changes come from structural context reduction, not effort hints.
+  - Single-pass review without re-review — quality regression. At minimum, re-review BLOCKING fixes.
   - Removing reviewer agents used only by the target workflow when no other workflow references them — dead files confuse future experiments.
+- **When near baseline, prefer simpler.** If two configurations produce similar token counts (within ~5%), choose the one with fewer lines, fewer reviewer agents, and less structural complexity. Simpler workflows are easier to maintain and debug.
 - Change ONE coherent batch per iteration. That batch can contain multiple related changes.
 - For each hypothesis, estimate impact on reviewer output tokens specifically.
 
@@ -188,12 +193,14 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 - Stop after 2 consecutive batches with no noticeable improvement, or at `Max Batches` (default 10).
 
 ## 9. Stop rules
-- Stop when:
-  - best batch is clearly better and next hypothesis is weak
-  - 2 consecutive batches produce no noticeable improvement
-  - `Max Batches` reached
-  - target workflow becomes unstable
+- Stop ONLY when:
+  - ALL plausible optimization strategies have been attempted and none remain untried
+  - `Max Batches` reached (default 10, but push past this if real progress is visible)
+  - target workflow becomes unstable (3+ consecutive discarded batches)
   - more than half the samples in a batch are discarded (entire batch discarded)
+- Do NOT stop just because 2 batches showed no improvement — try different categories of optimization.
+- Exhaust all categories before stopping: reviewer merging, prompt compression, model tiering, review loop restructuring, output format compression, scope boundaries, cache optimization, structural withholding.
+- If output tokens are still above 60% of baseline, you haven't tried enough. Keep going.
 
 ## 10. Discarded attempt handling
 - A sample is discarded when: `run_batch.py` reports non-COMPLETED status, or export `root_session_status` is `error`/`abandoned`.
