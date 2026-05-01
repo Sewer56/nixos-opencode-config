@@ -189,8 +189,9 @@ def run_worktree_sample(args_tuple):
                 pass
 
     # Build opencode command
+    opencode_bin = shutil.which("opencode") or "opencode"
     cmd = [
-        "opencode", "run",
+        opencode_bin, "run",
         "--format", "json",
         "--command", command,
         "--title", f"{title} sample-{sample_idx}",
@@ -238,8 +239,9 @@ def run_direct_sample(sample_idx, repo_root, command, title, model, files, promp
             except Exception:
                 pass
 
+    opencode_bin = shutil.which("opencode") or "opencode"
     cmd = [
-        "opencode", "run",
+        opencode_bin, "run",
         "--format", "json",
         "--command", command,
         "--title", f"{title} sample-{sample_idx}",
