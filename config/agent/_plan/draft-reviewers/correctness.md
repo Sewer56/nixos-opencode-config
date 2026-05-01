@@ -20,18 +20,18 @@ permission:
   external_directory: allow
 ---
 
+Review plan draft artifacts for template structure, diff header validity,
+and snippet illustrativeness.
 
-Review plan draft artifacts for template structure, diff header validity, snippet illustrativeness, and dead-code removal.
 
 # Inputs
 - `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Focus
-- Template structure: required sections present — `# Title`, `## Overall Goal`, `## Open Questions`, `## Decisions`, `---` separated `[P#]` items with `**Files:**` line. Block for missing sections.
-- Diff headers: every diff block header references a valid file path. `--- a/<path>` and `+++ b/<path>` paths exist or are plausible targets.
-- Illustrative snippets: code snippets in `[P#]` items are illustrative, not binding. Flag when a snippet prescribes exact implementation rather than showing a shape or signature.
-- Dead-code removal: when a `[P#]` item deletes files or removes code, check that it also handles orphaned references (imports, callers, type refs, cross-file dependencies). Flag missing cleanup.
+- Template structure: required sections present — Task Plan heading, Overall Goal, Plan with `[P#]` items, Open Questions, Decisions. Omit Open Questions or Decisions only when explicitly marked `None`.
+- Diff headers: every diff block header references a valid file path. `--- a/<path>` and `+++ b/<path>` paths exist or are plausible targets for the declared action.
+- Illustrative snippets: code snippets in `[P#]` items are illustrative and not binding implementation instructions. Flag when a snippet prescribes exact implementation rather than showing a shape or signature.
 
 # Process
 1. Load cache
@@ -53,24 +53,12 @@ Review plan draft artifacts for template structure, diff header validity, snippe
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- Write cache to derived cache file. Format: `# Review Cache: <domain>` with `## Verified Observations` (one line per [P#] with grounding snapshot) and `## Findings` (each with Status/Category/Severity/Problem/Fix).
-# Review Cache: correctness
-
-## Verified Observations
-- [P#]: <grounding snapshot — one line each>
-
-## Findings
-### [COR-NNN]
-Status: OPEN | RESOLVED
-Category: TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS | DEAD_CODE
-Severity: BLOCKING | ADVISORY
-Problem: <one line>
-Fix: <one line or diff>
-Resolution: <only for RESOLVED>
-```
-
 - If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
+  - Replace entries whose fields changed.
+  - Insert new entries in the appropriate section.
+  - Remove pruned `[P#]` ids.
+  - Move entries between sections when status transitions (e.g., Open → Resolved).
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
@@ -85,7 +73,7 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [COR-001]
-Category: TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS | DEAD_CODE
+Category: TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
@@ -102,6 +90,7 @@ Fix: <smallest concrete correction>
 
 ## Verified
 - [P#]: <item description — unchanged items that remain verified>
+
 ````
 
 Return ONLY the block above — no introduction, no summary, no conversational
@@ -110,7 +99,6 @@ Any content outside this format is a protocol violation.
 
 # Constraints
 - Block for missing required sections, invalid diff headers, or implementation-prescriptive snippets that should be illustrative.
-- Block for orphaned references when a `[P#]` removes files or code without cleanup.
 - Do not block for minor wording when structure and snippet style are valid.
 - Cite section names and specific `[P#]` items as evidence.
 - Keep findings short and specific.

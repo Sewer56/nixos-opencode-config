@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks wording quality, clarity, and comprehensibility in plan draft artifacts (human zone exempt)
+description: Checks token density, filler, hedging, and bullet atomicity in plan draft artifacts (human zone exempt)
 model: sewer-axonhub/MiniMax-M2.7  # LOW
 reasoningEffort: medium
 permission:
@@ -20,8 +20,8 @@ permission:
   external_directory: allow
 ---
 
+Review plan draft artifacts for LLM instruction wording quality.
 
-Review plan draft artifacts for wording quality and comprehensibility.
 
 # Inputs
 - `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
@@ -29,7 +29,7 @@ Review plan draft artifacts for wording quality and comprehensibility.
 
 # Focus
 (All items BLOCKING unless marked ADVISORY.)
-- Token density (machine zone only; human zone exempt): no filler, hedging, "please note", "it's important to", "make sure to", "ensure that". Every word earns its place.
+- Token density (machine zone only; human zone exempt — jargon-free narrative by design): no filler, hedging, "please note", "it's important to", "make sure to", "ensure that". Every word earns its place.
 - Wording optimization: flag phrasing that can be tightened without changing meaning. Prefer fewer tokens; flat instruction structure. ADVISORY — block only for egregious inflation.
 - Bullet atomicity: one checkable condition per Focus, Process, or Constraint item. Split multi-condition bullets. ADVISORY.
 - Undefined jargon: instructions use internal taxonomy or project-specific compound terms without defining them. Replace with inline definitions.
@@ -62,24 +62,12 @@ Review plan draft artifacts for wording quality and comprehensibility.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
-- Write cache to derived cache file. Format: `# Review Cache: <domain>` with `## Verified Observations` (one line per [P#] with grounding snapshot) and `## Findings` (each with Status/Category/Severity/Problem/Fix).
-# Review Cache: wording
-
-## Verified Observations
-- [P#]: <grounding snapshot — one line each>
-
-## Findings
-### [WRD-NNN]
-Status: OPEN | RESOLVED
-Category: TOKEN_DENSITY | WORDING_OPTIMIZATION | BULLET_ATOMICITY | UNDEFINED_JARGON | COMPOUND_TERM | OPAQUE_REFERENCE
-Severity: BLOCKING | ADVISORY
-Problem: <one line>
-Fix: <one line or diff>
-Resolution: <only for RESOLVED>
-```
-
 - If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
+  - Replace entries whose fields changed.
+  - Insert new entries in the appropriate section.
+  - Remove pruned `[P#]` ids.
+  - Move entries between sections when status transitions (e.g., Open → Resolved).
 - Leave entries whose content has not changed exactly as they are.
 
 6. Emit the final review block
@@ -97,20 +85,21 @@ Decision: PASS | ADVISORY | BLOCKING
 Category: TOKEN_DENSITY | WORDING_OPTIMIZATION | BULLET_ATOMICITY | UNDEFINED_JARGON | COMPOUND_TERM | OPAQUE_REFERENCE
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
-Problem: <what is unnecessarily verbose, poorly structured, or incomprehensible>
-Fix: <smallest simplification or inline definition>
+Problem: <what is unnecessarily verbose or poorly structured>
+Fix: <smallest simplification>
 ```diff
 <artifact_base>.draft.md
 --- a/<artifact_base>.draft.md
 +++ b/<artifact_base>.draft.md
  unchanged context
--problematic text
-+corrected text
+-verbose or poorly structured text
++tightened replacement text
  unchanged context
 ```
 
 ## Verified
 - [P#]: <item description — unchanged items that remain verified>
+
 ````
 
 Return ONLY the block above — no introduction, no summary, no conversational
@@ -120,7 +109,6 @@ Any content outside this format is a protocol violation.
 # Constraints
 - Do not block for concise but complete instructions, or when different sections reference the same concept for different analytical purposes.
 - Human zone wording is exempt — jargon-free narrative by design.
-- For behavior-governing instructions: block when a term is not defined in the same file and is not a common programming term.
 - Keep findings short and specific.
 - Include a unified diff after every finding's `Fix:` field targeting `context_path` with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.
