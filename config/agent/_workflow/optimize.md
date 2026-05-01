@@ -41,7 +41,7 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 - No todo lists. State in `experiment_log` only.
 
 # Key Principles
-- **Multi-sample averaging required.** LLM output is non-deterministic. Always run 3 samples per batch, compare batch averages, not single runs.
+- **Multi-sample averaging required.** LLM output is non-deterministic. Always run 3 samples per batch, compare batch averages, not single runs. When results are within ~15% of the best known result or sample spread exceeds 50% of the average, run 2 additional samples (5 total) to increase confidence. Do not run all 5 upfront — expand only when the result is ambiguous.
 - **Writes are the bottleneck.** Reviewer output tokens (what they write) and reasoning tokens (what they think) are the primary cost. Optimize these first. Reads (input tokens) are secondary.
 - **Structural over instructional.** Soft text constraints ("don't re-read X", "keep it short") are ignored. Restructure the workflow instead: embed relevant content directly in the prompt, permission-block paths, withhold files from dispatch.
 - **Less is more.** Every prompt line costs tokens every invocation. Remove instructions over adding them. Compress reviewer agent files to domain + output format + scope boundary only.
@@ -180,7 +180,11 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 - Primary comparison: `avg_output_tokens` (tokens reviewers wrote).
 - Secondary: `avg_reasoning_tokens`, `avg_input_tokens`, `avg_total_tokens`, and reviewer balance (max reviewer output tokens + spread).
 - A batch wins if its average output tokens are meaningfully lower (≥10% reduction) while quality holds. A small average-token regression can still win when max reviewer output drops significantly.
-- If spread is very wide (max-min > 50% of avg), the metric is too noisy to be reliable — look for more stable structural metrics instead.
+- **Sequential sample expansion:** After 3 samples, decide:
+  - Clear win (>15% better than current best) → accept, no more samples needed.
+  - Clear loss (>15% worse) → discard batch, no more samples.
+  - Ambiguous (within ±15% of best) or spread >50% of avg → run 2 more samples (5 total). Trim highest and lowest, average the middle 3 for the final metric.
+- With 3-sample batches and typical 12–70% spread, only effects ≥~15% are reliably detectable. Smaller differences are noise.
 - Stop after 2 consecutive batches with no noticeable improvement, or at `Max Batches` (default 10).
 
 ## 9. Stop rules
