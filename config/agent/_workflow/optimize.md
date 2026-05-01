@@ -152,11 +152,19 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
   4. **Domain-step curation** — don't pass all items to every reviewer. Each reviewer gets only the items relevant to its domain (e.g., tests reviewer gets test items + implementation items affecting assertions, not UI/config-only items).
   5. **ADVISORY-only deferral** — don't re-run review loop solely to clear advisory findings. Record as DEFERRED, carry forward.
   6. **Cheaper models for narrow or simple tasks** — use `# LOW` models for narrow-scope or mechanically simple reviewers (e.g., dead-code detection, format checks). Tag model lines with `# LOW` / `# MED` / `# HIGH`.
+  7. **Merge reviewers with overlapping file reads** — when two reviewers both read all step files (e.g., correctness + scope), merge into one. Eliminates duplicate dispatch, duplicate handoff reads, and cross-reviewer scope leakage. The merged reviewer must cover all domains the originals did. For larger plans, the orchestrator can conditionally split.
+  8. **Pre-discovery explorer for shared caching** — dispatch a task-tailored explorer subagent before writing the machine plan. The explorer reads the draft, surveys all touched files, and returns a compact structured manifest (files, symbols, test locations, observations). The orchestrator uses this manifest instead of doing its own discovery, and pre-inlines relevant sections into reviewer prompts. More output tokens from the explorer, but LESS total tokens because: (a) reviewers don't independently re-discover the same files, (b) explorer output is cached and shared, (c) orchestrator reasoning drops since it receives structured facts instead of open-ended discovery. Only deny source-file reads when absolutely necessary — plans can target any file type, and blanket denial breaks review quality.
+  9. **Serial final-gate reviewers** — run inexpensive but always-valuable checks (like performance) after the main review loop converges. Prevents wasted reviews on plans that will be revised by BLOCKING findings. Reduces total reviewer dispatches.
 - Ineffective (avoid):
   - Soft output budgets / word caps — models ignore them.
   - Pre-inlining entire rule files into prompts — increases prompt weight, models write more.
+  - Pre-inlining changed step content into rereview prompts — increases prompt size and output.
   - Iteration caps below 5 — stop convergence.
   - Naive reviewer splits that each re-read the full source documents independently.
+  - Ultra-compressed prompts (stripping >50% of instructions) — removes structure models need, increases wandering.
+  - Permission-denying source files with broad patterns like `"*": deny` — blocks the read tool entirely.
+  - `reasoningEffort` tags — have no effect on some providers (e.g., GLM). Reasoning changes come from structural context reduction, not effort hints.
+  - Removing reviewer agents used only by the target workflow when no other workflow references them — dead files confuse future experiments.
 - Change ONE coherent batch per iteration. That batch can contain multiple related changes.
 - For each hypothesis, estimate impact on reviewer output tokens specifically.
 

@@ -43,13 +43,10 @@ Category: FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE
 Severity: BLOCKING | ADVISORY
 Problem: <one line>
 Fix: <unified diff when concrete>
-
-## Notes
-- <only if non-empty>
 ```
 
 # Constraints
-- PASS with 0 new findings: output Decision line only, no Findings or Notes section.
+- PASS with 0 new findings: output Decision line only.
 - BLOCKING: max 2 findings. ADVISORY findings → DEFERRED, do not block.
 - Read only: `cache_path` + `changed_step_paths`. Max 5 tool calls. No grep, no source file reads.
 - Trust cache grounding snapshots. Only re-read a source file if a fix demonstrably invalidates a cached observation.

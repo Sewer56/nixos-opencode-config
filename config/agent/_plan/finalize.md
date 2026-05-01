@@ -20,6 +20,7 @@ permission:
   task: {
     "*": "deny",
     "mcp-search": "allow",
+    "_plan/finalize-explorer": "allow",
     "_plan/finalize-reviewers/audit": "allow",
     "_plan/finalize-reviewers/audit-rereview": "allow",
     "_plan/finalize-reviewers/tests": "allow",
@@ -78,14 +79,13 @@ Next Command: /plan/draft
 - Treat the `/plan/finalize` invocation itself as the confirmation boundary.
 - Do not rewrite `plan_path`.
 
-## 2. Deepen discovery only where needed
+## 2. Dispatch explorer to gather repo facts
 - Only enter this phase after `plan_path` is resolved and read successfully.
-- Start from the paths and shapes already present in `plan_path`.
-- `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers. Ground implementation and test step diffs in actual file content.
-- Deepen discovery only where the confirmed plan still leaves concrete file placement, ownership, code shape, test coverage, verification commands, or external API details unresolved.
-- Use direct targeted `glob`/`grep`/`read` for repo discovery when needed. Do not dispatch explorer helper subagents for this workflow; avoid helper-agent output unless direct discovery cannot answer a concrete placement/anchor question.
+- Dispatch `@_plan/finalize-explorer` with `plan_path`. The explorer reads the draft, identifies all touched files, gathers current state (symbols, line ranges, imports, test files), and returns a compact structured manifest.
+- Use the explorer manifest for ALL subsequent steps — it provides shared, cached context. Do not re-discover files the explorer already surveyed.
+- The explorer manifest reduces orchestrator reasoning and prevents duplicate file reads by reviewers.
+- If the explorer fails (unlikely), fall back to direct `glob`/`grep`/`read` for discovery.
 - Use `@mcp-search` for external libraries or APIs first when needed.
-- Only after that initial search is complete, read the files and external facts they surfaced that matter to the machine plan.
 
 ## 3. Write the handoff file
 - Rewrite `handoff_path` from scratch for this run.
@@ -107,24 +107,22 @@ Next Command: /plan/draft
 - Before initial reviewer pass, derive `reviewer_set`:
   - Always include `@_plan/finalize-reviewers/audit`.
   - Always include `@_plan/finalize-reviewers/tests`.
-  - Include `@_plan/finalize-reviewers/performance` only when `## Review Focus` or Step Index includes performance-sensitive changes (algorithm changes, N+1 patterns, concurrency, db queries). Skip for UI/config/docs/text-only plans.
+  - Do NOT include performance in the initial pass. Performance runs after audit+tests converge (see 5d).
 
 ### 5a. Initial reviewer dispatch (full reviewers)
 - Pass `handoff_path`, `plan_path`, and `cache_path` to each selected reviewer.
 - **Curate step paths per reviewer domain:**
   - Audit: all step paths (I# + T#).
   - Tests: test step paths (T#) + implementation steps that directly affect test assertions/coverage. Do NOT include steps that only change UI, config, docs, or non-testable surface.
-  - Performance (if dispatched): all step paths.
-- Pre-inline essential context:
-  - For tests: existing test structure summary (framework, file location, current test count) + relevant REQ acceptance criteria.
-  - For audit and performance: no special pre-inlining needed.
+- Pre-inline essential context from the explorer manifest:
+  - For audit: relevant file paths and current state from `## Files Touched` + `## Key Symbols`.
+  - For tests: test file locations from `## Test Files` + existing test structure from `## Observations`.
 - Full reviewers handle INITIAL review only. They write cache files with grounding snapshots.
 
 ### 5b. Re-review dispatch (dedicated rereview agents, after fixes)
 - After applying fixes, dispatch dedicated rereview agents — NOT the full reviewers:
   - If audit had BLOCKING findings or audit-domain steps changed: dispatch `@_plan/finalize-reviewers/audit-rereview`.
   - If tests had BLOCKING findings or test-domain steps changed: dispatch `@_plan/finalize-reviewers/tests-rereview`.
-  - Performance: never re-dispatched (PASS or ADVISORY-only; ADVISORY recorded as DEFERRED).
 - Pass to rereview agent:
   - `cache_path` (required — the initial review cache with grounding snapshots)
   - `changed_step_paths` (only step files that changed)
@@ -149,6 +147,13 @@ Next Command: /plan/draft
 - Recompute `reviewer_set` and re-run only reviewers with BLOCKING findings or domains touched by BLOCKING fixes, using dedicated rereview agents (5b). Advisory-only reviewers are recorded as DEFERRED and carried forward.
 - Loop until no findings of any severity remain or 10 iterations.
   No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
+
+### 5d. Performance final gate (after audit+tests converge)
+- After audit and tests both return PASS with 0 BLOCKING findings, dispatch `@_plan/finalize-reviewers/performance` once.
+- Pass `handoff_path`, `plan_path`, and all step paths. The explorer manifest is still in context — pre-inline relevant `## Key Symbols` and `## Files Touched`.
+- Performance reviews algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, missing validation.
+- Performance findings: BLOCKING trigger a fix cycle → re-dispatch performance (not a rereview agent — performance has no cache). ADVISORY only → DEFERRED.
+- This runs once, at the end, on a stable plan. Not re-dispatched in the main review loop.
 
 # Output
 Return exactly:

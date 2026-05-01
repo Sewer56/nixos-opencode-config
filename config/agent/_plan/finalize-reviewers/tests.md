@@ -78,16 +78,9 @@ Fix: <smallest useful test-plan correction; include unified diff below when conc
  unchanged context
 ```
 
-## Verified
-- <changed/open I#/T# only>
-
-## Notes
-- <optional short notes>
-```
-
 # Constraints
 - Read `handoff_path`, `plan_path`, all `step_paths`, rules. Full audit. Write cache.
-- PASS: Decision + `## Findings` with `(none)` + `## Verified` listing changed/open items only.
+- PASS: Decision + `## Findings` with `(none)`.
 - Focus on behavior, not implementation-detail tests.
 - Include unified diff after `Fix:` when concrete. Omit for coverage assessments.
 - Verified observations MUST include grounding snapshots.

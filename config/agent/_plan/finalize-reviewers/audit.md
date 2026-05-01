@@ -87,17 +87,11 @@ Fix: <unified diff when concrete, prose when conceptual>
 +fix
  unchanged context
 ```
-
-## Verified
-- <changed/open I#/T# only>
-
-## Notes
-- <optional>
 ```
 
 # Constraints
 - Read each source file at most once. Take notes in cache. Do not re-read files after initial grounding pass.
-- PASS: Decision + `## Findings` with `(none)` + `## Verified` listing changed/open items only.
+- PASS: Decision + `## Findings` with `(none)`.
 - BLOCKING: max 6 findings. One-line each + Fix with diff where concrete.
 - Dead-code: skip entirely if Step Index has no REMOVE steps.
 - Economy: block only for clear unnecessary expansion. Don't nitpick placement style.
