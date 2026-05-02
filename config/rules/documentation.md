@@ -48,6 +48,8 @@ Use these rules when writing or updating documentation in changed scope.
 /// assert_eq!(groups.files, vec!["Pack/file.txt"]);
 /// assert_eq!(groups.directories, vec!["Pack"]);
 /// ```
+/// 
+/// [`Error::InvalidPath`]: crate::error::Error::InvalidPath
 pub fn split_paths_by_kind(paths: Vec<String>) -> PathGroups { ... }
 ```
 
