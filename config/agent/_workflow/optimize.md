@@ -42,7 +42,7 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 
 # Key Principles
 - **Multi-sample averaging required.** LLM output is non-deterministic. Always run 3 samples per batch, compare batch averages, not single runs. When results are within ~15% of the best known result or sample spread exceeds 50% of the average, run 2 additional samples (5 total) to increase confidence. Do not run all 5 upfront — expand only when the result is ambiguous.
-- **Writes are the bottleneck.** Reviewer output tokens (what they write) and reasoning tokens (what they think) are the primary cost. Optimize these first. Reads (input tokens) are secondary. Elapsed time varies with provider load and routing. Please ignore it; focus on tokens only.
+- **Writes are the bottleneck.** Reviewer output tokens (what they write) and reasoning tokens (what they think) are the primary cost — always measure and compare them **combined** as output+reasoning. Reads (input tokens) are secondary. Elapsed time varies with provider load and routing. Please ignore it; focus on tokens only.
 - **Less is more.** Every prompt line costs tokens every invocation. Remove instructions over adding them. Compress reviewer agent files to domain + output format + scope boundary only.
 - **Radical over incremental.** Instead of patching with more instructions, restructure to make wasteful behavior impossible.
 - **Flatten reviewer output spread.** Wall-clock is gated by the slowest (highest-output) reviewer. Splitting a heavy reviewer into targeted sub-agents improves balance. Duplicated reads are acceptable; the win is in writes.
@@ -90,11 +90,10 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
   - `## Rejected Changes`, `## Next Experiments`
 - Quality gate comparison priorities:
   1. Quality (hard gate — PASS required)
-  2. Reviewer output tokens (primary cost metric — tokens the reviewer wrote)
-  3. Reviewer balance / max reviewer output tokens (wall-clock proxy)
-  4. Reviewer reasoning tokens (thinking/reasoning cost)
-  5. Total tokens (output + reasoning + input)
-  6. Reviewer input tokens (context loading cost — lowest priority)
+  2. Output+reasoning tokens combined (primary cost metric — what the model wrote and thought)
+  3. Reviewer balance / max reviewer output+reasoning tokens (wall-clock proxy)
+  4. Total tokens (output + reasoning + input)
+  5. Reviewer input tokens (context loading cost — lowest priority)
 
 ## 3. Run parallel batch experiments
 - For each batch (including baseline), clean target artifacts from ALL git worktrees and the main working tree.
@@ -118,8 +117,7 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 
 ## 4. Compute batch averages
 - From per-sample metadata, compute averages for:
-  - `avg_output_tokens` (PRIMARY — tokens reviewers wrote)
-  - `avg_reasoning_tokens` (reasoning/thinking cost)
+  - `avg_output_plus_reasoning_tokens` (PRIMARY — output + reasoning combined, the actual generation cost)
   - `avg_input_tokens` (context loading cost)
   - `avg_total_tokens`
   - `max_reviewer_output_tokens` and per-reviewer output spread (wall-clock/balance proxy)
@@ -179,9 +177,9 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 ## 8. Compare batches and keep winner
 - Compare batch averages, not single runs.
 - Quality gate is hard gate — candidate must match or beat baseline on quality.
-- Primary comparison: `avg_output_tokens` (tokens reviewers wrote).
+- Primary comparison: `avg_output_plus_reasoning_tokens` (output + reasoning combined, the actual generation cost). Output and reasoning are both model-generated cost; always compare them together, never separately.
 - Secondary: `avg_reasoning_tokens`, `avg_input_tokens`, `avg_total_tokens`, and reviewer balance (max reviewer output tokens + spread).
-- A batch wins if its average output tokens are meaningfully lower (≥10% reduction) while quality holds. A small average-token regression can still win when max reviewer output drops significantly.
+- A batch wins if its average output+reasoning tokens are meaningfully lower (≥10% reduction) while quality holds. A small average-token regression can still win when max reviewer output+reasoning drops significantly.
 - **Sequential sample expansion:** After 3 samples, decide:
   - Clear win (>15% better than current best) → accept, no more samples needed.
   - Clear loss (>15% worse) → discard batch, no more samples.
@@ -217,8 +215,7 @@ Batches: <n>
 Samples: <total across all batches>
 Target Command: /<command> | Mixed
 Best Batch: <n>
-Best Avg Output Tokens: <n> | None
-Best Avg Reasoning Tokens: <n> | None
+Best Avg Output+Reasoning Tokens: <n> | None
 Best Avg Input Tokens: <n> | None
 Best Avg Total Tokens: <n> | None
 Best Session IDs: <comma-separated ids> | None
