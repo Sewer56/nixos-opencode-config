@@ -60,24 +60,7 @@ Status: OPEN | RESOLVED
 Category: FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE
 Severity: BLOCKING | ADVISORY
 Problem: <one line>
-Fix: <one line or diff>
-Resolution: <only for RESOLVED>
-````
-
-# Output
-
-```text
-# REVIEW
-Agent: _plan/finalize-reviewers/audit
-Decision: PASS | ADVISORY | BLOCKING
-
-## Findings
-### [AUD-001]
-Category: FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE
-Severity: BLOCKING | ADVISORY
-Evidence: <section, path:line, or missing element>
-Problem: <one line>
-Fix: <unified diff when concrete, prose when conceptual>
+Fix: <unified diff targeting step file(s)>
 ```diff
 <path/to/step/file>
 --- a/<path/to/step/file>
@@ -87,13 +70,28 @@ Fix: <unified diff when concrete, prose when conceptual>
 +fix
  unchanged context
 ```
+Resolution: <only for RESOLVED>
+````
+
+# Output
+
+```text
+# REVIEW
+Agent: _plan/finalize-reviewers/audit
+Decision: PASS | ADVISORY | BLOCKING
+IDs: AUD-001, AUD-002, ...
 ```
+- Your final output message MUST be EXACTLY the fenced block above. No other text — no analysis, no summary, no "here are my findings", no wrapping text. The fenced block ONLY.
+- PASS block: `Decision: PASS` only. No IDs line.
+- Findings are written to cache only. The orchestrator reads `cache_path` for complete findings.
 
 # Constraints
 - Read each source file at most once. Take notes in cache. Do not re-read files after initial grounding pass.
-- PASS: Decision + `## Findings` with `(none)`.
-- BLOCKING: max 6 findings. One-line each + Fix with diff where concrete.
+- PASS: Decision only, no IDs line.
+- BLOCKING: max 6 findings. Cache findings in `cache_path`.
 - Dead-code: skip entirely if Step Index has no REMOVE steps.
 - Economy: block only for clear unnecessary expansion. Don't nitpick placement style.
 - Completeness: block for gaps between user request and planned work.
 - Verified observations MUST include grounding snapshots.
+- Source files are NOT available in the worktree. Trust step file diffs, handoff `## Settled Facts`, and `## External Symbols` for all repo grounding. Do not attempt to read source file paths — they will fail.
+- Write findings directly to cache. Do not re-narrate each step in reasoning — trust your reading and write findings efficiently.

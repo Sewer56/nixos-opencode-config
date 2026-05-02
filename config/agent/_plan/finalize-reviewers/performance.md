@@ -66,33 +66,18 @@ Rules: `/home/sewer/opencode/config/rules/performance.md`.
 # REVIEW
 Agent: _plan/finalize-reviewers/performance
 Decision: PASS | ADVISORY | BLOCKING
+IDs: PERF-001, PERF-002, ...
+```
+- Your final output message MUST be EXACTLY the fenced block above. No other text — no analysis, no summary, no "## Findings", no "## Verified", no "## Notes".
+- Performance has no cache — if you HAVE findings, detail goes in cache-like inline sections AFTER the fenced block. But if PASS: just the fenced block, nothing else.
+- PASS with 0 findings: `Decision: PASS` only. No IDs line. No extra text.
 
-## Scope
-- Performance Sensitive: YES | NO
-
-## Findings
+## Findings (only when IDs listed — after fenced block)
 ### [PERF-001]
 Category: ALGORITHM | DATA | DATABASE | CONCURRENCY | VALIDATION
 Severity: BLOCKING | ADVISORY
-Evidence: <plan section or `path:line`>
-Problem: <material performance risk>
-Fix: <smallest correction; include unified diff below when concrete>
-```diff
-<path/to/step/file>
---- a/<path/to/step/file>
-+++ b/<path/to/step/file>
- unchanged context
--+N+1 query pattern
-++batch query or eager loading
- unchanged context
-```
-
-## Verified
-- <changed/open I#/T# only; do not list full verified inventory>
-
-## Notes
-- <optional short notes>
-````
+Problem: <one line>
+Fix: <diff or prose>
 
 # Constraints
 - On initial review: read `handoff_path`, `plan_path`, `step_paths`, rules. Audit perf-sensitive changes.

@@ -37,19 +37,17 @@ Verify resolved test findings and check changed steps for new test gaps. Cache-p
 # REVIEW
 Agent: _plan/finalize-reviewers/tests-rereview
 Decision: PASS | ADVISORY | BLOCKING
-
-## Findings
-### [TST-NNN]
-Category: COVERAGE | REDUNDANCY | PARAMETERIZATION | PLACEMENT
-Severity: BLOCKING | ADVISORY
-Problem: <one line>
-Fix: <unified diff when concrete>
+IDs: TST-NNN, TST-NNN, ...
 ```
+- Your final output message MUST be EXACTLY the fenced block above. No other text.
+- PASS block: `Decision: PASS` only. No IDs line.
+- Findings are written to cache only. The orchestrator reads `cache_path` for finding details.
 
 # Constraints
+- PASS with 0 new findings: output Decision only, no IDs line.
+- BLOCKING: max 2 findings. ADVISORY findings → DEFERRED, do not block.
 - Do NOT read `handoff_path`, `plan_path`, or rules files.
 - Do NOT re-read unchanged step files or their source files.
 - Trust cache observations for unchanged steps.
-- PASS with 0 new findings: output Decision line only.
-- BLOCKING: max 2 findings. ADVISORY findings recorded as DEFERRED.
 - Max 5 tool calls. Read only `cache_path` + `changed_step_paths`.
+- Output: write findings to cache. Emit only terse `# REVIEW` block with Decision + IDs.

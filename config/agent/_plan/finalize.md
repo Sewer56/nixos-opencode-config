@@ -118,6 +118,8 @@ Next Command: /plan/draft
   - For audit: relevant file paths and current state from `## Files Touched` + `## Key Symbols`.
   - For tests: test file locations from `## Test Files` + existing test structure from `## Observations`.
 - Full reviewers handle INITIAL review only. They write cache files with grounding snapshots.
+- **After reviewer returns, read `cache_path` for complete findings.** Reviewers emit terse output (Decision + IDs only); cache has full finding detail.
+- **On re-review: do NOT re-read the cache file unless a fix fails.** The re-review agent already returns terse Decision + IDs. Trust the IDs and proceed directly to applying fixes.
 
 ### 5b. Re-review dispatch (dedicated rereview agents, after fixes)
 - After applying fixes, dispatch dedicated rereview agents — NOT the full reviewers:
@@ -128,7 +130,8 @@ Next Command: /plan/draft
   - `changed_step_paths` (only step files that changed)
   - `resolved_finding_ids`, `unresolved_finding_ids`, `finding_resolution_ledger`
 - Do NOT pass `handoff_path` or `plan_path` to rereview agents.
-- Rereview agents: read cache → read changed steps → verify fixes → check for new issues → update cache → emit REVIEW.
+- Rereview agents: read cache → read changed steps → verify fixes → check for new issues → update cache → emit terse `# REVIEW`.
+- After rereview returns, read `cache_path` for complete findings.
 - If the cache file does not exist (initial review write failed), fall back to re-dispatching the full reviewer with structural withhold.
 
 ### 5c. Review loop control
@@ -139,8 +142,10 @@ Next Command: /plan/draft
   - skip broad repo exploration unless required by its own focus contract
   - prefer changed items from `## Delta`; do not re-evaluate unchanged items without new evidence
 - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
-- Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
-- Apply core domain ownership: AUDIT → audit reviewer; TEST → tests reviewer; PERF → performance reviewer. Arbitrate cross-domain conflicts.
+- **Per-reviewer findings are stored in cache files only.** The `## Review Ledger` in `handoff_path` carries only domain summaries (counts + cache ref) and cross-domain decisions (DEC-###). No per-finding detail.
+- When populating the Review Ledger after reviewer dispatch: read `cache_path` for finding details, apply fixes, then update domain summaries in handoff. Keep per-domain findings in cache — do NOT copy them into handoff.
+- Assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED. Update cache files.
+- Each reviewer reads only its own cache + handoff Delta. Cross-domain findings stay isolated — reviewers do not need other domains' detail.
 - Do not reopen RESOLVED issues without new concrete evidence.
 - Revise step files only where needed. Append one line to `## Revision History`.
 - **PASS-stays-PASS gate:** Do not re-dispatch a reviewer that returned PASS with 0 findings unless revisions address a domain that overlaps with its focus. AUDIT covers fidelity+structure+completeness+economy+dead-code; TESTS covers test coverage; PERF covers performance.
@@ -280,20 +285,13 @@ Source Plan: <absolute path to `<artifact_base>.draft.md`>
 
 ## Review Ledger
 
-### Issues
-
-#### [AUD-001]
-Id: AUD-001
-Domain: AUDIT | TEST | PERF
-Source: _plan/finalize-reviewers/audit
-Severity: BLOCKING | ADVISORY
-Status: OPEN | RESOLVED | DEFERRED
-Evidence: <section or path:line>
-Summary: <brief description>
-Requested Fix: <what needs to change>
-Acceptance Criteria: <testable closure condition>
+### Domain Summaries
+- AUDIT: <n> BLOCKING, <m> ADVISORY → cache: `<artifact_base>.review-audit.md`
+- TEST: <n> BLOCKING, <m> ADVISORY → cache: `<artifact_base>.review-tests.md`
+- PERF: <n> BLOCKING, <m> ADVISORY (inline, no cache)
 
 ### Decisions
+- Only cross-domain arbitration entries (DEC-###). Per-domain finding details stay in cache files. Reviewers read only their own cache + handoff Delta — no cross-domain finding pollution.
 
 #### [DEC-001]
 Type: DOMAIN_AUTHORITY | ARBITRATION

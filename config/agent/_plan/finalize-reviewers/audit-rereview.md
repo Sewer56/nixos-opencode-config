@@ -36,17 +36,15 @@ Verify resolved audit findings. Check only changed steps for new issues. Trust c
 # REVIEW
 Agent: _plan/finalize-reviewers/audit-rereview
 Decision: PASS | ADVISORY | BLOCKING
-
-## Findings
-### [AUD-NNN]
-Category: FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE
-Severity: BLOCKING | ADVISORY
-Problem: <one line>
-Fix: <unified diff when concrete>
+IDs: AUD-NNN, AUD-NNN, ...
 ```
+- Your final output message MUST be EXACTLY the fenced block above. No other text.
+- PASS block: `Decision: PASS` only. No IDs line.
+- Findings are written to cache only. The orchestrator reads `cache_path` for finding details.
 
 # Constraints
-- PASS with 0 new findings: output Decision line only.
+- PASS with 0 new findings: output Decision only, no IDs line.
 - BLOCKING: max 2 findings. ADVISORY findings → DEFERRED, do not block.
 - Read only: `cache_path` + `changed_step_paths`. Max 5 tool calls. No grep, no source file reads.
 - Trust cache grounding snapshots. Only re-read a source file if a fix demonstrably invalidates a cached observation.
+- Output: write findings to cache. Emit only terse `# REVIEW` block with Decision + IDs.
