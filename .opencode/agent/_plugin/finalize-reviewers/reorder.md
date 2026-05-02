@@ -22,12 +22,6 @@ permission:
 
 Review plugin code for declaration ordering and return reorder diffs.
 
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which STEP items to reopen.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-
 # Inputs
 - `context_path` (e.g., `<artifact_base>.draft.md`)
 - `handoff_path` (e.g., `<artifact_base>.handoff.md`)

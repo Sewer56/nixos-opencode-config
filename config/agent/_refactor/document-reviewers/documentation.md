@@ -21,12 +21,6 @@ permission:
 
 Review documentation coverage and specificity for direct documentation workflow source files.
 
-**Execution Contract:**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which items to reopen.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-
 # Inputs
 - `handoff_path`
 

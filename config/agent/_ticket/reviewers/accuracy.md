@@ -22,12 +22,6 @@ permission:
 
 Review ticket drafts for factual accuracy. Check file path validity, evidence-claim alignment, UI navigation precision, and external link plausibility. Do not re-check jargon, prose quality, or section presence — those are owned by other reviewers.
 
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which sections to reopen. Domain ownership: this reviewer holds final say on accuracy findings.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-
 # Inputs
 
 - `ticket_path` (`<artifact_base>.draft.md`) — the ticket draft to review.

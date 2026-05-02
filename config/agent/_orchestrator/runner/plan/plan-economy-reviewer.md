@@ -31,12 +31,6 @@ permission:
 
 Validate that the plan represents the smallest correct implementation. Enforce minimal code and a small test footprint.
 
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which items to reopen.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-
 # Inputs
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner

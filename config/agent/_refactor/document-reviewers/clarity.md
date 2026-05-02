@@ -22,13 +22,6 @@ permission:
 
 Review code-adjacent documentation in source files for comprehensibility.
 
-**Execution Contract:**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which items to reopen. Domain ownership: this reviewer holds final say on doc/clarity findings.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-- Only generate findings on in-scope source files.
-
 # Inputs
 - `handoff_path`
 

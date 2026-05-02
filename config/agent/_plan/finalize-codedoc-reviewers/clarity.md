@@ -22,13 +22,6 @@ permission:
 
 Review a finalized machine plan's code-adjacent documentation (I#/T# steps) for comprehensibility.
 
-**Execution Contract:**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which items to reopen. Domain ownership: this reviewer holds final say on codedoc/clarity findings.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-- Only generate findings on in-scope I# and T# steps.
-
 # Inputs
 - `handoff_path` (e.g., `<artifact_base>.handoff.md`)
 - `plan_path` (e.g., `<artifact_base>.draft.md`)

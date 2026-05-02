@@ -22,12 +22,6 @@ permission:
 
 Review branding for availability.
 
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which sections to reopen. Domain ownership: this reviewer holds final say on availability findings.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-
 # Inputs
 
 - `handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `@mcp-search` runs.

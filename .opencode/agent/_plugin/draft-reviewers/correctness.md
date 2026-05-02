@@ -23,12 +23,6 @@ permission:
 Review plugin draft artifacts for template structure, diff header validity,
 and plugin-specific constraints.
 
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps.
-- Use Delta, cache state, and `### Decisions` to decide which `[P#]` items to reopen.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-
 # Inputs
 - `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)

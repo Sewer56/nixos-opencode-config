@@ -22,12 +22,6 @@ permission:
 
 Review ticket drafts for comprehensibility. Flag undefined jargon, compressed compound terms, opaque references, and acronyms without expansion. Block only for terms a non-technical reader could not understand without prior context.
 
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which sections to reopen. Domain ownership: this reviewer holds final say on clarity findings.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-
 # Inputs
 
 - `ticket_path` (`<artifact_base>.draft.md`) — the ticket draft to review.

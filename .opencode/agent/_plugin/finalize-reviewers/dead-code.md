@@ -22,12 +22,6 @@ permission:
 
 Detect dead code in finalized plugin artifacts. When a STEP item deletes, replaces, or redirects code, trace what becomes dead after the diffs are applied and block if the STEP set lacks cleanup.
 
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which STEP items to reopen.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-
 # Inputs
 - `context_path` (e.g., `<artifact_base>.draft.md`)
 - `handoff_path` (e.g., `<artifact_base>.handoff.md`)

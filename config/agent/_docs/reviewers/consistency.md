@@ -22,14 +22,6 @@ permission:
 
 Review end-user documentation for cross-page coherence.
 
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which sections to reopen. Domain ownership: this reviewer holds final say on consistency findings.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-- Only generate findings on in-scope sections. Findings on frozen regions are invalid.
-- When the handoff lists only one target file, skip with PASS — consistency requires multiple pages.
-
 # Inputs
 
 - `handoff_path` (`<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.

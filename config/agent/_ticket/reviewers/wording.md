@@ -22,12 +22,6 @@ permission:
 
 Review ticket drafts for wording and structural quality. Flag filler, passive voice in instructional steps, terminology inconsistencies, fluff, and structural issues that impede scannability. Block only for what degrades human readability.
 
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which sections to reopen. Domain ownership: this reviewer holds final say on wording findings.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-
 # Inputs
 
 - `ticket_path` (`<artifact_base>.draft.md`) — the ticket draft to review.

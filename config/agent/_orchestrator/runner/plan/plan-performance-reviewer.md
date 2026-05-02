@@ -31,12 +31,6 @@ permission:
 
 Validate performance-critical aspects of the implementation plan. Only review when plan touches performance-sensitive areas.
 
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which items to reopen.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-
 # Inputs
 - `prompt_path`: requirements and objectives
 - `plan_path`: implementation plan from planner

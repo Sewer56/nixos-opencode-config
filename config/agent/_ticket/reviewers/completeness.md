@@ -22,12 +22,6 @@ permission:
 
 Review ticket drafts for completeness. Flag missing required sections, untestable acceptance criteria, non-actionable checklist items, contradictory evidence, and cross-section inconsistencies. Block only for what prevents the ticket from being acted on.
 
-**Execution Contract (hard requirements):**
-- Follow the numbered `# Process` steps exactly, in order.
-- Use Delta, cache state, and `### Decisions` to decide which sections to reopen. Domain ownership: this reviewer holds final say on completeness findings.
-- Write the reviewer cache before the final response.
-- Use only the `# REVIEW` block from `# Output` as the final answer.
-
 # Inputs
 
 - `ticket_path` (`<artifact_base>.draft.md`) — the ticket draft to review.
