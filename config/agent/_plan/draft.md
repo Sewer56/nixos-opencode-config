@@ -20,8 +20,8 @@ permission:
   list: allow
   task: {
     "*": "deny",
-    "codebase-explorer": "allow",
     "mcp-search": "allow",
+    "_plan/draft-explorer": "allow",
     "_plan/draft-reviewers/*": "allow"
   }
   # bash: deny
@@ -48,25 +48,33 @@ Create and maintain a collaborative human-first plan. Write only `<artifact_base
 # Process
 
 ## 1. Start from the request
-- Derive `artifact_base` from `slug` as `PROMPT-PLAN-<slug>`. All artifact paths derive from `artifact_base`. Rewrite `plan_path` from scratch for this run.
+- Derive `artifact_base` from `slug` as `PROMPT-PLAN-<slug>`. All artifact paths derive from `artifact_base`.
 - Treat the user's explicit requirements, constraints, and answers in this conversation as the source of truth.
 
-## 2. Do lightweight discovery
-- Run `@codebase-explorer` and `@mcp-search` in parallel before reading local files yourself.
-- Ask `@codebase-explorer` for the relevant local files, repo boundaries, ownership, existing patterns, and documentation surfaces (READMEs, wiki pages, guides, changelogs, nav configs) for the request.
-- Ask `@mcp-search` to fetch the external libraries, APIs, or docs that matter to the request, or report that none are needed.
-- After those subagents return, read the files and external facts they surfaced that matter to the human draft.
-- Keep discovery lightweight: gather only the repo context needed for a grounded outline, clear scope choices, and sensible open questions.
+## 2. Run discovery
+- Run `@_plan/draft-explorer` and `@mcp-search` in parallel before writing the plan.
+- Pass the user's request text to `@_plan/draft-explorer` as `request`. The explorer surveys the repo for relevant files and returns a compact manifest.
+- `@mcp-search` fetches external libraries, APIs, or docs relevant to the request, or reports that none are needed.
+- After both return, read the external facts from mcp-search that matter.
 
 ## 3. Write the human plan
-- Write only the human section to `plan_path`.
+- Write only the human section to `plan_path`. Use the explorer manifest to ground file paths and scope.
 - Keep it short, easy to understand, and jargon free.
-- Use repository evidence only when it helps explain the outline.
 - Small snippets are allowed when they clarify the shape of the work.
 - Good snippet types: function signatures, interface/type shapes, route shapes, and tiny placeholder code blocks.
 - Keep snippets basic and brief. They are illustrative, not binding implementation instructions.
 - Leave unresolved human decisions in `## Open Questions`.
 - When a `[P#]` item changes code that end-user documentation references, add a corresponding `[P#]` item for the documentation update or creation. When a `[P#]` item adds user-facing surface that has no existing documentation, add a `[P#]` item to create it. State the doc file path and what changes.
+- From the explorer manifest, add a `**Relevant Paths:**` bulleted list to each `[P#]` item listing files the explorer surfaced that are relevant to that item but not already in its `**Files:**` line. Include why each file is relevant. Format:
+```markdown
+[P1] Update the help page handler
+**Files:** `handlers.go`
+**Relevant Paths:**
+- `handlers_test.go` — covers handler tests
+- `help.html` — template rendered by this handler
+- `viewmodels.go` — shared types used here
+```
+Skip for items where the explorer found nothing beyond what's already listed.
 
 ## 4. Run the draft review loop
 Follow the ordered steps below.
@@ -79,14 +87,14 @@ Follow the ordered steps below.
 
 2. Stage 1 — Correctness (fidelity + structure)
 - Run `@_plan/draft-reviewers/correctness` first.
-- Include only: `plan_path` and `draft_handoff_path`.
+- Include: `plan_path` and `draft_handoff_path`.
 - Validate, apply fixes, recompute Delta.
 - If correctness returns BLOCKING: fix and re-run correctness. Do NOT proceed to stage 2 until correctness is PASS or ADVISORY-only.
 - If correctness returns PASS or ADVISORY-only: proceed to stage 2.
 
 3. Stage 2 — Documentation + Wording
 - Run in parallel: `@_plan/draft-reviewers/documentation`, `@_plan/draft-reviewers/wording`.
-- Include only: `plan_path` and `draft_handoff_path`.
+- Include: `plan_path` and `draft_handoff_path`.
 - Validate, apply fixes, recompute Delta.
 
 4. Validate each reviewer response
