@@ -42,18 +42,15 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 
 # Key Principles
 - **Multi-sample averaging required.** LLM output is non-deterministic. Always run 3 samples per batch, compare batch averages, not single runs. When results are within ~15% of the best known result or sample spread exceeds 50% of the average, run 2 additional samples (5 total) to increase confidence. Do not run all 5 upfront — expand only when the result is ambiguous.
-- **Writes are the bottleneck.** Reviewer output tokens (what they write) and reasoning tokens (what they think) are the primary cost. Optimize these first. Reads (input tokens) are secondary.
-- **Structural over instructional.** Soft text constraints ("don't re-read X", "keep it short") are ignored. Restructure the workflow instead: embed relevant content directly in the prompt, permission-block paths, withhold files from dispatch.
+- **Writes are the bottleneck.** Reviewer output tokens (what they write) and reasoning tokens (what they think) are the primary cost. Optimize these first. Reads (input tokens) are secondary. Elapsed time varies with provider load and routing. Please ignore it; focus on tokens only.
 - **Less is more.** Every prompt line costs tokens every invocation. Remove instructions over adding them. Compress reviewer agent files to domain + output format + scope boundary only.
-- **Radical over incremental.** Instead of patching with more instructions, restructure to make wasteful behavior impossible. Pre-inline content instead of begging models not to re-read it.
+- **Radical over incremental.** Instead of patching with more instructions, restructure to make wasteful behavior impossible.
 - **Flatten reviewer output spread.** Wall-clock is gated by the slowest (highest-output) reviewer. Splitting a heavy reviewer into targeted sub-agents improves balance. Duplicated reads are acceptable; the win is in writes.
-- **Token-only cross-batch comparison.** Elapsed time varies with provider load and routing. Only output, reasoning, and input tokens are reliable metrics across batches.
 - **Iteration caps: moderate is fine.** Caps of 5+ are acceptable; caps of 3 or lower are not acceptable. Stop rules still needed for instability detection.
 - **Simplify rules, don't delete them.** Preserve quality gates and required rule enforcement. Make rules shorter, LLM-optimized, and easier to process — but don't remove required coverage.
-- **Fix diffs over prose.** When a finding has a concrete correction, output a unified diff after `Fix:`. Use prose only for conceptual findings with no single correct replacement.
-- **Shared agents are shared risk.** Don't globally optimize agents other workflows use unless the win is broadly safe. Prefer task-tailored agents.
+- **Fix diffs over prose.** When a finding has a concrete correction, output a unified diff after `Fix:`. Use prose only for conceptual findings with no single correct replacement. That best carries intent.
+- **Shared agents are shared risk.** Don't globally optimize agents other workflows use unless the win is broadly safe. Prefer task-tailored agents. A prefetch/info agent tailord to one specific workflow is fine.
 - **No user in the loop.** There is no human checking in. Do not pause to ask questions or wait for approval. Keep iterating autonomously through the full batch budget until a hard stop rule fires. Report results briefly — one line per batch suffices.
-
 
 # Shared helpers
 - `@_workflow/optimize-setup` — normalize input, resolve workflow files
@@ -146,19 +143,19 @@ Run exact workflow optimization experiments with multi-sample averaging, paralle
 - Prefer structural changes over instruction additions. Estimate impact on reviewer output tokens for every hypothesis — that is the primary cost axis.
 - **Any approach is valid.** The examples below are known-effective patterns from prior experiments, not a constraint set. Novel strategies encouraged if they reduce reviewer output tokens while preserving quality.
 - Proven strategies (prefer these first):
-  1. **Structural withhold on re-review** — don't pass human-written source documents on re-review. Pass only machine-generated structural context (index, delta, ledger) that the reviewer needs to locate and assess changes. Reviewer reads its own cache first, then structural context, then changed items. Cuts re-review output ~39% and reasoning ~44%.
-  2. **Compress reviewer agent files** — strip verbose process steps, keep only domain focus + output format + scope boundary. Cuts prompt size ~43-55%.
+  1. **Structural withhold on re-review** — don't pass human-written source documents on re-review. Pass only machine-generated structural context (index, delta, ledger) that the reviewer needs to locate and assess changes. Reviewer reads its own cache first, then structural context, then changed items.
+  2. **Stage reviewers by dependency** — run content-changing reviewers first (fidelity, correctness, structure), apply fixes, then run additive/auxiliary reviewers (docs, wording, performance). Parallel is only valid when reviewers have no output dependencies — none of them change content the others will read. Staging prevents reviewers from wasting tokens on content that will be revised by earlier-stage BLOCKING findings.
+  3. **Compress reviewer agent files** — strip verbose process steps, keep only domain focus + output format + scope boundary.
   3. **Cache-primary re-reviews** — write verified observations with grounding snapshots on initial review; re-review trusts cached observations for unchanged steps.
   4. **Domain-step curation** — don't pass all items to every reviewer. Each reviewer gets only the items relevant to its domain (e.g., tests reviewer gets test items + implementation items affecting assertions, not UI/config-only items).
   5. **ADVISORY-only deferral** — don't re-run review loop solely to clear advisory findings. Record as DEFERRED, carry forward.
   6. **Cheaper models for narrow or simple tasks** — use `# LOW` models for narrow-scope or mechanically simple reviewers (e.g., dead-code detection, format checks). Tag model lines with `# LOW` / `# MED` / `# HIGH`.
-  7. **Merge reviewers with overlapping file reads** — when two reviewers both read all step files (e.g., correctness + scope), merge into one. Eliminates duplicate dispatch, duplicate handoff reads, and cross-reviewer scope leakage. The merged reviewer must cover all domains the originals did. For larger plans, the orchestrator can conditionally split. **If merge increases per-reviewer output too much, split back — but try the merge first.**
+  7. **Merge reviewers with overlapping scope** — when two reviewers read the same files or search the same areas of the codebase, merge into one. Eliminates duplicate dispatch, duplicate reads, and cross-reviewer scope leakage. The merged reviewer must cover all domains the originals did. For larger plans, the orchestrator can conditionally split. **If merge increases per-reviewer output too much, split back — but try the merge first.**
   8. **Pre-discovery explorer for shared caching** — dispatch a task-tailored explorer subagent before writing the machine plan. The explorer reads the draft, surveys all touched files, and returns a compact structured manifest (files, symbols, test locations, observations). The orchestrator uses this manifest instead of doing its own discovery, and pre-inlines relevant sections into reviewer prompts. More output tokens from the explorer, but LESS total tokens because: (a) reviewers don't independently re-discover the same files, (b) explorer output is cached and shared, (c) orchestrator reasoning drops since it receives structured facts instead of open-ended discovery. Only deny source-file reads when absolutely necessary — plans can target any file type, and blanket denial breaks review quality.
-  9. **Serial final-gate reviewers** — run inexpensive but always-valuable checks (like performance) after the main review loop converges. Prevents wasted reviews on plans that will be revised by BLOCKING findings. Reduces total reviewer dispatches.
-  10. **Compress orchestrator prompt** — the orchestrator agent file itself is prompt tokens. Strip verbose descriptions, use terse imperative language, remove examples that don't apply.
-  11. **Pre-create cache stubs** — write empty `{}` cache files for all reviewers before the first batch. Eliminates not-found errors on first pass.
-  12. **Compress reviewer output format** — remove optional sections (`## Notes`), shorten agent names in output header, use single-line `## Verified` format. Small per-reviewer savings that compound.
-  13. **Remove Execution Contract block from reviewers** — the "Execution Contract (hard requirements)" block in reviewer agent files is redundant with the Process section. Removing it saves ~5 lines per reviewer and reduces prompt bloat.
+  9. **Compress orchestrator prompt** — the orchestrator agent file itself is prompt tokens. Strip verbose descriptions, use terse imperative language, remove examples that don't apply.
+  10. **Pre-create cache stubs** — write empty `{}` cache files for all reviewers before the first batch. Eliminates not-found errors on first pass.
+  11. **Compress reviewer output format** — remove optional sections (`## Notes`), shorten agent names in output header, use single-line `## Verified` format. Small per-reviewer savings that compound.
+  12. **Remove Execution Contract block from reviewers** — the "Execution Contract (hard requirements)" block in reviewer agent files is redundant with the Process section. Removing it saves ~5 lines per reviewer and reduces prompt bloat.
 - Ineffective (avoid):
   - Soft output budgets / word caps — models ignore them.
   - Pre-inlining entire rule files into prompts — increases prompt weight, models write more.

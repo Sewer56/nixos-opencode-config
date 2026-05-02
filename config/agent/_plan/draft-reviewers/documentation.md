@@ -53,6 +53,22 @@ Review plan draft artifacts for documentation coverage and specificity.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
+- Write cache in this format:
+```markdown
+# Review Cache: <domain>
+
+## Verified Observations
+- [P#]: <grounding snapshot — one line each>
+
+## Findings
+### [XXX-NNN]
+Status: OPEN | RESOLVED
+Category: <category>
+Severity: BLOCKING | ADVISORY
+Problem: <one line>
+Fix: <one line or diff>
+Resolution: <only for RESOLVED>
+```
 - If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.

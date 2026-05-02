@@ -77,23 +77,21 @@ Follow the ordered steps below.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Recompute `## Delta` after every material revision to `plan_path`.
 
-2. Build reviewer prompts
-- After each draft, run these reviewers in parallel:
-  - `@_plan/draft-reviewers/correctness`
-  - `@_plan/draft-reviewers/documentation`
-  - `@_plan/draft-reviewers/wording`
-- Include only:
-  - `plan_path` (`<artifact_base>.draft.md`) and `draft_handoff_path` (`<artifact_base>.draft.handoff.md`)
-- Omit:
-  - Output format, focus/check lists, role assignment, blanket read orders
+2. Stage 1 — Correctness (fidelity + structure)
+- Run `@_plan/draft-reviewers/correctness` first.
+- Include only: `plan_path` and `draft_handoff_path`.
+- Validate, apply fixes, recompute Delta.
+- If correctness returns BLOCKING: fix and re-run correctness. Do NOT proceed to stage 2 until correctness is PASS or ADVISORY-only.
+- If correctness returns PASS or ADVISORY-only: proceed to stage 2.
 
-3. Validate each reviewer response
-- Same validation as finalize: `# REVIEW` header, `Decision:`, `## Findings`, `## Verified`.
-- All 3 draft reviewers are diff-mandated.
+3. Stage 2 — Documentation + Wording
+- Run in parallel: `@_plan/draft-reviewers/documentation`, `@_plan/draft-reviewers/wording`.
+- Include only: `plan_path` and `draft_handoff_path`.
+- Validate, apply fixes, recompute Delta.
+
+4. Validate each reviewer response
+- `# REVIEW` header, `Decision:`, `## Findings`, `## Verified`. All 3 reviewers are diff-mandated.
 - Treat malformed output as BLOCKING after retries.
-
-4. Retry malformed responses from the existing review state
-- Same retry protocol as finalize.
 
 5. Record decisions and apply domain ownership
 - Update `### Decisions` in `draft_handoff_path`.
@@ -104,9 +102,10 @@ Follow the ordered steps below.
 - Recompute `## Delta`.
 
 7. Re-run or finish
-- Loop until no findings or 5 iterations.
-- No findings: proceed to Clarify. At cap: proceed with risks noted.
-- On re-entry (user explicitly requests re-review after a modification): recompute Delta for changed `[P#]` items, re-run this entire step. Reviewers skip Unchanged items via cache.
+- Loop until no BLOCKING findings or 5 iterations.
+- ADVISORY-only findings → DEFERRED. Do not re-run for advisory-only.
+- On re-review: dispatch only reviewers with prior BLOCKING decision. PASS/ADVISORY reviewers skip unless their domain is touched by BLOCKING fixes.
+- At cap: proceed with risks noted.
 
 ## 5. Clarify only when needed
 - If the request is too ambiguous to outline responsibly, ask only the missing question or questions.

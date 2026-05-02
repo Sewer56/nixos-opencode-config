@@ -20,8 +20,7 @@ permission:
   external_directory: allow
 ---
 
-Review plan draft artifacts for template structure, diff header validity,
-and snippet illustrativeness.
+Review plan draft artifacts for fidelity to user requirements, template structure, diff header validity, and snippet illustrativeness.
 
 
 # Inputs
@@ -29,9 +28,12 @@ and snippet illustrativeness.
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Focus
-- Template structure: required sections present — Task Plan heading, Overall Goal, Plan with `[P#]` items, Open Questions, Decisions. Omit Open Questions or Decisions only when explicitly marked `None`.
-- Diff headers: every diff block header references a valid file path. `--- a/<path>` and `+++ b/<path>` paths exist or are plausible targets for the declared action.
-- Illustrative snippets: code snippets in `[P#]` items are illustrative and not binding implementation instructions. Flag when a snippet prescribes exact implementation rather than showing a shape or signature.
+- Fidelity: each user requirement, constraint, and question from the original request is addressed by at least one `[P#]` item. Flag missing or unaddressed requirements. BLOCKING.
+- Fidelity: `[P#]` item actions are appropriate for the stated goal. Flag approaches that contradict the user's intent or use wrong tools/patterns. BLOCKING.
+- Fidelity: file paths in `**Files:**` lines and diff headers exist in the repo or are plausible targets. Flag paths that don't match the repo structure. BLOCKING.
+- Template structure: required sections present — `# Title`, `## Overall Goal`, `## Open Questions`, `## Decisions`, `---` separated `[P#]` items with `**Files:**` line. BLOCKING.
+- Diff headers: every diff block header references a valid file path. BLOCKING.
+- Illustrative snippets: code snippets in `[P#]` items are illustrative and not binding implementation instructions. Flag when a snippet prescribes exact implementation rather than showing a shape or signature. ADVISORY.
 
 # Process
 1. Load cache
@@ -53,6 +55,22 @@ and snippet illustrativeness.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
+- Write cache in this format:
+```markdown
+# Review Cache: <domain>
+
+## Verified Observations
+- [P#]: <grounding snapshot — one line each>
+
+## Findings
+### [XXX-NNN]
+Status: OPEN | RESOLVED
+Category: <category>
+Severity: BLOCKING | ADVISORY
+Problem: <one line>
+Fix: <one line or diff>
+Resolution: <only for RESOLVED>
+```
 - If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
@@ -73,7 +91,7 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [COR-001]
-Category: TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS
+Category: FIDELITY | TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
