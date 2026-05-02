@@ -72,12 +72,12 @@ Generate and review end-user documentation steps for a finalized machine plan. R
 ## 5. Run the end-user documentation review loop
 - Write and maintain `## Delta` in `handoff_path`. Record each D# step as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Mark existing I#/T# entries as Unchanged with `Why: pre-existing step`. Recompute `## Delta` after every material revision.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
-- **Stage 1: Content-changing review** — Run `@_plan/finalize-eudoc-reviewers/clarity-wording` first. This reviewer may change D# step content. Apply its diffs, update `## Review Ledger`, append to `## Revision History`. Recompute `## Delta`.
-- **Stage 2: Additive review** — Run `@_plan/finalize-eudoc-reviewers/engagement-consistency` after Stage 1 fixes are applied.
+- **Stage 1: Correctness** — Run `@_plan/finalize-eudoc-reviewers/correctness` first. Checks coverage, specificity, and broken links. Before dispatch, create empty cache stubs if they don't exist: `{artifact_base}.review-eudoc-correctness.md` and `{artifact_base}.review-eudoc-polish.md`. Apply its diffs, update `## Review Ledger`, append to `## Revision History`. Recompute `## Delta`.
+- **Stage 2: Polish** — Run `@_plan/finalize-eudoc-reviewers/polish` after Stage 1 fixes are applied. Checks clarity, wording, engagement, and cross-page polish.
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
   - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
-- Apply end-user documentation domain ownership: EDOC → clarity-wording; EENG/ECNS → engagement-consistency. Arbitrate cross-domain conflicts.
+- Apply end-user documentation domain ownership: EDOC → correctness; ECLR/EWRD/EENG/ECNS → polish. Arbitrate cross-domain conflicts.
 - Apply reviewer diffs to D# step files only. Append one line to `## Revision History`.
 - **ADVISORY-only deferral**: If after applying diffs, only ADVISORY findings remain (no BLOCKING), record remaining ADVISORY findings as DEFERRED in the Review Ledger. Do not re-run reviewers solely to clear ADVISORY findings.
 - Re-run reviewers after every material revision where BLOCKING findings were applied.
