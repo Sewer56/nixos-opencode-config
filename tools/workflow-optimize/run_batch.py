@@ -47,8 +47,13 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from statistics import median
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from agent_semaphore import AgentSemaphore  # noqa: E402
+
 
 SAMPLES = 3
+MAX_AGENTS = 10
+AGENT_NAMESPACE = "global"
 
 
 def main() -> int:
@@ -81,6 +86,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repo", required=True, help="Absolute path to source workspace root")
     parser.add_argument("--slug", required=True, help="Experiment slug for workspace naming")
     parser.add_argument("--cleanup-pattern", action="append", default=[], help="Artifact glob to remove before each sample")
+    parser.add_argument(
+        "--max-agents",
+        type=int,
+        default=MAX_AGENTS,
+        help="Global max concurrent subagent slots across all run_batch.py instances",
+    )
+    parser.add_argument(
+        "--max-parallel-subagents",
+        type=int,
+        default=1,
+        help="Subagent slots each sample consumes (1 + max parallel subagents the command under test spawns)",
+    )
     return parser.parse_args()
 
 
@@ -144,9 +161,18 @@ def run_workspace_sample(args_tuple) -> tuple[int, dict]:
     try:
         cleanup_artifacts(workspace_dir, cleanup_patterns)
         cmd = build_opencode_cmd(args, sample, workspace_dir)
-        meta = run_opencode_session(cmd)
+        sem = AgentSemaphore(AGENT_NAMESPACE, max_agents=args.max_agents)
+        print(f"  Sample {sample}: waiting for {args.max_parallel_subagents} agent slots...")
+        sem.acquire(args.max_parallel_subagents)
+        try:
+            print(f"  Sample {sample}: slots acquired, running...")
+            meta = run_opencode_session(cmd)
+        finally:
+            sem.release()
         add_sample_fields(meta, sample, args)
         return sample, meta
+    except TimeoutError as exc:
+        return sample, {"error": str(exc), "status": f"TIMEOUT: {exc}"}
     finally:
         shutil.rmtree(workspace_dir, ignore_errors=True)
 

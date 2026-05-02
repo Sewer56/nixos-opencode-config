@@ -1,2 +1,4 @@
 # Prompt files
 PROMPT-*.md
+
+tools/workflow-optimize/__pycache__/
