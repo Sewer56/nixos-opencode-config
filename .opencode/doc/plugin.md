@@ -2,9 +2,7 @@
 
 Reference for the `/plugin/draft` → `/plugin/finalize` → `/plugin/implement` → `/plugin/debug` pipeline.
 
-Shared workflow optimization patterns live in `.opencode/WORKFLOW-OPTIMIZATIONS.md`.
-Use this README for plugin-specific pipeline behavior; use the shared catalog
-for reusable prompt and workflow patterns.
+Shared workflow design patterns live in `config/doc/workflow/design-patterns.md`. Use this doc for plugin-specific pipeline behavior; use the shared catalog for reusable prompt and workflow design patterns.
 
 ## Command Pipeline
 
@@ -15,8 +13,7 @@ for reusable prompt and workflow patterns.
 
 ## Draft Review
 
-The draft agent runs 5 reviewers in `draft-reviewers/` before presenting
-the plan to the user:
+The draft agent runs 5 reviewers in `draft-reviewers/` before presenting the plan to the user:
 - `correctness` — plan template structure, diff header paths, plugin constraints
 - `dedup` — human/machine zone overlap, `[P#]` cross-item redundancy
 - `wording` — token density, bullet atomicity
@@ -25,8 +22,7 @@ the plan to the user:
 
 Coordination: `<artifact_base>.draft.handoff.md` (Delta + Decisions).
 Cache: `<artifact_base>.draft.review-<domain>.md`. Iteration cap: 5.
-Re-review runs automatically on the initial write; after user modifications
-the agent reminds that re-review is available on request.
+Re-review runs automatically on the initial write; after user modifications the agent reminds that re-review is available on request.
 
 ## Reviewers
 
@@ -53,17 +49,11 @@ Plugins placed in `config/plugins/` are automatically discovered and loaded by O
 
 ## Split STEP Files
 
-The finalize agent writes a single handoff (`<artifact_base>.handoff.md`)
-with Summary, Revision History, Step Index, Delta, and Review Ledger, plus
-individual STEP files as `<artifact_base>.step.*.md`. No separate
-`machine.md`. Reviewers read only the STEP files that Delta marks as
-Changed or New. Implementers read the handoff, then each STEP file in
-order. Stable numbering: gaps are valid, no renumbering.
+The finalize agent writes a single handoff (`<artifact_base>.handoff.md`) with Summary, Revision History, Step Index, Delta, and Review Ledger, plus individual STEP files as `<artifact_base>.step.*.md`. No separate `machine.md`. Reviewers read only the STEP files that Delta marks as Changed or New. Implementers read the handoff, then each STEP file in order. Stable numbering: gaps are valid, no renumbering.
 
 ## Cache Files
 
-Each reviewer owns a cache file (unchanged from before, but reviewers
-now use it to skip reading Unchanged STEP files):
+Each reviewer owns a cache file (unchanged from before, but reviewers now use it to skip reading Unchanged STEP files):
 
 - `<artifact_base>.review-errors.md`
 - `<artifact_base>.review-reorder.md`
@@ -74,7 +64,6 @@ The finalize agent maintains a `## Delta` section in `<artifact_base>.handoff.md
 
 ## Slug Derivation
 
-Each `/plugin/draft` and `/plugin/finalize` agent derives a 2–3 word
-slug from the request context. The slug becomes part of the base name:
+Each `/plugin/draft` and `/plugin/finalize` agent derives a 2–3 word slug from the request context. The slug becomes part of the base name:
 
 - `artifact_base` = `PROMPT-PLUGIN-PLAN-<slug>` for both draft and finalize

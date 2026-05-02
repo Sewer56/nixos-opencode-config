@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Selects approved workflow optimization patterns for a target command or agent
+description: Selects approved workflow design patterns for a target command or agent
 permission:
   "*": deny
   read:
@@ -12,17 +12,17 @@ permission:
   external_directory: allow
 ---
 
-Select approved workflow optimization patterns for a target command or agent.
+Select approved workflow design patterns for a target command or agent.
 
 # Inputs
 - `pipeline`: source workflow asking for selection
 - `target_summary`: short description of target files or behavior
-- `behavior_traits`: compact list of traits such as review loop, subagent coordination, machine-readable output, diff-based artifacts, convention change, failure-path validation, export analysis, or nested-run harnessing
+- `behavior_traits`: compact list of traits such as command delegation, primary runner + review subagents, review loop, subagent coordination, machine-readable output, diff-based artifacts, failure-path validation, path-only helper sections, or shared pattern selection
 - `target_paths`: optional repo-relative target paths
 
 # Process
-1. Read `.opencode/WORKFLOW-OPTIMIZATIONS.md`.
-2. Use the Trait Matrix and approved patterns only. Ignore candidates.
+1. Read `config/doc/workflow/design-patterns.md`.
+2. Use the Trait Matrix and approved `OPT-###` patterns only. Ignore optimize-only `WOPT-###` tactics and unproven ideas.
 3. Select only patterns that match the provided traits and target summary.
 4. Keep output compact.
 5. Do not invent new pattern ids.

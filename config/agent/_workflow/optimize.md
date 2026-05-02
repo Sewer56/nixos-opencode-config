@@ -39,7 +39,7 @@ Optimize OpenCode workflow prompts/tools by running real 3-sample experiments an
 
 1. **Exactly 3 samples per batch.** Never expand to 5. Never compare single samples.
 2. **Fresh sessions only.** No session reuse.
-3. **Isolated copies.** `run_batch.py` makes a raw 1:1 copy of the current folder into one isolated workspace per sample. Dirty candidate edits are included automatically.
+3. **Isolated copies.** `run_batch.py` makes a raw 1:1 copy of the current folder into one isolated workspace per sample. Dirty edits under test are included automatically.
 4. **Primary metric:** export-derived tree `output+reasoning` tokens, root + child sessions. `run_batch.py` root metrics are only early signal.
 5. **Win rule:** quality holds and average output+reasoning drops. Any drop wins. ≥5% is meaningful. Only treat results as basically same when delta is <1%, rounded metrics are equal, or sample spread gives no clear direction; then prefer simpler prompt/structure.
 6. **Quality gate first.** Define PASS criteria before baseline. Never trade required coverage/correctness for token savings.
@@ -62,6 +62,8 @@ Optimize OpenCode workflow prompts/tools by running real 3-sample experiments an
 - `exports_dir`: `/tmp/workflow-optimize-<slug>-exports/` (outside repo).
 - `db_path`: `opencode db path`
 - `opencode_sessions_bin`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/tools/opencode-sessions/target/release/opencode-sessions`
+- `design_patterns`: `config/doc/workflow/design-patterns.md` when present.
+- `optimize_patterns`: `config/doc/workflow/optimize-patterns.md` when present.
 
 # Operating Loop
 
@@ -72,23 +74,24 @@ Optimize OpenCode workflow prompts/tools by running real 3-sample experiments an
 - Use setup result as source of truth: task cases, CLI command(s), files under test, cleanup patterns, model, goal, max batches.
 - Use exactly 3 samples.
 - Resolve `db_path` once.
+- Read `design_patterns` and `optimize_patterns` if present. Use them as memory, not as limits on possible changes.
 
 ## 2. Create log
 
 Write only sections useful for optimization decisions:
 
-- `## Setup` — target, goal, model, db, task cases, files under test, cleanup patterns, quality gate.
-- `## Strategy Matrix` — categories, status, evidence, next untried move.
+- `## Setup` — target, workflow shape, goal, model, db, task cases, files under test, cleanup patterns, quality gate, relevant pattern refs.
+- `## Strategy Matrix` — `WOPT-###`/`OPT-###`/`LOCAL:<name>` refs, status, signals, evidence, next move.
 - `## Batches` — per-batch avg/median/spread, session IDs, export digest paths, quality result, decision.
 - `## Decisions` — noisy metric calls, analyzer disagreements, quality calls, why kept/reverted.
-- `## Current Hypothesis` — active category, exact edit, expected generated-token impact.
+- `## Current Hypothesis` — active ref, exact edit, expected generated-token impact.
 - `## Best Current Strategy` — current winner and why.
 - `## Rejected Changes` — reverted edits and evidence.
 - `## Next Experiments` — ranked remaining moves.
 
 Do not paste full per-sample JSON, analyzer transcripts, or export text into the log. Reference meta files/export digests instead.
 
-Initialize `## Strategy Matrix` with categories from `# Strategy Menu`, status `UNTRIED`.
+Initialize `## Strategy Matrix` from `# Strategy Sources`, status `UNTRIED`. Do not maintain embedded strategy definitions.
 
 ## 3. Run batch
 
@@ -139,16 +142,17 @@ If `run_batch.py` root metrics disagree with export tree metrics, trust export t
 ## 6. Analyze exports
 
 - Spawn one `@_workflow/export-analyzer` per completed export, not one mega-call.
-- Pass: export path, enriched digest, goal, target command, files under test, baseline metrics, current metrics, prior common findings, and current `# Strategy Menu` labels/excerpts.
+- Pass: export path, enriched digest, goal, target command, workflow shape, files under test, baseline metrics, current metrics, prior common findings, and relevant design/optimize pattern excerpts.
+- Ask analyzer to scan observable focus signals and counterevidence, then map hypotheses to `WOPT-###`, `OPT-###`, or `LOCAL:<name>` refs only after evidence is clear. Optimizer still owns strategy choice and 3-sample proof.
 - Validate analyzer output shape. Malformed analyzer output contributes no hypotheses and gets `DEC-###`.
-- Synthesize common signals. Prefer concrete export evidence over generic concerns. Treat analyzer `Strategy` as a label, not proof.
-- If analyzers return `NEW_STRATEGY_CANDIDATE`, test it like any other category. If it wins, add it to `# Strategy Menu` with `What it means`, `Use when`, `Try`, and `Example`, and record evidence in `## Decisions`.
+- Synthesize common signals. Prefer concrete export evidence over generic concerns. Treat analyzer refs as hypotheses, not proof.
+- If analyzers return `LOCAL:<name>`, test it like any other ref only when no `WOPT-###`/`OPT-###` fits. If it wins and looks reusable, update `design_patterns`, `optimize_patterns`, or `unproven-patterns.md` per `# Update optimization memory`.
 
-## 7. Choose one strategy category
+## 7. Choose one strategy ref
 
-- Pick one category from `# Strategy Menu` or an analyzer `NEW_STRATEGY_CANDIDATE` based on metrics/analyzer evidence.
+- Pick one ref from `## Strategy Matrix`: approved `WOPT-###`, approved `OPT-###`, or analyzer/local `LOCAL:<name>` based on metrics/analyzer evidence.
 - Apply one coherent edit batch. Multiple files OK if same hypothesis.
-- Record category + expected output+reasoning impact in `## Current Hypothesis` and `## Strategy Matrix`.
+- Record ref + expected output+reasoning impact in `## Current Hypothesis` and `## Strategy Matrix`.
 - Favor structural changes over added prose.
 
 ## 8. Apply edits
@@ -162,84 +166,79 @@ If `run_batch.py` root metrics disagree with export tree metrics, trust export t
 
 Quality gate first. Then compare batch averages, not single samples.
 
-- **Win:** quality PASS and avg output+reasoning lower. Keep candidate. Mark confidence:
+- **Win:** quality PASS and avg output+reasoning lower. Keep change. Mark confidence:
   - `HIGH`: win ≥15% or spread small.
   - `MED`: win 5–15%.
   - `LOW`: win <5% or high spread. Still keep token winner unless results are basically same.
 - **Basically same:** delta <1%, rounded metrics equal, or sample spread gives no clear direction. Keep simpler prompt/structure. If equal complexity, keep lower max-child generated tokens.
 - **Loss:** quality fails or output+reasoning increases without clear balance win. Revert and log rejected change.
-- Two flat/lost batches in one category → switch category, not global stop.
+- Two flat/lost batches in one ref → switch ref, not global stop.
 
-## 10. Stop rules
+## 10. Update optimization memory
+
+After each batch decision, update reusable-memory docs only when the evidence is useful outside the current experiment:
+
+- Canonical docs live in `config/doc/workflow/`: `design-patterns.md` for approved creation/refinement design patterns, `optimize-patterns.md` for approved existing-workflow tactics, and `unproven-patterns.md` for genuinely unproven reusable ideas.
+- Proven creation/refinement behavior → add or update `OPT-###` in `design-patterns.md`; update Trait Matrix and keep carry-in compact.
+- Proven existing-workflow refactor/analysis tactic → add or update `WOPT-###` in `optimize-patterns.md`; update Focus Signal Map.
+- New reusable idea with insufficient proof → add `IDEA-###` to `unproven-patterns.md` with source experiment, problem, proposed change, scope guess, and evidence needed.
+- Local-only strategy or target-specific wording → keep in experiment log and record `No docs update` in `## Decisions`.
+- Never make target prompts depend on users reading docs. Approved behavior must be carried into target workflow files when selected.
+
+## 11. Stop rules
 
 Stop only when one applies:
 
-- `Max Batches` reached and no promising category remains.
-- All strategy categories are `WON`, `LOST`, or consciously skipped with evidence.
+- `Max Batches` reached and no promising ref remains.
+- All matrix refs are `WON`, `LOST`, or consciously skipped with evidence.
 - Target becomes unstable: 3 consecutive majority-discarded batches.
 - A batch has more than half samples discarded; discard batch. Do not count it toward `Max Batches`.
 
-Do not stop merely because two batches showed no improvement. Switch strategy category.
+Do not stop merely because two batches showed no improvement. Switch strategy ref.
 
-# Strategy Menu
+# Focus Signals
 
-A strategy is a named class of target workflow change. Pick one category per edit batch so experiments stay attributable. Use `What it means` to understand the category, `Use when` to choose it, and `Try` for concrete moves. `Example` is a tiny pattern, not a template to copy. When an experiment proves a new reusable strategy, add it here with the same four bullets and record the evidence in `## Decisions`.
+Focus signals identify where command/subagent cooperation wastes tokens. Strategies are edit classes; pattern refs are reusable memory. Evidence first, label second.
 
-## Structural withholding
+- Generated hotspot: root or child dominates output+reasoning; high child spread.
+- Tight input violation: runner passes subagent-owned focus/output/process/read-order rules instead of only paths, delta, flags, notes, and changed decisions.
+- Overbroad handoff: full content passed where paths, delta, flags, or notes are enough.
+- Duplicate reads: same files reread within/across reviewers without domain reason.
+- Duplicate reasoning: multiple subagents think through same constraints/evidence/fix state when cache/runner state could carry it once.
+- Scope leakage: reviewer investigates or reports outside owned domain.
+- Review-loop churn: unchanged/PASS/advisory work reruns without touched domain.
+- Cache/delta failure: reviewers re-derive unchanged facts or cannot trust prior evidence.
+- Output bloat: verbose PASS/advisory prose or duplicate response/cache findings.
+- Topology mismatch: overlapping reviewers, too many reviewers, or separable overloaded reviewer.
+- Model/risk mismatch: low-risk mechanical reviewer spends high generated tokens; do not downgrade correctness/security.
+- Prompt/context bloat: duplicated examples/process blocks/hard gates without observed behavior value.
 
-- **What it means:** Make repeated review impossible for unchanged content by changing data flow, not by asking reviewers to be brief.
-- **Use when:** reviewers re-read full artifacts after fixes; unchanged items get reviewed again; re-review cost resembles first-review cost.
-- **Try:** split first review vs re-review paths; first review reads full needed context and writes grounded cache; re-review reads cache + changed-item list only; unchanged verified items stay verified.
-- **Example:** One step changes and reviewer rereads all step files → add rereview path that reads cache + changed step only.
+# Strategy Sources
 
-## Review loop restructuring
+Do not maintain embedded strategy definitions here. Canonical strategy memory lives in:
 
-- **What it means:** Change reviewer order and rerun rules so agents do not spend tokens on work that later gets invalidated.
-- **Use when:** reviewers polish content later rewritten by correctness fixes; advisory findings cause extra loops; PASS reviewers rerun without domain changes.
-- **Try:** stage correctness before presentation/style; re-run only domains touched by blocking fixes; PASS-stays-PASS unless domain touched; defer advisory-only findings.
-- **Example:** Style reviewer fixes prose that correctness later rewrites → run correctness first, then style after correctness PASS.
+- `config/doc/workflow/optimize-patterns.md` — approved `WOPT-###` tactics and Focus Signal Map for existing workflows.
+- `config/doc/workflow/design-patterns.md` — approved `OPT-###` design patterns and Trait Matrix for creation/refinement.
 
-## Reviewer merging / splitting
+Build `## Strategy Matrix` from:
 
-- **What it means:** Change reviewer topology: combine duplicate reviewers or split one overloaded reviewer into independent domains.
-- **Use when:** multiple reviewers read same files and produce overlapping findings; one reviewer dominates max child output+reasoning; scopes are unclear.
-- **Try:** merge overlapping reviewers that read same context; split only when one heavy reviewer has clean independent subdomains; keep merged reviewer output terse; undo split if each child rereads full context.
-- **Example:** Clarity and wording reviewers read same artifact and both flag phrasing → merge into one presentation reviewer.
+1. Matching approved `WOPT-###` tactics from `optimize-patterns.md` Focus Signal Map and tactic entries.
+2. Matching approved `OPT-###` patterns from `design-patterns.md` Trait Matrix when the final desired design pattern is clear.
+3. Analyzer/local hypotheses as `LOCAL:<short-name>` only when no `WOPT-###` or `OPT-###` fits.
 
-## Scope boundaries
+Matrix row format:
 
-- **What it means:** Narrow what each reviewer is responsible for and what context it receives.
-- **Use when:** reviewers investigate outside their domain; analyzers show duplicate broad reads; reviewer findings belong to another reviewer.
-- **Try:** state each reviewer domain and non-domain explicitly; pass only relevant files/steps; let off-domain concerns be one-line notes; route cross-domain issues to orchestrator decisions.
-- **Example:** Tests reviewer reads docs-only steps → pass only test steps plus implementation steps that affect assertions.
+```text
+- Ref: WOPT-001 | Name: Structural Withholding | Source: optimize-patterns | Status: UNTRIED | Signals: review-loop churn | Evidence: <digest/analyzer refs> | Next Move: <exact edit idea>
+```
 
-## Prompt compression
+Selection rules:
 
-- **What it means:** Reduce prompt tokens and cognitive load while preserving required behavior and quality gates.
-- **Use when:** agent files have long examples, repeated process blocks, duplicated hard requirements, or tutorial prose.
-- **Try:** keep goal, inputs, process, output format, and hard gates; remove examples that do not affect behavior; replace prose with short imperative bullets; move shared patterns to catalog refs only when useful.
-- **Example:** Reviewer has both `Execution Contract` and identical `Process` rules → remove duplicate contract block.
-
-## Output format compression
-
-- **What it means:** Reduce how much reviewers write back after doing the same review work.
-- **Use when:** reviewers write long summaries, notes, repeated evidence, or full findings in both response and cache.
-- **Try:** reviewer response returns `Decision` + finding IDs + changed cache path; store full detail in cache; remove optional sections; shorten headings and agent labels.
-- **Example:** Reviewer writes full finding text in response and cache → response emits `Decision: BLOCKING` + IDs; cache holds detail.
-
-## Cache optimization
-
-- **What it means:** Preserve reviewer conclusions between passes so thinking models do not spend reasoning tokens re-deriving the same conclusions. Agents verify changed facts against cached evidence instead of rethinking unchanged work.
-- **Use when:** cache files missing on first pass; reviewers rethink unchanged findings; re-review cannot trust prior evidence.
-- **Try:** pre-create cache stubs; cache grounded observations, finding IDs, expected fix condition, and evidence path/line; re-review reads changed files only and checks whether cached condition is now true; require concrete new evidence to reopen resolved findings.
-- **Example:** Rereview rethinks a resolved finding → cache `expected: section X exists` + evidence path, then verify by reading only changed file/section.
-
-## Model tiering
-
-- **What it means:** Match model cost/strength to reviewer risk and difficulty.
-- **Use when:** simple mechanical reviewers use high-cost models; low-risk format/dead-code/wording checks dominate generated tokens.
-- **Try:** switch narrow mechanical reviewers to `# LOW`; keep correctness/security/high-risk reviewers `# HIGH`; use `# MED` for mixed judgment; record model tier changes in `## Decisions`.
-- **Example:** Formatting-only reviewer uses high model and writes no blocking findings → move it to `# LOW`.
+- Prefer a `WOPT-###` when it directly matches an existing-workflow refactor/analysis tactic.
+- Use an `OPT-###` when the design pattern itself directly describes the desired steady-state prompt shape.
+- Use `LOCAL:<name>` for target-specific or newly discovered moves; convert to `OPT-###`, `WOPT-###`, or `IDEA-###` only after evidence warrants shared docs.
+- One coherent ref per edit batch; multiple files OK if same hypothesis.
+- Pattern refs are hypotheses. Export-derived 3-sample metrics decide.
 
 Avoid:
 - Soft word/token budgets.

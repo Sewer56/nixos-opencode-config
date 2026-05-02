@@ -105,7 +105,7 @@ wrapper, no text before `# REVIEW` or after the final `## Notes` line.
 Any content outside this format is a protocol violation.
 
 # Constraints
-- Block for schema errors, missing required fields, permission inconsistencies, dangling references, unresolved placeholders, missing applicable optimization rule fragments, or operational behavior delegated to external docs.
+- Block for schema errors, missing required fields, permission inconsistencies, dangling references, unresolved placeholders, missing applicable design-rule fragments, or operational behavior delegated to external docs.
 - Do not block for minor wording preferences when schema and cross-references are valid.
 - Cite file paths and specific frontmatter fields or sections as evidence.
 - Keep findings short and specific.

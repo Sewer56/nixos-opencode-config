@@ -53,7 +53,7 @@ Convert a confirmed plugin plan into reviewed machine instructions. Derive `arti
 - Consume `Overall Goal:` lines and `[P#]` labeled steps directly.
 - `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers. Treat as draft-level guidance — ground STEP diffs in actual file content.
 - Deepen discovery only where the confirmed context leaves frontmatter fields, permission patterns, naming, cross-references, or output formats unresolved.
-- Infer which optimization rules apply to each confirmed target from its behavior: review loop, subagent coordination, machine-readable output, or convention/artifact changes.
+- Infer which design rules apply to each confirmed target from its behavior: review loop, subagent coordination, or machine-readable output.
 - Use `@codebase-explorer` for repo discovery first when needed.
 - Use `@mcp-search` for external libraries or APIs only when needed.
 - Read the files surfaced by discovery that matter to the machine artifact.
@@ -68,7 +68,7 @@ Convert a confirmed plugin plan into reviewed machine instructions. Derive `arti
 - Stable numbering: number items sequentially from 001. If a STEP is removed during revision, leave the gap — do not renumber other items.
 - Write `handoff_path` using the `# Templates` section (handoff now includes Summary, Revision History, and Step Index).
 - Write each STEP item to its own file matching `step_pattern` using the `# Templates` section.
-- Apply only the relevant optimization rules to each target. Split rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
+- Apply only the relevant design rules to each target. Split rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
 - Embed operational rules directly in generated targets.
 
 ## Phase Structure

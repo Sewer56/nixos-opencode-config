@@ -58,7 +58,7 @@ Extract from user input:
 - Action: create new, refine existing, or both.
 - Intent: what the command/agent should accomplish.
 - Behavior traits: whether the target runs a review loop, coordinates subagents, defines machine-readable output, or changes conventions/artifacts.
-- Self-iteration: when target paths include `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`, set `self_iteration: true`. Classify intent as `wording-only` (text refinements with no enforcement-logic impact) or `rule-change` (modifications to instructions that govern future `/iterate` output). Ask the user only when intent is materially ambiguous.
+- Self-iteration: when target paths include `.opencode/agent/_iterate/**`, `.opencode/command/iterate/**`, or `.opencode/doc/iterate.md`, set `self_iteration: true`. Classify intent as `wording-only` (text refinements with no enforcement-logic impact) or `rule-change` (modifications to instructions that govern future `/iterate` output). Ask the user only when intent is materially ambiguous.
 - Artifact naming convention: for draft+finalize command/agent pairs, enforce `PROMPT-<PIPELINE>-<slug>` base names with dot-separated phase segments (`.draft.` for draft-phase, no segment for finalize). Wrong: `.draft-handoff.md` (hyphen before `handoff`). Correct: `.draft.handoff.md`.
 
 ## 2. Discover
@@ -79,8 +79,8 @@ From discovery, determine:
 - For existing files: current state and gaps vs. request intent.
 - Dependencies: does the command need an agent that doesn't exist yet?
 - Call `@_iterate/optimization-selector` with the target summary, target paths, and behavior traits from step 1.
-- Use the selector result as the source of truth for applicable shared optimization requirements.
-- If selector fails, read `.opencode/WORKFLOW-OPTIMIZATIONS.md` directly and choose patterns manually.
+- Use the selector result as the source of truth for applicable shared design requirements.
+- If selector fails, read `config/doc/workflow/design-patterns.md` directly and choose patterns manually.
 
 ## 4. Write context
 
@@ -90,9 +90,9 @@ Write `context_path` using the template below. Derive `artifact_base` from `slug
 - Machine zone: operational — no prose explanations. Zero overlap between zones.
 - Each `[P#]` item is a free-form explanation followed by a diff block. File paths go in the diff block header (`--- a/<path>`).
 - When a `[P#]` item contains multiple diff blocks (scattered changes across one file), label each block with its own `Lines: ~start-end` range so implementers and the finalize agent can read targeted ranges.
-- REFINE: write explanation of intent, why, and selected optimization patterns as target-file behavior, then a unified diff block (`diff` fence, 2+ context lines per hunk).
+- REFINE: write explanation of intent, why, and selected design patterns as target-file behavior, then a unified diff block (`diff` fence, 2+ context lines per hunk).
 - CREATE: explanation only — no diff against empty.
-- Split optimization rules across affected prompts or reviewers. Describe target-file sections in Inputs → Process → Supplemental order. Omit `## User Request` when a command takes no arguments. Return only items requiring action.
+- Split design rules across affected prompts or reviewers. Describe target-file sections in Inputs → Process → Supplemental order. Omit `## User Request` when a command takes no arguments. Return only items requiring action.
 
 ## 5. Run the draft review loop
 Follow the ordered steps below.
@@ -155,11 +155,11 @@ Ask up to 10 questions in one batch only if answers would materially improve the
 - When the user modifies the draft but does not request re-review, append a reminder: "Re-review available — say 'review' to re-run draft reviewers."
 - Otherwise return `Status: DRAFT`.
 
-# Optimization Catalog
+# Design Pattern Catalog
 
-- Approved shared patterns live in `.opencode/WORKFLOW-OPTIMIZATIONS.md`.
+- Approved shared design patterns live in `config/doc/workflow/design-patterns.md`.
 - `@_iterate/optimization-selector` chooses which patterns apply.
-- Carry only selected pattern behavior into `<artifact_base>.draft.md`. Do not paste whole-catalog text into the artifact.
+- Carry only selected pattern behavior into `<artifact_base>.draft.md`. Do not paste whole design-catalog text into the artifact.
 
 # Command→Agent Composition
 
@@ -202,8 +202,8 @@ create | refine | both
 
 ### [P1] <label>
 
-<free-form explanation of intent, why, and applicable optimization
-rules as target-file behavior>
+<free-form explanation of intent, why, and applicable design rules as
+target-file behavior>
 
 ```diff
 <path>

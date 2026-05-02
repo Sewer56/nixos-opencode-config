@@ -31,7 +31,7 @@ Review finalized iteration artifacts for cross-document and cross-STEP redundanc
 (All items BLOCKING unless marked ADVISORY.)
 - Cross-document: flag when an artifact re-states information available in another artifact or referenced file. Prefer referencing by path or section name.
 - Cross-STEP: flag when two STEP items duplicate each other's content instead of referencing.
-- Rule splitting: flag when a STEP copies the full optimization contract into multiple targets instead of only the relevant fragments per target.
+- Rule splitting: flag when a STEP copies the full design-pattern contract into multiple targets instead of only the relevant fragments per target.
 - Frontmatter-import redundancy: flag when STEP frontmatter duplicates content from an imported or parent file.
 - Human-doc vs model-doc: flag when a STEP adds human-facing docs and duplicates that prose in model-facing instructions.
 - Subagent input economy: flag when caller prompts restate callee-owned output formats, focus/check lists, role assignments, paths from Step Index, or blanket read orders.

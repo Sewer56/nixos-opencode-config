@@ -45,6 +45,12 @@ Normalize workflow-optimize input and return small experiment brief.
       - local agent names listed in resolved file task permissions
    - Resolve only local `config/agent/**` or `.opencode/agent/**` paths. Do not scan whole repo.
    - Recursively resolve one additional level of local `@agent/name` references and task-permission local agents from those helper/reviewer files. Deduplicate. Stop after one transitive level to avoid explosion.
+   - Classify workflow shape:
+      - `primary+reviewers` when resolved files contain reviewer agents, review loop language, or reviewer cache/delta artifacts.
+      - `primary+helpers` when local subagents/helpers exist but no review loop is evident.
+      - `single-agent` when no local helper/reviewer agents are resolved.
+      - `nested-run` when target explicitly launches `opencode run`, `run_batch.py`, or session export harnesses.
+      - `mixed` when multiple task cases use different shapes; `unknown` when evidence is insufficient.
    - Derive cleanup patterns when obvious from command/artifact names. Examples: `/plan/*` uses `PROMPT-PLAN-*.handoff.md`, `PROMPT-PLAN-*.step.*.md`, `PROMPT-PLAN-*.review-*.md`. If unknown, return `None` and let caller decide.
 4. Return compact brief. Keep notes short.
 
@@ -60,6 +66,7 @@ Primary Command: /<command> | Mixed | None
 Model: <model>
 Goal: <one line>
 Max Batches: <n>
+Workflow Shape: primary+reviewers | primary+helpers | single-agent | nested-run | mixed | unknown
 Slug Hint: <slug> | None
 
 ## Command Surface

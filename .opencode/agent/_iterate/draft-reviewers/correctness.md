@@ -30,7 +30,7 @@ rule application, and human/machine zone separation.
 # Focus
 - Template structure: required sections present — Overall Goal, Open Questions, Decisions, `---` separator, Action with `[P#]` items. Omit Open Questions or Decisions only when explicitly marked `None`.
 - Diff headers: every diff block header references a valid file path. `--- a/<path>` and `+++ b/<path>` paths exist or are plausible targets for the declared action.
-- Rule application: optimization rules listed in `[P#]` items correctly match the target file's behavior traits (review loop → cache/Delta rules, subagent coordination → shared ledger rules, machine-readable output → fixed output blocks rules).
+- Rule application: selected design-pattern rules listed in `[P#]` items correctly match the target file's behavior traits (review loop → cache/Delta rules, subagent coordination → shared ledger rules, machine-readable output → fixed output blocks rules).
 - Human zone: no file paths, no action labels (CREATE, UPDATE, DELETE), no status markers. Narrative only.
 - Machine zone: no prose explanations. Operational instructions and diff blocks only.
 
@@ -101,7 +101,7 @@ wrapper, no text before `# REVIEW` or after the final `## Notes` line.
 Any content outside this format is a protocol violation.
 
 # Constraints
-- Block for missing required sections, invalid diff headers, misapplied optimization rules, human zone containing file paths/action labels/status markers, or machine zone containing prose.
+- Block for missing required sections, invalid diff headers, misapplied design-pattern rules, human zone containing file paths/action labels/status markers, or machine zone containing prose.
 - Do not block for minor wording when structure and zone separation are valid.
 - Cite section names and specific `[P#]` items as evidence.
 - Keep findings short and specific.

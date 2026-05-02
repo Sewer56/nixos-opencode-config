@@ -43,7 +43,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 ## 1. Preconditions and source of truth
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-ITERATE-<slug>`. All artifact paths derive from `artifact_base`.
 - Read `context_path` (`<artifact_base>.draft.md`) as the source of truth, supplemented only by any explicit finalize-time notes from the latest user message.
-- When `## Self-Iteration` is absent but any STEP target path matches `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`, infer `Intent: rule-change` and apply the enforcement completeness gate in step 4.
+- When `## Self-Iteration` is absent but any STEP target path matches `.opencode/agent/_iterate/**`, `.opencode/command/iterate/**`, or `.opencode/doc/iterate.md`, infer `Intent: rule-change` and apply the enforcement completeness gate in step 4.
 - Treat the `/iterate/finalize` invocation as the confirmation boundary.
 
 ## 2. Deepen discovery only where needed
@@ -53,8 +53,8 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - Read `## Self-Iteration` from `context_path` when present. For `wording-only` intent: proceed with standard finalize flow. For `rule-change` intent: apply the enforcement completeness gate in step 4.
 - Deepen discovery only where the confirmed context leaves concrete frontmatter fields, permission patterns, naming, cross-references, or output formats unresolved.
 - Call `@_iterate/optimization-selector` with the confirmed target summary, target paths, and inferred behavior traits.
-- Use the selector result as the source of truth for applicable shared optimization requirements.
-- If selector fails, read `.opencode/WORKFLOW-OPTIMIZATIONS.md` directly and choose patterns manually.
+- Use the selector result as the source of truth for applicable shared design requirements.
+- If selector fails, read `config/doc/workflow/design-patterns.md` directly and choose patterns manually.
 - Use `@codebase-explorer` for repo discovery first when needed.
 - Use `@mcp-search` for external libraries or APIs only when needed.
 - Read the files surfaced by discovery that matter to the machine artifact.
@@ -70,7 +70,7 @@ Convert a confirmed iteration context into reviewed revision instructions. Write
 - Stable numbering: number items sequentially from 001. If a STEP is removed during revision, leave the gap — do not renumber other items.
 - Write `handoff_path` using the `# Templates` section (handoff now includes Summary, Revision History, and Step Index).
 - Write each STEP item to its own file matching `step_pattern` using the `# Templates` section.
-- Apply only the selected patterns from `# Optimization Catalog` to each target. Split those rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
+- Apply only the selected patterns from `# Design Pattern Catalog` to each target. Split those rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
 - Keep operational rules in the generated targets themselves. Do not delegate model-facing behavior to external docs.
 - When self-iteration intent is `rule-change`: verify at least one STEP item updates enforcement-logic text (instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output). If no enforcement-logic STEP exists, treat this as a fatal gap — add a STEP item covering the missing enforcement-logic update rather than delegating to reviewers.
 - **Artifact naming convention**: for draft+finalize command/agent pairs, enforce `PROMPT-<PIPELINE>-<slug>` base names with dot-separated phase segments (`.draft.` for draft-phase, no segment for finalize). Wrong: `.draft-handoff.md` (hyphen before `handoff`). Correct: `.draft.handoff.md`.
@@ -155,9 +155,9 @@ Summary: <one-line summary>
 - Keep user-facing responses brief and factual.
 - Artifact naming convention: for draft+finalize command/agent pairs, use `PROMPT-<PIPELINE>-<slug>` base names with dot-separated phase segments (`.draft.` for draft-phase, no segment for finalize). Wrong: `.draft-handoff.md`. Correct: `.draft.handoff.md`.
 
-# Optimization Catalog
+# Design Pattern Catalog
 
-- Approved shared patterns live in `.opencode/WORKFLOW-OPTIMIZATIONS.md`.
+- Approved shared design patterns live in `config/doc/workflow/design-patterns.md`.
 - `@_iterate/optimization-selector` chooses which patterns apply.
 - Generated targets must absorb the selected behavior directly. Do not offload model-facing rules into external docs only.
 
