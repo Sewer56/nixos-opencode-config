@@ -39,7 +39,7 @@ Optimize OpenCode workflow prompts/tools by running real 3-sample experiments an
 
 1. **Exactly 3 samples per batch.** Never expand to 5. Never compare single samples.
 2. **Fresh sessions only.** No session reuse.
-3. **Isolated copies by default.** `run_batch.py` makes a raw 1:1 copy of the current folder into one isolated workspace per sample. Dirty candidate edits are included automatically. `--direct` skips copies and runs in place.
+3. **Isolated copies.** `run_batch.py` makes a raw 1:1 copy of the current folder into one isolated workspace per sample. Dirty candidate edits are included automatically.
 4. **Primary metric:** export-derived tree `output+reasoning` tokens, root + child sessions. `run_batch.py` root metrics are only early signal.
 5. **Win rule:** quality holds and average output+reasoning drops. Any drop wins. ≥5% is meaningful. Only treat results as basically same when delta is <1%, rounded metrics are equal, or sample spread gives no clear direction; then prefer simpler prompt/structure.
 6. **Quality gate first.** Define PASS criteria before baseline. Never trade required coverage/correctness for token savings.
@@ -104,11 +104,10 @@ python3 tools/workflow-optimize/run_batch.py \
 ```
 
 Rules:
-- Copy mode means default `run_batch.py` behavior without `--direct`: one raw 1:1 folder copy per sample.
+- Copy mode: one raw 1:1 folder copy per sample.
 - Clean target artifacts from main tree and isolated workspaces before each batch.
 - Use setup cleanup patterns; derive narrow artifact globs if setup returns `None`.
 - Bash timeout: large (3h / `10800000ms`).
-- If isolated copies fail, use `--direct`; mark lower isolation in log.
 
 ## 4. Export and digest
 

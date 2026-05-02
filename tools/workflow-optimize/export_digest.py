@@ -1,5 +1,29 @@
 #!/usr/bin/env python3
-"""Emit compact metrics-first digest for one opencode-sessions export bundle."""
+"""Emit compact metrics-first digest for one opencode-sessions export bundle.
+
+Reads an export directory produced by `opencode-sessions export` and prints a
+structured digest to stdout. The optimizer uses this to decide whether a
+candidate workflow change helped or hurt.
+
+Output sections (in order):
+  # EXPORT DIGEST           — root session metadata (ID, title, status, turn count, etc.)
+  ## Tree Token Totals      — aggregate tokens summed across root + all child sessions
+  ## Root Token Totals      — tokens for the root (orchestrator) session only
+  ## Child Generated Spread — max/min/spread of child output+reasoning tokens
+                               (high spread → unbalanced reviewer workload)
+  ## Child Sessions         — per-child breakdown: agent, status, generated tokens,
+                               input, output, reasoning, cache, tools, decision
+  ## Top Child Generated Tokens — top 5 children by output+reasoning (cost hotspots)
+  ## Duplicate Child Reads  — files read by multiple child agents (waste signal)
+  Child Summary Files       — relative paths to each child's summary.json
+
+Key metric: output_plus_reasoning_tokens.
+  - Tree level  → primary: did the change reduce total generated tokens?
+  - Child level → secondary: which reviewer dominates cost? is spread balanced?
+
+Duplicate reads signal redundant context loading across reviewers — a target
+for scope-boundary or reviewer-merging strategies.
+"""
 
 from __future__ import annotations
 

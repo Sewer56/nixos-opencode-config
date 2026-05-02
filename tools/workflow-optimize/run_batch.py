@@ -1,9 +1,38 @@
 #!/usr/bin/env python3
-"""Run three OpenCode sessions for workflow optimization experiments.
+"""Run three identical OpenCode sessions in parallel, isolated workspace copies.
 
-Default mode makes a raw 1:1 copy of the current folder into one isolated workspace per
-sample, runs samples in parallel, captures compact metadata, and deletes the
-workspaces. `--direct` skips copies and runs three samples in place.
+What it does (end to end):
+  1. Copies the source repo to /tmp per sample so sessions never share state.
+  2. Cleans old workflow artifacts from the source tree (before copy) and each
+     workspace (after copy) using caller-supplied glob patterns.
+  3. Spawns three opencode sessions in parallel via ProcessPoolExecutor.
+  4. Streams JSON events from each session; captures token breakdowns, step
+     counts, tool-use counts, elapsed time, and exit status.
+  5. Writes per-sample <prefix>.meta.json files and a <prefix>-summary.json
+     with avg/median/spread for every metric.
+  6. Deletes each workspace immediately after its session finishes.
+
+Output files:
+  <meta-dir>/run-<run:03d>-<task>-sample-<sample:03d>.meta.json  — per session
+  <meta-dir>/run-<run:03d>-<task>-summary.json                   — aggregate
+
+Per-sample meta.json captures:
+  session_id, status, stop_reason, elapsed_seconds,
+  step_count, tool_use_count,
+  input_tokens, output_tokens, reasoning_tokens,
+  output_plus_reasoning_tokens,  ← primary optimizer metric (early signal)
+  cache_read_tokens, cache_write_tokens,
+  total_tokens, total_with_cache_tokens,
+  status_line (last 500 chars of session output).
+
+Summary aggregates across completed samples:
+  avg/median/spread/spread_pct for every token and tool/step metric,
+  session_ids, samples_completed, samples_discarded, wall_elapsed_seconds.
+
+The summary is the primary input for the optimizer's compare-and-decide step.
+Final decisions use export-derived tree output+reasoning (see export_digest.py).
+Session stdout/stderr is interleaved (stderr merged to stdout) so the caller
+sees live progress per sample.
 """
 
 from __future__ import annotations
@@ -21,26 +50,17 @@ from statistics import median
 
 SAMPLES = 3
 
-ARTIFACT_CLEANUP_PATTERNS = [
-    "PROMPT-PLAN-*.handoff.md",
-    "PROMPT-PLAN-*.step.*.md",
-    "PROMPT-PLAN-*.review-*.md",
-]
-
 
 def main() -> int:
     args = parse_args()
     repo_root = Path(args.repo).resolve()
-    cleanup_patterns = args.cleanup_pattern or ARTIFACT_CLEANUP_PATTERNS
+    cleanup_patterns = args.cleanup_pattern
     task_label = safe_label(args.task)
     overall_start = time.time()
 
     cleanup_artifacts(repo_root, cleanup_patterns)
 
-    if args.direct:
-        results = run_direct_samples(args, repo_root, cleanup_patterns)
-    else:
-        results = run_copy_samples(args, repo_root, cleanup_patterns, task_label)
+    results = run_samples(args, repo_root, cleanup_patterns, task_label)
 
     wall_elapsed = round(time.time() - overall_start, 1)
     summary = write_results(args, results, task_label, cleanup_patterns, wall_elapsed)
@@ -61,7 +81,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repo", required=True, help="Absolute path to source workspace root")
     parser.add_argument("--slug", required=True, help="Experiment slug for workspace naming")
     parser.add_argument("--cleanup-pattern", action="append", default=[], help="Artifact glob to remove before each sample")
-    parser.add_argument("--direct", action="store_true", help="Run in repo dir instead of isolated copies")
     return parser.parse_args()
 
 
@@ -90,24 +109,7 @@ def cleanup_artifacts(root: Path, patterns: list[str]) -> None:
                 pass
 
 
-def run_direct_samples(args: argparse.Namespace, repo_root: Path, cleanup_patterns: list[str]) -> dict[int, dict]:
-    results = {}
-    for sample in range(1, SAMPLES + 1):
-        idx, meta = run_direct_sample(sample, args, repo_root, cleanup_patterns)
-        results[idx] = meta
-        print_sample(idx, meta)
-    return results
-
-
-def run_direct_sample(sample: int, args: argparse.Namespace, repo_root: Path, cleanup_patterns: list[str]) -> tuple[int, dict]:
-    cleanup_artifacts(repo_root, cleanup_patterns)
-    cmd = build_opencode_cmd(args, sample, repo_root)
-    meta = run_opencode_session(cmd)
-    add_sample_fields(meta, sample, args)
-    return sample, meta
-
-
-def run_copy_samples(args: argparse.Namespace, repo_root: Path, cleanup_patterns: list[str], task_label: str) -> dict[int, dict]:
+def run_samples(args: argparse.Namespace, repo_root: Path, cleanup_patterns: list[str], task_label: str) -> dict[int, dict]:
     workspace_base = Path("/tmp") / f"workflow-optimize-{args.slug}-workspaces" / f"run-{args.run:03d}-{task_label}"
     workspace_base.mkdir(parents=True, exist_ok=True)
 
@@ -296,7 +298,6 @@ def write_results(args: argparse.Namespace, results: dict[int, dict], task_label
         "run": args.run,
         "task": args.task,
         "slug": args.slug,
-        "mode": "direct" if args.direct else "copy",
         "cleanup_patterns": cleanup_patterns,
         "samples_requested": SAMPLES,
         "samples_completed": len(completed),
@@ -359,7 +360,7 @@ def rounded(value: float) -> float:
 
 
 def print_summary(summary: dict) -> None:
-    print(f"\nRun {summary['run']} complete: {summary['samples_completed']}/{SAMPLES} samples succeeded ({summary['mode']} mode)")
+    print(f"\nRun {summary['run']} complete: {summary['samples_completed']}/{SAMPLES} samples succeeded")
     print(
         f"  Avg output+reasoning: {summary['avg_output_plus_reasoning_tokens']:.0f} "
         f"(spread={summary['spread_output_plus_reasoning_tokens']:.0f}, "
