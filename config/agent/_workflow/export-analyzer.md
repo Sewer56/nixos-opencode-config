@@ -23,6 +23,7 @@ Review machine-first export bundles and surface workflow optimization moves. Foc
 - `goal`: optimization goal
 - `target_command`: normalized target command name
 - `files_under_test`: repo-relative workflow files the caller is willing to change
+- Optional: `baseline_metrics`, `current_batch_metrics`, `prior_common_findings`, `strategy_menu`
 
 # Export format
 
@@ -38,20 +39,16 @@ The export is an `opencode-sessions` directory bundle:
 ```
 
 # Process
-1. Start from `export_digest`. Do not read export-local `README.md` by default.
-2. Read `index.json` for totals, token efficiency, session index, tool rollup, and hotspots.
-3. Read root session `summary.json` for session narrative, file access rollup, tool rollup, and child links.
-4. **For reviewer-heavy workflows**: read EACH child session `summary.json` to extract per-reviewer metrics:
-   - output tokens per reviewer
-   - tool calls per reviewer
-   - duration per reviewer
-   - error patterns per reviewer
-   - This is critical for reviewer-focused optimization.
-5. Read `turns.compact.jsonl` only when summary is insufficient.
-6. Read `messages.compact.jsonl` only when chronology or wording evidence is needed.
-7. Read child `turns.compact.jsonl` only when per-reviewer output token breakdown is needed.
-8. Identify workflow waste signals:
-   - **reviewer output token volume** (primary signal — how much the reviewer wrote)
+1. Start from enriched `export_digest`. Do not read export-local `README.md` by default.
+2. Use digest `Tree Token Totals`, `Child Sessions`, `Top Child Generated Tokens`, and `Duplicate Child Reads` first. These are the default evidence source.
+3. Read `index.json` only when digest totals look missing/inconsistent or hotspot detail is needed.
+4. Read root session `summary.json` only when session narrative, file access rollup, tool rollup, or child links are not enough in digest.
+5. **For reviewer-heavy workflows**: read a child `summary.json` only for reviewers whose digest line shows high generated tokens, errors, duplicate reads, or scope leakage suspicion. Do not read every child summary if digest is sufficient.
+6. Read `turns.compact.jsonl` only when summary is insufficient.
+7. Read `messages.compact.jsonl` only when chronology or wording evidence is needed.
+8. Read child `turns.compact.jsonl` only when per-reviewer output token breakdown is missing from digest or summary.
+9. Identify workflow waste signals:
+   - **reviewer output+reasoning token volume** (primary signal — how much the reviewer generated)
    - **reviewer re-reading** (same file read multiple times in one reviewer session)
    - **cross-reviewer redundant reads** (same file read by multiple reviewers)
    - **reviewer scope leakage** (time/tokens spent outside assigned domain)
@@ -62,14 +59,28 @@ The export is an `opencode-sessions` directory bundle:
    - token-heavy context rebuilds with little progress
    - missing shared context / pre-inlined content
    - weak stop conditions causing long review loops
-9. Include per-reviewer breakdown in metrics:
+10. Include per-reviewer breakdown in metrics:
+   - output+reasoning tokens per reviewer domain
    - output tokens per reviewer domain
+   - reasoning tokens per reviewer domain
    - duration per reviewer domain
    - tool calls per reviewer domain
    - quality of findings (blocking vs advisory vs pass)
-10. Tie every recommendation to local workflow files only.
-11. Keep findings compact. No more than 5 hypotheses.
-12. **Prioritize hypotheses by expected reviewer output token reduction.**
+11. Map each hypothesis to a strategy category only after evidence is clear. Use `strategy_menu` when provided; otherwise use these known labels:
+   - structural withholding
+   - review loop restructuring
+   - reviewer merging / splitting
+   - scope boundaries
+   - prompt compression
+   - output format compression
+   - cache optimization
+   - model tiering
+   - `NEW_STRATEGY_CANDIDATE:<short-name>`
+12. Do not force-fit. If evidence suggests a reusable move outside known labels, use `NEW_STRATEGY_CANDIDATE:<short-name>` and explain why existing labels do not fit.
+13. Compare against `baseline_metrics` and `prior_common_findings` when provided. Prioritize new regressions or repeated cross-sample signals over generic advice.
+14. Tie every recommendation to local workflow files only.
+15. Keep findings compact. Up to 10 findings, no more than 5 hypotheses.
+16. **Prioritize hypotheses by expected reviewer output+reasoning token reduction.**
 
 # Output
 
@@ -93,7 +104,7 @@ Export Path: <absolute path>
 - Reviewer Spread: <summary or n/a>
 
 ## Reviewer Output Breakdown
-- <reviewer_name>: output_tokens=<n>, duration=<ms>, tools=<n>, findings=<blocking>/<advisory>/<pass>
+- <reviewer_name>: output_plus_reasoning_tokens=<n>, output_tokens=<n>, reasoning_tokens=<n>, duration=<ms>, tools=<n>, findings=<blocking>/<advisory>/<pass>
 - (one line per reviewer)
 
 ## Findings
@@ -101,7 +112,7 @@ Export Path: <absolute path>
 - None
 
 ## Hypotheses
-- [H1] Target: <repo-relative path> | Change: <exact workflow change> | Expected Output Token Reduction: <n or %> | Evidence: <finding refs>
+- [H1] Strategy: <strategy label | NEW_STRATEGY_CANDIDATE:name> | Confidence: HIGH | MED | LOW | Target: <repo-relative path> | Change: <exact workflow change> | Expected Output+Reasoning Reduction: <n or %> | Evidence: <finding refs> | Why New: <only for NEW_STRATEGY_CANDIDATE, else omit>
 - None
 
 ## Best Next Move

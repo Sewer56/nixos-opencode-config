@@ -24,14 +24,13 @@ Normalize workflow-optimize input and return small experiment brief.
 # Process
 1. Parse user request.
    - Accept compact `/command prompt` or labeled fields.
-    - Optional fields: `Goal`, `Model`, `Max Batches`, `Samples`, `Tasks`, `Files`.
-    - Support one target command with many task cases, or repeated task cases that each name their own target command.
-    - If `Tasks:` is missing, create one implicit task case from the top-level command + prompt.
-    - If required prompt text is missing, return `NEEDS_INPUT`.
-    - Default `Model` to `sewer-axonhub/wafer/GLM-5.1`.
-    - Default `Goal` to reducing reviewer output tokens, repeated reads, reviewer re-thinking, and total token/cost waste while preserving result quality.
-    - Default `Max Batches` to `10`.
-    - Default `Samples` to `3` (for multi-sample averaging to handle LLM non-determinism).
+   - Optional fields: `Goal`, `Model`, `Max Batches`, `Tasks`, `Files`.
+   - Support one target command with many task cases, or repeated task cases that each name their own target command.
+   - If `Tasks:` is missing, create one implicit task case from the top-level command + prompt.
+   - If required prompt text is missing, return `NEEDS_INPUT`.
+   - Default `Model` to `sewer-axonhub/wafer/GLM-5.1`.
+   - Default `Goal` to reducing reviewer output tokens, repeated reads, reviewer re-thinking, and total token/cost waste while preserving result quality.
+   - Default `Max Batches` to `10`.
 2. Normalize each target command.
    - Strip leading `/`.
    - Keep slash-separated CLI form like `plan/finalize`.
@@ -42,9 +41,11 @@ Normalize workflow-optimize input and return small experiment brief.
    - Read command frontmatter and resolve `agent:` sequentially from `config/agent/<agent>.md` then `.opencode/agent/<agent>.md`.
    - Read resolved agent file.
    - Resolve local helper/reviewer agents from:
-     - explicit `@agent/name` references in resolved files
-     - local agent names listed in resolved file task permissions
+      - explicit `@agent/name` references in resolved files
+      - local agent names listed in resolved file task permissions
    - Resolve only local `config/agent/**` or `.opencode/agent/**` paths. Do not scan whole repo.
+   - Recursively resolve one additional level of local `@agent/name` references and task-permission local agents from those helper/reviewer files. Deduplicate. Stop after one transitive level to avoid explosion.
+   - Derive cleanup patterns when obvious from command/artifact names. Examples: `/plan/*` uses `PROMPT-PLAN-*.handoff.md`, `PROMPT-PLAN-*.step.*.md`, `PROMPT-PLAN-*.review-*.md`. If unknown, return `None` and let caller decide.
 4. Return compact brief. Keep notes short.
 
 # Output
@@ -59,7 +60,6 @@ Primary Command: /<command> | Mixed | None
 Model: <model>
 Goal: <one line>
 Max Batches: <n>
-Samples: <n>
 Slug Hint: <slug> | None
 
 ## Command Surface
@@ -75,6 +75,10 @@ Slug Hint: <slug> | None
 
 ## Files Under Test
 - <repo-relative path>
+- None
+
+## Cleanup Patterns
+- <glob pattern>
 - None
 
 ## Notes
