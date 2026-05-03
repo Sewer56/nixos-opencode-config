@@ -28,17 +28,43 @@ instructions.
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Focus
-- Undefined jargon: instructions use internal taxonomy or project-specific compound terms without defining them. Replace with inline definitions.
-- Scope boundary: linguistic comprehensibility — whether the words are understandable. Not execution-readiness or same-concept restatement across sections.
-- Compound-term compression: phrases that compress meaning at the cost of comprehension. Replace with the expanded meaning.
-- Opaque references: "follow the Foo convention" or "apply the Bar pattern" where Foo/Bar are not standard terms and are not defined in the same file. Replace with the inline definition or a path pointer.
-- Exclusions (ADVISORY only — do not block):
-  - Common programming terms: "unified diff", "markdown", "frontmatter"
-  - Path-based pointers: "read `config/rules/testing.md`" — navigation, not comprehension
-  - Terms defined earlier in the same file
-  - Headings, section names, and non-prescriptive prose
-  - Technical domain terms standard in the file's domain
-  - Plugin SDK terms defined in the Plugin Knowledge section: hook names, PluginInput fields
+(All items BLOCKING unless marked ADVISORY.)
+
+## Undefined jargon
+Flag internal taxonomy or project-specific terms used without inline definition.
+
+Bad: `Use the lifecycle hydration seam.`
+Good: `Use the hook that runs before each assistant response to initialize plugin state.`
+
+## Scope boundary
+Review linguistic comprehensibility only. Do not judge correctness, duplication, or style unless unclear wording causes the issue.
+
+Bad finding: `This SDK hook name is wrong.`
+Good finding: `The draft says "runtime bridge" without explaining which hook or file it means.`
+
+
+Bad: flag a wrong hook name as clarity.
+Good: flag undefined wording that prevents knowing which hook is meant.
+
+## Compound-term compression
+Flag compressed phrases that hide executable meaning.
+
+Bad: `standalone log lifecycle`
+Good: `debug log file created under `<plugin-dir>/.logs/<name>/debug.log` when the plugin runs`
+
+## Opaque references
+Flag references to conventions or patterns that are not defined in the same file.
+
+Bad: `Follow the standard plugin logging pattern.`
+Good: `Write debug logs to `<plugin-dir>/.logs/<name>/debug.log`; avoid `client.app.log` for debug output.`
+
+## Exclusions
+Do not block these as clarity issues:
+- Common programming terms: `unified diff`, `markdown`, `frontmatter`, `hook`.
+- Path pointers used as navigation.
+- Terms defined earlier in the same file.
+- Headings, section names, and non-prescriptive prose.
+- SDK terms standard in plugin docs when a nearby SDK path is provided.
 
 # Process
 1. Load cache

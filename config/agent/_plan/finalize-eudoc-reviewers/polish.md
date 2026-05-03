@@ -29,37 +29,149 @@ Review D# steps for clarity, wording quality, reader engagement, and cross-page 
 
 # Focus
 
-## Clarity
-- **Undefined jargon**: technical terms without inline definition. BLOCKING for project-specific terms; ADVISORY for standard domain terms.
-- **Ambiguous language**: phrases with multiple interpretations. BLOCKING.
-- **Compound-term compression**: compressed phrases sacrificing comprehension. BLOCKING.
-- **Opaque reference**: "follow the X pattern" where X is undefined. BLOCKING.
-- **Acronym without expansion**: acronyms without expansion on first use. BLOCKING for project-specific; ADVISORY for universal.
-- Exclusions (ADVISORY only): common programming terms, path-based pointers, terms defined earlier on same page, headings, standard domain terms.
+## Undefined jargon
+Flag project-specific or niche terms without inline definition. BLOCKING for project-specific terms; ADVISORY for standard domain terms.
 
-## Wording
-- **Passive voice**: in instructional steps where active is clearer. BLOCKING for instructions; ADVISORY for descriptive prose.
-- **Filler**: hedging ("please note", "simply", "just"), weasel words. BLOCKING.
-- **Wordiness**: phrasing that can be tightened. ADVISORY — block only egregious inflation.
-- **Terminology consistency**: different terms for same concept within a single D# step. BLOCKING when ambiguous; ADVISORY for stylistic variation.
-- **Paragraph length**: over 4 sentences or 4 lines. ADVISORY.
+Bad: `Use the hydration seam.`
+Good: `Use the startup hook that initializes state before rendering.`
 
-## Engagement & Structure
-- **Hook-first**: first 50 words must answer what/why/who. BLOCKING for landing/index pages; ADVISORY for inner reference.
-- **Show-don't-tell**: code/example within first screenful. BLOCKING for getting-started/guide; ADVISORY for reference.
-- **Scannability**: paragraphs under 3 sentences, feature lists in tables/grids. ADVISORY.
-- **Progressive complexity**: one-line what → example → common usage → config → advanced. BLOCKING when advanced before basics.
-- **No fluff**: no "welcome to", "made with love", emoji without purpose. ADVISORY.
-- **Quick start feasibility**: ≤3 steps, copy-pasteable. BLOCKING for quick-start sections.
-- **Peer points as bullets**: 3+ parallel explanatory points as inline clauses → must become list. ADVISORY.
-- **Bullet spacing**: blank line before first bullet after prose; blank lines between multi-line items. ADVISORY.
+## Ambiguous language
+Block phrases with multiple plausible interpretations.
 
-## Cross-page Polish
-- **Terminology drift**: different terms for the same concept across D# steps. ADVISORY.
-- **Content duplication**: same explanation verbatim/near-verbatim across D# steps — flag when cross-page link would serve better. ADVISORY.
-- **Orphaned references**: a D# step references a concept not explained elsewhere. ADVISORY.
+Bad: `Update the config near the setup.`
+Good: Update `docs/config.md` under `## Setup`.
 
-Exclusions (ADVISORY only): API reference pages, changelogs, migration guides. Exclude frozen regions.
+## Compound-term compression
+Block compressed phrases that sacrifice comprehension.
+
+Bad: `hot-reload DX pipeline`
+Good: `developer workflow that reloads the app after source changes`
+
+## Opaque reference
+Block undefined pattern/convention references.
+
+Bad: `Follow the adapter pattern.`
+Good: `Wrap external calls behind one local interface.`
+
+## Acronym without expansion
+Flag acronyms without first-use expansion. BLOCKING for project-specific; ADVISORY for universal.
+
+Bad: `HMR updates the page.`
+Good: `Hot module replacement (HMR) updates the page.`
+
+## Passive voice
+Flag passive voice where active voice is clearer. BLOCKING for instructions; ADVISORY for descriptive prose.
+
+Bad: `The command should be run.`
+Good: `Run the command.`
+
+## Filler
+Block hedging and zero-information phrases such as `please note`, `simply`, `just`, and weasel words.
+
+Bad: `Please note that you can simply run...`
+Good: `Run...`
+
+## Wordiness
+Flag tighten-able phrasing. ADVISORY; block only for egregious inflation.
+
+Bad: `in order to allow users to`
+Good: `so users can`
+
+## Terminology consistency
+Flag different terms for the same concept within one D# step. BLOCKING when ambiguous; ADVISORY for style variation.
+
+
+Bad: same command called `sync`, `refresh`, and `reload` in one D# step.
+Good: one term used consistently or distinctions defined.
+
+## Paragraph length
+Flag paragraphs over 4 sentences or 4 rendered lines. ADVISORY.
+
+
+Bad: one paragraph covers install, config, caveats, and troubleshooting.
+Good: split by task or convert peer points to bullets.
+
+## Hook-first
+First 50 words should answer what/why/who. BLOCKING for landing/index pages; ADVISORY for inner reference.
+
+
+Bad: landing page starts with project history.
+Good: first sentences say what it is, who uses it, and why it matters.
+
+## Show-don't-tell
+Getting-started and guide pages need code/example/command within first screenful. BLOCKING for guides; ADVISORY for reference.
+
+
+Bad: guide explains concepts for a screenful before any command.
+Good: minimal command or example appears immediately after the hook.
+
+## Scannability
+Prefer short paragraphs, tables/grids for feature lists, and bold key terms. ADVISORY.
+
+
+Bad: dense paragraph lists features and caveats.
+Good: short paragraphs, bullets, or grid with bold key terms.
+
+## Progressive complexity
+Order content: one-line what → example → common usage → configuration → advanced. BLOCKING when advanced precedes basics.
+
+
+Bad: edge cases precede common usage.
+Good: what → example → common usage → config → advanced.
+
+## No fluff
+Flag `welcome to`, `made with love`, purposeless emoji, and generic contribution blurbs without steps. ADVISORY unless it blocks comprehension.
+
+
+Bad: `Welcome to this awesome project!`
+Good: first line states user value.
+
+## Quick start feasibility
+Quick starts should be ≤3 steps and copy-pasteable. BLOCKING for quick-start sections.
+
+
+Bad: quick start requires five decisions before first run.
+Good: three copy-pasteable steps reach running code.
+
+## Peer points as bullets
+Three or more parallel explanatory points should become a bullet or numbered list. ADVISORY.
+
+
+Bad: `Use it for A, B, and C` where A/B/C are full clauses.
+Good: list A, B, and C as bullets.
+
+## Bullet spacing
+Use blank line before first bullet after prose and between multi-line bullet items. ADVISORY.
+
+
+Do not flag: compact single-line option lists.
+Good: blank lines around multi-line list items.
+
+## Cross-page terminology drift
+Flag different terms for the same concept across D# steps. ADVISORY.
+
+
+Bad: D1 says `workspace`; D2 says `project` for the same concept.
+Good: shared term or explicit distinction.
+
+## Content duplication
+Flag verbatim/near-verbatim explanation across D# steps when a cross-page link would serve better. ADVISORY.
+
+
+Bad: two D# pages repeat the same setup paragraph.
+Good: one canonical explanation, other page links or gives short reminder.
+
+## Orphaned references
+Flag references to concepts no D# step explains. ADVISORY.
+
+
+Bad: D# mentions profiles but no D# page explains profiles.
+Good: add explanation or link to existing docs.
+
+## Exclusions
+Do not flag common programming terms, path pointers, terms defined earlier, headings, API reference pages, changelogs, migration guides, or frozen regions outside the requested change.
+
+Do not flag: frozen regions, changelog chronology, API-reference density, or terms defined earlier.
 
 # Process
 

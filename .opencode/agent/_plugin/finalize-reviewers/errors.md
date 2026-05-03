@@ -28,12 +28,36 @@ Review plugin code for error-handling coverage and standalone log pattern compli
 - `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
+(All items BLOCKING unless marked ADVISORY.)
 
-- **Coverage**: every hook callback and async path in generated plugin code has error handling (try/catch). Missing error paths are BLOCKING.
-- **Doc coverage**: every public error-returning API has an `@throws` tag or `# Errors` section documenting each error variant with a specific trigger.
-- **Specificity**: vague catch-all handlers without specific error types are ADVISORY.
-- **Swallowed errors**: flag `catch(() => {})`, `catch {}`, async rejections silently dropped as BLOCKING.
-- **Log handling**: debug logging uses the standalone file pattern (writes to `<plugin-dir>/.logs/<name>/debug.log`). Any use of `client.app.log` for debug output is BLOCKING.
+## Coverage
+Every hook callback and async path in generated plugin code needs error handling. Missing critical path handling is BLOCKING.
+
+Bad: async hook performs file I/O without `try/catch`.
+Good: async hook catches errors and returns/handles them without crashing the plugin.
+
+## Doc coverage
+Every public error-returning API needs an `@throws` tag or `# Errors` section documenting each error variant with a specific trigger.
+
+Bad: `Throws when something goes wrong.`
+Good: `Throws ConfigError when the config file cannot be parsed.`
+
+## Specificity (ADVISORY)
+Flag vague catch-all handlers that hide error type or trigger.
+
+Bad: `catch (err) { return false }`
+Good: branch on known error type, record trigger, and rethrow or surface unknown errors.
+
+## Swallowed errors
+Flag silent drops as BLOCKING: `catch(() => {})`, empty `catch {}`, ignored rejected promises, or catch blocks that neither log nor surface failure.
+
+Do not flag: intentional best-effort cleanup that documents why failure is safe to ignore.
+
+## Log handling
+Debug logging must use standalone files, not `client.app.log`.
+
+Bad: write debug output with `client.app.log`.
+Good: write debug output to `<plugin-dir>/.logs/<name>/debug.log`.
 
 # Process
 

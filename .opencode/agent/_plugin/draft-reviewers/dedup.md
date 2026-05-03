@@ -29,9 +29,35 @@ plugin knowledge restatement.
 
 # Focus
 (All items BLOCKING unless marked ADVISORY.)
-- Zone overlap: flag when the human zone repeats information from the machine zone or vice versa. Human zone is narrative; machine zone is operational. Zero overlap.
-- Cross-item: flag when two `[P#]` items duplicate each other's content instead of referencing.
-- Knowledge restatement: flag when a `[P#]` item restates content from the Plugin Knowledge section (hook catalog, file structure, standalone log pattern, auto-loading). Reference the section name instead.
+
+## Zone overlap
+Human-zone rationale and machine-zone `[P#]` instructions must not repeat the same operational content. Human zone explains why; machine zone says what to change.
+
+Bad: Overall Goal and `[P1]` both restate exact standalone logging implementation steps.
+Good: Overall Goal names the plugin outcome; `[P1]` carries the concrete logging edits.
+
+Do not flag: short labels or terminology repeated for navigation.
+
+## Cross-item duplication
+Flag two `[P#]` items that instruct the same change on the same target or restate the same requirement without a distinct scope.
+
+Bad: `[P1]` and `[P2]` both add the same hook wrapper.
+Good: `[P1]` adds hook wrapper; `[P2]` documents hook behavior.
+
+## Knowledge restatement
+Flag `[P#]` items that copy Plugin Knowledge prose instead of referencing or applying only needed behavior.
+
+Bad:
+```text
+[P2] restates all SDK hook type background from Plugin Knowledge.
+```
+
+Good:
+```text
+[P2] uses `Hooks` names from SDK types and points to `opencode-source/packages/plugin/src/index.ts` for details.
+```
+
+Do not flag: one-line constraint fragments needed to make a `[P#]` executable.
 
 # Process
 1. Load cache

@@ -28,20 +28,101 @@ Review plugin plans for correctness, fidelity, and SDK type validity.
 - `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
+(All items BLOCKING unless marked ADVISORY.)
 
-- **Fidelity**: explicit goals, constraints, scope, and clarified decisions in `handoff_path` and `context_path` remain represented in STEP files.
-- **Requirements**: every `REQ-###` in STEP files maps to concrete implementation refs.
-- **Structure**: STEP files use the required stable headings and explicit refs.
-- **SDK types**: hook names match the SDK `Hooks` interface. Plugin signature is valid (`export const XxxPlugin: Plugin = async (input) => { ... }`).
-- **Frontmatter**: schema validity in STEP target frontmatter fields.
-- **Completeness**: no placeholders (`...`, `TODO`, `FIXME`), missing anchors, or undefined helpers.
-- **Auto-load**: flag unnecessary `opencode.json` registration for plugins in `config/plugins/` as ADVISORY.
-- **Log handling**: `client.app.log` usage for debug output in generated plugin code is BLOCKING. Standalone file pattern required.
-- **Line-location validity**: `Lines: ~<start>-<end>` fields in STEP files point near the change location in the target file; the range is within ±10 lines of the actual content.
-- **Per-hunk line labels**: each diff block within a STEP must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Missing labels are BLOCKING.
-- **Focused `Lines:` ranges**: header `Lines: ~` must list the comma-separated union of hunk ranges. Full-file ranges are BLOCKING when the change is localized. Valid only for CREATE/DELETE actions.
-- **Diff context**: every hunk in `## Diff` sections includes 2+ unchanged context lines before and after each change region; context lines match content in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
-- **Nested code fences**: block when a STEP target contains an inner ``` fence inside an outer ``` fence. Outer fence uses backticks (```), inner fences use tildes (~~~).
+## Fidelity
+Explicit goals, constraints, scope, and clarified decisions from `handoff_path` and `context_path` must remain represented in STEP files.
+
+Bad: handoff requires standalone debug logging but STEP only adds hook code.
+Good: STEP adds hook behavior and the standalone debug log path.
+
+## Requirements
+Every `REQ-###` in STEP files must map to concrete implementation references.
+
+Bad: `REQ-002` listed with no file or diff reference.
+Good: `REQ-002` points to `config/plugins/foo.ts` and the relevant hunk.
+
+## Structure
+STEP files must use required stable headings and explicit refs.
+
+Bad: missing `Action`, `Why`, `Lines`, or `Diff` headings.
+Good: each STEP has stable headings with concrete values or `None`.
+
+## SDK types
+Hook names must match the SDK `Hooks` interface and plugin signature must be valid.
+
+Bad: `export const FooPlugin = { hooks: ... }`
+Good: `export const FooPlugin: Plugin = async (input) => { ... }`
+
+## Frontmatter
+STEP target frontmatter fields must match the target schema.
+
+Do not flag: content-only changes that do not touch frontmatter.
+
+## Completeness
+Block placeholders, missing anchors, undefined helpers, and exact implementation references that cannot be applied.
+
+Bad: `TODO`, `FIXME`, `...`, or helper `writeDebugLog()` with no definition.
+Good: full helper definition or explicit reference to an existing helper path.
+
+## Auto-load (ADVISORY)
+Plugins under `config/plugins/` auto-load. Flag unnecessary `opencode.json` registration unless the plan has a concrete nonstandard loading reason.
+
+
+Bad: add `opencode.json` registration for `config/plugins/foo.ts` with no reason.
+Good: rely on `config/plugins/` auto-loading or explain the nonstandard loading path.
+
+## Log handling
+Debug output in generated plugin code must use standalone file logging. `client.app.log` for debug output is BLOCKING.
+
+Bad: `client.app.log("debug", details)`
+Good: append debug details to `<plugin-dir>/.logs/<name>/debug.log`.
+
+## Line-location validity
+`Lines: ~<start>-<end>` fields in STEP files should point near the change location, within ±10 lines of actual content.
+
+Do not block for small line-count drift when hunk context clearly targets the right content.
+
+## Per-hunk line labels
+Each diff block within a STEP must carry its own bold `Lines: ~start-end` label immediately before the diff fence. Missing labels are BLOCKING.
+
+Bad:
+```markdown
+Diff:
+~~~diff
+@@
+...
+~~~
+```
+
+Good:
+```markdown
+Diff:
+
+**Lines: ~45-52**
+
+~~~diff
+@@
+...
+~~~
+```
+
+## Focused `Lines:` ranges
+STEP header `Lines: ~` must list the comma-separated union of hunk ranges. Full-file ranges are valid only for CREATE/DELETE actions.
+
+Bad: localized update with `Lines: ~1-400`.
+Good: localized update with `Lines: ~45-52, ~120-130`.
+
+## Diff context
+Every hunk in `## Diff` includes 2+ unchanged context lines before and after each change region, and context lines match target file content near the indicated range.
+
+Block missing or unmatched context. Do not block off-by-one/few line-number discrepancies when context is correct.
+
+## Nested code fences
+Block when a STEP target contains an inner ``` fence inside an outer ``` fence. Outer fence uses backticks; inner fences use tildes.
+
+Bad: outer ```markdown block contains inner ```diff block.
+Good: outer ```markdown block contains inner ~~~diff block.
 
 # Process
 

@@ -24,6 +24,30 @@ Verify resolved test findings and check changed steps for new test gaps. Cache-p
 - `changed_step_paths`: only step files that changed since last review
 - `resolved_finding_ids`, `finding_resolution_ledger`
 
+# Focus
+
+## Cache-first verification
+Trust existing cache observations for unchanged steps and re-verify only resolved findings or changed test steps.
+
+Bad: reread all source and step files on every pass.
+Good: read cache, then changed step files only.
+
+## Resolved finding checks
+For each resolved test finding, confirm the changed step content applies the fix.
+
+Bad: mark resolved because ID appears in ledger only.
+Good: changed step contains concrete coverage/parameterization fix.
+
+## New test gaps
+Scan changed steps for new coverage, redundancy, or parameterization issues.
+
+Do not flag: unchanged cached issues outside changed steps.
+
+## Output minimality
+Write finding details to cache and emit only the terse `# REVIEW` block.
+
+Good: `Decision: PASS` only when no new findings exist.
+
 # Process
 1. Read `cache_path` — carry forward unchanged observations.
 2. Read `changed_step_paths` only. Open target repo test files ONLY for changed steps.

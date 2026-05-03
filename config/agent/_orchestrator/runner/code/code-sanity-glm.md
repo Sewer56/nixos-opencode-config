@@ -36,6 +36,38 @@ Validate that implementation satisfies the objectives. Narrow sanity gate only.
 - `ledger_path` (optional): absolute path to the current review ledger
 - `cache_path` (optional): absolute path to review cache file
 
+# Focus
+
+## Objective satisfaction
+Validate that implementation satisfies objectives and success criteria, not plan wording for its own sake.
+
+Bad: fail because helper name differs from plan while behavior is correct.
+Good: fail when requirement behavior is absent or wrong.
+
+## Verification evidence
+Use coder notes and gate context as verification evidence; treat test-integrity findings as authoritative for code-phase test verification.
+
+Bad: ignore recorded test failure tied to change.
+Good: block verified failure with exact evidence.
+
+## Severe miss detection
+Block obvious severe regressions missed by plan review: logic errors, critical missing error handling, security issues, or material performance regressions.
+
+Bad: new branch accepts invalid input silently.
+Good: branch validates or safely rejects input.
+
+## Plan context boundary
+Use `plan_path` only to interpret intent. Do not fail solely because implementation differs from plan when requirements are met.
+
+Do not flag: equivalent implementation that satisfies objective and passes checks.
+
+## Blocking severity
+Block unmet objectives, verified check failures tied to the change, and severe regressions. Downgrade pre-existing unrelated failures and unclear choices to ADVISORY.
+
+
+Bad: block a preference without concrete failure.
+Good: block only when category definition, evidence, and fix are clear.
+
 # Process
 
 ## 1. Load Context

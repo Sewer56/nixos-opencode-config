@@ -37,6 +37,36 @@ Validate that tests are well-designed, non-redundant, and follow parameterizatio
 - `ledger_path` (optional): absolute path to the current review ledger
 - `step_pattern`: file pattern for individual step files adjacent to `plan_path` (e.g., `PROMPT-??-*-PLAN.step.*.md`)
 
+# Focus
+
+## Coverage and structure
+New code paths need test coverage, including explicit edge cases when behavior changes.
+
+Bad: new validation branch has no test step.
+Good: tests cover success, invalid input, and boundary case.
+
+## Test-requirement mapping
+Each test step should map to a requirement or behavior and prove acceptance criteria without over-testing internals.
+
+Bad: test asserts private helper call sequence.
+Good: test asserts observable output tied to `REQ-###`.
+
+## Redundancy
+Block tests that duplicate the same feature without extra behavior coverage.
+
+Do not flag: same behavior tested through two public entry points when both are user-visible contracts.
+
+## Parameterization
+Block obvious 3+ near-identical tests that should clearly be parameterized.
+
+Bad: copied tests differ only by input value.
+Good: table-driven cases with meaningful names.
+
+## Design boundaries
+Flag non-deterministic tests, real I/O/network where unnecessary, complex setup, or one-use helpers with no value.
+
+Rules source: `testing.md` and `test-parameterization.md` from `/home/sewer/opencode/config/rules/`.
+
 # Process
 
 1. Load cache
@@ -72,63 +102,41 @@ Validate that tests are well-designed, non-redundant, and follow parameterizatio
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
 
-# Focus
-
-## Coverage & Structure
-- All new code paths have test coverage (edge cases explicitly)
-- Each test step maps to a requirement; tests prove acceptance criteria without over-testing internals
-
-## Test-Requirement Mapping
-- Each test step maps to a requirement or behavior
-- Tests are sufficient to prove acceptance criteria
-- No over-testing (testing internals not exposed behavior)
-
-Rules (read in parallel from `/home/sewer/opencode/config/rules/`): `testing.md`, `test-parameterization.md`.
-
 # Blocking Criteria
 
-BLOCKING for:
-- **REDUNDANT_TESTS**: Same feature tested twice, wasting CI time and maintenance
-- **OBVIOUS_PARAMETERIZATION**: 3+ similar tests that should clearly be parameterized
-- **MISSING_COVERAGE**: New code without any test plan
-- **TESTING_IMPLEMENTATION**: Tests verify internals not observable behavior
+## Missing coverage
+Block new code without any test plan or critical paths without coverage.
 
-ADVISORY for:
-- Suboptimal test naming
-- Minor coverage gaps in edge cases
-- Debatable helper extraction
+Bad: new parser branch has no test step.
+Good: test step covers success and failure branch.
 
-## Issue Categories
+## Redundant tests
+Block tests that prove the same feature twice without new behavior coverage.
 
-### Coverage Issues
-**Category**: TEST_COVERAGE
-**Types**:
-- MISSING_COVERAGE: New code has no test steps
-- INSUFFICIENT_COVERAGE: Critical paths not tested
-- OVERLY_BROAD_COVERAGE: Testing beyond behavior scope
+Bad: two tests call the same public API with same input and assertion.
+Good: second test covers a distinct edge case.
 
-### Redundancy Issues
-**Category**: TEST_REDUNDANCY
-**Types**:
-- DUPLICATE_TEST: Same behavior tested twice
-- OVERLAPPING_TESTS: Multiple tests cover same code path
-- UNNECESSARY_TEST_FILE: Separate test file not justified
+## Obvious parameterization
+Block 3+ clearly similar tests that should be one parameterized/table-driven test.
 
-### Parameterization Issues
-**Category**: TEST_PARAMETERIZATION
-**Types**:
-- SHOULD_PARAMETERIZE: Similar tests should be merged
-- POOR_CASE_NAMES: Generic names like case_1
-- UNALIGNED_LABELS: Inconsistent formatting
-- MISSING_LABELS: Non-obvious parameters without comments
+Bad: copied tests differ only in input literal.
+Good: one table with named cases.
 
-### Design Issues
-**Category**: TEST_DESIGN
-**Types**:
-- NON_DETERMINISTIC: Real I/O, time, or network
-- TESTS_IMPLEMENTATION: Verifies internals not behavior
-- UNNECESSARY_HELPER: Helper not reused sufficiently
-- OVERLY_COMPLEX_SETUP: Setup more complex than code under test
+## Testing implementation
+Block tests that verify internals rather than observable behavior.
+
+Bad: asserts private helper call order.
+Good: asserts public output or side effect.
+
+## Advisory cases
+Use ADVISORY for naming, minor edge gaps, and debatable helper extraction.
+
+Do not block: non-critical style issues with passing meaningful tests.
+
+## Category map
+Use `TEST_COVERAGE`, `TEST_REDUNDANCY`, `TEST_PARAMETERIZATION`, or `TEST_DESIGN` based on the smallest violated domain.
+
+Good: category matches finding evidence and requested fix.
 
 # Output
 

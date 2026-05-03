@@ -37,6 +37,30 @@ Validate that the implementation plan covers documentation requirements concrete
 - `ledger_path` (optional): absolute path to the current review ledger
 - `step_pattern`: file pattern for individual step files adjacent to `plan_path` (e.g., `PROMPT-??-*-PLAN.step.*.md`)
 
+# Focus
+
+## Changed scope
+Review documentation obligations for the changed scope described by the plan.
+
+Bad: review unrelated docs because they are nearby.
+Good: inspect only planned files/surfaces and required supporting docs.
+
+## Errors exclusion
+Do not review `# Errors` sections; errors reviewer owns them.
+
+Do not flag: missing `# Errors` details as documentation findings.
+
+## Blocking criteria compliance
+Verify each relevant implementation step satisfies the `Review Blocking Criteria` section in `/home/sewer/opencode/config/rules/documentation.md`.
+
+Bad: generic `update docs` step with no file or affected section.
+Good: step names doc file, affected section, and required content.
+
+## Targeted reads
+Read only repo files needed to ground documentation coverage, placement, specificity, and fidelity.
+
+Rules source: `/home/sewer/opencode/config/rules/documentation.md`.
+
 # Process
 
 1. Load cache
@@ -72,31 +96,28 @@ Validate that the implementation plan covers documentation requirements concrete
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
 
-# Focus
-- Review the changed scope described by the plan.
-- Do not review `# Errors` sections — those are fully owned by another reviewer.
-- Verify each relevant implementation step satisfies the "Review Blocking Criteria" section in the rules.
-- Read only the repo files needed to ground those checks.
-
-Rules: `/home/sewer/opencode/config/rules/documentation.md`.
-
 # Blocking Criteria
-Mark BLOCKING only when all present:
-1. Required documentation coverage is missing, vague, or dropped.
-2. Concrete evidence from the plan or repo surface.
-3. A smallest concrete correction.
 
-If any are missing, downgrade to ADVISORY.
+## Documentation blocking standard
+Mark BLOCKING only when documentation rules require a concrete doc change and the plan omits or underspecifies it.
 
-## Issue Categories
+Bad: new public CLI flag has no docs step.
+Good: docs step names file, section, and exact behavior to document.
 
-### Documentation Issues
-**Category**: DOCS
-**Types**:
-- MISSING_REQUIRED_DOCS: required non-error docs are not planned
-- MISSING_API_EXAMPLE: requested example is not planned on the API docs
-- VAGUE_DOC_PLAN: docs are only described abstractly
-- DOC_CONTENT_DROP: meaningful existing docs would be lost
+## Errors exclusion
+Do not block `# Errors` concerns here; errors reviewer owns them.
+
+Do not flag: missing error variant bullets as DOCS.
+
+## Advisory cases
+Use ADVISORY for weak but usable docs scope or unclear ownership.
+
+Good: advisory asks planner to clarify doc placement when multiple pages could own it.
+
+## Category map
+Use `DOCS` with `MISSING_DOCS`, `GENERIC_DOC_STEP`, `WRONG_DOC_LOCATION`, or `DOC_FIDELITY`.
+
+Good: category reflects coverage, specificity, placement, or fidelity.
 
 # Output
 

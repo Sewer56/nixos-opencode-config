@@ -28,19 +28,68 @@ Review end-user documentation for reader engagement and structural quality.
 
 # Focus
 
-(Principles distilled from landing-page and copywriting research — baked in, no external reading required at runtime.)
+(Principles distilled from landing-page and copywriting research — baked in, no external reading required.)
 
-- **Hook-first — content**: the first 50 words must answer what this is, why it is different, and who it is for. Lead with value or the problem solved, not description. BLOCKING for landing/index pages; ADVISORY for inner reference pages.
-- **Hook-first — length**: first 50 words of the page (≈ 3 sentences). BLOCKING for landing/index pages; ADVISORY for inner reference pages.
-- **Show-don't-tell**: a code example, terminal output, or visual must appear within the first screenful. No walls of text before the first interactive or concrete element. BLOCKING for getting-started and guide pages; ADVISORY for reference pages.
-- **Scannability**: paragraphs under 3 sentences, no paragraph over 4 lines, feature lists in tables or grids (not prose paragraphs), bold key terms for scanning eyes. ADVISORY — BLOCKING only for egregious walls of text on landing pages.
-- **Peer points as bullets**: three or more parallel explanatory points (reasons, criteria, steps in a rationale) presented as inline clauses in a paragraph must become a bullet or numbered list. The structural pattern is the trigger — not sentence count. ADVISORY.
-- **Bullet spacing**: blank line before the first bullet item when a list follows prose, and blank lines between bullet items when any item is multi-line. Single-line items in a compact list (flags, enums) may omit inter-item spacing. ADVISORY.
-- **Progressive complexity**: content follows the order: one-line what → minimal example → common usage → configuration → advanced patterns → edge cases. Flag when advanced material appears before the basics. BLOCKING.
-- **No fluff**: no "welcome to", "made with love", generic "Contributions Welcome" without specific steps, emoji without purpose, or phrases that add zero information. BLOCKING.
-- **Quick start feasibility**: quick-start sections must be 3 steps or fewer, every command copy-pasteable, installation to running code under 30 seconds of reading. BLOCKING for quick-start sections; not applicable elsewhere.
+## Hook-first content
+First 50 words should answer what this is, why it is different, and who it is for. BLOCKING for landing/index pages; ADVISORY for inner reference pages.
 
-Exclusions (ADVISORY only — do not block): API reference pages (exempt from hook-first, progressive complexity, quick start), changelogs, migration guides (exempt from progressive complexity).
+Bad: starts with history, welcome text, or implementation detail.
+Good: starts with value, audience, and differentiator.
+
+## Hook-first length
+The hook should fit in roughly 50 words or 3 short sentences.
+
+Bad: first screen has several paragraphs before the value statement.
+Good: concise opening followed by details.
+
+## Show-don't-tell
+Getting-started and guide pages need a concrete example, command, terminal output, or visual within the first screenful. BLOCKING for guides; ADVISORY for reference pages.
+
+Bad: long conceptual intro before any command or example.
+Good: minimal example appears immediately after the hook.
+
+## Scannability
+Prefer short paragraphs, tables/grids for feature lists, and bold key terms. ADVISORY; BLOCKING only for egregious landing-page walls of text.
+
+Bad: dense paragraph lists five features.
+Good: feature grid or bullet list.
+
+## Peer points as bullets
+Three or more parallel explanatory points should be a list. ADVISORY.
+
+Bad: reasons A, B, and C as inline clauses.
+Good: bullets for A, B, and C.
+
+## Bullet spacing
+Use a blank line before the first bullet after prose and between multi-line bullet items. ADVISORY.
+
+Do not flag: compact single-line enum or flag lists.
+
+## Progressive complexity
+Content order should be: one-line what → minimal example → common usage → configuration → advanced patterns → edge cases. BLOCKING when advanced material appears before basics.
+
+
+Bad: advanced configuration appears before any minimal example.
+Good: basic example appears before configuration and edge cases.
+
+## No fluff
+Block zero-information text: `welcome to`, `made with love`, generic `Contributions Welcome` without steps, purposeless emoji.
+
+
+Bad: `Welcome to our amazing project, made with love!`
+Good: `Install the CLI and run your first command.`
+
+## Quick start feasibility
+Quick starts should be ≤3 steps, copy-pasteable, and reach running code within 30 seconds of reading. BLOCKING for quick-start sections.
+
+
+Bad: quick start has six conceptual steps before first command.
+Good: three copy-pasteable steps reach running code.
+
+## Exclusions
+API reference pages are exempt from hook-first, progressive complexity, and quick start. Changelogs and migration guides are exempt from progressive complexity.
+
+Do not flag: API references for hook-first, changelogs for progressive flow, or migration guides for quick-start shape.
 
 # Process
 

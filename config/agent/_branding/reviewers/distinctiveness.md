@@ -28,11 +28,35 @@ Review branding for distinctiveness.
 
 # Focus
 
-- **Generic name**: candidate names that use common dictionary words without distinctive combination or branding treatment (e.g., "Fast", "Cloud", "Build"). BLOCKING.
-- **Overused startup suffix**: names relying on overused suffixes such as -ify, -ly, -io, -hub, -base, -flow, -kit without a distinctive prefix. BLOCKING.
-- **Near-duplicate within list**: two or more candidates in the shortlist that are so similar they would confuse rather than help the user choose. ADVISORY.
-- **Duplicate or collision with existing project**: name matches or closely resembles an existing crate, package, repository, product, or well-known competitor found in search findings recorded in the handoff. BLOCKING for exact or confusingly similar matches; ADVISORY for partial or domain-adjacent collisions.
-- **Weak searchability**: name returns mostly unrelated results or is indistinguishable from common words in a web search, making it hard for users to find the project. ADVISORY.
+## Generic name
+Block common dictionary words used without distinctive combination or branding treatment.
+
+Bad: `Fast`, `Cloud`, `Build`.
+Good: a name with a specific metaphor, coined form, or distinctive combination.
+
+## Overused startup suffix
+Block names relying on overused suffixes (`-ify`, `-ly`, `-io`, `-hub`, `-base`, `-flow`, `-kit`) without a distinctive prefix.
+
+Bad: `Taskify`.
+Good: suffix earns its place through a specific, memorable root.
+
+## Near-duplicate within list (ADVISORY)
+Flag shortlist candidates so similar they confuse choice rather than clarify it.
+
+Bad: `FlowKit`, `FlowBase`, `FlowHub` in same shortlist.
+Good: candidates explore different naming territories.
+
+## Duplicate or collision with existing project
+Block exact or confusingly similar matches to known packages, repos, products, or competitors found in handoff search findings. ADVISORY for partial/domain-adjacent collisions.
+
+
+Bad: candidate matches an existing npm package in handoff search findings.
+Good: candidate differs enough to avoid package/product confusion.
+
+## Weak searchability (ADVISORY)
+Flag names drowned by unrelated search results or indistinguishable from common words.
+
+Good: candidate can be searched with project domain and still find relevant results.
 
 # Process
 

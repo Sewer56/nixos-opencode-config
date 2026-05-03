@@ -25,16 +25,33 @@ Review a finalized machine plan for correctness and scope in one pass. Initial r
 
 # Focus (ordered — skip later passes if inapplicable)
 
-1. **Fidelity**: goals, constraints, scope, and decisions in `handoff_path` + `plan_path` are represented in steps.
-2. **Structure**: stable headings, explicit refs, valid anchors, correct line locators.
-   - `Lines: ~start-end` within ±10 lines. Per-hunk labels required (BLOCKING when missing).
-   - Full-file ranges invalid for localized changes. Header lists comma-separated union of hunk ranges.
-   - 2+ context lines before/after each change, matching target file content. Block for missing/unmatched context.
-   - Nested fences: outer fence uses backticks (```), inner fences use tildes (~~~) (BLOCKING).
-3. **Completeness**: every REQ-### maps to impl + test refs. No gaps, placeholders, missing anchors, undefined helpers.
-4. **Economy**: no unnecessary steps beyond confirmed intent. Correct file placement.
-5. **Dead-code**: only when steps contain REMOVE or symbol-deletion UPDATE. Skip otherwise.
-   - Orphaned imports, callers, type refs, unreachable paths, cross-file dead imports.
+## Fidelity
+Goals, constraints, scope, and decisions in `handoff_path` and `plan_path` must be represented in steps.
+
+Bad: handoff requires backward compatibility; no step preserves or tests it.
+Good: implementation and test steps carry the compatibility requirement.
+
+## Structure
+Steps need stable headings, explicit refs, valid anchors, correct line locators, per-hunk labels, focused header ranges, matching diff context, and safe nested fences.
+
+Bad: localized edit uses `Lines: ~1-500` or inner ``` fence inside outer ``` fence.
+Good: header range is hunk union; each hunk has `**Lines: ~start-end**`; inner fences use `~~~`.
+
+## Completeness
+Every `REQ-###` maps to implementation and test refs. Block gaps, placeholders, missing anchors, and undefined helpers.
+
+Bad: `REQ-004` has no test ref or uses `TODO`.
+Good: concrete I#/T# refs and complete diff content.
+
+## Economy
+Block unnecessary steps beyond confirmed intent and wrong file placement.
+
+Do not flag: separate steps needed for distinct files or review ownership.
+
+## Dead code
+Run only when steps contain REMOVE or symbol-deletion UPDATE. Skip otherwise.
+
+Flag orphaned imports, callers, type refs, unreachable paths, dead dispatch arms, and cross-file dead imports.
 
 # Process
 1. Read `handoff_path` for Delta, Review Ledger, Decisions, Step Index.

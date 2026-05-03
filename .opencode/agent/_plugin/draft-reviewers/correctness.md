@@ -28,9 +28,38 @@ and plugin-specific constraints.
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Focus
-- Template structure: required sections present — Overall Goal, Open Questions, Decisions, Action with `[P#]` items, Dependencies, Discovery. Omit Open Questions or Decisions only when explicitly marked `None`.
-- Diff headers: every diff block header references a valid file path. `--- a/<path>` and `+++ b/<path>` paths exist or are plausible targets for the declared action.
-- Plugin constraints: when a `[P#]` item involves logging, verify it follows the standalone log pattern (`<plugin-dir>/.logs/<plugin-stem>/debug.log`, not `client.app.log`). When a `[P#]` item involves plugin registration, verify it omits `opencode.json` registration for auto-loaded plugins.
+(All items BLOCKING unless marked ADVISORY.)
+
+## Template structure
+Required draft sections must be present and in shape: Overall Goal, Open Questions, Decisions, Action, Dependencies, Discovery, and `[P#]` items.
+
+Bad: draft jumps from Overall Goal directly to `[P1]` with no Decisions or Discovery.
+Good: draft includes each required section, using `None` when no content exists.
+
+## Diff headers
+Every diff block header must reference a valid or plausible target file path.
+
+Bad:
+```diff
+--- a/file
++++ b/file
+```
+
+Good:
+```diff
+--- a/config/plugins/my-plugin.ts
++++ b/config/plugins/my-plugin.ts
+```
+
+Do not flag: new plugin paths that are plausible under `config/plugins/`.
+
+## Plugin constraints
+Plugin plans must preserve OpenCode plugin constraints: config plugin auto-loading, valid SDK hook names, standalone debug logs, and no `client.app.log` for debug output.
+
+Bad: add `opencode.json` registration for `config/plugins/foo.ts` or write debug output with `client.app.log`.
+Good: rely on `config/plugins/` auto-loading and write debug logs to `<plugin-dir>/.logs/<name>/debug.log`.
+
+Auto-loading issues are ADVISORY unless the plan would break loading; `client.app.log` debug usage is BLOCKING.
 
 # Process
 1. Load cache

@@ -29,18 +29,44 @@ Review plan draft artifacts for LLM instruction wording quality.
 
 # Focus
 (All items BLOCKING unless marked ADVISORY.)
-- Token density (machine zone only; human zone exempt — jargon-free narrative by design): no filler, hedging, "please note", "it's important to", "make sure to", "ensure that". Every word earns its place.
-- Wording optimization: flag phrasing that can be tightened without changing meaning. Prefer fewer tokens; flat instruction structure. ADVISORY — block only for egregious inflation.
-- Bullet atomicity: one checkable condition per Focus, Process, or Constraint item. Split multi-condition bullets. ADVISORY.
-- Undefined jargon: instructions use internal taxonomy or project-specific compound terms without defining them. Replace with inline definitions.
-- Compound-term compression: phrases that compress meaning at the cost of comprehension. Replace with the expanded meaning.
-- Opaque references: "follow the Foo convention" or "apply the Bar pattern" where Foo/Bar are not standard terms and are not defined in the same file. Replace with the inline definition or a path pointer.
-- Exclusions (ADVISORY only — do not block):
-  - Common programming terms: "unified diff", "markdown", "frontmatter"
-  - Path-based pointers: "read `config/rules/testing.md`" — navigation, not comprehension
-  - Terms defined earlier in the same file
-  - Headings, section names, and non-prescriptive prose
-  - Technical domain terms standard in the file's domain
+
+## Token density
+Flag filler in machine-zone instructions. Human-zone narrative is exempt.
+
+Bad: `Please make sure to ensure that the plan is able to update the file.`
+Good: `Update the file.`
+
+## Wording optimization (ADVISORY)
+Flag phrasing that can be tightened without changing meaning. Prefer fewer tokens and flat instruction structure.
+
+Bad: `in order to make it possible for reviewers to determine`
+Good: `so reviewers can determine`
+
+## Bullet atomicity (ADVISORY)
+Each Focus, Process, or Constraint bullet should carry one checkable condition.
+
+Bad: `Read the draft, check paths, and update cache.`
+Good: split into three bullets.
+
+## Undefined jargon
+Flag internal taxonomy or project-specific terms without inline definition.
+
+Bad: `Apply the hydration pathway.`
+Good: `Initialize state before rendering starts.`
+
+## Compound-term compression
+Flag phrases that compress meaning at the cost of comprehension.
+
+Bad: `cache-delta ledger handshake`
+Good: `handoff Delta tells reviewers which cached findings to re-check`
+
+## Opaque references
+Flag `follow the Foo convention` or `apply the Bar pattern` when Foo/Bar are not standard and not defined in the same file.
+
+Good: inline the convention or point to a path when navigation is enough.
+
+## Exclusions
+Do not block common programming terms (`unified diff`, `markdown`, `frontmatter`), path pointers, terms defined earlier, headings, section names, or standard domain terms.
 
 # Process
 1. Load cache

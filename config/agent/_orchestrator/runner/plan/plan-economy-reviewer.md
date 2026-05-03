@@ -37,6 +37,31 @@ Validate that the plan represents the smallest correct implementation. Enforce m
 - `ledger_path` (optional): absolute path to the current review ledger
 - `step_pattern`: file pattern for individual step files adjacent to `plan_path` (e.g., `PROMPT-??-*-PLAN.step.*.md`)
 
+# Focus
+
+## Code minimality
+Flag planned code that violates minimality rules or adds structure without value.
+
+Bad: new abstraction layer for one call site.
+Good: local helper only when it removes duplication or isolates complexity.
+
+## Placement economy
+Flag planned file layout that violates placement rules or spreads tiny changes across unnecessary files.
+
+Bad: new module for a two-line helper used once.
+Good: place helper near its only caller or existing domain module.
+
+## Test footprint
+Keep planned test surface small. Flag extra test files or helpers when they add structure without value.
+
+Bad: separate test helper module used by one test.
+Good: inline setup or reuse existing helper.
+
+Do not flag duplicate coverage or parameterization; `plan-test-reviewer` owns those.
+
+## Rule sources
+Read `general.md` and `code-placement.md` from `/home/sewer/opencode/config/rules/` in parallel.
+
 # Process
 
 1. Load cache
@@ -72,48 +97,35 @@ Validate that the plan represents the smallest correct implementation. Enforce m
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
 
-# Focus
-
-## Code Minimality
-Flag any rule that would be violated by the planned implementation.
-
-## Placement Economy
-Flag any rule that would be violated by the planned file layout.
-
-## Test Footprint
-- Keep the planned test surface small
-- Flag extra test files or helpers when they add structure without value
-- Leave duplicate coverage and parameterization to `plan-test-reviewer`
-
-Rules (read in parallel from `/home/sewer/opencode/config/rules/`): `general.md`, `code-placement.md`.
-
 # Blocking Criteria
 
-Mark BLOCKING only for:
-- **UNNECESSARY_COMPLEXITY**: Adding abstraction without clear benefit
-- **UNNECESSARY_NEW_FILE**: File/module creation not justified by ownership
-- **UNNECESSARY_REFACTOR**: Broad refactor not required by prompt
+## Unnecessary code
+Block obvious code or abstraction that adds no value to confirmed intent.
 
-ADVISORY for:
-- Minor style preferences
-- Debatable abstraction choices
+Bad: new service class with one method and one call site.
+Good: local helper or inline logic when scope is small.
 
-## Issue Categories
+## Wrong placement
+Block file layout that contradicts ownership or locality rules.
 
-### Minimality Issues
-**Category**: ECONOMY
-**Types**:
-- UNNECESSARY_FILE: New file/module without clear ownership benefit
-- UNNECESSARY_HELPER: Helper extracted for single use without boundary benefit
-- UNNECESSARY_ABSTRACTION: Interface/trait for single implementation
-- OVERENGINEERED: More complex than required
+Bad: domain helper added to unrelated shared utils.
+Good: helper placed in owning module or existing domain file.
 
-### Placement Issues
-**Category**: PLACEMENT
-**Types**:
-- MISPLACED_CODE: Should stay in existing file
-- MISPLACED_TEST: Tests not co-located with module
-- UNNECESSARY_MODULE_SPLIT: Split not justified by ownership
+## Unnecessary test footprint
+Block extra test files/helpers when they add structure without coverage value.
+
+Bad: one-use test helper module.
+Good: inline setup in the relevant test.
+
+## Advisory cases
+Use ADVISORY for debatable minimality or future-maintenance questions.
+
+Do not block: extra step/file when separation follows clear ownership boundary.
+
+## Category map
+Use `ECONOMY` with `UNNECESSARY_CODE`, `WRONG_PLACEMENT`, `OVER_ABSTRACTION`, or `UNNECESSARY_TEST_FOOTPRINT`.
+
+Good: category type names concrete economy failure.
 
 # Output
 

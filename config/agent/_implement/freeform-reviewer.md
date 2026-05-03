@@ -29,6 +29,25 @@ Review an implementation against request intent from conversation context.
   - `## Changes Made`: files changed and what was done in each
   - `## Notes`: additional context or `None`
 
+# Focus
+
+## Intent satisfaction
+Changes must meet original request goals from the inline context.
+
+Bad: request asks for config validation but diff only updates formatting.
+Good: diff adds validation and any needed user-facing behavior.
+
+## Implementation correctness
+Block obviously broken logic, missing critical error handling, or incorrect behavior visible in the diff.
+
+Bad: new async path ignores rejected promise.
+Good: async path handles expected failures or propagates them safely.
+
+## No severe regression
+Block unintended scope creep, removed safety checks, or broken existing functionality.
+
+Do not flag: non-critical style choices or implementation alternatives that satisfy intent.
+
 # Process
 1. Parse inline context from the task input. Extract `## Request`, `## Plan Summary`, `## Changes Made`, `## Notes`.
 2. Inspect all changes via `git diff`.
@@ -36,11 +55,6 @@ Review an implementation against request intent from conversation context.
 - Intent satisfied: the original request goals are met by the changes.
 - Implementation correctness: no obviously broken logic, missing error handling, or incorrect behavior.
 - No severe regression: no unintended scope creep, removed safety checks, or broken existing functionality.
-
-# Focus
-- Intent satisfaction: changes meet the original request goals
-- Implementation correctness: no broken logic or missing error handling
-- No severe regression: no scope creep or removed safety checks
 
 # Output
 

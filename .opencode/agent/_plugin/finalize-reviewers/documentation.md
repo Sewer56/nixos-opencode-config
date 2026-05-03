@@ -28,12 +28,30 @@ Review plugin code for documentation coverage and return doc diffs.
 - `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
+(All items BLOCKING unless marked ADVISORY.)
 
-- **Coverage**: every exported plugin has a JSDoc module header. Every hook callback has a doc comment. `# Usage`, `# Public API`, `# Hooks` sections present.
-- Do not review `@throws` tags or `# Errors` sections — those are fully owned by another reviewer.
-- **Specificity**: debug flag documented (e.g. `Set XXX_DEBUG=1 to enable logging`).
-- **Fidelity**: standalone log path documented (e.g. `Set XXX_DEBUG=1 to enable logging to <plugin-dir>/.logs/<name>/debug.log`).
-- Read `DOCUMENTATION_RULES_PATH` (`config/rules/documentation.md`) as source of truth.
+## Coverage
+Exported plugins need a JSDoc module header, hook callbacks need doc comments, and docs should include `# Usage`, `# Public API`, and `# Hooks` sections when relevant.
+
+Bad: generated plugin exposes hooks with no module or hook docs.
+Good: module header explains plugin purpose; each hook comment states when it runs.
+
+Do not flag: `@throws` tags or `# Errors` sections — owned by the errors reviewer.
+
+## Specificity
+Debug flags must be documented with exact env var and enablement behavior.
+
+Bad: `Enable debug mode if needed.`
+Good: `Set FOO_DEBUG=1 to enable debug logging.`
+
+## Fidelity
+Document the actual standalone log path used by the generated code.
+
+Bad: docs say logs go to app logs when code writes a file.
+Good: docs say `FOO_DEBUG=1` writes to `<plugin-dir>/.logs/foo/debug.log`.
+
+## Rules source
+Read `DOCUMENTATION_RULES_PATH` (`config/rules/documentation.md`) as source of truth before judging coverage, specificity, and fidelity.
 
 # Process
 

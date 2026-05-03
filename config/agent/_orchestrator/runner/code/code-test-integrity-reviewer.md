@@ -35,6 +35,45 @@ Validate that tests compile, run, and provide coverage as planned. Verify test i
 - `coder_notes_path`: notes from coder implementation
 - `ledger_path` (optional): absolute path to the current review ledger
 
+# Focus
+
+## Compilation
+New tests and helpers must compile.
+
+Bad: test imports undefined helper.
+Good: imports resolve and helper types match.
+
+## Execution
+Planned tests must run and pass; failures must be tied to the change when blocking.
+
+Bad: test crashes during setup introduced by change.
+Good: test passes or failure is unrelated and noted.
+
+## Coverage
+Implemented tests must match plan expectations for critical paths.
+
+Bad: planned edge-case test missing.
+Good: critical success/failure/edge paths covered as planned.
+
+## Parameterization
+Parameterized tests must execute all intended cases with meaningful labels.
+
+Bad: table cases exist but one branch never runs.
+Good: each named case executes and asserts behavior.
+
+## Test design execution
+Tests should be deterministic, isolated, and meaningful.
+
+Bad: test depends on wall-clock time or real network.
+Good: test controls time/state and asserts observable behavior.
+
+## Blocking severity
+Block compile failures, runtime failures, critical coverage gaps, and missing planned tests. Downgrade minor style/helper issues to ADVISORY.
+
+
+Bad: block a preference without concrete failure.
+Good: block only when category definition, evidence, and fix are clear.
+
 # Process
 
 ## 1. Load Context

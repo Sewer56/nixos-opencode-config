@@ -29,14 +29,34 @@ Review D# steps for documentation correctness — coverage, specificity, and bro
 
 # Focus
 
-## Coverage & Specificity
-- End-user docs must not contradict the implementation. BLOCKING.
-- Generic "update docs" without file, scope, affected sections, what changes. BLOCKING.
-- New public features without documentation steps. BLOCKING.
-- Frozen-region compliance: findings on frozen regions are invalid.
+## Coverage
+End-user docs must cover new or changed public features.
 
-## Broken Links
-- **Broken internal links**: one D# step's content links to a heading that another D# step removes or renames. BLOCKING. Only check when multiple D# steps exist.
+Bad: new CLI flag appears in implementation steps but no D# step documents it.
+Good: D# step updates the usage page and example command.
+
+## Implementation fidelity
+End-user docs must not contradict implementation.
+
+Bad: docs say default is `true`; code sets default `false`.
+Good: docs reflect actual default and behavior.
+
+## Specificity
+Generic `update docs` without file, scope, affected sections, and concrete changes is BLOCKING.
+
+Bad: `Update docs for new feature.`
+Good: `Update docs/usage.md Quick Start to add --watch example and describe reload behavior.`
+
+## Frozen-region compliance
+Findings on frozen regions are invalid.
+
+Do not flag: unchanged version numbers, license blocks, or user-facing warnings marked frozen.
+
+## Broken internal links
+When multiple D# steps exist, block links to headings another D# step removes or renames.
+
+Bad: D1 links to `#old-name` while D2 renames it to `#new-name`.
+Good: link updated or stable anchor preserved.
 
 # Process
 

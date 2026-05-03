@@ -28,10 +28,30 @@ Review plan draft artifacts for documentation coverage and specificity.
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Focus
-- Coverage: check that each `[P#]` item changing code that end-user documentation references has a corresponding `[P#]` item for the documentation update or creation.
-- Coverage: check that each `[P#]` item adding user-facing surface without existing documentation has a `[P#]` item to create that documentation.
-- Specificity: a generic "update docs" description blocks — specify file, scope level, affected sections, and what changes.
-- Focus on end-user documentation (READMEs, wiki, guides, changelogs) only — in-code API docs are owned by another reviewer.
+(All items BLOCKING unless marked ADVISORY.)
+
+## Referenced-doc coverage
+Each `[P#]` item changing code that end-user docs reference needs a matching docs `[P#]` item to update or create docs.
+
+Bad: changes CLI flag behavior with no README/guide update item.
+Good: code item plus docs item naming affected file and section.
+
+## New-surface docs coverage
+Each `[P#]` item adding user-facing surface without existing docs needs a docs creation item.
+
+Bad: adds public command but no docs plan.
+Good: adds command and creates/updates user guide.
+
+## Specificity
+Generic `update docs` blocks. Specify file, scope level, affected sections, and what changes.
+
+Bad: `Update docs.`
+Good: `Update README Usage section to document --watch behavior and example command.`
+
+## Scope boundary
+Focus on end-user documentation only: READMEs, wiki, guides, changelogs. In-code API docs are owned by another reviewer.
+
+Do not flag: in-code API docs, comments, or internal developer docs unless the user asked for end-user docs.
 
 # Process
 1. Load cache

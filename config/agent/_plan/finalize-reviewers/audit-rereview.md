@@ -24,6 +24,30 @@ Verify resolved audit findings. Check only changed steps for new issues. Trust c
 - `changed_step_paths` (only step files that changed since last review)
 - `resolved_finding_ids`, `finding_resolution_ledger`
 
+# Focus
+
+## Cache-first verification
+Trust cache grounding snapshots for unchanged audit observations and re-read only changed steps.
+
+Bad: reread handoff, draft, rules, and unchanged steps.
+Good: read cache plus `changed_step_paths`.
+
+## Resolved finding checks
+For each resolved audit finding, confirm the fix is correctly applied in changed step content.
+
+Bad: accept resolution from ledger without checking changed step.
+Good: changed step contains the required structure/fidelity fix.
+
+## New audit issues
+Scan changed steps for new fidelity, structure, completeness, economy, or dead-code issues.
+
+Do not flag: unchanged cached items outside changed steps.
+
+## Output minimality
+Write finding details to cache and emit only the terse `# REVIEW` block.
+
+Good: `Decision: PASS` only when no new findings exist.
+
 # Process
 1. Read `cache_path`. Carry forward all unchanged observations.
 2. Read `changed_step_paths` ONLY. Do NOT read handoff.md, draft.md, rules, or unchanged step files.

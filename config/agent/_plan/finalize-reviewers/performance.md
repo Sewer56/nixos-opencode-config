@@ -34,10 +34,23 @@ Review only the performance-sensitive parts of a machine plan.
 - `step_paths` (exact list of step files to inspect)
 
 # Focus
-- Hunt: algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, or missing validation that could cause material performance issues.
-- Read the referenced repo code before judging performance risk, then use `handoff_path` and `plan_path` only to verify that the machine plan did not introduce performance-sensitive scope beyond the confirmed plan.
 
-Rules: `/home/sewer/opencode/config/rules/performance.md`.
+## Performance-sensitive patterns
+Hunt algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, and missing validation that could cause material performance issues.
+
+Bad: nested per-item database query for a list endpoint.
+Good: batched query, pagination, or explicit bounded workload.
+
+## Grounded code read
+Read referenced repo code before judging performance risk.
+
+Bad: infer N+1 risk from plan wording only.
+Good: inspect target data path, then verify whether plan introduces risk.
+
+## Scope boundary
+Use `handoff_path` and `plan_path` only to verify the machine plan did not introduce performance-sensitive scope beyond the confirmed plan.
+
+Rules source: `/home/sewer/opencode/config/rules/performance.md`.
 
 # Process
 1. Read Delta and Decisions

@@ -31,9 +31,24 @@ Enumerate all error-returning functions in one module, trace every error path in
 - `cache_path`: absolute path to the per-module cache file (e.g. `PROMPT-ERROR-DOCS.<module_name>.cache.md`). Each collector receives its own file — no concurrent writes to a shared cache.
 
 # Focus
-- Exhaustive enumeration of public error-returning functions
-- Accurate tracing of every reachable error path
-- Correct classification per language rules
+
+## Exhaustive enumeration
+Enumerate every public error-returning function in `target_path` using the language rules. Private/internal helpers are out of scope.
+
+Bad: scanning only exported files and missing public functions in nested modules.
+Good: all public error-returning functions recorded with path, line, and return type.
+
+## Reachable error tracing
+Trace every reachable error path in each function body. Record one entry per variant/trigger pair.
+
+Bad: one generic `may fail` entry for several branches.
+Good: separate entries for parse failure, missing file, and permission error.
+
+## Classification accuracy
+Classify existing docs using the language rule decision table.
+
+Bad: mark vague docs as specific because an `# Errors` header exists.
+Good: mark specific only when each reachable path has concrete variant and trigger docs.
 
 # Workflow
 

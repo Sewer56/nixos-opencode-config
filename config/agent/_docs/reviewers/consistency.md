@@ -28,12 +28,31 @@ Review end-user documentation for cross-page coherence.
 
 # Focus
 
-- **Broken internal links**: one target page links to a heading that another target page removes or renames. BLOCKING.
-- **Terminology drift**: different terms used for the same concept across target pages (e.g., "configuration" on page A, "config" on page B). ADVISORY.
-- **Content duplication**: the same explanation or instruction appears verbatim or near-verbatim on multiple target pages — one should reference the other instead. ADVISORY. Duplication is acceptable when it aids comprehension (e.g., a brief inline reminder on a getting-started page that also has a detailed reference elsewhere) — flag only when a cross-page link would serve the reader better.
-- **Orphaned references**: a target page references a concept, feature, or page that no target page explains and that is not a well-known external resource. ADVISORY.
+## Broken internal links
+Block when one target page links to a heading that another target page removes or renames.
 
-Exclusions: single-file scope (skip entirely — PASS), API reference pages, changelogs.
+Bad: page A links to `#install`, but page B renames it to `#installation`.
+Good: link target is updated or stable anchor preserved.
+
+## Terminology drift
+Flag different terms for the same concept across target pages. ADVISORY.
+
+Bad: one page says `workspace`, another says `project root` for the same value.
+Good: choose one term or define the distinction.
+
+## Content duplication
+Flag verbatim or near-verbatim explanations across pages when a cross-page link would serve readers better. ADVISORY.
+
+Do not flag: brief inline reminders that improve local comprehension.
+
+## Orphaned references
+Flag a target page referencing a concept, feature, or page that no target page explains and that is not a known external resource. ADVISORY.
+
+Bad: `Use profiles` with no page or section explaining profiles.
+Good: add explanation or link to the owning page.
+
+## Exclusions
+Skip entirely for single-file scope. Do not review API reference pages or changelogs for cross-page consistency.
 
 # Process
 

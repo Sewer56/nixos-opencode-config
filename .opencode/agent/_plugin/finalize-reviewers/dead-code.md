@@ -28,14 +28,53 @@ Detect dead code in finalized plugin artifacts. When a STEP item deletes, replac
 - `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
-- Dead code detection: when a STEP item deletes, replaces, or redirects code, identify newly-dead code that the STEP set does not clean up.
-- Unused imports: imports whose only usage was the deleted code.
-- Orphaned callers: functions or methods that call a deleted function and have no other callers.
-- Dead type references: references to deleted types, interfaces, or structs.
-- Unreachable paths: code paths guarded by conditions that become impossible after the diff.
-- Dead dispatch arms: switch/match arms for deleted enum variants or discriminated values.
-- Cross-file dead code: dead code in files other than the STEP target when the deleted code is imported or referenced from other files.
-- Completeness: the STEP set includes cleanup for all newly-dead code.
+(All items BLOCKING unless marked ADVISORY.)
+
+## Dead code detection
+When a STEP deletes, replaces, or redirects code, identify newly-dead code that the STEP set fails to clean up.
+
+Bad: STEP deletes a hook export but leaves helper code only used by that hook.
+Good: STEP deletes both hook export and now-unused helper.
+
+## Unused imports
+Flag imports whose only usage was deleted code.
+
+Bad: `import { writeFile } from "fs"` remains after file logging helper is removed.
+Good: import removed with the helper.
+
+## Orphaned callers
+Flag functions or methods that call a deleted function and have no remaining valid call path.
+
+Do not flag: callers updated in another STEP or still reachable through an unchanged API.
+
+## Dead type references
+Flag references to deleted types, interfaces, or structs.
+
+Bad: `PluginState` type deleted but JSDoc or helper signatures still reference it.
+Good: references removed or replaced with surviving type.
+
+## Unreachable paths
+Flag code paths guarded by conditions that become impossible after the diff.
+
+Bad: branch checks an option value that no longer exists.
+Good: branch removed or option value kept.
+
+## Dead dispatch arms
+Flag switch/match arms for deleted enum variants or discriminated values.
+
+Bad: `case "legacy-hook"` remains after variant is removed.
+Good: dispatch arm removed with variant.
+
+## Cross-file dead code
+Check files beyond the STEP target when deleted code is imported or referenced elsewhere.
+
+Do not flag: speculative cleanup with no import/reference evidence.
+
+## Completeness
+STEP set must include cleanup for all newly-dead code found above.
+
+Bad: finding suggests cleanup but no STEP owns it.
+Good: affected STEP or follow-up STEP includes cleanup diff.
 
 # Process
 

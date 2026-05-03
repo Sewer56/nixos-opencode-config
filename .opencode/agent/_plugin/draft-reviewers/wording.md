@@ -28,9 +28,46 @@ Review plugin draft artifacts for LLM instruction wording quality.
 
 # Focus
 (All items BLOCKING unless marked ADVISORY.)
-- Token density (machine zone only; human zone narrative by design): no filler, hedging, "please note", "it's important to", "make sure to", "ensure that". Every word earns its place.
-- Wording optimization: flag phrasing that can be tightened without changing meaning. Prefer fewer tokens; flat instruction structure. ADVISORY — block only for egregious inflation.
-- Bullet atomicity: one checkable condition per Focus, Process, or Constraint item. Split multi-condition bullets. ADVISORY.
+
+## Token density
+Flag filler in machine-zone instructions. Human-zone narrative is exempt.
+
+Bad:
+```text
+Please make sure to ensure that the plugin reviewer is able to read the file.
+```
+
+Good:
+```text
+Read the file.
+```
+
+Do not flag: plain-language narrative in human-facing plan sections when it improves user understanding.
+
+## Wording optimization (ADVISORY)
+Flag phrasing that can be tightened without changing meaning. Prefer fewer tokens and flat instruction structure.
+
+Bad: `in order to make it possible for the implementation agent to`
+Good: `so the implementation agent can`
+
+Block only for egregious inflation that makes instructions harder to execute.
+
+## Bullet atomicity (ADVISORY)
+Each bullet in Focus, Process, or Constraints should carry one checkable condition. Split bullets that combine unrelated checks.
+
+Bad:
+```text
+- Read the draft, verify the diff headers, and update the cache.
+```
+
+Good:
+```text
+- Read the draft.
+- Verify diff headers.
+- Update the cache.
+```
+
+Do not flag: tightly coupled conditions that must be executed together.
 
 # Process
 1. Load cache

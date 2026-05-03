@@ -200,18 +200,77 @@ Do not stop merely because two batches showed no improvement. Switch strategy re
 
 Focus signals identify where command/subagent cooperation wastes tokens. Strategies are edit classes; pattern refs are reusable memory. Evidence first, label second.
 
-- Generated hotspot: root or child dominates output+reasoning; high child spread.
-- Tight input violation: runner passes subagent-owned focus/output/process/read-order rules instead of only paths, delta, flags, notes, and changed decisions.
-- Overbroad handoff: full content passed where paths, delta, flags, or notes are enough.
-- Duplicate reads: same files reread within/across reviewers without domain reason.
-- Duplicate reasoning: multiple subagents think through same constraints/evidence/fix state when cache/runner state could carry it once.
-- Scope leakage: reviewer investigates or reports outside owned domain.
-- Review-loop churn: unchanged/PASS/advisory work reruns without touched domain.
-- Cache/delta failure: reviewers re-derive unchanged facts or cannot trust prior evidence.
-- Output bloat: verbose PASS/advisory prose or duplicate response/cache findings.
-- Topology mismatch: overlapping reviewers, too many reviewers, or separable overloaded reviewer.
-- Model/risk mismatch: low-risk mechanical reviewer spends high generated tokens; do not downgrade correctness/security.
-- Prompt/context bloat: duplicated examples/process blocks/hard gates without observed behavior value.
+## Generated hotspot
+Root or child dominates output+reasoning tokens, or child spread is high.
+
+Signal: one agent repeatedly produces most generated tokens.
+Action: inspect prompt boundaries, output verbosity, and subagent split.
+
+## Tight input violation
+Runner passes callee-owned focus/output/process/read-order rules instead of only paths, Delta, flags, notes, and changed decisions.
+
+Bad: caller restates reviewer's full `# Output` block.
+Good: caller passes `handoff_path`, scoped target paths, Delta excerpt, and user notes.
+
+## Overbroad handoff
+Full content is passed where paths, Delta, flags, or notes are enough.
+
+Bad: pass whole draft when reviewer only needs path and Delta.
+Good: pass path, touched IDs, and relevant decision notes.
+
+## Duplicate reads
+Same files are reread within/across reviewers without domain reason.
+
+Signal: repeated reads of same file by several reviewers.
+Action: cache shared evidence or pass scoped excerpts.
+
+## Duplicate reasoning
+Multiple subagents reason through the same constraints, evidence, or fix state when cache or runner state could carry it once.
+
+Signal: multiple reviewers re-derive same constraints.
+Action: move settled facts to handoff or ledger.
+
+## Scope leakage
+Reviewer investigates or reports outside owned domain.
+
+Bad: wording reviewer reports correctness issue as blocking.
+Good: wording reviewer emits advisory pointer or defers to owner.
+
+## Review-loop churn
+Unchanged, PASS, or advisory work reruns without touched domain.
+
+Signal: unchanged PASS items rerun every cycle.
+Action: add Delta/cache skip path.
+
+## Cache/delta failure
+Reviewers re-derive unchanged facts or cannot trust prior evidence.
+
+Bad: reviewer cannot tell what changed.
+Good: handoff has per-item Status and reason.
+
+## Output bloat
+PASS/advisory prose or response/cache findings duplicate information.
+
+Bad: PASS response repeats all verified evidence.
+Good: PASS emits terse decision; cache holds details.
+
+## Topology mismatch
+Reviewers overlap, too many reviewers run, or one overloaded reviewer should be split.
+
+Signal: reviewers overlap or one reviewer owns separable domains.
+Action: merge, split, or narrow reviewer scopes.
+
+## Model/risk mismatch
+Low-risk mechanical reviewers spend high generated tokens. Do not downgrade correctness or security reviewers solely to save tokens.
+
+Bad: high-cost model handles mechanical formatting checks.
+Good: reserve high-cost model for correctness/security risk.
+
+## Prompt/context bloat
+Examples, process blocks, or gates are duplicated or unused without observed behavior value.
+
+Bad: copy same examples into caller and callee.
+Good: callee owns rule cards; caller passes path and scope.
 
 # Strategy Sources
 

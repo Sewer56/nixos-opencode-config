@@ -37,6 +37,54 @@ Validate performance-critical aspects of the implementation plan. Only review wh
 - `ledger_path` (optional): absolute path to the current review ledger
 - `step_pattern`: file pattern for individual step files adjacent to `plan_path` (e.g., `PROMPT-??-*-PLAN.step.*.md`)
 
+# Focus
+
+## Always review
+Review plan sections involving concurrency/parallelism, large data processing, algorithmic changes, database query patterns, caching, or memory-heavy operations.
+
+Bad: skip review of a new per-item database query.
+Good: inspect planned data path and validation for N+1 risk.
+
+## Skip or light review
+Use light review for simple CRUD without scale concerns, UI-only changes, pure refactors with same complexity class, and config-only changes.
+
+Do not flag speculative micro-optimizations without material risk.
+
+## Algorithmic efficiency
+Check whether chosen algorithms fit expected data sizes and complexity is justified.
+
+Bad: nested loop over all users and all events without bound.
+Good: indexed lookup or documented small bounded input.
+
+## Concurrency and parallelism
+Check whether parallelism is justified and safe: workload size, race/deadlock risk, async fit, and thread-pool sizing.
+
+Bad: shared mutable cache updated from parallel tasks with no synchronization.
+Good: synchronized access or per-task aggregation.
+
+## Data flow
+Check large allocations, unnecessary cloning, unnecessary collection, streaming, and batching.
+
+Bad: collect entire stream before processing first item.
+Good: process iterator/stream incrementally.
+
+## Database and I/O
+Check N+1 queries, missing pagination, missing indexes, and individual operations that should be bulk.
+
+Bad: query per list item.
+Good: one batched query keyed by IDs.
+
+## Caching
+Check cache need, invalidation, and stampede protections where caching is planned.
+
+Bad: global cache with no invalidation for mutable data.
+Good: cache key, TTL/invalidation, and concurrent miss behavior specified.
+
+## Rule sources
+Read plan and performance rules in parallel from `/home/sewer/opencode/config/rules/` as listed below.
+
+Good: read listed rule files in parallel; report only performance-relevant violations.
+
 # Process
 
 1. Load cache
@@ -73,106 +121,41 @@ Validate performance-critical aspects of the implementation plan. Only review wh
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
 
-# Focus
-
-Review plan sections for performance-sensitive indicators:
-
-**Always Review**:
-- Concurrency/parallelism (async, threads, parallel iterators)
-- Large data processing (batching, streaming)
-- Algorithmic changes (sorting, searching, data structures)
-- Database query patterns (N+1, pagination, joins)
-- Caching strategies
-- Memory-heavy operations (large allocations, cloning)
-
-**Skip or Light Review**:
-- Simple CRUD operations without scale concerns
-- UI-only changes
-- Pure refactoring with same complexity class
-- Config-only changes
-
-Rules (read in parallel from `/home/sewer/opencode/config/rules/`): `_orchestrator/plan-content.md`, `general.md`, `performance.md`, `testing.md`, `test-parameterization.md`, `code-placement.md`, `documentation.md`, `_orchestrator/orchestration-plan.md`, `_orchestrator/orchestration-revision.md`.
-
-## Performance Review Dimensions
-
-### Algorithmic Efficiency
-- Are chosen algorithms appropriate for data sizes?
-- Is complexity class justified? (O(n) vs O(n²) vs O(n log n))
-- Are there nested loops that could be linear?
-
-### Concurrency & Parallelism
-- Is parallelism justified by workload size?
-- Are there race conditions or synchronization issues?
-- Is async used appropriately (not over-async)?
-- Are thread pools sized appropriately?
-
-### Data Flow
-- Are large allocations minimized?
-- Is unnecessary cloning avoided?
-- Are iterators used instead of collecting when possible?
-- Is streaming/batching used for large datasets?
-
-### Database & I/O
-- Are queries efficient (proper indexing, no N+1)?
-- Is pagination used for large result sets?
-- Are bulk operations used instead of individual queries?
-
-### Caching
-- Is caching strategy specified where beneficial?
-- Are cache invalidation patterns correct?
-- Are there cache stampede protections?
-
 # Blocking Criteria
 
-BLOCKING for:
-- **ALGORITHMIC_REGRESSION**: Changes complexity class without justification
-- **MISSING_VALIDATION**: Performance-critical change with no validation plan
-- **OBVIOUS_INEFFICIENCY**: Clear performance anti-pattern (e.g., N+1 queries, unbounded growth)
-- **CONCURRENCY_BUG**: Race condition or deadlock risk in concurrent code
+## Algorithmic regression
+Block complexity-class regressions without justification.
 
-ADVISORY for:
-- Findings that conflict with the rules
-- Debatable improvement choices
+Bad: O(n) scan becomes O(n²) nested scan for unbounded input.
+Good: complexity stays bounded or plan justifies data size.
 
-## Issue Categories
+## Missing validation
+Block performance-critical changes with no validation plan.
 
-### Algorithmic Issues
-**Category**: PERF_ALGORITHM
-**Types**:
-- QUADRATIC_WHEN_LINEAR: O(n²) possible as O(n)
-- UNNECESSARY_SORTING: Sorting when not needed
-- INEFFICIENT_DATA_STRUCTURE: Wrong structure for access patterns
+Bad: new cache claims speedup but no benchmark/profile step.
+Good: validation step measures target workload or budget.
 
-### Concurrency Issues
-**Category**: PERF_CONCURRENCY
-**Types**:
-- RACE_CONDITION: Unsynchronized shared state
-- DEADLOCK_RISK: Lock ordering issues
-- OVER_PARALLELIZATION: Parallelism overhead exceeds benefit
-- UNNECESSARY_ASYNC: Async without I/O or concurrency need
+## Obvious inefficiency
+Block clear anti-patterns such as N+1 queries, unbounded growth, or needless full collection.
 
-### Data Flow Issues
-**Category**: PERF_DATA
-**Types**:
-- UNNECESSARY_CLONE: Could use references
-- UNNECESSARY_COLLECTION: Collecting when streaming works
-- LARGE_ALLOCATION: Unbounded memory growth
-- NO_BATCHING: Individual operations where batching better
+Bad: query per item in paginated list.
+Good: batched query with pagination.
 
-### Database Issues
-**Category**: PERF_DATABASE
-**Types**:
-- N_PLUS_ONE: Query per item pattern
-- MISSING_INDEX: Queries without proper indexes
-- UNBOUNDED_QUERY: No pagination on large tables
-- INEFFICIENT_JOIN: Suboptimal join strategy
+## Concurrency bug
+Block race, deadlock, or unsafe synchronization risk in concurrent code.
 
-### Validation Issues
-**Category**: PERF_VALIDATION
-**Types**:
-- NO_BENCHMARK: Performance claim without benchmark plan
-- NO_PROFILING: Complex change without profiling strategy
-- MISSING_BUDGET: No performance budget specified
+Bad: parallel tasks mutate shared map without lock.
+Good: synchronized access or per-task aggregation.
+
+## Advisory cases
+Use ADVISORY for debatable improvements or rule conflicts without clear material risk.
+
+Do not block: micro-optimizations with no expected scale impact.
+
+## Category map
+Use `PERF_ALGORITHM`, `PERF_CONCURRENCY`, `PERF_DATA`, `PERF_DATABASE`, or `PERF_VALIDATION` based on evidence.
+
+Good: N+1 finding uses `PERF_DATABASE`; missing benchmark uses `PERF_VALIDATION`.
 
 # Output
 

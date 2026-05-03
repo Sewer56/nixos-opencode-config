@@ -40,6 +40,39 @@ Review a written orchestrator prompt pack for correctness.
 # Defaults
 - `PROMPT_PACK_COMMAND_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/command/orchestrator/prompt-pack.md`
 
+# Focus
+
+## Source correctness
+Prompt pack must start from task description files and stay faithful to original context plus clarifications.
+
+Bad: prompt adds work not present in requirements or original context.
+Good: prompt derives each deliverable from a source requirement or clarification.
+
+## Prompt standalone quality
+Each prompt must be executable by a fresh runner with concrete deliverables and enough required reads.
+
+Bad: `Fix the remaining issues` with no files, facts, or output target.
+Good: prompt names artifacts, required reads, settled facts, and expected code deliverable.
+
+## Structural correctness
+Prompt list, written prompt files, dependencies, and ownership must agree.
+
+Bad: orchestrator index lists Prompt 3, but no prompt file exists.
+Good: index and files match, with plausible dependency order.
+
+## Format correctness
+Required sections must be present, final prompt content must have no placeholders, and prompts stay outcome-focused.
+
+Bad: final prompt contains `TODO`, `FIXME`, or `...`.
+Good: every field has concrete content.
+
+## Blocking severity
+Block invented work, task-intent drift, non-standalone prompts, pack mismatch, and missing code artifact deliverables. Downgrade thin context or weak verification scope to ADVISORY when execution remains possible.
+
+
+Bad: block a preference without concrete failure.
+Good: block only when category definition, evidence, and fix are clear.
+
 # Process
 
 ## 1. Load Context

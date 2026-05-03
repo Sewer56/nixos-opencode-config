@@ -25,17 +25,48 @@ Review applied error docs for correctness — verify the primary agent applied c
 
 # Focus
 
-Read `cache_path` fully. Read the lang rules file for each language in the cache. If `## Delta` is non-empty, read and verify only the source files for items listed in `## Delta`; read all source files in `## Items` only when `## Delta` is absent or empty (first pass). Apply all checks below.
+## Read scope
+Read `cache_path` fully and the lang rules file for each language in the cache. If `## Delta` is non-empty, verify only source files for Delta items; otherwise verify all cache items on first pass.
 
-1. **Application fidelity**: each source file's applied error docs match the `**Proposed:**` section from the corresponding cache item. Nothing was dropped, mangled, or partially applied. Function names, file paths, and line numbers in the cache match source.
-2. **Specificity**: each `**Proposed:**` section has one bullet per traced error path. Variant names are exact (match source code). Triggers are plain-language and predictable from inputs/state alone — no vague triggers like "if an error occurs".
-3. **Format**: proposed docs match the doc format from the matching lang rules file.
-4. **Zero-path fallback**: when `Traced Error Paths: (none)`, the proposed docs apply the Zero-Path Fallback from the lang file.
-5. **No placeholders**: no TODO, TBD, FIXME, or vague stubs in `**Proposed:**` sections.
-6. **Per-hunk line labels**: when a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence. Per-hunk labels are the authoritative locators.
+Do not scan source for functions missing from cache; collector owns enumeration.
 
-**Wrong**: Scanning source files for functions not in the cache and flagging them as coverage gaps.
-**Correct**: Verify the applied docs in source files match the `**Proposed:**` sections in the cache.
+## Application fidelity
+Applied source docs must match each cache item's `**Proposed:**` section. Function names, paths, and line numbers must align.
+
+Bad: source doc drops one proposed error variant.
+Good: source doc preserves every proposed bullet with matching trigger.
+
+## Specificity
+Each `**Proposed:**` section needs one bullet per traced error path. Variant names match source; triggers are predictable from inputs/state.
+
+Bad: `if an error occurs`.
+Good: `when the config file is missing`.
+
+## Format
+Proposed docs must match the matching language rule file's doc format.
+
+Bad: Rust function gets TypeScript-style `@throws` tags.
+Good: format follows `lang-rust-errors.txt`.
+
+## Zero-path fallback
+When `Traced Error Paths: (none)`, proposed docs must apply the language file's Zero-Path Fallback.
+
+
+Bad: omit docs because no error paths were traced.
+Good: apply the language file's explicit zero-path wording.
+
+## No placeholders
+Block `TODO`, `TBD`, `FIXME`, `...`, and vague stubs in `**Proposed:**` sections.
+
+
+Bad: `TODO: document errors`.
+Good: concrete proposed docs or explicit zero-path fallback.
+
+## Per-hunk line labels
+When a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence.
+
+Bad: one finding-level range for multiple hunks.
+Good: each hunk has its own bold line label.
 
 # Language Rules Directory
 

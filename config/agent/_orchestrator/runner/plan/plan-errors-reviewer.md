@@ -37,6 +37,25 @@ Validate that the implementation plan covers error documentation requirements co
 - `ledger_path` (optional): absolute path to the current review ledger
 - `step_pattern`: file pattern for individual step files adjacent to `plan_path` (e.g., `PROMPT-??-*-PLAN.step.*.md`)
 
+# Focus
+
+## Errors-section ownership
+Own all `# Errors` section concerns in the changed scope described by the plan: existence, placement, format, specificity, and completeness.
+
+Bad: public error-returning API planned with no `# Errors` section.
+Good: plan includes concrete `# Errors` bullets for each error variant and trigger.
+
+## Specific triggers
+Error bullets must name predictable triggers, not vague failures.
+
+Bad: `Returns Error if something goes wrong.`
+Good: `Returns ParseError when the config file contains invalid TOML.`
+
+## Targeted reads
+Read only repo files needed to ground error-doc checks.
+
+Rules source: `/home/sewer/opencode/config/rules/errors.md`.
+
 # Process
 
 1. Load cache
@@ -72,11 +91,36 @@ Validate that the implementation plan covers error documentation requirements co
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
 
-# Focus
-- Own all `# Errors` section concerns (existence, placement, format, specificity, completeness) in the changed scope described by the plan.
-- Read only the repo files needed to ground those checks.
+# Blocking Criteria
 
-Rules: `/home/sewer/opencode/config/rules/errors.md`.
+## Errors blocking standard
+Mark BLOCKING only when a `# Errors` section is missing for a planned public error-returning API, or variant bullets are vague/incomplete.
+
+Bad: public API returns parse errors but plan has no `# Errors` section.
+Good: plan includes one bullet per error variant with trigger.
+
+## Evidence requirement
+Blocking findings need concrete evidence from plan or repo surface.
+
+Bad: no path, step, or symbol reference.
+Good: cites I# step and public function path.
+
+## Smallest correction
+Blocking findings need the smallest concrete correction.
+
+Bad: `Improve errors docs.`
+Good: add the exact `# Errors` bullets to the affected step.
+
+## Advisory downgrade
+If evidence or correction is incomplete, downgrade to ADVISORY.
+
+Do not block: uncertain public/private API status without repo evidence.
+
+## Category map
+Use `ERRS` with `MISSING_ERRORS_SECTION`, `VAGUE_ERROR_BULLET`, or `INCOMPLETE_ERROR_ENUM`.
+
+Good: category type matches missing, vague, or incomplete error docs.
+
 
 # Output
 
@@ -115,23 +159,6 @@ Acceptance Criteria: The affected implementation step includes a concrete `# Err
 ## Notes
 - Brief observations for other reviewers or planner
 ```
-
-# Blocking Criteria
-Mark BLOCKING only when all present:
-1. A `# Errors` section is missing on a planned public error-returning API, or error variant bullets are vague/incomplete.
-2. Concrete evidence from the plan or repo surface.
-3. A smallest concrete correction.
-
-If any are missing, downgrade to ADVISORY.
-
-## Issue Categories
-
-### Error Documentation Issues
-**Category**: ERRS
-**Types**:
-- MISSING_ERRORS_SECTION: `# Errors` section not planned on a public error-returning API
-- VAGUE_ERROR_BULLET: error variant bullet uses a vague trigger
-- INCOMPLETE_ERROR_ENUM: `# Errors` section does not enumerate all reachable error variants
 
 # Constraints
 - Follow the `# Process` section for cache, Delta, and skip handling.

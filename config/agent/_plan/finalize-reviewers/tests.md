@@ -24,9 +24,35 @@ Review a machine plan's test strategy. Initial review only — re-review handled
 - `handoff_path`, `plan_path`, `step_paths`, `cache_path`
 
 # Focus
-- Acceptance lens: planned tests should prove stated acceptance criteria.
-- Judge coverage, duplication, and parameterization.
-- Trust step file diffs and handoff snapshots. Only open repo test files for specific verification needs.
+
+## Acceptance lens
+Planned tests should prove stated acceptance criteria, not implementation trivia.
+
+Bad: tests assert private helper call order.
+Good: tests assert observable behavior tied to acceptance criteria.
+
+## Coverage
+Judge whether critical new or changed behavior has tests.
+
+Bad: new error path has no test.
+Good: test covers success, failure, and relevant edge case.
+
+## Redundancy
+Flag duplicate tests that prove the same behavior without added value.
+
+Do not flag: intentionally repeated coverage across different public entry points.
+
+## Parameterization
+Flag obvious 3+ near-identical tests that should be parameterized.
+
+Bad: three copied tests differ only in input value.
+Good: one table-driven test with named cases.
+
+## Trust snapshots
+Trust step file diffs and handoff snapshots. Open repo test files only for specific verification needs.
+
+Bad: reread unrelated repo tests for every item.
+Good: trust step diffs and open repo tests only to resolve a specific coverage question.
 
 # Process
 1. Read `handoff_path` for Delta, Review Ledger, Decisions.

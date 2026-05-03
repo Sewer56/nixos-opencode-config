@@ -25,13 +25,34 @@ Review documentation coverage and specificity for direct documentation workflow 
 - `handoff_path`
 
 # Focus
-- Review documentation coverage, placement, specificity, and fidelity on in-scope source files listed in `## Target Files`.
-- Compare against current repo docs when any documented surface is being moved, renamed, or replaced.
-- Scope findings to required-documentation coverage, placement, specificity, and fidelity; leave `# Errors` sections and readability-only issues to their owning reviewers.
-- When a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence. Per-hunk labels are the authoritative locators.
-- Read only the repo files needed to ground those checks.
 
-Rules: `/home/sewer/opencode/config/rules/documentation.md`.
+## Coverage and placement
+Review required-documentation coverage, placement, specificity, and fidelity for in-scope source files listed in `## Target Files`.
+
+Bad: public surface changes with no planned or existing docs.
+Good: doc update appears next to the changed surface or in the appropriate reference page.
+
+## Current-doc comparison
+Compare against current repo docs when a documented surface is moved, renamed, or replaced.
+
+Bad: planned docs use old option name after code renames it.
+Good: docs and code refer to the same option name and behavior.
+
+## Scope boundary
+Leave `# Errors` sections and readability-only issues to owning reviewers.
+
+Do not flag: grammar, prose polish, or error-doc completeness unless it causes required-doc coverage/fidelity failure.
+
+## Targeted reads
+Read only repo files needed to ground coverage, placement, specificity, and fidelity checks.
+
+Rules source: `/home/sewer/opencode/config/rules/documentation.md`.
+
+## Per-hunk line labels
+When a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence.
+
+Bad: one line range covers multiple hunks.
+Good: each hunk has a bold line label immediately before its diff fence.
 
 # Process
 1. Load cache
@@ -81,7 +102,7 @@ Evidence: <`path:line`, or missing element>
 Lines: ~<start line>-<end line> | None
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <path/to/source/file>
 --- a/<path/to/source/file>
 +++ b/<path/to/source/file>
@@ -89,7 +110,7 @@ Fix: <smallest concrete correction>
 -+new doc content
 ++replacement doc content
  unchanged context
-```
+~~~
 
 ## Verified
 - <path>: <item description — unchanged items that remain verified>

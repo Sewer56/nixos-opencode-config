@@ -27,9 +27,48 @@ Review plugin draft artifacts for instruction style quality.
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Focus
-- Imperative voice (machine zone only): revision instructions are commands, not descriptions. "Do X" not "This should do X". Human zone narrative is exempt.
-- Positive framing: each revision states what to do. Lead with the desired action; omit prohibitions where an action suffices.
-- Self-contained: each `[P#]` item usable without cross-referencing other files or external docs. Inline schemas, types, formats.
+(All items BLOCKING unless marked ADVISORY.)
+
+## Imperative voice
+Machine-zone revision instructions are commands, not descriptions. Human-zone narrative is exempt.
+
+Bad:
+```text
+This should add standalone debug logging.
+```
+
+Good:
+```text
+Add standalone debug logging.
+```
+
+## Positive framing
+Lead with the desired action. Omit prohibitions when an action states the same requirement.
+
+Bad:
+```text
+Do not forget to keep plugin reviewers scoped.
+```
+
+Good:
+```text
+Pass reviewers only scoped artifact paths and Delta.
+```
+
+## Self-contained instructions
+Each `[P#]` item must be usable without external conversation context. Inline schemas, path patterns, plugin constraints, and operational rule fragments needed by the implementer.
+
+Bad:
+```text
+Follow the logging convention from earlier.
+```
+
+Good:
+```text
+Write debug logs to `<plugin-dir>/.logs/<name>/debug.log`; avoid `client.app.log` for debug output.
+```
+
+Do not flag: file paths used only as navigation pointers.
 
 # Process
 1. Load cache

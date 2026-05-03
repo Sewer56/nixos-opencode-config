@@ -26,6 +26,30 @@ Review a finalized machine plan's code-adjacent documentation work.
 - `plan_path` (e.g., `<artifact_base>.draft.md`)
 - `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
+# Focus
+
+## Coverage and placement
+Review required-documentation coverage, placement, specificity, and fidelity for Implementation (I#) and Test (T#) step files matching `step_pattern`.
+
+Bad: public surface changes with no planned or existing docs.
+Good: doc update appears next to the changed surface or in the appropriate reference page.
+
+## Current-doc comparison
+Compare against current repo docs when a documented surface is moved, renamed, or replaced.
+
+Bad: planned docs use old option name after code renames it.
+Good: docs and code refer to the same option name and behavior.
+
+## Scope boundary
+Leave `# Errors` sections and readability-only issues to owning reviewers.
+
+Do not flag: grammar, prose polish, or error-doc completeness unless it causes required-doc coverage/fidelity failure.
+
+## Targeted reads
+Read only repo files needed to ground coverage, placement, specificity, and fidelity checks.
+
+Rules source: `/home/sewer/opencode/config/rules/documentation.md`.
+
 # Process
 1. Load cache
 - Cache: `PROMPT-PLAN-auth-refactor.handoff.md` → `PROMPT-PLAN-auth-refactor.review-codedoc-documentation.md`. Read if exists; treat missing/malformed as empty.
@@ -59,14 +83,6 @@ Review a finalized machine plan's code-adjacent documentation work.
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
 
-# Focus
-- Review code-adjacent documentation changes described by Implementation (I#) and Test (T#) step files matching `step_pattern`.
-- Compare against current repo docs when any documented surface is being moved, renamed, or replaced.
-- Scope findings to required-documentation coverage, placement, specificity, and fidelity; leave `# Errors` sections and readability-only issues to their owning reviewers.
-- Read only the repo files needed to ground those checks.
-
-Rules: `/home/sewer/opencode/config/rules/documentation.md`.
-
 # Output
 
 ```text
@@ -81,7 +97,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <path/to/step/file>
 --- a/<path/to/step/file>
 +++ b/<path/to/step/file>
@@ -89,7 +105,7 @@ Fix: <smallest concrete correction>
 -+new doc content
 ++replacement doc content
  unchanged context
-```
+~~~
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>

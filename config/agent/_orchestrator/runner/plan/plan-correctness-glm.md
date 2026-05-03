@@ -37,6 +37,55 @@ Validate that the implementation plan will correctly and completely satisfy all 
 - `ledger_path` (optional): absolute path to the current review ledger
 - `step_pattern`: file pattern for individual step files adjacent to `plan_path` (e.g., `PROMPT-??-*-PLAN.step.*.md`)
 
+# Focus
+
+## Required reads
+Read `prompt_path` and `plan_path`. When `ledger_path` is provided, read it as prior review context.
+
+Bad: review plan from prompt alone.
+Good: compare requirements, plan steps, and prior ledger state.
+
+## Rule sources
+Read rules in parallel from `/home/sewer/opencode/config/rules/`: `_orchestrator/plan-content.md`, `general.md`, `performance.md`, `testing.md`, `test-parameterization.md`, `code-placement.md`, `documentation.md`, `_orchestrator/orchestration-plan.md`, `_orchestrator/orchestration-revision.md`.
+
+Do not inline entire rule files in findings; cite only violated rule and evidence.
+
+
+Good: read all listed rule files in parallel, then cite only violated rule fragments in findings.
+
+## Requirement impact
+A BLOCKING correctness issue needs requirement impact: `REQ-###` or success criterion affected.
+
+Bad: `This plan feels incomplete.`
+Good: `REQ-004 has no implementation step.`
+
+## Concrete evidence
+A BLOCKING issue needs concrete plan section or code evidence.
+
+Bad: no section/path reference.
+Good: `Trace Matrix row REQ-004 lacks I#/T# refs.`
+
+## Failing scenario
+A BLOCKING issue needs smallest failing scenario or gap description.
+
+Bad: `may fail sometimes.`
+Good: `User can submit invalid config because no validation step handles parse errors.`
+
+## Compliance dimensions
+Check placeholders, undefined symbols, import specs, requirement mapping, trace matrix, external symbols, acceptance criteria, changed-section refs, and revision reopen policy.
+
+Do not flag: equivalent implementation shape when requirements and rules are satisfied.
+
+## Risk areas
+Check cross-file ordering, performance-sensitive validation, and error handling for new code paths.
+
+Good: flag missing validation for a changed hot path; leave style/placement debates to owning reviewers unless correctness breaks.
+
+## Issue categories
+Use existing output categories: `REQ-###` for requirement issues, `COMPLETENESS` for missing/undefined/placeholder issues, and `REVISION` for unresolved or reopened prior findings.
+
+Good: choose the narrowest output category that matches evidence and requested fix.
+
 # Process
 1. Load cache
 - Read `<plan_stem>-PLAN.review-correctness-glm.md` if it exists. Treat missing or malformed cache as empty.
@@ -71,58 +120,37 @@ Validate that the implementation plan will correctly and completely satisfy all 
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
 
-# Focus
-
-Read `prompt_path` and `plan_path`. When `ledger_path` is provided, read the ledger from that path and use it as prior review context.
-
-Rules (read in parallel from `/home/sewer/opencode/config/rules/`): `_orchestrator/plan-content.md`, `general.md`, `performance.md`, `testing.md`, `test-parameterization.md`, `code-placement.md`, `documentation.md`, `_orchestrator/orchestration-plan.md`, `_orchestrator/orchestration-revision.md`.
-
 # Blocking Criteria
-Mark an issue BLOCKING only when all present:
-1. Requirement impact (REQ-### or success criterion)
-2. Concrete evidence (plan section reference or code evidence)
-3. Minimal failing scenario or gap description
 
-If any missing, downgrade to ADVISORY.
+## Blocking standard
+Mark BLOCKING only when requirement impact, concrete evidence, and failing scenario/gap are all present.
 
-## Review Dimensions
+Bad: `Plan seems incomplete.`
+Good: `REQ-003 has no implementation step, so the user-visible import path remains unsupported.`
 
-Check plan compliance against the rules.
+## Advisory downgrade
+If any blocking ingredient is missing, downgrade to ADVISORY.
 
-Focus areas for correctness review:
-- Placeholders, undefined symbols, import specs
-- Requirement mapping, trace matrix, external symbols
-- Acceptance criteria, changed-section refs, reopen policy (revisions)
+Bad: block speculative risk with no plan reference.
+Good: advisory note asks planner to confirm ambiguous risk.
 
-### Risk Areas
-- Cross-file changes have proper ordering
-- Performance-sensitive paths have validation
-- Error handling is specified for new code paths
+## Requirement issues
+Use `Category: REQ-###` for missing, partial, untested, or untestable requirement coverage.
 
-## Issue Categories
+Bad: `REQ-002` has implementation but no acceptance criterion or test ref.
+Good: trace matrix maps `REQ-002` to concrete I#/T# refs.
 
-### Requirement Issues
-**Category**: REQ-###
-**Types**:
-- MISSING: no implementation steps
-- MISSING_TEST: no test coverage
-- PARTIAL: incomplete coverage
-- NO_ACCEPTANCE: missing or untestable criteria
+## Completeness issues
+Use `Category: COMPLETENESS` for undefined symbols, placeholders, missing imports, or incomplete trace rows.
 
-### Completeness Issues
-**Category**: COMPLETENESS
-**Types**:
-- UNDEFINED_SYMBOL: helper/type referenced but not defined
-- PLACEHOLDER: `...` or TODO in implementation
-- MISSING_IMPORT: external dependency without import spec
-- INCOMPLETE_TRACE: matrix entry lacks refs or criteria
+Bad: implementation step calls `normalizeInput()` but no step defines/imports it.
+Good: helper definition or import spec exists.
 
-### Revision Issues
-**Category**: REVISION
-**Types**:
-- UNRESOLVED_BLOCKING: prior blocking issue not addressed
-- MISSING_ACCEPTANCE_CRITERIA: blocking issue lacks closure condition
-- REOPENED_WITHOUT_EVIDENCE: RESOLVED item reopened without justification
+## Revision issues
+Use `Category: REVISION` for unresolved prior blocking items, missing acceptance criteria for fixes, or reopened findings without evidence.
+
+Bad: prior BLOCKING marked resolved with no changed step.
+Good: ledger cites changed step and acceptance criterion.
 
 # Output
 

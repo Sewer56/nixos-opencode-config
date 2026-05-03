@@ -25,11 +25,28 @@ Review error documentation coverage and specificity for direct documentation wor
 - `handoff_path`
 
 # Focus
-- Own all `# Errors` section concerns (existence, placement, format, specificity, completeness) on public error-returning APIs in in-scope source files listed in `## Target Files`.
-- When a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence. Per-hunk labels are the authoritative locators.
-- Read only the repo files needed to ground those checks.
 
-Rules: `/home/sewer/opencode/config/rules/errors.md`.
+## Errors-section ownership
+Own all `# Errors` section concerns for public error-returning APIs in in-scope source files listed in `## Target Files`: existence, placement, format, specificity, and completeness.
+
+Bad: public error-returning API has no `# Errors` section or only says `may fail`.
+Good: `# Errors` lists each variant with a concrete trigger.
+
+## Specific triggers
+Each error bullet must name the condition that produces it. Vague catch-all wording is insufficient.
+
+Bad: `Returns Error if something goes wrong.`
+Good: `Returns ParseError when the config file contains invalid TOML.`
+
+## Targeted reads
+Read only repo files needed to ground error-doc checks.
+
+Rules source: `/home/sewer/opencode/config/rules/errors.md`.
+
+## Per-hunk line labels
+When a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence.
+
+Good: each hunk has its own bold line label; per-hunk labels are authoritative locators.
 
 # Process
 1. Load cache
@@ -79,7 +96,7 @@ Evidence: <`path:line`, or missing element>
 Lines: ~<start line>-<end line> | None
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <path/to/source/file>
 --- a/<path/to/source/file>
 +++ b/<path/to/source/file>
@@ -87,7 +104,7 @@ Fix: <smallest concrete correction>
 -+new error section
 ++replacement error section with per-variant bullets
  unchanged context
-```
+~~~
 
 ## Verified
 - <path>: <item description — unchanged items that remain verified>

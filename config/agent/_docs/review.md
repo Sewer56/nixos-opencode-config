@@ -33,6 +33,31 @@ Review existing end-user-facing documentation and apply fixes with a four-review
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-DOCS-REVIEW-<slug>`.
 - `handoff_path`: `<artifact_base>.handoff.md`
 
+# Focus
+
+## Existing-doc scope
+Review existing end-user-facing documentation only. Do not create new pages or source-code doc comments.
+
+Bad: turn a section review into a new-page creation task.
+Good: edit only requested existing docs within declared scope.
+
+## Handoff and Delta
+Write `handoff_path` before reviewers run. Delta entries must identify file, sections changed, scope level, and `Status: New | Changed | Unchanged`.
+
+Bad: reviewers receive only target paths with no scoped Delta.
+Good: reviewers receive `handoff_path` with per-file scope and status.
+
+## Reviewer loop
+Run clarity, wording, engagement, and consistency reviewers in parallel. Pass only `handoff_path`; reviewer prompts own their Focus, Process, and Output.
+
+Bad: caller restates each reviewer's full rules.
+Good: caller passes handoff path and lets reviewers read their own prompt.
+
+## Frozen regions
+Reject reviewer diffs that modify frozen regions.
+
+Do not flag: reviewer findings outside frozen regions that preserve scope.
+
 # Process
 
 ## 1. Parse request

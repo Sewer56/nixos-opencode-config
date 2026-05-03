@@ -26,6 +26,25 @@ Review a finalized machine plan's code-adjacent error documentation.
 - `plan_path` (e.g., `<artifact_base>.draft.md`)
 - `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
+# Focus
+
+## Errors-section ownership
+Own all `# Errors` section concerns for changed scope described by I#/T# step files matching `step_pattern`: existence, placement, format, specificity, and completeness.
+
+Bad: public error-returning API has no `# Errors` section or only says `may fail`.
+Good: `# Errors` lists each variant with a concrete trigger.
+
+## Specific triggers
+Each error bullet must name the condition that produces it. Vague catch-all wording is insufficient.
+
+Bad: `Returns Error if something goes wrong.`
+Good: `Returns ParseError when the config file contains invalid TOML.`
+
+## Targeted reads
+Read only repo files needed to ground error-doc checks.
+
+Rules source: `/home/sewer/opencode/config/rules/errors.md`.
+
 # Process
 1. Load cache
 - Cache: `PROMPT-PLAN-auth-refactor.handoff.md` → `PROMPT-PLAN-auth-refactor.review-codedoc-errors.md`. Read if exists; treat missing/malformed as empty.
@@ -59,12 +78,6 @@ Review a finalized machine plan's code-adjacent error documentation.
 6. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
 
-# Focus
-- Own all `# Errors` section concerns (existence, placement, format, specificity, completeness) in the changed scope described by Implementation (I#) and Test (T#) step files matching `step_pattern`.
-- Read only the repo files needed to ground those checks.
-
-Rules: `/home/sewer/opencode/config/rules/errors.md`.
-
 # Output
 
 ```text
@@ -79,7 +92,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <path/to/step/file>
 --- a/<path/to/step/file>
 +++ b/<path/to/step/file>
@@ -87,7 +100,7 @@ Fix: <smallest concrete correction>
 -+new error section
 ++replacement error section with per-variant bullets
  unchanged context
-```
+~~~
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>

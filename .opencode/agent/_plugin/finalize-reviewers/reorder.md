@@ -28,11 +28,30 @@ Review plugin code for declaration ordering and return reorder diffs.
 - `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
+(All items BLOCKING unless marked ADVISORY.)
 
-- **Visibility tier**: public/entry-point declarations before private helpers.
-- **Call order**: callers before callees within each visibility tier.
-- **Entry point first**: `export const XxxPlugin` appears first in the file, then hooks in order of registration, then helper functions.
-- **Stability**: when two declarations have equal priority, preserve existing relative order.
+## Visibility tier
+Public and entry-point declarations should appear before private helpers.
+
+Bad: helper functions precede `export const FooPlugin`.
+Good: `export const FooPlugin` first, then exported hooks/types, then private helpers.
+
+## Call order
+Within each visibility tier, place callers before callees so readers meet behavior before implementation detail.
+
+Bad: `writeDebugLog` appears before the hook that calls it.
+Good: hook callback appears first; `writeDebugLog` follows.
+
+## Entry point first
+Generated plugin files should start with `export const XxxPlugin`, followed by hooks in registration order, then helpers.
+
+Bad: file starts with low-level path helpers.
+Good: plugin export and hook registration are visible in the first declarations.
+
+## Stability
+When two declarations have equal priority, preserve existing relative order.
+
+Do not flag: unchanged ordering with no clear visibility or call-order benefit.
 
 # Process
 
