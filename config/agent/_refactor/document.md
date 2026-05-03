@@ -44,12 +44,12 @@ Discover, add, and review missing code documentation in source files.
 ## 2. Enumerate missing or vague required docs
 
 - For each in-scope source file, check against the documentation and error rules for missing or vague required documentation.
-- Enumerate per-file gaps: missing doc comments, vague descriptions, incomplete `# Errors` sections on public error-returning APIs.
+- Enumerate per-file gaps: missing doc comments, vague descriptions, missing inline readability comments in non-trivial function bodies, incomplete `# Errors` sections on public error-returning APIs.
 - Write `handoff_path` with `## Target Files`, `## Delta`, `## Verification Commands`, and `## Review Ledger`.
 
 ## 3. Apply documentation edits
 
-- Add the documentation required by the rule files to in-scope source files.
+- Add the documentation required by the rule files to in-scope source files, including short inline comments at non-obvious logical steps inside non-trivial function bodies.
 - Constrain edits to target source files and `PROMPT-DOC-COVERAGE-*.md`.
 - Preserve runtime behavior; make only documentation-specific changes.
 - Run obvious formatters or linters for touched files.
@@ -59,19 +59,17 @@ Discover, add, and review missing code documentation in source files.
 - Write and maintain `## Delta` in `handoff_path`. Record each target source file as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Recompute `## Delta` after every material revision.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
-- Run these reviewers in parallel:
-  - `@_refactor/document-reviewers/documentation`
+- Run these reviewers:
+  - `@_refactor/document-reviewers/docs-and-readability`
   - `@_refactor/document-reviewers/errors`
-  - `@_refactor/document-reviewers/clarity`
-  - `@_refactor/document-reviewers/wording`
 - Include in each reviewer prompt only task-specific data: `handoff_path` and user notes.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
-- Apply domain ownership: DDOC → documentation reviewer; DERR → errors reviewer; DCLR → clarity reviewer; DWRD → wording reviewer. Arbitrate cross-domain conflicts.
+- Apply domain ownership: DDOC, DREAD → docs-and-readability reviewer; DERR → errors reviewer. DDOC owns required inline readability comments. Arbitrate cross-domain conflicts.
 - Apply reviewer diffs to target source files only. Append one line to `## Revision History`.
-- Re-run reviewers after every material revision.
-- Loop until no findings of any severity remain or 10 iterations.
-  No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
-- Validate each reviewer response against the review block shape: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified` headings. Treat malformed responses as BLOCKING with a synthetic finding.
+- Re-run only reviewers whose owned domain or touched file changed after a material revision; rerun both reviewers when a fix changes shared documentation scope.
+- Loop until no BLOCKING findings remain or 10 iterations.
+  No blocking: SUCCESS with recorded/deferred advisories. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
+- Validate each reviewer response against the review block shape: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `Cache:`, `## Findings`, and `## Verified` headings. Treat malformed responses as BLOCKING with a synthetic finding.
 
 # Output
 

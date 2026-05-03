@@ -25,21 +25,13 @@ permission:
   }
 ---
 
-Review and revise code-adjacent documentation (API references, inline comments, parameter descriptions, error message strings, developer-facing READMEs) inside finalized code/test steps. Apply documentation and error-doc fixes to existing Implementation (I#) and Test (T#) step files. Leave end-user documentation steps (D# steps) to `/plan/finalize-user-docs`.
+Review and revise code-adjacent documentation (API references, doc comments, inline comments inside non-trivial code bodies, parameter descriptions, error message strings, developer-facing READMEs) inside finalized code/test steps. Apply documentation and error-doc fixes to existing Implementation (I#) and Test (T#) step files. Leave end-user documentation steps (D# steps) to `/plan/finalize-user-docs`.
 
 # Inputs
 - The latest user message may provide code-documentation notes.
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
-- Required local artifacts for this run:
-  - `<artifact_base>.draft.md`
-  - `<artifact_base>.handoff.md`
-  - existing I#/T# files matching `<artifact_base>.step.*.md`
-
-# Artifacts
-- `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
-- `plan_path`: `<artifact_base>.draft.md`
-- `handoff_path`: `<artifact_base>.handoff.md`
-- `step_pattern`: `<artifact_base>.step.*.md`
+- Use `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, and `step_pattern` = `<artifact_base>.step.*.md`.
+- Required local artifacts for this run: `plan_path`, `handoff_path`, and existing I#/T# files matching `step_pattern`.
 
 # Process
 
@@ -47,29 +39,35 @@ Review and revise code-adjacent documentation (API references, inline comments, 
 - Read `handoff_path`.
 - Read all existing I# and T# step files matching `step_pattern`.
 - Treat the finalized code/test steps as the source of truth.
-- Modify existing I#/T# step files only when documentation or errors reviewer findings target them.
+- Modify existing I#/T# step files only when the initial code-documentation pass or reviewer findings target them.
 - Do not create D# step files.
 
 ## 2. Deepen discovery only where needed
-- Read target source files referenced by selected I#/T# steps before judging code docs or error docs.
+- Read target source files referenced by selected I#/T# steps before judging code docs, inline comments, or error docs.
 - Use `@codebase-explorer` for repo discovery first when file ownership, public API surface, or documentation placement is unclear.
 - Use `@mcp-search` for external library or API documentation expectations first when needed.
 
-## 3. Run the code-documentation review loop
+## 3. Apply an initial code-documentation pass
+- Scan I#/T# diffs for missing API docs, parameter/return docs, `# Errors` sections, and inline readability comments required by the documentation and errors rules.
+- For non-trivial function-body changes, add short inline comments inside the planned code diff at logical steps when names/control flow do not make intent obvious. Skip obvious assignments, getters, direct delegation, and code already explained by names.
+- Put documentation changes in the relevant step diff or snippet. A generic note such as `update docs` does not satisfy the rule files.
+- Preserve the step's existing action, intent, and approximate line labels; add or adjust only the minimal affected diff hunks.
+
+## 4. Run the code-documentation review loop
 - Write and maintain `## Delta` in `handoff_path`. Record each I# and T# step as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Recompute `## Delta` after every material revision.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
-- Run these reviewers in parallel:
+- Run these shared code-doc reviewers:
   - `@_plan/finalize-codedoc-reviewers/docs-and-readability`
   - `@_plan/finalize-codedoc-reviewers/errors`
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
-  - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
-- Apply domain ownership: CDOC, CREAD → docs-and-readability reviewer; CERR → errors reviewer. Arbitrate cross-domain conflicts.
+- Apply domain ownership: CDOC and CREAD → docs-and-readability reviewer; CERR → errors reviewer. CDOC owns required API docs and inline readability comments in planned code diffs. Arbitrate cross-domain conflicts.
 - Apply reviewer diffs to existing I# and T# step files only. Append one line to `## Revision History`.
-- Re-run reviewers after every material revision.
-- Loop until no findings of any severity remain or 10 iterations.
-  No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
+- Re-run only reviewers whose owned domain or touched step changed after a material revision; rerun both reviewers when a fix changes both code docs and error docs.
+- Loop until no BLOCKING findings remain or 10 iterations.
+  No blocking: SUCCESS with recorded/deferred advisories. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
+- Validate each reviewer response against the review block shape: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `Cache:`, `## Findings`, and `## Verified` headings. Treat malformed responses as BLOCKING with a synthetic finding.
 
 # Output
 Return exactly:

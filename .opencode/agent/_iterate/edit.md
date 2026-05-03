@@ -9,6 +9,7 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
+  bash: allow
   edit: allow
   question: allow
   todowrite: allow

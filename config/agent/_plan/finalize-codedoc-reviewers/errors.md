@@ -17,6 +17,7 @@ permission:
   edit:
     "*PROMPT-PLAN*.review-codedoc-errors.md": allow
   external_directory: allow
+  task: deny
 ---
 
 Review finalized steps' code-adjacent error documentation.
@@ -28,25 +29,13 @@ Review finalized steps' code-adjacent error documentation.
 
 # Focus
 
-## Errors-section ownership
-Own all `# Errors` section concerns for changed scope described by I#/T# step files matching `step_pattern`: existence, placement, format, specificity, and completeness.
-
-Bad: public error-returning API has no `# Errors` section or only says `may fail`.
-Good: `# Errors` lists each variant with a concrete trigger.
-
-## Specific triggers
-Each error bullet must name the condition that produces it. Vague catch-all wording is insufficient.
-
-Bad: `Returns Error if something goes wrong.`
-Good: `Returns ParseError when the config file contains invalid TOML.`
-
-## Targeted reads
-Ground error-doc checks in step file diffs and handoff content. Open target source files only when a step diff is ambiguous or missing needed context.
+{file:./rules/code-doc-review/errors-focus.plan.md}
 
 # Process
-1. Load cache (derived from `handoff_path`: replace `.handoff.md` with `.review-codedoc-errors.md`). Read `## Delta` from `handoff_path`. Skip missing/malformed cache.
-2. Review Changed/New items only; carry forward cached Verified items. Ground checks in step file diffs — open source files only when a diff is ambiguous or missing context. On malformed-output retry, reuse prior cache and re-emit valid output.
-3. Update cache: targeted edits for changed entries, insert new, prune removed ids, preserve unchanged byte-for-byte. Emit `# REVIEW` block.
+1. Load `handoff_path` sections: `## Delta`, `## Review Ledger`, and non-empty `### Decisions`. Load cache by replacing `.handoff.md` with `.review-codedoc-errors.md`; missing/malformed cache is empty.
+2. Inspect Changed/New I#/T# steps, own Open findings, and decision-referenced items; carry forward Verified entries only for Unchanged Delta items.
+3. Read selected step files in one batch. Open referenced source files only when the step diff lacks context for public API status or reachable error variants.
+4. Check Open→Resolved transitions. Update only changed cache entries, preserving unchanged cache text byte-for-byte, then emit the `# REVIEW` block. On malformed-output retry without new Delta/Decision entries, reuse prior analysis/cache and re-emit valid output.
 
 # Output
 
@@ -54,12 +43,14 @@ Ground error-doc checks in step file diffs and handoff content. Open target sour
 # REVIEW
 Agent: _plan/finalize-codedoc-reviewers/errors
 Decision: PASS | ADVISORY | BLOCKING
+Cache: <path to `.review-codedoc-errors.md`>
 
 ## Findings
-### [CERR-001]
+### [CERR-NNN]
 Category: COVERAGE | SPECIFICITY | FIDELITY
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
+Lines: ~<start line>-<end line> | None
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
 ~~~diff
@@ -67,8 +58,8 @@ Fix: <smallest concrete correction>
 --- a/<path/to/step/file>
 +++ b/<path/to/step/file>
  unchanged context
--+new error section
-++replacement error section with per-variant bullets
+-missing or vague error docs
++concrete # Errors docs
  unchanged context
 ~~~
 
@@ -79,10 +70,9 @@ Fix: <smallest concrete correction>
 - <optional short notes>
 ```
 
+Return ONLY the block above — no introduction, no summary, no conversational wrapper. Always include `Cache:`, `## Findings`, and `## Verified`; write `- None` under empty sections.
+
 # Constraints
-- Keep findings short and specific.
-- When Decision is PASS with no findings: emit only `Agent:`, `Decision: PASS`, and `Cache: <path>`. Skip `## Findings` and `## Verified`.
-- Read your own cache before reviewing. Do not reopen Resolved items without new concrete evidence.
 - Flag missing `# Errors` sections on public error-returning APIs as BLOCKING per the errors rules.
 - Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact `# Errors` section to add or fix.
 - Follow the `# Process` section for cache, Delta, and skip handling.
