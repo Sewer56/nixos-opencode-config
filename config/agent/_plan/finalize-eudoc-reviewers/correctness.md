@@ -30,42 +30,29 @@ Review D# steps for documentation correctness — coverage, specificity, and bro
 # Focus
 
 ## Coverage
-End-user docs must cover new or changed public features.
-
-Bad: new CLI flag appears in implementation steps but no D# step documents it.
-Good: D# step updates the usage page and example command.
+End-user docs must cover new or changed public features. Bad: new CLI flag appears in implementation steps but no D# step documents it. Good: D# step updates the usage page and example command.
 
 ## Implementation fidelity
-End-user docs must not contradict implementation.
-
-Bad: docs say default is `true`; code sets default `false`.
-Good: docs reflect actual default and behavior.
+End-user docs must not contradict implementation. Bad: docs say default is `true`; code sets default `false`. Good: docs reflect actual default and behavior.
 
 ## Specificity
-Generic `update docs` without file, scope, affected sections, and concrete changes is BLOCKING.
-
-Bad: `Update docs for new feature.`
-Good: `Update docs/usage.md Quick Start to add --watch example and describe reload behavior.`
+Generic `update docs` without file, scope, affected sections, and concrete changes is BLOCKING. Bad: `Update docs for new feature.` Good: `Update docs/usage.md Quick Start to add --watch example and describe reload behavior.`
 
 ## Frozen-region compliance
-Findings on frozen regions are invalid.
-
-Do not flag: unchanged version numbers, license blocks, or user-facing warnings marked frozen.
+Findings on frozen regions are invalid. Do not flag: version numbers, license blocks, warnings marked frozen.
 
 ## Broken internal links
-When multiple D# steps exist, block links to headings another D# step removes or renames.
-
-Bad: D1 links to `#old-name` while D2 renames it to `#new-name`.
-Good: link updated or stable anchor preserved.
+When multiple D# steps exist, block links to headings another D# step removes or renames. Bad: D1 links to `#old-name` while D2 renames it to `#new-name`. Good: link updated or stable anchor preserved.
 
 # Process
 
 1. Load cache
-- Cache: `PROMPT-PLAN-auth-refactor.handoff.md` → `PROMPT-PLAN-auth-refactor.review-eudoc-correctness.md`. Read if exists; treat missing/malformed as empty.
+- Cache: `<artifact_base>.handoff.md` → `<artifact_base>.review-eudoc-correctness.md`. Read if exists; treat missing/malformed as empty.
 - One record per item (D#) with fields `last_decision`, `open_findings`, `evidence`, `verified`.
 
 2. Read Delta and Decisions
-- Read `## Delta` from `handoff_path`.
+- Use the `## Delta` passed inline in the task prompt. If Delta was passed inline, skip reading `handoff_path` for it.
+- If Delta was NOT passed inline, read `## Delta` from `handoff_path`.
 - Read `### Decisions` only when non-empty.
 
 3. Select items to inspect
@@ -75,7 +62,7 @@ Good: link updated or stable anchor preserved.
 - Exclude frozen regions.
 
 4. Inspect selected content
-- **First review** (cache empty or no prior findings): Read `handoff_path` for summary, requirements, Step Index. Read all D# step files matching `step_pattern`. For UPDATE scope: read target doc files. For NEW: read sibling pages. This is the full discovery pass.
+- **First review** (cache empty or no prior findings): If Delta was passed inline, skip reading `handoff_path` — use the inline Step Index and Requirement Trace Matrix rows. Read all D# step files. For UPDATE scope: read target doc files at the line ranges the D# step specifies — do not read full target files beyond those ranges unless evidence is insufficient. For NEW: read sibling pages. Skip ARCHITECTURE.md, source code, or I#/T# step files unless a D# step explicitly references them as evidence.
 - **Re-review** (cache has prior findings): Read `## Delta` from `handoff_path` for status changes. Read ONLY D# steps marked Changed or New in Delta — skip Unchanged steps (they are in cache as Verified). Do NOT re-read the full handoff, target doc files, or sibling pages for Unchanged items. Check Open→Resolved transitions against cache.
 - Check coverage/specificity on selected D# steps. Check broken links across D# steps (only if multiple exist).
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output.

@@ -44,15 +44,15 @@ Generate and review end-user documentation steps for a finalized machine plan. R
 # Process
 
 ## 1. Preconditions and source of truth
-- Read `handoff_path`.
-- Read all existing I# and T# step files matching `step_pattern`.
+- Read `handoff_path`. Use its Step Index, Requirement Trace Matrix, Settled Facts, and Human Plan Mapping as the primary source for user-facing behavior changes.
+- Read existing I# and T# step files only when the handoff lacks sufficient detail about a specific user-facing effect.
 - Treat the finalized machine plan as the source of truth.
 - Do not modify I# or T# step files.
 
 ## 2. Deepen discovery
-- Read target source files referenced by I#/T# steps to identify user-facing behavior, configuration, CLI surface, output, and errors.
-- Read existing user documentation that may describe the changed behavior.
+- Read existing user documentation files that may describe changed behavior.
 - For NEW documentation, read sibling pages for style/structure consistency.
+- Skip source code reads — the handoff's Settled Facts already capture key code evidence and locations. Only read a source file when the handoff lacks the exact line reference needed for a D# step's Evidence field.
 - Use `@codebase-explorer` for repo discovery first when documentation ownership or placement is unclear.
 - Use `@mcp-search` for external libraries or APIs first when needed.
 
@@ -72,13 +72,15 @@ Generate and review end-user documentation steps for a finalized machine plan. R
 ## 5. Run the end-user documentation review loop
 - Write and maintain `## Delta` in `handoff_path`. Record each D# step as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Mark existing I#/T# entries as Unchanged with `Why: pre-existing step`. Recompute `## Delta` after every material revision.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
-- **Stage 1: Correctness** — Run `@_plan/finalize-eudoc-reviewers/correctness` first. Checks coverage, specificity, and broken links. Before dispatch, create empty cache stubs if they don't exist: `{artifact_base}.review-eudoc-correctness.md` and `{artifact_base}.review-eudoc-polish.md`. Apply its diffs, update `## Review Ledger`, append to `## Revision History`. Recompute `## Delta`.
+- **Stage 1: Correctness** — Run `@_plan/finalize-eudoc-reviewers/correctness` first. Checks coverage, specificity, and broken links. Apply its diffs, update `## Review Ledger`, append to `## Revision History`. Recompute `## Delta`.
 - **Stage 2: Polish** — Run `@_plan/finalize-eudoc-reviewers/polish` after Stage 1 fixes are applied. Checks clarity, wording, engagement, and cross-page polish.
-- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
-  - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
+- Include in each reviewer prompt only task-specific data. For first review, extract and inline the `## Delta` section, D# Step Index rows, and relevant Requirement Trace Matrix rows from `handoff_path`. Pass `handoff_path` only for cache file naming — reviewers must not re-read the full handoff.
+  - Re-review: pass `cache_path`, `changed_ids=[D# list]`, `handoff_path`, and one-line fix summaries. Withhold unchanged step paths.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply end-user documentation domain ownership: EDOC → correctness; ECLR/EWRD/EENG/ECNS → polish. Arbitrate cross-domain conflicts.
-- Apply reviewer diffs to D# step files only. Append one line to `## Revision History`.
+- Apply reviewer diffs to D# step files only. Trust reviewer evidence — apply diffs directly without re-reading target files to verify. Only re-read if the edit fails to apply.
+- After initial handoff read, track which sections need edits (Step Index, Delta, Review Ledger, Revision History). Apply all handoff edits sequentially without re-reading between edits. Only re-read handoff if an edit fails.
+- Append one line to `## Revision History`.
 - **ADVISORY-only deferral**: If after applying diffs, only ADVISORY findings remain (no BLOCKING), record remaining ADVISORY findings as DEFERRED in the Review Ledger. Do not re-run reviewers solely to clear ADVISORY findings.
 - Re-run reviewers after every material revision where BLOCKING findings were applied.
 - Loop until no findings of any severity remain or 10 iterations.
@@ -97,21 +99,10 @@ Summary: <one-line summary>
 ```
 
 # Constraints
-- Only modify `<artifact_base>.handoff.md` and D# step files matching `<artifact_base>.step.D*.md`.
-- Do not modify I# or T# step files.
-- Never modify product code while planning.
-- Never rewrite `<artifact_base>.draft.md`.
-- Within each D# step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
-- Each diff block within a D# step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Per-hunk labels are the authoritative locators.
-- Full-file `Lines:` ranges are invalid for localized changes — use only for NEW actions that add complete files.
-- Nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~).
+- Only modify `<artifact_base>.handoff.md` and D# step files. Do not modify I#/T# step files, product code, or `<artifact_base>.draft.md`.
+- Each diff hunk: 2+ context lines, per-hunk `**Lines: ~start-end**` label. Full-file Lines only for NEW files.
+- Nested fences: outer ```, inner ~~~.
 - Keep user-facing responses brief and factual.
-
-# Rules
-
-Load all rule files below in parallel. Apply them:
-
-/home/sewer/opencode/config/rules/documentation.md
 
 # Templates
 
@@ -121,20 +112,20 @@ Load all rule files below in parallel. Apply them:
 # D1: `path/to/documentation-file`
 
 Action: UPDATE | INSERT | NEW
-Why: <why this documentation changes>
+Why: <reason>
 Scope: page | section | paragraph | new
-Affected sections: <heading or region> | `None` (for new pages)
-Frozen regions: <headings or paragraphs that must not be modified (e.g. version numbers, license blocks, user-facing warnings)> | `None`
-Anchor: `<existing heading or section>` | `None`
-Lines: ~<start>-<end> | `None`
+Affected sections: <heading or region> | None
+Frozen regions: <headings/paragraphs that must not change> | None
+Anchor: <existing heading or section> | None
+Lines: ~<start>-<end> | None
 
 Content diff:
 
 ~~~diff
-<documentation changes; for NEW pages, the full page content>
+<documentation changes; for NEW, full page content>
 ~~~
 
-Sibling pages: `path/to/nearby/doc` | `None` (for isolated new pages; used for style/structure consistency)
+Sibling pages: <path/to/nearby/doc for style reference> | None
 Dependencies: None | I# | D#
-Evidence: `path/to/code/file:line` | `path/to/nearby/pattern:line`
+Evidence: <path/to/code:line or pattern:line>
 ```
