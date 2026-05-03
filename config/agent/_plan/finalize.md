@@ -25,7 +25,8 @@ permission:
     "_plan/finalize-reviewers/audit-rereview": "allow",
     "_plan/finalize-reviewers/tests": "allow",
     "_plan/finalize-reviewers/tests-rereview": "allow",
-    "_plan/finalize-reviewers/performance": "allow"
+    "_plan/finalize-reviewers/performance": "allow",
+    "_plan/finalize-reviewers/placement": "allow"
   }
 ---
 
@@ -43,7 +44,7 @@ Convert a confirmed human plan into a reviewed code and test machine plan. Write
 - `plan_path`: `<artifact_base>.draft.md`
 - `handoff_path`: `<artifact_base>.handoff.md`
 - `step_pattern`: `<artifact_base>.step.*.md`
-- Cache paths (written by reviewers on initial review, read by rereview agents on re-review):
+- Cache paths (written by reviewers on initial review, read by reviewers/rereview agents on re-review):
   - `<artifact_base>.review-audit.md`
   - `<artifact_base>.review-tests.md`
 
@@ -142,23 +143,24 @@ Next Command: /plan/draft
   - skip broad repo exploration unless required by its own focus contract
   - prefer changed items from `## Delta`; do not re-evaluate unchanged items without new evidence
 - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
-- **Per-reviewer findings are stored in cache files only.** The `## Review Ledger` in `handoff_path` carries only domain summaries (counts + cache ref) and cross-domain decisions (DEC-###). No per-finding detail.
-- When populating the Review Ledger after reviewer dispatch: read `cache_path` for finding details, apply fixes, then update domain summaries in handoff. Keep per-domain findings in cache — do NOT copy them into handoff.
-- Assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED. Update cache files.
-- Each reviewer reads only its own cache + handoff Delta. Cross-domain findings stay isolated — reviewers do not need other domains' detail.
+- Keep `## Review Ledger` to domain summaries and cross-domain decisions (DEC-###). Do not copy per-finding detail into handoff.
+- For cache-backed reviewers, read `cache_path` only when detailed findings are needed for fixes or summaries.
+- Assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED. Update cache files where present.
+- Cache-backed reviewers read only their own cache + handoff Delta. Cross-domain findings stay isolated — reviewers do not need other domains' detail.
 - Do not reopen RESOLVED issues without new concrete evidence.
 - Revise step files only where needed. Append one line to `## Revision History`.
-- **PASS-stays-PASS gate:** Do not re-dispatch a reviewer that returned PASS with 0 findings unless revisions address a domain that overlaps with its focus. AUDIT covers fidelity+structure+completeness+economy+dead-code; TESTS covers test coverage; PERF covers performance.
+- **PASS-stays-PASS gate:** Do not re-dispatch a reviewer that returned PASS with 0 findings unless revisions address a domain that overlaps with its focus. AUDIT covers fidelity+structure+completeness+economy+dead-code; TESTS covers test coverage; PLACEMENT covers declaration placement/order; PERF covers performance.
 - Recompute `reviewer_set` and re-run only reviewers with BLOCKING findings or domains touched by BLOCKING fixes, using dedicated rereview agents (5b). Advisory-only reviewers are recorded as DEFERRED and carried forward.
 - Loop until no findings of any severity remain or 10 iterations.
   No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
-### 5d. Performance final gate (after audit+tests converge)
-- After audit and tests both return PASS with 0 BLOCKING findings, dispatch `@_plan/finalize-reviewers/performance` once.
-- Pass `handoff_path`, `plan_path`, and all step paths. The explorer manifest is still in context — pre-inline relevant `## Key Symbols` and `## Files Touched`.
+### 5d. Final gates (after audit+tests converge)
+- Dispatch placement and performance in the same final-gate phase after audit+tests converge.
+- Placement: pass `handoff_path` and all I# step paths. It owns declaration-order checks and exact step-file diffs.
+- Performance: pass `handoff_path`, `plan_path`, and all step paths. The explorer manifest is still in context — pre-inline relevant `## Key Symbols` and `## Files Touched`.
 - Performance reviews algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, missing validation.
-- Performance findings: BLOCKING trigger a fix cycle → re-dispatch performance (not a rereview agent — performance has no cache). ADVISORY only → DEFERRED.
-- This runs once, at the end, on a stable plan. Not re-dispatched in the main review loop.
+- Final-gate BLOCKING findings trigger fixes; apply exact ordering-only placement diffs directly. For other fixes, rerun only touched final-gate domains. ADVISORY only → DEFERRED.
+- Final success requires zero unresolved BLOCKING findings from audit, tests, placement, and performance.
 
 # Output
 Return exactly:
@@ -285,7 +287,8 @@ Source Plan: <absolute path to `<artifact_base>.draft.md`>
 ### Domain Summaries
 - AUDIT: <n> BLOCKING, <m> ADVISORY → cache: `<artifact_base>.review-audit.md`
 - TEST: <n> BLOCKING, <m> ADVISORY → cache: `<artifact_base>.review-tests.md`
-- PERF: <n> BLOCKING, <m> ADVISORY (inline, no cache)
+- PLACEMENT: <n> BLOCKING, <m> ADVISORY (inline)
+- PERF: <n> BLOCKING, <m> ADVISORY (inline)
 
 ### Decisions
 - Only cross-domain arbitration entries (DEC-###). Per-domain finding details stay in cache files. Reviewers read only their own cache + handoff Delta — no cross-domain finding pollution.

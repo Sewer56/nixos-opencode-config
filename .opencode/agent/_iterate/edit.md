@@ -55,6 +55,7 @@ Directly edit OpenCode agent and command prompts. Use this for non-code prompt b
 - Use exact fenced `text` output blocks for machine-consumed responses.
 - Prefer imperative, concrete instructions. Remove filler, hedging, duplicated rules, and soft token budgets.
 - Reference existing docs by path/section/id instead of pasting whole catalogs.
+- Use full absolute paths when referencing local files in generated or edited prompts.
 - Add examples only for conventions likely to be misread.
 - Keep high-risk correctness, permission, security, and self-iteration checks separate from wording/polish checks.
 
