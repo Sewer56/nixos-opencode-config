@@ -140,7 +140,7 @@ Summary: <one-line summary>
 - Keep `<artifact_base>.draft.md` compact and scannable.
 - Enforce the standalone log pattern: every plugin plan must include `.logs/<name>/debug.log` co-located logging, not `client.app.log`.
 - Enforce auto-loading: plugins in `config/plugins/` need no `opencode.json` registration.
-- Enforce nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block.
+- Enforce nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block.
 
 ---
 
@@ -235,7 +235,7 @@ cd config/ && bun run typecheck
 
 # Template: `<artifact_base>.draft.md`
 
-````markdown
+```markdown
 # Plugin Plan
 
 Overall Goal: <one-line goal>
@@ -260,7 +260,7 @@ create | refine
 
 <free-form explanation of intent and why>
 
-```diff
+~~~diff
 <path>
 --- a/<path>
 +++ b/<path>
@@ -268,7 +268,7 @@ create | refine
 -old content
 +new content
  unchanged context
-```
+~~~
 
 <!-- CREATE actions: omit diff block. Explanation only. -->
 
@@ -283,4 +283,4 @@ create | refine
 
 ### Reference Files
 - `<path>`: <why it matters as a reference for this iteration>
-````
+```

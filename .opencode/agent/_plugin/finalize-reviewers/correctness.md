@@ -41,7 +41,7 @@ Review plugin plans for correctness, fidelity, and SDK type validity.
 - **Per-hunk line labels**: each diff block within a STEP must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Missing labels are BLOCKING.
 - **Focused `Lines:` ranges**: header `Lines: ~` must list the comma-separated union of hunk ranges. Full-file ranges are BLOCKING when the change is localized. Valid only for CREATE/DELETE actions.
 - **Diff context**: every hunk in `## Diff` sections includes 2+ unchanged context lines before and after each change region; context lines match content in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
-- **Nested code fences**: block when a STEP target contains an inner ``` fence inside an outer ``` fence. The outer fence must use more backticks (e.g. ```` for outer when inner uses ```).
+- **Nested code fences**: block when a STEP target contains an inner ``` fence inside an outer ``` fence. Outer fence uses backticks (```), inner fences use tildes (~~~).
 
 # Process
 
@@ -79,7 +79,7 @@ Review plugin plans for correctness, fidelity, and SDK type validity.
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _plugin/finalize-reviewers/correctness
 Decision: PASS | ADVISORY | BLOCKING
@@ -93,20 +93,20 @@ Problem: <what is wrong>
 Fix: <smallest concrete correction>
 
 ## Diff
-```diff
+~~~diff
 <path/to/file>
 --- a/path/to/file
 +++ b/path/to/file
 -context
 +fix
-```
+~~~
 
 ## Verified
 - <STEP-###>: <item description>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

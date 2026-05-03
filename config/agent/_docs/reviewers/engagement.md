@@ -79,7 +79,7 @@ Exclusions (ADVISORY only — do not block): API reference pages (exempt from ho
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _docs/reviewers/engagement
 Decision: PASS | ADVISORY | BLOCKING
@@ -91,7 +91,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or structural pattern>
 Problem: <what engagement or structural issue degrades the reader experience>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <path/to/documentation/file>
 --- a/<path/to/documentation/file>
 +++ b/<path/to/documentation/file>
@@ -99,14 +99,14 @@ Fix: <smallest concrete correction>
 -engagement issue
 +corrected structure or content
   unchanged context
-```
+~~~
 
 ## Verified
 - <file:section>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

@@ -74,7 +74,7 @@ Review ticket drafts for factual accuracy. Check file path validity, evidence-cl
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _ticket/reviewers/accuracy
 Decision: PASS | ADVISORY | BLOCKING
@@ -86,7 +86,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or reference>
 Problem: <what factual inaccuracy or unsupported claim degrades the ticket>
 Fix: <corrected path, evidence, or navigation>
-```diff
+~~~diff
 <path/to/<artifact_base>.draft.md>
 --- a/<path/to/<artifact_base>.draft.md>
 +++ b/<path/to/<artifact_base>.draft.md>
@@ -94,14 +94,14 @@ Fix: <corrected path, evidence, or navigation>
 -inaccurate path, claim, or navigation
 +corrected content
   unchanged context
-```
+~~~
 
 ## Verified
 - <section>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

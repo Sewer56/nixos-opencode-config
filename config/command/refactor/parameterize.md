@@ -60,7 +60,7 @@ If no target path is provided, stop and ask for an explicit path.
 
 ## Output Format (Template)
 
-````markdown
+```markdown
 Proposed Parameterisation Plan
 
 Targets:
@@ -92,14 +92,14 @@ Group:
 - <what is repetitive>
 
 Before:
-```<language>
+~~~<language>
 <old tests being replaced>
-```
+~~~
 
 After (planned):
-```<language>
+~~~<language>
 <new parameterised test with case names, parameters, and comments>
-```
+~~~
 
 Parameter labelling (only when non-obvious):
 - Add labels directly beside parameters in the `After (planned)` code block.
@@ -108,7 +108,7 @@ Verification:
 - <command>
 
 Say "go" to apply this plan, or suggest changes.
-````
+```
 
 ## Constraints
 - Keep the plan implementation-ready and concrete.
@@ -116,7 +116,7 @@ Say "go" to apply this plan, or suggest changes.
 
 ## Example Output
 
-````markdown
+```markdown
 Proposed Parameterisation Plan
 
 Targets:
@@ -145,7 +145,7 @@ Group:
 - Sign-check tests with identical logic, differing only in input/expected.
 
 Before:
-```rust
+~~~rust
 #[test]
 fn absolute_value_should_flip_negative() { ... }
 
@@ -154,10 +154,10 @@ fn absolute_value_should_keep_zero() { ... }
 
 #[test]
 fn absolute_value_should_keep_positive() { ... }
-```
+~~~
 
 After (planned):
-```rust
+~~~rust
 #[rstest]
 #[case::negative_should_flip(
     -5,  // input: negative value
@@ -175,10 +175,10 @@ fn absolute_value_should_return_expected(
     #[case] input: i32,
     #[case] expected: i32,
 ) { ... }
-```
+~~~
 
 Verification:
 - cargo test
 
 Say "go" to apply this plan, or suggest changes.
-````
+```

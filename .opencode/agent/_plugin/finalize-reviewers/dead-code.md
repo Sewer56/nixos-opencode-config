@@ -78,7 +78,7 @@ Detect dead code in finalized plugin artifacts. When a STEP item deletes, replac
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _plugin/finalize-reviewers/dead-code
 Decision: PASS | ADVISORY | BLOCKING
@@ -92,7 +92,7 @@ Description: <how the symbol became dead after the diffs are applied>
 Fix: <cleanup action>
 
 ## Diff
-```diff
+~~~diff
 <path/to/file>
 --- a/path/to/file
 +++ b/path/to/file
@@ -100,14 +100,14 @@ Fix: <cleanup action>
 -missing cleanup
 +added cleanup
  unchanged context
-```
+~~~
 
 ## Verified
 - <STEP-###>: <item description>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

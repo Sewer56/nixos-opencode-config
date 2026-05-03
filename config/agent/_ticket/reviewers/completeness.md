@@ -75,7 +75,7 @@ Review ticket drafts for completeness. Flag missing required sections, untestabl
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _ticket/reviewers/completeness
 Decision: PASS | ADVISORY | BLOCKING
@@ -87,7 +87,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or structural pattern>
 Problem: <what completeness issue degrades the ticket>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <path/to/<artifact_base>.draft.md>
 --- a/<path/to/<artifact_base>.draft.md>
 +++ b/<path/to/<artifact_base>.draft.md>
@@ -95,14 +95,14 @@ Fix: <smallest concrete correction>
 -missing or incomplete content
 +corrected content
   unchanged context
-```
+~~~
 
 ## Verified
 - <section>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

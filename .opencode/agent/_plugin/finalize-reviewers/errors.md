@@ -71,7 +71,7 @@ Review plugin code for error-handling coverage and standalone log pattern compli
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _plugin/finalize-reviewers/errors
 Decision: PASS | ADVISORY | BLOCKING
@@ -85,20 +85,20 @@ Problem: <what is wrong>
 Fix: <smallest concrete correction>
 
 ## Diff
-```diff
+~~~diff
 <path/to/file>
 --- a/path/to/file
 +++ b/path/to/file
 -context
 +fix
-```
+~~~
 
 ## Verified
 - <STEP-###>: <item description>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

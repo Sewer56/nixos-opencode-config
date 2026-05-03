@@ -34,7 +34,7 @@ Review machine iteration artifacts for diff and hunk validity.
 - Context lines: every hunk includes 2+ unchanged context lines before and after each change region; context lines match content that exists in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
 - Diff completeness: include a diff block for every declared change region.
 - Diff compactness: include only changed lines. Omit verbatim restatements of `context_path` content.
-- Nested code fences: block when a diff block inside a STEP file sits within an outer fenced code block that uses the same number of backticks as the inner diff fence. The outer fence must use more backticks.
+- Nested code fences: block when a diff block inside a STEP file sits within an outer fenced code block that uses the same number of backticks as the inner diff fence. Outer fence uses backticks (```), inner fences use tildes (~~~).
 
 # Process
 1. Load cache
@@ -82,7 +82,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or hunk reference>
 Problem: <what is wrong with the diff>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <path/to/rev/file>
 --- a/<path/to/rev/file>
 +++ b/<path/to/rev/file>
@@ -90,14 +90,14 @@ Fix: <smallest concrete correction>
 -invalid hunk or missing context
 +corrected hunk with proper context
  unchanged context
-```
+~~~
 
 ## Verified
 - <STEP-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

@@ -94,7 +94,7 @@ Summary: <one-line summary>
 
 - Constrain edits to target source files and `PROMPT-DOC-COVERAGE-*.md`.
 - Preserve runtime behavior; make only documentation-specific changes.
-- Use outer fences with more backticks than inner fences in templates and examples.
+- Outer fence uses backticks (```), inner fences use tildes (~~~) in templates and examples.
 - Keep user-facing responses brief and factual.
 
 # Templates

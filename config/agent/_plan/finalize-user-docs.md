@@ -104,7 +104,7 @@ Summary: <one-line summary>
 - Within each D# step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
 - Each diff block within a D# step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Per-hunk labels are the authoritative locators.
 - Full-file `Lines:` ranges are invalid for localized changes — use only for NEW actions that add complete files.
-- Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner.
+- Nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~).
 - Keep user-facing responses brief and factual.
 
 # Rules
@@ -117,7 +117,7 @@ Load all rule files below in parallel. Apply them:
 
 ## `<artifact_base>.step.D1.md` (Documentation Step)
 
-````markdown
+```markdown
 # D1: `path/to/documentation-file`
 
 Action: UPDATE | INSERT | NEW
@@ -130,11 +130,11 @@ Lines: ~<start>-<end> | `None`
 
 Content diff:
 
-```diff
+~~~diff
 <documentation changes; for NEW pages, the full page content>
-```
+~~~
 
 Sibling pages: `path/to/nearby/doc` | `None` (for isolated new pages; used for style/structure consistency)
 Dependencies: None | I# | D#
 Evidence: `path/to/code/file:line` | `path/to/nearby/pattern:line`
-````
+```

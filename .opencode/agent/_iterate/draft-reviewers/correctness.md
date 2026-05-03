@@ -67,7 +67,7 @@ rule application, and human/machine zone separation.
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _iterate/draft-reviewers/correctness
 Decision: PASS | ADVISORY | BLOCKING
@@ -79,7 +79,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <artifact_base>.draft.md
 --- a/<artifact_base>.draft.md
 +++ b/<artifact_base>.draft.md
@@ -87,14 +87,14 @@ Fix: <smallest concrete correction>
 -incorrect content
 +correct content
  unchanged context
-```
+~~~
 
 ## Verified
 - [P#]: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational
 wrapper, no text before `# REVIEW` or after the final `## Notes` line.

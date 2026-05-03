@@ -74,7 +74,7 @@ Review end-user documentation for wording quality.
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _docs/reviewers/wording
 Decision: PASS | ADVISORY | BLOCKING
@@ -86,7 +86,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what wording issue degrades readability>
 Fix: <concise replacement>
-```diff
+~~~diff
 <path/to/documentation/file>
 --- a/<path/to/documentation/file>
 +++ b/<path/to/documentation/file>
@@ -94,14 +94,14 @@ Fix: <concise replacement>
 -wordy or awkward phrasing
 +concise replacement
   unchanged context
-```
+~~~
 
 ## Verified
 - <file:section>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

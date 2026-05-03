@@ -72,7 +72,7 @@ instructions.
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _iterate/draft-reviewers/clarity
 Decision: PASS | ADVISORY | BLOCKING
@@ -84,7 +84,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what term or phrase is incomprehensible without prior knowledge>
 Fix: <inline definition or expanded meaning>
-```diff
+~~~diff
 <artifact_base>.draft.md
 --- a/<artifact_base>.draft.md
 +++ b/<artifact_base>.draft.md
@@ -92,14 +92,14 @@ Fix: <inline definition or expanded meaning>
 -undefined jargon or compressed term
 +expanded inline definition
  unchanged context
-```
+~~~
 
 ## Verified
 - [P#]: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational
 wrapper, no text before `# REVIEW` or after the final `## Notes` line.

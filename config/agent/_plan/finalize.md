@@ -180,7 +180,7 @@ Next Command: /plan/finalize-code-docs
 - Within each step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
 - Each diff block within a step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). The step header `Lines: ~` lists the comma-separated union of hunk ranges. Per-hunk labels are the authoritative locators.
 - Full-file `Lines:` ranges are invalid for localized changes — use only for ADD actions that add complete files.
-- Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to machine-plan templates, diff blocks, and reviewer output format examples.
+- Nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block. Applies to machine-plan templates, diff blocks, and reviewer output format examples.
 - Keep `<artifact_base>.handoff.md` machine-first: stable headings, explicit refs, concrete file-level steps, and anchors that point at the current repo surface. Step files follow the same machine-first discipline.
 - Keep `<artifact_base>.handoff.md` factual and stable enough for the machine plan and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
@@ -191,16 +191,16 @@ Next Command: /plan/finalize-code-docs
 
 ## `<artifact_base>.handoff.md`
 
-````markdown
+```markdown
 # Plan Handoff
 
 Source Plan: <absolute path to `<artifact_base>.draft.md`>
 
 ## Raw Request
 
-```text
+~~~text
 <verbatim user request or current consolidated request>
-```
+~~~
 
 ## Mission
 - Goal: see Overall Goal in source plan
@@ -298,7 +298,7 @@ Type: DOMAIN_AUTHORITY | ARBITRATION
 Issue: AUD-001
 Winner: <reviewer_name>
 Rationale: <why this view prevailed>
-````
+```
 
 ## `<artifact_base>.step.*.md` files
 
@@ -306,7 +306,7 @@ Implementation and test step content lives in individual files matching `step_pa
 
 ### `<artifact_base>.step.I1.md` (Implementation Step)
 
-````markdown
+```markdown
 # I1: `path/to/file`
 
 Action: UPDATE | INSERT | ADD | REMOVE
@@ -317,9 +317,9 @@ Insert at: before | after | replace `<anchor or region>` | `None`
 
 Import diff:
 
-```diff
+~~~diff
 <import changes or `None`>
-```
+~~~
 
 Code Shape:
 
@@ -329,11 +329,11 @@ Changes:
 - <concrete code change>
 Dependencies: None | I#
 Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
-````
+```
 
 ### `<artifact_base>.step.T1.md` (Test Step)
 
-````markdown
+```markdown
 # T1: `path/to/test-or-module`
 
 Action: UPDATE | INSERT | ADD | REMOVE
@@ -345,9 +345,9 @@ Insert at: before | after | replace `<anchor or region>` | `None`
 
 Import diff:
 
-```diff
+~~~diff
 <import changes or `None`>
-```
+~~~
 
 Code shape:
 
@@ -358,4 +358,4 @@ Changes:
 Parameterization: None | <cases>
 Dependencies: None | I# | T#
 Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
-````
+```

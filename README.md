@@ -13,7 +13,7 @@ update this often enough, making it harder to track OS/system changes.
 
 ## Directory Structure
 
-````
+```
 .
 ├── default.nix            # Home Manager module (packages, symlinks)
 ├── opencode-source/       # Pinned OpenCode source (submodule)
@@ -24,7 +24,7 @@ update this often enough, making it harder to track OS/system changes.
 │   ├── command/           # Slash-command definitions
 │   ├── rules/             # Coding and documentation rules
 │   └── plugins/           # TypeScript plugins
-````
+```
 
 `config/` is symlinked to `~/.config/opencode` at build time (see
 [default.nix](default.nix)).

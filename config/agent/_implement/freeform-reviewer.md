@@ -44,7 +44,7 @@ Review an implementation against request intent from conversation context.
 
 # Output
 
-````text
+```text
 # REVIEW
 Decision: PASS | BLOCKING | ADVISORY
 
@@ -54,7 +54,7 @@ Severity: BLOCKING | ADVISORY
 File: <path>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 src/lib.rs
 --- a/src/lib.rs
 +++ b/src/lib.rs
@@ -62,14 +62,14 @@ src/lib.rs
 -old content
 +new content
  unchanged context
-```
+~~~
 
 ## Verified
 - <list items checked with no issues found>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 # Constraints
 - Both BLOCKING and ADVISORY findings must be addressed by the caller.

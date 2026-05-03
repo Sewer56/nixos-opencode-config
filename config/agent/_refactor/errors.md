@@ -127,7 +127,7 @@ Summary: <one-line summary>
 
 ## `PROMPT-ERROR-DOCS.cache.md`
 
-````markdown
+```markdown
 # Error Docs Cache
 
 ## Summary
@@ -147,4 +147,4 @@ Summary: <one-line summary>
 ## Items
 
 ### <relative_path:line> — `function_name` (missing|vague)
-````
+```

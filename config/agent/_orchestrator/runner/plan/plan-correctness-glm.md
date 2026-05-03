@@ -159,7 +159,7 @@ Summary: Undefined helper function in plan
 Why It Matters: Coder will need to invent implementation details
 Requested Fix: Define validate_token() signature and location, or reference existing implementation
 Acceptance Criteria: All referenced symbols are defined or mapped to existing code
-```diff
+~~~diff
 <path/to/step/file>
 --- a/<path/to/step/file>
 +++ b/<path/to/step/file>
@@ -167,14 +167,14 @@ Acceptance Criteria: All referenced symbols are defined or mapped to existing co
 -+undefined symbol referenced
 ++defined symbol or mapped to existing code
  unchanged context
-```
+~~~
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - Brief observations for other reviewers or planner
-````
+```
 
 # Constraints
 - Follow the `# Process` section for cache, Delta, and skip handling.

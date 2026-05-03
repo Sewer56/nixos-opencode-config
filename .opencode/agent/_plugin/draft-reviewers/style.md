@@ -64,7 +64,7 @@ Review plugin draft artifacts for instruction style quality.
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _plugin/draft-reviewers/style
 Decision: PASS | ADVISORY | BLOCKING
@@ -76,7 +76,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what violates the style criterion>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <artifact_base>.draft.md
 --- a/<artifact_base>.draft.md
 +++ b/<artifact_base>.draft.md
@@ -84,14 +84,14 @@ Fix: <smallest concrete correction>
 -prose description or passive voice
 +imperative command
  unchanged context
-```
+~~~
 
 ## Verified
 - [P#]: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational
 wrapper, no text before `# REVIEW` or after the final `## Notes` line.

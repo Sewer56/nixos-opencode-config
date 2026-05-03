@@ -79,7 +79,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what self-policing rule is violated>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <path/to/rev/file>
 --- a/<path/to/rev/file>
 +++ b/<path/to/rev/file>
@@ -87,14 +87,14 @@ Fix: <smallest concrete correction>
 -missing enforcement-logic update
 +enforcement-logic instruction added
  unchanged context
-```
+~~~
 
 ## Verified
 - <STEP-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

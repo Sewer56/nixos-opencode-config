@@ -84,7 +84,7 @@ Source Document: <path if one exists, else `user input`>
 
 ## `PROMPT-DRAFT-NN-{title}.md`
 
-````markdown
+```markdown
 # Draft Task
 
 Title: <short task title>
@@ -100,16 +100,16 @@ Depends on: None | `PROMPT-DRAFT-0N-<title>.md`
 1. <step>
 2. <step>
 
-```language
+~~~language
 <optional: known function signature, interface shape, schema fragment, or route contract>
-```
+~~~
 
 Note: <one short note if needed>
 
 ## Scope Notes
 - <task-specific constraint, decision, or open question>
 - <or `None`>
-````
+```
 
 ## Constraints
 - Number draft files sequentially.

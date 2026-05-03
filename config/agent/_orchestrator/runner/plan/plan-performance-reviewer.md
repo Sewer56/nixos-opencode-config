@@ -199,7 +199,7 @@ Summary: Database query inside loop creates N+1 query pattern
 Why It Matters: Performance degrades linearly with user count; will fail at scale
 Requested Fix: Use batch query to fetch all user details in one query, or use eager loading
 Acceptance Criteria: Single query or JOIN fetches all required data
-```diff
+~~~diff
 <path/to/step/file>
 --- a/<path/to/step/file>
 +++ b/<path/to/step/file>
@@ -207,7 +207,7 @@ Acceptance Criteria: Single query or JOIN fetches all required data
 -+N+1 query pattern
 ++batch query or eager loading
  unchanged context
-```
+~~~
 
 ### [PERF-002]
 Category: PERF_DATA
@@ -225,7 +225,7 @@ Acceptance Criteria: No unnecessary cloning of large data structures
 
 ## Notes
 - Performance context for other reviewers
-````
+```
 
 # Constraints
 - If no performance-sensitive areas detected, return PASS with brief note

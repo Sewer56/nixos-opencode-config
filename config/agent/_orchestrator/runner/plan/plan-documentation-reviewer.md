@@ -119,7 +119,7 @@ Summary: Required in-source docs are not planned concretely
 Why It Matters: The coder would need to invent documentation scope and content
 Requested Fix: Show the intended module and required API doc block/comment directly in the relevant implementation step snippet or diff
 Acceptance Criteria: The affected implementation step includes concrete doc snippets or diffs that satisfy the rules
-```diff
+~~~diff
 <path/to/step/file>
 --- a/<path/to/step/file>
 +++ b/<path/to/step/file>
@@ -127,14 +127,14 @@ Acceptance Criteria: The affected implementation step includes concrete doc snip
 -+new doc content
 ++replacement doc content
  unchanged context
-```
+~~~
 
 ## Verified
 - <I#/T#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - Brief observations for other reviewers or planner
-````
+```
 
 # Constraints
 - Follow the `# Process` section for cache, Delta, and skip handling.

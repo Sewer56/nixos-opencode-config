@@ -62,7 +62,7 @@ Lines: ~<start>-<end> | None
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <path/to/plan/item/file>
 --- a/<path/to/plan/item/file>
 +++ b/<path/to/plan/item/file>
@@ -70,11 +70,11 @@ Fix: <smallest concrete correction>
 -+proposed error docs with vague trigger
 ++proposed error docs with concrete trigger
  unchanged context
-```
+~~~
 
 ## Notes
 - <optional short notes>
-````
+```
 
 # Malformed-Output Retry
 

@@ -82,7 +82,7 @@ Resolution: <only for RESOLVED>
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: documentation
 Decision: PASS | ADVISORY | BLOCKING
@@ -94,7 +94,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <artifact_base>.draft.md
 --- a/<artifact_base>.draft.md
 +++ b/<artifact_base>.draft.md
@@ -102,12 +102,12 @@ Fix: <smallest concrete correction>
 -missing doc [P#] item
 +added doc [P#] item with file path and change description
  unchanged context
-```
+~~~
 
 ## Verified
 - [P#]: <item description — unchanged items that remain verified>
 
-````
+```
 
 # Constraints
 - Block for missing documentation `[P#]` items when code changes affect user-facing surface.

@@ -36,7 +36,7 @@ Review finalized iteration artifacts for instruction style quality.
 - Output format pinned: when a revision or `STEP-###` target prescribes structured output, specify the exact format in a fenced code block with `text` language tag.
 - Fixed-output consistency: when multiple `STEP-###` targets define the same structured output kind, use identical format blocks.
 - Subagent prompt shape: when a revision defines a reviewer or subagent prompt, pin only task-specific inputs.
-- Nested code fences: block when a STEP target or reviewer output format example contains an inner ``` fence inside an outer ``` fence. The outer fence must use more backticks (e.g. ```` for outer when inner uses ```).
+- Nested code fences: block when a STEP target or reviewer output format example contains an inner ``` fence inside an outer ``` fence. Outer fence uses backticks (```), inner fences use tildes (~~~).
 
 # Process
 1. Load cache
@@ -84,7 +84,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what violates the style criterion>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <path/to/rev/file>
 --- a/<path/to/rev/file>
 +++ b/<path/to/rev/file>
@@ -92,14 +92,14 @@ Fix: <smallest concrete correction>
 -prose description or passive voice
 +imperative command
  unchanged context
-```
+~~~
 
 ## Verified
 - <STEP-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational
 wrapper, no text before `# REVIEW` or after the final `## Notes` line.

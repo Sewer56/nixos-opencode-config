@@ -149,7 +149,7 @@ Revisions produced by this finalize run must follow. Apply only the relevant rul
 - **Shared ledger/file**: use a shared ledger or coordination file for orchestrator state when coordinating subagents. ~~Scattering coordination state across subagent outputs~~ → single shared file.
 - **Concise human-facing docs**: include a short documentation update for humans when the iteration changes conventions or adds new artifacts.
 - **Tight subagent inputs**: pass only artifact paths, Delta/Decision excerpts, scoping, and user notes to subagents. ~~Re-stating output formats, focus lists, role assignments, target paths already enumerated in shared artifacts, or blanket read orders~~ → pass only what the callee cannot derive from its own agent file.
-- **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```). Prevents premature closure of the outer block. Applies to templates, machine-artifact diff blocks, and reviewer output format examples.
+- **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block. Applies to templates, machine-artifact diff blocks, and reviewer output format examples.
 
 # Reference Paths
 
@@ -163,16 +163,16 @@ Revisions produced by this finalize run must follow. Apply only the relevant rul
 
 ## `<artifact_base>.handoff.md`
 
-````markdown
+```markdown
 # Iteration Handoff
 
 Source Context: <absolute path to `<artifact_base>.draft.md`>
 
 ## Raw Request
 
-```text
+~~~text
 <verbatim user request or current consolidated request>
-```
+~~~
 
 ## Supplementary Context
 - <repo fact, boundary, or pattern not already in source context Discovery>
@@ -217,13 +217,13 @@ Type: DOMAIN_AUTHORITY | ARBITRATION
 Issue: COR-001
 Winner: <reviewer_name>
 Rationale: <why this view prevailed>
-````
+```
 
 ## `<artifact_base>.step.*.md` files
 
 Each file `<artifact_base>.step.NNN.md` contains one revision item:
 
-````markdown
+```markdown
 # STEP-NNN: `path/to/file`
 
 Action: CREATE | UPDATE | DELETE
@@ -237,19 +237,19 @@ Diff:
 
 **Lines: ~<start>-<end>**
 
-```diff
+~~~diff
 <diff block — include 2+ context lines before and after
 each change.>
-```
+~~~
 
 **Lines: ~<start>-<end>**
 
-```diff
+~~~diff
 <additional diff block if changes are scattered>
-```
+~~~
 
 Changes:
 - <summary for quick scanning>
 Dependencies: None | STEP#
 Evidence: `path/to/file:line`
-````
+```

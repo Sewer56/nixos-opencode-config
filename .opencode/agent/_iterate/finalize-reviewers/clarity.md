@@ -74,7 +74,7 @@ Review finalized iteration artifacts for comprehensibility of behavior-governing
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _iterate/finalize-reviewers/clarity
 Decision: PASS | ADVISORY | BLOCKING
@@ -86,7 +86,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what term or phrase is incomprehensible without prior knowledge>
 Fix: <inline definition or expanded meaning>
-```diff
+~~~diff
 <path/to/rev/file>
 --- a/<path/to/rev/file>
 +++ b/<path/to/rev/file>
@@ -94,14 +94,14 @@ Fix: <inline definition or expanded meaning>
 -undefined jargon or compressed term
 +expanded inline definition
  unchanged context
-```
+~~~
 
 ## Verified
 - <STEP-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

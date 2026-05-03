@@ -107,5 +107,5 @@ Summary: <one-line summary>
 
 - Write only `<artifact_base>.draft.md`, `<artifact_base>.draft.handoff.md`, and `<artifact_base>.draft.review-*.md`.
 - Use fenced `text` code blocks for plain structured output.
-- Use a longer outer fence than inner fence whenever a code block contains another code block.
+- Outer fence uses backticks (```), inner fences use tildes (~~~) whenever a code block contains another code block.
 - Treat live availability claims (domains, packages, handles) as provisional unless the handoff records an explicit external check via `@mcp-search`.

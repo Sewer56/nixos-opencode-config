@@ -31,7 +31,7 @@ Review iteration draft artifacts for instruction style quality.
 - Positive framing: each revision states what to do. Lead with the desired action; omit prohibitions where an action suffices.
 - Self-contained: each `[P#]` item usable without cross-referencing other files or external docs. Inline schemas, types, formats.
 - Output format pinned: when a `[P#]` item prescribes structured output, specify the exact format in a fenced code block with `text` language tag.
-- Nested code fences: block when a diff block or template inside a `[P#]` item contains an inner ``` fence inside an outer ``` fence. Use more backticks for the outer fence than the inner (e.g. ```` for outer when inner uses ```).
+- Nested code fences: block when a diff block or template inside a `[P#]` item contains an inner ``` fence inside an outer ``` fence. Outer fence uses backticks (```), inner fences use tildes (~~~).
 
 # Process
 1. Load cache
@@ -66,7 +66,7 @@ Review iteration draft artifacts for instruction style quality.
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _iterate/draft-reviewers/style
 Decision: PASS | ADVISORY | BLOCKING
@@ -78,7 +78,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what violates the style criterion>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <artifact_base>.draft.md
 --- a/<artifact_base>.draft.md
 +++ b/<artifact_base>.draft.md
@@ -86,14 +86,14 @@ Fix: <smallest concrete correction>
 -prose description or passive voice
 +imperative command
  unchanged context
-```
+~~~
 
 ## Verified
 - [P#]: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational
 wrapper, no text before `# REVIEW` or after the final `## Notes` line.

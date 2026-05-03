@@ -132,7 +132,7 @@ For a single prompt, use `@_orchestrator/runner`.
 
 ## Prompt File Format: `PROMPT-NN-{title}.md`
 
-````markdown
+```markdown
 # Mission
 [1-2 sentence goal]
 
@@ -183,7 +183,7 @@ A: <answer>
 - In scope checks: <format/lint/build/tests relevant to this prompt>
 - Out of scope known failures: <pre-existing unrelated failures if any, else None>
 - Priority files: <files reviewers should prioritize>
-````
+```
 
 ## Orchestrator Index: `PROMPT-ORCHESTRATOR.md`
 

@@ -71,7 +71,7 @@ Review branding for positioning.
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _branding/reviewers/positioning
 Decision: PASS | ADVISORY | BLOCKING
@@ -83,7 +83,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what positioning issue undermines brand coherence>
 Fix: <concrete correction or alternative>
-```diff
+~~~diff
 <artifact_base>.draft.md
 --- a/<artifact_base>.draft.md
 +++ b/<artifact_base>.draft.md
@@ -91,14 +91,14 @@ Fix: <concrete correction or alternative>
 -misaligned name or messaging
 +coherent alternative
   unchanged context
-```
+~~~
 
 ## Verified
 - [<ID>]: <candidate name or section — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

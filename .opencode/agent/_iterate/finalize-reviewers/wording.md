@@ -81,7 +81,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what is unnecessarily verbose or poorly structured>
 Fix: <smallest simplification>
-```diff
+~~~diff
 <path/to/rev/file>
 --- a/<path/to/rev/file>
 +++ b/<path/to/rev/file>
@@ -89,14 +89,14 @@ Fix: <smallest simplification>
 -verbose or poorly structured text
 +tightened replacement text
  unchanged context
-```
+~~~
 
 ## Verified
 - <STEP-###>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

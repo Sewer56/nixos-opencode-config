@@ -73,7 +73,7 @@ Review branding for availability.
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _branding/reviewers/availability
 Decision: PASS | ADVISORY | BLOCKING
@@ -85,7 +85,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what availability issue creates risk or misleading claims>
 Fix: <concrete correction or addition>
-```diff
+~~~diff
 <artifact_base>.draft.md
 --- a/<artifact_base>.draft.md
 +++ b/<artifact_base>.draft.md
@@ -93,14 +93,14 @@ Fix: <concrete correction or addition>
 -missing or risky availability claim
 +qualified claim or disclaimer
   unchanged context
-```
+~~~
 
 ## Verified
 - [<ID>]: <candidate name or section — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

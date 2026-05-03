@@ -76,7 +76,7 @@ Review ticket drafts for wording and structural quality. Flag filler, passive vo
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _ticket/reviewers/wording
 Decision: PASS | ADVISORY | BLOCKING
@@ -88,7 +88,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or structural pattern>
 Problem: <what wording or structural issue degrades readability>
 Fix: <concise replacement or structural correction>
-```diff
+~~~diff
 <path/to/<artifact_base>.draft.md>
 --- a/<path/to/<artifact_base>.draft.md>
 +++ b/<path/to/<artifact_base>.draft.md>
@@ -96,14 +96,14 @@ Fix: <concise replacement or structural correction>
 -wordy, passive, or structural issue
 +concise replacement
   unchanged context
-```
+~~~
 
 ## Verified
 - <section>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

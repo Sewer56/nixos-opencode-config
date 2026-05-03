@@ -180,16 +180,16 @@ Apply these rules when writing STEP files:
 
 ## `<artifact_base>.handoff.md`
 
-````markdown
+```markdown
 # Iteration Handoff
 
 Source Context: <absolute path to `<artifact_base>.draft.md`>
 
 ## Raw Request
 
-```text
+~~~text
 <verbatim user request or current consolidated request>
-```
+~~~
 
 ## Supplementary Context
 - <repo fact, boundary, or pattern not already in source context Discovery>
@@ -234,13 +234,13 @@ Type: DOMAIN_AUTHORITY | ARBITRATION
 Issue: COR-001
 Winner: <reviewer_name>
 Rationale: <why this view prevailed>
-````
+```
 
 ## `<artifact_base>.step.*.md` files
 
 Each file `<artifact_base>.step.NNN.md` contains one revision item:
 
-````markdown
+```markdown
 # STEP-NNN: `path/to/file`
 
 Action: CREATE | UPDATE | DELETE
@@ -255,19 +255,19 @@ Diff:
 
 **Lines: ~<start>-<end>**
 
-```diff
+~~~diff
 <diff block — include 2+ context lines before and after
 each change.>
-```
+~~~
 
 **Lines: ~<start>-<end>**
 
-```diff
+~~~diff
 <additional diff block if changes are scattered>
-```
+~~~
 
 Changes:
 - <summary for quick scanning>
 Dependencies: None | STEP#
 Evidence: `path/to/file:line`
-````
+```

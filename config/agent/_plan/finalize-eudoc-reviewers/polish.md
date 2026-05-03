@@ -94,7 +94,7 @@ Exclusions (ADVISORY only): API reference pages, changelogs, migration guides. E
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _plan/finalize-eudoc-reviewers/polish
 Decision: PASS | ADVISORY | BLOCKING
@@ -107,7 +107,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <D# step, `path:line`, or pattern>
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
-```diff
+~~~diff
 <path/to/step/file>
 --- a/<path/to/step/file>
 +++ b/<path/to/step/file>
@@ -115,14 +115,14 @@ Fix: <smallest concrete correction>
 -issue
 +fix
   unchanged context
-```
+~~~
 
 ## Verified
 - <D#>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line.
 

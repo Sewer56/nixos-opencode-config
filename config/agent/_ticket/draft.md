@@ -88,7 +88,7 @@ Read the files surfaced by discovery that matter to the ticket. Gather code snip
 
 Derive `artifact_base` from `slug` as `PROMPT-TICKET-<slug>`. All artifact paths derive from `artifact_base`. Write `ticket_path` from scratch for this run. Apply the ticket template with the sections the user's request implies. Each section must be self-contained and actionable. Include a section only when the request or research produces meaningful content for it.
 
-``````markdown
+```markdown
 ## Summary
 
 2–3 short sentences.
@@ -103,9 +103,9 @@ State what the issue is, then why it matters.
 
 One-sentence lead-in, then data only.
 
-```<lang>
+~~~<lang>
 <code block, table, or file excerpt>
-```
+~~~
 
 ## Options
 
@@ -126,15 +126,15 @@ Current leaning: <which option and why, or "compare X against Y before choosing"
 
 Regex:
 
-```text
+~~~text
 <pattern>
-```
+~~~
 
 Search path:
 
-```text
+~~~text
 <directory or file glob>
-```
+~~~
 
 Plain-English meaning:
 - <what the matches represent>
@@ -145,15 +145,15 @@ Plain-English meaning:
 
 Current pattern:
 
-```<lang>
+~~~<lang>
 <before>
-```
+~~~
 
 Better direction:
 
-```<lang>
+~~~<lang>
 <after>
-```
+~~~
 
 Simple meaning:
 - <one-line plain-English explanation>
@@ -184,7 +184,7 @@ Simple meaning:
 ## Not affected
 
 - <explicit non-concern>
-``````
+```
 
 Section inclusion rules:
 - **Always include**: Summary, Acceptance Criteria.
@@ -253,5 +253,5 @@ Summary: <one-line summary>
 - Follow bullet-spacing and prose-wrap conventions — see `_ticket/reviewers/wording.md` Focus for details.
 - Enforce the "Conciseness and formatting" subsection rules as hard constraints.
 - Wrap prose at ~80 characters per line.
-- Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner (e.g. ```` for outer when inner uses ```).
+- Nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~).
 - Keep user-facing responses brief and factual.

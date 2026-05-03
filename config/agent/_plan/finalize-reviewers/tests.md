@@ -37,7 +37,7 @@ Review a machine plan's test strategy. Initial review only — re-review handled
 
 # Cache file format
 
-````markdown
+```markdown
 # Review Cache: tests
 
 ## Verified Observations
@@ -51,17 +51,17 @@ Category: COVERAGE | REDUNDANCY | PARAMETERIZATION | PLACEMENT
 Severity: BLOCKING | ADVISORY
 Problem: <one line>
 Fix: <unified diff targeting step file(s)>
-```diff
+~~~diff
 <path/to/step/file>
 --- a/<path/to/step/file>
 +++ b/<path/to/step/file>
- unchanged context
+  unchanged context
 -+proposed test step
 ++corrected test step with proper coverage
- unchanged context
-```
+  unchanged context
+~~~
 Resolution: <only for RESOLVED>
-````
+```
 
 # Output
 

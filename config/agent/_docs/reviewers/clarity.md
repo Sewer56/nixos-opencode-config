@@ -79,7 +79,7 @@ Review end-user documentation for comprehensibility.
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _docs/reviewers/clarity
 Decision: PASS | ADVISORY | BLOCKING
@@ -91,7 +91,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what term or phrase is incomprehensible without prior knowledge>
 Fix: <inline definition, link, or expanded meaning>
-```diff
+~~~diff
 <path/to/documentation/file>
 --- a/<path/to/documentation/file>
 +++ b/<path/to/documentation/file>
@@ -99,14 +99,14 @@ Fix: <inline definition, link, or expanded meaning>
 -undefined jargon or compressed term
 +expanded inline definition
   unchanged context
-```
+~~~
 
 ## Verified
 - <file:section>: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
 

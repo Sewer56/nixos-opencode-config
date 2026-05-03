@@ -159,5 +159,5 @@ Summary: <one-line summary>
 - Track reviewer cache and delta per sub-ticket.
 - Pass only paths and deltas to reviewers.
 - Use fenced code blocks with the `text` language tag for machine-readable output.
-- Nested code fences: when a fenced code block contains another fenced code block, the outer fence must use more backticks than the inner.
+- Nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~).
 - Keep user-facing responses brief and factual.

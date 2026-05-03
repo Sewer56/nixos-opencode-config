@@ -91,7 +91,7 @@ Resolution: <only for RESOLVED>
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: wording
 Decision: PASS | ADVISORY | BLOCKING
@@ -103,7 +103,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what is unnecessarily verbose or poorly structured>
 Fix: <smallest simplification>
-```diff
+~~~diff
 <artifact_base>.draft.md
 --- a/<artifact_base>.draft.md
 +++ b/<artifact_base>.draft.md
@@ -111,12 +111,12 @@ Fix: <smallest simplification>
 -verbose or poorly structured text
 +tightened replacement text
  unchanged context
-```
+~~~
 
 ## Verified
 - [P#]: <item description — unchanged items that remain verified>
 
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational
 wrapper, no text before `# REVIEW` or after the `## Verified` block.

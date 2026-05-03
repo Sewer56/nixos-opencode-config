@@ -172,7 +172,7 @@ When creating or refining command/agent pairs, understand how arguments flow:
 
 # Template: `<artifact_base>.draft.md`
 
-````markdown
+```markdown
 # Iteration Context
 
 Overall Goal: <one-line goal>
@@ -205,7 +205,7 @@ create | refine | both
 <free-form explanation of intent, why, and applicable design rules as
 target-file behavior>
 
-```diff
+~~~diff
 <path>
 --- a/<path>
 +++ b/<path>
@@ -213,12 +213,12 @@ target-file behavior>
 -old content
 +new content
  unchanged context
-````
-````
+~~~
+```
 
 ## `<artifact_base>.draft.handoff.md`
 
-````markdown
+```markdown
 # Draft Review Handoff
 
 Source Context: <absolute path to `<artifact_base>.draft.md`>
@@ -236,7 +236,7 @@ Type: DOMAIN_AUTHORITY | ARBITRATION
 Issue: <finding-id>
 Winner: <reviewer_name>
 Rationale: <why this view prevailed>
-````
+```
 
 # Output
 

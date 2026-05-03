@@ -66,7 +66,7 @@ plugin knowledge restatement.
 
 # Output
 
-````text
+```text
 # REVIEW
 Agent: _plugin/draft-reviewers/dedup
 Decision: PASS | ADVISORY | BLOCKING
@@ -78,7 +78,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what is duplicated that should be referenced>
 Fix: <smallest deduplication>
-```diff
+~~~diff
 <artifact_base>.draft.md
 --- a/<artifact_base>.draft.md
 +++ b/<artifact_base>.draft.md
@@ -86,14 +86,14 @@ Fix: <smallest deduplication>
 -duplicated content
 +reference to source section or Plugin Knowledge
  unchanged context
-```
+~~~
 
 ## Verified
 - [P#]: <item description — unchanged items that remain verified>
 
 ## Notes
 - <optional short notes>
-````
+```
 
 Return ONLY the block above — no introduction, no summary, no conversational
 wrapper, no text before `# REVIEW` or after the final `## Notes` line.

@@ -30,7 +30,7 @@ Review a finalized machine plan for correctness and scope in one pass. Initial r
    - `Lines: ~start-end` within ±10 lines. Per-hunk labels required (BLOCKING when missing).
    - Full-file ranges invalid for localized changes. Header lists comma-separated union of hunk ranges.
    - 2+ context lines before/after each change, matching target file content. Block for missing/unmatched context.
-   - Nested fences: outer must use more backticks than inner (BLOCKING).
+   - Nested fences: outer fence uses backticks (```), inner fences use tildes (~~~) (BLOCKING).
 3. **Completeness**: every REQ-### maps to impl + test refs. No gaps, placeholders, missing anchors, undefined helpers.
 4. **Economy**: no unnecessary steps beyond confirmed intent. Correct file placement.
 5. **Dead-code**: only when steps contain REMOVE or symbol-deletion UPDATE. Skip otherwise.
@@ -47,7 +47,7 @@ Review a finalized machine plan for correctness and scope in one pass. Initial r
 
 # Cache file format
 
-````markdown
+```markdown
 # Review Cache: audit
 
 ## Verified Observations
@@ -61,17 +61,17 @@ Category: FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE
 Severity: BLOCKING | ADVISORY
 Problem: <one line>
 Fix: <unified diff targeting step file(s)>
-```diff
+~~~diff
 <path/to/step/file>
 --- a/<path/to/step/file>
 +++ b/<path/to/step/file>
- unchanged context
+  unchanged context
 -problem
 +fix
- unchanged context
-```
+  unchanged context
+~~~
 Resolution: <only for RESOLVED>
-````
+```
 
 # Output
 

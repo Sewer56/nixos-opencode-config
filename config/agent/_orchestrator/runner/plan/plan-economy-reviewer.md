@@ -136,7 +136,7 @@ Summary: Creating a new file for a trivial helper
 Why It Matters: Increases module complexity without ownership benefit
 Requested Fix: Inline the helper in the calling module or use existing utility
 Acceptance Criteria: Helper is inlined or moved to existing appropriate file
-```diff
+~~~diff
 <path/to/step/file>
 --- a/<path/to/step/file>
 +++ b/<path/to/step/file>
@@ -144,7 +144,7 @@ Acceptance Criteria: Helper is inlined or moved to existing appropriate file
 -+unnecessary new file or abstraction
 ++inlined or moved to existing file
  unchanged context
-```
+~~~
 
 ### [ECO-002]
 Category: ECONOMY
@@ -162,7 +162,7 @@ Acceptance Criteria: Direct implementation without trait, or justification for t
 
 ## Notes
 - Observations for other reviewers
-````
+```
 
 # Constraints
 - Be explicit about why an abstraction/file/helper is unnecessary
