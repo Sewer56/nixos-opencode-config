@@ -9,13 +9,7 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
-  edit:
-    "*": deny
-    "config/agent/**": allow
-    "config/command/**": allow
-    ".opencode/agent/**": allow
-    ".opencode/command/**": allow
-    "*PROMPT-ITERATE-EDIT*.md": allow
+  edit: allow
   question: allow
   todowrite: allow
   external_directory: allow

@@ -52,7 +52,7 @@ from agent_semaphore import AgentSemaphore  # noqa: E402
 
 
 SAMPLES = 3
-MAX_AGENTS = 10
+MAX_AGENTS = 16
 AGENT_NAMESPACE = "global"
 
 
@@ -86,12 +86,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repo", required=True, help="Absolute path to source workspace root")
     parser.add_argument("--slug", required=True, help="Experiment slug for workspace naming")
     parser.add_argument("--cleanup-pattern", action="append", default=[], help="Artifact glob to remove before each sample")
-    parser.add_argument(
-        "--max-agents",
-        type=int,
-        default=MAX_AGENTS,
-        help="Global max concurrent subagent slots across all run_batch.py instances",
-    )
     parser.add_argument(
         "--max-parallel-subagents",
         type=int,
@@ -161,7 +155,7 @@ def run_workspace_sample(args_tuple) -> tuple[int, dict]:
     try:
         cleanup_artifacts(workspace_dir, cleanup_patterns)
         cmd = build_opencode_cmd(args, sample, workspace_dir)
-        sem = AgentSemaphore(AGENT_NAMESPACE, max_agents=args.max_agents)
+        sem = AgentSemaphore(AGENT_NAMESPACE, max_agents=MAX_AGENTS)
         print(f"  Sample {sample}: waiting for {args.max_parallel_subagents} agent slots...")
         sem.acquire(args.max_parallel_subagents)
         try:
