@@ -189,6 +189,8 @@ Next Command: /plan/finalize-code-docs
 
 # Templates
 
+**Template rule:** Omit any section whose only content would be `None`, a placeholder, or empty. Do not write sections that carry no information.
+
 ## `<artifact_base>.handoff.md`
 
 ```markdown
@@ -207,20 +209,16 @@ Source Plan: <absolute path to `<artifact_base>.draft.md`>
 - Why: <why this work matters>
 
 ## Supplementary Context
-- <repo fact, boundary, or pattern not already in source plan [P#] sections>
-- <or `None`>
+- <repo fact, boundary, or pattern not already in source plan [P#] sections; omit section if none>
 
 ## Required Reads
-- `path/to/file-or-dir`: <why it matters>
-- <or `None`>
+- `path/to/file-or-dir`: <why it matters; omit section if none>
 
 ## Constraints
-- <explicit user or repo constraint>
-- <or `None`>
+- <explicit user or repo constraint; omit section if none>
 
 ## Success Criteria
-- <what must be true when the work is done>
-- <or `None`>
+- <what must be true when the work is done; omit section if none>
 
 ## Scope
 - In scope: <what this plan covers>
@@ -238,17 +236,16 @@ Source Plan: <absolute path to `<artifact_base>.draft.md`>
 - <brief goal and shape of the change>
 
 ## Settled Facts
-- [FACT-001] <repo fact the plan depends on> (Source: `path/to/file:line`)
-- <or `None`>
+- [FACT-001] <repo fact the plan depends on> (Source: `path/to/file:line`; omit section if none)
 
 ## Assumptions
-- <assumptions or `None`>
+- <assumptions; omit section if none>
 
 ## Risks and Open Questions
-- <real risks or `None`>
+- <real risks; omit section if none>
 
 ## Review Focus
-- <areas reviewers should scrutinize>
+- <areas reviewers should scrutinize; omit section if none>
 
 ## Revision History
 - Iteration 1: Initial draft.
@@ -281,7 +278,7 @@ Source Plan: <absolute path to `<artifact_base>.draft.md`>
 | T1 | `path/to/test` | INSERT | `<artifact_base>.step.T1.md` |
 
 ## Verification Commands
-- `<command>`: <why it should be run>
+- `<command>`: <why it should be run; omit section if none>
 
 ## Review Ledger
 
