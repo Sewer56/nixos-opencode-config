@@ -184,6 +184,18 @@ describe("expand: mixed {env:...} and {file:...}", () => {
       restore()
     }
   })
+
+  test("env values may inject file tokens (env expands before file)", async () => {
+    const dir = await makeTmpDir({ "from-env.txt": "ENV_TO_FILE_MARKER" })
+    cleanup.push(dir)
+    const restore = withEnv("FILE_INTERP_TEST_FILE_TOKEN", "{file:./from-env.txt}")
+    try {
+      const result = await expand(`value={env:FILE_INTERP_TEST_FILE_TOKEN}`, dir)
+      expect(result).toBe("value=ENV_TO_FILE_MARKER")
+    } finally {
+      restore()
+    }
+  })
 })
 
 // ── expand: no tokens ─────────────────────────────────────────────────────────
@@ -197,6 +209,16 @@ describe("expand: no tokens", () => {
   test("returns text unchanged when only plain variable references", async () => {
     const result = await expand("path=GENERAL_RULES_PATH home=$HOME", "/tmp")
     expect(result).toBe("path=GENERAL_RULES_PATH home=$HOME")
+  })
+
+  test("leaves empty token forms unchanged", async () => {
+    const result = await expand("empty {env:} and {file:}", "/tmp")
+    expect(result).toBe("empty {env:} and {file:}")
+  })
+
+  test("leaves unclosed token forms unchanged", async () => {
+    const result = await expand("broken {env:FOO and {file:./x.txt", "/tmp")
+    expect(result).toBe("broken {env:FOO and {file:./x.txt")
   })
 })
 
@@ -254,4 +276,3 @@ describe("expand: regex lastIndex safety", () => {
     expect(result2).toBe("value=X")
   })
 })
-
