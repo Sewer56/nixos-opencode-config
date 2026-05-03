@@ -27,14 +27,15 @@ permission:
 Check changed prompt files against selected workflow patterns.
 
 # Inputs
-- `log_path`: `PROMPT-ITERATE-EDIT-<slug>.md`.
-- `pattern_contract_path`: `PROMPT-ITERATE-EDIT-<slug>.patterns.md`.
+- `log_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.md` path.
+- `pattern_contract_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.patterns.md` path.
+- `cache_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.review-pattern-compliance.md` path chosen by caller.
 - `changed_paths`: repo-relative files changed by `_iterate/edit`.
 - `target_summary`: one-line edit goal.
 - `risk_flags`: compact flags.
 
 # Process
-1. Derive `cache_path` by replacing `.md` in `log_path` with `.review-pattern-compliance.md`.
+1. Use provided `cache_path` exactly.
 2. Read `log_path` and `pattern_contract_path`.
 3. Read selected source sections named by the contract, such as `config/doc/workflow/design-patterns.md#OPT-###` or `config/doc/workflow/optimize-patterns.md#WOPT-###`.
 4. Read changed files and any `Apply To` files from the contract.

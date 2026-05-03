@@ -43,7 +43,7 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
 - Do not create D# step files.
 
 ## 2. Deepen discovery only where needed
-- Read target source files referenced by selected I#/T# steps before judging code docs, inline comments, or error docs.
+- Inspect I#/T# step diffs first. Read referenced target source files only when a step diff lacks context for public API status, doc placement, reachable error variants, or body intent.
 - Use `@codebase-explorer` for repo discovery first when file ownership, public API surface, or documentation placement is unclear.
 - Use `@mcp-search` for external library or API documentation expectations first when needed.
 
@@ -57,12 +57,13 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
 - Write and maintain `## Delta` in `handoff_path`. Record each I# and T# step as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Recompute `## Delta` after every material revision.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
-- Run these shared code-doc reviewers:
+- Run these independent shared code-doc reviewers in parallel on the first pass:
   - `@_plan/finalize-codedoc-reviewers/docs-and-readability`
   - `@_plan/finalize-codedoc-reviewers/errors`
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: CDOC and CREAD → docs-and-readability reviewer; CERR → errors reviewer. CDOC owns required API docs and inline readability comments in planned code diffs. Arbitrate cross-domain conflicts.
+- Apply all BLOCKING fixes before advisories. Resolve CDOC/CERR before CREAD when fixes conflict. Record or defer advisories when no blockers remain.
 - Apply reviewer diffs to existing I# and T# step files only. Append one line to `## Revision History`.
 - Re-run only reviewers whose owned domain or touched step changed after a material revision; rerun both reviewers when a fix changes both code docs and error docs.
 - Loop until no BLOCKING findings remain or 10 iterations.

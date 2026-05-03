@@ -47,6 +47,7 @@ Directly edit OpenCode agent and command prompts. Use this for non-code prompt b
 - Prefer deny-all permissions with narrow allows. Keep `*.env` and `*.env.*` denied; allow `*.env.example` only as safe sample input.
 - Keep documentation outside `agent/` and `command/` unless the markdown file is an executable agent or command.
 - Do not read `opencode-source/`. Direct prompt edits rely on local command/agent conventions and workflow docs, not OpenCode implementation internals.
+- Use `bash` only for git metadata/diff/status, `git diff --check`, and requested validation commands. Prefer `read`, `grep`, and `glob` for file inspection.
 
 # Instruction Optimization Rules
 - Put operational behavior in the prompt that executes it. Docs can explain, but cannot be the only source for model-facing rules.
@@ -69,12 +70,13 @@ Directly edit OpenCode agent and command prompts. Use this for non-code prompt b
 
 # Artifacts
 - `artifact_base`: `PROMPT-ITERATE-EDIT-<slug>`.
-- `log_path`: `<artifact_base>.md` in current working directory.
-- `pattern_contract_path`: `<artifact_base>.patterns.md` in current working directory.
-- Reviewer caches:
-  - `<artifact_base>.review-integrity.md`
-  - `<artifact_base>.review-pattern-compliance.md`
-  - `<artifact_base>.review-instruction-quality.md`
+- `cwd`: current working directory.
+- `log_path`: absolute `<cwd>/<artifact_base>.md`.
+- `pattern_contract_path`: absolute `<cwd>/<artifact_base>.patterns.md`.
+- Reviewer caches, absolute in `cwd`; never use review subdirectories:
+  - `integrity_cache_path`: `<cwd>/<artifact_base>.review-integrity.md`
+  - `pattern_compliance_cache_path`: `<cwd>/<artifact_base>.review-pattern-compliance.md`
+  - `instruction_quality_cache_path`: `<cwd>/<artifact_base>.review-instruction-quality.md`
 
 # Process
 
@@ -91,8 +93,9 @@ Directly edit OpenCode agent and command prompts. Use this for non-code prompt b
 - Set `optimizer-workflow` when paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`.
 
 ## 3. Discover
-- Spawn `@codebase-explorer` first. Ask it to map exact target files, command/agent wiring, permission conventions, related local docs, and existing reviewer topology. It must return paths and concise findings. Tell it not to inspect `opencode-source/`.
-- Read target files and directly related files surfaced by discovery.
+- When the user names explicit target paths, read those files and directly related callers/reviewers with `read`, `grep`, and `glob` first.
+- Use `@codebase-explorer` only when target paths, command/agent wiring, permission conventions, related local docs, or reviewer topology remain unclear after direct reads. Ask it to return paths and concise findings. Tell it not to inspect `opencode-source/`.
+- Read target files and directly related files surfaced by direct reads or discovery.
 - If `optimizer-workflow` is set, read `config/doc/workflow/optimize-maintenance.md` before editing; otherwise do not read it.
 
 ## 4. Select patterns
@@ -157,15 +160,24 @@ Log shape:
 - [DEC-001] <cross-domain decision or None>
 ```
 
-## 7. Review
-- Derive `changed_paths` from actual edits and `## Delta`.
+## 7. Static smoke checks
+- Derive `changed_paths` from actual edits (`git diff --name-only` when available) and reconcile with `## Delta`; fix duplicate, missing, or stale Delta entries before reviewer calls.
+- Verify changed concrete `{file:<path>}` imports, excluding schema examples, resolve to existing repo files and do not point into `opencode-source/`.
+- Verify changed local `@agent/name`, `agent: <name>`, and `permission.task` references resolve to existing local agent files.
+- For changed agent/command files, check frontmatter delimiters and essential routing fields.
+- Run `git diff --check` when `bash` is available; fix whitespace warnings before reviewer calls.
+- Use `read`, `grep`, and `glob` for static checks except git metadata/diff commands.
+
+## 8. Review
+- Use reconciled `changed_paths` from static smoke checks.
 - Run `@_iterate/edit-reviewers/integrity` first when any changed path changes frontmatter, permissions, command-agent wiring, self-iteration behavior, optimizer workflow behavior, or reviewer topology.
 - Run `@_iterate/edit-reviewers/pattern-compliance` every run after integrity. It validates generated edits against selected pattern carry-ins, quality guards, apply-to paths, and validation bullets.
 - Run `@_iterate/edit-reviewers/instruction-quality` when any changed path changes an agent prompt, command body, output schema, subagent call, or reviewer topology.
 - Pass reviewers only their owned run data:
-  - `integrity`: `log_path`, `changed_paths`, `target_summary`, `risk_flags`.
-  - `pattern-compliance`: `log_path`, `pattern_contract_path`, `changed_paths`, `target_summary`, `risk_flags`.
-  - `instruction-quality`: `log_path`, `changed_paths`, `target_summary`, `risk_flags`.
+  - `integrity`: `log_path`, `cache_path: integrity_cache_path`, `changed_paths`, `target_summary`, `risk_flags`.
+  - `pattern-compliance`: `log_path`, `pattern_contract_path`, `cache_path: pattern_compliance_cache_path`, `changed_paths`, `target_summary`, `risk_flags`.
+  - `instruction-quality`: `log_path`, `cache_path: instruction_quality_cache_path`, `changed_paths`, `target_summary`, `risk_flags`.
+- Reviewers must write only the provided `cache_path`.
 - Omit reviewer Focus, Process, Output, role text, and blanket read orders.
 - Validate each response starts with `# REVIEW`, has `Decision: PASS | ADVISORY | BLOCKING`, `Cache:`, `## Findings`, and `## Verified`.
 - For BLOCKING findings, read the named cache, apply the smallest fix, update `log_path`, and rerun only reviewers whose domain or changed paths are touched.

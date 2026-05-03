@@ -27,7 +27,8 @@ permission:
 Review direct OpenCode agent and command prompt edits for correctness and safety.
 
 # Inputs
-- `log_path`: `PROMPT-ITERATE-EDIT-<slug>.md`.
+- `log_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.md` path.
+- `cache_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.review-integrity.md` path chosen by caller.
 - `changed_paths`: repo-relative files changed by `_iterate/edit`.
 - `target_summary`: one-line edit goal.
 - `risk_flags`: compact flags such as command-agent, permission, self-iteration, optimizer-workflow, reviewer-topology, or json-config.
@@ -141,7 +142,7 @@ Requested reviewer merge updates only caller routing, task permissions, and affe
 ```
 
 # Process
-1. Derive `cache_path` by replacing `.md` in `log_path` with `.review-integrity.md`.
+1. Use provided `cache_path` exactly.
 2. Read `log_path`; use its Delta, changed paths, and risk flags.
 3. Read existing cache if present; treat missing/malformed cache as empty.
 4. Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or changed paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`.

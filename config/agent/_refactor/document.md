@@ -59,12 +59,13 @@ Discover, add, and review missing code documentation in source files.
 - Write and maintain `## Delta` in `handoff_path`. Record each target source file as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Recompute `## Delta` after every material revision.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
-- Run these reviewers:
+- Run these independent reviewers in parallel on the first pass:
   - `@_refactor/document-reviewers/docs-and-readability`
   - `@_refactor/document-reviewers/errors`
 - Include in each reviewer prompt only task-specific data: `handoff_path` and user notes.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: DDOC, DREAD → docs-and-readability reviewer; DERR → errors reviewer. DDOC owns required inline readability comments. Arbitrate cross-domain conflicts.
+- Apply all BLOCKING fixes before advisories. Resolve DDOC/DERR before DREAD when fixes conflict. Record or defer advisories when no blockers remain.
 - Apply reviewer diffs to target source files only. Append one line to `## Revision History`.
 - Re-run only reviewers whose owned domain or touched file changed after a material revision; rerun both reviewers when a fix changes shared documentation scope.
 - Loop until no BLOCKING findings remain or 10 iterations.

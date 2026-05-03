@@ -27,7 +27,8 @@ permission:
 Review direct OpenCode agent and command prompt edits for LLM instruction quality and prompt economy.
 
 # Inputs
-- `log_path`: `PROMPT-ITERATE-EDIT-<slug>.md`.
+- `log_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.md` path.
+- `cache_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.review-instruction-quality.md` path chosen by caller.
 - `changed_paths`: repo-relative files changed by `_iterate/edit`.
 - `target_summary`: one-line edit goal.
 - `risk_flags`: compact flags such as review-loop, subagent-coordination, structured-output, reviewer-topology, or optimizer-workflow.
@@ -163,7 +164,7 @@ Good:
 ````
 
 # Process
-1. Derive `cache_path` by replacing `.md` in `log_path` with `.review-instruction-quality.md`.
+1. Use provided `cache_path` exactly.
 2. Read `log_path`; use Delta, changed paths, and risk flags.
 3. Do not read workflow pattern catalogs or pattern contracts; pattern-compliance owns selected-pattern application checks.
 4. Read existing cache if present; treat missing/malformed cache as empty.
