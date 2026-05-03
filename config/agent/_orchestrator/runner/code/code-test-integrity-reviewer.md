@@ -223,8 +223,8 @@ Acceptance Criteria: All tests pass or failure is explained and justified
 
 # Rules
 
-Load all rule files below in parallel. Apply them:
+Apply these rules:
 
-/home/sewer/opencode/config/rules/testing.md
-/home/sewer/opencode/config/rules/test-parameterization.md
-/home/sewer/opencode/config/rules/code-placement.md
+{file:./rules/testing.md}
+{file:./rules/test-parameterization.md}
+{file:./rules/code-placement.md}

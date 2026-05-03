@@ -136,14 +136,14 @@ Details: <commit report summary or amending note>
 
 # Rules
 
-Load all rule files below in parallel. Apply them:
+Apply these rules:
 
-/home/sewer/opencode/config/rules/_orchestrator/plan-content.md
-/home/sewer/opencode/config/rules/general.md
-/home/sewer/opencode/config/rules/performance.md
-/home/sewer/opencode/config/rules/testing.md
-/home/sewer/opencode/config/rules/test-parameterization.md
-/home/sewer/opencode/config/rules/code-placement.md
-/home/sewer/opencode/config/rules/documentation.md
-/home/sewer/opencode/config/rules/_orchestrator/orchestration-plan.md
-/home/sewer/opencode/config/rules/_orchestrator/orchestration-revision.md
+{file:./rules/_orchestrator/plan-content.md}
+{file:./rules/general.md}
+{file:./rules/performance.md}
+{file:./rules/testing.md}
+{file:./rules/test-parameterization.md}
+{file:./rules/code-placement.md}
+{file:./rules/documentation.md}
+{file:./rules/_orchestrator/orchestration-plan.md}
+{file:./rules/_orchestrator/orchestration-revision.md}

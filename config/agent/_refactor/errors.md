@@ -30,11 +30,7 @@ Discover error-returning functions with missing or vague documentation. Trace er
 
 # Workflow
 
-- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
-- `ERROR_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/errors.md`
 - `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor`
-
-Read `DOCUMENTATION_RULES_PATH` and `ERROR_RULES_PATH` once before starting.
 
 ## 1. Discover structure
 
@@ -148,3 +144,8 @@ Summary: <one-line summary>
 
 ### <relative_path:line> — `function_name` (missing|vague)
 ```
+
+# Rules
+
+{file:./rules/documentation.md}
+{file:./rules/errors.md}

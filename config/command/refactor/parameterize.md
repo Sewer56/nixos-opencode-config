@@ -20,26 +20,21 @@ If no target path is provided, stop and ask for an explicit path.
 
 ## Process
 
-`TESTING_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/testing.md`
-`TEST_PARAMETERIZATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/test-parameterization.md`
-
-1. Read `TESTING_RULES_PATH` and `TEST_PARAMETERIZATION_RULES_PATH` once and use them as the source of truth for duplicate-coverage expectations, case naming, and labels/comments.
-
-2. Resolve targets
+1. Resolve targets
 - If a file is provided, use it directly.
 - If a directory is provided, find test files in scope based on project
   conventions.
 
-3. Read and group tests
+2. Read and group tests
 - Read each target file fully.
 - Group tests that exercise the same logic path but vary by data only.
 
-4. Choose strategy per group
+3. Choose strategy per group
 - Use the existing test framework for each file.
 - Prefer native parameterisation support in that framework.
-- Apply the parameterize-vs-split rules from `TEST_PARAMETERIZATION_RULES_PATH`.
+- Apply the parameterize-vs-split rules from the test-parameterization rules.
 
-5. Draft the plan (no edits)
+4. Draft the plan (no edits)
 - For each file, list each candidate group and proposed replacement strategy (parameterized or split).
 - For parameterized tests, include:
   - test function name
@@ -49,11 +44,11 @@ If no target path is provided, stop and ask for an explicit path.
   - shared helper name and signature
   - individual test names
 
-6. Verification plan
+5. Verification plan
 - Include exact commands to run after implementation.
 - Prefer repo verification scripts when available.
 
-7. Confirmation gate
+6. Confirmation gate
 - Return the plan and stop.
 - Ask for confirmation: `Say "go" to apply this plan, or suggest changes.`
 - Show proposed changes for every target file (not just selected files).
@@ -182,3 +177,8 @@ Verification:
 
 Say "go" to apply this plan, or suggest changes.
 ```
+
+# Rules
+
+{file:./rules/testing.md}
+{file:./rules/test-parameterization.md}

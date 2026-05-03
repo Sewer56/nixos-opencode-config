@@ -29,7 +29,7 @@ Review finalized implementation steps for declaration placement/order. Return ex
 
 ## Owned domain
 
-Check only source declaration placement/order for selected I# implementation steps, using `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/code-placement.md` as the source of truth. Filter to source-file steps that affect declarations; mark the rest verified/skipped.
+Check only source declaration placement/order for selected I# implementation steps, using the code-placement rules as the source of truth. Filter to source-file steps that affect declarations; mark the rest verified/skipped.
 
 In scope:
 - new source files and new declarations
@@ -55,7 +55,7 @@ When ordering requires broad semantic inference, security/correctness judgment, 
 # Process
 
 1. Fast prerequisites
-- Read `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/code-placement.md` first. If unreadable, emit one BLOCKING `RULES_MISSING` finding and stop; do not scan the repo.
+- Read each target source file referenced by selected I# steps to verify declaration placement.
 
 2. Select items
 - Initial review: inspect only `step_paths`.
@@ -123,3 +123,7 @@ Your final response MUST be exactly the fenced block above. No prose before or a
 - BLOCKING only for clear declaration-order risk or missing context.
 - ADVISORY for broad pre-existing file order issues outside selected/touched declarations.
 - PASS with 0 findings: use `IDs: None`, `## Findings` with `- None`, and concise `## Verified` lines.
+
+# Rules
+
+{file:./rules/code-placement.md}

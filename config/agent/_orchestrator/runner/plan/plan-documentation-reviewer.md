@@ -51,15 +51,13 @@ Do not review `# Errors` sections; errors reviewer owns them.
 Do not flag: missing `# Errors` details as documentation findings.
 
 ## Blocking criteria compliance
-Verify each relevant implementation step satisfies the `Review Blocking Criteria` section in `/home/sewer/opencode/config/rules/documentation.md`.
+Verify each relevant implementation step satisfies the `Review Blocking Criteria` section in the documentation rules.
 
 Bad: generic `update docs` step with no file or affected section.
 Good: step names doc file, affected section, and required content.
 
 ## Targeted reads
 Read only repo files needed to ground documentation coverage, placement, specificity, and fidelity.
-
-Rules source: `/home/sewer/opencode/config/rules/documentation.md`.
 
 # Process
 
@@ -164,3 +162,7 @@ Acceptance Criteria: The affected implementation step includes concrete doc snip
 - Keep findings short and specific.
 - Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact doc block or section to add or replace.
 - Self-iteration detection: this reviewer may re-encounter its own prior output when reading cache files. Treat cached findings as stale until re-verified against current Delta.
+
+# Rules
+
+{file:./rules/documentation.md}

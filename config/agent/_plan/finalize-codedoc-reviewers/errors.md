@@ -43,8 +43,6 @@ Good: `Returns ParseError when the config file contains invalid TOML.`
 ## Targeted reads
 Ground error-doc checks in step file diffs and handoff content. Open target source files only when a step diff is ambiguous or missing needed context.
 
-Rules source: `/home/sewer/opencode/config/rules/errors.md`.
-
 # Process
 1. Load cache (derived from `handoff_path`: replace `.handoff.md` with `.review-codedoc-errors.md`). Read `## Delta` from `handoff_path`. Skip missing/malformed cache.
 2. Review Changed/New items only; carry forward cached Verified items. Ground checks in step file diffs — open source files only when a diff is ambiguous or missing context. On malformed-output retry, reuse prior cache and re-emit valid output.
@@ -88,3 +86,7 @@ Fix: <smallest concrete correction>
 - Flag missing `# Errors` sections on public error-returning APIs as BLOCKING per the errors rules.
 - Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact `# Errors` section to add or fix.
 - Follow the `# Process` section for cache, Delta, and skip handling.
+
+# Rules
+
+{file:./rules/errors.md}

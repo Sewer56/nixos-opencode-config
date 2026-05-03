@@ -61,4 +61,8 @@ Collector output is final — per-item blocks for candidates/review, then summar
 
 ## 4. Classify
 
-Read `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_audit/analysis-rules.txt` and follow it. Use `whole repo` as the scope value and `N modules (languages)` as the scope line.
+Use `whole repo` as the scope value and `N modules (languages)` as the scope line.
+
+### Rules
+
+{file:./agent/_audit/analysis-rules.txt}

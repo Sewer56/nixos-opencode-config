@@ -67,7 +67,7 @@ Create a complete implementation plan in a separate plan file. Use `@mcp-search`
 - Extract what must be built.
 - Treat `# Implementation Hints` as guidance, not a locked plan.
 - Requirements, clarifications, and settled facts are binding. If a simpler valid approach preserves them without sacrificing performance, prefer it.
-- Determine project type, package boundaries, and documentation scope required (see rules below).
+- Determine project type, package boundaries, and documentation scope required.
 - Identify any libraries or frameworks that need lookup.
 - Set `repo_root` as the closest ancestor of `prompt_path` that contains `.git`. If none exists, use `prompt_path` parent.
 
@@ -170,13 +170,13 @@ Final message must contain:
 
 # Rules
 
-Load all rule files below in parallel. Apply them:
+Apply these rules:
 
-/home/sewer/opencode/config/rules/_orchestrator/plan-content.md
-/home/sewer/opencode/config/rules/general.md
-/home/sewer/opencode/config/rules/performance.md
-/home/sewer/opencode/config/rules/testing.md
-/home/sewer/opencode/config/rules/test-parameterization.md
-/home/sewer/opencode/config/rules/code-placement.md
-/home/sewer/opencode/config/rules/_orchestrator/orchestration-plan.md
-/home/sewer/opencode/config/rules/_orchestrator/orchestration-revision.md
+{file:./rules/_orchestrator/plan-content.md}
+{file:./rules/general.md}
+{file:./rules/performance.md}
+{file:./rules/testing.md}
+{file:./rules/test-parameterization.md}
+{file:./rules/code-placement.md}
+{file:./rules/_orchestrator/orchestration-plan.md}
+{file:./rules/_orchestrator/orchestration-revision.md}

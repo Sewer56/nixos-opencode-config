@@ -30,14 +30,9 @@ Discover, add, and review missing code documentation in source files.
 
 # Workflow
 
-- `GENERAL_RULES_PATH`: `/home/sewer/opencode/config/rules/general.md`
-- `DOCUMENTATION_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
-- `ERROR_RULES_PATH`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/errors.md`
 - Derive `slug` from the request context as a 2–3 word identifier for this run.
 - `artifact_base`: `PROMPT-DOC-COVERAGE-<slug>` (derived from `slug`)
 - `handoff_path`: `<artifact_base>.handoff.md`
-
-Read `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, and `ERROR_RULES_PATH` once before starting.
 
 ## 1. Resolve target source files
 
@@ -48,7 +43,7 @@ Read `GENERAL_RULES_PATH`, `DOCUMENTATION_RULES_PATH`, and `ERROR_RULES_PATH` on
 
 ## 2. Enumerate missing or vague required docs
 
-- For each in-scope source file, check against `DOCUMENTATION_RULES_PATH` and `ERROR_RULES_PATH` for missing or vague required documentation.
+- For each in-scope source file, check against the documentation and error rules for missing or vague required documentation.
 - Enumerate per-file gaps: missing doc comments, vague descriptions, incomplete `# Errors` sections on public error-returning APIs.
 - Write `handoff_path` with `## Target Files`, `## Delta`, `## Verification Commands`, and `## Review Ledger`.
 
@@ -121,3 +116,9 @@ Summary: <one-line summary>
 ### Decisions
 None
 ```
+
+# Rules
+
+{file:./rules/general.md}
+{file:./rules/documentation.md}
+{file:./rules/errors.md}

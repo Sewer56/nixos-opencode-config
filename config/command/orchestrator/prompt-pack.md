@@ -120,15 +120,6 @@ For a single prompt, use `@_orchestrator/runner`.
 - Write machine-ready prompts that define outcomes, constraints, and evidence. Do not write implementation plans.
 - Every prompt must be standalone, include the context and file paths a fresh runner needs, and produce real code.
 - Review written prompt-pack files, not an in-memory draft.
-- `RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules`
-- Apply the shaping rules in this file and these shared rules relative to `RULES_DIR`:
-  - `general.md`
-  - `documentation.md`
-  - `performance.md`
-  - `testing.md`
-  - `test-parameterization.md`
-  - `code-placement.md`
-- The shared rule files are the source of truth for reusable code-writing guidance.
 
 ## Prompt File Format: `PROMPT-NN-{title}.md`
 
@@ -247,3 +238,12 @@ Query: <what was searched or inspected>
 ## Links
 - https://example.com/docs
 ```
+
+# Rules
+
+{file:./rules/general.md}
+{file:./rules/documentation.md}
+{file:./rules/performance.md}
+{file:./rules/testing.md}
+{file:./rules/test-parameterization.md}
+{file:./rules/code-placement.md}

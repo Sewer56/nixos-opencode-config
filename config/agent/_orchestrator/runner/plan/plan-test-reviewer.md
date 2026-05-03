@@ -65,8 +65,6 @@ Good: table-driven cases with meaningful names.
 ## Design boundaries
 Flag non-deterministic tests, real I/O/network where unnecessary, complex setup, or one-use helpers with no value.
 
-Rules source: `testing.md` and `test-parameterization.md` from `/home/sewer/opencode/config/rules/`.
-
 # Process
 
 1. Load cache
@@ -216,3 +214,8 @@ Acceptance Criteria: One test with six descriptive cases
 - If economy flagged economy issues, focus on test design quality
 - Priority: coverage > deduplication > parameterization style
 - Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., adding missing test steps, merging duplicate tests, parameterizing similar cases). Omit the diff when the finding is a coverage assessment with no single correct test plan.
+
+# Rules
+
+{file:./rules/testing.md}
+{file:./rules/test-parameterization.md}

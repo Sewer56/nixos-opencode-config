@@ -59,9 +59,6 @@ Good: inline setup or reuse existing helper.
 
 Do not flag duplicate coverage or parameterization; `plan-test-reviewer` owns those.
 
-## Rule sources
-Read `general.md` and `code-placement.md` from `/home/sewer/opencode/config/rules/` in parallel.
-
 # Process
 
 1. Load cache
@@ -184,3 +181,8 @@ Acceptance Criteria: Direct implementation without trait, or justification for t
 - Do not block on economy when correctness is blocking (let correctness resolve first)
 - Flag economy issues that become more important after correctness fixes
 - Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., inlining a helper, removing an unnecessary file or trait). Omit the diff when the finding is a debatable abstraction choice with no single correct replacement.
+
+# Rules
+
+{file:./rules/general.md}
+{file:./rules/code-placement.md}

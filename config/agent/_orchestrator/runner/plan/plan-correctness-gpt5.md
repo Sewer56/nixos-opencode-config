@@ -46,13 +46,9 @@ Read `prompt_path` and `plan_path`. When `ledger_path` is provided, read it as p
 Bad: review plan from prompt alone.
 Good: compare requirements, plan steps, and prior ledger state.
 
-## Rule sources
-Read rules in parallel from `/home/sewer/opencode/config/rules/`: `_orchestrator/plan-content.md`, `general.md`, `performance.md`, `testing.md`, `test-parameterization.md`, `code-placement.md`, `documentation.md`, `_orchestrator/orchestration-plan.md`, `_orchestrator/orchestration-revision.md`.
+In findings, cite only the violated rule and evidence — do not quote entire rule sections.
 
-Do not inline entire rule files in findings; cite only violated rule and evidence.
-
-
-Good: read all listed rule files in parallel, then cite only violated rule fragments in findings.
+Good: cite only the violated rule fragment and evidence in findings.
 
 ## Requirement impact
 A BLOCKING correctness issue needs requirement impact: `REQ-###` or success criterion affected.
@@ -215,3 +211,15 @@ Acceptance Criteria: All referenced symbols are defined or mapped to existing co
 - Treat documentation gaps as correctness issues only when they make a stated requirement or acceptance criterion unprovable
 - Be explicit about requirement gaps - they are always blocking
 - Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., replacing placeholders, defining undefined symbols, adding missing imports). Omit the diff when the finding is a requirement gap or conceptual concern with no single correct replacement.
+
+# Rules
+
+{file:./rules/_orchestrator/plan-content.md}
+{file:./rules/general.md}
+{file:./rules/performance.md}
+{file:./rules/testing.md}
+{file:./rules/test-parameterization.md}
+{file:./rules/code-placement.md}
+{file:./rules/documentation.md}
+{file:./rules/_orchestrator/orchestration-plan.md}
+{file:./rules/_orchestrator/orchestration-revision.md}

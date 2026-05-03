@@ -97,8 +97,8 @@ Next Command: /plan/finalize-user-docs
 
 # Rules
 
-Load all rule files below in parallel. Apply them:
+Apply these rules:
 
-/home/sewer/opencode/config/rules/general.md
-/home/sewer/opencode/config/rules/documentation.md
-/home/sewer/opencode/config/rules/errors.md
+{file:./rules/general.md}
+{file:./rules/documentation.md}
+{file:./rules/errors.md}

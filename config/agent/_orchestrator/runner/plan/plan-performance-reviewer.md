@@ -80,10 +80,7 @@ Check cache need, invalidation, and stampede protections where caching is planne
 Bad: global cache with no invalidation for mutable data.
 Good: cache key, TTL/invalidation, and concurrent miss behavior specified.
 
-## Rule sources
-Read plan and performance rules in parallel from `/home/sewer/opencode/config/rules/` as listed below.
-
-Good: read listed rule files in parallel; report only performance-relevant violations.
+Report only performance-relevant violations.
 
 # Process
 
@@ -219,3 +216,7 @@ Acceptance Criteria: No unnecessary cloning of large data structures
 - Only flag performance issues that materially impact the workload
 - Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., replacing an N+1 pattern with a batch query, adding a missing index). Omit the diff when the finding is a performance budget concern with no single correct implementation.
 - Self-iteration detection: this reviewer may re-encounter its own prior output when reading cache files. Treat cached findings as stale until re-verified against current Delta.
+
+# Rules
+
+{file:./rules/performance.md}

@@ -76,4 +76,8 @@ Discard any collector items whose `File` field is not within or equal to one of 
 
 ## 5. Classify
 
-Read `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_audit/analysis-rules.txt` and follow it. Use `targeted: <paths>` as the scope value and `N paths (languages)` as the scope line.
+Use `targeted: <paths>` as the scope value and `N paths (languages)` as the scope line.
+
+### Rules
+
+{file:./agent/_audit/analysis-rules.txt}

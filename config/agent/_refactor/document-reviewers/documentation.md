@@ -46,8 +46,6 @@ Do not flag: grammar, prose polish, or error-doc completeness unless it causes r
 ## Targeted reads
 Read only repo files needed to ground coverage, placement, specificity, and fidelity checks.
 
-Rules source: `/home/sewer/opencode/config/rules/documentation.md`.
-
 ## Per-hunk line labels
 When a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence.
 
@@ -126,3 +124,7 @@ Fix: <smallest concrete correction>
 - Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
 - Include a unified diff after every finding's `Fix:` field targeting the affected source file with the exact doc block or section to add or replace.
 - Follow the `# Process` section for cache, Delta, and skip handling.
+
+# Rules
+
+{file:./rules/documentation.md}

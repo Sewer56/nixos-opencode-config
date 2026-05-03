@@ -41,8 +41,6 @@ Good: `Returns ParseError when the config file contains invalid TOML.`
 ## Targeted reads
 Read only repo files needed to ground error-doc checks.
 
-Rules source: `/home/sewer/opencode/config/rules/errors.md`.
-
 ## Per-hunk line labels
 When a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence.
 
@@ -119,3 +117,7 @@ Fix: <smallest concrete correction>
 - Flag missing `# Errors` sections on public error-returning APIs as BLOCKING per the errors rules.
 - Include a unified diff after every finding's `Fix:` field targeting the affected source file with the exact `# Errors` section to add or fix.
 - Follow the `# Process` section for cache, Delta, and skip handling.
+
+# Rules
+
+{file:./rules/errors.md}

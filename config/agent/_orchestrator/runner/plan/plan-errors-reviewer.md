@@ -54,8 +54,6 @@ Good: `Returns ParseError when the config file contains invalid TOML.`
 ## Targeted reads
 Read only repo files needed to ground error-doc checks.
 
-Rules source: `/home/sewer/opencode/config/rules/errors.md`.
-
 # Process
 
 1. Load cache
@@ -165,3 +163,7 @@ Acceptance Criteria: The affected implementation step includes a concrete `# Err
 - Keep findings short and specific.
 - Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact `# Errors` section to add or fix.
 - Self-iteration detection: this reviewer may re-encounter its own prior output when reading cache files. Treat cached findings as stale until re-verified against current Delta.
+
+# Rules
+
+{file:./rules/errors.md}

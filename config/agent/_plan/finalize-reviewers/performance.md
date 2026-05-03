@@ -50,8 +50,6 @@ Good: inspect target data path, then verify whether plan introduces risk.
 ## Scope boundary
 Use `handoff_path` and `plan_path` only to verify the steps did not introduce performance-sensitive scope beyond the confirmed plan.
 
-Rules source: `/home/sewer/opencode/config/rules/performance.md`.
-
 # Process
 1. Read Delta and Decisions
 - Read `## Delta` from `handoff_path`.
@@ -102,3 +100,7 @@ Fix: <diff or prose>
 - Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., replacing an N+1 pattern with a batch query, adding a missing index). Omit the diff when the finding is a performance budget concern with no single correct implementation.
 - Follow the `# Process` section for Delta and skip handling.
 - Verified lists only changed/open items; do not restate every requirement or step on PASS.
+
+# Rules
+
+{file:./rules/performance.md}
