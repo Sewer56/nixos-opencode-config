@@ -68,7 +68,7 @@ From discovery, determine:
 
 Write `context_path` using the template below. Derive `artifact_base` from `slug` as `PROMPT-PLUGIN-PLAN-<slug>`. All artifact paths derive from `artifact_base`. Populate every section from discovery and request analysis.
 Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator. Human zone stays narrative — no file paths, action labels, or status markers. Machine zone stays operational — no prose explanations. Zero overlap between zones.
-- Each `[P#]` item: free-form explanation + diff block (same convention as `_iterate/draft.md`). CREATE: explanation only. Return only items requiring action.
+- Each `[P#]` item: free-form explanation + diff block. CREATE: explanation only. Return only items requiring action.
 
 ## 5. Run the draft review loop
 Follow the ordered steps below.

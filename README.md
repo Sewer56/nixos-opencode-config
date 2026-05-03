@@ -47,14 +47,12 @@ Split a large plan into sub-prompts with `/plan/split`.
 
 **Iterate & Plugin**
 
-- `/iterate/draft` - draft an iteration context for commands and agents
-- `/iterate/finalize` - convert a confirmed iteration context into revision instructions
+- `/iterate/edit` - directly edit OpenCode agent/command prompts with pattern contract and compact reviewers
 - `/plugin/draft` - draft a plugin implementation plan
 - `/plugin/finalize` - convert a confirmed plugin plan into a machine plan
 
-> Draft and finalize agents derive a 2–3 word slug from the request
-> context to name their artifacts (e.g., `PROMPT-PLAN-auth-refactor`).
-> Draft and finalize for the same work use the same slug internally.
+> Iteration agents derive a 2–3 word slug from the request context to name
+> artifacts (e.g., `PROMPT-ITERATE-EDIT-reviewer-merge`).
 
 **Orchestrate multi-step work** - Build a prompt pack, then run it:
 

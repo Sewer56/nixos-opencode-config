@@ -1,88 +1,84 @@
 # Iterate Workflow Playbook
 
-Reference for iterate-specific flow. Shared design patterns live in:
+Reference for direct OpenCode agent/command prompt edits. Shared pattern memory lives in:
 
 - `config/doc/workflow/design-patterns.md` — approved reusable creation/refinement patterns
-- `config/doc/workflow/unproven-patterns.md` — empty intake for genuinely unproven ideas
+- `config/doc/workflow/optimize-patterns.md` — approved existing-workflow optimization tactics
+- `config/doc/workflow/unproven-patterns.md` — intake for genuinely unproven reusable ideas
 
-`_iterate/draft` and `_iterate/finalize` should treat this file as the pipeline playbook, not the shared design catalog.
+`_iterate/edit` treats this file as the iterate playbook, not the shared pattern catalog.
 
 ## Pipeline
 
-1. `/iterate/draft` — write `PROMPT-ITERATE-<slug>.draft.md` plus `PROMPT-ITERATE-<slug>.draft.handoff.md`
-2. `/iterate/finalize` — convert confirmed draft into `PROMPT-ITERATE-<slug>.handoff.md` plus `PROMPT-ITERATE-<slug>.step.*.md`
-3. Draft reviewers live in `_iterate/draft-reviewers/`
-4. Finalize reviewers live in `_iterate/finalize-reviewers/`
+1. `/iterate/edit` — directly edit agent/command target files, write `PROMPT-ITERATE-EDIT-<slug>.md` plus pattern contract, and run compact reviewers.
+2. Pattern selector: `_iterate/edit-pattern-selector` writes `PROMPT-ITERATE-EDIT-<slug>.patterns.md`.
+3. Reviewers live in `_iterate/edit-reviewers/`:
+   - `integrity` — OpenCode schema, permissions, wiring, scope, self-iteration, optimizer architecture.
+   - `pattern-compliance` — generated-edit compliance with selected carry-ins, quality guards, apply-to paths, and validation bullets.
+   - `instruction-quality` — LLM instruction clarity, dedup, tight inputs, output schemas, topology economy.
 
-## Shared Design Pattern Selection
+No draft/finalize commands. No handoff or STEP artifacts.
 
-- `_iterate/draft` and `_iterate/finalize` call `@_iterate/optimization-selector`.
-- Selector reads `config/doc/workflow/design-patterns.md` and returns only approved patterns matching target behavior traits.
-- Generated targets should absorb only selected rule fragments. Do not copy whole catalog text into draft or finalize artifacts.
+## Shared Pattern Selection
+
+- `_iterate/edit` calls `@_iterate/edit-pattern-selector`.
+- Selector reads `config/doc/workflow/design-patterns.md` and `config/doc/workflow/optimize-patterns.md` every run.
+- Selector reads `config/doc/workflow/optimize-maintenance.md` only for `_workflow/optimize*` or `export-analyzer.md` edits.
+- Selector reads `config/doc/workflow/unproven-patterns.md` only for `IDEA-###` intake or promotion.
+- Selector writes selected carry-ins, quality guards, apply-to paths, and validation bullets to `<artifact_base>.patterns.md`.
+- Only `pattern-compliance` receives `pattern_contract_path`; it checks generated edits against the selected contract.
+- Use `OPT-###` when selected design pattern describes desired steady-state prompt shape.
+- Use `WOPT-###` only when refactoring an existing workflow and focus signals match.
+- Carry compact rule fragments into changed prompts. Do not paste whole catalogs.
+- Target prompts must contain model-facing operational rules directly. Docs cannot be the only source for behavior.
 
 ## Iterate-Only Conventions
 
 ### Self-Iteration
 
-- If target paths include `.opencode/agent/_iterate/**`, `.opencode/command/iterate/**`, or `.opencode/doc/iterate.md`, set `self_iteration: true`.
+- If target paths include `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`, set `self_iteration: true`.
 - Classify intent as:
   - `wording-only` — text refinement with no enforcement-logic effect
-  - `rule-change` — changes to instructions that govern future `/iterate` output
-- `rule-change` finalize runs must include at least one STEP that updates enforcement logic, not only wording around it.
+  - `rule-change` — changes to instructions that govern future `/iterate/edit` output
+- For rule-change runs, directly update model-facing instructions in `_iterate` agents/reviewers/commands when future behavior changes.
+- Documentation-only updates are outside `/iterate/edit` target scope.
 
-### Draft Artifact Shape
+### Artifact Shape
 
-- `artifact_base` = `PROMPT-ITERATE-<slug>`
-- draft context = `<artifact_base>.draft.md`
-- draft handoff = `<artifact_base>.draft.handoff.md`
-- Draft items use `[P#]` labels with free-form explanation followed by a diff block.
+- `artifact_base` = `PROMPT-ITERATE-EDIT-<slug>`
+- edit log = `<artifact_base>.md`
+- pattern contract = `<artifact_base>.patterns.md`
+- reviewer caches:
+   - `<artifact_base>.review-integrity.md`
+   - `<artifact_base>.review-pattern-compliance.md`
+   - `<artifact_base>.review-instruction-quality.md`
+- no draft context, finalize handoff, or STEP files
 
-### Finalize Artifact Shape
+### Reviewer Merge
 
-- finalize handoff = `<artifact_base>.handoff.md`
-- machine steps = `<artifact_base>.step.*.md`
-- no separate `machine.md`
-- handoff carries Summary, Revision History, Step Index, Delta, and review coordination state
+The old wording/style/clarity/dedup/performance/correctness/diff/meta reviewer spread is collapsed into two merged review domains plus one pattern audit:
 
-### Artifact Naming
+- `integrity` keeps high-risk checks separate: command/agent schema, permissions, task refs, self-iteration enforcement, optimize architecture, and scope.
+- `pattern-compliance` independently checks generated prompt edits against selected OPT/WOPT carry-ins and guards.
+- `instruction-quality` owns overlapping prompt-economy checks: wording, style, clarity, dedup, tight inputs, output schemas, markdown fences, and reviewer topology.
 
-- Use `PROMPT-<PIPELINE>-<slug>` base names.
-- Draft phase uses `.draft.` as a dot-separated segment.
-- Finalize phase drops the `.draft.` segment.
-- Wrong: `.draft-handoff.md`
-- Correct: `.draft.handoff.md`
+Keep high-risk correctness/security/data-loss checks separate from wording/polish checks. Merge reviewers when they read the same artifacts and emit overlapping findings.
 
-### Diff Conventions
+## Direct Edit Loop
 
-- Use full repo-relative paths in diff headers.
-- Use `Lines: ~start-end` locators.
-- When one item has multiple hunks, each hunk gets its own `Lines:` label.
-- STEP header `Lines:` is a union summary; per-hunk labels are authoritative.
-- Keep 2+ context lines around each diff hunk.
-
-### Reviewer Diff Output
-
-- When reviewer can determine exact replacement text, include inline unified diff after `Fix:`.
-- When fix is conceptual, keep `Fix:` prose only.
-
-## Review Loops
-
-### Draft Loop
-
-- draft reviewers: correctness, wording, style, dedup, clarity
-- coordination file: `<artifact_base>.draft.handoff.md`
-- reviewers receive only artifact paths; they derive the rest from their own prompts plus Delta/cache state
-- if user edits draft without asking for re-review, remind that re-review is available on request
-
-### Finalize Loop
-
-- finalize reviewers live in `_iterate/finalize-reviewers/`
-- handoff owns Delta and decisions
-- reviewers reopen only changed, new, unresolved, or decision-referenced items
+- coordination file: `PROMPT-ITERATE-EDIT-<slug>.md`
+- pattern contract file: `PROMPT-ITERATE-EDIT-<slug>.patterns.md`
+- reviewer caches hold detailed findings; final responses stay compact
+- integrity runs first when frontmatter, permissions, wiring, self-iteration, optimizer workflow, or command/agent files change
+- pattern-compliance runs every run after integrity and is the only reviewer that receives the pattern contract
+- instruction-quality runs for prompts, command bodies, output schemas, subagent calls, and reviewer topology changes
+- rerun only reviewer domains touched by fixes
 
 ## When to Read What
 
-- Read this file for iterate-only artifact and self-iteration rules.
-- Read `config/doc/workflow/design-patterns.md` for shared creation/refinement patterns.
-- Read `config/doc/workflow/unproven-patterns.md` only when evaluating whether a new pattern lacks enough proof for shared docs.
-- Read `config/doc/workflow/optimize-patterns.md` only when optimizing an existing workflow with `/workflow/optimize`.
+- Read this file for iterate-specific artifact and self-iteration rules.
+- Read `config/doc/workflow/design-patterns.md` for shared creation/refinement prompt design patterns.
+- Read `config/doc/workflow/optimize-patterns.md` for existing-workflow prompt optimization tactics.
+- Read `config/doc/workflow/optimize-maintenance.md` only when editing `_workflow/optimize*` or `export-analyzer.md`.
+- Read `config/doc/workflow/unproven-patterns.md` only for `IDEA-###` intake or promotion.
+- Do not read `opencode-source/`; direct prompt edits use local command/agent conventions and workflow docs.
