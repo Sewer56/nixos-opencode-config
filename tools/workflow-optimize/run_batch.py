@@ -52,7 +52,7 @@ from agent_semaphore import AgentSemaphore  # noqa: E402
 
 
 SAMPLES = 3
-MAX_AGENTS = 16
+MAX_AGENTS = 36
 AGENT_NAMESPACE = "global"
 
 
