@@ -115,6 +115,7 @@ Rules:
 - If setup lists input/state files, narrow cleanup globs before running.
 - Bash timeout: large (3h / `10800000ms`).
 - `--max-agents` is internal; pass only `--max-parallel-subagents`.
+- `--command` must not start with `/`. CLI form is `plan/finalize-user-docs`.
 
 ## 4. Export and digest
 

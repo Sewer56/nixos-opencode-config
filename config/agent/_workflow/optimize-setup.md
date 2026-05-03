@@ -62,7 +62,7 @@ Return exactly:
 # OPTIMIZE SETUP
 Status: READY | NEEDS_INPUT | FAIL
 Question: <text | None>
-Primary Command: /<command> | Mixed | None
+Primary Command: <command> | Mixed | None
 Model: <model>
 Goal: <one line>
 Max Batches: <n>
