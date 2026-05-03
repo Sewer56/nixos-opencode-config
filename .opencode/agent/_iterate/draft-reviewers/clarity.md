@@ -28,16 +28,57 @@ instructions.
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Focus
-- Undefined jargon: instructions use internal taxonomy or project-specific compound terms without defining them. Replace with inline definitions.
-- Scope boundary: linguistic comprehensibility — whether the words are understandable. Not execution-readiness (inline schemas, types, formats) or same-concept restatement across sections.
-- Compound-term compression: phrases that compress meaning at the cost of comprehension (e.g., "diff-when-exact constraint", "tier-2 rules"). Replace with the expanded meaning.
-- Opaque references: "follow the Foo convention" or "apply the Bar pattern" where Foo/Bar are not standard terms and are not defined in the same file. Replace with the inline definition or a path pointer to where the term is defined.
-- Exclusions (ADVISORY only — do not block):
-  - Common programming terms: "unified diff", "markdown", "frontmatter", "N+1 query"
-  - Path-based pointers: "read `config/rules/testing.md`" — navigation, not comprehension
-  - Terms defined earlier in the same file
-  - Headings, section names, and non-prescriptive prose
-  - Technical domain terms standard in the file's domain
+
+## Undefined jargon
+Flag internal taxonomy or project-specific terms that are not defined in the same file.
+
+Bad:
+```text
+Apply the shared workflow rule.
+```
+
+Good:
+```text
+For review loops, read cache first, use Delta to find Changed/New items, and update cache before final response.
+```
+
+## Compound-term compression
+Flag compressed phrases that hide meaning.
+
+Bad:
+```text
+Use the diff-when-exact constraint.
+```
+
+Good:
+```text
+Include a unified diff only when exact replacement text is known.
+```
+
+## Opaque references
+Flag "follow the Foo convention" or "apply the Bar pattern" when Foo/Bar are not standard terms and are not defined in the same file.
+
+Bad:
+```text
+Apply the shared reviewer pattern.
+```
+
+Good:
+```text
+Reviewer reads Delta, reopens Changed/New/Open items, and preserves unchanged verified cache records.
+```
+
+## Scope boundary
+Review linguistic comprehensibility only: whether the words are understandable.
+
+Do not flag: missing schemas, missing types, missing formats, or same-concept restatement across sections. Style, correctness, and dedup own those checks.
+
+## Exclusions (ADVISORY only — do not block)
+- Common programming terms: "unified diff", "markdown", "frontmatter", "N+1 query"
+- Path-based pointers: "read `config/rules/testing.md`" — navigation, not comprehension
+- Terms defined earlier in the same file
+- Headings, section names, and non-prescriptive prose
+- Technical domain terms standard in the file's domain
 
 # Process
 1. Load cache

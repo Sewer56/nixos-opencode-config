@@ -28,11 +28,60 @@ rule application, and human/machine zone separation.
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Focus
-- Template structure: required sections present — Overall Goal, Open Questions, Decisions, `---` separator, Action with `[P#]` items. Omit Open Questions or Decisions only when explicitly marked `None`.
-- Diff headers: every diff block header references a valid file path. `--- a/<path>` and `+++ b/<path>` paths exist or are plausible targets for the declared action.
-- Rule application: selected design-pattern rules listed in `[P#]` items correctly match the target file's behavior traits (review loop → cache/Delta rules, subagent coordination → shared ledger rules, machine-readable output → fixed output blocks rules).
-- Human zone: no file paths, no action labels (CREATE, UPDATE, DELETE), no status markers. Narrative only.
-- Machine zone: no prose explanations. Operational instructions and diff blocks only.
+
+## Template structure
+Required sections: Overall Goal, Open Questions, Decisions, `---` separator, and Action with `[P#]` items. Omit Open Questions or Decisions only when explicitly marked `None`.
+
+Bad: draft starts directly at `## Action` with no Overall Goal.
+Good: human zone has Overall Goal plus Open Questions/Decisions, then `---`, then machine-zone Action.
+
+## Diff headers
+Every diff block header must reference a valid or plausible target path. `--- a/<path>` and `+++ b/<path>` must point at the same repo-relative target.
+
+Bad:
+```diff
+--- a/file.md
++++ b/config/agent/foo.md
+```
+
+Good:
+```diff
+--- a/config/agent/foo.md
++++ b/config/agent/foo.md
+```
+
+## Rule application
+Behavior-rule text in `[P#]` items must match the target file's behavior traits. Use this inline rule map; do not rely on external pattern names.
+
+- Review-loop targets need: cache file/path derivation, Delta or changed-id invalidation, read cache first, reread Changed/New/Open/Decision-touched material, preserve unchanged verified records, update cache before final response.
+- Subagent-coordination targets need: one shared handoff/ledger/context file, caller-owned arbitration decisions, reviewer-owned domain findings/cache, and scoped inputs only.
+- Machine-readable-output targets need: one exact fenced `text` output block, stable headings/fields/order/allowed values, required empty sections, and no prose outside the block.
+
+Bad:
+```text
+Apply the shared workflow pattern.
+```
+
+Bad: add cache/Delta rules to a single-pass target with no review loop.
+
+Good:
+```text
+For this review loop, read cache first. Inspect Changed/New items from Delta. Update cache before final response.
+```
+
+Do not flag: a single-pass target that omits cache/Delta because no review loop or repeated subagent run exists.
+
+## Human zone
+Human zone is narrative only: no file paths, no action labels (`CREATE`, `UPDATE`, `DELETE`), no status markers.
+
+Bad: `Overall Goal: UPDATE config/agent/foo.md`
+Good: `Overall Goal: Improve reviewer cache reuse.`
+
+## Machine zone
+Machine zone is operational only: action labels, target paths, instructions, and diff blocks. No user-facing rationale.
+
+Bad: machine zone explains why the user wants the change.
+Good: machine zone lists action, target, and exact diff.
 
 # Process
 1. Load cache
@@ -101,7 +150,7 @@ wrapper, no text before `# REVIEW` or after the final `## Notes` line.
 Any content outside this format is a protocol violation.
 
 # Constraints
-- Block for missing required sections, invalid diff headers, misapplied design-pattern rules, human zone containing file paths/action labels/status markers, or machine zone containing prose.
+- Block for missing required sections, invalid diff headers, behavior-rule text that mismatches the target's traits, human zone containing file paths/action labels/status markers, or machine zone containing prose.
 - Do not block for minor wording when structure and zone separation are valid.
 - Cite section names and specific `[P#]` items as evidence.
 - Keep findings short and specific.

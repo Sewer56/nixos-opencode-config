@@ -28,13 +28,66 @@ Review machine iteration artifacts for diff and hunk validity.
 - `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
-- Line-location validity: `Lines: ~<start>-<end>` fields point near the change location in the target file; the range is within ±10 lines of the actual content. `Anchor` fields are approximate.
-- Per-hunk line labels: each diff block within a STEP must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Missing labels are BLOCKING (DIFF_COMPLETENESS).
-- Focused `Lines:` ranges: header `Lines: ~` must list the comma-separated union of hunk ranges. Full-file ranges like `Lines: ~1-258` are BLOCKING when the change is localized (RANGE_VALIDITY). Valid only for CREATE/DELETE actions.
-- Context lines: every hunk includes 2+ unchanged context lines before and after each change region; context lines match content that exists in the target file near the indicated range. Block when context lines are missing or do not match; do not block for off-by-one or off-by-few line-count discrepancies.
-- Diff completeness: include a diff block for every declared change region.
-- Diff compactness: include only changed lines. Omit verbatim restatements of `context_path` content.
-- Nested code fences: block when a diff block inside a STEP file sits within an outer fenced code block that uses the same number of backticks as the inner diff fence. Outer fence uses backticks (```), inner fences use tildes (~~~).
+
+## Line-location validity
+`Lines: ~<start>-<end>` fields must point near the change location in the target file. ±10 lines is acceptable. `Anchor` fields are approximate.
+
+Bad: `Lines: ~10-20` but the changed heading is near line 140.
+Good: range points within about 10 lines of the changed content.
+
+## Per-hunk line labels
+Each diff block within a STEP must carry its own `Lines: ~start-end` label immediately before the diff fence. Missing labels are BLOCKING.
+
+Bad:
+```markdown
+Lines: ~45-52
+
+~~~diff
+@@
+...
+~~~
+```
+
+Good:
+```markdown
+**Lines: ~45-52**
+
+~~~diff
+@@
+...
+~~~
+```
+
+## Focused `Lines:` ranges
+Header `Lines: ~` must list the comma-separated union of hunk ranges. Full-file ranges are valid only for CREATE/DELETE actions.
+
+Bad: localized one-line edit uses `Lines: ~1-258`.
+Good: two localized hunks use `Lines: ~45-52, ~120-128`.
+
+## Context lines
+Every hunk includes 2+ unchanged context lines before and after each change region. Context lines must match content near the indicated range.
+
+Bad: hunk shows only changed lines with no stable surrounding text.
+Good: hunk includes nearby unchanged heading/list lines before and after.
+Do not flag: off-by-one or off-by-few line-count discrepancies when content and range are otherwise clear.
+
+## Diff completeness
+Include a diff block for every declared change region.
+
+Bad: Changes list says frontmatter and Output change, but diff covers only Output.
+Good: every declared region has a diff hunk.
+
+## Diff compactness
+Include only changed lines plus needed context. Omit verbatim restatements of `context_path` content.
+
+Bad: STEP copies the whole target file for a localized update.
+Good: STEP includes only affected hunks with context.
+
+## Nested code fences
+Block when a diff block inside a STEP file sits within an outer fenced code block that uses the same number of backticks as the inner diff fence.
+
+Bad: outer ```markdown fence contains inner ```diff fence.
+Good: outer ```markdown fence contains inner ~~~diff fence.
 
 # Process
 1. Load cache
@@ -77,7 +130,7 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [DIF-001]
-Category: RANGE_VALIDITY | CONTEXT_LINES | DIFF_COMPLETENESS | COMPACTNESS
+Category: RANGE_VALIDITY | PER_HUNK_LABELS | CONTEXT_LINES | DIFF_COMPLETENESS | COMPACTNESS | NESTED_FENCES
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or hunk reference>
 Problem: <what is wrong with the diff>

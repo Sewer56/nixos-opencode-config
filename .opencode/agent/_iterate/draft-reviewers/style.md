@@ -27,11 +27,72 @@ Review iteration draft artifacts for instruction style quality.
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Focus
-- Imperative voice (machine zone only): revision instructions are commands, not descriptions. "Do X" not "This should do X". Human zone narrative is exempt.
-- Positive framing: each revision states what to do. Lead with the desired action; omit prohibitions where an action suffices.
-- Self-contained: each `[P#]` item usable without cross-referencing other files or external docs. Inline schemas, types, formats.
-- Output format pinned: when a `[P#]` item prescribes structured output, specify the exact format in a fenced code block with `text` language tag.
-- Nested code fences: block when a diff block or template inside a `[P#]` item contains an inner ``` fence inside an outer ``` fence. Outer fence uses backticks (```), inner fences use tildes (~~~).
+
+## Imperative voice
+Machine-zone revision instructions are commands, not descriptions. Human-zone narrative is exempt.
+
+Bad:
+```text
+This should add cache handling.
+```
+
+Good:
+```text
+Add cache handling.
+```
+
+## Positive framing
+Lead with the desired action. Omit prohibitions when an action states the same requirement.
+
+Bad:
+```text
+Do not forget to keep reviewers scoped.
+```
+
+Good:
+```text
+Pass reviewers only scoped artifact paths and Delta.
+```
+
+## Self-contained instructions
+Each `[P#]` item must be usable without external docs. Inline schemas, types, formats, and operational rule fragments needed by the target.
+
+Bad:
+```text
+Apply the shared pattern from docs.
+```
+
+Good:
+```text
+Read cache first. Inspect Changed/New items from Delta. Update cache before final response.
+```
+
+Do not flag: path pointers used only as navigation to target files.
+
+## Output format pinned
+When a `[P#]` item prescribes structured output, specify the exact format in a fenced `text` block.
+
+Bad:
+```text
+Return a review summary.
+```
+
+Good:
+```markdown
+~~~text
+# REVIEW
+Decision: PASS | ADVISORY | BLOCKING
+## Findings
+## Verified
+## Notes
+~~~
+```
+
+## Nested code fences
+Block when a diff block or template inside a `[P#]` item contains an inner ``` fence inside an outer ``` fence.
+
+Bad: outer ```markdown fence contains inner ```diff fence.
+Good: outer ```markdown fence contains inner ~~~diff fence.
 
 # Process
 1. Load cache

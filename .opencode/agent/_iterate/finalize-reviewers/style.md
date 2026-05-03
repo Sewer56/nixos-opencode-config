@@ -28,15 +28,103 @@ Review finalized iteration artifacts for instruction style quality.
 - `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
-- Imperative voice: revision instructions are commands, not descriptions. "Do X" not "This should do X".
-- Prompt-local operational rules: when a revision adds workflow behavior to a prompt or reviewer, state the required action in that file.
-- Positive framing: each revision states what to do. Lead with the desired action; omit prohibitions where an action suffices.
-- Negative examples: revisions that prescribe a style or format include a wrong example alongside the correct form. Use negative examples to demonstrate anti-patterns; keep surrounding instruction language positive.
-- Self-contained: each revision item usable without cross-referencing other files or external docs. Inline schemas, types, formats.
-- Output format pinned: when a revision or `STEP-###` target prescribes structured output, specify the exact format in a fenced code block with `text` language tag.
-- Fixed-output consistency: when multiple `STEP-###` targets define the same structured output kind, use identical format blocks.
-- Subagent prompt shape: when a revision defines a reviewer or subagent prompt, pin only task-specific inputs.
-- Nested code fences: block when a STEP target or reviewer output format example contains an inner ``` fence inside an outer ``` fence. Outer fence uses backticks (```), inner fences use tildes (~~~).
+
+## Imperative voice
+Revision instructions are commands, not descriptions.
+
+Bad:
+```text
+This should add cache handling.
+```
+
+Good:
+```text
+Add cache handling.
+```
+
+## Prompt-local operational rules
+When a revision adds workflow behavior to a prompt or reviewer, state the required action in that target file.
+
+Bad:
+```text
+Follow workflow docs for review-loop behavior.
+```
+
+Good:
+```text
+Read cache first. Inspect Changed/New items from Delta. Update cache before final response.
+```
+
+## Positive framing
+Lead with the desired action. Omit prohibitions when an action states the same requirement.
+
+Bad:
+```text
+Do not forget to avoid broad reviewer prompts.
+```
+
+Good:
+```text
+Pass reviewers only context path, handoff path, step pattern, and relevant flags.
+```
+
+## Negative examples
+When a revision prescribes a style or format likely to be misread, include a wrong example next to the correct form. Keep surrounding instruction language positive.
+
+Bad: target adds only desired format and leaves anti-pattern implicit.
+Good: target includes `Wrong:` and `Correct:` examples for confusing conventions.
+
+## Self-contained revision items
+Each revision item must be usable without external docs. Inline schemas, types, formats, and operational rule fragments needed by the target.
+
+Bad:
+```text
+Apply the shared pattern from docs.
+```
+
+Good:
+```text
+Inline the concrete rule fragments the target needs.
+```
+
+Do not flag: file paths used as targets or evidence.
+
+## Output format pinned
+When a revision or `STEP-###` target prescribes structured output, specify exact headings, field names, order, and allowed values in a fenced `text` block.
+
+Bad:
+```text
+Return findings in a consistent format.
+```
+
+Good:
+```markdown
+~~~text
+# REVIEW
+Decision: PASS | ADVISORY | BLOCKING
+## Findings
+## Verified
+## Notes
+~~~
+```
+
+## Fixed-output consistency
+When multiple `STEP-###` targets define the same structured output kind, use identical format blocks.
+
+Bad: correctness and dedup reviewers define different `# REVIEW` field order.
+Good: both reviewers use the same `# REVIEW` block shape.
+
+## Subagent prompt shape
+When a revision defines a reviewer or subagent prompt, pin only task-specific inputs. Callee prompt owns role, Focus, Process, and Output.
+
+Bad: caller prompt restates callee role, output schema, Focus list, and blanket read orders.
+Good: caller passes artifact paths and invalidation data only.
+
+## Nested code fences
+Block when a STEP target or reviewer output-format example contains an inner ``` fence inside an outer ``` fence.
+
+Bad: outer ```markdown fence contains inner ```diff fence.
+Good: outer ```markdown fence contains inner ~~~diff fence.
 
 # Process
 1. Load cache
@@ -79,7 +167,7 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [STY-001]
-Category: IMPERATIVE_VOICE | POSITIVE_FRAMING | NEGATIVE_EXAMPLES | SELF_CONTAINED | OUTPUT_FORMAT
+Category: IMPERATIVE_VOICE | PROMPT_LOCAL_RULES | POSITIVE_FRAMING | NEGATIVE_EXAMPLES | SELF_CONTAINED | OUTPUT_FORMAT | FIXED_OUTPUT_CONSISTENCY | SUBAGENT_PROMPT_SHAPE | NESTED_FENCES
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
 Problem: <what violates the style criterion>
@@ -106,7 +194,7 @@ wrapper, no text before `# REVIEW` or after the final `## Notes` line.
 Any content outside this format is a protocol violation.
 
 # Constraints
-- Block for persistent imperative-voice violations, missing negative examples where they matter, unpinned output formats, operational rules delegated to external docs, subagent prompts that re-state callee-owned role/output/focus contracts instead of task-specific inputs, or instruction language that leads with prohibitions instead of actions.
+- Block for persistent imperative-voice violations, missing negative examples where they matter, unpinned output formats, fixed-output inconsistencies, nested code fence violations, operational rules delegated to external docs, subagent prompts that re-state callee-owned role/output/focus contracts instead of task-specific inputs, or instruction language that leads with prohibitions instead of actions.
 - Do not block for minor wording when instructions are already imperative, positive-framing, and self-contained.
 - Keep findings short and specific.
 - Include a unified diff after every finding's `Fix:` field targeting the affected STEP file with the exact text replacement.

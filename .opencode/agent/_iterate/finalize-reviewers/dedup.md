@@ -29,14 +29,67 @@ Review finalized iteration artifacts for cross-document and cross-STEP redundanc
 
 # Focus
 (All items BLOCKING unless marked ADVISORY.)
-- Cross-document: flag when an artifact re-states information available in another artifact or referenced file. Prefer referencing by path or section name.
-- Cross-STEP: flag when two STEP items duplicate each other's content instead of referencing.
-- Rule splitting: flag when a STEP copies the full design-pattern contract into multiple targets instead of only the relevant fragments per target.
-- Frontmatter-import redundancy: flag when STEP frontmatter duplicates content from an imported or parent file.
-- Human-doc vs model-doc: flag when a STEP adds human-facing docs and duplicates that prose in model-facing instructions.
-- Subagent input economy: flag when caller prompts restate callee-owned output formats, focus/check lists, role assignments, paths from Step Index, or blanket read orders.
-- Rules-scope redundancy: flag when a target restates scope, criteria, or requirements from an imported rules file. The rules file is the scope — reference, don't duplicate.
-- Rules-file independence: flag when a rules file references, imports, or cross-links another rules file. Each must stand alone.
+
+## Cross-document duplication
+Flag when a STEP or artifact restates information available in another artifact or referenced file. Prefer path, section, item id, or finding id references.
+
+Bad: STEP file copies the whole handoff Summary and Step Index.
+Good: STEP says "See handoff Step Index" and carries only target-specific diff instructions.
+
+## Cross-STEP duplication
+Flag when two STEP items duplicate content instead of referencing.
+
+Bad: STEP-001 and STEP-002 repeat the same Why/Changes prose for the same reviewer-family update.
+Good: STEP-002 references STEP-001 or the handoff summary for shared rationale and includes only target-specific changes.
+
+## Rule splitting
+Flag broad rule prose repeated across STEP items when each target needs only part of it. Each STEP carries only fragments its target needs; shared rationale belongs in the handoff summary or one referenced STEP.
+
+Bad: every STEP pastes the full review-loop, subagent-coordination, output-format, and diff checklist when each target needs only one fragment.
+Good: each STEP carries only its needed fragment and references shared rationale elsewhere.
+Do not flag: the same small operational fragment repeated in separate target prompts that must stand alone.
+
+## Frontmatter-import redundancy
+Flag STEP frontmatter that duplicates content from an imported or parent file without changing it.
+
+Bad: imported parent file sets permissions and STEP repeats the same permission prose without change.
+Good: STEP changes only the field that differs.
+
+## Human-doc vs model-doc duplication
+Flag the same prose copied into both human-facing docs and model-facing instructions.
+
+Bad: same explanatory paragraph appears in README text and agent instructions.
+Good: README explains user workflow; agent prompt gives operational commands.
+
+## Subagent input economy
+Flag caller prompts that restate callee-owned role, output format, Focus/check lists, Step Index paths, or blanket read orders.
+
+Bad:
+```text
+You are the dedup reviewer. Check cross-document duplication, cross-STEP duplication...
+Return this exact # REVIEW block...
+Read every STEP file.
+```
+
+Good:
+```text
+context_path=<path>
+handoff_path=<path>
+step_pattern=<pattern>
+Delta=<changed ids or excerpt>
+```
+
+## Rules-scope redundancy
+Flag targets that import a rules file and then restate that rules file's scope, criteria, or requirements. The rules file is the scope.
+
+Bad: target imports `config/rules/testing.md` and repeats the full testing criteria.
+Good: target says "Follow `config/rules/testing.md`; add project-specific timeout rule below."
+
+## Rules-file independence
+Flag rules files that reference, import, or cross-link another rules file. Each rules file must stand alone.
+
+Bad: `rules/frontend.md` says "also follow backend rules."
+Good: duplicate only the small shared requirement needed for independence.
  
 # Process
 1. Load cache

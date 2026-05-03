@@ -28,10 +28,37 @@ Review finalized iteration artifacts for iterate-system self-policing.
 - `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
-- Self-iteration enforcement completeness: when context contains `## Self-Iteration` with `Intent: rule-change`, block if any STEP updates `_iterate` text or documentation but no STEP updates enforcement-logic instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output. Includes enforcing the Line-location convention: block when a STEP writes diff blocks but no STEP updates a reviewer to enforce `Lines: ~` validity and context-line requirements.
-- Section ordering: block when a non-reviewer STEP target has sections outside the Inputs → Process → Supplemental convention (e.g., Rules or Focus between Inputs and Process, Inputs after Process, Process before Inputs). Block when a reviewer STEP target has sections outside Inputs → Focus → Process → Supplemental (Focus must sit before Process in reviewers). Omit `## User Request` when a command takes no arguments. Exempt: pure-proxy commands, simple capability agents.
-- Supplemental sub-ordering: flag when Supplemental sections follow a sub-optimal order within the post-Process zone. Prefer Output → Constraints → Rules → Templates/Examples. ~~Wrong: # Rules before # Output after Process.~~ Correct: # Output → # Constraints → # Rules. Advisory only — do not block.
-- Focus-as-scope: `# Focus` is the reviewer's scope boundary — reviewers check only what Focus enumerates. Block when a STEP targets an `_iterate` reviewer whose Focus item is broad enough to overlap another reviewer's domain (e.g., a correctness Focus bullet that could encompass diff-content validation). Prompt the author to split or narrow the item.
+
+## Self-iteration enforcement completeness
+When context contains `## Self-Iteration` with `Intent: rule-change`, block if any STEP updates `_iterate` text or documentation but no STEP updates enforcement-logic instructions in `draft.md`, `finalize.md`, or reviewer files that govern future `/iterate` output.
+
+Also block when a STEP writes diff blocks but no STEP updates a reviewer to enforce `Lines: ~` validity and context-line requirements.
+
+Bad: STEP updates `.opencode/doc/iterate.md` only, but future `/iterate` output is governed by `draft.md`, `finalize.md`, or reviewers.
+Good: at least one STEP updates the instruction that future agents/reviewers execute.
+
+## Section ordering
+Block section-order violations.
+
+- Non-reviewer target: Inputs → Process → Supplemental.
+- Reviewer target: Inputs → Focus → Process → Supplemental.
+- Omit `## User Request` when a command takes no arguments.
+- Exempt: pure-proxy commands and simple capability agents.
+
+Bad: reviewer file puts `# Process` before `# Focus`.
+Good: reviewer file orders Inputs → Focus → Process → Output/Constraints.
+
+## Supplemental sub-ordering (ADVISORY)
+Flag sub-optimal order within the post-Process zone. Prefer Output → Constraints → Rules → Templates/Examples. Do not block.
+
+Bad: `# Rules` before `# Output` after Process.
+Good: `# Output` → `# Constraints` → `# Rules`.
+
+## Focus-as-scope
+`# Focus` is the reviewer's scope boundary. Block when a STEP targets an `_iterate` reviewer whose Focus item overlaps another reviewer's domain.
+
+Bad: correctness Focus says "verify all diff validity" which overlaps diff reviewer.
+Good: correctness Focus checks required rule presence; diff reviewer checks individual hunk validity.
 
 # Process
 1. Load cache

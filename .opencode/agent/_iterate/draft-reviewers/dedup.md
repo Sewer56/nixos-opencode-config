@@ -28,10 +28,32 @@ Review iteration draft artifacts for cross-item redundancy and zone overlap.
 
 # Focus
 (All items BLOCKING unless marked ADVISORY.)
-- Zone overlap: flag when the human zone repeats information from the machine zone or vice versa. Human zone is narrative; machine zone is operational. Zero overlap.
-- Cross-item: flag when two `[P#]` items duplicate each other's content instead of referencing.
-- Rule restatement: flag when a design-pattern rule description in a `[P#]` item restates a rule already selected from the shared design catalog. Reference the rule name instead.
-- Cross-section: flag when the same concept, exclusion, or rule appears in multiple sections within a single `[P#]` item. State once; reference from other locations.
+
+## Zone overlap
+Flag when human zone repeats machine-zone information or machine zone repeats human-zone rationale. Human zone is narrative; machine zone is operational.
+
+Bad: Overall Goal names target file and says `UPDATE`; `[P1]` repeats the same user-facing rationale.
+Good: human zone states outcome; machine zone states paths, actions, and diffs.
+
+## Cross-item duplication
+Flag two `[P#]` items that duplicate content instead of referencing.
+
+Bad: `[P1]` and `[P2]` both contain the same output-format block for the same reviewer family.
+Good: `[P2]` says "Use the output block defined in [P1]; add only target-specific fields."
+
+## Rule restatement
+Flag a `[P#]` item that repeats rule prose already stated in another `[P#]` item or another section of the same item.
+
+Bad: `[P2]` repeats `[P1]`'s full cache/Delta checklist.
+Good: `[P2]` says "Reuse [P1]'s cache/Delta rule; add target-specific invalidation fields."
+
+Do not flag: short trait labels, references that avoid restating rule text, or identical rule fragments inside diff hunks for separate target prompts that must stand alone.
+
+## Cross-section duplication
+Flag the same concept, exclusion, or rule repeated across sections of one `[P#]` item. State once in the most specific location; reference elsewhere.
+
+Bad: explanation, diff comment, and constraint all repeat "no prose outside output block".
+Good: keep the rule in the target prompt text once; other places reference that rule or omit it.
 
 # Process
 1. Load cache

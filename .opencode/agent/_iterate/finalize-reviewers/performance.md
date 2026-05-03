@@ -28,9 +28,24 @@ Review finalized iteration artifacts for iterate performance patterns.
 - `step_pattern` (e.g., `<artifact_base>.step.*.md`)
 
 # Focus
-- Cache/delta efficiency: flag when a `STEP-###` target itself runs a review loop or coordinates subagents but lacks per-reviewer cache files or a Delta section — reviewers will re-evaluate everything on each pass. Do not flag targets that have no review loop.
-- Coordination overhead: flag when a finalize agent or orchestrator scatters coordination state across subagent outputs instead of using a shared ledger or coordination file.
-- Scaling: flag patterns that scale badly as STEP items grow — reviewers reading all artifacts on every pass, handoff growing unbounded, or cache files that accumulate stale entries without pruning.
+
+## Cache/delta efficiency
+Flag when a `STEP-###` target itself runs a review loop or coordinates subagents but lacks per-reviewer cache files or a Delta section. Do not flag targets with no review loop or subagent coordination.
+
+Bad: reviewer loop reruns all reviewers on every revision with no cache and no Delta.
+Good: handoff records Changed/New/Unchanged items; reviewers cache verified records and reopen only invalidated items.
+
+## Coordination overhead
+Flag when a finalize agent or orchestrator scatters coordination state across subagent outputs instead of using one shared ledger or coordination file.
+
+Bad: arbitration decisions live only in chat or individual reviewer responses.
+Good: handoff contains shared Decisions; reviewer caches contain domain findings.
+
+## Scaling
+Flag patterns that scale badly as STEP items grow: reviewers reading all artifacts on every pass, unbounded handoff growth, or cache files that accumulate stale entries without pruning.
+
+Bad: every reviewer reads every STEP and every target file on each pass.
+Good: reviewer uses Delta/cache to inspect Changed/New/Open/Decision-touched items only and prunes removed STEP records.
 
 # Process
 1. Load cache

@@ -29,11 +29,50 @@ Review finalized iteration artifacts for LLM instruction wording quality.
 
 # Focus
 (All items BLOCKING unless marked ADVISORY.)
-- Token density: no filler, hedging, "please note", "it's important to", "make sure to", "ensure that". Every word earns its place.
-- Minimal template: omit sections that add zero value.
-- Wording optimization: flag phrasing that can be tightened without changing meaning. Prefer fewer tokens; flat instruction structure. ADVISORY — block only for egregious inflation.
-- Bullet atomicity: one checkable condition per Focus, Process, or Constraint item. Split multi-condition bullets. ADVISORY.
-- Cross-section restatement: flag when the same concept, exclusion, or rule appears in multiple sections of a single target. State once in the most specific section; others reference it.
+
+## Token density
+Flag filler in STEP instructions: no hedging, "please note", "it's important to", "make sure to", or "ensure that".
+
+Bad:
+```text
+Please make sure to ensure that the agent is able to read the file.
+```
+
+Good:
+```text
+Agent reads the file.
+```
+
+## Minimal template
+Flag sections or fields that add no value and are not required by the STEP template.
+
+Bad: `Dependencies: None`, `Evidence: None`, and `Notes: None` repeated when the template does not require them.
+Good: keep only required STEP fields and useful evidence.
+
+## Wording optimization (ADVISORY)
+Flag phrasing that can be tightened without changing meaning. Prefer fewer tokens and flat instruction structure. Block only for egregious inflation.
+
+Bad:
+```text
+This update is intended to provide guidance for how the reviewer should proceed.
+```
+
+Good:
+```text
+Add reviewer process guidance.
+```
+
+## Bullet atomicity (ADVISORY)
+Flag Focus, Process, or Constraint bullets that contain multiple independent checks.
+
+Bad: one bullet combines schema validation, permission validation, and diff validation.
+Good: one bullet per validation rule.
+
+## Cross-section restatement
+Flag the same concept, exclusion, or rule repeated in multiple sections of one target.
+
+Bad: STEP repeats the same cache/Delta rule in Why, Diff, and Changes.
+Good: target prompt text carries the rule once; STEP summary references it briefly.
  
 # Process
 1. Load cache

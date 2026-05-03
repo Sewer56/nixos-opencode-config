@@ -28,10 +28,46 @@ Review iteration draft artifacts for LLM instruction wording quality.
 
 # Focus
 (All items BLOCKING unless marked ADVISORY.)
-- Token density (machine zone only; human zone narrative by design): no filler, hedging, "please note", "it's important to", "make sure to", "ensure that". Every word earns its place.
-- Wording optimization: flag phrasing that can be tightened without changing meaning. Prefer fewer tokens; flat instruction structure. ADVISORY — block only for egregious inflation.
-- Bullet atomicity: one checkable condition per Focus, Process, or Constraint item. Split multi-condition bullets. ADVISORY.
-- Cross-section restatement: flag when the same concept, exclusion, or rule appears in multiple sections of a single `[P#]` item. State once in the most specific section; others reference it.
+
+## Token density
+Flag filler in machine-zone instructions. Human-zone narrative is exempt.
+
+Bad:
+```text
+Please make sure to ensure that the reviewer is able to read the file.
+```
+
+Good:
+```text
+Reviewer reads the file.
+```
+
+Do not flag: human-zone narrative that explains intent to the user.
+
+## Wording optimization (ADVISORY)
+Flag phrasing that can be tightened without changing meaning. Prefer fewer tokens and flat instruction structure. Block only for egregious inflation.
+
+Bad:
+```text
+This section is intended to provide guidance about how the agent should proceed.
+```
+
+Good:
+```text
+Use this guidance.
+```
+
+## Bullet atomicity (ADVISORY)
+Flag Focus, Process, or Constraint bullets that contain multiple independent checks.
+
+Bad: one bullet requires schema checks, permission checks, and output-format checks.
+Good: one bullet per checkable condition.
+
+## Cross-section restatement
+Flag the same concept, exclusion, or rule repeated in multiple sections of one `[P#]` item.
+
+Bad: `[P1]` repeats the same cache/Delta rule in explanation, diff text, and constraints.
+Good: state the rule once; later sections reference it or omit it.
 
 # Process
 1. Load cache
