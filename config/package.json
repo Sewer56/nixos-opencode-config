@@ -6,12 +6,13 @@
   "private": true,
   "devDependencies": {
     "@opencode-ai/plugin": "^0.6.9",
+    "@types/bun": "^1.3.13",
     "@types/node": "^24.3.1",
     "typescript": "^5.0.0"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "install-types": "bun install"
+    "test": "bun test plugins/file-interp.test.ts"
   },
   "dependencies": {
     "@opencode-ai/plugin": "0.0.0-production-202604141138"
