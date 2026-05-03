@@ -20,7 +20,7 @@ class AgentSemaphore:
         namespace: str,
         max_agents: int,
         slot_dir: str = "/tmp/opencode-agent-slots",
-        timeout: float = 3600,
+        timeout: float = 86400,
     ):
         self._dir = Path(slot_dir) / namespace
         self._max_agents = max_agents
