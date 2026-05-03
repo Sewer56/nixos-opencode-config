@@ -60,14 +60,12 @@ Review and revise code-adjacent documentation (API references, inline comments, 
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
 - Run these reviewers in parallel:
-  - `@_plan/finalize-codedoc-reviewers/documentation`
+  - `@_plan/finalize-codedoc-reviewers/docs-and-readability`
   - `@_plan/finalize-codedoc-reviewers/errors`
-  - `@_plan/finalize-codedoc-reviewers/clarity`
-  - `@_plan/finalize-codedoc-reviewers/wording`
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
   - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
-- Apply domain ownership: CDOC → documentation reviewer; CERR → errors reviewer; CCLR → clarity reviewer; CWRD → wording reviewer. Arbitrate cross-domain conflicts.
+- Apply domain ownership: CDOC, CREAD → docs-and-readability reviewer; CERR → errors reviewer. Arbitrate cross-domain conflicts.
 - Apply reviewer diffs to existing I# and T# step files only. Append one line to `## Revision History`.
 - Re-run reviewers after every material revision.
 - Loop until no findings of any severity remain or 10 iterations.

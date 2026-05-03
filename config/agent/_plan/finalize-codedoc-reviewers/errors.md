@@ -41,42 +41,14 @@ Bad: `Returns Error if something goes wrong.`
 Good: `Returns ParseError when the config file contains invalid TOML.`
 
 ## Targeted reads
-Read only repo files needed to ground error-doc checks.
+Ground error-doc checks in step file diffs and handoff content. Open target source files only when a step diff is ambiguous or missing needed context.
 
 Rules source: `/home/sewer/opencode/config/rules/errors.md`.
 
 # Process
-1. Load cache
-- Cache: `PROMPT-PLAN-auth-refactor.handoff.md` → `PROMPT-PLAN-auth-refactor.review-codedoc-errors.md`. Read if exists; treat missing/malformed as empty.
-- Treat the cache as one record per item (REQ, I#, T#) with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
-
-2. Read Delta and Decisions
-- Read `## Delta` from `handoff_path`.
-- Read `### Decisions` only when non-empty.
-
-3. Select items to inspect
-- Carry forward Verified items that are Unchanged in Delta.
-- Re-evaluate Changed and New items.
-- Re-evaluate own Open items from cache and decision-referenced items.
-
-4. Inspect selected content
-- Read `handoff_path` for summary, requirements, Step Index, and dependency mapping.
-- Read selected step files matching `step_pattern` in one batch.
-- Open target files only for the selected items.
-- Check Open→Resolved transitions.
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
-
-5. Update cache
-- If the derived cache file is missing or malformed: write the full cache file.
-- Otherwise: use targeted edits to update only entries that changed.
-  - Replace entries whose fields changed.
-  - Insert new entries in the appropriate section.
-  - Remove pruned item ids.
-  - Move entries between sections when status transitions.
-- Leave entries whose content has not changed exactly as they are.
-
-6. Emit the final review block
-- Emit the `# REVIEW` block from `# Output`.
+1. Load cache (derived from `handoff_path`: replace `.handoff.md` with `.review-codedoc-errors.md`). Read `## Delta` from `handoff_path`. Skip missing/malformed cache.
+2. Review Changed/New items only; carry forward cached Verified items. Ground checks in step file diffs — open source files only when a diff is ambiguous or missing context. On malformed-output retry, reuse prior cache and re-emit valid output.
+3. Update cache: targeted edits for changed entries, insert new, prune removed ids, preserve unchanged byte-for-byte. Emit `# REVIEW` block.
 
 # Output
 
@@ -111,7 +83,8 @@ Fix: <smallest concrete correction>
 
 # Constraints
 - Keep findings short and specific.
-- Read your own `PROMPT-PLAN.review-codedoc-errors.md` cache before reviewing. Do not reopen Resolved items without new concrete evidence.
+- When Decision is PASS with no findings: emit only `Agent:`, `Decision: PASS`, and `Cache: <path>`. Skip `## Findings` and `## Verified`.
+- Read your own cache before reviewing. Do not reopen Resolved items without new concrete evidence.
 - Flag missing `# Errors` sections on public error-returning APIs as BLOCKING per the errors rules.
 - Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact `# Errors` section to add or fix.
 - Follow the `# Process` section for cache, Delta, and skip handling.
