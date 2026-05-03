@@ -16,7 +16,7 @@ permission:
   external_directory: allow
 ---
 
-Read a confirmed draft plan and gather the repo facts needed to write a machine plan. Return a compact structured manifest. Do NOT write any files.
+Read a confirmed draft plan and gather the repo facts needed to write implementation/test steps. Return a compact structured manifest. Do NOT write any files.
 
 # Inputs
 - `plan_path`: the confirmed draft plan (`<artifact_base>.draft.md`)

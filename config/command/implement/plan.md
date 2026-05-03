@@ -1,5 +1,5 @@
 ---
-description: "Implement a finalized machine plan with automated review loop"
+description: "Implement a finalized plan with automated review loop"
 agent: _implement/plan
 ---
 

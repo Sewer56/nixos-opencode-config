@@ -115,4 +115,4 @@ Note: <one short note if needed>
 - Number draft files sequentially.
 - Ensure each meaningful area surfaced during inspection or review is owned by at least one draft task, or is called out as intentionally unresolved.
 - Avoid overlapping draft ownership unless the dependency is explicit and necessary.
-- Do not add requirement inventories, acceptance matrices, or other machine-only scaffolding.
+- Do not add requirement inventories, acceptance matrices, or other automation-only scaffolding.

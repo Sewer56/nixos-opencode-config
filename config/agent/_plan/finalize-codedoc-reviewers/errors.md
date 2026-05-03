@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks code-adjacent error documentation coverage and specificity for finalized machine plans
+description: Checks code-adjacent error documentation coverage and specificity for finalized steps
 model: sewer-axonhub/MiniMax-M2.7  # LOW
 permission:
   "*": deny
@@ -19,7 +19,7 @@ permission:
   external_directory: allow
 ---
 
-Review a finalized machine plan's code-adjacent error documentation.
+Review finalized steps' code-adjacent error documentation.
 
 # Inputs
 - `handoff_path` (e.g., `<artifact_base>.handoff.md`)

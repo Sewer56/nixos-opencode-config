@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Implements a machine plan with an automated review loop
+description: Implements a finalized plan with an automated review loop
 permission:
   "*": deny
   read:
@@ -24,7 +24,7 @@ permission:
     "_implement/plan-reviewer": "allow"
 ---
 
-Implements a finalized machine plan with automated review.
+Implements a finalized plan with automated review.
 
 # Prerequisite
 `HANDOFF_DOCUMENT` must exist.

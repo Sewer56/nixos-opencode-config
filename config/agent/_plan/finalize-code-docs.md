@@ -25,7 +25,7 @@ permission:
   }
 ---
 
-Review and revise code-adjacent documentation (API references, inline comments, parameter descriptions, error message strings, developer-facing READMEs) inside a finalized code/test machine plan. Apply documentation and error-doc fixes to existing Implementation (I#) and Test (T#) step files. Leave end-user documentation steps (D# steps) to `/plan/finalize-user-docs`.
+Review and revise code-adjacent documentation (API references, inline comments, parameter descriptions, error message strings, developer-facing READMEs) inside finalized code/test steps. Apply documentation and error-doc fixes to existing Implementation (I#) and Test (T#) step files. Leave end-user documentation steps (D# steps) to `/plan/finalize-user-docs`.
 
 # Inputs
 - The latest user message may provide code-documentation notes.
@@ -46,7 +46,7 @@ Review and revise code-adjacent documentation (API references, inline comments, 
 ## 1. Preconditions and source of truth
 - Read `handoff_path`.
 - Read all existing I# and T# step files matching `step_pattern`.
-- Treat the finalized code/test machine plan as the source of truth.
+- Treat the finalized code/test steps as the source of truth.
 - Modify existing I#/T# step files only when documentation or errors reviewer findings target them.
 - Do not create D# step files.
 

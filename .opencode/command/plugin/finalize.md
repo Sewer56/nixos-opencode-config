@@ -1,5 +1,5 @@
 ---
-description: "Convert a confirmed plugin plan into a reviewed machine plan"
+description: "Convert a confirmed plugin plan into reviewed STEP files"
 agent: _plugin/finalize
 ---
 

@@ -20,7 +20,7 @@ permission:
   task: deny
 ---
 
-Review a finalized machine plan's code-adjacent documentation (I#/T# steps) for doc coverage, specificity, fidelity, and readability.
+Review finalized code/test steps for code-adjacent documentation coverage, specificity, fidelity, and readability.
 
 # Inputs
 - `handoff_path` (e.g., `<artifact_base>.handoff.md`)

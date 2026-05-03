@@ -7,18 +7,15 @@ Shared workflow design patterns live in `config/doc/workflow/design-patterns.md`
 ## Command Pipeline
 
 1. `/plugin/draft` — Write `<artifact_base>.draft.md` describing the plugin, its hooks, and constraints.
-2. `/plugin/finalize` — Convert the confirmed plan into a reviewed machine plan. Writes `<artifact_base>.handoff.md` (includes manifest) and individual STEP files as `<artifact_base>.step.*.md`. Runs 4 diff-returning reviewers.
-3. `/plugin/implement` — Apply the machine plan, type-check, then debug-iterate until the plugin loads cleanly.
+2. `/plugin/finalize` — Convert the confirmed plan into reviewed STEP files. Writes `<artifact_base>.handoff.md` (includes manifest) and individual STEP files as `<artifact_base>.step.*.md`. Runs cache-backed plugin reviewers with scoped re-review.
+3. `/plugin/implement` — Apply the finalized plan, type-check, then debug-iterate until the plugin loads cleanly.
 4. `/plugin/debug` — Inspect an existing plugin's debug flag and log path, run with debug enabled, check the co-located log file for issues.
 
 ## Draft Review
 
-The draft agent runs 5 reviewers in `draft-reviewers/` before presenting the plan to the user:
-- `correctness` — plan template structure, diff header paths, plugin constraints
-- `dedup` — human/machine zone overlap, `[P#]` cross-item redundancy
-- `wording` — token density, bullet atomicity
-- `style` — imperative voice, positive framing
-- `clarity` — undefined jargon, opaque references
+The draft agent follows the shared `/plan/draft` shape with plugin-specific agents:
+- Stage 1: `correctness` — request fidelity, template structure, diff header paths, plugin constraints.
+- Stage 2: `documentation` + `wording` in parallel. `wording` owns token density, bullet atomicity, imperative style, deduplication, and clarity.
 
 Coordination: `<artifact_base>.draft.handoff.md` (Delta + Decisions).
 Cache: `<artifact_base>.draft.review-<domain>.md`. Iteration cap: 5.
@@ -26,14 +23,24 @@ Re-review runs automatically on the initial write; after user modifications the 
 
 ## Reviewers
 
-The finalize agent runs four reviewers in parallel:
+The finalize agent follows the shared `/plan/finalize` shape with plugin-specific agents: fast draft precondition, `_plugin/finalize-explorer`, cache-backed initial review, scoped re-review, and final gates.
 
-- `_plugin/finalize-reviewers/errors` — Error-handling coverage, swallowed errors, standalone log pattern compliance.
-- `_plugin/finalize-reviewers/reorder` — Declaration ordering (entry point first, callers before callees).
-- `_plugin/finalize-reviewers/documentation` — JSDoc coverage, debug flag docs, log path docs.
-- `_plugin/finalize-reviewers/correctness` — Plan fidelity, SDK type correctness, no `client.app.log`, no unnecessary `opencode.json` registration.
+Initial reviewers:
 
-Each reviewer returns a `## Diff` section with unified diffs so the implement agent can apply fixes mechanically.
+- `_plugin/finalize-reviewers/audit` — Plan fidelity, structure, completeness, plugin constraints, economy, and dead-code cleanup.
+- `_plugin/finalize-reviewers/tests` — Verification coverage, typecheck/debug checks, behavior coverage, redundancy, and parameterization.
+
+Re-reviewers:
+
+- `_plugin/finalize-reviewers/audit-rereview` — Cache-first verification of audit fixes.
+- `_plugin/finalize-reviewers/tests-rereview` — Cache-first verification of verification fixes.
+
+Final-gate reviewers:
+
+- `_plugin/finalize-reviewers/placement` — Declaration ordering (entry point first, callers before callees).
+- `_plugin/finalize-reviewers/performance` — Hot-hook overhead, unbounded work, sync I/O, logging volume, and concurrency risk.
+
+Audit/tests write detailed findings and diffs to cache files. Placement/performance return inline findings.
 
 ## Standalone Log Pattern
 
@@ -49,18 +56,16 @@ Plugins placed in `config/plugins/` are automatically discovered and loaded by O
 
 ## Split STEP Files
 
-The finalize agent writes a single handoff (`<artifact_base>.handoff.md`) with Summary, Revision History, Step Index, Delta, and Review Ledger, plus individual STEP files as `<artifact_base>.step.*.md`. No separate `machine.md`. Reviewers read only the STEP files that Delta marks as Changed or New. Implementers read the handoff, then each STEP file in order. Stable numbering: gaps are valid, no renumbering.
+The finalize agent writes a single handoff (`<artifact_base>.handoff.md`) with Summary, Revision History, Step Index, Delta, and Review Ledger, plus individual STEP files as `<artifact_base>.step.*.md`. Reviewers read only the STEP files that Delta marks as Changed or New. Implementers read the handoff, then each STEP file in order. Stable numbering: gaps are valid, no renumbering.
 
 ## Cache Files
 
-Each reviewer owns a cache file (unchanged from before, but reviewers now use it to skip reading Unchanged STEP files):
+Audit/tests own cache files and use `## Delta` plus changed STEP paths to skip unchanged STEP files on re-review:
 
-- `<artifact_base>.review-errors.md`
-- `<artifact_base>.review-reorder.md`
-- `<artifact_base>.review-documentation.md`
-- `<artifact_base>.review-correctness.md`
+- `<artifact_base>.review-audit.md`
+- `<artifact_base>.review-tests.md`
 
-The finalize agent maintains a `## Delta` section in `<artifact_base>.handoff.md`. Reviewers skip Unchanged items on re-runs.
+The finalize agent maintains a `## Delta` section in `<artifact_base>.handoff.md`. Re-review passes only `cache_path`, changed STEP paths, finding IDs, and a fix ledger unless the cache is missing or scope changed.
 
 ## Slug Derivation
 

@@ -1,5 +1,5 @@
 ---
-description: "Draft a collaborative human-first implementation plan"
+description: "Draft a collaborative implementation plan"
 agent: _plan/draft
 ---
 

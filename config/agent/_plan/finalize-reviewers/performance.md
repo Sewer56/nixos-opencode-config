@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks performance-sensitive decisions in finalized machine plans
+description: Checks performance-sensitive decisions in finalized steps
 model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
@@ -26,7 +26,7 @@ permission:
   # skill: deny
 ---
 
-Review only the performance-sensitive parts of a machine plan.
+Review only the performance-sensitive parts of finalized steps.
 
 # Inputs
 - `handoff_path` (e.g., `<artifact_base>.handoff.md`)
@@ -48,7 +48,7 @@ Bad: infer N+1 risk from plan wording only.
 Good: inspect target data path, then verify whether plan introduces risk.
 
 ## Scope boundary
-Use `handoff_path` and `plan_path` only to verify the machine plan did not introduce performance-sensitive scope beyond the confirmed plan.
+Use `handoff_path` and `plan_path` only to verify the steps did not introduce performance-sensitive scope beyond the confirmed plan.
 
 Rules source: `/home/sewer/opencode/config/rules/performance.md`.
 

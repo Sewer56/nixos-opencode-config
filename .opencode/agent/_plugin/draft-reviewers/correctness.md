@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks template structure, diff headers, and plugin constraints in plugin draft artifacts
+description: Checks fidelity, template structure, diff headers, and plugin constraints in plugin draft artifacts
 model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
@@ -20,8 +20,7 @@ permission:
   external_directory: allow
 ---
 
-Review plugin draft artifacts for template structure, diff header validity,
-and plugin-specific constraints.
+Review plugin draft artifacts for fidelity, template structure, diff header validity, and plugin-specific constraints.
 
 # Inputs
 - `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
@@ -30,8 +29,20 @@ and plugin-specific constraints.
 # Focus
 (All items BLOCKING unless marked ADVISORY.)
 
+## Requirement fidelity
+Each user requirement, constraint, and open question from the request must be addressed by at least one `[P#]` item, a Decision, or an Open Question.
+
+Bad: user asks for debug flag docs; no `[P#]` touches debug docs.
+Good: `[P#]` explicitly owns debug docs or records why out of scope.
+
+## Action appropriateness
+`[P#]` item actions must match the requested goal and not contradict confirmed decisions.
+
+Bad: user asks to investigate an existing plugin; draft creates a new plugin without rationale.
+Good: draft refines the existing plugin or records an Open Question.
+
 ## Template structure
-Required draft sections must be present and in shape: Overall Goal, Open Questions, Decisions, Action, Dependencies, Discovery, and `[P#]` items.
+Required draft sections must be present and in shape: `## Overall Goal`, `## Open Questions`, `## Decisions`, `## Action`, `[P#]` items, `**Files:**` lines, `## Dependencies`, and `## Discovery`.
 
 Bad: draft jumps from Overall Goal directly to `[P1]` with no Decisions or Discovery.
 Good: draft includes each required section, using `None` when no content exists.
@@ -61,9 +72,13 @@ Good: rely on `config/plugins/` auto-loading and write debug logs to `<plugin-di
 
 Auto-loading issues are ADVISORY unless the plan would break loading; `client.app.log` debug usage is BLOCKING.
 
+## Scope boundary
+Own fidelity, structure, paths, and plugin constraints. Mention documentation or wording concerns at most once in `## Notes` without blocking.
+
 # Process
 1. Load cache
-- Cache: `PROMPT-PLUGIN-PLAN-opencode-config.draft.handoff.md` → `PROMPT-PLUGIN-PLAN-opencode-config.draft.review-correctness.md`. Read if exists. Treat missing or malformed cache as empty.
+- Derive cache path from `draft_handoff_path`: `<artifact_base>.draft.handoff.md` → `<artifact_base>.draft.review-correctness.md`.
+- Read the cache if it exists; treat missing or malformed cache as empty.
 - Treat the cache as one record per `[P#]` with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
 2. Read Delta and Decisions
@@ -81,6 +96,22 @@ Auto-loading issues are ADVISORY unless the plan would break loading; `client.ap
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
 5. Update cache
+- Write cache in this format:
+```markdown
+# Review Cache: correctness
+
+## Verified Observations
+- [P#]: <grounding snapshot — one line each>
+
+## Findings
+### [COR-NNN]
+Status: OPEN | RESOLVED
+Category: FIDELITY | ACTION | TEMPLATE_STRUCTURE | DIFF_HEADERS | PLUGIN_CONSTRAINTS
+Severity: BLOCKING | ADVISORY
+Problem: <one line>
+Fix: <one line or diff>
+Resolution: <only for RESOLVED>
+```
 - If the derived cache file is missing or malformed: write the full cache file.
 - Otherwise: use targeted edits to update only entries that changed.
   - Replace entries whose fields changed.
@@ -101,7 +132,7 @@ Decision: PASS | ADVISORY | BLOCKING
 
 ## Findings
 ### [COR-001]
-Category: TEMPLATE_STRUCTURE | DIFF_HEADERS | PLUGIN_CONSTRAINTS
+Category: FIDELITY | ACTION | TEMPLATE_STRUCTURE | DIFF_HEADERS | PLUGIN_CONSTRAINTS
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
 Problem: <what is wrong>
@@ -123,12 +154,11 @@ Fix: <smallest concrete correction>
 - <optional short notes>
 ```
 
-Return ONLY the block above — no introduction, no summary, no conversational
-wrapper, no text before `# REVIEW` or after the final `## Notes` line.
+Return ONLY the fenced `text` block above — no introduction, no summary, no conversational wrapper.
 Any content outside this format is a protocol violation.
 
 # Constraints
-- Block for missing required sections, invalid diff headers, or violations of the standalone log pattern or auto-loading constraints.
+- Block for missing required sections, invalid diff headers, request/plan mismatches, or violations of the standalone log pattern or auto-loading constraints.
 - Do not block for minor wording when structure and plugin constraints are valid.
 - Cite section names and specific `[P#]` items as evidence.
 - Keep findings short and specific.

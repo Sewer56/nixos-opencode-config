@@ -17,7 +17,7 @@ permission:
   external_directory: allow
 ---
 
-Review a finalized machine plan for correctness and scope in one pass. Initial review only — re-review is handled by a dedicated agent.
+Review finalized implementation/test steps for correctness and scope in one pass. Initial review only — re-review is handled by a dedicated agent.
 
 # Inputs
 

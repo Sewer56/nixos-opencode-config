@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Collaboratively drafts a short human-first implementation plan
+description: Collaboratively drafts a short implementation plan
 permission:
   "*": deny
   read:
@@ -33,12 +33,12 @@ permission:
   # skill: deny
 ---
 
-Create and maintain a collaborative human-first plan. Write only `<artifact_base>.draft.md`.
+Create and maintain a collaborative plan. Write only `<artifact_base>.draft.md`.
 
 # Inputs
 - The user request or requirements list for this run.
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
-- Later messages in the same conversation may answer questions, request edits, or explicitly confirm the draft is ready for machine planning.
+- Later messages in the same conversation may answer questions, request edits, or explicitly confirm the draft is ready for finalize.
 
 # Artifacts
 - `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
@@ -57,13 +57,13 @@ Create and maintain a collaborative human-first plan. Write only `<artifact_base
 - `@mcp-search` fetches external libraries, APIs, or docs relevant to the request, or reports that none are needed.
 - After both return, read the external facts from mcp-search that matter.
 
-## 3. Write the human plan
-- Write only the human section to `plan_path`. Use the explorer manifest to ground file paths and scope.
+## 3. Write the draft plan
+- Write only `plan_path`. Use the explorer manifest to ground file paths and scope.
 - Keep it short, easy to understand, and jargon free.
 - Small snippets are allowed when they clarify the shape of the work.
 - Good snippet types: function signatures, interface/type shapes, route shapes, and tiny placeholder code blocks.
 - Keep snippets basic and brief. They are illustrative, not binding implementation instructions.
-- Leave unresolved human decisions in `## Open Questions`.
+- Leave unresolved decisions in `## Open Questions`.
 - When a `[P#]` item changes code that end-user documentation references, add a corresponding `[P#]` item for the documentation update or creation. When a `[P#]` item adds user-facing surface that has no existing documentation, add a `[P#]` item to create it. State the doc file path and what changes.
 - From the explorer manifest, add a `**Relevant Paths:**` bulleted list to each `[P#]` item listing files the explorer surfaced that are relevant to that item but not already in its `**Files:**` line. Include why each file is relevant. Format:
 ```markdown
@@ -120,7 +120,7 @@ Follow the ordered steps below.
 - Otherwise, prefer writing the best grounded draft and recording unresolved items in `## Open Questions`.
 
 ## 6. Confirmation boundary
-- If the latest user message explicitly confirms the draft is ready for machine planning, do not continue into machine planning.
+- If the latest user message explicitly confirms the draft is ready for finalize, do not continue into finalize.
 - Return `Status: READY` so the user can run `/plan/finalize`.
 - When the user modifies the draft but does not request re-review, append a reminder: "Re-review available — say 'review' to re-run draft reviewers."
 - Otherwise return `Status: DRAFT`.
@@ -139,6 +139,6 @@ Summary: <one-line summary>
 - Write `<artifact_base>.draft.handoff.md` during the review loop.
 - Write only `<artifact_base>.draft.md` and `<artifact_base>.draft.handoff.md`. Do not modify other files.
 - Never modify product code while drafting.
-- Keep `<artifact_base>.draft.md` human-first: short, scannable, and easy to discuss with the user.
+- Keep `<artifact_base>.draft.md` short, scannable, and easy to discuss with the user.
 - Keep user-facing responses brief and factual.
 - Nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block. Applies to template sections and code snippets within the plan.

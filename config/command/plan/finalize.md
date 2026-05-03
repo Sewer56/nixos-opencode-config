@@ -1,5 +1,5 @@
 ---
-description: "Turn a confirmed human plan into a reviewed machine plan"
+description: "Turn a confirmed draft plan into reviewed implementation/test steps"
 agent: _plan/finalize
 ---
 

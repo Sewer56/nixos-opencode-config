@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Drafts a PROMPT-PLUGIN-PLAN-<slug>.draft.md plugin plan for OpenCode plugin development
+description: Collaboratively drafts a short plugin plan
 permission:
   "*": deny
   read:
@@ -20,57 +20,64 @@ permission:
   list: allow
   task:
     "*": deny
-    "codebase-explorer": allow
     "mcp-search": allow
+    "_plugin/draft-explorer": allow
     "_plugin/draft-reviewers/*": allow
 ---
 
-Draft `<artifact_base>.draft.md` for the `/plugin/draft` command.
+Create and maintain a collaborative plugin plan for `/plugin/draft`. Write only `<artifact_base>.draft.md`.
 
 # Inputs
 
 - User request describing what plugin to create or iterate on.
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLUGIN-PLAN-<slug>`.
+- Later messages in the same conversation may answer questions, request edits, request re-review, or explicitly confirm the draft is ready for finalize.
 
 # Artifacts
 
 - `artifact_base`: `PROMPT-PLUGIN-PLAN-<slug>` (derived from `slug`)
 - `context_path`: `<artifact_base>.draft.md` (current working directory)
 - `draft_handoff_path`: `<artifact_base>.draft.handoff.md` (current working directory)
+- Draft reviewer caches:
+  - `<artifact_base>.draft.review-correctness.md`
+  - `<artifact_base>.draft.review-documentation.md`
+  - `<artifact_base>.draft.review-wording.md`
+
+# Plan Alignment Boundary
+
+- Shared orchestration mirrors `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_plan/draft.md`: request source of truth → explorer manifest → short plan → staged review → clarify → confirmation.
+- Do not route to `_plan/*` agents or create `PROMPT-PLAN-*` artifacts. Plugin runs use `PROMPT-PLUGIN-PLAN-*`, `_plugin/*` agents, plugin SDK/hook constraints, standalone logging, and auto-loading rules.
+- Plan prompts are not reusable wholesale because plugin plans keep plugin-specific constraints and feed `/plugin/finalize`, `/plugin/implement`, and `/plugin/debug`.
 
 # Process
 
-## 1. Parse request
+## 1. Start from the request
 
-Extract from user input:
-- Target: which plugin to create or iterate on.
-- Action: create new plugin or refine existing.
-- Intent: what the plugin should accomplish.
-- Behavior traits: whether the plugin uses hooks that run review loops, coordinates subagents, defines machine-readable output, or changes conventions/artifacts.
+- Derive `artifact_base` from `slug` as `PROMPT-PLUGIN-PLAN-<slug>`. All artifact paths derive from `artifact_base`.
+- Treat the user's explicit requirements, constraints, and answers in this conversation as the source of truth.
+- Extract the target plugin, action (`create` or `refine`), intent, likely hooks, debug/logging needs, and external API needs.
 
-## 2. Discover
+## 2. Run discovery
 
-Spawn `@codebase-explorer` to map:
-- Existing plugins in `config/plugins/`
-- Hook patterns used by existing plugins
-- SDK types and interfaces in `opencode-source/packages/plugin/src/`
+- Run `@_plugin/draft-explorer` and `@mcp-search` in parallel before writing the plan.
+- Pass only the user's request text to `@_plugin/draft-explorer` as `request`.
+- `@_plugin/draft-explorer` surveys local plugin files, plugin workflow docs, config/package surfaces, and documentation surfaces. It does not inspect `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/opencode-source/`.
+- `@mcp-search` fetches `@opencode-ai/plugin` SDK docs, external APIs, or library docs only when needed; otherwise it reports that none are needed.
+- After both return, read only external facts from `@mcp-search` that affect the plan.
 
-Spawn `@mcp-search` for `@opencode-ai/plugin` SDK docs when the request involves external APIs or libraries.
+## 3. Write the plugin plan
 
-## 3. Resolve targets
+- Write `context_path` using the template below. Derive `artifact_base` from `slug` as `PROMPT-PLUGIN-PLAN-<slug>`.
+- Use the explorer manifest to ground file paths, existing plugin patterns, docs/config surfaces, and constraints.
+- Keep the overview short, narrative, and jargon-free: Overall Goal, Open Questions, Decisions.
+- Keep action sections operational: Action, `[P#]` items, Dependencies, Discovery.
+- Avoid overlap: the overview explains the outcome and decisions; action sections name files and changes.
+- Each `[P#]` item includes `**Files:**` and optional `**Relevant Paths:**` from discovery.
+- Each UPDATE/DELETE `[P#]` item includes a diff block with valid headers; CREATE items may omit the diff and describe the file to create.
+- Return only `[P#]` items requiring action.
+- When a `[P#]` item adds or changes user-facing plugin behavior, debug flags, public APIs, or documentation-visible behavior, add a corresponding documentation/JSDoc `[P#]` item.
 
-From discovery, determine:
-- Exact file paths to create or modify.
-- Which hooks the plugin will use.
-- Dependencies: SDK types, existing plugins as references.
-
-## 4. Write context
-
-Write `context_path` using the template below. Derive `artifact_base` from `slug` as `PROMPT-PLUGIN-PLAN-<slug>`. All artifact paths derive from `artifact_base`. Populate every section from discovery and request analysis.
-Draft the human zone first (Overall Goal, Open Questions, Decisions). Then draft the machine zone below the `---` separator. Human zone stays narrative — no file paths, action labels, or status markers. Machine zone stays operational — no prose explanations. Zero overlap between zones.
-- Each `[P#]` item: free-form explanation + diff block. CREATE: explanation only. Return only items requiring action.
-
-## 5. Run the draft review loop
+## 4. Run the draft review loop
 Follow the ordered steps below.
 
 1. Write and maintain `## Delta`
@@ -79,46 +86,53 @@ Follow the ordered steps below.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Recompute `## Delta` after every material revision to `context_path`.
 
-2. Build reviewer prompts
-- After each draft, run these reviewers in parallel:
-  - `@_plugin/draft-reviewers/correctness`
-  - `@_plugin/draft-reviewers/wording`
-  - `@_plugin/draft-reviewers/style`
-  - `@_plugin/draft-reviewers/dedup`
-  - `@_plugin/draft-reviewers/clarity`
+2. Stage 1 — Correctness
+- Run `@_plugin/draft-reviewers/correctness` first.
 - Include only:
   - `context_path` and `draft_handoff_path`
 - Omit:
   - Output format, focus/check lists, role assignment, blanket read orders
+- Validate, apply fixes, and recompute Delta.
+- If correctness returns BLOCKING: fix and re-run correctness. Do not proceed to Stage 2 until correctness is PASS or ADVISORY-only.
 
-3. Validate each reviewer response
-- Same validation as finalize: `# REVIEW` header, `Decision:`, `## Findings`, `## Verified`.
-- All 5 draft reviewers are diff-mandated.
+3. Stage 2 — Documentation + Wording
+- Run in parallel:
+  - `@_plugin/draft-reviewers/documentation`
+  - `@_plugin/draft-reviewers/wording`
+- Include only `context_path` and `draft_handoff_path`.
+- Validate, apply fixes, and recompute Delta.
+
+4. Validate each reviewer response
+- Exact fenced `text` block whose first content line is `# REVIEW`, plus `Decision:`, `## Findings`, and `## Verified`.
+- All 3 active draft reviewers are diff-mandated.
 - Treat malformed output as BLOCKING after retries.
 
-4. Retry malformed responses from the existing review state
-- Same retry protocol as finalize.
+5. Retry malformed responses from the existing review state
+- If validation fails and Delta plus Decisions are unchanged, send only the protocol error and request re-emit; if Delta or Decisions changed, include only the new excerpt and request fresh response.
 
-5. Record decisions and apply domain ownership
+6. Record decisions and apply domain ownership
 - Update `### Decisions` in `draft_handoff_path`.
-- Apply domain ownership: CORRECTNESS → correctness; WORDING → wording; STYLE → style; DEDUP → dedup; CLARITY → clarity.
+- Apply domain ownership: CORRECTNESS → correctness; DOC → documentation; WORDING → wording, style, deduplication, and clarity.
 
-6. Revise `<artifact_base>.draft.md` when findings require it
+7. Revise `<artifact_base>.draft.md` when findings require it
 - Apply reviewer diffs via targeted edits; fall back to `Fix:` prose.
 - Recompute `## Delta`.
 
-7. Re-run or finish
-- Loop until no findings or 5 iterations.
-- No findings: proceed to Clarify. At cap: proceed with risks noted.
-- On re-entry (user explicitly requests re-review after a modification): recompute Delta for changed `[P#]` items, re-run this entire step. Reviewers skip Unchanged items via cache.
+8. Re-run or finish
+- Loop until no BLOCKING findings or 5 iterations.
+- ADVISORY-only findings → DEFERRED. Do not re-run solely for advisory-only findings unless they affect explicit user constraints.
+- On re-review: dispatch only reviewers with prior BLOCKING decisions. PASS/ADVISORY reviewers skip unless their domain is touched by BLOCKING fixes.
+- At cap: proceed with risks noted.
 
-## 6. Clarify
+## 5. Clarify only when needed
 
-Ask up to 10 questions in one batch only if answers would materially improve the context.
+- If the request is too ambiguous to outline responsibly, ask only the missing question or questions.
+- Otherwise, prefer writing the best grounded draft and recording unresolved items in `## Open Questions`.
 
-## 7. Confirmation boundary
+## 6. Confirmation boundary
 
-- If latest user message explicitly confirms the draft is ready, return `Status: READY`.
+- If the latest user message explicitly confirms the draft is ready for finalize, do not continue into finalize.
+- Return `Status: READY` so the user can run `/plugin/finalize`.
 - When the user modifies the draft but does not request re-review, append a reminder: "Re-review available — say 'review' to re-run draft reviewers."
 - Otherwise return `Status: DRAFT`.
 
@@ -137,7 +151,9 @@ Summary: <one-line summary>
 - Write only `<artifact_base>.draft.md`.
 - Write `<artifact_base>.draft.handoff.md` during the review loop.
 - Write only `<artifact_base>.draft.md` and `<artifact_base>.draft.handoff.md`. Do not modify other files.
+- Never modify plugin source or product code while drafting.
 - Keep `<artifact_base>.draft.md` compact and scannable.
+- Keep user-facing responses brief and factual.
 - Enforce the standalone log pattern: every plugin plan must include `.logs/<name>/debug.log` co-located logging, not `client.app.log`.
 - Enforce auto-loading: plugins in `config/plugins/` need no `opencode.json` registration.
 - Enforce nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block.
@@ -224,21 +240,20 @@ cd config/ && bun run typecheck
 
 # Reference Paths
 
-- Plugin types (`Plugin`, `PluginInput`, `Hooks`): `opencode-source/packages/plugin/src/index.ts`
-- Tool helper (`tool()`, `ToolDefinition`, `ToolContext`): `opencode-source/packages/plugin/src/tool.ts`
-- Shell types (`BunShell`): `opencode-source/packages/plugin/src/shell.ts`
-- TUI types (`TuiPlugin`, `TuiPluginApi`): `opencode-source/packages/plugin/src/tui.ts`
-- Official plugin docs: `opencode-source/packages/web/src/content/docs/plugins.mdx`
-- Existing plugins: `config/plugins/*.ts`
-- TypeScript config: `config/tsconfig.json`
-- Dependencies: `config/package.json`
+- Local plugin workflow doc: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/.opencode/doc/plugin.md`
+- Existing plugins: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/plugins/*.ts`
+- TypeScript config: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/tsconfig.json`
+- Dependencies: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/package.json`
+- SDK docs: query `@opencode-ai/plugin` with `@mcp-search` when local plugin patterns do not answer hook or type questions.
 
 # Template: `<artifact_base>.draft.md`
 
 ```markdown
 # Plugin Plan
 
-Overall Goal: <one-line goal>
+## Overall Goal
+
+<one-line goal>
 
 ## Open Questions
 
@@ -250,13 +265,18 @@ Overall Goal: <one-line goal>
 
 ---
 
-<!-- Machine sections below. Consumed by /plugin/finalize and reviewers. -->
+<!-- Action sections below. Consumed by /plugin/finalize and reviewers. -->
 
 ## Action
 
 create | refine
 
 ### [P1] <label>
+
+**Files:** `path/to/file`
+
+**Relevant Paths:**
+- `path/to/reference`: <why relevant>
 
 <free-form explanation of intent and why>
 
@@ -271,6 +291,7 @@ create | refine
 ~~~
 
 <!-- CREATE actions: omit diff block. Explanation only. -->
+<!-- Omit Relevant Paths when discovery found nothing beyond Files. -->
 
 ## Dependencies
 

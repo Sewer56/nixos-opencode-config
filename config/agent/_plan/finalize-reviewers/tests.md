@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks test coverage and test minimality for finalized machine plans
+description: Checks test coverage and test minimality for finalized implementation/test steps
 model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
@@ -17,7 +17,7 @@ permission:
   external_directory: allow
 ---
 
-Review a machine plan's test strategy. Initial review only — re-review handled by dedicated agent.
+Review finalized steps' test strategy. Initial review only — re-review handled by dedicated agent.
 
 # Inputs
 

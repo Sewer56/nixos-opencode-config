@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Converts a confirmed plugin plan into reviewed machine instructions
+description: Converts a confirmed plugin plan into reviewed implementation steps
 permission:
   "*": deny
   read:
@@ -19,86 +19,127 @@ permission:
   list: allow
   task:
     "*": deny
-    "codebase-explorer": allow
     "mcp-search": allow
-    "_plugin/finalize-reviewers/errors": allow
-    "_plugin/finalize-reviewers/reorder": allow
-    "_plugin/finalize-reviewers/documentation": allow
-    "_plugin/finalize-reviewers/correctness": allow
-    "_plugin/finalize-reviewers/dead-code": allow
+    "_plugin/finalize-explorer": allow
+    "_plugin/finalize-reviewers/audit": allow
+    "_plugin/finalize-reviewers/audit-rereview": allow
+    "_plugin/finalize-reviewers/tests": allow
+    "_plugin/finalize-reviewers/tests-rereview": allow
+    "_plugin/finalize-reviewers/performance": allow
+    "_plugin/finalize-reviewers/placement": allow
 ---
 
-Convert a confirmed plugin plan into reviewed machine instructions. Derive `artifact_base` from `slug` as `PROMPT-PLUGIN-PLAN-<slug>`.
+Convert a confirmed plugin plan into reviewed implementation steps. Write `<artifact_base>.handoff.md` and individual plugin STEP files matching `<artifact_base>.step.*.md`.
 
 # Inputs
-- The latest user message may confirm the plan, provide finalize-time notes, or note changes since the draft.
+- The latest user message may confirm the draft, provide small finalize-time notes, or point out changes since the draft.
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLUGIN-PLAN-<slug>`.
-- Required local artifact: `<artifact_base>.draft.md`
+- Required local artifacts for this run:
+  - `<artifact_base>.draft.md`
+- If the request does not identify an exact draft path or slug, you may use one targeted glob for `PROMPT-PLUGIN-PLAN-*.draft.md` in the current workspace to disambiguate. Do not broaden search beyond that precondition check.
 
 # Artifacts
 - `artifact_base`: `PROMPT-PLUGIN-PLAN-<slug>` (derived from `slug`)
 - `context_path`: `<artifact_base>.draft.md`
 - `handoff_path`: `<artifact_base>.handoff.md`
 - `step_pattern`: `<artifact_base>.step.*.md`
+- Cache paths, written by initial reviewers and read by re-reviewers:
+  - `<artifact_base>.review-audit.md`
+  - `<artifact_base>.review-tests.md`
+
+# Plan Alignment Boundary
+- Shared orchestration mirrors `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_plan/finalize.md`: fast precondition gate → finalize explorer manifest → handoff + per-file steps → cache-backed initial review → scoped re-review → final gates.
+- Reviewer topology mirrors `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_plan/finalize-reviewers`: audit, tests, audit-rereview, tests-rereview, placement, performance.
+- Do not route to `_plan/*` agents or create `PROMPT-PLAN-*` artifacts. Plan reviewers are not reusable wholesale because plugin finalization uses `PROMPT-PLUGIN-PLAN-*`, plugin SDK/hook constraints, standalone logging, auto-loading, STEP-### files, and `/plugin/implement` as the next phase.
+- Carry shared workflow logic by reference and plugin-specific delta; embed operational rules here so the agent does not need to reread the plan prompts at runtime.
 
 # Process
 
 ## 1. Preconditions and source of truth
-- Derive `artifact_base` from `slug` as `PROMPT-PLUGIN-PLAN-<slug>`. All artifact paths derive from `artifact_base`.
-- Read `context_path` (`<artifact_base>.draft.md`) as the source of truth, supplemented only by any explicit finalize-time notes from the latest user message.
-- Treat the `/plugin/finalize` invocation as the confirmation boundary.
 
-## 2. Deepen discovery only where needed
-- Start from the paths and shapes already present in `context_path`.
-- Consume `Overall Goal:` lines and `[P#]` labeled steps directly.
-- `[P#]` items use free-form explanation + diff block. Extract file paths from diff block headers. Treat as draft-level guidance — ground STEP diffs in actual file content.
-- Deepen discovery only where the confirmed context leaves frontmatter fields, permission patterns, naming, cross-references, or output formats unresolved.
-- Infer which design rules apply to each confirmed target from its behavior: review loop, subagent coordination, or machine-readable output.
-- Use `@codebase-explorer` for repo discovery first when needed.
-- Use `@mcp-search` for external libraries or APIs only when needed.
-- Read the files surfaced by discovery that matter to the machine artifact.
+**PRECONDITION GATE: Do not load rule files, read repo files, run reviewers, or write artifacts beyond Step 1a until `context_path` is confirmed.**
+
+### Step 1a — Resolve draft path (one tool call maximum)
+- If the latest user message names an exact `PROMPT-PLUGIN-PLAN-*.draft.md` path, use it directly. Skip glob.
+- Else if the latest user message or command arguments clearly imply `slug`, derive `artifact_base` as `PROMPT-PLUGIN-PLAN-<slug>` and use `<artifact_base>.draft.md`. Skip glob.
+- Else run exactly one glob for `PROMPT-PLUGIN-PLAN-*.draft.md` in the current workspace.
+  - If exactly one match exists → proceed to Step 1b.
+  - If zero matches exist → immediately output the FAIL template below. Do not run additional globs, reads, searches, reviewer calls, or artifact writes. Stop.
+  - If multiple matches exist → immediately output the FAIL template below with the multiple-drafts reason. Stop.
+
+**FAIL output template:**
+```text
+Status: FAIL
+Context Path: N/A
+Handoff Path: N/A
+Step Pattern: N/A
+Review Iterations: 0
+Summary: <"No PROMPT-PLUGIN-PLAN-*.draft.md file found" or "Multiple plugin draft files found, specify slug or path">
+Next Command: /plugin/draft
+```
+
+### Step 1b — Confirm draft
+- Derive `artifact_base` from the resolved path. All artifact paths derive from `artifact_base`.
+- Read `context_path`. If read fails or the file is missing, return `Status: FAIL` and stop.
+- Treat `context_path` and explicit finalize-time notes from the latest user message as the source of truth for this run.
+- Treat `/plugin/finalize` as the confirmation boundary.
+- Do not rewrite `context_path`.
+
+## 2. Dispatch explorer to gather repo facts
+- Only enter this phase after `context_path` is resolved and read successfully.
+- Dispatch `@_plugin/finalize-explorer` with `context_path`.
+- The explorer reads the draft, identifies touched files, gathers current plugin/logging/docs/config state, and returns a compact manifest.
+- Use the explorer manifest for subsequent step generation. Do not rediscover files the explorer already surveyed unless a specific hunk needs exact line confirmation.
+- Use `@mcp-search` for `@opencode-ai/plugin` SDK docs, external libraries, or APIs only when the draft or manifest leaves hook/type/API facts unresolved.
 
 ## 3. Write the handoff file
 - Rewrite `handoff_path` from scratch for this run.
 - Preserve the latest consolidated user request verbatim under `## Raw Request`.
-- Write `handoff_path` using the `# Templates` section below.
+- Include the explorer manifest's settled facts, plugin constraints, reviewer cache paths, and Step Index using the `# Templates` section.
 
-## 4. Write the machine artifact
-- Derive discrete `STEP-###` items from the confirmed context and handoff.
-- Stable numbering: number items sequentially from 001. If a STEP is removed during revision, leave the gap — do not renumber other items.
-- Write `handoff_path` using the `# Templates` section (handoff now includes Summary, Revision History, and Step Index).
+## 4. Write STEP artifacts
+- Derive discrete `STEP-###` items from confirmed `[P#]` items, `handoff_path`, and the explorer manifest.
+- Keep plugin STEP numbering sequential from 001. If a STEP is removed during revision, leave the gap — do not renumber other items.
 - Write each STEP item to its own file matching `step_pattern` using the `# Templates` section.
-- Apply only the relevant design rules to each target. Split rule fragments across the affected prompts and reviewers instead of copying the whole contract into every file.
+- Keep STEP files diff-based with full target paths, anchors, approximate line locators, and per-hunk line labels.
+- Apply only relevant design rules to each target. Split rule fragments across affected prompts and reviewers instead of copying a whole rule catalog.
 - Embed operational rules directly in generated targets.
 
-## Phase Structure
-- Review loop structure: a core phase (correctness) runs first; after it passes, a polish phase (documentation/errors/reorder) runs with independent Delta tracking and iteration limits.
-
 ## 5. Run the review loop
-Follow the ordered steps below exactly, in order.
+- Write and maintain `## Delta` in `handoff_path` before the first reviewer pass. Record `Source Context`, `Review Ledger`, and each `STEP-###` item with `Status:`, `Touched:`, and `Why:` fields. Recompute after every material revision.
+- Derive exact `step_paths` from `## Step Index` before reviewer dispatch.
+- Validate each reviewer response against that reviewer's own output schema. Every reviewer starts with `# REVIEW` and has `Decision: PASS | ADVISORY | BLOCKING`.
 
-### Core review
-- Write and maintain `## Delta`: write to `handoff_path` before the first reviewer pass; record each `STEP-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields; add artifact markers for `Source Context` and `Review Ledger`; recompute after every material revision.
-- Build core reviewer prompts: after each full machine-artifact draft, run `@_plugin/finalize-reviewers/correctness` and `@_plugin/finalize-reviewers/dead-code` in parallel. Treat each reviewer prompt as scoped call data. Include only: artifact paths (`context_path`, `handoff_path`), `step_pattern` (a glob pattern matching STEP target file paths to scope the review), and finalize-time user notes. Omit: output format, focus lists, target file paths from STEP items, role assignment, blanket read orders — reviewers decide what to open from Delta, cache state, and Decisions.
-  - `context_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
-- Validate each reviewer response: confirm `# REVIEW` header, `Decision: PASS | ADVISORY | BLOCKING`, `## Findings` and `## Verified` headings. If malformed after retries, treat as BLOCKING with a synthetic finding.
-- Retry malformed responses: if validation fails and Delta plus Decisions are unchanged, send only the protocol error and request re-emit; if Delta or Decisions changed, include only the new excerpt and request fresh response.
-- Record decisions: update `### Decisions` in `handoff_path` for cross-domain arbitration only. Reviewers own issue tracking in their cache files. Core domain ownership: CORRECTNESS → correctness reviewer; DEAD_CODE → dead-code reviewer.
-- Revise the machine artifact when findings require it: revise STEP files only where needed; append one line to `## Revision History`.
-- Re-run core reviewers after every material revision.
-- Loop until no findings of any severity remain or 10 iterations.
-  No findings: proceed to polish review. At cap: FAIL if BLOCKING, proceed to polish with risks if only ADVISORY.
+### 5a. Initial reviewer dispatch
+- Before dispatch, derive `reviewer_set`:
+  - Always include `@_plugin/finalize-reviewers/audit`.
+  - Always include `@_plugin/finalize-reviewers/tests`.
+  - Do not include placement or performance in the initial pass; they run after audit/tests converge (see 5d).
+- Run selected initial reviewers in parallel.
+- Pass `handoff_path`, `context_path`, exact `step_paths`, `cache_path`, and finalize-time user notes.
+- Do not pass focus lists, output schemas, role text, blanket read orders, or target file lists already present in shared artifacts.
+- After each reviewer returns, read its `cache_path` for complete findings.
 
-### Polish review
-- Update `## Delta` in `handoff_path`. Mark all core-reviewed items as Unchanged. Set `Why: core phase passed`.
-- Build polish reviewer prompts: run `@_plugin/finalize-reviewers/documentation`, `@_plugin/finalize-reviewers/errors`, and `@_plugin/finalize-reviewers/reorder` in parallel. Include the same task-specific data as the core phase.
-- Validate each reviewer response (same criteria as core).
-- Retry malformed responses (same protocol as core).
-- Record decisions: update `### Decisions` in `handoff_path` for cross-domain arbitration. Polish domain ownership: DOCUMENTATION → documentation reviewer; ERRORS → errors reviewer; REORDER → reorder reviewer.
-- Apply polish reviewer diffs to STEP files. Append one line to `## Revision History`.
-- Re-run polish reviewers after every material revision.
-- Loop until no findings of any severity remain or 10 iterations.
-  No findings: SUCCESS. At cap: FAIL if BLOCKING, proceed to output with risks if only ADVISORY.
+### 5b. Re-review dispatch
+- After fixes, dispatch dedicated re-reviewers, not the full reviewers:
+  - If audit had BLOCKING findings or audit-domain steps changed: dispatch `@_plugin/finalize-reviewers/audit-rereview`.
+  - If tests had BLOCKING findings or verification-domain steps changed: dispatch `@_plugin/finalize-reviewers/tests-rereview`.
+- Pass only `cache_path`, `changed_step_paths`, `resolved_finding_ids`, `unresolved_finding_ids`, and `finding_resolution_ledger`.
+- Do not pass `handoff_path`, `context_path`, or unchanged step paths to re-reviewers unless the cache is missing or malformed.
+
+### 5c. Review loop control
+- Advisory-only findings → DEFERRED. Do not revise or rerun solely to clear advisory findings unless they affect explicit acceptance criteria or hard user constraints.
+- Keep `## Review Ledger` to domain summaries and cross-domain decisions. Per-finding details stay in audit/tests cache files.
+- Preserve finding IDs for unchanged root causes. Mark fixed issues RESOLVED in cache. Do not reopen RESOLVED issues without new evidence.
+- Recompute `reviewer_set` when fixes change scope, risk, paths, or STEP count. Rerun only reviewers with BLOCKING findings or domains touched by BLOCKING fixes.
+- Loop until audit/tests have zero unresolved BLOCKING findings or 10 iterations. At cap: FAIL if BLOCKING remains.
+
+### 5d. Final gates
+- After audit/tests converge, run `@_plugin/finalize-reviewers/placement` and `@_plugin/finalize-reviewers/performance` in parallel.
+- Placement: pass `handoff_path` and source STEP paths that add, move, rename, or re-anchor declarations.
+- Performance: pass `handoff_path`, `context_path`, and all step paths. Pre-inline only relevant explorer facts when needed.
+- Final-gate BLOCKING findings trigger STEP fixes. Rerun only touched final-gate domains.
+- Final success requires zero unresolved BLOCKING findings from audit, tests, placement, and performance.
 
 # Output
 
@@ -111,15 +152,17 @@ Handoff Path: <absolute path to `<artifact_base>.handoff.md`>
 Step Pattern: `<artifact_base>.step.*.md`
 Review Iterations: <n>
 Summary: <one-line summary>
+Next Command: /plugin/implement
 ```
 
 # Constraints
 
 - Write only `<artifact_base>.handoff.md` and files matching `<artifact_base>.step.*.md` during finalize.
-- Modify only those files during finalize.
-- Read `<artifact_base>.draft.md` as source of truth only; write to handoff and machine paths.
+- Never modify plugin source or product code while planning.
+- Never rewrite `<artifact_base>.draft.md` in this command.
 - Keep each STEP file diff-based with `Lines: ~` locators and context lines per `# Rules`. CREATE actions include full file content.
-- Keep `<artifact_base>.handoff.md` factual and stable enough for the machine artifact and reviewers to use without rereading the whole conversation.
+- Keep `<artifact_base>.handoff.md` factual and stable enough for the STEP files and reviewers to use without rereading the whole conversation.
+- Keep user-facing responses brief and factual.
 
 # Rules
 
@@ -147,19 +190,21 @@ Revisions produced by this finalize run must follow. Apply only the relevant rul
 - **Fixed output blocks**: use fenced code blocks with `text` language tag for plain structured output. ~~`json`/`yaml` tags for plain structured output~~ → `text` only.
 - **No duplicated content**: reference information from other artifacts by section name or file path. ~~Re-quoting content already in another artifact~~ → reference by section name.
 - **Shared ledger/file**: use a shared ledger or coordination file for orchestrator state when coordinating subagents. ~~Scattering coordination state across subagent outputs~~ → single shared file.
-- **Concise human-facing docs**: include a short documentation update for humans when the iteration changes conventions or adds new artifacts.
+- **Concise docs**: include a short documentation update when the iteration changes conventions or adds new artifacts.
 - **Tight subagent inputs**: pass only artifact paths, Delta/Decision excerpts, scoping, and user notes to subagents. ~~Re-stating output formats, focus lists, role assignments, target paths already enumerated in shared artifacts, or blanket read orders~~ → pass only what the callee cannot derive from its own agent file.
-- **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block. Applies to templates, machine-artifact diff blocks, and reviewer output format examples.
+- **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block. Applies to templates, STEP diff blocks, and reviewer output format examples.
 
 # Reference Paths
 
-- Plugin types: `opencode-source/packages/plugin/src/index.ts`
-- Tool helper: `opencode-source/packages/plugin/src/tool.ts`
-- Shell types: `opencode-source/packages/plugin/src/shell.ts`
-- TUI types: `opencode-source/packages/plugin/src/tui.ts`
-- Existing plugins: `config/plugins/`
+- Local plugin workflow doc: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/.opencode/doc/plugin.md`
+- Existing plugins: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/plugins/`
+- Documentation rules: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/documentation.md`
+- Code placement rules: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/rules/code-placement.md`
+- SDK docs: query `@opencode-ai/plugin` with `@mcp-search` when the draft or explorer manifest leaves hook/type questions unresolved.
 
 # Templates
+
+**Template rule:** Omit optional sections whose only content would be `None`, a placeholder, or empty. Keep required coordination sections even when entries are `None`.
 
 ## `<artifact_base>.handoff.md`
 
@@ -210,11 +255,19 @@ Source Context: <absolute path to `<artifact_base>.draft.md`>
 
 ## Review Ledger
 
+### Domain Summaries
+- AUDIT: <n> BLOCKING, <m> ADVISORY → cache: `<artifact_base>.review-audit.md`
+- TESTS: <n> BLOCKING, <m> ADVISORY → cache: `<artifact_base>.review-tests.md`
+- PLACEMENT: <n> BLOCKING, <m> ADVISORY (inline)
+- PERF: <n> BLOCKING, <m> ADVISORY (inline)
+
 ### Decisions
+
+Only cross-domain arbitration entries (DEC-###). Per-domain finding details stay in reviewer caches.
 
 #### [DEC-001]
 Type: DOMAIN_AUTHORITY | ARBITRATION
-Issue: COR-001
+Issue: AUD-001
 Winner: <reviewer_name>
 Rationale: <why this view prevailed>
 ```

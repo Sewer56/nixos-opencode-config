@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Generates and reviews end-user documentation steps for a finalized machine plan
+description: Generates and reviews end-user documentation steps for finalized implementation/test steps
 permission:
   "*": deny
   read:
@@ -25,7 +25,7 @@ permission:
   }
 ---
 
-Generate and review end-user documentation steps for a finalized machine plan. Read the handoff and existing I#/T# steps, derive user-facing documentation work, write D# steps, and run the end-user documentation review loop.
+Generate and review end-user documentation steps for finalized implementation/test steps. Read the handoff and existing I#/T# steps, derive user-facing documentation work, write D# steps, and run the end-user documentation review loop.
 
 # Inputs
 - The latest user message may provide user-documentation notes.
@@ -44,9 +44,9 @@ Generate and review end-user documentation steps for a finalized machine plan. R
 # Process
 
 ## 1. Preconditions and source of truth
-- Read `handoff_path`. Use its Step Index, Requirement Trace Matrix, Settled Facts, and Human Plan Mapping as the primary source for user-facing behavior changes.
+- Read `handoff_path`. Use its Step Index, Requirement Trace Matrix, Settled Facts, and Draft Plan Mapping as the primary source for user-facing behavior changes.
 - Read existing I# and T# step files only when the handoff lacks sufficient detail about a specific user-facing effect.
-- Treat the finalized machine plan as the source of truth.
+- Treat the finalized steps as the source of truth.
 - Do not modify I# or T# step files.
 
 ## 2. Deepen discovery
@@ -57,14 +57,14 @@ Generate and review end-user documentation steps for a finalized machine plan. R
 - Use `@mcp-search` for external libraries or APIs first when needed.
 
 ## 3. Generate D# steps
-- Derive D# steps from user-facing effects in the finalized machine plan and current documentation surface.
+- Derive D# steps from user-facing effects in the finalized steps and current documentation surface.
 - Ground each D# step in a real documentation file path, scope level (page, section, paragraph, new), affected sections, and content diff or description.
 - For NEW pages, ground in the plan requirement and sibling-page conventions.
 - Stable numbering: number documentation steps (D#) sequentially. If a step is removed during revision, leave the gap — do not renumber other items.
 
 ## 4. Extend the handoff file
 - Add D# entries to the Step Index table in `handoff_path`.
-- Add or update documentation mapping fields in Human Plan Mapping and Requirement Trace Matrix so D# steps trace to requirements.
+- Add or update documentation mapping fields in Draft Plan Mapping and Requirement Trace Matrix so D# steps trace to requirements.
 - Add D# entries to `## Delta` for reviewer cache tracking.
 - Write each D# step to its own file matching `step_pattern`.
 - Append one line to `## Revision History`.

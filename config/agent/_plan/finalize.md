@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Converts a confirmed human plan into a reviewed code and test machine plan
+description: Converts a confirmed draft plan into reviewed code and test steps
 permission:
   "*": deny
   read:
@@ -30,7 +30,7 @@ permission:
   }
 ---
 
-Convert a confirmed human plan into a reviewed code and test machine plan. Write `<artifact_base>.handoff.md` (handoff, includes manifest) and individual implementation/test step files matching `<artifact_base>.step.*.md`. No separate `machine.md`.
+Convert a confirmed draft plan into reviewed code and test steps. Write `<artifact_base>.handoff.md` (handoff, includes manifest) and individual implementation/test step files matching `<artifact_base>.step.*.md`.
 
 # Inputs
 - The latest user message may confirm the draft, provide small finalize-time notes, or point out changes since the draft.
@@ -93,13 +93,13 @@ Next Command: /plan/draft
 - Preserve the latest consolidated user request verbatim under `## Raw Request`.
 - Write `handoff_path` using the `# Templates` section below.
 
-## 4. Write the machine plan
-- Derive discrete `REQ-###` items from the confirmed human plan and handoff.
+## 4. Write the implementation/test steps
+- Derive discrete `REQ-###` items from the confirmed draft plan and handoff.
 - Record the settled repo facts that the plan depends on.
-- Keep the machine plan concrete enough that an implementer does not need to invent file placement, major structure, missing test coverage, verification commands, or code shape.
+- Keep the step plan concrete enough that an implementer does not need to invent file placement, major structure, missing test coverage, verification commands, or code shape.
 - Ground each implementation and test step in the current repo surface with a real file path, an anchor, repo evidence, and a short code snippet or diff.
 - Stable numbering: number implementation steps (I#) and test steps (T#) sequentially within each type. If a step is removed during revision, leave the gap — do not renumber other items.
-- Write `handoff_path` with all plan content (manifest merges the former machine.md content).
+- Write `handoff_path` with all plan content.
 - Write each implementation step and test step to its own file matching `step_pattern`.
 
 ## 5. Run the code/test review loop
@@ -182,9 +182,9 @@ Next Command: /plan/finalize-code-docs
 - Within each step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
 - Each diff block within a step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). The step header `Lines: ~` lists the comma-separated union of hunk ranges. Per-hunk labels are the authoritative locators.
 - Full-file `Lines:` ranges are invalid for localized changes — use only for ADD actions that add complete files.
-- Nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block. Applies to machine-plan templates, diff blocks, and reviewer output format examples.
-- Keep `<artifact_base>.handoff.md` machine-first: stable headings, explicit refs, concrete file-level steps, and anchors that point at the current repo surface. Step files follow the same machine-first discipline.
-- Keep `<artifact_base>.handoff.md` factual and stable enough for the machine plan and reviewers to use without rereading the whole conversation.
+- Nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block. Applies to step templates, diff blocks, and reviewer output format examples.
+- Keep `<artifact_base>.handoff.md` stable: explicit refs, concrete file-level steps, and anchors that point at the current repo surface. Step files follow the same discipline.
+- Keep `<artifact_base>.handoff.md` factual and stable enough for the steps and reviewers to use without rereading the whole conversation.
 - Keep user-facing responses brief and factual.
 
 
@@ -255,7 +255,7 @@ Source Plan: <absolute path to `<artifact_base>.draft.md`>
 ## Requirements
 - REQ-001: <discrete requirement>
 
-## Human Plan Mapping
+## Draft Plan Mapping
 
 | Plan Ref | Purpose         | Impl Ref(s) | Test Ref(s) |
 | -------- | --------------- | ----------- | ----------- |

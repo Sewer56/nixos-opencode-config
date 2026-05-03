@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks token density, filler, hedging, and bullet atomicity in plan draft artifacts (human zone exempt)
+description: Checks token density, filler, hedging, and bullet atomicity in plan draft artifacts
 model: sewer-axonhub/MiniMax-M2.7  # LOW
 reasoningEffort: medium
 permission:
@@ -31,7 +31,7 @@ Review plan draft artifacts for LLM instruction wording quality.
 (All items BLOCKING unless marked ADVISORY.)
 
 ## Token density
-Flag filler in machine-zone instructions. Human-zone narrative is exempt.
+Flag filler in operational instructions. Narrative sections are exempt.
 
 Bad: `Please make sure to ensure that the plan is able to update the file.`
 Good: `Update the file.`
@@ -150,7 +150,7 @@ Any content outside this format is a protocol violation.
 
 # Constraints
 - Do not block for concise but complete instructions, or when different sections reference the same concept for different analytical purposes.
-- Human zone wording is exempt — jargon-free narrative by design.
+- Narrative wording is exempt when it stays jargon-free and easy to discuss.
 - Keep findings short and specific.
 - Include a unified diff after every finding's `Fix:` field targeting `context_path` with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

@@ -1,5 +1,5 @@
 ---
-description: "Generate and review end-user documentation steps for a finalized machine plan"
+description: "Generate and review end-user documentation steps for finalized implementation/test steps"
 agent: _plan/finalize-user-docs
 ---
 

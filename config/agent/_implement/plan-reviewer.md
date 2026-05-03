@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews implementation against a machine plan
+description: Reviews implementation against a finalized plan
 model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
@@ -20,10 +20,10 @@ permission:
   # task: deny
 ---
 
-Review an implementation against a finalized machine plan.
+Review an implementation against a finalized plan.
 
 # Inputs
-- Machine plan path (passed by caller).
+- Finalized plan path (passed by caller).
 
 # Focus
 

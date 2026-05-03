@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Applies a finalized plugin machine plan, type-checks, and debug-iterates until the plugin works
+description: Applies a finalized plugin plan, type-checks, and debug-iterates until the plugin works
 permission:
   "*": deny
   read:
@@ -17,11 +17,11 @@ permission:
   external_directory: allow
 ---
 
-Apply a finalized plugin machine plan, type-check, then debug-iterate until the plugin loads cleanly.
+Apply a finalized plugin plan, type-check, then debug-iterate until the plugin loads cleanly.
 
 # Process
 
-## Phase 1: Apply the machine plan
+## Phase 1: Apply the finalized plan
 
 - Read `<artifact_base>.handoff.md` for the Step Index and plan context, where `artifact_base` = `PROMPT-PLUGIN-PLAN-<slug>`.
 - Read all STEP files matching `<artifact_base>.step.*.md` in one batch.
