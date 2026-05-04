@@ -4,7 +4,7 @@
  * Run: `cd config && bun test plugins/file-interp.test.ts`
  */
 import { describe, test, expect, beforeEach, afterEach } from "bun:test"
-import { resolvePath, expand } from "./file-interp"
+import { resolvePath, expand, MAX_DEPTH } from "./file-interp"
 import fsp from "node:fs/promises"
 import fs from "node:fs"
 import os from "node:os"
@@ -274,5 +274,172 @@ describe("expand: regex lastIndex safety", () => {
     const result2 = await expand(text, dir)
     expect(result1).toBe("value=X")
     expect(result2).toBe("value=X")
+  })
+})
+
+// ── expand: recursive {file:...} ─────────────────────────────────────────────
+
+describe("expand: recursive {file:...}", () => {
+  test("recursively expands {file:...} in imported content", async () => {
+    const dir = await makeTmpDir({
+      "inner.txt": "INNER_CONTENT",
+      "outer.txt": "outer: {file:./inner.txt}",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./outer.txt}`, dir)
+    expect(result).toBe("outer: INNER_CONTENT")
+  })
+
+  test("expands multi-level chain (3 deep)", async () => {
+    const dir = await makeTmpDir({
+      "c.txt": "C_VALUE",
+      "b.txt": "B:{file:./c.txt}",
+      "a.txt": "A:{file:./b.txt}",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./a.txt}`, dir)
+    expect(result).toBe("A:B:C_VALUE")
+  })
+
+  test("detects self-referential cycle and replaces with empty string", async () => {
+    const dir = await makeTmpDir({
+      "loop.txt": "start {file:./loop.txt} end",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./loop.txt}`, dir)
+    // loop.txt is in visited set when its content is recursively expanded;
+    // the inner {file:./loop.txt} finds it in visited → empty string
+    expect(result).toBe("start  end")
+  })
+
+  test("missing file within recursive chain resolves to empty string", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "prefix {file:./missing.txt} suffix",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./outer.txt}`, dir)
+    expect(result).toBe("prefix  suffix")
+  })
+
+  test("detects mutual cycle (A→B→A) and breaks it", async () => {
+    const dir = await makeTmpDir({
+      "a.txt": "A-{file:./b.txt}",
+      "b.txt": "B-{file:./a.txt}",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./a.txt}`, dir)
+    // a.txt content expanded with visited={a}; b.txt found, expanded with
+    // visited={a,b}; b's inner {file:./a.txt} finds a in visited → ""
+    expect(result).toBe("A-B-")
+  })
+
+  test("sibling tokens referencing same file both resolve (diamond pattern)", async () => {
+    const dir = await makeTmpDir({
+      "shared.txt": "SHARED",
+      "top.txt": "{file:./shared.txt} and {file:./shared.txt}",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./top.txt}`, dir)
+    // visited is per-ancestor-chain, not global — sibling tokens each get
+    // their own chain, so both resolve shared.txt
+    expect(result).toBe("SHARED and SHARED")
+  })
+
+  test("expands chain exactly MAX_DEPTH levels deep", async () => {
+    const files: Record<string, string> = {}
+    for (let i = 0; i < MAX_DEPTH; i++) {
+      if (i === MAX_DEPTH - 1) {
+        files[`d${i}.txt`] = `LEAF`
+      } else {
+        files[`d${i}.txt`] = `D${i}:{file:./d${i + 1}.txt}`
+      }
+    }
+    const dir = await makeTmpDir(files)
+    cleanup.push(dir)
+    const result = await expand(`{file:./d0.txt}`, dir)
+    expect(result).toContain("LEAF")
+  })
+
+  test("at MAX_DEPTH, leaves unexpanded {file:...} tokens as literal text", async () => {
+    // Chain of MAX_DEPTH files; the deepest file contains a {file:...} token
+    // that should NOT be expanded — left as literal text in the output.
+    const files: Record<string, string> = {}
+    for (let i = 0; i < MAX_DEPTH; i++) {
+      if (i === MAX_DEPTH - 1) {
+        files[`e${i}.txt`] = `DEEP_{file:./e-leaf.txt}_{env:FILE_INTERP_DEPTH_ENV}`
+      } else {
+        files[`e${i}.txt`] = `E${i}:{file:./e${i + 1}.txt}`
+      }
+    }
+    // The leaf file exists but should never be read because depth is capped
+    files["e-leaf.txt"] = `NEVER_READ`
+    const dir = await makeTmpDir(files)
+    cleanup.push(dir)
+    const restore = withEnv("FILE_INTERP_DEPTH_ENV", "YES")
+    try {
+      const result = await expand(`{file:./e0.txt}`, dir)
+      expect(result).toContain("DEEP_")                  // deepest content present
+      expect(result).toContain("{file:./e-leaf.txt}")    // file token left as literal text
+      expect(result).toContain("YES")                    // env token still expanded at MAX_DEPTH
+      expect(result).not.toContain("NEVER_READ")         // leaf file never expanded
+    } finally {
+      restore()
+    }
+  })
+
+  test("expands {env:...} inside recursively imported content", async () => {
+    const dir = await makeTmpDir({
+      "with-env.txt": "region={env:FILE_INTERP_RECURSE_ENV}",
+    })
+    cleanup.push(dir)
+    const restore = withEnv("FILE_INTERP_RECURSE_ENV", "eu-west")
+    try {
+      const result = await expand(`{file:./with-env.txt}`, dir)
+      expect(result).toBe("region=eu-west")
+    } finally {
+      restore()
+    }
+  })
+
+  test("skips recursive expansion when imported file has no tokens", async () => {
+    const dir = await makeTmpDir({
+      "plain.txt": "NO_TOKENS_HERE",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./plain.txt}`, dir)
+    expect(result).toBe("NO_TOKENS_HERE")
+  })
+
+  test("readCache deduplicates raw I/O for same path across branches", async () => {
+    const dir = await makeTmpDir({
+      "shared.txt": "SHARED",
+      "ref-a.txt": "A:{file:./shared.txt}",
+      "ref-b.txt": "B:{file:./shared.txt}",
+      "top.txt": "{file:./ref-a.txt} | {file:./ref-b.txt}",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./top.txt}`, dir)
+    // shared.txt raw I/O is read once via readCache, then independently
+    // expanded by ref-a and ref-b (each with their own visited snapshot)
+    expect(result).toBe("A:SHARED | B:SHARED")
+  })
+
+  test("expansion is independent per ancestor chain (no cross-contamination)", async () => {
+    // shared.txt references ref-a.txt; ref-a is in ref-a's ancestor chain
+    // but NOT in ref-b's ancestor chain. Both branches should expand
+    // shared.txt independently with their own visited sets.
+    const dir = await makeTmpDir({
+      "shared.txt": "S:{file:./ref-a.txt}",
+      "ref-a.txt": "A_CONTENT",
+      "ref-b.txt": "B:{file:./shared.txt}",
+      "top.txt": "{file:./ref-a.txt} | {file:./ref-b.txt}",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./top.txt}`, dir)
+    // ref-a branch: visited={ref-a} → "A_CONTENT"
+    // ref-b branch: visited={ref-b} → shared → visited={ref-b,shared} →
+    //   {file:./ref-a.txt}: ref-a NOT in visited → "A_CONTENT"
+    // So shared.txt expands to "S:A_CONTENT" from ref-b's perspective
+    expect(result).toBe("A_CONTENT | B:S:A_CONTENT")
   })
 })

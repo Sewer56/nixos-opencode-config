@@ -1,10 +1,14 @@
 /**
- * File Interpolation plugin — expands {file:...} and {env:...} in .md agent prompts.
+ * File Interpolation plugin — recursively expands {file:...} and {env:...} in .md agent prompts.
  *
  * OpenCode already supports {file:~/.secrets/openai-key} in JSON config files,
  * but .md agent/command/mode/skill files receive no interpolation. This plugin
  * fixes that by rewriting the system prompt at LLM-call time via the
  * `experimental.chat.system.transform` hook.
+ *
+ * Imported file content is recursively expanded up to `MAX_DEPTH` levels.
+ * Cycles resolve to empty string. Relative paths resolve against the
+ * original `baseDir`, not the file they appear in.
  *
  * Agents and commands load into the system prompt; tokens in those files are
  * expanded before the LLM sees them. Plain-text variable references like
@@ -17,9 +21,8 @@
  * - `{env:VAR_NAME}`         — environment variable value
  *
  * # Raw inlining
- * Inlined file content is raw text spliced directly into the prompt; the LLM
- * sees the content, not a file path or tool call. Plain-text variable references
- * like `GENERAL_RULES_PATH` are left untouched — only {file:...} and {env:...} match.
+ * Inlined content is recursively expanded, then spliced into the prompt.
+ * At `MAX_DEPTH`, `{file:...}` tokens are left literal; `{env:...}` still expands.
  *
  * # Usage
  * In any .md agent file:
@@ -37,11 +40,11 @@
  * # Public API
  * - `FileInterpPlugin` — default export, consumed by OpenCode plugin loader
  * - `expand`, `resolvePath` — exported for tests and benchmarks
+ * - `MAX_DEPTH` — maximum recursion depth, exported for tests
  */
 import type { Plugin } from "@opencode-ai/plugin"
 import path from "node:path"
 import os from "node:os"
-import fsp from "node:fs/promises"
 import fs from "node:fs"
 
 // ── Entry point ──────────────────────────────────────────────────────────────
@@ -79,6 +82,18 @@ export const FileInterpPlugin: Plugin = async (input) => {
 }
 
 // ── Internals ────────────────────────────────────────────────────────────────
+
+/** Maximum recursion depth for nested {file:...} expansion. Exported for tests. */
+export const MAX_DEPTH = 10
+
+/** Shared context for a single expand() call tree — carries cycle guard and read cache. */
+interface ExpandContext {
+  /** Resolved absolute paths of ancestor files in the current recursion chain. */
+  visited: Set<string>
+  depth: number
+  /** Raw I/O cache keyed by resolved absolute path (content before recursive expansion). */
+  readCache: Map<string, Promise<string>>
+}
 
 /**
  * Set `FILE_INTERP_DEBUG=1` in your shell env to enable debug logging.
@@ -160,11 +175,20 @@ export function resolvePath(raw: string, baseDir: string): string {
  * Expand {env:VAR} and {file:path} tokens in `text`.
  *
  * Environment substitution runs first (synchronous), then file substitution
- * (async reads). Missing env vars and missing/unreadable files resolve to
- * empty string.
+ * (async reads). File content is recursively expanded if it contains further
+ * {file:...} or {env:...} tokens, up to MAX_DEPTH levels deep. At depth ≥
+ * MAX_DEPTH, {file:...} tokens are left as literal text; {env:...} tokens
+ * are still expanded. Cycles are detected via ancestor-path tracking — a
+ * token referencing a file in its own ancestor chain resolves to empty string.
+ *
+ * An optional `ExpandContext` carries recursion state (cycle guard, depth
+ * counter, raw I/O cache). External callers should omit it — a fresh context
+ * is created internally.
  */
-export async function expand(text: string, baseDir: string): Promise<string> {
+export async function expand(text: string, baseDir: string, ctx?: ExpandContext): Promise<string> {
   if (text.indexOf(TOKEN_START) === -1) return text
+
+  if (!ctx) ctx = { visited: new Set(), depth: 0, readCache: new Map() }
 
   const hasEnv = text.includes(ENV_PREFIX)
   let hasFile = text.includes(FILE_PREFIX)
@@ -178,7 +202,9 @@ export async function expand(text: string, baseDir: string): Promise<string> {
 
   if (!hasFile) hasFile = text.includes(FILE_PREFIX)
   if (!hasFile) return text
-  return expandFileTokens(text, baseDir)
+  // Depth gate: at MAX_DEPTH, leave {file:...} tokens as literal text.
+  if (ctx.depth >= MAX_DEPTH) return text
+  return expandFileTokens(text, baseDir, ctx)
 }
 
 /** Expand {env:VAR} tokens with manual scanning to avoid regex allocation/state. */
@@ -216,11 +242,9 @@ function expandEnvTokens(text: string): string {
 }
 
 /** Expand {file:path} tokens. Reads start during scan and resolve in parallel. */
-async function expandFileTokens(text: string, baseDir: string): Promise<string> {
+async function expandFileTokens(text: string, baseDir: string, ctx: ExpandContext): Promise<string> {
   const parts: string[] = []
   const reads: Promise<string>[] = []
-  const rawPaths: string[] = []
-  let readCache: Map<string, Promise<string>> | undefined
 
   let cursor = 0
   let searchFrom = 0
@@ -241,25 +265,32 @@ async function expandFileTokens(text: string, baseDir: string): Promise<string> 
 
     const rawPath = text.slice(valueStart, end)
     const token = DEBUG ? text.slice(start, end + 1) : ""
-    let read: Promise<string> | undefined
+    const resolved = resolvePath(rawPath, baseDir)
 
-    if (readCache) {
-      read = readCache.get(rawPath)
-    } else if (reads.length > 0) {
-      readCache = new Map<string, Promise<string>>()
-      for (let i = 0; i < reads.length; i++) {
-        readCache.set(rawPaths[i], reads[i])
-      }
-      read = readCache.get(rawPath)
+    // Cycle detection: skip files already in this token's ancestor chain
+    if (ctx.visited.has(resolved)) {
+      if (DEBUG) debugLog(`file: ${token} → ${resolved} SKIPPED (cycle detected)`)
+      parts.push(text.slice(cursor, start))
+      reads.push(Promise.resolve(""))
+      cursor = end + 1
+      searchFrom = cursor
+      continue
     }
 
-    if (!read) {
-      read = readTokenFile(rawPath, baseDir, token)
-      readCache?.set(rawPath, read)
+    // Raw I/O dedup: same resolved path → reuse cached raw read
+    let rawPromise = ctx.readCache.get(resolved)
+    if (!rawPromise) {
+      rawPromise = readRawFile(resolved, rawPath, token)
+      ctx.readCache.set(resolved, rawPromise)
     }
+
+    // Per-caller expansion: each token gets its own expansion with its
+    // ancestor chain, so sibling branches don't cross-contaminate.
+    const read = rawPromise.then(raw =>
+      recursivelyExpand(raw, resolved, baseDir, token, ctx)
+    )
 
     parts.push(text.slice(cursor, start))
-    rawPaths.push(rawPath)
     reads.push(read)
     cursor = end + 1
     searchFrom = cursor
@@ -280,21 +311,23 @@ async function expandFileTokens(text: string, baseDir: string): Promise<string> 
   return out + tail
 }
 
-/** Read one {file:...} token, with config-dir fallback for relative paths. */
-async function readTokenFile(rawPath: string, baseDir: string, token: string): Promise<string> {
-  const resolved = resolvePath(rawPath, baseDir)
-
+/** Read raw file content (trimmed), with config-dir fallback for relative paths. */
+async function readRawFile(
+  resolved: string,
+  rawPath: string,
+  token: string,
+): Promise<string> {
   try {
-    const content = (await fsp.readFile(resolved, "utf8")).trim()
-    if (DEBUG) debugLog(`file: ${token} → ${resolved} (${content.length} chars)`)
-    return content
+    const raw = (await Bun.file(resolved).text()).trim()
+    if (DEBUG) debugLog(`file: ${token} → ${resolved} (${raw.length} chars)`)
+    return raw
   } catch (err: unknown) {
-    const e = err as NodeJS.ErrnoException
-    const canFallback = e.code === "ENOENT" && (rawPath.startsWith("./") || rawPath.startsWith("../"))
+    const code = (err as NodeJS.ErrnoException)?.code
+    const canFallback = code === "ENOENT" && (rawPath.startsWith("./") || rawPath.startsWith("../"))
     if (!canFallback) {
       if (DEBUG) {
-        if (e.code === "ENOENT") debugLog(`file: ${token} → ${resolved} DOES NOT EXIST`)
-        else debugLog(`file: ${token} → ${resolved} READ ERROR: ${e.message}`)
+        if (code === "ENOENT") debugLog(`file: ${token} → ${resolved} DOES NOT EXIST`)
+        else debugLog(`file: ${token} → ${resolved} READ ERROR: ${(err as Error).message}`)
       }
       return ""
     }
@@ -306,16 +339,41 @@ async function readTokenFile(rawPath: string, baseDir: string, token: string): P
     }
 
     try {
-      const content = (await fsp.readFile(configResolved, "utf8")).trim()
+      const content = (await Bun.file(configResolved).text()).trim()
       if (DEBUG) debugLog(`file: ${token} → ${configResolved} (${content.length} chars) [config dir fallback]`)
       return content
     } catch (err2: unknown) {
-      const e2 = err2 as NodeJS.ErrnoException
+      const code2 = (err2 as NodeJS.ErrnoException)?.code
       if (DEBUG) {
-        if (e2.code === "ENOENT") debugLog(`file: ${token} → ${resolved} DOES NOT EXIST`)
-        else debugLog(`file: ${token} → ${configResolved} READ ERROR: ${e2.message}`)
+        if (code2 === "ENOENT") debugLog(`file: ${token} → ${resolved} DOES NOT EXIST`)
+        else debugLog(`file: ${token} → ${configResolved} READ ERROR: ${(err2 as Error).message}`)
       }
       return ""
     }
   }
+}
+
+/**
+ * Recursively expand tokens in raw file content if depth allows and tokens exist.
+ * Creates an immutable snapshot of the visited set with `resolved` added,
+ * so sibling tokens can independently visit the same file while ancestor-chain
+ * cycles are still broken.
+ */
+async function recursivelyExpand(
+  raw: string,
+  resolved: string,
+  baseDir: string,
+  token: string,
+  ctx: ExpandContext,
+): Promise<string> {
+  if (!hasExpandableToken(raw)) return raw
+  const childVisited = new Set(ctx.visited)
+  childVisited.add(resolved)
+  const expanded = await expand(raw, baseDir, {
+    visited: childVisited,
+    depth: ctx.depth + 1,
+    readCache: ctx.readCache,
+  })
+  if (DEBUG) debugLog(`file: ${token} → ${resolved} recursive expansion (${expanded.length} chars, depth ${ctx.depth + 1})`)
+  return expanded
 }
