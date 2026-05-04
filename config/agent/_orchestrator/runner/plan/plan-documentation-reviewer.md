@@ -39,25 +39,7 @@ Validate that the implementation plan covers documentation requirements concrete
 
 # Focus
 
-## Changed scope
-Review documentation obligations for the changed scope described by the plan.
-
-Bad: review unrelated docs because they are nearby.
-Good: inspect only planned files/surfaces and required supporting docs.
-
-## Errors exclusion
-Do not review `# Errors` sections; errors reviewer owns them.
-
-Do not flag: missing `# Errors` details as documentation findings.
-
-## Blocking criteria compliance
-Verify each relevant implementation step satisfies the `Review Blocking Criteria` section in the documentation rules.
-
-Bad: generic `update docs` step with no file or affected section.
-Good: step names doc file, affected section, and required content.
-
-## Targeted reads
-Read only repo files needed to ground documentation coverage, placement, specificity, and fidelity.
+{file:./rules/code-doc-review/documentation-focus.plan.md}
 
 # Process
 

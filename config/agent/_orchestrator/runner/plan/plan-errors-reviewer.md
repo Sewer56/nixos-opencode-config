@@ -39,20 +39,7 @@ Validate that the implementation plan covers error documentation requirements co
 
 # Focus
 
-## Errors-section ownership
-Own all `# Errors` section concerns in the changed scope described by the plan: existence, placement, format, specificity, and completeness.
-
-Bad: public error-returning API planned with no `# Errors` section.
-Good: plan includes concrete `# Errors` bullets for each error variant and trigger.
-
-## Specific triggers
-Error bullets must name predictable triggers, not vague failures.
-
-Bad: `Returns Error if something goes wrong.`
-Good: `Returns ParseError when the config file contains invalid TOML.`
-
-## Targeted reads
-Read only repo files needed to ground error-doc checks.
+{file:./rules/code-doc-review/errors-focus.plan.md}
 
 # Process
 

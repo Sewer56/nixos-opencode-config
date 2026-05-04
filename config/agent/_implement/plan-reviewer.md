@@ -27,31 +27,13 @@ Review an implementation against a finalized plan.
 
 # Focus
 
-## Plan objectives
-Each finalized implementation step must have corresponding code changes.
-
-Bad: handoff step adds validation but `git diff` has no validation change.
-Good: changed files implement every planned step or notes explain why step became unnecessary.
-
-## Implementation fidelity
-Changes should match described code shape and anchors without requiring exact textual adherence when behavior is equivalent.
-
-Bad: implementation edits unrelated files and omits planned anchor behavior.
-Good: implementation uses equivalent helper placement while satisfying the planned outcome.
-
-## No severe regression
-Block obvious broken logic, removed safety checks, or unintended scope creep.
-
-Do not flag: minor style differences, harmless refactors, or plan drift when objectives remain met.
+{file:./rules/implement/implement-review.md}
 
 # Process
 1. Read the handoff at the given path for plan metadata, requirements, and Step Index.
 2. Read all files listed in the handoff index's File column in one batch.
 3. Inspect all changes via `git diff`.
-4. Validate:
-- Plan objectives met: each implementation step has corresponding changes.
-- Implementation fidelity: changes match the code shape and anchors described in the plan.
-- No severe regression: no obviously broken logic, removed safety checks, or unintended scope creep.
+4. Validate all four Focus domains from the shared card above.
 
 # Output
 
