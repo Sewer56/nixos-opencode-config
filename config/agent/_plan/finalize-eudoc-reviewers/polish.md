@@ -29,71 +29,13 @@ Review D# steps for clarity, wording quality, reader engagement, and cross-page 
 
 # Focus
 
-## Undefined jargon
-Flag project-specific terms without inline definition. BLOCKING for project-specific; ADVISORY for standard. Bad: `Use the hydration seam.` Good: `Use the startup hook that initializes state before rendering.`
+{file:./rules/eudoc-review/clarity.md}
+{file:./rules/eudoc-review/wording.md}
+{file:./rules/eudoc-review/engagement.md}
+{file:./rules/eudoc-review/consistency.md}
 
-## Ambiguous language
-Block phrases with multiple plausible interpretations. Bad: `Update the config near the setup.` Good: Update `docs/config.md` under `## Setup`.
-
-## Compound-term compression
-Block compressed phrases that sacrifice comprehension. Bad: `hot-reload DX pipeline` Good: `developer workflow that reloads the app after source changes`
-
-## Opaque reference
-Block undefined pattern/convention references. Bad: `Follow the adapter pattern.` Good: `Wrap external calls behind one local interface.`
-
-## Acronym without expansion
-Flag acronyms without first-use expansion. BLOCKING project-specific; ADVISORY universal. Bad: `HMR updates the page.` Good: `Hot module replacement (HMR) updates the page.`
-
-## Passive voice
-Flag passive where active is clearer. BLOCKING for instructions; ADVISORY for descriptive. Bad: `The command should be run.` Good: `Run the command.`
-
-## Filler
-Block `please note`, `simply`, `just`, weasel words. Bad: `Please note that you can simply run...` Good: `Run...`
-
-## Wordiness
-Flag tighten-able phrasing. ADVISORY; block only for egregious inflation. Bad: `in order to allow users to` Good: `so users can`
-
-## Terminology consistency
-Flag different terms for same concept within one D# step. BLOCKING when ambiguous; ADVISORY for style. Bad: same command called `sync`, `refresh`, `reload`. Good: one term used consistently.
-
-## Paragraph length
-Flag paragraphs over 4 sentences/lines. ADVISORY. Bad: one paragraph covers install, config, caveats, troubleshooting. Good: split by task or use bullets.
-
-## Hook-first
-First 50 words must answer what/why/who. BLOCKING for landing/index; ADVISORY for inner reference. Bad: landing page starts with history. Good: first sentences say what it is, who uses it, why.
-
-## Show-don't-tell
-Getting-started/guide pages need code/example within first screenful. BLOCKING for guides; ADVISORY for reference. Bad: guide explains concepts before any command. Good: command/example appears immediately after hook.
-
-## Scannability
-Prefer short paragraphs, tables for feature lists, bold key terms. ADVISORY. Bad: dense paragraph lists features. Good: short paragraphs, bullets, grid with bold terms.
-
-## Progressive complexity
-Order: what → example → common usage → config → advanced. BLOCKING when advanced precedes basics. Bad: edge cases before common usage. Good: what → example → usage → config → advanced.
-
-## No fluff
-Flag `welcome to`, `made with love`, purposeless emoji, generic contribution blurbs. ADVISORY unless blocks comprehension. Bad: `Welcome to this awesome project!` Good: first line states user value.
-
-## Quick start feasibility
-Quick starts ≤3 copy-pasteable steps. BLOCKING. Bad: quick start needs five decisions before first run. Good: three steps reach running code.
-
-## Peer points as bullets
-≥3 parallel explanatory points → bullet/numbered list. ADVISORY. Bad: `Use it for A, B, and C` as prose. Good: list as bullets.
-
-## Bullet spacing
-Blank line before first bullet after prose and between multi-line items. ADVISORY. Do not flag compact single-line option lists.
-
-## Cross-page terminology drift
-Flag different terms for same concept across D# steps. ADVISORY. Bad: D1 says `workspace`; D2 says `project`. Good: shared term or explicit distinction.
-
-## Content duplication
-Flag verbatim/near-verbatim explanation across D# steps when cross-page link would serve better. ADVISORY. Bad: two pages repeat same setup. Good: one canonical, others link.
-
-## Orphaned references
-Flag references to concepts no D# step explains. ADVISORY. Bad: D# mentions profiles but none explains profiles. Good: add explanation or link.
-
-## Exclusions
-Do not flag: common programming terms, path pointers, terms defined earlier, headings, API reference, changelogs, migration guides, frozen regions.
+## Plan-step context
+- Do not flag frozen regions.
 
 # Process
 
