@@ -85,6 +85,72 @@ Split a large plan into sub-prompts with `/plan/split`.
 - `/branding/draft` - draft project names and brand direction
 - `/write/issue` - write a GitHub issue
 
+### Review Topology
+
+#### Adjudicated review (high-risk)
+
+Correctness, audit, and implementation fidelity domains use per-domain
+adjudicators. The caller dispatches the `-cached` adjudicator during normal
+iterations and the `-cacheless` adjudicator for the final full-artifact audit.
+
+```
+domain-adjudicator-cached (normal iterations)
+  ├── domain-a-cached  (GLM-5.1, temp 1.0)
+  └── domain-b-cached  (GLM-5.1, temp 0.7)
+  └── emits merged # REVIEW with Decision + IDs
+
+domain-adjudicator-cacheless (final full-artifact audit)
+  ├── domain-a-cacheless  (GLM-5.1, temp 1.0)
+  └── domain-b-cacheless  (GLM-5.1, temp 0.7)
+  └── emits merged # REVIEW with inline findings (no file I/O)
+```
+
+Cached: each leg writes findings and cache to separate sidecar files
+(`.a.` / `.b.`). The adjudicator reads sidecar actions, merges, and writes one
+canonical actions file plus one canonical cache. The caller reads the actions
+file directly. Cacheless: legs return findings inline; the adjudicator parses
+each leg's inline `## Findings` and emits merged findings inline. No file I/O.
+
+Every autonomous workflow runs a final cacheless audit before returning READY
+or SUCCESS.
+
+Both legs currently use GLM-5.1 (A at temp 1.0, B at temp 0.7) because
+DeepSeek-V4-Pro is unreliable right now. Once it stabilizes, the intended
+setup is GLM + DeepSeek — model diversity beats temperature diversity.
+
+#### Single review (low-risk)
+
+Tests, performance, docs, branding, and placement domains use one reviewer
+with `-cached` and `-cacheless` variants. No adjudicator.
+
+- **Cached**: writes findings to an actions file, cache to a separate cache
+  file. Caller reads the actions file directly.
+- **Cacheless**: returns findings inline. No file I/O.
+
+Re-review reads the canonical cache from the prior round, trusts it for
+unchanged steps, and only inspects what changed.
+
+#### Cache isolation
+
+Each cached reviewer leg writes to its own sidecar cache. Neither leg sees the
+other's output or the canonical cache. Cacheless legs return findings inline —
+no sidecar files, no file I/O.
+
+Why isolate? Shared cache lets Leg B see Leg A's findings before forming its
+own judgment; agreeableness bias (LLMs reject invalid findings <25% of the
+time) turns B into a rubber stamp. Cacheless extends this further: the
+final-check audit leg never sees prior review state, eliminating anchoring
+from cached observations.
+
+Relevant:
+- SWR-Bench (arxiv 2509.01494) - multi-review aggregation: 15.25% to 21.91% F1
+- CodeAgent (EMNLP 2024) - supervisory QA-Checker patterns map well to adjudicators
+- Beyond Majority Voting (OpenReview) - aggregation should not be simple voting
+- HCCA (arxiv 2603.21454) - information restriction is the necessary condition for effective multi-LLM verification
+- Agreeableness Bias (OpenReview) - TNR below 25% in LLM judges
+- Anchors in the Machine (arxiv 2511.05766) - anchoring bias cannot be instructed away
+- Behavioral Entanglement (arxiv 2604.07650) - shared evaluative context reintroduces model coupling
+
 ### Rules
 
 Coding and documentation rules live under `config/rules/`. They enforce

@@ -1,0 +1,43 @@
+# Output
+
+```text
+# REVIEW
+Agent: _refactor/errors-reviewer
+Decision: PASS | ADVISORY | BLOCKING
+
+## Verified
+- <list items checked with no issues found>
+
+## Findings
+### [ERR-001]
+Category: SPECIFICITY | FORMAT | FIDELITY
+Severity: BLOCKING | ADVISORY
+Lines: ~<start>-<end> | None
+Evidence: <section, `path:line`, or missing element>
+Problem: <what is wrong>
+Fix: <smallest concrete correction>
+~~~diff
+<path/to/plan/item/file>
+--- a/<path/to/plan/item/file>
++++ b/<path/to/plan/item/file>
+ unchanged context
+-+proposed error docs with vague trigger
+++proposed error docs with concrete trigger
+ unchanged context
+~~~
+
+## Notes
+- <optional short notes>
+```
+
+# Malformed-Output Retry
+
+If the caller reports that the output does not conform to the `# REVIEW` protocol, reuse the prior analysis and cache state. Re-emit a protocol-compliant response. Do not re-read source files that were already analyzed.
+
+# Constraints
+
+- Block for wrong variant names, format violations, or missing zero-path fallbacks.
+- Do not block for minor wording preferences when specificity and format are correct.
+- Cite source file evidence when grounding a finding.
+- Keep findings short and specific.
+- `Lines: ~` values must be valid range specifiers (`~<start>-<end>`) matching the diff context; every `Lines:` reference must have corresponding unchanged lines in the accompanying diff.

@@ -18,7 +18,7 @@ permission:
   task: deny
 ---
 
-Review finalized implementation steps for declaration placement/order. Return exact step-artifact diffs when possible.
+Review implementation steps for declaration placement/order. Return exact step-artifact diffs when possible.
 
 # Inputs
 
@@ -126,4 +126,4 @@ Your final response MUST be exactly the fenced block above. No prose before or a
 
 # Rules
 
-{file:./rules/quality/code-placement.md}
+{{ file="./rules/quality/code-placement.md" }}

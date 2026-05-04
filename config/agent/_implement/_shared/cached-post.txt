@@ -1,0 +1,52 @@
+# Cache file format
+```markdown
+# Review Cache: implementation
+Latest Actions: <actions_path>
+
+## Verified Observations
+- <{arg:verified_subject}>: <grounding snapshot — one line each>
+
+## Finding Ledger
+| ID | Status | File | Lines | Severity | Introduced In | Latest Action | Resolution |
+|---|---|---|---|---|---|---|---|
+| F-NNN | OPEN | — | — | — | — | — | — |
+```
+
+# Actions file format
+```markdown
+# Review Actions: implementation
+Source Cache: <cache_path>
+
+## Findings
+### [F-001]
+Severity: BLOCKING | ADVISORY
+File: <path>
+Lines: ~<start line>-<end line> | None
+Evidence: <{arg:evidence}, diff hunk, path:line, command output, or behavior note>
+Problem: <one line>
+Fix: <smallest concrete correction>
+~~~diff
+src/lib.rs
+--- a/src/lib.rs
++++ b/src/lib.rs
+ unchanged context
+-old content
++new content
+ unchanged context
+~~~
+```
+
+# Output
+```text
+# REVIEW
+Decision: PASS | BLOCKING | ADVISORY
+IDs: F-001, F-002, ...
+```
+- PASS keeps `Decision: PASS`; omit `IDs`.
+- Every ID in the response MUST exist in `actions_path`.
+- Return ONLY the fenced block above.
+
+# Constraints
+- Keep findings short and specific.
+- Cite file paths and line numbers where possible.
+- In the cache, include a unified diff after every finding's `Fix:` field when the fix is concrete. Omit the diff when the finding is a conceptual concern with no single correct replacement.

@@ -1,0 +1,11 @@
+Review end-user documentation for wording quality.
+
+# Inputs
+
+- `handoff_path` (`<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
+
+# Focus
+
+(Scope: human-readable documentation, not LLM token density.)
+
+{{ file="./rules/eudoc-review/wording.md" }}

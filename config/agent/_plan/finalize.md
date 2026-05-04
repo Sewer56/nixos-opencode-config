@@ -21,11 +21,14 @@ permission:
     "*": "deny",
     "mcp-search": "allow",
     "_plan/finalize-explorer": "allow",
-    "_plan/finalize-reviewers/audit": "allow",
+    "_plan/finalize-reviewers/audit-adjudicator-cached": "allow",
+    "_plan/finalize-reviewers/audit-adjudicator-cacheless": "allow",
     "_plan/finalize-reviewers/audit-rereview": "allow",
-    "_plan/finalize-reviewers/tests": "allow",
+    "_plan/finalize-reviewers/tests-cached": "allow",
+    "_plan/finalize-reviewers/tests-cacheless": "allow",
     "_plan/finalize-reviewers/tests-rereview": "allow",
     "_plan/finalize-reviewers/performance": "allow",
+    "_plan/finalize-reviewers/performance-cacheless": "allow",
     "_plan/finalize-reviewers/placement": "allow"
   }
 ---
@@ -106,12 +109,14 @@ Next Command: /plan/draft
 - Write and maintain `## Delta` in `handoff_path` before the first reviewer pass. Record each `REQ-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields. Add artifact markers for `Source Plan` and `Review Ledger`. Recompute `## Delta` after every material revision.
 - Also record each I# and T# step as a Delta entry so reviewers can skip Unchanged step files.
 - Before initial reviewer pass, derive `reviewer_set`:
-  - Always include `@_plan/finalize-reviewers/audit`.
-  - Always include `@_plan/finalize-reviewers/tests`.
+  - Always include `@_plan/finalize-reviewers/audit-adjudicator-cached` for the audit domain.
+  - Always include `@_plan/finalize-reviewers/tests-cached` for the tests domain.
   - Do NOT include performance in the initial pass. Performance runs after audit+tests converge (see 5d).
 
 ### 5a. Initial reviewer dispatch (full reviewers)
 - Pass `handoff_path`, `plan_path`, and `cache_path` to each selected reviewer.
+- Treat every selected reviewer as one reviewer contract.
+- Tests and performance are single-reviewer. Use their delta variants during normal iterations.
 - **Curate step paths per reviewer domain:**
   - Audit: all step paths (I# + T#).
   - Tests: test step paths (T#) + implementation steps that directly affect test assertions/coverage. Do NOT include steps that only change UI, config, docs, or non-testable surface.
@@ -119,20 +124,26 @@ Next Command: /plan/draft
   - For audit: relevant file paths and current state from `## Files Touched` + `## Key Symbols`.
   - For tests: test file locations from `## Test Files` + existing test structure from `## Observations`.
 - Full reviewers handle INITIAL review only. They write cache files with grounding snapshots.
-- **After reviewer returns, read `cache_path` for complete findings.** Reviewers emit terse output (Decision + IDs only); cache has full finding detail.
-- **On re-review: do NOT re-read the cache file unless a fix fails.** The re-review agent already returns terse Decision + IDs. Trust the IDs and proceed directly to applying fixes.
+- After each reviewer returns:
+  - Read `actions_path` for current findings and fixes.
+  - If the actions file is absent, malformed, truncated, ambiguous, or insufficient: treat the response as a protocol failure and retry/rerun the reviewer.
+  - The cache is reviewer-owned state; the caller does not read it.
+  - Apply only current findings exposed by the returned pointer.
+- On re-review: pass `cache_path` as reviewer state; do not pass unchanged artifacts. After it returns, read `actions_path` for current fixes.
 
 ### 5b. Re-review dispatch (dedicated rereview agents, after fixes)
 - After applying fixes, dispatch dedicated rereview agents — NOT the full reviewers:
   - If audit had BLOCKING findings or audit-domain steps changed: dispatch `@_plan/finalize-reviewers/audit-rereview`.
   - If tests had BLOCKING findings or test-domain steps changed: dispatch `@_plan/finalize-reviewers/tests-rereview`.
+- Re-reviewers receive only change state and finding IDs.
 - Pass to rereview agent:
   - `cache_path` (required — the initial review cache with grounding snapshots)
   - `changed_step_paths` (only step files that changed)
   - `resolved_finding_ids`, `unresolved_finding_ids`, `finding_resolution_ledger`
 - Do NOT pass `handoff_path` or `plan_path` to rereview agents.
-- Rereview agents: read cache → read changed steps → verify fixes → check for new issues → update cache → emit terse `# REVIEW`.
-- After rereview returns, read `cache_path` for complete findings.
+- Rereview agents: read cache → read changed steps → verify fixes → check for new issues → update cache/actions → emit terse `# REVIEW`.
+- After rereview returns, read `Actions:` for current fixes.
+- Treat missing or malformed actions file as a protocol failure and rerun the re-reviewer.
 - If the cache file does not exist (initial review write failed), fall back to re-dispatching the full reviewer with structural withhold.
 
 ### 5c. Review loop control
@@ -144,23 +155,43 @@ Next Command: /plan/draft
   - prefer changed items from `## Delta`; do not re-evaluate unchanged items without new evidence
 - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
 - Keep `## Review Ledger` to domain summaries and cross-domain decisions (DEC-###). Do not copy per-finding detail into handoff.
-- For cache-backed reviewers, read `cache_path` only when detailed findings are needed for fixes or summaries.
+- For cache-backed reviewers, pass `cache_path` as state; use `actions_path` for fixes and `## Review Ledger` for summaries.
 - Assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED. Update cache files where present.
 - Cache-backed reviewers read only their own cache + handoff Delta. Cross-domain findings stay isolated — reviewers do not need other domains' detail.
 - Do not reopen RESOLVED issues without new concrete evidence.
 - Revise step files only where needed. Append one line to `## Revision History`.
 - **PASS-stays-PASS gate:** Do not re-dispatch a reviewer that returned PASS with 0 findings unless revisions address a domain that overlaps with its focus. AUDIT covers fidelity+structure+completeness+economy+dead-code; TESTS covers test coverage; PLACEMENT covers declaration placement/order; PERF covers performance.
 - Recompute `reviewer_set` and re-run only reviewers with BLOCKING findings or domains touched by BLOCKING fixes, using dedicated rereview agents (5b). Advisory-only reviewers are recorded as DEFERRED and carried forward.
+- Rerun every domain whose assumptions changed: audit for changes to REQ items, step structure, file paths, diff headers, output schema, requirement mapping, or required sections; tests for changes to behavior, acceptance criteria, verification commands, or test steps; placement for declaration anchors/order; performance for algorithmic, data, concurrency, validation, logging, or workload changes.
+- Use audit variants after changes to structure, schema, output contract, numbering, file paths, diff headers, or requirement mapping, or after multiple fix rounds.
 - Loop until no findings of any severity remain or 10 iterations.
   No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
 ### 5d. Final gates (after audit+tests converge)
-- Dispatch placement and performance in the same final-gate phase after audit+tests converge.
+- Dispatch placement and `@_plan/finalize-reviewers/performance` in the same final-gate phase after audit+tests converge.
 - Placement: pass `handoff_path` and all I# step paths. It owns declaration-order checks and exact step-file diffs.
 - Performance: pass `handoff_path`, `plan_path`, and all step paths. The explorer manifest is still in context — pre-inline relevant `## Key Symbols` and `## Files Touched`.
 - Performance reviews algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, missing validation.
 - Final-gate BLOCKING findings trigger fixes; apply exact ordering-only placement diffs directly. For other fixes, rerun only touched final-gate domains. ADVISORY only → DEFERRED.
 - Final success requires zero unresolved BLOCKING findings from audit, tests, placement, and performance.
+
+### 5e. Final full audit before SUCCESS
+- Before returning `Status: SUCCESS`, run a final full audit after all normal reviewers and final gates have zero unresolved BLOCKING findings.
+- Always run final audit and final tests audits:
+  - `@_plan/finalize-reviewers/audit-adjudicator-cacheless` with `handoff_path`, `plan_path`, all step paths, and the canonical audit cache.
+  - `@_plan/finalize-reviewers/tests-cacheless` with `handoff_path`, `plan_path`, verification-relevant step paths, and the canonical tests cache.
+- Run final performance audit with `@_plan/finalize-reviewers/performance-cacheless` only when steps touch performance-sensitive paths, algorithms, data access, concurrency, validation, logging, or workload size.
+- Final audit rules:
+  - Read the full artifact.
+  - Ignore Delta shortcuts and prior cache entries.
+  - Return current BLOCKING and ADVISORY findings.
+  - Read `actions_path` for fixes.
+  - The cache is audit ledger state; the caller does not read it.
+- If a final audit finds BLOCKING issues:
+  - Apply accepted fixes.
+  - Recompute `## Delta`.
+  - Rerun only domains touched by the fix.
+  - Run the final full audit again.
 
 # Output
 Return exactly:

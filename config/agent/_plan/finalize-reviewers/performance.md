@@ -26,7 +26,7 @@ permission:
   # skill: deny
 ---
 
-Review only the performance-sensitive parts of finalized steps.
+Review only the performance-sensitive parts of step artifacts.
 
 # Inputs
 - `handoff_path` (e.g., `<artifact_base>.handoff.md`)
@@ -68,7 +68,7 @@ Use `handoff_path` and `plan_path` only to verify the steps did not introduce pe
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis and re-emit valid protocol output from the existing review state.
 
 
-5. Emit the final review block
+4. Emit the final review block
 - Emit the `# REVIEW` block from `# Output`.
 
 # Output
@@ -103,4 +103,4 @@ Fix: <diff or prose>
 
 # Rules
 
-{file:./rules/quality/performance.md}
+{{ file="./rules/quality/performance.md" }}

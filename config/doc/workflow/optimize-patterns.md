@@ -166,34 +166,65 @@ Low/default tier:
 Downgrade only after 3-sample PASS shows no lost required findings.
 ```
 
-### WOPT-005 — Reviewer Response / Cache Split
+### WOPT-005 — Reviewer Action / Cache Split
 
-- Applies To: review loops where runner needs compact decisions but re-review needs detailed evidence.
+- Applies To: review loops where runner needs current fixes while re-review/adjudication needs detailed evidence and history.
 - Trigger Signals: output bloat, cache/delta failure, duplicate reasoning.
 - Refactor Move:
-  - Reviewer final response MUST contain only orchestration data: decision, finding IDs, optional one-line summaries, verified ids, and cache path.
-  - Cache file MUST contain detailed finding text, status, evidence, prior decision, and expected fix condition.
-  - Runner MUST use final response for routing/parsing.
-  - Runner MUST read cache only when it needs detailed findings for fix application, reporting, or final audit.
+  - Cached reviewer/adjudicator final response MUST be pointer-only: decision, `Actions:`, `Cache:`, and current finding IDs.
+  - Actions file MUST contain only current actionable OPEN findings needed for this loop.
+  - Cache file MUST contain full finding text, status, evidence, prior decisions, verified observations, resolved/deferred items, expected fix conditions, and a pointer to latest actions.
+  - Cacheless reviewers MUST NOT read or write cache or actions files. Findings MUST be returned inline in the output block with `## Findings` and `## Notes` sections.
+  - Cacheless adjudicators MUST parse A/B findings from each leg's inline `## Findings` section. They MUST NOT read sidecar files or emit `Actions:`/`Cache:` pointers.
+  - Runner MUST use final response for routing and read `Actions:` for fix application (cached) or inline `## Findings` (cacheless).
+  - Runner MUST treat missing, malformed, truncated, ambiguous, or insufficient `Actions:` (cached) or inline findings (cacheless) as a protocol failure to retry/rerun.
+  - Runner MUST treat `Cache:` as reviewer-owned state for re-review/adjudication and ledger references, not current fix input.
   - Re-review MUST receive `cache_path` and use cache for detailed evidence.
-  - Do not duplicate full finding prose in both final response and cache.
+  - Do not duplicate full history, verified observations, resolved findings, or merge notes in the response or actions file.
 - Quality Guard:
   - Response schema MUST stay stable and parseable.
-  - Every ID in response MUST exist in cache.
-  - Cache evidence MUST be actionable without rereading unchanged inputs.
+  - Every ID in cached response MUST exist in actions and cache when IDs are used.
+  - Actions evidence MUST be actionable without rereading unchanged inputs; cache ledger MUST point to the action files that hold evidence.
+  - Cacheless output MUST include all findings inline — no sidecar file references, no `Cache:` or `Actions:` pointers.
   - Do not split response/cache if downstream consumer cannot read the cache file.
-- Related Design Patterns: OPT-004, OPT-005, OPT-006.
-- Expected Gain: smaller runner context and less duplicated response/cache prose.
+- Related Design Patterns: OPT-004, OPT-005, OPT-006, OPT-016.
+- Expected Gain: smaller runner context and less duplicated cache/history prose.
 
 ```text
-Reviewer response:
+CACHED reviewer response:
 Decision: BLOCKING
-Findings: [F1 one-line summary]
-Verified: [STEP-002]
+Actions: <actions-path>
 Cache: <path>
 
-Cache file:
-F1 full evidence, expected fix condition, prior decision, detailed text
+Actions file:
+F1 current problem + smallest fix
 
-Runner reads response; re-review reads cache.
+Cache file:
+Latest Actions: <actions-path>
+F1 full evidence, expected fix condition, prior decision, verified observations, resolved history
+
+CACHELESS reviewer response:
+Decision: BLOCKING
+IDs: COR-001, COR-002, ...
+
+## Findings
+### [COR-001]
+Category: FIDELITY
+Severity: BLOCKING
+Evidence: <section, [P#], path:line>
+Problem: <one line>
+Fix: <smallest concrete correction>
+~~~
+--- a/<path>
++++ b/<path>
+ unchanged context
+-old
++new
+ unchanged context
+~~~
+
+## Notes
+- <optional>
+
+Runner fixes from actions (cached) or inline findings (cacheless); adjudicator/re-review reads actions first, cache only as needed.
 ```

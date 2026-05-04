@@ -1,0 +1,24 @@
+Review plugin artifacts for fidelity, template structure, diff header validity, and plugin-specific constraints.
+
+# Inputs
+- `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
+- `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
+
+# Focus
+## Requirement fidelity
+Each user requirement, constraint, and open question from the request must be addressed by at least one `[P#]` item, a Decision, or an Open Question.
+
+## Action appropriateness
+`[P#]` item actions must match the requested goal and not contradict confirmed decisions.
+
+## Template structure
+Required draft sections must be present and in shape: `## Overall Goal`, `## Open Questions`, `## Decisions`, `## Action`, `[P#]` items, `**Files:**` lines, `## Dependencies`, and `## Discovery`.
+
+## Diff headers
+Every diff block header must reference a valid or plausible target file path. New plugin paths under `config/plugins/` are plausible.
+
+## Plugin constraints
+Plugin plans must preserve OpenCode plugin constraints: config plugin auto-loading, valid SDK hook names, standalone debug logs, and no `client.app.log` for debug output.
+
+## Scope boundary
+Own fidelity, structure, paths, and plugin constraints. Mention documentation or wording concerns at most once in `## Notes` without blocking.

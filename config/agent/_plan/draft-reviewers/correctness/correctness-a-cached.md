@@ -1,0 +1,28 @@
+---
+mode: subagent
+hidden: true
+description: Independent correctness reviewer A (cached) for plan draft adjudication
+model: sewer-axonhub/GLM-5.1  # HIGH
+temperature: 1.0  # reviewer A
+reasoningEffort: medium
+permission:
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
+  edit:
+    "*PROMPT-PLAN*.draft.review-correctness.md": allow
+    "*PROMPT-PLAN*.draft.review-correctness.actions.*.md": allow
+    "*PROMPT-PLAN*.draft.review-correctness.a.md": allow
+    "*PROMPT-PLAN*.draft.review-correctness.a.actions.*.md": allow
+  grep: allow
+  glob: allow
+  list: allow
+  todowrite: allow
+  external_directory: allow
+---
+{{ file="./agent/_plan/draft-reviewers/correctness/shared-pre.txt" }}
+{{ file="./agent/_plan/draft-reviewers/correctness/shared-cached.txt" }}
+{{ file="./agent/_plan/draft-reviewers/correctness/cached-post.txt" }}

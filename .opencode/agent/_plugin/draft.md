@@ -22,7 +22,10 @@ permission:
     "*": deny
     "mcp-search": allow
     "_plugin/draft-explorer": allow
-    "_plugin/draft-reviewers/*": allow
+    "_plugin/draft-reviewers/correctness-adjudicator-cached": allow
+    "_plugin/draft-reviewers/correctness-adjudicator-cacheless": allow
+    "_plugin/draft-reviewers/documentation": allow
+    "_plugin/draft-reviewers/wording": allow
 ---
 
 Create and maintain a collaborative plugin plan for `/plugin/draft`. Write only `<artifact_base>.draft.md`.
@@ -87,13 +90,20 @@ Follow the ordered steps below.
 - Recompute `## Delta` after every material revision to `context_path`.
 
 2. Stage 1 — Correctness
-- Run `@_plugin/draft-reviewers/correctness` first.
-- Include only:
-  - `context_path` and `draft_handoff_path`
-- Omit:
-  - Output format, focus/check lists, role assignment, blanket read orders
-- Validate, apply fixes, and recompute Delta.
-- If correctness returns BLOCKING: fix and re-run correctness. Do not proceed to Stage 2 until correctness is PASS or ADVISORY-only.
+- Run `@_plugin/draft-reviewers/correctness-adjudicator-cached` first.
+- Pass only:
+  - `context_path`
+  - `draft_handoff_path`
+  - `cache_path: <artifact_base>.draft.review-correctness.md`
+- Do not pass output schemas, focus lists, role text, blanket read orders, or reviewer-internal details.
+- Treat correctness as a single reviewer contract.
+- Validate `# REVIEW`, `Decision:`, `Domains: COR`, and conditional `IDs:`.
+- Read `actions_path` for current findings and fixes.
+- Treat malformed or missing actions file as a protocol failure; retry or rerun correctness instead of mining the cache for fixes.
+- The cache is reviewer-owned state; the caller does not read it.
+- Apply only findings listed in the actions file.
+- Recompute `## Delta` after fixes.
+- If correctness returns BLOCKING: fix and re-run correctness before Stage 2.
 
 3. Stage 2 — Documentation + Wording
 - Run in parallel:
@@ -103,8 +113,9 @@ Follow the ordered steps below.
 - Validate, apply fixes, and recompute Delta.
 
 4. Validate each reviewer response
-- Exact fenced `text` block whose first content line is `# REVIEW`, plus `Decision:`, `## Findings`, and `## Verified`.
-- All 3 active draft reviewers are diff-mandated.
+- Correctness: exact fenced `text` block whose first content line is `# REVIEW`, plus `Decision:`, `Domains: COR`, and `IDs:` when Decision is BLOCKING or ADVISORY.
+- Documentation/wording reviewers: exact fenced `text` block whose first content line is `# REVIEW`, plus `Decision:`, `## Findings`, and `## Verified`.
+- All 3 active draft domains are diff-mandated; details may live in cache.
 - Treat malformed output as BLOCKING after retries.
 
 5. Retry malformed responses from the existing review state
@@ -122,6 +133,8 @@ Follow the ordered steps below.
 - Loop until no BLOCKING findings or 5 iterations.
 - ADVISORY-only findings → DEFERRED. Do not re-run solely for advisory-only findings unless they affect explicit user constraints.
 - On re-review: dispatch only reviewers with prior BLOCKING decisions. PASS/ADVISORY reviewers skip unless their domain is touched by BLOCKING fixes.
+- Rerun every touched domain after a fix: correctness fixes that change `[P#]` items, structure, paths, diff headers, plugin constraints, or requirement mapping require correctness re-review; documentation fixes that add user-facing work require documentation re-review; wording fixes that remove specificity require documentation and may require correctness.
+- Use the delta adjudicator during normal iterations. Switch to the audit adjudicator after structural, path, diff-header, requirement-mapping, output-contract, or plugin-constraint changes, or after multiple fix rounds.
 - At cap: proceed with risks noted.
 
 ## 5. Clarify only when needed
@@ -131,7 +144,14 @@ Follow the ordered steps below.
 
 ## 6. Confirmation boundary
 
-- If the latest user message explicitly confirms the draft is ready for finalize, do not continue into finalize.
+- If the latest user message explicitly confirms the draft is ready for finalize, run one final correctness audit before returning READY.
+- Final correctness audit:
+  - Call `@_plugin/draft-reviewers/correctness-adjudicator-cacheless` with `context_path`, `draft_handoff_path`, and `cache_path: <artifact_base>.draft.review-correctness.md`.
+  - The cache is audit ledger state; the caller does not read it.
+  - Read `actions_path` for current BLOCKING and ADVISORY findings.
+  - If BLOCKING: fix, recompute `## Delta`, rerun touched reviewers, then repeat final correctness audit.
+- Run final wording audit (full re-read, ignore caches) only after late operational/plugin-protocol changes or prior wording BLOCKING findings.
+- Do not continue into finalize.
 - Return `Status: READY` so the user can run `/plugin/finalize`.
 - When the user modifies the draft but does not request re-review, append a reminder: "Re-review available — say 'review' to re-run draft reviewers."
 - Otherwise return `Status: DRAFT`.

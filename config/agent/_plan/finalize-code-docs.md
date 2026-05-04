@@ -58,17 +58,24 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
 - Run these independent shared code-doc reviewers in parallel on the first pass:
-  - `@_plan/finalize-codedoc-reviewers/docs-and-readability`
-  - `@_plan/finalize-codedoc-reviewers/errors`
+  - `@_plan/finalize-codedoc-reviewers/docs-and-readability-cached`
+  - `@_plan/finalize-codedoc-reviewers/errors-cached`
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: CDOC and CREAD → docs-and-readability reviewer; CERR → errors reviewer. CDOC owns required API docs and inline readability comments in planned code diffs. Arbitrate cross-domain conflicts.
 - Apply all BLOCKING fixes before advisories. Resolve CDOC/CERR before CREAD when fixes conflict. Record or defer advisories when no blockers remain.
 - Apply reviewer diffs to existing I# and T# step files only. Append one line to `## Revision History`.
 - Re-run only reviewers whose owned domain or touched step changed after a material revision; rerun both reviewers when a fix changes both code docs and error docs.
+- After a fix, rerun only reviewers whose domain changed. Do not rerun unrelated domains.
 - Loop until no BLOCKING findings remain or 10 iterations.
   No blocking: SUCCESS with recorded/deferred advisories. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
-- Validate each reviewer response against the review block shape: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `Cache:`, `## Findings`, and `## Verified` headings. Treat malformed responses as BLOCKING with a synthetic finding.
+- Validate each reviewer response against the review block shape: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified` headings. Treat malformed responses as BLOCKING with a synthetic finding.
+- Before `Status: SUCCESS`:
+  - Audit errors with `@_plan/finalize-codedoc-reviewers/errors-cacheless` when public API/error-docs changed.
+  - Audit docs-and-readability with `@_plan/finalize-codedoc-reviewers/docs-and-readability-cacheless` when doc comments changed.
+  - Ignore caches and Delta shortcuts.
+  - Return all current findings.
+  - If BLOCKING: fix, recompute Delta, rerun touched reviewers, then re-audit.
 
 # Output
 Return exactly:
@@ -98,6 +105,6 @@ Next Command: /plan/finalize-user-docs
 
 Apply these rules:
 
-{file:./rules/quality/general.md}
-{file:./rules/docs/documentation.md}
-{file:./rules/docs/errors.md}
+{{ file="./rules/quality/general.md" }}
+{{ file="./rules/docs/documentation.md" }}
+{{ file="./rules/docs/errors.md" }}

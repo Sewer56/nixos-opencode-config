@@ -32,6 +32,7 @@ Related files:
 | failure-path validation | OPT-013 |
 | subagent review of partial plan | OPT-014 |
 | shared pattern selection | OPT-015 |
+| adjudicated high-risk review | OPT-016 |
 
 ## Approved Patterns
 
@@ -353,27 +354,6 @@ code+test change -> correctness + tests reviewers
 performance-sensitive change -> add performance reviewer
 advisory-only finding -> record/defer, no full rerun
 ```
-### OPT-011 — Triggered Reviewer Sets
-
-- Scope: finalize-family
-- Apply When: reviewer cost varies by complexity/risk or trivial plans can safely skip high-cost reviewers.
-- Skip When: every reviewer is always required for correctness.
-- Carry-In:
-  - Orchestrator MUST choose reviewer set before dispatch.
-  - Selection MUST consider step count, action mix, changed paths, risk flags, performance sensitivity, security/correctness impact, and triviality.
-  - Orchestrator MUST include every reviewer required for correctness, security, data-loss, or touched high-risk domains.
-  - Orchestrator MAY skip high-cost reviewers only when their domain is untouched and skip is safe by explicit criteria.
-  - Advisory-only findings MUST be recorded/deferred unless workflow explicitly requires advisory cleanup before completion.
-  - If risk is unclear, include the safer reviewer.
-- Expected Gain: less reviewer fan-out and better elapsed/token profile.
-
-```text
-docs-only change -> wording + docs reviewers
-code+test change -> correctness + tests reviewers
-performance-sensitive change -> add performance reviewer
-advisory-only finding -> record/defer, no full rerun
-```
-
 ### OPT-012 — Explicit Reviewer Scope Boundaries
 
 - Scope: cross-workflow
@@ -485,7 +465,7 @@ Main agent applies only returned carry-ins.
 - Carry-In:
   - Per high-risk domain: `<domain>-adjudicator`
     - Calls independent `<domain>-a` + `<domain>-b` (same artifact, isolated)
-    - Legs import shared reviewer text from sidecar `.txt` via `{{ file="./path.txt" }}`
+    - Legs import shared reviewer text from sidecar `.txt` via `{file:...}`
     - One adjudicator per domain, never shared
   - Adjudicator duties:
     - Use the same domain scope as A/B, but do not run as reviewer C

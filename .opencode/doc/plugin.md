@@ -27,7 +27,7 @@ The finalize agent follows the shared `/plan/finalize` shape with plugin-specifi
 
 Initial reviewers:
 
-- `_plugin/finalize-reviewers/audit` — Plan fidelity, structure, completeness, plugin constraints, economy, and dead-code cleanup.
+- `_plugin/finalize-reviewers/audit-adjudicator` — Plan fidelity, structure, completeness, plugin constraints, economy, and dead-code cleanup.
 - `_plugin/finalize-reviewers/tests` — Verification coverage, typecheck/debug checks, behavior coverage, redundancy, and parameterization.
 
 Re-reviewers:
@@ -64,6 +64,8 @@ Audit/tests own cache files and use `## Delta` plus changed STEP paths to skip u
 
 - `<artifact_base>.review-audit.md`
 - `<artifact_base>.review-tests.md`
+
+Audit A/B sidecars use `.a`/`.b` suffixes, for example `<artifact_base>.review-audit.a.md`. Final AUDIT mode ignores prior cache entries and writes a ledger such as `<artifact_base>.review-audit.ledger.md`.
 
 The finalize agent maintains a `## Delta` section in `<artifact_base>.handoff.md`. Re-review passes only `cache_path`, changed STEP paths, finding IDs, and a fix ledger unless the cache is missing or scope changed.
 

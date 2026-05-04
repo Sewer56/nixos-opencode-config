@@ -21,11 +21,14 @@ permission:
     "*": deny
     "mcp-search": allow
     "_plugin/finalize-explorer": allow
-    "_plugin/finalize-reviewers/audit": allow
+    "_plugin/finalize-reviewers/audit-adjudicator-cached": allow
+    "_plugin/finalize-reviewers/audit-adjudicator-cacheless": allow
     "_plugin/finalize-reviewers/audit-rereview": allow
-    "_plugin/finalize-reviewers/tests": allow
+    "_plugin/finalize-reviewers/tests-cached": allow
+    "_plugin/finalize-reviewers/tests-cacheless": allow
     "_plugin/finalize-reviewers/tests-rereview": allow
     "_plugin/finalize-reviewers/performance": allow
+    "_plugin/finalize-reviewers/performance-cacheless": allow
     "_plugin/finalize-reviewers/placement": allow
 ---
 
@@ -48,10 +51,10 @@ Convert a confirmed plugin plan into reviewed implementation steps. Write `<arti
   - `<artifact_base>.review-tests.md`
 
 # Plan Alignment Boundary
-- Shared orchestration mirrors `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_plan/finalize.md`: fast precondition gate → finalize explorer manifest → handoff + per-file steps → cache-backed initial review → scoped re-review → final gates.
-- Reviewer topology mirrors `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_plan/finalize-reviewers`: audit, tests, audit-rereview, tests-rereview, placement, performance.
-- Do not route to `_plan/*` agents or create `PROMPT-PLAN-*` artifacts. Plan reviewers are not reusable wholesale because plugin finalization uses `PROMPT-PLUGIN-PLAN-*`, plugin SDK/hook constraints, standalone logging, auto-loading, STEP-### files, and `/plugin/implement` as the next phase.
-- Carry shared workflow logic by reference and plugin-specific delta; embed operational rules here so the agent does not need to reread the plan prompts at runtime.
+- Mirror `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_plan/finalize.md` by phase shape only: precondition gate → explorer manifest → handoff + STEP files → review loop → final gates.
+- Use only `_plugin/*` reviewers and `PROMPT-PLUGIN-PLAN-*` artifacts.
+- Do not route to `_plan/*` agents or create `PROMPT-PLAN-*` artifacts.
+- Keep plugin-specific constraints here: plugin SDK/hooks, standalone logging, auto-loading, STEP-### files, and `/plugin/implement` as the next phase.
 
 # Process
 
@@ -112,26 +115,38 @@ Next Command: /plugin/draft
 
 ### 5a. Initial reviewer dispatch
 - Before dispatch, derive `reviewer_set`:
-  - Always include `@_plugin/finalize-reviewers/audit`.
-  - Always include `@_plugin/finalize-reviewers/tests`.
+  - Always include `@_plugin/finalize-reviewers/audit-adjudicator-cached` for the audit domain.
+  - Always include `@_plugin/finalize-reviewers/tests-cached` for the tests domain.
   - Do not include placement or performance in the initial pass; they run after audit/tests converge (see 5d).
 - Run selected initial reviewers in parallel.
 - Pass `handoff_path`, `context_path`, exact `step_paths`, `cache_path`, and finalize-time user notes.
 - Do not pass focus lists, output schemas, role text, blanket read orders, or target file lists already present in shared artifacts.
-- After each reviewer returns, read its `cache_path` for complete findings.
+- Treat every selected reviewer as one reviewer contract.
+- Consume the returned pointer:
+  - Read `actions_path` for current findings and fixes.
+  - If the actions file is absent, malformed, truncated, ambiguous, or insufficient: treat the response as a protocol failure and retry/rerun the reviewer.
+  - The cache is reviewer-owned state; the caller does not read it.
+- Apply only current findings exposed by the returned pointer.
+- Do not inspect reviewer-internal files from the primary runner.
+- Tests and performance are single-reviewer.
 
 ### 5b. Re-review dispatch
 - After fixes, dispatch dedicated re-reviewers, not the full reviewers:
   - If audit had BLOCKING findings or audit-domain steps changed: dispatch `@_plugin/finalize-reviewers/audit-rereview`.
   - If tests had BLOCKING findings or verification-domain steps changed: dispatch `@_plugin/finalize-reviewers/tests-rereview`.
+- Re-reviewers receive only change state and finding IDs.
 - Pass only `cache_path`, `changed_step_paths`, `resolved_finding_ids`, `unresolved_finding_ids`, and `finding_resolution_ledger`.
 - Do not pass `handoff_path`, `context_path`, or unchanged step paths to re-reviewers unless the cache is missing or malformed.
+- After re-review returns, read `actions_path` for current fixes.
+- Treat missing or malformed actions file as a protocol failure and rerun the re-reviewer.
 
 ### 5c. Review loop control
 - Advisory-only findings → DEFERRED. Do not revise or rerun solely to clear advisory findings unless they affect explicit acceptance criteria or hard user constraints.
 - Keep `## Review Ledger` to domain summaries and cross-domain decisions. Per-finding details stay in audit/tests cache files.
 - Preserve finding IDs for unchanged root causes. Mark fixed issues RESOLVED in cache. Do not reopen RESOLVED issues without new evidence.
 - Recompute `reviewer_set` when fixes change scope, risk, paths, or STEP count. Rerun only reviewers with BLOCKING findings or domains touched by BLOCKING fixes.
+- Rerun every domain whose assumptions changed: audit for STEP structure, file paths, diff headers, requirement mapping, plugin constraints, or required sections; tests for behavior, verification commands, debug checks, or test steps; placement for declaration anchors/order; performance for hot hooks, IO, logging, concurrency, validation, or workload changes.
+- Use audit variants after changes to structure, schema, output contract, numbering, file paths, diff headers, plugin constraints, or requirement mapping, or after multiple fix rounds.
 - Loop until audit/tests have zero unresolved BLOCKING findings or 10 iterations. At cap: FAIL if BLOCKING remains.
 
 ### 5d. Final gates
@@ -140,6 +155,24 @@ Next Command: /plugin/draft
 - Performance: pass `handoff_path`, `context_path`, and all step paths. Pre-inline only relevant explorer facts when needed.
 - Final-gate BLOCKING findings trigger STEP fixes. Rerun only touched final-gate domains.
 - Final success requires zero unresolved BLOCKING findings from audit, tests, placement, and performance.
+
+### 5e. Final full audit before SUCCESS
+- Before returning `Status: SUCCESS`, run one final full audit after all normal reviewers and final gates have zero unresolved BLOCKING findings.
+- Always run final audit and final tests audits:
+  - `@_plugin/finalize-reviewers/audit-adjudicator-cacheless` with `handoff_path`, `context_path`, all step paths, and the canonical audit cache.
+  - `@_plugin/finalize-reviewers/tests-cacheless` with `handoff_path`, `context_path`, verification-relevant step paths, and the canonical tests cache.
+- Run final performance audit with `@_plugin/finalize-reviewers/performance-cacheless` only when steps touch hot hooks, IO/logging, algorithms, data access, concurrency, validation, or workload size.
+- Final audit rules:
+  - Read the full artifact.
+  - Ignore Delta shortcuts and prior cache entries.
+  - Return current BLOCKING and ADVISORY findings.
+  - Read `actions_path` for fixes.
+  - The cache is audit ledger state; the caller does not read it.
+- If a final audit finds BLOCKING issues:
+  - Apply accepted fixes.
+  - Recompute `## Delta`.
+  - Rerun only domains touched by the fix.
+  - Run the final full audit again.
 
 # Output
 

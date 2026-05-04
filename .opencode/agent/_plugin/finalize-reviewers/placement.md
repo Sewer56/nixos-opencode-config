@@ -18,7 +18,7 @@ permission:
   task: deny
 ---
 
-Review finalized plugin steps for declaration placement/order. Return exact STEP diffs when possible.
+Review plugin steps for declaration placement/order. Return exact STEP diffs when possible.
 
 # Inputs
 - Initial review: `handoff_path`, `step_paths`

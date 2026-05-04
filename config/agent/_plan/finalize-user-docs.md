@@ -72,7 +72,7 @@ Generate and review end-user documentation steps for finalized implementation/te
 ## 5. Run the end-user documentation review loop
 - Write and maintain `## Delta` in `handoff_path`. Record each D# step as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Mark existing I#/T# entries as Unchanged with `Why: pre-existing step`. Recompute `## Delta` after every material revision.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
-- **Stage 1: Correctness** — Run `@_plan/finalize-eudoc-reviewers/correctness` first. Checks coverage, specificity, and broken links. Apply its diffs, update `## Review Ledger`, append to `## Revision History`. Recompute `## Delta`.
+- **Stage 1: Correctness** — Run `@_plan/finalize-eudoc-reviewers/correctness-cached` first. Checks coverage, specificity, and broken links. Apply its diffs, update `## Review Ledger`, append to `## Revision History`. Recompute `## Delta`.
 - **Stage 2: Polish** — Run `@_plan/finalize-eudoc-reviewers/polish` after Stage 1 fixes are applied. Checks clarity, wording, engagement, and cross-page polish.
 - Include in each reviewer prompt only task-specific data. For first review, extract and inline the `## Delta` section, D# Step Index rows, and relevant Requirement Trace Matrix rows from `handoff_path`. Pass `handoff_path` only for cache file naming — reviewers must not re-read the full handoff.
   - Re-review: pass `cache_path`, `changed_ids=[D# list]`, `handoff_path`, and one-line fix summaries. Withhold unchanged step paths.
@@ -83,8 +83,14 @@ Generate and review end-user documentation steps for finalized implementation/te
 - Append one line to `## Revision History`.
 - **ADVISORY-only deferral**: If after applying diffs, only ADVISORY findings remain (no BLOCKING), record remaining ADVISORY findings as DEFERRED in the Review Ledger. Do not re-run reviewers solely to clear ADVISORY findings.
 - Re-run reviewers after every material revision where BLOCKING findings were applied.
+- After a fix, rerun only the reviewer whose domain changed. Do not rerun unrelated domains.
 - Loop until no findings of any severity remain or 10 iterations.
   No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
+- Before `Status: SUCCESS`:
+  - Run final eudoc correctness audit with `@_plan/finalize-eudoc-reviewers/correctness-cacheless` over all D# steps and handoff mappings.
+  - Ignore caches and Delta shortcuts.
+  - Return all current findings.
+  - If BLOCKING: fix, recompute Delta, rerun touched reviewer, then re-audit.
 
 # Output
 Return exactly:

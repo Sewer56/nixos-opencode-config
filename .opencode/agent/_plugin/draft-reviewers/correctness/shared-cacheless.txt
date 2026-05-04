@@ -1,0 +1,40 @@
+# Process
+1. Read the full `context_path` and relevant `draft_handoff_path` sections from scratch.
+2. Inspect all `[P#]` items and required sections.
+4. Return all findings directly in the output block. Do not write cache or actions files.
+
+# Output
+
+```text
+# REVIEW
+Agent: _plugin/draft-reviewers/correctness
+Decision: PASS | ADVISORY | BLOCKING
+Domains: COR
+IDs: COR-001, COR-002, ...
+
+## Findings
+### [COR-NNN]
+Category: FIDELITY | ACTION | TEMPLATE_STRUCTURE | DIFF_HEADERS | PLUGIN_CONSTRAINTS
+Severity: BLOCKING | ADVISORY
+Evidence: <section, [P#], path:line, diff header, or missing element>
+Problem: <one line>
+Fix: <smallest concrete correction>
+~~~
+<artifact_base>.draft.md
+--- a/<artifact_base>.draft.md
++++ b/<artifact_base>.draft.md
+ unchanged context
+-incorrect content
++correct content
+ unchanged context
+~~~
+
+## Notes
+- <optional short notes>
+```
+- PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
+- BLOCKING: max 6 findings.
+- Return ONLY the fenced block.
+
+# Constraints
+- Answer whether the draft is free of blocking issues in COR.

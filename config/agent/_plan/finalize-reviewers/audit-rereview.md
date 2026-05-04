@@ -12,6 +12,8 @@ permission:
     "*.env.example": allow
   edit:
     "*PROMPT-PLAN*.review-audit.md": allow
+    "*PROMPT-PLAN*.review-audit.actions.*.md": allow
+  glob: allow
   list: allow
   todowrite: allow
   external_directory: allow
@@ -21,6 +23,7 @@ Verify resolved audit findings. Check only changed steps for new issues. Trust c
 
 # Inputs
 - `cache_path` (required — initial audit cache with grounding snapshots)
+- `actions_path` (optional; derive next `<cache_path without .md>.actions.<nnn>.md` when omitted)
 - `changed_step_paths` (only step files that changed since last review)
 - `resolved_finding_ids`, `finding_resolution_ledger`
 
@@ -49,11 +52,14 @@ Write finding details to cache and emit only the terse `# REVIEW` block.
 Good: `Decision: PASS` only when no new findings exist.
 
 # Process
-1. Read `cache_path`. Carry forward all unchanged observations.
-2. Read `changed_step_paths` ONLY. Do NOT read handoff.md, draft.md, rules, or unchanged step files.
-3. For each resolved finding: confirm the fix is correctly applied in changed step content. Use cache grounding snapshots to verify without re-reading source files.
-4. Scan changed steps for new fidelity/structure/completeness/economy/dead-code issues.
-5. Update `cache_path` if needed. Emit `# REVIEW`.
+1. Derive `actions_path` when absent by globbing existing `<cache_path without .md>.actions.*.md` files and choosing the next three-digit `<nnn>` path, starting `001`.
+2. Read `cache_path`. Carry forward all unchanged observations.
+3. Read `changed_step_paths` ONLY. Do NOT read handoff.md, draft.md, rules, or unchanged step files.
+4. For each resolved finding: confirm the fix is correctly applied in changed step content. Use cache grounding snapshots to verify without re-reading source files.
+5. Scan changed steps for new fidelity/structure/completeness/economy/dead-code issues.
+6. Update `cache_path` if needed.
+7. Write `actions_path` with only current OPEN findings the caller must fix.
+8. Emit `# REVIEW`.
 
 # Output
 ```text
@@ -63,12 +69,10 @@ Decision: PASS | ADVISORY | BLOCKING
 IDs: AUD-NNN, AUD-NNN, ...
 ```
 - Your final output message MUST be EXACTLY the fenced block above. No other text.
-- PASS block: `Decision: PASS` only. No IDs line.
-- Findings are written to cache only. The orchestrator reads `cache_path` for finding details.
+- PASS keeps `Agent:` and `Decision: PASS`; omit `IDs`.
 
 # Constraints
-- PASS with 0 new findings: output Decision only, no IDs line.
 - BLOCKING: max 2 findings. ADVISORY findings → DEFERRED, do not block.
 - Read only: `cache_path` + `changed_step_paths`. Max 5 tool calls. No grep, no source file reads.
 - Trust cache grounding snapshots. Only re-read a source file if a fix demonstrably invalidates a cached observation.
-- Output: write findings to cache. Emit only terse `# REVIEW` block with Decision + IDs.
+- Output: write current fixes to `actions_path`; keep history in `cache_path`.

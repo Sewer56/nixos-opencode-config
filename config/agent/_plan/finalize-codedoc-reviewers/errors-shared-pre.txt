@@ -1,0 +1,11 @@
+Review step artifacts' code-adjacent error documentation.
+
+# Inputs
+
+- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
+- `plan_path` (e.g., `<artifact_base>.draft.md`)
+- `step_pattern` (e.g., `<artifact_base>.step.*.md`)
+
+# Focus
+
+{{ file="./rules/code-doc-review/errors-focus.plan.md" }}

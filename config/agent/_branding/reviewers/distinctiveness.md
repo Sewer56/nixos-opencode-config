@@ -60,7 +60,7 @@ Good: candidate can be searched with project domain and still find relevant resu
 
 # Process
 
-{file:./rules/branding-review/shared-process-pre.md}
+{{ file="./rules/branding-review/shared-process-pre.md" }}
 
 4. Inspect selected content
 - Read `<artifact_base>.draft.md` for in-scope sections (Candidate Shortlist, Top Recommendation, Risk and Availability Notes).
@@ -69,7 +69,7 @@ Good: candidate can be searched with project domain and still find relevant resu
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
-{file:./rules/branding-review/shared-process-post.md}
+{{ file="./rules/branding-review/shared-process-post.md" }}
 
 # Output
 
@@ -77,7 +77,6 @@ Good: candidate can be searched with project domain and still find relevant resu
 # REVIEW
 Agent: _branding/reviewers/distinctiveness
 Decision: PASS | ADVISORY | BLOCKING
-Cache: <path to `.review-distinctiveness.md`>
 Domains: DST
 
 ## Findings
@@ -105,7 +104,7 @@ Fix: <concrete correction or alternative>
 - <optional short notes>
 ```
 
-Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `Cache:`, `## Findings`, and `## Verified`; write `- None` under empty sections.
+Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections.
 
 # Constraints
 

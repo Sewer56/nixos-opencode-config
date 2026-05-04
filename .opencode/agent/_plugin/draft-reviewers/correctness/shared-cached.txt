@@ -1,0 +1,7 @@
+# Process
+1. Use explicit `cache_path` when provided. Otherwise derive cache path from `draft_handoff_path`: `<artifact_base>.draft.handoff.md` → `<artifact_base>.draft.review-correctness.md`. Use explicit `actions_path` when provided; otherwise glob existing `<cache_path without .md>.actions.*.md` files and choose the next three-digit `<nnn>` path, starting `001`.
+2. Read `## Delta` from `draft_handoff_path`, read Decisions only when non-empty, carry forward Verified Unchanged items, and re-evaluate Changed/New, own Open, and decision-referenced items.
+3. Read selected content from `context_path`. Check Open→Resolved transitions.
+4. Update `cache_path`:
+   - Verified Observations and Finding Ledger; preserve unchanged entries byte-for-byte when possible.
+5. Write `actions_path` with only current OPEN findings the caller/adjudicator must act on. Do not include resolved findings, full Verified Observations, prior history, or merge notes. Emit only the pointer `# REVIEW` block.

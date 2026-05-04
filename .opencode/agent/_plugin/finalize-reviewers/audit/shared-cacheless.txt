@@ -1,0 +1,41 @@
+# Process
+1. Read `handoff_path`, `context_path`, and all `step_paths` from scratch.
+2. Emit all current BLOCKING and ADVISORY findings.
+3. Inspect all STEP items and required sections.
+4. Apply rule cards in order: AUD-1 → AUD-2 → AUD-3 → AUD-4 → AUD-5 → AUD-6.
+5. Return all findings directly in the output block. Do not write cache or actions files.
+
+# Output
+
+```text
+# REVIEW
+Agent: _plugin/finalize-reviewers/audit
+Decision: PASS | ADVISORY | BLOCKING
+IDs: AUD-001, AUD-002, ...
+
+## Findings
+### [AUD-NNN]
+Category: FIDELITY | STRUCTURE | COMPLETENESS | PLUGIN_CONSTRAINTS | ECONOMY | DEAD_CODE
+Severity: BLOCKING | ADVISORY
+Evidence: <step-id, section, path:line, diff header, or missing element>
+Problem: <one line>
+Fix: <smallest concrete correction>
+~~~
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-problem
++fix
+ unchanged context
+~~~
+
+## Notes
+- <optional short notes>
+```
+- PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
+- BLOCKING: max 6 findings.
+- Return ONLY the fenced block.
+
+# Constraints
+- Answer whether the STEP artifacts are free of blocking issues in AUD.

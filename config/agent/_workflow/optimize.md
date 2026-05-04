@@ -45,6 +45,15 @@ Optimize OpenCode workflow prompts/tools by running real 3-sample experiments an
 6. **Quality gate first.** Define PASS criteria before baseline. Never trade required coverage/correctness for token savings.
 7. **No user loop.** Ask only if setup returns `NEEDS_INPUT`. Otherwise keep iterating until hard stop.
 8. **State lives in log.** No todo lists. Update `experiment_log` after every batch/edit/decision.
+9. **High-risk review topology stays safe.**
+   - Do not optimize away high-risk double-checks, touched-domain reruns, or final audits.
+   - If adding double-checks: use `<domain>-adjudicator` → independent `<domain>-a` + `<domain>-b` legs sharing a sidecar `.txt`.
+   - Derive leg state paths with `.a` and `.b` suffixes before `.md`.
+   - Adjudicators read A/B actions before caches and merge evidence; do not make them reviewer C.
+   - Adjudicators write `actions_path` for current fixes; the cache is reviewer-owned state the caller does not read.
+   - Primary runners read the actions file; they pass cache paths forward but do not mine caches for fixes.
+   - Caches hold history/verified data; final AUDIT uses a ledger when cache state would otherwise leak shortcuts.
+   - Re-review stays single: read own cache, inspect changed material, update cache/actions.
 
 # Helpers
 
@@ -263,7 +272,7 @@ Signal: reviewers overlap or one reviewer owns separable domains.
 Action: merge, split, or narrow reviewer scopes.
 
 ## Model/risk mismatch
-Low-risk mechanical reviewers spend high generated tokens. Do not downgrade correctness or security reviewers solely to save tokens.
+Low-risk mechanical reviewers spend high generated tokens. Do not downgrade correctness or security reviewers, per-reviewer adjudicators, or final full audits solely to save tokens.
 
 Bad: high-cost model handles mechanical formatting checks.
 Good: reserve high-cost model for correctness/security risk.

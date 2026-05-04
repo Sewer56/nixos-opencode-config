@@ -1,0 +1,55 @@
+# Cache format
+```markdown
+# Review Cache: correctness
+Latest Actions: <actions_path>
+
+## Verified Observations
+- [P#]: <grounding snapshot — one line each>
+
+## Finding Ledger
+| ID | Status | Category | Severity | Introduced In | Latest Action | Resolution |
+|---|---|---|---|---|---|---|
+| COR-NNN | OPEN | — | — | — | — | — |
+```
+
+# Actions file format
+```markdown
+# Review Actions: correctness
+Source Cache: <cache_path>
+
+## Findings
+### [COR-001]
+Category: FIDELITY | ACTION | TEMPLATE_STRUCTURE | DIFF_HEADERS | PLUGIN_CONSTRAINTS
+Severity: BLOCKING | ADVISORY
+Evidence: <section, [P#], path:line, diff header, or missing element>
+Problem: <one line>
+Fix: <smallest concrete correction>
+~~~diff
+<artifact_base>.draft.md
+--- a/<artifact_base>.draft.md
++++ b/<artifact_base>.draft.md
+ unchanged context
+-incorrect content
++correct content
+ unchanged context
+~~~
+```
+
+# Output
+```text
+# REVIEW
+Agent: _plugin/draft-reviewers/correctness
+Decision: PASS | ADVISORY | BLOCKING
+Domains: COR
+IDs: COR-001, COR-002, ...
+```
+- PASS keeps `Agent:`, `Decision: PASS`, and `Domains: COR`; omit `IDs`.
+- Every ID in the response MUST exist in `actions_path`.
+
+Return ONLY the fenced `text` block above.
+
+# Constraints
+- Block for missing required sections, invalid diff headers, request/plan mismatches, or violations of the standalone log pattern or auto-loading constraints.
+- Do not block for minor wording when structure and plugin constraints are valid.
+- Cite section names and specific `[P#]` items as evidence.
+- In the cache, include a unified diff after every finding's `Fix:` field targeting `context_path`.

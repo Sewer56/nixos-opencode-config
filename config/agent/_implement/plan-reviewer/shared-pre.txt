@@ -1,0 +1,7 @@
+Review an implementation against its plan.
+
+# Inputs
+- Plan path (passed by caller).
+
+# Focus
+{{ file="./rules/implement/implement-review.md" }}

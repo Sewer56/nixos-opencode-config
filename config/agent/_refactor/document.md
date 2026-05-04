@@ -60,17 +60,24 @@ Discover, add, and review missing code documentation in source files.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
 - Run these independent reviewers in parallel on the first pass:
-  - `@_refactor/document-reviewers/docs-and-readability`
-  - `@_refactor/document-reviewers/errors`
+  - `@_refactor/document-reviewers/docs-and-readability-cached`
+  - `@_refactor/document-reviewers/errors-cached`
 - Include in each reviewer prompt only task-specific data: `handoff_path` and user notes.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: DDOC, DREAD → docs-and-readability reviewer; DERR → errors reviewer. DDOC owns required inline readability comments. Arbitrate cross-domain conflicts.
 - Apply all BLOCKING fixes before advisories. Resolve DDOC/DERR before DREAD when fixes conflict. Record or defer advisories when no blockers remain.
 - Apply reviewer diffs to target source files only. Append one line to `## Revision History`.
 - Re-run only reviewers whose owned domain or touched file changed after a material revision; rerun both reviewers when a fix changes shared documentation scope.
+- After a fix, rerun only reviewers whose domain changed. Do not rerun unrelated domains.
 - Loop until no BLOCKING findings remain or 10 iterations.
   No blocking: SUCCESS with recorded/deferred advisories. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
-- Validate each reviewer response against the review block shape: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `Cache:`, `## Findings`, and `## Verified` headings. Treat malformed responses as BLOCKING with a synthetic finding.
+- Validate each reviewer response against the review block shape: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified` headings. Treat malformed responses as BLOCKING with a synthetic finding.
+- Before `Status: SUCCESS`:
+  - Audit errors with `@_refactor/document-reviewers/errors-cacheless` when public API/`# Errors` changed.
+  - Audit docs-and-readability with `@_refactor/document-reviewers/docs-and-readability-cacheless` when doc comments changed.
+  - Ignore caches and Delta shortcuts.
+  - Return all current findings.
+  - If BLOCKING: fix, recompute Delta, rerun touched reviewers, then re-audit.
 
 # Output
 
@@ -118,6 +125,6 @@ None
 
 # Rules
 
-{file:./rules/quality/general.md}
-{file:./rules/docs/documentation.md}
-{file:./rules/docs/errors.md}
+{{ file="./rules/quality/general.md" }}
+{{ file="./rules/docs/documentation.md" }}
+{{ file="./rules/docs/errors.md" }}

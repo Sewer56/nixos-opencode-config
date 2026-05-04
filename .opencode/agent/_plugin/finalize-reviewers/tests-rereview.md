@@ -12,6 +12,8 @@ permission:
     "*.env.example": allow
   edit:
     "*PROMPT-PLUGIN-PLAN*.review-tests.md": allow
+    "*PROMPT-PLUGIN-PLAN*.review-tests.actions.*.md": allow
+  glob: allow
   list: allow
   todowrite: allow
   external_directory: allow
@@ -21,6 +23,7 @@ Verify resolved verification findings and check changed steps for new gaps. Trus
 
 # Inputs
 - `cache_path`
+- `actions_path` (optional; derive next `<cache_path without .md>.actions.<nnn>.md` when omitted)
 - `changed_step_paths`
 - `resolved_finding_ids`, `unresolved_finding_ids`, `finding_resolution_ledger`
 
@@ -28,14 +31,16 @@ Verify resolved verification findings and check changed steps for new gaps. Trus
 - Read cache plus `changed_step_paths` only.
 - Confirm each resolved test/verification finding is fixed in changed step content.
 - Scan changed steps for new coverage, redundancy, parameterization, verification-command, or debug-check gaps.
-- Write finding details to cache and emit only the terse `# REVIEW` block.
+- Write current fixes to actions, keep history in cache, and emit only the terse `# REVIEW` block.
 
 # Process
-1. Read `cache_path` and carry forward unchanged observations.
-2. Read `changed_step_paths` only.
-3. Verify resolved findings and scan changed steps for new verification gaps.
-4. Update `cache_path` if needed.
-5. Emit `# REVIEW`.
+1. Derive `actions_path` when absent by globbing existing `<cache_path without .md>.actions.*.md` files and choosing the next three-digit `<nnn>` path, starting `001`.
+2. Read `cache_path` and carry forward unchanged observations.
+3. Read `changed_step_paths` only.
+4. Verify resolved findings and scan changed steps for new verification gaps.
+5. Update `cache_path` if needed.
+6. Write `actions_path` with only current OPEN findings the caller must fix.
+7. Emit `# REVIEW`.
 
 # Output
 ```text
@@ -46,6 +51,6 @@ IDs: TST-NNN, TST-NNN, ...
 ```
 
 # Constraints
-- Return only the fenced `text` block. PASS uses `Decision: PASS` only; omit `IDs`.
+- Return only the fenced `text` block. PASS keeps `Agent:` and `Decision: PASS`; omit `IDs`.
 - BLOCKING: max 2 findings. ADVISORY findings may be DEFERRED.
 - Do not read `handoff_path`, `context_path`, rules, or unchanged step files.

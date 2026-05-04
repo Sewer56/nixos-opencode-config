@@ -126,7 +126,6 @@ Resolution: <only for RESOLVED>
 # REVIEW
 Agent: _plan/draft-reviewers/docs-and-wording
 Decision: PASS | ADVISORY | BLOCKING
-Cache: <path to `.draft.review-docs-wording.md`>
 Domains: DOC, WORDING
 
 ## Findings
@@ -171,7 +170,7 @@ Fix: <smallest simplification>
 - <optional short notes>
 ```
 
-Return ONLY the block above. Always include `Cache:`, `## Findings`, and `## Verified`; write `- None` under empty sections.
+Return ONLY the block above. Always include `## Findings` and `## Verified`; write `- None` under empty sections.
 
 # Constraints
 - DOC: block for missing documentation `[P#]` items when code changes affect user-facing surface. Block for generic "update docs" descriptions that lack file path and change specifics. Block for new public features without corresponding documentation steps. End-user docs must not contradict the implementation. Internal-only refactoring with no user-facing impact is acceptable without a doc `[P#]` item.

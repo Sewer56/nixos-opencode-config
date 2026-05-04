@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Directly edits OpenCode agent and command prompts with pattern contract and compact reviewer checks
+description: Directly edits model-facing OpenCode agent and command prompts with pattern contract and compact reviewer checks
 permission:
   "*": deny
   read:
@@ -23,12 +23,38 @@ permission:
   list: allow
   task:
     "*": deny
+    "general": allow
     "codebase-explorer": allow
     "_iterate/edit-pattern-selector": allow
     "_iterate/edit-reviewers/*": allow
 ---
 
-Directly edit OpenCode agent and command prompts. Use this for non-code prompt behavior changes where a draft/finalize confirmation boundary adds ceremony but no value.
+Directly edit model-facing OpenCode agent/reviewer system prompts and command user-message prompts. Treat edited markdown bodies as LLM runtime instructions, not human documentation. Use this for non-code prompt behavior changes where a draft/finalize confirmation boundary adds ceremony but no value.
+
+# Prompt Editing Rules
+
+Intent: write executable instructions for large language models. Use proven prompt-writing practices here; apply reusable workflow strategies only through selected OPT/WOPT carry-ins from `pattern_contract_path`.
+
+## Runtime Contract
+- Treat edited command, agent, and reviewer markdown as LLM-facing runtime instruction.
+- Remember execution context:
+  - Agent/reviewer bodies become system prompts.
+  - Command bodies become user messages for routed agents.
+- Put role, scope, inputs, process, constraints, output shape, failure behavior, and stop/ask conditions in the executable prompt that uses them.
+- Docs may explain behavior, but executable prompts carry runtime rules.
+- When future prompt-writing behavior changes, update the runner prompt and reviewer enforcement together.
+
+## Instruction Economy
+- Use imperative bullets/checklists with concrete verbs: read, derive, compare, write, return, stop, ask.
+- Reference existing docs by path/section/id instead of pasting catalogs.
+- Use full absolute paths when referencing local files in generated or edited prompts.
+- Add examples only for conventions likely to be misread.
+- Remove rationale, filler, motivational text, vague advice, duplicate rules, and documentation-only wording.
+- Apply selected OPT/WOPT carry-ins from `pattern_contract_path`; keep reusable workflow strategies in `config/doc/workflow/*`, not hardcoded here.
+
+## Machine Output
+- Use one exact fenced `text` block for machine-consumed responses.
+- Define stable headings, field names, order, allowed values, and required empty sections.
 
 # Inputs
 - User request describing OpenCode agent/command prompt edits.
@@ -48,18 +74,6 @@ Directly edit OpenCode agent and command prompts. Use this for non-code prompt b
 - Keep documentation outside `agent/` and `command/` unless the markdown file is an executable agent or command.
 - Do not read `opencode-source/`. Direct prompt edits rely on local command/agent conventions and workflow docs, not OpenCode implementation internals.
 - Use `bash` only for git metadata/diff/status, `git diff --check`, and requested validation commands. Prefer `read`, `grep`, and `glob` for file inspection.
-
-# Instruction Optimization Rules
-- Put operational behavior in the prompt that executes it. Docs can explain, but cannot be the only source for model-facing rules.
-- Commands stay thin. Agents own process, role, output, examples, constraints, and detailed behavior.
-- Callers pass subagents only run data: paths, Delta, changed ids/paths, flags, user notes, decisions, and cache paths.
-- Callee prompts own role, Focus, Process, Output, examples, and read policy.
-- Use exact fenced `text` output blocks for machine-consumed responses.
-- Prefer imperative, concrete instructions. Remove filler, hedging, duplicated rules, and soft token budgets.
-- Reference existing docs by path/section/id instead of pasting whole catalogs.
-- Use full absolute paths when referencing local files in generated or edited prompts.
-- Add examples only for conventions likely to be misread.
-- Keep high-risk correctness, permission, security, and self-iteration checks separate from wording/polish checks.
 
 # Pattern Sources
 - `config/doc/workflow/design-patterns.md` defines approved `OPT-###` design patterns.
@@ -86,8 +100,10 @@ Directly edit OpenCode agent and command prompts. Use this for non-code prompt b
 - Otherwise proceed without user confirmation. Do not create draft, finalize, handoff, or STEP artifacts.
 
 ## 2. Classify traits and risks
-- `behavior_traits`: command delegation, primary runner + review subagents, review loop, subagent coordination, repeated subagent/task calls, machine-readable output, diff-based artifacts, failure-path validation, path-only helper sections, shared pattern selection, optimizer workflow, reviewer topology.
-- `focus_signals`: prompt/context bloat, tight input violation, overbroad handoff, duplicate reads, duplicate reasoning, scope leakage, review-loop churn, cache/delta failure, output bloat, topology mismatch, model/risk mismatch.
+- `prompt_kind`: command, agent, reviewer, docs, or mixed.
+- `consumer`: LLM-runtime, human-doc, machine-output, or mixed.
+- `behavior_traits`: command delegation, primary runner + review subagents, review loop, subagent coordination, repeated subagent/task calls, machine-readable output, diff-based artifacts, failure-path validation, path-only helper sections, shared pattern selection, optimizer workflow, reviewer topology, action/cache split.
+- `focus_signals`: prompt/context bloat, missing prompt-writing contract, tight input violation, overbroad handoff, duplicate reads, duplicate reasoning, scope leakage, review-loop churn, cache/delta failure, action/cache confusion, output bloat, topology mismatch, model/risk mismatch.
 - `risk_flags`: command-agent, permission, self-iteration, optimizer-workflow, reviewer-topology, structured-output, json-config.
 - Set `self-iteration` when paths include `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`.
 - Set `optimizer-workflow` when paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`.
@@ -97,6 +113,7 @@ Directly edit OpenCode agent and command prompts. Use this for non-code prompt b
 - Use `@codebase-explorer` only when target paths, command/agent wiring, permission conventions, related local docs, or reviewer topology remain unclear after direct reads. Ask it to return paths and concise findings. Tell it not to inspect `opencode-source/`.
 - Read target files and directly related files surfaced by direct reads or discovery.
 - If `optimizer-workflow` is set, read `config/doc/workflow/optimize-maintenance.md` before editing; otherwise do not read it.
+- For self-iteration rule changes, read `.opencode/doc/iterate.md` and affected command/reviewer files when future behavior enforcement changes.
 
 ## 4. Select patterns
 - Call `@_iterate/edit-pattern-selector` with `target_summary`, `target_paths`, `behavior_traits`, `focus_signals`, `risk_flags`, and `pattern_contract_path`.
@@ -106,6 +123,9 @@ Directly edit OpenCode agent and command prompts. Use this for non-code prompt b
 ## 5. Apply direct edits
 - Edit target files directly. Keep changes limited to requested OpenCode agent/command behavior.
 - For model-facing behavior, write rules into executable command/agent/reviewer prompts.
+- Write command bodies as user messages and agent/reviewer bodies as system prompts.
+- When changing prompt-writing behavior, update runner prompt and reviewer enforcement together when future drift should be caught.
+- When changing review action/cache semantics, update primary runners, reviewer/adjudicator prompts, shared pattern docs, and `_iterate/edit-reviewers/instruction-quality.md` together.
 - When merging reviewers, update caller routing, task permissions, cache/output names, reviewer prompts, and scope boundaries together.
 - Prefer structural prompt changes over added prose.
 - Do not read or modify `opencode-source/`.
@@ -131,6 +151,8 @@ Log shape:
 - Status: WRITTEN | FALLBACK_WRITTEN | MISSING
 
 ## Classification
+- Prompt Kind: <command | agent | reviewer | docs | mixed>
+- Consumer: <LLM-runtime | human-doc | machine-output | mixed>
 - Behavior Traits: <comma-separated>
 - Focus Signals: <comma-separated>
 - Risk Flags: <comma-separated>
@@ -179,7 +201,7 @@ Log shape:
   - `instruction-quality`: `log_path`, `cache_path: instruction_quality_cache_path`, `changed_paths`, `target_summary`, `risk_flags`.
 - Reviewers must write only the provided `cache_path`.
 - Omit reviewer Focus, Process, Output, role text, and blanket read orders.
-- Validate each response starts with `# REVIEW`, has `Decision: PASS | ADVISORY | BLOCKING`, `Cache:`, `## Findings`, and `## Verified`.
+- Validate each response starts with `# REVIEW`, has `Decision: PASS | ADVISORY | BLOCKING`, `## Findings`, and `## Verified`.
 - For BLOCKING findings, read the named cache, apply the smallest fix, update `log_path`, and rerun only reviewers whose domain or changed paths are touched.
 - For ADVISORY findings, record in log. Fix only when cheap and aligned with request.
 - Stop when no BLOCKING findings remain or after 5 review iterations. At cap, return `INCOMPLETE` if BLOCKING remains.

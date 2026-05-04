@@ -75,7 +75,7 @@ Good: name, values, and messages reinforce one promise.
 
 # Process
 
-{file:./rules/branding-review/shared-process-pre.md}
+{{ file="./rules/branding-review/shared-process-pre.md" }}
 
 4. Inspect selected content
 - Read `<artifact_base>.draft.md` for in-scope sections (Project Read, Naming Criteria, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone, Visual Direction).
@@ -83,7 +83,7 @@ Good: name, values, and messages reinforce one promise.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
-{file:./rules/branding-review/shared-process-post.md}
+{{ file="./rules/branding-review/shared-process-post.md" }}
 
 # Output
 
@@ -91,7 +91,6 @@ Good: name, values, and messages reinforce one promise.
 # REVIEW
 Agent: _branding/reviewers/positioning
 Decision: PASS | ADVISORY | BLOCKING
-Cache: <path to `.review-positioning.md`>
 Domains: POS
 
 ## Findings
@@ -119,7 +118,7 @@ Fix: <concrete correction or alternative>
 - <optional short notes>
 ```
 
-Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `Cache:`, `## Findings`, and `## Verified`; write `- None` under empty sections.
+Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections.
 
 # Constraints
 

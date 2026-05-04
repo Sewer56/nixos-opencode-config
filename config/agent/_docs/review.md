@@ -83,7 +83,7 @@ Max 5 iterations.
 a. Write `handoff_path` with scope, per-file Delta, and Change Plan before first reviewer pass. Per-file Delta entries track: file path, sections changed, scope level.
    Include `Status: New | Changed | Unchanged` in each entry. Mark unchanged files as `Unchanged`.
 
-b. Run four reviewers in parallel: `@_docs/reviewers/clarity`, `@_docs/reviewers/wording`, `@_docs/reviewers/engagement`, `@_docs/reviewers/consistency`. Pass only: `handoff_path`. Reviewers read the actual documentation files and use the handoff to determine which files and sections are in scope.
+b. Run four reviewers in parallel: `@_docs/reviewers/clarity`, `@_docs/reviewers/wording-cached`, `@_docs/reviewers/engagement`, `@_docs/reviewers/consistency-cached`. Pass only: `handoff_path`. Reviewers read the actual documentation files and use the handoff to determine which files and sections are in scope.
 
 c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified`. All 4 reviewers are diff-mandated — confirm each finding contains a unified diff block. Treat missing diffs as protocol violation requiring retry.
 
@@ -93,9 +93,19 @@ e. Apply reviewer diffs via targeted edits; fall back to `Fix:` prose. Reject di
 
 f. Recompute Delta. Re-run all reviewers after every material revision (any substantive change to doc content — not cosmetic fixes like whitespace or typo corrections). Loop until no findings or 5 iterations.
 
+   After a fix, rerun only reviewers whose domain changed. Do not rerun unrelated domains.
+
 ## 6. Handle feedback
 
-On explicit confirmation: return `Status: READY`. On user feedback: apply changes, update Delta, re-run review loop. Otherwise return `Status: DRAFT` with reminder: "Re-review available — say 'review' to re-run reviewers."
+- On explicit confirmation:
+  - Run final consistency audit with `@_docs/reviewers/consistency-cacheless`.
+  - Run final wording audit with `@_docs/reviewers/wording-cacheless` only after late operational/protocol/command changes or prior wording BLOCKING findings.
+  - Ignore caches and Delta shortcuts.
+  - Return all current findings.
+  - If BLOCKING: fix, recompute Delta, rerun touched reviewers, then re-audit.
+  - If no BLOCKING: return `Status: READY`.
+- On feedback: apply it, update Delta, and re-run the loop.
+- Otherwise return `Status: DRAFT` with: "Re-review available — say 'review' to re-run reviewers."
 
 # Output
 

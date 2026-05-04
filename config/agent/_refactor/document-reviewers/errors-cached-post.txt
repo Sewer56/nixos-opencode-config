@@ -1,0 +1,42 @@
+# Output
+
+```text
+# REVIEW
+Agent: _refactor/document-reviewers/errors
+Decision: PASS | ADVISORY | BLOCKING
+
+## Findings
+### [DERR-NNN]
+Category: COVERAGE | SPECIFICITY | FIDELITY
+Severity: BLOCKING | ADVISORY
+Evidence: <`path:line`, or missing element>
+Lines: ~<start line>-<end line> | None
+Problem: <what is wrong>
+Fix: <smallest concrete correction>
+~~~diff
+<path/to/source/file>
+--- a/<path/to/source/file>
++++ b/<path/to/source/file>
+ unchanged context
+-missing or vague error docs
++concrete # Errors docs
+ unchanged context
+~~~
+
+## Verified
+- <path>: <item description — unchanged items that remain verified>
+
+## Notes
+- <optional short notes>
+```
+
+Return ONLY the block above. Always include `## Findings` and `## Verified`; write `- None` under empty sections.
+
+# Constraints
+
+- Flag missing `# Errors` sections on public error-returning APIs as BLOCKING per the errors rules.
+- Include a unified diff after every finding's `Fix:` field.
+
+# Rules
+
+{{ file="./rules/docs/errors.md" }}

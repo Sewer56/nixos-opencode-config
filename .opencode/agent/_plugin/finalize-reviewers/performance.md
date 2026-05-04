@@ -16,7 +16,7 @@ permission:
   external_directory: allow
 ---
 
-Review only the performance-sensitive parts of a finalized plugin plan.
+Review only the performance-sensitive parts of step artifacts.
 
 # Inputs
 - `handoff_path`

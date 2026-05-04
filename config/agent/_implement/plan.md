@@ -21,7 +21,8 @@ permission:
   external_directory: allow
   task:
     "*": "deny"
-    "_implement/plan-reviewer": "allow"
+    "_implement/plan-reviewer-adjudicator-cached": "allow",
+    "_implement/plan-reviewer-adjudicator-cacheless": "allow"
 ---
 
 Implements a finalized plan with automated review.
@@ -124,7 +125,22 @@ Reason: this merges `~11-16`, `~28-35`, and `~79-85` into one large range.
 Apply steps in Step Index order using the ranged reads from step 1. After each cohesive group of changes: format, lint, build, test. Iterate until all checks pass.
 
 ## 3. Review loop
-Spawn `@_implement/plan-reviewer`, passing the path to `HANDOFF_DOCUMENT`. If findings (BLOCKING or ADVISORY): fix all, re-review. Repeat until `Decision: PASS` or 5 total iterations.
+Spawn `@_implement/plan-reviewer-adjudicator-cached` with:
+- `handoff_path: HANDOFF_DOCUMENT`
+- `cache_path: HANDOFF_DOCUMENT` with `.handoff.md` replaced by `.review-implementation.md`
+
+After each review response:
+- Read `actions_path` for current findings and fixes.
+- If the actions file is malformed, truncated, ambiguous, or insufficient: retry/rerun the reviewer.
+- The cache is reviewer-owned state; the caller does not read it.
+- If findings are BLOCKING or ADVISORY: fix all, then re-review.
+- Repeat until `Decision: PASS` or 5 total iterations.
+
+Before `Status: SUCCESS`:
+- Run one final audit with `@_implement/plan-reviewer-adjudicator-cacheless` and canonical `cache_path`.
+  - Read `actions_path` for current findings and fixes.
+- The cache is audit ledger state; the caller does not read it.
+- If BLOCKING: fix, rerun touched, then re-audit.
 
 ## 4. Report
 Return exactly:

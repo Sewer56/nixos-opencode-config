@@ -1,0 +1,48 @@
+# Process
+1. Load cache
+- Use explicit `cache_path` when provided. Otherwise derive cache path from artifact_base: `<artifact_base>.draft.handoff.md` → `<artifact_base>.draft.review-correctness.md`. Read if exists; treat missing/malformed as empty.
+- Use explicit `actions_path` when provided. Otherwise glob existing `<cache_path without .md>.actions.*.md` files and choose the next three-digit `<nnn>` path, starting `001`.
+- Treat the cache as one record per `[P#]` with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
+
+2. Read Delta and Decisions
+- Read `## Delta` from `draft_handoff_path`.
+- Read `### Decisions` only when it is non-empty.
+
+3. Select [P#] items to inspect
+- Carry forward Verified items that are Unchanged in Delta.
+- Re-evaluate Changed and New items.
+- Re-evaluate own Open items from cache and decision-referenced items.
+
+4. Inspect selected content
+- Read `context_path` for the selected `[P#]` items.
+- Check Open→Resolved transitions.
+- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
+
+5. Update cache
+- Write cache in this format:
+```markdown
+# Review Cache: <domain>
+Latest Actions: <actions_path>
+
+## Verified Observations
+- [P#]: <grounding snapshot — one line each>
+
+## Finding Ledger
+| ID | Status | Category | Severity | Introduced In | Latest Action | Resolution |
+|---|---|---|---|---|---|---|
+| XXX-NNN | OPEN | — | — | — | — | — |
+```
+- If the derived cache file is missing or malformed: write the full cache file.
+- Otherwise: use targeted edits to update only entries that changed.
+  - Replace entries whose fields changed.
+  - Insert new ledger entries in the appropriate section.
+  - Remove pruned `[P#]` ids.
+  - Move entries between sections when status transitions (e.g., Open → Resolved).
+- Leave entries whose content has not changed exactly as they are.
+
+6. Emit the final review block
+- Write `actions_path` with only current OPEN findings the caller/adjudicator must act on. Do not include resolved findings, full Verified Observations, prior history, or merge notes.
+- Emit only the pointer `# REVIEW` block from `# Output`.
+
+# Constraints
+- Do not search for unrelated issues; adjudicate the two reviewer caches.
