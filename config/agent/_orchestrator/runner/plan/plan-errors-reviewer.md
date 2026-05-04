@@ -166,4 +166,4 @@ Acceptance Criteria: The affected implementation step includes a concrete `# Err
 
 # Rules
 
-{file:./rules/errors.md}
+{file:./rules/docs/errors.md}

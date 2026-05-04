@@ -180,5 +180,5 @@ Say "go" to apply this plan, or suggest changes.
 
 # Rules
 
-{file:./rules/testing.md}
-{file:./rules/test-parameterization.md}
+{file:./rules/testing/testing.md}
+{file:./rules/testing/test-parameterization.md}

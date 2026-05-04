@@ -225,6 +225,6 @@ Acceptance Criteria: All tests pass or failure is explained and justified
 
 Apply these rules:
 
-{file:./rules/testing.md}
-{file:./rules/test-parameterization.md}
-{file:./rules/code-placement.md}
+{file:./rules/testing/testing.md}
+{file:./rules/testing/test-parameterization.md}
+{file:./rules/quality/code-placement.md}

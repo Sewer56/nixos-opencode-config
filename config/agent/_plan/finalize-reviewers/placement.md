@@ -126,4 +126,4 @@ Your final response MUST be exactly the fenced block above. No prose before or a
 
 # Rules
 
-{file:./rules/code-placement.md}
+{file:./rules/quality/code-placement.md}

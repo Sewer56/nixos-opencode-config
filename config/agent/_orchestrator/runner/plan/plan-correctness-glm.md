@@ -214,11 +214,11 @@ Acceptance Criteria: All referenced symbols are defined or mapped to existing co
 # Rules
 
 {file:./rules/_orchestrator/plan-content.md}
-{file:./rules/general.md}
-{file:./rules/performance.md}
-{file:./rules/testing.md}
-{file:./rules/test-parameterization.md}
-{file:./rules/code-placement.md}
-{file:./rules/documentation.md}
+{file:./rules/quality/general.md}
+{file:./rules/quality/performance.md}
+{file:./rules/testing/testing.md}
+{file:./rules/testing/test-parameterization.md}
+{file:./rules/quality/code-placement.md}
+{file:./rules/docs/documentation.md}
 {file:./rules/_orchestrator/orchestration-plan.md}
 {file:./rules/_orchestrator/orchestration-revision.md}

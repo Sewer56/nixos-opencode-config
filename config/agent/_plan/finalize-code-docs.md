@@ -98,6 +98,6 @@ Next Command: /plan/finalize-user-docs
 
 Apply these rules:
 
-{file:./rules/general.md}
-{file:./rules/documentation.md}
-{file:./rules/errors.md}
+{file:./rules/quality/general.md}
+{file:./rules/docs/documentation.md}
+{file:./rules/docs/errors.md}

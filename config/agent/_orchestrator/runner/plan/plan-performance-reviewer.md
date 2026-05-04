@@ -219,4 +219,4 @@ Acceptance Criteria: No unnecessary cloning of large data structures
 
 # Rules
 
-{file:./rules/performance.md}
+{file:./rules/quality/performance.md}

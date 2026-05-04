@@ -79,4 +79,4 @@ Return ONLY the block above — no introduction, no summary, no conversational w
 
 # Rules
 
-{file:./rules/errors.md}
+{file:./rules/docs/errors.md}

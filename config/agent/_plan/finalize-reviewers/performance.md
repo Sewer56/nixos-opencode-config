@@ -103,4 +103,4 @@ Fix: <diff or prose>
 
 # Rules
 
-{file:./rules/performance.md}
+{file:./rules/quality/performance.md}

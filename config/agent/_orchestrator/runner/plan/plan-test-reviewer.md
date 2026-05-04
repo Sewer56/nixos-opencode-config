@@ -217,5 +217,5 @@ Acceptance Criteria: One test with six descriptive cases
 
 # Rules
 
-{file:./rules/testing.md}
-{file:./rules/test-parameterization.md}
+{file:./rules/testing/testing.md}
+{file:./rules/testing/test-parameterization.md}

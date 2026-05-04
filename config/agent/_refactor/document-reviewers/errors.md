@@ -77,4 +77,4 @@ Return ONLY the block above. Always include `Cache:`, `## Findings`, and `## Ver
 
 # Rules
 
-{file:./rules/errors.md}
+{file:./rules/docs/errors.md}

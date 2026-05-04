@@ -165,4 +165,4 @@ Acceptance Criteria: The affected implementation step includes concrete doc snip
 
 # Rules
 
-{file:./rules/documentation.md}
+{file:./rules/docs/documentation.md}

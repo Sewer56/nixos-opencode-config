@@ -184,5 +184,5 @@ Acceptance Criteria: Direct implementation without trait, or justification for t
 
 # Rules
 
-{file:./rules/general.md}
-{file:./rules/code-placement.md}
+{file:./rules/quality/general.md}
+{file:./rules/quality/code-placement.md}
