@@ -81,7 +81,7 @@ a. Write `<artifact_base>.draft.handoff.md` with scope, Delta, and search findin
 
 b. Run four reviewers in parallel: `@_branding/reviewers/clarity`, `@_branding/reviewers/distinctiveness`, `@_branding/reviewers/positioning`, `@_branding/reviewers/availability`. Pass only: `branding_path` (`<artifact_base>.draft.md`), `handoff_path` (`<artifact_base>.draft.handoff.md`), scope boundaries, and user notes.
 
-c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified`. All 4 reviewers are diff-mandated — confirm each finding contains a unified diff block. Treat missing diffs as protocol violation requiring retry.
+c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `Cache:`, `## Findings` and `## Verified`. All 4 reviewers are diff-mandated — confirm each finding contains a unified diff block. Treat missing diffs as protocol violation requiring retry.
 
 d. Record only cross-domain arbitration (disagreements spanning two or more reviewer domains) in `### Decisions` in `handoff_path`. Apply domain ownership: CLARITY → clarity; DISTINCTIVENESS → distinctiveness; POSITIONING → positioning; AVAILABILITY → availability.
 

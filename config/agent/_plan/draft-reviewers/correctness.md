@@ -128,12 +128,15 @@ Resolution: <only for RESOLVED>
 # REVIEW
 Agent: correctness
 Decision: PASS | ADVISORY | BLOCKING
+Cache: <path to `.draft.review-correctness.md`>
+Domains: COR
 
 ## Findings
 ### [COR-001]
 Category: FIDELITY | TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or missing element>
+Lines: ~<start line>-<end line> | None
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
 ~~~diff
@@ -149,11 +152,11 @@ Fix: <smallest concrete correction>
 ## Verified
 - [P#]: <item description — unchanged items that remain verified>
 
+## Notes
+- <optional short notes>
 ```
 
-Return ONLY the block above — no introduction, no summary, no conversational
-wrapper, no text before `# REVIEW` or after the `## Verified` block.
-Any content outside this format is a protocol violation.
+Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the `## Notes` block. Always include `Cache:`, `## Findings`, and `## Verified`; write `- None` under empty sections.
 
 # Constraints
 - Block for missing required sections, invalid diff headers, or implementation-prescriptive snippets that should be illustrative.

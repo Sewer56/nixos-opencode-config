@@ -92,18 +92,18 @@ Follow the ordered steps below.
 - If correctness returns BLOCKING: fix and re-run correctness. Do NOT proceed to stage 2 until correctness is PASS or ADVISORY-only.
 - If correctness returns PASS or ADVISORY-only: proceed to stage 2.
 
-3. Stage 2 — Documentation + Wording
-- Run in parallel: `@_plan/draft-reviewers/documentation`, `@_plan/draft-reviewers/wording`.
+3. Stage 2 — Documentation and Wording
+- Run `@_plan/draft-reviewers/docs-and-wording`.
 - Include: `plan_path` and `draft_handoff_path`.
 - Validate, apply fixes, recompute Delta.
 
 4. Validate each reviewer response
-- `# REVIEW` header, `Decision:`, `## Findings`, `## Verified`. All 3 reviewers are diff-mandated.
+- `# REVIEW` header, `Decision:`, `Cache:`, `## Findings`, `## Verified`. Both reviewers are diff-mandated.
 - Treat malformed output as BLOCKING after retries.
 
 5. Record decisions and apply domain ownership
 - Update `### Decisions` in `draft_handoff_path`.
-- Apply domain ownership: CORRECTNESS → correctness; DOC → documentation; WORDING → wording.
+- Apply domain ownership: CORRECTNESS → correctness; DOC → docs-and-wording; WORDING → docs-and-wording.
 
 6. Revise `<artifact_base>.draft.md` when findings require it
 - Apply reviewer diffs via targeted edits; fall back to `Fix:` prose.

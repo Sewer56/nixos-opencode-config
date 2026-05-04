@@ -16,8 +16,6 @@ permission:
   list: allow
   todowrite: allow
   external_directory: allow
-  # edit: deny
-  # task: deny
 ---
 
 Review an implementation against a finalized plan.
@@ -45,6 +43,7 @@ Decision: PASS | BLOCKING | ADVISORY
 ### [F-001]
 Severity: BLOCKING | ADVISORY
 File: <path>
+Lines: ~<start line>-<end line> | None
 Problem: <what is wrong>
 Fix: <smallest concrete correction>
 ~~~diff

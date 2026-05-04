@@ -75,18 +75,7 @@ Good: name, values, and messages reinforce one promise.
 
 # Process
 
-1. Load cache
-- Derive cache path from `handoff_path`: replace the `.handoff.md` suffix with `.review-positioning.md`. Read the cache file if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per candidate name or brand element with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
-
-2. Read handoff
-- Read `## Delta` for change tracking.
-- Read `### Decisions` only when non-empty.
-
-3. Select in-scope content
-- Carry forward Verified entries that are Unchanged in Delta.
-- Re-evaluate Changed and New entries.
-- Re-evaluate own Open entries from cache and decision-referenced entries.
+{file:./rules/branding-review/shared-process-pre.md}
 
 4. Inspect selected content
 - Read `<artifact_base>.draft.md` for in-scope sections (Project Read, Naming Criteria, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone, Visual Direction).
@@ -94,17 +83,7 @@ Good: name, values, and messages reinforce one promise.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
-5. Update cache
-- If the cache file is missing or malformed: write the full cache file.
-- Otherwise: use targeted edits to update only entries that changed.
-  - Replace entries whose fields changed.
-  - Insert new entries in the appropriate section.
-  - Remove pruned entries.
-  - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Leave entries whose content has not changed exactly as they are.
-
-6. Emit the final review block
-- Emit the `# REVIEW` block from `# Output`.
+{file:./rules/branding-review/shared-process-post.md}
 
 # Output
 
@@ -112,12 +91,15 @@ Good: name, values, and messages reinforce one promise.
 # REVIEW
 Agent: _branding/reviewers/positioning
 Decision: PASS | ADVISORY | BLOCKING
+Cache: <path to `.review-positioning.md`>
+Domains: POS
 
 ## Findings
 ### [POS-NNN]
 Category: PURPOSE_MISMATCH | AUDIENCE_MISMATCH | EMOTIONAL_TONE_INCONSISTENCY | WEAK_BRAND_STORY | TAGLINE_MESSAGE_DISCONNECT | EXTENSIBILITY_LIMITATION | VALUE_NAME_DISCONNECT
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
+Lines: ~<start line>-<end line> | None
 Problem: <what positioning issue undermines brand coherence>
 Fix: <concrete correction or alternative>
 ~~~diff
@@ -137,7 +119,7 @@ Fix: <concrete correction or alternative>
 - <optional short notes>
 ```
 
-Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
+Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `Cache:`, `## Findings`, and `## Verified`; write `- None` under empty sections.
 
 # Constraints
 

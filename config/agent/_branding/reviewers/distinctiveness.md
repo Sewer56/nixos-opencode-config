@@ -60,19 +60,7 @@ Good: candidate can be searched with project domain and still find relevant resu
 
 # Process
 
-1. Load cache
-- Derive cache path from `handoff_path`: replace the `.handoff.md` suffix with `.review-distinctiveness.md`. Read the cache file if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per candidate name with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
-
-2. Read handoff
-- Read `## Delta` for change tracking.
-- Read `### Decisions` only when non-empty.
-- Read search findings section for external duplicate/availability data.
-
-3. Select in-scope content
-- Carry forward Verified entries that are Unchanged in Delta.
-- Re-evaluate Changed and New entries.
-- Re-evaluate own Open entries from cache and decision-referenced entries.
+{file:./rules/branding-review/shared-process-pre.md}
 
 4. Inspect selected content
 - Read `<artifact_base>.draft.md` for in-scope sections (Candidate Shortlist, Top Recommendation, Risk and Availability Notes).
@@ -81,17 +69,7 @@ Good: candidate can be searched with project domain and still find relevant resu
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
 
-5. Update cache
-- If the cache file is missing or malformed: write the full cache file.
-- Otherwise: use targeted edits to update only entries that changed.
-  - Replace entries whose fields changed.
-  - Insert new entries in the appropriate section.
-  - Remove pruned entries.
-  - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Leave entries whose content has not changed exactly as they are.
-
-6. Emit the final review block
-- Emit the `# REVIEW` block from `# Output`.
+{file:./rules/branding-review/shared-process-post.md}
 
 # Output
 
@@ -99,12 +77,15 @@ Good: candidate can be searched with project domain and still find relevant resu
 # REVIEW
 Agent: _branding/reviewers/distinctiveness
 Decision: PASS | ADVISORY | BLOCKING
+Cache: <path to `.review-distinctiveness.md`>
+Domains: DST
 
 ## Findings
 ### [DST-NNN]
 Category: GENERIC_NAME | OVERUSED_SUFFIX | NEAR_DUPLICATE_LIST | DUPLICATE_COLLISION | WEAK_SEARCHABILITY
 Severity: BLOCKING | ADVISORY
 Evidence: <section, `path:line`, or field>
+Lines: ~<start line>-<end line> | None
 Problem: <what distinctiveness issue undermines the name choice>
 Fix: <concrete correction or alternative>
 ~~~diff
@@ -124,7 +105,7 @@ Fix: <concrete correction or alternative>
 - <optional short notes>
 ```
 
-Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Any content outside this format is a protocol violation.
+Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `Cache:`, `## Findings`, and `## Verified`; write `- None` under empty sections.
 
 # Constraints
 
