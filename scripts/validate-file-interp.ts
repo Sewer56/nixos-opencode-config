@@ -11,6 +11,7 @@ const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
 const CONFIG_DIR = path.resolve(SCRIPT_DIR, "../config")
 const SKIP_DIRS = new Set([".git", ".logs", "node_modules"])
 const FILE_TEMPLATE_RE = /\{\{\s*file\s*=/g
+const INLINE_CONDITIONAL_RE = /\{\{\s*(?:if\s*=|endif\b)/g
 
 interface ValidationFailure {
   file: string
@@ -42,6 +43,17 @@ async function main(): Promise<void> {
         line: loc.line,
         column: loc.column,
         message: "unexpanded file template remains after render",
+      })
+    }
+
+    INLINE_CONDITIONAL_RE.lastIndex = 0
+    while ((match = INLINE_CONDITIONAL_RE.exec(result.text)) !== null) {
+      const loc = lineColumn(result.text, match.index)
+      failures.push({
+        file: rel,
+        line: loc.line,
+        column: loc.column,
+        message: "unexpanded inline conditional remains after render",
       })
     }
   }

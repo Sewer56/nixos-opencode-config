@@ -1,6 +1,7 @@
 /**
- * File Interpolation plugin — recursively expands {arg:...}, {env:...}, and
- * `{{ file="..." }}` templates in .md agent prompts.
+ * File Interpolation plugin — recursively expands {arg:...}, {env:...},
+ * inline `{{ if=... }}...{{ endif }}` conditionals, and `{{ file="..." }}`
+ * templates in .md agent prompts.
  *
  * OpenCode already supports native secret-file interpolation in JSON config files,
  * but .md agent/command/mode/skill files receive no interpolation. This plugin
@@ -15,8 +16,8 @@
  *
  * Agents and commands load into the system prompt; templates in those files are
  * expanded before the LLM sees them. Plain-text variable references like
- * `GENERAL_RULES_PATH` are left untouched — only {arg:...}, {env:...}, and
- * `{{ file="..." }}` match.
+ * `GENERAL_RULES_PATH` are left untouched — only {arg:...}, {env:...}, inline
+ * conditionals, and `{{ file="..." }}` match.
  *
  * # Supported tokens
  * - `{{ file="~/.secrets/key" }}`  — absolute or ~-relative file content
@@ -25,6 +26,10 @@
  * - `{{ file="./path" key=val key2="val with spaces" }}` — file with caller args
  * - `{{ file="./path" if=arg_key }}` — include only when arg is non-empty
  * - `{{ file="./path" if=mode==cached }}` — include only when arg exactly matches
+ * - `{{ if=arg_key }}...{{ endif }}` — include block only when arg is non-empty
+ * - `{{ if=mode==cached }}...{{ endif }}` — include block only when arg exactly matches
+ * - `{{ if=env:VAR_NAME }}...{{ endif }}` — include block only when env var is non-empty
+ * - `{{ if=env:VAR_NAME==value }}...{{ endif }}` — include block only when env var exactly matches
  * - `{env:VAR_NAME}`               — environment variable value
  * - `{arg:key}`                    — caller-provided arg value inside embedded files
  *
@@ -36,12 +41,15 @@
  * - `if` is reserved and is not passed as an arg
  * - `if=arg_key` checks whether the current arg is non-empty
  * - `if=arg_key==value` checks exact string equality; no expression parser
+ * - `if=env:VAR_NAME` checks whether an environment variable is non-empty
+ * - `if=env:VAR_NAME==value` checks exact environment-variable equality
  * - Args set on the same `{{ file="..." }}` call can satisfy `if`, and override outer args
- * - Expansion order: {arg:} → {env:} → `{{ file="..." }}`
+ * - Expansion order: {arg:} → {env:} → inline `{{ if=... }}` → `{{ file="..." }}`
  *
  * # Template style
  * - Use `{{ file="..." }}` for file imports; legacy colon syntax is not supported
  * - `file` must be the first attribute for fast detection
+ * - Use `{{ if=... }}...{{ endif }}` for inline conditionals; `else` is intentionally unsupported
  * - Any whitespace is allowed after `{{`, between attributes, and before `}}`
  * - Prefer multiline templates when passing args:
  *   ```markdown
@@ -56,7 +64,8 @@
  *
  * # Raw inlining
  * Inlined content is recursively expanded, then spliced into the prompt.
- * At `MAX_DEPTH`, `{{ file="..." }}` templates are left literal; `{env:...}` still expands.
+ * At `MAX_DEPTH`, `{{ file="..." }}` templates are left literal; `{env:...}`
+ * and inline conditionals still expand.
  *
  * # Usage
  * In any .md agent file:
@@ -84,8 +93,8 @@ import fs from "node:fs"
 // ── Entry point ──────────────────────────────────────────────────────────────
 
 /**
- * OpenCode plugin that expands {arg:...}, {env:...}, and `{{ file="..." }}` templates
- * in .md agent system prompts.
+ * OpenCode plugin that expands {arg:...}, {env:...}, inline conditionals, and
+ * `{{ file="..." }}` templates in .md agent system prompts.
  *
  * Captures `directory` from `PluginInput` at init time to resolve relative
  * paths. Rewrites every system prompt entry that contains tokens; no-op
@@ -181,7 +190,8 @@ interface SyncExpandResult {
 }
 
 interface IfCondition {
-  argKey: string
+  source: "arg" | "env"
+  key: string
   expected?: string
 }
 
@@ -257,6 +267,8 @@ const FILE_TEMPLATE_START = "{{"
 const FILE_TEMPLATE_END = "}}"
 const FILE_ATTR = "file"
 const IF_ATTR = "if"
+const ENDIF_ATTR = "endif"
+const ENV_CONDITION_PREFIX = "env:"
 const ENV_PREFIX = "{env:"
 const ARG_PREFIX = "{arg:"
 const TOKEN_END = "}"
@@ -266,7 +278,7 @@ function hasExpandableToken(text: string): boolean {
   let start = text.indexOf(TOKEN_START)
   while (start !== -1) {
     const next = text.charCodeAt(start + 1)
-    if (next === 123 && startsFileTemplate(text, start)) return true // {
+    if (next === 123 && (startsFileTemplate(text, start) || startsInlineIfTemplate(text, start))) return true // {
     if (next === 101 && text.startsWith(ENV_PREFIX, start)) return true // e
     if (next === 97 && text.startsWith(ARG_PREFIX, start)) return true // a
     start = text.indexOf(TOKEN_START, start + 1)
@@ -281,6 +293,17 @@ function startsFileTemplate(text: string, start: number): boolean {
   while (i < text.length && isTemplateSpace(text.charCodeAt(i))) i++
   if (!text.startsWith(FILE_ATTR, i)) return false
   i += FILE_ATTR.length
+  while (i < text.length && isTemplateSpace(text.charCodeAt(i))) i++
+  return text.charCodeAt(i) === 61 // =
+}
+
+/** Fast check for `{{ if=... }}`. Requires `if` first by style rule. */
+function startsInlineIfTemplate(text: string, start: number): boolean {
+  if (!text.startsWith(FILE_TEMPLATE_START, start)) return false
+  let i = start + FILE_TEMPLATE_START.length
+  while (i < text.length && isTemplateSpace(text.charCodeAt(i))) i++
+  if (!text.startsWith(IF_ATTR, i)) return false
+  i += IF_ATTR.length
   while (i < text.length && isTemplateSpace(text.charCodeAt(i))) i++
   return text.charCodeAt(i) === 61 // =
 }
@@ -304,15 +327,17 @@ export function resolvePath(raw: string, baseDir: string): string {
 }
 
 /**
- * Expand {arg:key}, {env:VAR}, and `{{ file="path" }}` templates in `text`.
+ * Expand {arg:key}, {env:VAR}, inline `{{ if=... }}` blocks, and
+ * `{{ file="path" }}` templates in `text`.
  *
  * Arg substitution runs first (synchronous), then environment substitution
- * (synchronous), then file substitution (async reads). File content is
- * recursively expanded if it contains further {arg:...}, {env:...}, or
- * file templates, up to MAX_DEPTH levels deep. At depth ≥ MAX_DEPTH,
- * file templates are left as literal text; {arg:...} and {env:...} tokens
- * are still expanded. Cycles are detected via ancestor-path tracking — a template
- * referencing a file in its own ancestor chain resolves to empty string.
+ * (synchronous), then inline conditional substitution (synchronous), then file
+ * substitution (async reads). File content is recursively expanded if it contains
+ * further {arg:...}, {env:...}, inline conditionals, or file templates, up to
+ * MAX_DEPTH levels deep. At depth ≥ MAX_DEPTH, file templates are left as literal
+ * text; {arg:...}, {env:...}, and inline conditionals are still expanded. Cycles
+ * are detected via ancestor-path tracking — a template referencing a file in its
+ * own ancestor chain resolves to empty string.
  *
  * An optional `ExpandContext` carries recursion state (cycle guard, depth
  * counter, raw I/O cache, scoped args). External callers should omit it — a
@@ -325,8 +350,9 @@ export async function expand(text: string, baseDir: string, ctx?: ExpandContext)
 
   const hasArg = text.includes(ARG_PREFIX)
   const hasEnv = text.includes(ENV_PREFIX)
-  let hasFile = text.includes(FILE_TEMPLATE_START)
-  if (!hasArg && !hasEnv && !hasFile) return text
+  const hasTemplate = text.includes(FILE_TEMPLATE_START)
+  let hasFile = hasTemplate
+  if (!hasArg && !hasEnv && !hasTemplate) return text
 
   let protectedRanges = EMPTY_RANGES
 
@@ -343,6 +369,17 @@ export async function expand(text: string, baseDir: string, ctx?: ExpandContext)
     const envResult = expandEnvTokens(text, protectedRanges)
     text = envResult.text
     protectedRanges = envResult.protectedRanges
+  }
+
+  // Inline conditionals run before file substitution so file templates inside
+  // false branches are removed before any filesystem read can be scheduled.
+  // Non-file file-template args are shielded because arg values are literal.
+  if (hasTemplate) {
+    const inlineProtectedRanges = mergeRanges(
+      protectedRanges,
+      collectFileArgRanges(text, protectedRanges),
+    )
+    text = expandInlineConditionals(text, ctx, inlineProtectedRanges)
   }
 
   if (!hasFile) hasFile = text.includes(FILE_TEMPLATE_START)
@@ -593,6 +630,202 @@ async function expandFileTokens(
   return out + tail
 }
 
+interface InlineIfTemplateSpec {
+  condition: IfCondition
+  /** Inclusive offset of the second `}` in the opening `{{ if=... }}` marker. */
+  end: number
+}
+
+interface InlineEndifTemplateSpec {
+  /** Inclusive offset of the first `{` in the closing `{{ endif }}` marker. */
+  start: number
+  /** Inclusive offset of the second `}` in the closing `{{ endif }}` marker. */
+  end: number
+}
+
+/**
+ * Expand inline conditional blocks in already arg/env-expanded text.
+ *
+ * False branches are removed before `expandFileTokens` runs, so file imports
+ * inside excluded blocks are never read. Marker replacements use the same empty
+ * sentinel as missing arg/env/file values, which lets `stripEmptyExpansionMarkers`
+ * remove marker-only lines while preserving inline spacing.
+ */
+function expandInlineConditionals(
+  text: string,
+  ctx: ExpandContext,
+  protectedRanges: ProtectedRange[],
+): string {
+  if (text.indexOf(FILE_TEMPLATE_START) === -1) return text
+  return expandInlineConditionalsInRange(text, 0, text.length, ctx, protectedRanges)
+}
+
+/**
+ * Expand all complete inline conditional blocks within one absolute text range.
+ *
+ * The scanner works on absolute offsets so protected arg-literal ranges remain
+ * valid through recursive calls. Malformed or unclosed blocks are left literal;
+ * validation later flags any remaining `{{ if=... }}` or `{{ endif }}` markers.
+ */
+function expandInlineConditionalsInRange(
+  text: string,
+  rangeStart: number,
+  rangeEnd: number,
+  ctx: ExpandContext,
+  protectedRanges: ProtectedRange[],
+): string {
+  let out = ""
+  let cursor = rangeStart
+  let searchFrom = rangeStart
+  let protectedIndex = advanceRangeIndex(protectedRanges, 0, rangeStart)
+  let changed = false
+
+  while (searchFrom < rangeEnd) {
+    const start = text.indexOf(FILE_TEMPLATE_START, searchFrom)
+    if (start === -1 || start >= rangeEnd) break
+
+    protectedIndex = advanceRangeIndex(protectedRanges, protectedIndex, start)
+    if (isInRange(protectedRanges, protectedIndex, start)) {
+      searchFrom = protectedRanges[protectedIndex].end
+      continue
+    }
+
+    const parsed = parseInlineIfTemplate(text, start, protectedRanges)
+    if (!parsed || parsed.end + 1 > rangeEnd) {
+      searchFrom = start + FILE_TEMPLATE_START.length
+      continue
+    }
+
+    const closing = findMatchingInlineEndif(text, parsed.end + 1, rangeEnd, protectedRanges)
+    if (!closing) {
+      searchFrom = parsed.end + 1
+      continue
+    }
+
+    out += text.slice(cursor, start) + EMPTY_EXPANSION_MARKER
+    if (shouldExpandForCondition(parsed.condition, ctx.args, EMPTY_ARGS)) {
+      out += expandInlineConditionalsInRange(
+        text,
+        parsed.end + 1,
+        closing.start,
+        ctx,
+        protectedRanges,
+      )
+    }
+    out += EMPTY_EXPANSION_MARKER
+
+    cursor = closing.end + 1
+    searchFrom = cursor
+    changed = true
+  }
+
+  return changed ? out + text.slice(cursor, rangeEnd) : text.slice(rangeStart, rangeEnd)
+}
+
+/**
+ * Find the `{{ endif }}` marker that closes an opening inline `{{ if=... }}`.
+ *
+ * Nested conditionals increment depth and must close before the outer block can
+ * close. Invalid marker-looking text is ignored so unrelated `{{ ... }}` content
+ * does not break parsing.
+ */
+function findMatchingInlineEndif(
+  text: string,
+  searchStart: number,
+  rangeEnd: number,
+  protectedRanges: ProtectedRange[],
+): InlineEndifTemplateSpec | undefined {
+  let depth = 1
+  let searchFrom = searchStart
+  let protectedIndex = advanceRangeIndex(protectedRanges, 0, searchStart)
+
+  while (searchFrom < rangeEnd) {
+    const start = text.indexOf(FILE_TEMPLATE_START, searchFrom)
+    if (start === -1 || start >= rangeEnd) return undefined
+
+    protectedIndex = advanceRangeIndex(protectedRanges, protectedIndex, start)
+    if (isInRange(protectedRanges, protectedIndex, start)) {
+      searchFrom = protectedRanges[protectedIndex].end
+      continue
+    }
+
+    const nested = parseInlineIfTemplate(text, start, protectedRanges)
+    if (nested && nested.end + 1 <= rangeEnd) {
+      depth++
+      searchFrom = nested.end + 1
+      continue
+    }
+
+    const closing = parseInlineEndifTemplate(text, start)
+    if (closing && closing.end + 1 <= rangeEnd) {
+      depth--
+      if (depth === 0) return closing
+      searchFrom = closing.end + 1
+      continue
+    }
+
+    searchFrom = start + FILE_TEMPLATE_START.length
+  }
+
+  return undefined
+}
+
+/**
+ * Parse an inline conditional opening marker: `{{ if=condition }}`.
+ *
+ * Accepted conditions are the same small grammar as file-template `if` attrs:
+ * `arg`, `arg==value`, `env:NAME`, and `env:NAME==value`. Anything malformed
+ * returns `undefined` and remains literal for validation.
+ */
+function parseInlineIfTemplate(
+  text: string,
+  start: number,
+  protectedRanges: ProtectedRange[],
+): InlineIfTemplateSpec | undefined {
+  if (!text.startsWith(FILE_TEMPLATE_START, start)) return undefined
+
+  let i = start + FILE_TEMPLATE_START.length
+  i = skipTemplateSpace(text, i)
+
+  const keyStart = i
+  i = scanTemplateKey(text, i)
+  if (i === keyStart || text.slice(keyStart, i) !== IF_ATTR) return undefined
+
+  i = skipTemplateSpace(text, i)
+  if (text.charCodeAt(i) !== 61) return undefined // =
+  i = skipTemplateSpace(text, i + 1)
+
+  const value = readTemplateValue(text, i, protectedRanges)
+  if (!value) return undefined
+  const condition = parseIfCondition(value.value)
+  if (!condition) return undefined
+  i = skipTemplateSpace(text, value.next)
+
+  if (!text.startsWith(FILE_TEMPLATE_END, i)) return undefined
+  return { condition, end: i + FILE_TEMPLATE_END.length - 1 }
+}
+
+/**
+ * Parse an inline conditional closing marker: `{{ endif }}`.
+ *
+ * Closing markers accept surrounding whitespace but no attributes. Non-matching
+ * `{{ ... }}` text returns `undefined` so other template forms can coexist.
+ */
+function parseInlineEndifTemplate(text: string, start: number): InlineEndifTemplateSpec | undefined {
+  if (!text.startsWith(FILE_TEMPLATE_START, start)) return undefined
+
+  let i = start + FILE_TEMPLATE_START.length
+  i = skipTemplateSpace(text, i)
+
+  const keyStart = i
+  i = scanTemplateKey(text, i)
+  if (i === keyStart || text.slice(keyStart, i) !== ENDIF_ATTR) return undefined
+
+  i = skipTemplateSpace(text, i)
+  if (!text.startsWith(FILE_TEMPLATE_END, i)) return undefined
+  return { start, end: i + FILE_TEMPLATE_END.length - 1 }
+}
+
 interface FileTemplateSpec {
   rawPath: string
   args: Map<string, string>
@@ -789,29 +1022,48 @@ function readUnquotedTemplateValue(
   }
 }
 
+/**
+ * Parse the small `if` condition grammar shared by file imports and inline blocks.
+ *
+ * Supported forms are `arg`, `arg==value`, `env:NAME`, and `env:NAME==value`.
+ * There is no expression parser, boolean algebra, negation, or empty-string
+ * equality check; invalid input returns `undefined` so the caller can leave the
+ * template literal intact for validation.
+ */
 function parseIfCondition(raw: string): IfCondition | undefined {
   if (raw.length === 0) return undefined
 
   const equality = raw.indexOf("==")
-  if (equality === -1) {
-    return isValidArgKey(raw) ? { argKey: raw } : undefined
+  const key = equality === -1 ? raw : raw.slice(0, equality)
+  const expected = equality === -1 ? undefined : raw.slice(equality + 2)
+  if (expected !== undefined && expected.length === 0) return undefined
+
+  if (key.startsWith(ENV_CONDITION_PREFIX)) {
+    const envKey = key.slice(ENV_CONDITION_PREFIX.length)
+    return isValidEnvKey(envKey) ? { source: "env", key: envKey, expected } : undefined
   }
 
-  const argKey = raw.slice(0, equality)
-  const expected = raw.slice(equality + 2)
-  if (!isValidArgKey(argKey) || expected.length === 0) return undefined
-  return { argKey, expected }
+  return isValidArgKey(key) ? { source: "arg", key, expected } : undefined
 }
 
+/**
+ * Evaluate a parsed condition against the current arg scope and process env.
+ *
+ * Args supplied on the same file-template call override inherited scoped args.
+ * Inline conditionals pass an empty template-arg map and therefore read only the
+ * current scoped args or environment variables.
+ */
 function shouldExpandForCondition(
   condition: IfCondition | undefined,
   scopedArgs: Map<string, string>,
   templateArgs: Map<string, string>,
 ): boolean {
   if (!condition) return true
-  const actual = templateArgs.has(condition.argKey)
-    ? templateArgs.get(condition.argKey)!
-    : scopedArgs.get(condition.argKey) ?? ""
+  const actual = condition.source === "env"
+    ? process.env[condition.key] ?? ""
+    : templateArgs.has(condition.key)
+      ? templateArgs.get(condition.key)!
+      : scopedArgs.get(condition.key) ?? ""
   return condition.expected === undefined
     ? actual.length > 0
     : actual === condition.expected
@@ -898,6 +1150,17 @@ function isValidArgKey(key: string): boolean {
   if (!isArgKeyStart(key.charCodeAt(0))) return false
   for (let i = 1; i < key.length; i++) {
     if (!isArgKeyChar(key.charCodeAt(i))) return false
+  }
+  return true
+}
+
+/** Validate environment variable keys used by `if=env:NAME` conditions. */
+function isValidEnvKey(key: string): boolean {
+  if (key.length === 0) return false
+  if (!isArgKeyStart(key.charCodeAt(0))) return false
+  for (let i = 1; i < key.length; i++) {
+    const code = key.charCodeAt(i)
+    if (!isArgKeyStart(code) && (code < 48 || code > 57)) return false
   }
   return true
 }

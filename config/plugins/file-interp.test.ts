@@ -419,6 +419,145 @@ describe("expand: file template if conditions", () => {
   })
 })
 
+// ── expand: inline conditional blocks ────────────────────────────────────────
+
+describe("expand: inline conditional blocks", () => {
+  test("if=arg includes block when scoped arg is non-empty", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "before\n{{ if=include_extra }}\nEXTRA\n{{ endif }}\nafter",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./outer.txt" include_extra=1 }}`, dir)
+    expect(result).toBe("before\nEXTRA\nafter")
+  })
+
+  test("if=arg removes block when scoped arg is absent", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "before\n{{ if=include_extra }}\nEXTRA\n{{ endif }}\nafter",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./outer.txt" }}`, dir)
+    expect(result).toBe("before\nafter")
+  })
+
+  test("if=arg==value includes only exact matches", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": [
+        "start",
+        "{{ if=mode==cached }}",
+        "CACHED",
+        "{{ endif }}",
+        "{{ if=mode==cacheless }}",
+        "CACHELESS",
+        "{{ endif }}",
+        "end",
+      ].join("\n"),
+    })
+    cleanup.push(dir)
+
+    const cached = await expand(`{{ file="./outer.txt" mode=cached }}`, dir)
+    const cacheless = await expand(`{{ file="./outer.txt" mode=cacheless }}`, dir)
+
+    expect(cached).toBe("start\nCACHED\nend")
+    expect(cacheless).toBe("start\nCACHELESS\nend")
+  })
+
+  test("if=env:VAR includes block when env var is non-empty", async () => {
+    const restore = withEnv("FILE_INTERP_INLINE_ENV", "enabled")
+    try {
+      const result = await expand(
+        "before\n{{ if=env:FILE_INTERP_INLINE_ENV }}\nENV\n{{ endif }}\nafter",
+        "/tmp",
+      )
+      expect(result).toBe("before\nENV\nafter")
+    } finally {
+      restore()
+    }
+  })
+
+  test("if=env:VAR==value includes only exact env matches", async () => {
+    const restore = withEnv("FILE_INTERP_INLINE_MODE", "cached")
+    try {
+      const result = await expand(
+        [
+          "start",
+          "{{ if=env:FILE_INTERP_INLINE_MODE==cached }}",
+          "CACHED",
+          "{{ endif }}",
+          "{{ if=env:FILE_INTERP_INLINE_MODE==cacheless }}",
+          "CACHELESS",
+          "{{ endif }}",
+          "end",
+        ].join("\n"),
+        "/tmp",
+      )
+      expect(result).toBe("start\nCACHED\nend")
+    } finally {
+      restore()
+    }
+  })
+
+  test("nested inline conditionals expand independently", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": [
+        "start",
+        "{{ if=outer }}",
+        "OUTER",
+        "{{ if=inner }}",
+        "INNER",
+        "{{ endif }}",
+        "DONE",
+        "{{ endif }}",
+        "end",
+      ].join("\n"),
+    })
+    cleanup.push(dir)
+
+    const both = await expand(`{{ file="./outer.txt" outer=1 inner=1 }}`, dir)
+    const outerOnly = await expand(`{{ file="./outer.txt" outer=1 }}`, dir)
+
+    expect(both).toBe("start\nOUTER\nINNER\nDONE\nend")
+    expect(outerOnly).toBe("start\nOUTER\nDONE\nend")
+  })
+
+  test("false inline block does not read file imports inside", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "before\n{{ if=mode==cached }}\n{{ file=\"./missing.txt\" }}\n{{ endif }}\nafter",
+    })
+    cleanup.push(dir)
+    const result = await expandWithDiagnostics(`{{ file="./outer.txt" mode=cacheless }}`, dir)
+    expect(result.text).toBe("before\nafter")
+    expect(result.diagnostics).toEqual([])
+  })
+
+  test("inline blocks can be used within a single line", async () => {
+    const dir = await makeTmpDir({ "outer.txt": "prefix {{ if=mode==cached }}CACHED{{ endif }} suffix" })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./outer.txt" mode=cached }}`, dir)
+    expect(result).toBe("prefix CACHED suffix")
+  })
+
+  test("inline conditional markers in arg values remain literal", async () => {
+    const dir = await makeTmpDir({ "tmpl.txt": "{arg:snippet}" })
+    cleanup.push(dir)
+    const result = await expand(
+      `{{ file="./tmpl.txt" snippet="{{ if=flag }}YES{{ endif }}" flag=1 }}`,
+      dir,
+    )
+    expect(result).toBe("{{ if=flag }}YES{{ endif }}")
+  })
+
+  test("invalid inline condition stays literal for validation", async () => {
+    const result = await expand("before\n{{ if=mode=bad }}\nX\n{{ endif }}\nafter", "/tmp")
+    expect(result).toBe("before\n{{ if=mode=bad }}\nX\n{{ endif }}\nafter")
+  })
+
+  test("unclosed inline condition stays literal for validation", async () => {
+    const result = await expand("before\n{{ if=flag }}\nX", "/tmp")
+    expect(result).toBe("before\n{{ if=flag }}\nX")
+  })
+})
+
 // ── expand: mixed tokens ──────────────────────────────────────────────────────
 
 describe("expand: mixed {env:...} and file templates", () => {
