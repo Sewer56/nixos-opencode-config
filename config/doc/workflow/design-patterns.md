@@ -476,3 +476,52 @@ OPT-004 | Carry-In: fenced text output
 
 Main agent applies only returned carry-ins.
 ```
+
+### OPT-016 — Adjudicated High-Risk Review
+
+- Scope: cross-workflow
+- Apply When: a missed issue in the review domain could make the artifact invalid, unsafe, misleading, or structurally malformed (correctness, security, data-loss, API/CLI contracts, schema/diff/path validity, release gates).
+- Skip When: low-risk polish, style, formatting, token density, non-blocking docs.
+- Carry-In:
+  - Per high-risk domain: `<domain>-adjudicator`
+    - Calls independent `<domain>-a` + `<domain>-b` (same artifact, isolated)
+    - Legs import shared reviewer text from sidecar `.txt` via `{{ file="./path.txt" }}`
+    - One adjudicator per domain, never shared
+  - Adjudicator duties:
+    - Use the same domain scope as A/B, but do not run as reviewer C
+    - Validate terse A/B outputs
+    - Merge duplicates by root cause
+    - Keep single-leg findings when evidence is concrete and in scope
+    - Drop findings without evidence or outside domain
+    - Pick smallest safe fix on conflicts
+    - Cached: read sidecar actions first, sidecar caches only when needed; write canonical cache plus current actions file; emit `# REVIEW` pointer with `Actions:` and `Cache:`
+    - Cacheless: parse findings from each leg's inline `## Findings` section; emit merged findings inline in output block; do not read or write sidecar files
+    - Primary reads `Actions:` for current fixes (cached) or inline findings (cacheless)
+    - Primary treats `Cache:` as reviewer-owned state for future review calls and ledger references, not fix input
+  - Re-review: one reviewer reads its own cache, reuses verified unchanged records, inspects changed material, updates cache, no adjudicator wrapping
+  - Final audit before READY/SUCCESS:
+    - Cacheless variant inspects all artifacts from scratch, returns findings inline, does not read or write cache files
+    - Always: correctness/validity
+    - Conditional: docs (user-facing surface, API, CLI, config, migration)
+    - Rare: wording (prompt/rule artifact, late operational changes, prior BLOCKING)
+  - Risk tiers:
+    - High-risk → adjudicated double-check + final audit
+    - Low-risk → single reviewer + single-reviewer final audit
+  - After fix: rerun touched domains only
+- Expected Gain: fewer missed high-risk issues, reliable release gates, cost scaled by risk.
+
+```text
+Topology (<domain> = correctness, audit, plan-reviewer, freeform-reviewer):
+  CACHED path:
+    caller -> <domain>-adjudicator-cached (normal iterations)
+             <domain>-adjudicator-cached -> <domain>-a-cached + <domain>-b-cached (shared.txt + shared-cached.txt)
+             adjudicator reads sidecar actions/caches -> canonical actions + cache/ledger + # REVIEW pointer (Actions:, Cache:)
+
+  CACHELESS path:
+    caller -> <domain>-adjudicator-cacheless (final full-artifact audit)
+             <domain>-adjudicator-cacheless -> <domain>-a-cacheless + <domain>-b-cacheless (shared.txt + shared-cacheless.txt)
+             legs return findings inline -> adjudicator parses inline ## Findings -> merged inline findings + # REVIEW block (no Cache:, no Actions:)
+
+  RE-REVIEW:
+    single <domain>-rereview (cache + changed material)
+```

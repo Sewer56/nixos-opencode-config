@@ -29,10 +29,10 @@ Review D# steps for clarity, wording quality, reader engagement, and cross-page 
 
 # Focus
 
-{file:./rules/eudoc-review/clarity.md}
-{file:./rules/eudoc-review/wording.md}
-{file:./rules/eudoc-review/engagement.md}
-{file:./rules/eudoc-review/consistency.md}
+{{ file="./rules/eudoc-review/clarity.md" }}
+{{ file="./rules/eudoc-review/wording.md" }}
+{{ file="./rules/eudoc-review/engagement.md" }}
+{{ file="./rules/eudoc-review/consistency.md" }}
 
 ## Plan-step context
 - Do not flag frozen regions.

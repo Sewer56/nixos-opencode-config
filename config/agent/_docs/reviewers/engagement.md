@@ -30,7 +30,7 @@ Review end-user documentation for reader engagement and structural quality.
 
 (Principles distilled from landing-page and copywriting research — baked in, no external reading required.)
 
-{file:./rules/eudoc-review/engagement.md}
+{{ file="./rules/eudoc-review/engagement.md" }}
 
 # Process
 

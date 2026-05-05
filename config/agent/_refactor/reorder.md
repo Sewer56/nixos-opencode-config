@@ -92,4 +92,4 @@ Reorder declarations so reading top-to-bottom follows the call flow. This comman
 
 # Rules
 
-{file:./rules/quality/code-placement.md}
+{{ file="./rules/quality/code-placement.md" }}

@@ -30,7 +30,7 @@ Review end-user documentation for comprehensibility.
 
 (Scope: human-readable documentation, not LLM instructions.)
 
-{file:./rules/eudoc-review/clarity.md}
+{{ file="./rules/eudoc-review/clarity.md" }}
 
 ## Scope boundary
 Review linguistic comprehensibility only. Do not judge correctness, duplication, or wording style unless unclear language causes the issue.
