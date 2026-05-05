@@ -167,6 +167,118 @@ describe("expand: {file:...} tokens", () => {
   })
 })
 
+// ── expand: file args and arg tokens ─────────────────────────────────────────
+
+describe("expand: {file:...|args} and {arg:...} tokens", () => {
+  test("passes a basic arg into an embedded file", async () => {
+    const dir = await makeTmpDir({ "tmpl.txt": "domain={arg:domain}" })
+    cleanup.push(dir)
+    const result = await expand(`{file:./tmpl.txt|domain=correctness}`, dir)
+    expect(result).toBe("domain=correctness")
+  })
+
+  test("supports quoted arg values with spaces", async () => {
+    const dir = await makeTmpDir({ "tmpl.txt": "value={arg:key}" })
+    cleanup.push(dir)
+    const result = await expand(`{file:./tmpl.txt|key="val with spaces"}`, dir)
+    expect(result).toBe("value=val with spaces")
+  })
+
+  test("supports multiple args", async () => {
+    const dir = await makeTmpDir({ "tmpl.txt": "{arg:key1}/{arg:key2}" })
+    cleanup.push(dir)
+    const result = await expand(`{file:./tmpl.txt|key1=a key2=b}`, dir)
+    expect(result).toBe("a/b")
+  })
+
+  test("undefined args resolve to empty string", async () => {
+    const dir = await makeTmpDir({ "tmpl.txt": "before[{arg:missing}]after" })
+    cleanup.push(dir)
+    const result = await expand(`{file:./tmpl.txt}`, dir)
+    expect(result).toBe("before[]after")
+  })
+
+  test("args can compose nested file paths", async () => {
+    const dir = await makeTmpDir({
+      "tmpl.txt": "{file:./rules/{arg:topic}.md}",
+      "rules/testing.md": "TEST_RULE",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./tmpl.txt|topic=testing}`, dir)
+    expect(result).toBe("TEST_RULE")
+  })
+
+  test("nested files without args do not inherit parent args", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "outer={arg:key}; inner={file:./inner.txt}",
+      "inner.txt": "inner={arg:key}",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./outer.txt|key=OUTER}`, dir)
+    expect(result).toBe("outer=OUTER; inner=inner=")
+  })
+
+  test("nested files receive only their own args", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "outer={arg:key}; inner={file:./inner.txt|key=INNER other=2}",
+      "inner.txt": "inner={arg:key}/{arg:other}/{arg:missing}",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./outer.txt|key=OUTER other=1}`, dir)
+    expect(result).toBe("outer=OUTER; inner=inner=INNER/2/")
+  })
+
+  test("supports file paths with spaces before the arg separator", async () => {
+    const dir = await makeTmpDir({ "path with spaces.txt": "{arg:key}" })
+    cleanup.push(dir)
+    const result = await expand(`{file:./path with spaces.txt|key=val}`, dir)
+    expect(result).toBe("val")
+  })
+
+  test("duplicate arg keys use the last value", async () => {
+    const dir = await makeTmpDir({ "tmpl.txt": "{arg:key}" })
+    cleanup.push(dir)
+    const result = await expand(`{file:./tmpl.txt|key=a key=b}`, dir)
+    expect(result).toBe("b")
+  })
+
+  test("arg values containing env tokens remain literal", async () => {
+    const dir = await makeTmpDir({ "tmpl.txt": "{arg:key}" })
+    cleanup.push(dir)
+    const restore = withEnv("FILE_INTERP_ARG_LITERAL", "EXPANDED")
+    try {
+      const result = await expand(`{file:./tmpl.txt|key={env:FILE_INTERP_ARG_LITERAL}}`, dir)
+      expect(result).toBe("{env:FILE_INTERP_ARG_LITERAL}")
+    } finally {
+      restore()
+    }
+  })
+
+  test("arg values containing file tokens remain literal", async () => {
+    const dir = await makeTmpDir({
+      "tmpl.txt": "{arg:key}",
+      "secret.txt": "SHOULD_NOT_EXPAND",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{file:./tmpl.txt|key={file:./secret.txt}}`, dir)
+    expect(result).toBe("{file:./secret.txt}")
+  })
+
+  test("arg values containing arg tokens remain literal", async () => {
+    const dir = await makeTmpDir({ "tmpl.txt": "{arg:key}" })
+    cleanup.push(dir)
+    const result = await expand(`{file:./tmpl.txt|key={arg:other} other=expanded}`, dir)
+    expect(result).toBe("{arg:other}")
+  })
+
+  test("backwards-compatible file tokens still work with zero args", async () => {
+    const dir = await makeTmpDir({ "plain.txt": "PLAIN" })
+    cleanup.push(dir)
+    const result = await expand(`{file:./plain.txt}`, dir)
+    expect(result).toBe("PLAIN")
+  })
+})
+
 // ── expand: mixed tokens ──────────────────────────────────────────────────────
 
 describe("expand: mixed {env:...} and {file:...}", () => {
