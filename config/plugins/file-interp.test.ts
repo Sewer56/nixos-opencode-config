@@ -4,7 +4,7 @@
  * Run: `cd config && bun test plugins/file-interp.test.ts`
  */
 import { describe, test, expect, beforeEach, afterEach } from "bun:test"
-import { resolvePath, expand, MAX_DEPTH } from "./file-interp"
+import { resolvePath, expand, expandWithDiagnostics, MAX_DEPTH } from "./file-interp"
 import fsp from "node:fs/promises"
 import fs from "node:fs"
 import os from "node:os"
@@ -108,6 +108,16 @@ describe("expand: {env:...} tokens", () => {
     const result = await expand("path=GENERAL_RULES_PATH", "/tmp")
     expect(result).toBe("path=GENERAL_RULES_PATH")
   })
+
+  test("removes full line when unset env token is alone", async () => {
+    const restore = withEnv("FILE_INTERP_DEFINITELY_NOT_SET", undefined)
+    try {
+      const result = await expand("before\n{env:FILE_INTERP_DEFINITELY_NOT_SET}\nafter", "/tmp")
+      expect(result).toBe("before\nafter")
+    } finally {
+      restore()
+    }
+  })
 })
 
 // ── expand: file templates ────────────────────────────────────────────────────
@@ -172,6 +182,30 @@ describe("expand: file templates", () => {
     const result = await expand(`{{file="./marker.txt"}}`, dir)
     expect(result).toBe("TIGHT")
   })
+
+  test("removes full line when file template expands empty", async () => {
+    const dir = await makeTmpDir({})
+    cleanup.push(dir)
+    const result = await expand("before\n  {{ file=\"./missing.txt\" }}  \nafter", dir)
+    expect(result).toBe("before\nafter")
+  })
+
+  test("blanks inline file template when expansion is empty", async () => {
+    const dir = await makeTmpDir({})
+    cleanup.push(dir)
+    const result = await expand(`before {{ file="./missing.txt" }} after`, dir)
+    expect(result).toBe("before  after")
+  })
+
+  test("removes multiline template block when false or missing", async () => {
+    const dir = await makeTmpDir({})
+    cleanup.push(dir)
+    const result = await expand(
+      `before\n{{\n  file="./missing.txt"\n}}\nafter`,
+      dir,
+    )
+    expect(result).toBe("before\nafter")
+  })
 })
 
 // ── expand: file args and arg tokens ─────────────────────────────────────────
@@ -227,6 +261,13 @@ describe("expand: file template args and {arg:...} tokens", () => {
     cleanup.push(dir)
     const result = await expand(`{{ file="./tmpl.txt" }}`, dir)
     expect(result).toBe("before[]after")
+  })
+
+  test("undefined arg removes full line when alone", async () => {
+    const dir = await makeTmpDir({ "tmpl.txt": "before\n{arg:missing}\nafter" })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./tmpl.txt" }}`, dir)
+    expect(result).toBe("before\nafter")
   })
 
   test("args can compose nested file paths", async () => {
@@ -310,6 +351,74 @@ describe("expand: file template args and {arg:...} tokens", () => {
   })
 })
 
+// ── expand: file template if conditions ─────────────────────────────────────
+
+describe("expand: file template if conditions", () => {
+  test("if=arg includes when arg is non-empty", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "before\n{{ file=\"./extra.txt\" if=include_extra }}\nafter",
+      "extra.txt": "EXTRA",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./outer.txt" include_extra=1 }}`, dir)
+    expect(result).toBe("before\nEXTRA\nafter")
+  })
+
+  test("if=arg removes line when arg is absent", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "before\n{{ file=\"./extra.txt\" if=include_extra }}\nafter",
+      "extra.txt": "EXTRA",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./outer.txt" }}`, dir)
+    expect(result).toBe("before\nafter")
+  })
+
+  test("if=arg==value includes only exact matches", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": [
+        "start",
+        `{{ file="./cached.txt" if=mode==cached }}`,
+        `{{ file="./cacheless.txt" if=mode==cacheless }}`,
+        "end",
+      ].join("\n"),
+      "cached.txt": "CACHED",
+      "cacheless.txt": "CACHELESS",
+    })
+    cleanup.push(dir)
+
+    const cached = await expand(`{{ file="./outer.txt" mode=cached }}`, dir)
+    const cacheless = await expand(`{{ file="./outer.txt" mode=cacheless }}`, dir)
+
+    expect(cached).toBe("start\nCACHED\nend")
+    expect(cacheless).toBe("start\nCACHELESS\nend")
+  })
+
+  test("if condition can use same-template args", async () => {
+    const dir = await makeTmpDir({ "extra.txt": "EXTRA" })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./extra.txt" if=mode==cached mode=cached }}`, dir)
+    expect(result).toBe("EXTRA")
+  })
+
+  test("false if does not read file", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "before\n{{ file=\"./missing.txt\" if=mode==cached }}\nafter",
+    })
+    cleanup.push(dir)
+    const result = await expandWithDiagnostics(`{{ file="./outer.txt" mode=cacheless }}`, dir)
+    expect(result.text).toBe("before\nafter")
+    expect(result.diagnostics).toEqual([])
+  })
+
+  test("invalid if condition leaves template literal for validation", async () => {
+    const dir = await makeTmpDir({ "extra.txt": "EXTRA" })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./extra.txt" if=mode=bad }}`, dir)
+    expect(result).toBe(`{{ file="./extra.txt" if=mode=bad }}`)
+  })
+})
+
 // ── expand: mixed tokens ──────────────────────────────────────────────────────
 
 describe("expand: mixed {env:...} and file templates", () => {
@@ -354,9 +463,14 @@ describe("expand: no tokens", () => {
     expect(result).toBe("path=GENERAL_RULES_PATH home=$HOME")
   })
 
-  test("leaves empty token forms unchanged", async () => {
-    const result = await expand(`empty {env:} and {{ file="" }}`, "/tmp")
-    expect(result).toBe(`empty {env:} and {{ file="" }}`)
+  test("leaves empty env token form unchanged", async () => {
+    const result = await expand(`empty {env:}`, "/tmp")
+    expect(result).toBe(`empty {env:}`)
+  })
+
+  test("blanks empty file template path", async () => {
+    const result = await expand(`empty {{ file="" }}`, "/tmp")
+    expect(result).toBe("empty ")
   })
 
   test("leaves unclosed token forms unchanged", async () => {
@@ -417,6 +531,27 @@ describe("expand: repeated-call safety", () => {
     const result2 = await expand(text, dir)
     expect(result1).toBe("value=X")
     expect(result2).toBe("value=X")
+  })
+})
+
+// ── expandWithDiagnostics ────────────────────────────────────────────────────
+
+describe("expandWithDiagnostics", () => {
+  test("reports missing files while rendering empty", async () => {
+    const dir = await makeTmpDir({})
+    cleanup.push(dir)
+    const result = await expandWithDiagnostics(`{{ file="./missing.txt" }}`, dir)
+    expect(result.text).toBe("")
+    expect(result.diagnostics).toHaveLength(1)
+    expect(result.diagnostics[0].kind).toBe("missing-file")
+    expect(result.diagnostics[0].rawPath).toBe("./missing.txt")
+  })
+
+  test("reports empty file template paths", async () => {
+    const result = await expandWithDiagnostics(`{{ file="" }}`, "/tmp")
+    expect(result.text).toBe("")
+    expect(result.diagnostics).toHaveLength(1)
+    expect(result.diagnostics[0].kind).toBe("empty-file")
   })
 })
 

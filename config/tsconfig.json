@@ -15,7 +15,8 @@
   },
   "include": [
     "**/*.ts",
-    "**/*.js"
+    "**/*.js",
+    "../scripts/**/*.ts"
   ],
   "exclude": [
     "node_modules"

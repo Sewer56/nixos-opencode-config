@@ -12,7 +12,10 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "bun test plugins/file-interp.test.ts"
+    "test": "bun test plugins/file-interp.test.ts",
+    "validate:templates": "bun run ../scripts/validate-file-interp.ts",
+    "check": "bun run typecheck && bun run test && bun run validate:templates",
+    "hooks:install": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@opencode-ai/plugin": "0.0.0-production-202604141138"

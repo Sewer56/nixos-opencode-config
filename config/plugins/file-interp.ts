@@ -10,6 +10,8 @@
  * Imported file content is recursively expanded up to `MAX_DEPTH` levels.
  * Cycles resolve to empty string. Relative paths resolve against the
  * original `baseDir`, not the file they appear in.
+ * Empty expansions are blanked inline; if the empty token is the only
+ * non-whitespace thing on a line, the whole line is removed.
  *
  * Agents and commands load into the system prompt; templates in those files are
  * expanded before the LLM sees them. Plain-text variable references like
@@ -21,6 +23,8 @@
  * - `{{ file="./relative/path" }}` — relative to project directory; falls
  *   back to config directory when the file is not found
  * - `{{ file="./path" key=val key2="val with spaces" }}` — file with caller args
+ * - `{{ file="./path" if=arg_key }}` — include only when arg is non-empty
+ * - `{{ file="./path" if=mode==cached }}` — include only when arg exactly matches
  * - `{env:VAR_NAME}`               — environment variable value
  * - `{arg:key}`                    — caller-provided arg value inside embedded files
  *
@@ -29,6 +33,10 @@
  * - Undefined `{arg:...}` resolves to empty string
  * - Arg values are literal strings; tokens inside arg values are not expanded
  * - Args do not cascade: nested `{{ file="..." }}` calls start with empty args unless they provide their own
+ * - `if` is reserved and is not passed as an arg
+ * - `if=arg_key` checks whether the current arg is non-empty
+ * - `if=arg_key==value` checks exact string equality; no expression parser
+ * - Args set on the same `{{ file="..." }}` call can satisfy `if`, and override outer args
  * - Expansion order: {arg:} → {env:} → `{{ file="..." }}`
  *
  * # Template style
@@ -65,7 +73,7 @@
  *
  * # Public API
  * - `FileInterpPlugin` — default export, consumed by OpenCode plugin loader
- * - `expand`, `resolvePath` — exported for tests and benchmarks
+ * - `expand`, `expandWithDiagnostics`, `resolvePath` — exported for tests, validation, and benchmarks
  * - `MAX_DEPTH` — maximum recursion depth, exported for tests
  */
 import type { Plugin } from "@opencode-ai/plugin"
@@ -112,6 +120,19 @@ export const FileInterpPlugin: Plugin = async (input) => {
 /** Maximum recursion depth for nested file-template expansion. Exported for tests. */
 export const MAX_DEPTH = 10
 
+export interface ExpansionDiagnostic {
+  kind: "empty-file" | "missing-file" | "read-error" | "cycle"
+  token: string
+  rawPath?: string
+  resolved?: string
+  message: string
+}
+
+export interface ExpandWithDiagnosticsResult {
+  text: string
+  diagnostics: ExpansionDiagnostic[]
+}
+
 /** Shared context for a single expand() call tree — carries cycle guard, read cache, and args. */
 interface ExpandContext {
   /** Resolved absolute paths of ancestor files in the current recursion chain. */
@@ -121,6 +142,8 @@ interface ExpandContext {
   readCache: Map<string, Promise<string>>
   /** Caller-provided args scoped to this expansion level. */
   args: Map<string, string>
+  /** Optional diagnostics sink used by validation tooling. Runtime expansion stays silent. */
+  diagnostics?: ExpansionDiagnostic[]
 }
 
 /**
@@ -157,9 +180,32 @@ interface SyncExpandResult {
   protectedRanges: ProtectedRange[]
 }
 
+interface IfCondition {
+  argKey: string
+  expected?: string
+}
+
 /** Shared immutable empty maps/ranges to avoid hot-path allocations. Never mutate. */
 const EMPTY_ARGS = new Map<string, string>()
 const EMPTY_RANGES: ProtectedRange[] = []
+
+/** Internal marker for empty token expansions; removed after line-aware cleanup. */
+const EMPTY_EXPANSION_MARKER = "\uE000FILE_INTERP_EMPTY\uE001"
+
+export async function expandWithDiagnostics(
+  text: string,
+  baseDir: string,
+): Promise<ExpandWithDiagnosticsResult> {
+  const diagnostics: ExpansionDiagnostic[] = []
+  const expanded = await expand(text, baseDir, {
+    visited: new Set(),
+    depth: 0,
+    readCache: new Map(),
+    args: EMPTY_ARGS,
+    diagnostics,
+  })
+  return { text: expanded, diagnostics }
+}
 
 /**
  * Set `FILE_INTERP_DEBUG=1` in your shell env to enable debug logging.
@@ -193,6 +239,10 @@ function debugLog(...args: unknown[]): void {
   )
 }
 
+function recordDiagnostic(ctx: ExpandContext, diagnostic: ExpansionDiagnostic): void {
+  ctx.diagnostics?.push(diagnostic)
+}
+
 /** OpenCode config directory — fallback base for relative file-template paths. */
 const CONFIG_DIR = path.dirname(
   path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")),
@@ -206,6 +256,7 @@ const TOKEN_START = "{"
 const FILE_TEMPLATE_START = "{{"
 const FILE_TEMPLATE_END = "}}"
 const FILE_ATTR = "file"
+const IF_ATTR = "if"
 const ENV_PREFIX = "{env:"
 const ARG_PREFIX = "{arg:"
 const TOKEN_END = "}"
@@ -295,10 +346,10 @@ export async function expand(text: string, baseDir: string, ctx?: ExpandContext)
   }
 
   if (!hasFile) hasFile = text.includes(FILE_TEMPLATE_START)
-  if (!hasFile) return text
+  if (!hasFile) return stripEmptyExpansionMarkers(text)
   // Depth gate: at MAX_DEPTH, leave file templates as literal text.
-  if (ctx.depth >= MAX_DEPTH) return text
-  return expandFileTokens(text, baseDir, ctx, protectedRanges)
+  if (ctx.depth >= MAX_DEPTH) return stripEmptyExpansionMarkers(text)
+  return stripEmptyExpansionMarkers(await expandFileTokens(text, baseDir, ctx, protectedRanges))
 }
 
 /**
@@ -339,7 +390,8 @@ function expandArgTokens(text: string, args: Map<string, string>): SyncExpandRes
 
     const key = text.slice(valueStart, end)
     const found = args.has(key)
-    const value = found ? args.get(key)! : ""
+    const rawValue = found ? args.get(key)! : ""
+    const value = rawValue.length ? rawValue : EMPTY_EXPANSION_MARKER
     if (DEBUG) debugLog(`arg: ${key} → ${found ? value : "<undefined>"}`)
 
     // Build output lazily. `cursor` is the unflushed slice start from input.
@@ -402,8 +454,9 @@ function expandEnvTokens(text: string, protectedRanges: ProtectedRange[]): SyncE
     }
 
     const varName = text.slice(valueStart, end)
-    const value = process.env[varName] ?? ""
-    if (DEBUG) debugLog(`env: ${varName} → ${value ? "<set>" : "<unset>"}`)
+    const rawValue = process.env[varName] ?? ""
+    const value = rawValue.length ? rawValue : EMPTY_EXPANSION_MARKER
+    if (DEBUG) debugLog(`env: ${varName} → ${rawValue ? "<set>" : "<unset>"}`)
 
     out += text.slice(cursor, start) + value
     // Track offset delta only when there are protected ranges to preserve.
@@ -459,13 +512,31 @@ async function expandFileTokens(
       continue
     }
 
-    if (parsed.rawPath.length === 0) {
-      searchFrom = start + FILE_TEMPLATE_START.length
+    const { rawPath, args, condition, end } = parsed
+    const token = DEBUG || ctx.diagnostics ? text.slice(start, end + 1) : ""
+
+    if (rawPath.length === 0) {
+      recordDiagnostic(ctx, {
+        kind: "empty-file",
+        token: text.slice(start, end + 1),
+        message: "file template has an empty file path",
+      })
+      parts.push(text.slice(cursor, start))
+      reads.push(Promise.resolve(EMPTY_EXPANSION_MARKER))
+      cursor = end + 1
+      searchFrom = cursor
       continue
     }
 
-    const { rawPath, args, end } = parsed
-    const token = DEBUG ? text.slice(start, end + 1) : ""
+    if (!shouldExpandForCondition(condition, ctx.args, args)) {
+      if (DEBUG) debugLog(`file: ${text.slice(start, end + 1)} SKIPPED (if condition false)`)
+      parts.push(text.slice(cursor, start))
+      reads.push(Promise.resolve(EMPTY_EXPANSION_MARKER))
+      cursor = end + 1
+      searchFrom = cursor
+      continue
+    }
+
     const resolved = resolvePath(rawPath, baseDir)
     if (DEBUG && args.size > 0) {
       debugLog(`file: ${rawPath} ${formatArgsForCall(args)} → ${resolved} (${args.size} args: ${formatArgsForLog(args)})`)
@@ -474,8 +545,15 @@ async function expandFileTokens(
     // Cycle detection: skip files already in this token's ancestor chain
     if (ctx.visited.has(resolved)) {
       if (DEBUG) debugLog(`file: ${token} → ${resolved} SKIPPED (cycle detected)`)
+      recordDiagnostic(ctx, {
+        kind: "cycle",
+        token: text.slice(start, end + 1),
+        rawPath,
+        resolved,
+        message: `file template cycle detected for ${resolved}`,
+      })
       parts.push(text.slice(cursor, start))
-      reads.push(Promise.resolve(""))
+      reads.push(Promise.resolve(EMPTY_EXPANSION_MARKER))
       cursor = end + 1
       searchFrom = cursor
       continue
@@ -484,7 +562,7 @@ async function expandFileTokens(
     // Raw I/O dedup: same resolved path → reuse cached raw read
     let rawPromise = ctx.readCache.get(resolved)
     if (!rawPromise) {
-      rawPromise = readRawFile(resolved, rawPath, token)
+      rawPromise = readRawFile(resolved, rawPath, token, ctx)
       ctx.readCache.set(resolved, rawPromise)
     }
 
@@ -518,6 +596,7 @@ async function expandFileTokens(
 interface FileTemplateSpec {
   rawPath: string
   args: Map<string, string>
+  condition?: IfCondition
   /** Inclusive offset of the second `}` in the closing `}}`. */
   end: number
   /** Raw spans for non-file attr values; used only by collectFileArgRanges. */
@@ -540,6 +619,7 @@ interface TemplateValue {
  * - values are unquoted until whitespace/`}}`, or double-quoted with spaces
  * - common escapes decode in values: `\n`, `\r`, `\t`, `\b`, `\f`, `\v`, `\"`, `\\`
  * - duplicate arg keys use last value; duplicate `file` overwrites path
+ * - `if=arg` checks non-empty; `if=arg==value` checks exact equality
  */
 function parseFileTemplate(
   text: string,
@@ -566,6 +646,7 @@ function parseFileTemplate(
   i = fileValue.next
 
   let args: Map<string, string> | undefined
+  let condition: IfCondition | undefined
   let argValueRanges: ProtectedRange[] | undefined
 
   while (i < text.length) {
@@ -574,6 +655,7 @@ function parseFileTemplate(
       return {
         rawPath,
         args: args ?? EMPTY_ARGS,
+        condition,
         end: i + FILE_TEMPLATE_END.length - 1,
         argValueRanges,
       }
@@ -599,6 +681,15 @@ function parseFileTemplate(
 
     if (key === FILE_ATTR) {
       rawPath = value.value
+      continue
+    }
+
+    if (key === IF_ATTR) {
+      condition = parseIfCondition(value.value)
+      if (!condition) {
+        if (DEBUG) debugLog(`template parse: invalid if condition "${value.value}"`)
+        return undefined
+      }
       continue
     }
 
@@ -696,6 +787,72 @@ function readUnquotedTemplateValue(
     valueEnd: i,
     next: i,
   }
+}
+
+function parseIfCondition(raw: string): IfCondition | undefined {
+  if (raw.length === 0) return undefined
+
+  const equality = raw.indexOf("==")
+  if (equality === -1) {
+    return isValidArgKey(raw) ? { argKey: raw } : undefined
+  }
+
+  const argKey = raw.slice(0, equality)
+  const expected = raw.slice(equality + 2)
+  if (!isValidArgKey(argKey) || expected.length === 0) return undefined
+  return { argKey, expected }
+}
+
+function shouldExpandForCondition(
+  condition: IfCondition | undefined,
+  scopedArgs: Map<string, string>,
+  templateArgs: Map<string, string>,
+): boolean {
+  if (!condition) return true
+  const actual = templateArgs.has(condition.argKey)
+    ? templateArgs.get(condition.argKey)!
+    : scopedArgs.get(condition.argKey) ?? ""
+  return condition.expected === undefined
+    ? actual.length > 0
+    : actual === condition.expected
+}
+
+function stripEmptyExpansionMarkers(text: string): string {
+  if (text.indexOf(EMPTY_EXPANSION_MARKER) === -1) return text
+
+  let out = ""
+  let lineStart = 0
+  while (lineStart < text.length) {
+    let lineEnd = lineStart
+    while (lineEnd < text.length) {
+      const code = text.charCodeAt(lineEnd)
+      if (code === 10 || code === 13) break
+      lineEnd++
+    }
+
+    let nextLine = lineEnd
+    if (nextLine < text.length) {
+      if (text.charCodeAt(nextLine) === 13 && text.charCodeAt(nextLine + 1) === 10) {
+        nextLine += 2
+      } else {
+        nextLine++
+      }
+    }
+
+    const line = text.slice(lineStart, lineEnd)
+    if (line.indexOf(EMPTY_EXPANSION_MARKER) !== -1) {
+      const withoutMarkers = line.split(EMPTY_EXPANSION_MARKER).join("")
+      if (withoutMarkers.trim().length !== 0) {
+        out += withoutMarkers + text.slice(lineEnd, nextLine)
+      }
+    } else {
+      out += text.slice(lineStart, nextLine)
+    }
+
+    lineStart = nextLine
+  }
+
+  return out
 }
 
 function decodeTemplateEscapes(text: string): string {
@@ -874,11 +1031,12 @@ async function readRawFile(
   resolved: string,
   rawPath: string,
   token: string,
+  ctx: ExpandContext,
 ): Promise<string> {
   try {
     const raw = (await Bun.file(resolved).text()).trim()
     if (DEBUG) debugLog(`file: ${token} → ${resolved} (${raw.length} chars)`)
-    return raw
+    return raw.length ? raw : EMPTY_EXPANSION_MARKER
   } catch (err: unknown) {
     const code = (err as NodeJS.ErrnoException)?.code
     const canFallback = code === "ENOENT" && (rawPath.startsWith("./") || rawPath.startsWith("../"))
@@ -887,26 +1045,51 @@ async function readRawFile(
         if (code === "ENOENT") debugLog(`file: ${token} → ${resolved} DOES NOT EXIST`)
         else debugLog(`file: ${token} → ${resolved} READ ERROR: ${(err as Error).message}`)
       }
-      return ""
+      recordDiagnostic(ctx, {
+        kind: code === "ENOENT" ? "missing-file" : "read-error",
+        token,
+        rawPath,
+        resolved,
+        message: code === "ENOENT"
+          ? `file template target does not exist: ${resolved}`
+          : `file template read error for ${resolved}: ${(err as Error).message}`,
+      })
+      return EMPTY_EXPANSION_MARKER
     }
 
     const configResolved = path.resolve(CONFIG_DIR, rawPath)
     if (configResolved === resolved) {
       if (DEBUG) debugLog(`file: ${token} → ${resolved} DOES NOT EXIST`)
-      return ""
+      recordDiagnostic(ctx, {
+        kind: "missing-file",
+        token,
+        rawPath,
+        resolved,
+        message: `file template target does not exist: ${resolved}`,
+      })
+      return EMPTY_EXPANSION_MARKER
     }
 
     try {
       const content = (await Bun.file(configResolved).text()).trim()
       if (DEBUG) debugLog(`file: ${token} → ${configResolved} (${content.length} chars) [config dir fallback]`)
-      return content
+      return content.length ? content : EMPTY_EXPANSION_MARKER
     } catch (err2: unknown) {
       const code2 = (err2 as NodeJS.ErrnoException)?.code
       if (DEBUG) {
         if (code2 === "ENOENT") debugLog(`file: ${token} → ${resolved} DOES NOT EXIST`)
         else debugLog(`file: ${token} → ${configResolved} READ ERROR: ${(err2 as Error).message}`)
       }
-      return ""
+      recordDiagnostic(ctx, {
+        kind: code2 === "ENOENT" ? "missing-file" : "read-error",
+        token,
+        rawPath,
+        resolved: configResolved,
+        message: code2 === "ENOENT"
+          ? `file template target does not exist: ${resolved} (also missing fallback ${configResolved})`
+          : `file template read error for ${configResolved}: ${(err2 as Error).message}`,
+      })
+      return EMPTY_EXPANSION_MARKER
     }
   }
 }
@@ -933,6 +1116,7 @@ async function recursivelyExpand(
     depth: ctx.depth + 1,
     readCache: ctx.readCache,
     args,
+    diagnostics: ctx.diagnostics,
   })
   if (DEBUG) debugLog(`file: ${token} → ${resolved} recursive expansion (${expanded.length} chars, depth ${ctx.depth + 1})`)
   return expanded
