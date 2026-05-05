@@ -1,8 +1,8 @@
 /**
  * File Interpolation plugin — recursively expands {arg:...}, {env:...}, and
- * {file:...} in .md agent prompts.
+ * `{{ file="..." }}` templates in .md agent prompts.
  *
- * OpenCode already supports {file:~/.secrets/openai-key} in JSON config files,
+ * OpenCode already supports native secret-file interpolation in JSON config files,
  * but .md agent/command/mode/skill files receive no interpolation. This plugin
  * fixes that by rewriting the system prompt at LLM-call time via the
  * `experimental.chat.system.transform` hook.
@@ -11,37 +11,52 @@
  * Cycles resolve to empty string. Relative paths resolve against the
  * original `baseDir`, not the file they appear in.
  *
- * Agents and commands load into the system prompt; tokens in those files are
+ * Agents and commands load into the system prompt; templates in those files are
  * expanded before the LLM sees them. Plain-text variable references like
  * `GENERAL_RULES_PATH` are left untouched — only {arg:...}, {env:...}, and
- * {file:...} match.
+ * `{{ file="..." }}` match.
  *
  * # Supported tokens
- * - `{file:~/.secrets/key}`  — absolute or ~-relative file content
- * - `{file:./relative/path}` — relative to project directory; falls
+ * - `{{ file="~/.secrets/key" }}`  — absolute or ~-relative file content
+ * - `{{ file="./relative/path" }}` — relative to project directory; falls
  *   back to config directory when the file is not found
- * - `{file:./path|key=val key2="val with spaces"}` — file with caller args
- * - `{env:VAR_NAME}`         — environment variable value
- * - `{arg:key}`              — caller-provided arg value inside embedded files
+ * - `{{ file="./path" key=val key2="val with spaces" }}` — file with caller args
+ * - `{env:VAR_NAME}`               — environment variable value
+ * - `{arg:key}`                    — caller-provided arg value inside embedded files
  *
  * # Arg rules
- * - `{arg:key}` expands to the value passed by the embedding `{file:...|key=val}` call
+ * - `{arg:key}` expands to the value passed by the embedding `{{ file="..." key=val }}` call
  * - Undefined `{arg:...}` resolves to empty string
  * - Arg values are literal strings; tokens inside arg values are not expanded
- * - Args do not cascade: nested `{file:}` calls start with empty args unless they provide their own
- * - Expansion order: {arg:} → {env:} → {file:}
+ * - Args do not cascade: nested `{{ file="..." }}` calls start with empty args unless they provide their own
+ * - Expansion order: {arg:} → {env:} → `{{ file="..." }}`
+ *
+ * # Template style
+ * - Use `{{ file="..." }}` for file imports; legacy colon syntax is not supported
+ * - `file` must be the first attribute for fast detection
+ * - Any whitespace is allowed after `{{`, between attributes, and before `}}`
+ * - Prefer multiline templates when passing args:
+ *   ```markdown
+ *   {{
+ *     file="./path/to/template.txt"
+ *     arg1="text with spaces"
+ *     arg2=text2
+ *   }}
+ *   ```
+ * - Quote values containing whitespace; unquoted values end at whitespace or `}}`
+ * - Args decode common escapes: `\\n`, `\\r`, `\\t`, `\\b`, `\\f`, `\\v`, `\\"`, `\\\\`
  *
  * # Raw inlining
  * Inlined content is recursively expanded, then spliced into the prompt.
- * At `MAX_DEPTH`, `{file:...}` tokens are left literal; `{env:...}` still expands.
+ * At `MAX_DEPTH`, `{{ file="..." }}` templates are left literal; `{env:...}` still expands.
  *
  * # Usage
  * In any .md agent file:
  * ```markdown
- * Your API key is {file:~/.secrets/openai-key}
- * Project config: {file:./config/prompt-ctx.txt}
+ * Your API key is {{ file="~/.secrets/openai-key" }}
+ * Project config: {{ file="./config/prompt-ctx.txt" }}
  * Region: {env:AWS_REGION}
- * System rules: {file:./config/rules/general.md}
+ * System rules: {{ file="./config/rules/general.md" }}
  * ```
  *
  * # Debug Logging
@@ -61,7 +76,7 @@ import fs from "node:fs"
 // ── Entry point ──────────────────────────────────────────────────────────────
 
 /**
- * OpenCode plugin that expands {arg:...}, {env:...}, and {file:...} tokens
+ * OpenCode plugin that expands {arg:...}, {env:...}, and `{{ file="..." }}` templates
  * in .md agent system prompts.
  *
  * Captures `directory` from `PluginInput` at init time to resolve relative
@@ -94,7 +109,7 @@ export const FileInterpPlugin: Plugin = async (input) => {
 
 // ── Internals ────────────────────────────────────────────────────────────────
 
-/** Maximum recursion depth for nested {file:...} expansion. Exported for tests. */
+/** Maximum recursion depth for nested file-template expansion. Exported for tests. */
 export const MAX_DEPTH = 10
 
 /** Shared context for a single expand() call tree — carries cycle guard, read cache, and args. */
@@ -113,9 +128,10 @@ interface ExpandContext {
  *
  * Used for two cases:
  * 1. Text inserted from `{arg:key}` values. Arg values are literal by design,
- *    so `{env:FOO}` or `{file:./x}` inside the value must stay untouched.
- * 2. The arg tail of `{file:./path|key={env:FOO}}` while scanning the caller
- *    text. Those tokens belong to the arg string, not to the caller prompt.
+ *    so `{env:FOO}` or `{{ file="./x" }}` inside the value must stay untouched.
+ * 2. Non-file arg values of `{{ file="./path" key="{env:FOO}" }}` while
+ *    scanning the caller text. Those tokens belong to the arg string, not to
+ *    the caller prompt.
  */
 interface ProtectedRange {
   start: number
@@ -177,7 +193,7 @@ function debugLog(...args: unknown[]): void {
   )
 }
 
-/** OpenCode config directory — fallback base for relative {file:...} paths. */
+/** OpenCode config directory — fallback base for relative file-template paths. */
 const CONFIG_DIR = path.dirname(
   path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")),
 )
@@ -187,23 +203,35 @@ const HOME_DIR = os.homedir()
 
 /** Token prefixes. Keep exact: no plain `$VAR`, `%VAR%`, or bare names. */
 const TOKEN_START = "{"
-const FILE_PREFIX = "{file:"
+const FILE_TEMPLATE_START = "{{"
+const FILE_TEMPLATE_END = "}}"
+const FILE_ATTR = "file"
 const ENV_PREFIX = "{env:"
 const ARG_PREFIX = "{arg:"
 const TOKEN_END = "}"
-const ARG_SEPARATOR = "|"
 
-/** Fast transform gate. Exact expansion still requires a closing `}` later. */
+/** Fast transform gate. Exact file expansion still requires a closing `}}` later. */
 function hasExpandableToken(text: string): boolean {
   let start = text.indexOf(TOKEN_START)
   while (start !== -1) {
     const next = text.charCodeAt(start + 1)
-    if (next === 102 && text.startsWith(FILE_PREFIX, start)) return true // f
+    if (next === 123 && startsFileTemplate(text, start)) return true // {
     if (next === 101 && text.startsWith(ENV_PREFIX, start)) return true // e
     if (next === 97 && text.startsWith(ARG_PREFIX, start)) return true // a
     start = text.indexOf(TOKEN_START, start + 1)
   }
   return false
+}
+
+/** Fast check for `{{ file=... }}`. Requires `file` first by style rule. */
+function startsFileTemplate(text: string, start: number): boolean {
+  if (!text.startsWith(FILE_TEMPLATE_START, start)) return false
+  let i = start + FILE_TEMPLATE_START.length
+  while (i < text.length && isTemplateSpace(text.charCodeAt(i))) i++
+  if (!text.startsWith(FILE_ATTR, i)) return false
+  i += FILE_ATTR.length
+  while (i < text.length && isTemplateSpace(text.charCodeAt(i))) i++
+  return text.charCodeAt(i) === 61 // =
 }
 
 /**
@@ -225,14 +253,14 @@ export function resolvePath(raw: string, baseDir: string): string {
 }
 
 /**
- * Expand {arg:key}, {env:VAR}, and {file:path} tokens in `text`.
+ * Expand {arg:key}, {env:VAR}, and `{{ file="path" }}` templates in `text`.
  *
  * Arg substitution runs first (synchronous), then environment substitution
  * (synchronous), then file substitution (async reads). File content is
  * recursively expanded if it contains further {arg:...}, {env:...}, or
- * {file:...} tokens, up to MAX_DEPTH levels deep. At depth ≥ MAX_DEPTH,
- * {file:...} tokens are left as literal text; {arg:...} and {env:...} tokens
- * are still expanded. Cycles are detected via ancestor-path tracking — a token
+ * file templates, up to MAX_DEPTH levels deep. At depth ≥ MAX_DEPTH,
+ * file templates are left as literal text; {arg:...} and {env:...} tokens
+ * are still expanded. Cycles are detected via ancestor-path tracking — a template
  * referencing a file in its own ancestor chain resolves to empty string.
  *
  * An optional `ExpandContext` carries recursion state (cycle guard, depth
@@ -246,7 +274,7 @@ export async function expand(text: string, baseDir: string, ctx?: ExpandContext)
 
   const hasArg = text.includes(ARG_PREFIX)
   const hasEnv = text.includes(ENV_PREFIX)
-  let hasFile = text.includes(FILE_PREFIX)
+  let hasFile = text.includes(FILE_TEMPLATE_START)
   if (!hasArg && !hasEnv && !hasFile) return text
 
   let protectedRanges = EMPTY_RANGES
@@ -258,17 +286,17 @@ export async function expand(text: string, baseDir: string, ctx?: ExpandContext)
   }
 
   // Preserve existing semantics: env substitution runs before file substitution,
-  // so env values may intentionally inject {file:...} tokens. Env/arg tokens
-  // inside {file:...|args} are shielded so arg values remain literal.
+  // so env values may intentionally inject file templates. Env/arg tokens
+  // inside non-file template args are shielded so arg values remain literal.
   if (hasEnv) {
     const envResult = expandEnvTokens(text, protectedRanges)
     text = envResult.text
     protectedRanges = envResult.protectedRanges
   }
 
-  if (!hasFile) hasFile = text.includes(FILE_PREFIX)
+  if (!hasFile) hasFile = text.includes(FILE_TEMPLATE_START)
   if (!hasFile) return text
-  // Depth gate: at MAX_DEPTH, leave {file:...} tokens as literal text.
+  // Depth gate: at MAX_DEPTH, leave file templates as literal text.
   if (ctx.depth >= MAX_DEPTH) return text
   return expandFileTokens(text, baseDir, ctx, protectedRanges)
 }
@@ -278,15 +306,15 @@ export async function expand(text: string, baseDir: string, ctx?: ExpandContext)
  *
  * Notes:
  * - Runs before env/file expansion so args can compose later file paths, e.g.
- *   `{file:./rules/{arg:topic}.md}`.
- * - Skips `{arg:...}` text inside `{file:...|args}` because those tokens are
+ *   `{{ file="./rules/{arg:topic}.md" }}`.
+ * - Skips `{arg:...}` text inside non-file template args because those tokens are
  *   literal arg values for the callee, not caller-level tokens.
- * - Marks inserted arg values as protected when they contain `{`; later env/file
- *   passes must not expand token-looking text from arg values.
+ * - Marks inserted arg values as protected when they contain braces; later
+ *   env/file passes must not expand token-looking text from arg values.
  */
 function expandArgTokens(text: string, args: Map<string, string>): SyncExpandResult {
-  // Arg expansion sees the original caller text. Compute `{file:...|args}`
-  // spans once so `{file:./tmpl|x={arg:y}}` passes literal `{arg:y}`.
+  // Arg expansion sees the original caller text. Compute template arg-value
+  // spans once so `{{ file="./tmpl" x="{arg:y}" }}` passes literal `{arg:y}`.
   const fileArgRanges = collectFileArgRanges(text, EMPTY_RANGES)
   let fileArgIndex = 0
   let out = ""
@@ -319,9 +347,9 @@ function expandArgTokens(text: string, args: Map<string, string>): SyncExpandRes
     const outStart = out.length
     out += value
 
-    // Only allocate protected spans for values that could contain tokens.
-    // Literal `foo` needs no later skip check; `{env:FOO}` does.
-    if (value.indexOf(TOKEN_START) !== -1) {
+    // Only allocate protected spans for values that could contain tokens or
+    // template closers. Literal `foo` needs no later skip check; `{env:FOO}` does.
+    if (value.indexOf(TOKEN_START) !== -1 || value.indexOf(TOKEN_END) !== -1) {
       protectedRanges.push({ start: outStart, end: outStart + value.length })
     }
 
@@ -339,7 +367,7 @@ function expandArgTokens(text: string, args: Map<string, string>): SyncExpandRes
  * Expand `{env:VAR}` tokens with manual scanning to avoid regex allocation/state.
  *
  * `protectedRanges` come from earlier arg expansion. `fileArgRanges` are added
- * for the current string so `{file:./tmpl|x={env:FOO}}` keeps `{env:FOO}` as a
+ * for the current string so `{{ file="./tmpl" x="{env:FOO}" }}` keeps `{env:FOO}` as a
  * literal callee arg. If replacements happen before protected text, offsets are
  * remapped before returning.
  */
@@ -395,11 +423,12 @@ function expandEnvTokens(text: string, protectedRanges: ProtectedRange[]): SyncE
 }
 
 /**
- * Expand `{file:path}` tokens. Reads start during scan and resolve in parallel.
+ * Expand `{{ file="path" }}` templates. Reads start during scan and resolve in parallel.
  *
  * File scanning also observes protected arg-value spans. Example:
- * `{file:./tmpl|x={file:./secret}}` should read `./tmpl`, then pass literal
- * `{file:./secret}` as `x`; it must not read `./secret` at caller level.
+ * `{{ file="./tmpl" x="{{ file=\"./secret\" }}" }}` should read `./tmpl`,
+ * then pass literal `{{ file="./secret" }}` as `x`; it must not read
+ * `./secret` at caller level.
  */
 async function expandFileTokens(
   text: string,
@@ -415,7 +444,7 @@ async function expandFileTokens(
   let protectedIndex = 0
 
   while (true) {
-    const start = text.indexOf(FILE_PREFIX, searchFrom)
+    const start = text.indexOf(FILE_TEMPLATE_START, searchFrom)
     if (start === -1) break
 
     protectedIndex = advanceRangeIndex(protectedRanges, protectedIndex, start)
@@ -424,22 +453,22 @@ async function expandFileTokens(
       continue
     }
 
-    const valueStart = start + FILE_PREFIX.length
-    const end = findFileTokenEnd(text, valueStart, protectedRanges)
-    if (end === -1) break
-
-    // Preserve /\{file:([^}]+)\}/ semantics: empty `{file:}` is not a token.
-    if (end === valueStart) {
-      searchFrom = valueStart
+    const parsed = parseFileTemplate(text, start, protectedRanges)
+    if (!parsed) {
+      searchFrom = start + FILE_TEMPLATE_START.length
       continue
     }
 
-    const rawSpec = text.slice(valueStart, end)
-    const { rawPath, args } = parseFileSpec(rawSpec)
+    if (parsed.rawPath.length === 0) {
+      searchFrom = start + FILE_TEMPLATE_START.length
+      continue
+    }
+
+    const { rawPath, args, end } = parsed
     const token = DEBUG ? text.slice(start, end + 1) : ""
     const resolved = resolvePath(rawPath, baseDir)
     if (DEBUG && args.size > 0) {
-      debugLog(`file: ${rawPath}|${formatArgsForCall(args)} → ${resolved} (${args.size} args: ${formatArgsForLog(args)})`)
+      debugLog(`file: ${rawPath} ${formatArgsForCall(args)} → ${resolved} (${args.size} args: ${formatArgsForLog(args)})`)
     }
 
     // Cycle detection: skip files already in this token's ancestor chain
@@ -486,152 +515,224 @@ async function expandFileTokens(
   return out + tail
 }
 
-/**
- * Split a `{file:...}` body into path and caller args.
- *
- * Only the first `|` is structural:
- * - `./path`             → path `./path`, empty args
- * - `./path|a=1 b="two"` → path `./path`, parsed args
- *
- * Pipe is chosen as separator because it is not a valid path char on target OSs,
- * so paths may contain spaces without quoting.
- */
-function parseFileSpec(rawSpec: string): { rawPath: string, args: Map<string, string> } {
-  const pipe = rawSpec.indexOf(ARG_SEPARATOR)
-  if (pipe === -1) return { rawPath: rawSpec, args: EMPTY_ARGS }
-  return {
-    rawPath: rawSpec.slice(0, pipe),
-    args: parseArgString(rawSpec.slice(pipe + 1)),
-  }
+interface FileTemplateSpec {
+  rawPath: string
+  args: Map<string, string>
+  /** Inclusive offset of the second `}` in the closing `}}`. */
+  end: number
+  /** Raw spans for non-file attr values; used only by collectFileArgRanges. */
+  argValueRanges?: ProtectedRange[]
+}
+
+interface TemplateValue {
+  value: string
+  valueStart: number
+  valueEnd: number
+  next: number
 }
 
 /**
- * Parse the arg tail from `{file:./path|...}` into a map.
+ * Parse one `{{ file="..." ... }}` template.
  *
- * Accepted grammar, intentionally small:
- * - Segment separator: whitespace outside quotes
- * - Key: `[a-zA-Z_][a-zA-Z0-9_-]*`
- * - Value: unquoted text up to whitespace, or quoted `"..."`
- * - Escape: only `\"` inside quoted values
- * - Duplicate key: later value overwrites earlier value
- * - Invalid segment/key: skipped with debug log
- *
- * No regex: this sits on prompt hot path, and a single char-code scanner avoids
- * regex allocation/backtracking while making quoted segments explicit.
+ * Grammar stays intentionally small and scanner-only for prompt hot path:
+ * - `file` must be the first attribute
+ * - attributes are `key=value`; whitespace around `=` is allowed
+ * - values are unquoted until whitespace/`}}`, or double-quoted with spaces
+ * - common escapes decode in values: `\n`, `\r`, `\t`, `\b`, `\f`, `\v`, `\"`, `\\`
+ * - duplicate arg keys use last value; duplicate `file` overwrites path
  */
-function parseArgString(text: string): Map<string, string> {
-  // Allocate only when at least one valid arg exists. Most `{file:...}` tokens
-  // have no args, so callers usually keep using shared EMPTY_ARGS.
+function parseFileTemplate(
+  text: string,
+  start: number,
+  protectedRanges: ProtectedRange[],
+  collectArgRanges = false,
+): FileTemplateSpec | undefined {
+  if (!text.startsWith(FILE_TEMPLATE_START, start)) return undefined
+
+  let i = start + FILE_TEMPLATE_START.length
+  i = skipTemplateSpace(text, i)
+
+  const firstKeyStart = i
+  i = scanTemplateKey(text, i)
+  if (i === firstKeyStart || text.slice(firstKeyStart, i) !== FILE_ATTR) return undefined
+
+  i = skipTemplateSpace(text, i)
+  if (text.charCodeAt(i) !== 61) return undefined // =
+  i = skipTemplateSpace(text, i + 1)
+
+  const fileValue = readTemplateValue(text, i, protectedRanges)
+  if (!fileValue) return undefined
+  let rawPath = fileValue.value
+  i = fileValue.next
+
   let args: Map<string, string> | undefined
-  let i = 0
+  let argValueRanges: ProtectedRange[] | undefined
 
   while (i < text.length) {
-    while (i < text.length && isArgSpace(text.charCodeAt(i))) i++
-    if (i >= text.length) break
-
-    const segmentStart = i
-    const keyStart = i
-
-    // Scan the key candidate up to either `=` or whitespace. Whitespace before
-    // `=` makes the segment invalid (`foo =bar` is two bad/independent parts),
-    // matching the no-quoting/no-escaping-for-keys rule.
-    while (i < text.length) {
-      const code = text.charCodeAt(i)
-      if (code === 61 || isArgSpace(code)) break // = or space
-      i++
+    i = skipTemplateSpace(text, i)
+    if (text.startsWith(FILE_TEMPLATE_END, i)) {
+      return {
+        rawPath,
+        args: args ?? EMPTY_ARGS,
+        end: i + FILE_TEMPLATE_END.length - 1,
+        argValueRanges,
+      }
     }
 
-    if (i >= text.length || text.charCodeAt(i) !== 61) {
-      // Segment has no `=` before its separating whitespace. Skip the whole
-      // segment so `bad key=ok` still recovers at `key=ok`.
-      const invalidEnd = skipArgSegment(text, segmentStart)
-      if (DEBUG) debugLog(`arg parse: skipped invalid segment "${text.slice(segmentStart, invalidEnd)}"`)
-      i = invalidEnd
+    const keyStart = i
+    i = scanTemplateKey(text, i)
+    if (i === keyStart) return undefined
+    const key = text.slice(keyStart, i)
+
+    i = skipTemplateSpace(text, i)
+    if (text.charCodeAt(i) !== 61) return undefined // =
+    i = skipTemplateSpace(text, i + 1)
+
+    const value = readTemplateValue(text, i, protectedRanges)
+    if (!value) return undefined
+    i = value.next
+
+    if (!isValidArgKey(key)) {
+      if (DEBUG) debugLog(`template parse: skipped invalid key "${key}"`)
       continue
     }
 
-    const key = text.slice(keyStart, i)
-    i++ // =
-
-    let value: string
-    if (i < text.length && text.charCodeAt(i) === 34) { // "
-      // Quoted value: keep spaces, unescape `\"`, stop at next unescaped `"`.
-      // Unterminated quotes are lenient: consume rest as value. That preserves
-      // caller text better than dropping the segment.
-      i++
-      let chunkStart = i
-      let closed = false
-      value = ""
-      while (i < text.length) {
-        const code = text.charCodeAt(i)
-        if (code === 92 && text.charCodeAt(i + 1) === 34) { // \"
-          value += text.slice(chunkStart, i) + '"'
-          i += 2
-          chunkStart = i
-          continue
-        }
-        if (code === 34) {
-          value += text.slice(chunkStart, i)
-          i++
-          closed = true
-          break
-        }
-        i++
-      }
-      if (!closed) value += text.slice(chunkStart)
-    } else {
-      // Unquoted value: literal bytes until next whitespace. This means
-      // `key={env:FOO}` is stored literally; expansion code protects it later.
-      const valueStart = i
-      while (i < text.length && !isArgSpace(text.charCodeAt(i))) i++
-      value = text.slice(valueStart, i)
-    }
-
-    if (!isValidArgKey(key)) {
-      if (DEBUG) debugLog(`arg parse: skipped invalid key "${key}"`)
+    if (key === FILE_ATTR) {
+      rawPath = value.value
       continue
     }
 
     if (!args) args = new Map()
-    args.set(key, value)
+    args.set(key, value.value)
+
+    if (collectArgRanges) {
+      if (!argValueRanges) argValueRanges = []
+      argValueRanges.push({ start: value.valueStart, end: value.valueEnd })
+    }
   }
 
-  return args ?? EMPTY_ARGS
+  return undefined
 }
 
-/**
- * Return the end offset of one malformed arg segment.
- *
- * Used only after parser sees a segment without `=`. We still respect quotes so
- * `bad "not a real arg" key=ok` skips the bad quoted region and resumes at
- * `key=ok`, instead of splitting inside the quotes.
- */
-function skipArgSegment(text: string, start: number): number {
-  let inQuote = false
-  for (let i = start; i < text.length; i++) {
+function scanTemplateKey(text: string, i: number): number {
+  if (i >= text.length || !isArgKeyStart(text.charCodeAt(i))) return i
+  i++
+  while (i < text.length && isArgKeyChar(text.charCodeAt(i))) i++
+  return i
+}
+
+function readTemplateValue(
+  text: string,
+  start: number,
+  protectedRanges: ProtectedRange[],
+): TemplateValue | undefined {
+  if (start > text.length) return undefined
+  if (text.charCodeAt(start) === 34) return readQuotedTemplateValue(text, start, protectedRanges) // "
+  return readUnquotedTemplateValue(text, start, protectedRanges)
+}
+
+function readQuotedTemplateValue(
+  text: string,
+  quoteStart: number,
+  protectedRanges: ProtectedRange[],
+): TemplateValue | undefined {
+  let i = quoteStart + 1
+  let chunkStart = i
+  let value: string | undefined
+  let protectedIndex = 0
+
+  while (i < text.length) {
+    protectedIndex = advanceRangeIndex(protectedRanges, protectedIndex, i)
+    if (isInRange(protectedRanges, protectedIndex, i)) {
+      i = protectedRanges[protectedIndex].end
+      continue
+    }
+
     const code = text.charCodeAt(i)
-    if (inQuote) {
-      // Escaped quote inside a malformed quoted segment: skip both chars so it
-      // does not close the quote.
-      if (code === 92 && text.charCodeAt(i + 1) === 34) {
-        i++
-        continue
+    if (code === 92) { // \
+      if (value === undefined) value = ""
+      value += text.slice(chunkStart, i) + decodeTemplateEscape(text.charCodeAt(i + 1))
+      i += i + 1 < text.length ? 2 : 1
+      chunkStart = i
+      continue
+    }
+    if (code === 34) { // "
+      return {
+        value: value === undefined ? text.slice(quoteStart + 1, i) : value + text.slice(chunkStart, i),
+        valueStart: quoteStart + 1,
+        valueEnd: i,
+        next: i + 1,
       }
-      if (code === 34) inQuote = false
-      continue
     }
-    if (code === 34) {
-      inQuote = true
-      continue
-    }
-    if (isArgSpace(code)) return i
+    i++
   }
-  return text.length
+
+  return undefined
 }
 
-/** Args are single-line constants; any whitespace separates segments. */
-function isArgSpace(code: number): boolean {
+function readUnquotedTemplateValue(
+  text: string,
+  start: number,
+  protectedRanges: ProtectedRange[],
+): TemplateValue {
+  let i = start
+  let protectedIndex = 0
+  while (i < text.length) {
+    protectedIndex = advanceRangeIndex(protectedRanges, protectedIndex, i)
+    if (isInRange(protectedRanges, protectedIndex, i)) {
+      i = protectedRanges[protectedIndex].end
+      continue
+    }
+
+    const code = text.charCodeAt(i)
+    if (isTemplateSpace(code) || text.startsWith(FILE_TEMPLATE_END, i)) break
+    i++
+  }
+
+  const raw = text.slice(start, i)
+  return {
+    value: raw.indexOf("\\") === -1 ? raw : decodeTemplateEscapes(raw),
+    valueStart: start,
+    valueEnd: i,
+    next: i,
+  }
+}
+
+function decodeTemplateEscapes(text: string): string {
+  let out = ""
+  let chunkStart = 0
+  for (let i = 0; i < text.length; i++) {
+    if (text.charCodeAt(i) !== 92) continue // \
+    out += text.slice(chunkStart, i) + decodeTemplateEscape(text.charCodeAt(i + 1))
+    i += i + 1 < text.length ? 1 : 0
+    chunkStart = i + 1
+  }
+  return out + text.slice(chunkStart)
+}
+
+function decodeTemplateEscape(code: number): string {
+  if (Number.isNaN(code)) return "\\"
+  switch (code) {
+    case 34: return '"'
+    case 92: return "\\"
+    case 98: return "\b"
+    case 102: return "\f"
+    case 110: return "\n"
+    case 114: return "\r"
+    case 116: return "\t"
+    case 118: return "\v"
+    default: return "\\" + String.fromCharCode(code)
+  }
+}
+
+/** Template attrs may span lines; any common ASCII whitespace separates items. */
+function isTemplateSpace(code: number): boolean {
   return code === 32 || code === 9 || code === 10 || code === 13
+}
+
+function skipTemplateSpace(text: string, i: number): number {
+  while (i < text.length && isTemplateSpace(text.charCodeAt(i))) i++
+  return i
 }
 
 /** Validate `[a-zA-Z_][a-zA-Z0-9_-]*` without regex allocation. */
@@ -653,21 +754,22 @@ function isArgKeyChar(code: number): boolean {
 }
 
 /**
- * Find arg-string spans in `{file:...|args}` so sync expansion can skip them.
+ * Find non-file arg value spans in `{{ file="..." key=value }}` templates.
  *
- * Example: in `{file:./tmpl|x={env:FOO}}`, this returns the span covering
- * `x={env:FOO}`. The env pass then ignores `{env:FOO}` at caller level; later,
- * `parseArgString` passes it as literal `x` to `tmpl`.
+ * Example: in `{{ file="./tmpl" x="{env:FOO}" }}`, this returns the span
+ * covering `{env:FOO}`. The env pass ignores it at caller level; later,
+ * `parseFileTemplate` passes it as literal `x` to `tmpl`. The `file` value is
+ * not protected so `{arg:topic}` and `{env:PATH_PART}` can compose paths.
  */
 function collectFileArgRanges(text: string, protectedRanges: ProtectedRange[]): ProtectedRange[] {
-  if (text.indexOf(FILE_PREFIX) === -1 || text.indexOf(ARG_SEPARATOR) === -1) return EMPTY_RANGES
+  if (text.indexOf(FILE_TEMPLATE_START) === -1) return EMPTY_RANGES
 
   const ranges: ProtectedRange[] = []
   let searchFrom = 0
   let protectedIndex = 0
 
   while (true) {
-    const start = text.indexOf(FILE_PREFIX, searchFrom)
+    const start = text.indexOf(FILE_TEMPLATE_START, searchFrom)
     if (start === -1) break
 
     protectedIndex = advanceRangeIndex(protectedRanges, protectedIndex, start)
@@ -676,102 +778,17 @@ function collectFileArgRanges(text: string, protectedRanges: ProtectedRange[]): 
       continue
     }
 
-    const valueStart = start + FILE_PREFIX.length
-    const end = findFileTokenEnd(text, valueStart, protectedRanges)
-    if (end === -1) break
-    if (end === valueStart) {
-      searchFrom = valueStart
+    const parsed = parseFileTemplate(text, start, protectedRanges, true)
+    if (!parsed) {
+      searchFrom = start + FILE_TEMPLATE_START.length
       continue
     }
 
-    const pipe = findFirstPipe(text, valueStart, end, protectedRanges)
-    if (pipe !== -1) ranges.push({ start: pipe + 1, end })
-    searchFrom = end + 1
+    if (parsed.argValueRanges) ranges.push(...parsed.argValueRanges)
+    searchFrom = parsed.end + 1
   }
 
   return ranges.length ? ranges : EMPTY_RANGES
-}
-
-/**
- * Find the closing `}` for a `{file:...}` token body.
- *
- * Plain `text.indexOf("}")` is not enough once args can contain token-looking
- * literals: `{file:./tmpl|x={env:FOO}}` should end at the final brace, not the
- * brace after `FOO`. We count known nested token starts (`{arg:`, `{env:`,
- * `{file:`) and ignore braces inside quoted arg values.
- */
-function findFileTokenEnd(text: string, valueStart: number, protectedRanges: ProtectedRange[]): number {
-  let nested = 0
-  let inQuote = false
-  let protectedIndex = 0
-
-  for (let i = valueStart; i < text.length;) {
-    protectedIndex = advanceRangeIndex(protectedRanges, protectedIndex, i)
-    if (isInRange(protectedRanges, protectedIndex, i)) {
-      i = protectedRanges[protectedIndex].end
-      continue
-    }
-
-    const code = text.charCodeAt(i)
-    if (inQuote) {
-      if (code === 92 && text.charCodeAt(i + 1) === 34) {
-        i += 2
-        continue
-      }
-      if (code === 34) inQuote = false
-      i++
-      continue
-    }
-
-    if (code === 34) {
-      inQuote = true
-      i++
-      continue
-    }
-    if (code === 123 && startsKnownToken(text, i)) { // {
-      // Nested token-looking text inside arg values is literal, but counting it
-      // lets the outer file token consume its matching `}` correctly.
-      nested++
-      i++
-      continue
-    }
-    if (code === 125) { // }
-      if (nested > 0) nested--
-      else return i
-    }
-    i++
-  }
-
-  return -1
-}
-
-function startsKnownToken(text: string, start: number): boolean {
-  const next = text.charCodeAt(start + 1)
-  return (
-    (next === 102 && text.startsWith(FILE_PREFIX, start)) ||
-    (next === 101 && text.startsWith(ENV_PREFIX, start)) ||
-    (next === 97 && text.startsWith(ARG_PREFIX, start))
-  )
-}
-
-/** Find the first structural `|` in a file token body. */
-function findFirstPipe(
-  text: string,
-  start: number,
-  end: number,
-  protectedRanges: ProtectedRange[],
-): number {
-  let protectedIndex = 0
-  for (let i = start; i < end;) {
-    protectedIndex = advanceRangeIndex(protectedRanges, protectedIndex, i)
-    if (isInRange(protectedRanges, protectedIndex, i)) {
-      i = Math.min(protectedRanges[protectedIndex].end, end)
-      continue
-    }
-    if (text.charCodeAt(i) === 124) return i // |
-    i++
-  }
-  return -1
 }
 
 /** Advance range cursor while `pos` is after current range. Ranges are sorted. */
