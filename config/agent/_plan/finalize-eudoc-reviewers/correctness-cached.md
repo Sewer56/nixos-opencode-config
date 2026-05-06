@@ -44,7 +44,7 @@ In the `# REVIEW` output, set `Agent:` to `_plan/finalize-eudoc-reviewers/correc
 
 {{
   file="./agent/_templates/review-output/output.txt"
-  agent="_plan/finalize-eudoc-reviewers/correctness"
+  agent="_plan/finalize-eudoc-reviewers/correctness-cached"
   prefix=EDOC
   categories="COVERAGE | BROKEN_LINK"
   detail="E_CONTRADICTION | E_UNSPECIFIC | E_MISSING_DOCS | E_FROZEN_REGIONS | E_BROKEN_LINK"

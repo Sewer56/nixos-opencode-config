@@ -25,6 +25,8 @@ Diff:
 
 **Module Breakdown** - table: Module | Language | Public Items | Candidates | High Confidence
 
+Before printing the CLI summary, GATE: `PROMPT-API-AUDIT.md` MUST exist on disk and contain all required sections above. If missing or incomplete, write or repair it before output.
+
 # CLI Summary
 
 Print after writing:

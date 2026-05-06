@@ -15,6 +15,12 @@ permission:
 
 Reorder declarations so reading top-to-bottom follows the call flow. This command is **plan-first** and requires explicit user confirmation before any code edits.
 
+# Inputs
+
+- The user message may include one or more source file paths.
+- If no paths are provided, use changed source files from `git status --porcelain`.
+- Confirmation input must be exactly `go` before edits are made.
+
 # Focus
 
 ## Scope boundaries
@@ -83,6 +89,18 @@ Reorder declarations so reading top-to-bottom follows the call flow. This comman
 - Summarize files reordered and files already in order.
 - Summarize symbol movements per file.
 - Summarize verification command results.
+
+# Output
+
+Return exactly:
+
+```text
+Status: PLANNED | SUCCESS | NEEDS_CONFIRMATION | FAIL
+Targets: <comma-separated paths>
+Files Reordered: <comma-separated paths or None>
+Verification: PASS | FAIL | NOT_RUN
+Summary: <one-line summary>
+```
 
 # Rules
 

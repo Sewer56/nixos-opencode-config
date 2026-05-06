@@ -8,6 +8,10 @@ agent: plan
 Create a confirmation-first plan to convert repetitive tests into parameterised
 tests in the target file(s). This command plans only and does not edit files.
 
+# Inputs
+
+- `$ARGUMENTS`: one or more file or directory paths containing tests to parameterise.
+
 ## User Input
 
 ```text
@@ -53,7 +57,9 @@ If no target path is provided, stop and ask for an explicit path.
 - Ask for confirmation: `Say "go" to apply this plan, or suggest changes.`
 - Show proposed changes for every target file (not just selected files).
 
-## Output Format (Template)
+# Output
+
+Return ONLY the fenced `markdown` block below.
 
 ```markdown
 Proposed Parameterisation Plan

@@ -159,15 +159,15 @@ Next Command: /plugin/draft
 ### 5e. Final full audit before SUCCESS
 - Before returning `Status: SUCCESS`, run one final full audit after all normal reviewers and final gates have zero unresolved BLOCKING findings.
 - Always run final audit and final tests audits:
-  - `@_plugin/finalize-reviewers/audit-adjudicator-cacheless` with `handoff_path`, `context_path`, all step paths, and the canonical audit cache.
-  - `@_plugin/finalize-reviewers/tests-cacheless` with `handoff_path`, `context_path`, verification-relevant step paths, and the canonical tests cache.
+  - `@_plugin/finalize-reviewers/audit-adjudicator-cacheless` with `handoff_path`, `context_path`, and all step paths.
+  - `@_plugin/finalize-reviewers/tests-cacheless` with `handoff_path`, `context_path`, and verification-relevant step paths.
 - Run final performance audit with `@_plugin/finalize-reviewers/performance-cacheless` only when steps touch hot hooks, IO/logging, algorithms, data access, concurrency, validation, or workload size.
 - Final audit rules:
   - Read the full artifact.
   - Ignore Delta shortcuts and prior cache entries.
   - Return current BLOCKING and ADVISORY findings.
-  - Read `actions_path` for fixes.
-  - The cache is audit ledger state; the caller does not read it.
+  - Parse fixes from the inline `# REVIEW` blocks returned by cacheless final auditors.
+  - Do not read reviewer cache or actions files during cacheless final audits.
 - If a final audit finds BLOCKING issues:
   - Apply accepted fixes.
   - Recompute `## Delta`.

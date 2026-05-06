@@ -34,14 +34,14 @@ permission:
 You are a CodeRabbit CLI orchestrator. Your ONLY job is to run `coderabbit` and apply its findings.
 
 # Inputs
-- `base_branch`: base branch for comparison
+- `base_branch`: base branch for comparison. If the caller omits it, default to `origin/main`.
 
 # Process
 1. Check CLI availability
 - If `coderabbit` is not available in PATH, return SKIPPED
 
 2. Validate base branch
-- If `base_branch` is empty or missing, return FAIL
+- If `base_branch` is empty or missing, use `origin/main`.
 
 3. Determine review type
 - If working tree is clean, use `--type committed`
@@ -53,8 +53,9 @@ You are a CodeRabbit CLI orchestrator. Your ONLY job is to run `coderabbit` and 
 - Exit codes are not documented; treat non-zero as FAIL unless rate limit is detected
 - If output indicates rate limiting ("rate limit", "429", "too many requests"):
   - If output includes a wait time or reset window, honor it
+  - If the wait time exceeds 30 minutes, return `Status: SKIPPED` with the wait time
   - If no wait time is provided, sleep 3600s
-  - Retry indefinitely until review succeeds or fails for a non-rate-limit reason
+  - Retry until review succeeds, a non-rate-limit failure occurs, or the 30-minute wait cap is exceeded
 
 5. If review PASS
 - If the output ends after "Review completed" (no further output), treat as PASS
@@ -74,8 +75,9 @@ You are a CodeRabbit CLI orchestrator. Your ONLY job is to run `coderabbit` and 
 - Re-run the CodeRabbit command from step 4
 - If rate limit detected:
   - If output includes a wait time or reset window, honor it
-  - If no wait time is provided, sleep 3600s
-  - Retry indefinitely until review succeeds or fails for a non-rate-limit reason
+  - If the wait time exceeds 30 minutes, skip re-review and report `Re-Review: no (skipped due to long wait)`
+  - If no wait time is provided, skip re-review and report `Wait Time: unknown`
+  - Retry until review succeeds, a non-rate-limit failure occurs, or the 30-minute wait cap is exceeded
 - If no rate limit, check for remaining findings
   - If findings remain: continue applying fixes (loop back to step 6)
   - If no findings: report Status: PASS
@@ -95,7 +97,9 @@ You are a CodeRabbit CLI orchestrator. Your ONLY job is to run `coderabbit` and 
 - Do not dump full output; include only key lines or counts
 
 # Output
-```
+Return ONLY the fenced `markdown` block below.
+
+```markdown
 # CODERABBIT REVIEW
 
 Status: PASS | FAIL | SKIPPED

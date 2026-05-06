@@ -27,8 +27,11 @@ permission:
 
 Implements a finalized plan with automated review.
 
-# Prerequisite
-`HANDOFF_DOCUMENT` must exist.
+# Inputs
+
+- `HANDOFF_DOCUMENT`: absolute path to an existing finalized handoff file.
+- The handoff's Step Index lists every implementation/test step file to apply.
+- The caller may provide additional constraints; the handoff remains source of truth.
 
 # Steps
 
@@ -141,11 +144,15 @@ Before `Status: SUCCESS`:
   - Parse current findings and fixes from its inline `# REVIEW` block.
 - If BLOCKING: fix, rerun touched, then re-audit.
 
-## 4. Report
+# Output
+
 Return exactly:
+
+```text
 Status: SUCCESS | INCOMPLETE | FAIL
 Iterations: <n>
 Summary: <one-line summary>
+```
 
 ## Constraint
 

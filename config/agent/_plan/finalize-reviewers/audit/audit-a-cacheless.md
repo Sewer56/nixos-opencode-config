@@ -12,6 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   glob: allow
+  grep: allow
   list: allow
   todowrite: allow
   external_directory: allow

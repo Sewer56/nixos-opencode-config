@@ -1,6 +1,8 @@
 ```text
 # REVIEW
-{{ if=agent }}Agent: {{arg:agent}}
+{{ if=mode==cached }}Cache: <cache_path>
+{{ endif }}{{ if=has_actions_path }}Actions: <actions_path>
+{{ endif }}{{ if=agent }}Agent: {{arg:agent}}
 {{ endif }}Decision: PASS | ADVISORY | BLOCKING
 {{ if=domains }}Domains: {{arg:domains}}
 {{ endif }}IDs: {{arg:prefix}}-001, {{arg:prefix}}-002, ...

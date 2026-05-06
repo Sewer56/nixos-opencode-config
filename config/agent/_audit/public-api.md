@@ -68,3 +68,15 @@ Use `whole repo` as the scope value and `N modules (languages)` as the scope lin
 {{ file="./rules/groups/audit/search-public-api-analysis.md" }}
 
 {{ file="./agent/_audit/_templates/analysis-report.txt" }}
+
+# Output
+
+Return exactly:
+
+```text
+Status: SUCCESS | FAIL
+Report Path: <absolute path to PROMPT-API-AUDIT.md>
+Modules Audited: <n>
+Candidates: <n>
+Summary: <one-line summary>
+```

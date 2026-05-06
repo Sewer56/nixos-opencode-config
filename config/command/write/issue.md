@@ -5,6 +5,10 @@ agent: build
 
 # Write Issue
 
+# Inputs
+
+- `$ARGUMENTS`: issue request, bug/feature context, expected outcome, and any repo-specific constraints.
+
 Do one very quick repo pass before drafting:
 - inspect the repo root for obvious context
 - skim `README.md` if present
@@ -79,9 +83,19 @@ labels: [enhancement]
 [Any additional information]
 ```
 
-## Output
+# Output
 
 - Create `ISSUE-[brief-description].md`.
 - Write a tight initial issue draft that fits the chosen template.
 - Briefly state which template was used.
 - After writing the initial draft, offer an optional deep repo pass via `@general` to refine likely affected areas, solution shape, and risks.
+
+Return exactly:
+
+```text
+Status: SUCCESS | NEEDS_CLARIFICATION | FAIL
+Issue Path: <absolute path to ISSUE-[brief-description].md>
+Template Used: <repo template name | bug fallback | feature fallback>
+Summary: <one-line summary>
+Deep Pass Offered: yes | no
+```

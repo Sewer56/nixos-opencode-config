@@ -7,6 +7,10 @@ agent: build
 
 Write a clear commit for the current changes. Additional user instructions (if present):
 
+# Inputs
+
+- `$ARGUMENTS`: optional commit scope, issue reference, grouping preference, or message guidance.
+
 ## User Input
 
 ```
@@ -64,3 +68,15 @@ Changed: Refactor authentication flow
 - Run tests before committing
 
 Follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) for more on the prefix categories.
+
+# Output
+
+Return exactly:
+
+```text
+Status: SUCCESS | FAIL
+Commits: <hash first-line; comma-separated or None>
+Files Committed: <n>
+Summary: <one-line summary>
+Errors: <one-line error summary or None>
+```

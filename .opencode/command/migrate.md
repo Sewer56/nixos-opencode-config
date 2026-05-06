@@ -7,6 +7,10 @@ agent: build
 
 You are rebasing the `production` branch in `opencode-source/` onto a new upstream version tag: **$ARGUMENTS**
 
+# Inputs
+
+- `$ARGUMENTS`: upstream version tag or commit to rebase `production` onto.
+
 ## Step 1: Backup
 - Run: `git branch production-backup-$(date +%Y-%m-%d) production` in `opencode-source/`
 - Delete old backup branches (`production-backup-pre-rebase` style) if any exist
@@ -51,3 +55,15 @@ You are rebasing the `production` branch in `opencode-source/` onto a new upstre
 - `supplemental/*.txt` → domain workflows (git-workflow.txt, github-cli.txt)
 - Git commit protocol → `supplemental/git-workflow.txt`, NOT bash.txt
 - PR creation workflow → `supplemental/github-cli.txt`, NOT bash.txt
+
+# Output
+
+Return exactly:
+
+```text
+Status: SUCCESS | FAIL | BLOCKED
+Target Version: $ARGUMENTS
+Backup Branch: <branch name | None>
+Prompt Metrics: PASS | FAIL | NOT_RUN
+Summary: <one-line summary>
+```

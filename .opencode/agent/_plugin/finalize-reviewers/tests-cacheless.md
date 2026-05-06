@@ -10,6 +10,7 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
+  grep: allow
   list: allow
   todowrite: allow
   external_directory: allow
@@ -44,9 +45,18 @@ Flag duplicate checks and obvious 3+ near-identical tests that should be paramet
 # Output
 
 {{
-  file="./agent/_templates/review-output/pointer.txt"
+  file="./agent/_templates/review-output/output.txt"
   agent="_plugin/finalize-reviewers/tests-cacheless"
   prefix=TST
+  categories="COVERAGE | REDUNDANCY | PARAMETERIZATION | VERIFICATION_COMMAND | DEBUG_CHECK"
+  evidence="<step-id, section, path:line, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<path/to/step/file>"
+  bad="-problem"
+  good="+fix"
+  with_evidence=1
+  mode=cacheless
 }}
 
 # Constraints

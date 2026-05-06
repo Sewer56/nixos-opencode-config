@@ -42,7 +42,8 @@ Only modify `<artifact_base>.handoff.md` and existing I#/T# step files matching 
 
 ## 1. Preconditions and source of truth
 - Read `handoff_path`.
-- Read all existing I# and T# step files matching `step_pattern`.
+- Resolve exact `step_paths` by reading all existing I# and T# step files matching `step_pattern`.
+- Pass exact `step_paths` to all reviewers; do not pass only `step_pattern`.
 - Treat the finalized code/test steps as the source of truth.
 - Modify existing I#/T# step files only when the initial code-documentation pass or reviewer findings target them.
 - Do not create D# step files.
@@ -65,7 +66,7 @@ Only modify `<artifact_base>.handoff.md` and existing I#/T# step files matching 
 - Run these independent shared code-doc reviewers in parallel on the first pass:
   - `_plan/finalize-codedoc-reviewers/docs-and-readability-cached`
   - `_plan/finalize-codedoc-reviewers/errors-cached`
-- Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
+- Include in each reviewer prompt only task-specific data: `plan_path`, `handoff_path`, exact `step_paths`, and user notes.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: CDOC and CREAD → docs-and-readability reviewer; CERR → errors reviewer. CDOC owns required API docs and inline readability comments in planned code diffs. Arbitrate cross-domain conflicts.
 - Apply all BLOCKING fixes before advisories. Resolve CDOC/CERR before CREAD when fixes conflict. Record or defer advisories when no blockers remain.

@@ -47,6 +47,8 @@ Adjudicate the plugin AUD domain (cached). Validate A/B reviewer pointers, merge
 
 {{
   file="./agent/_templates/review-output/pointer.txt"
+  with_cache_path=1
+  with_actions_path=1
   agent="_plugin/finalize-reviewers/audit"
   prefix=AUD
 }}

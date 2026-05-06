@@ -83,3 +83,15 @@ Use `targeted: <paths>` as the scope value and `N paths (languages)` as the scop
 {{ file="./rules/groups/audit/search-public-api-analysis.md" }}
 
 {{ file="./agent/_audit/_templates/analysis-report.txt" }}
+
+# Output
+
+Return exactly:
+
+```text
+Status: SUCCESS | FAIL
+Report Path: <absolute path to PROMPT-API-AUDIT.md>
+Targets Audited: <n>
+Candidates: <n>
+Summary: <one-line summary>
+```

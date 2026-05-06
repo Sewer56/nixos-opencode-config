@@ -17,6 +17,7 @@ permission:
     "*PROMPT-PLAN*.review-audit.a.md": allow
     "*PROMPT-PLAN*.review-audit.a.actions.*.md": allow
   glob: allow
+  grep: allow
   list: allow
   todowrite: allow
   external_directory: allow

@@ -35,6 +35,13 @@ permission:
 
 Optimize OpenCode workflow prompts/tools by running real 3-sample experiments and keeping changes that reduce generated tokens without quality loss.
 
+# Inputs
+
+- The user message describes the workflow or command to optimize, the optimization goal, and any scope limits.
+- `target_command` may be explicit (for example `/plan/draft`) or inferred from the request.
+- Derive `slug` from the request context as a 2-3 word identifier for experiment artifacts.
+- Use the current workspace as the source repository unless the user provides a different repo path.
+
 # Non-Negotiables
 
 1. **Exactly 3 samples per batch.** Never expand to 5. Never compare single samples.

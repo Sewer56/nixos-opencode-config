@@ -1,3 +1,22 @@
+---
+mode: subagent
+hidden: true
+description: Reviews step test strategy for finalized plans (cacheless)
+model: sewer-axonhub/GLM-5.1  # HIGH
+permission:
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
+  grep: allow
+  glob: allow
+  list: allow
+  todowrite: allow
+  external_directory: allow
+---
+
 Review step test strategy. Audit pass — reads all artifacts from scratch, does not read prior review caches.
 
 # Inputs

@@ -29,6 +29,8 @@ Source Cache: <cache_path>
 
 {{
   file="./agent/_templates/review-output/pointer.txt"
+  with_cache_path=1
+  with_actions_path=1
   agent="_plugin/draft-reviewers/correctness"
   prefix=COR
   domains=COR

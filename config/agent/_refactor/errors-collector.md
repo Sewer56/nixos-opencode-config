@@ -91,6 +91,30 @@ Traced Paths: <count>
 
 - `Decision: PASS` when the scan is complete and cache is updated. The primary agent re-runs collectors until convergence (step 4), verifying exhaustiveness.
 
+# Output
+
+Return ONLY the fenced `text` block below.
+
+```text
+# REVIEW
+Agent: _refactor/errors-collector
+Decision: PASS
+
+## Findings
+### [ITEM-###]
+Category: NEW_ITEM | UPDATED_ITEM
+Function: <name>
+File: <relative_path:line>
+Classification: missing | vague
+Traced Paths: <count>
+
+## Summary
+- Module: <target_path>
+- Language: <language>
+- New items: <count>
+- Total items in cache: <count>
+```
+
 # Malformed-Output Retry
 
 If the caller reports that the output does not start with `# REVIEW`, reuse the existing cache state and re-emit a protocol-compliant response. Do not re-read source files that have already been traced — their results are in the cache.

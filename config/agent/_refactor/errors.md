@@ -29,6 +29,12 @@ permission:
 
 Discover error-returning functions with missing or vague documentation. Trace error paths, draft documentation, verify coverage via collector convergence (re-spawn until stable), apply corrections, and review.
 
+# Inputs
+
+- The user message may include file or directory paths to restrict the scan.
+- If no paths are provided, scan the repository's library/application modules discovered by `codebase-explorer`.
+- Derive all cache paths from `PROMPT-ERROR-DOCS` in the current workspace.
+
 # Focus
 
 ## Scope

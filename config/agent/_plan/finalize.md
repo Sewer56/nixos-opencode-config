@@ -119,7 +119,7 @@ Next Command: /plan/draft
   - Do NOT include performance in the initial pass. Performance runs after audit+tests converge (see 5d).
 
 ### 5a. Initial reviewer dispatch (full reviewers)
-- Pass `handoff_path`, `plan_path`, and `cache_path` to each selected reviewer.
+- Pass `handoff_path`, `plan_path`, exact curated `step_paths`, and `cache_path` to each selected reviewer.
 - Treat every selected reviewer as one reviewer contract.
 - Tests and performance are single-reviewer. Use their delta variants during normal iterations.
 - **Curate step paths per reviewer domain:**

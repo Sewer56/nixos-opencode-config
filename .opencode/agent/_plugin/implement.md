@@ -61,6 +61,8 @@ Summary: <one-line summary>
 
 ---
 
-# Input
+# Inputs
 
-Pass the path to the finalized handoff. The user must supply an absolute path to `<artifact_base>.handoff.md` (where `artifact_base` = `PROMPT-PLUGIN-PLAN-<slug>`).
+- `handoff_path`: absolute path to `<artifact_base>.handoff.md` (where `artifact_base` = `PROMPT-PLUGIN-PLAN-<slug>`).
+- `plugin_dir`: directory for plugin files; default `config/plugins/` unless the handoff specifies another path.
+- `model`: model to use for debug runs; default to the current OpenCode model unless the user or handoff specifies another model.

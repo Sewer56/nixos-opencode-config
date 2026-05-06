@@ -109,6 +109,8 @@ f. Recompute Delta. Re-run all reviewers after every material revision (any subs
 
 # Output
 
+Return exactly:
+
 ```text
 Status: DRAFT | READY
 Handoff Path: <absolute path>

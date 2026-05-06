@@ -86,10 +86,14 @@ If the repo uses a different style (conventional commits, plain messages, etc.),
 
 # Output
 
-When done, reply with:
+Return exactly:
 
-- Each commit hash and its first line
-- Total files committed
-- Any errors (if applicable)
+```text
+Status: SUCCESS | FAIL
+Commits: <hash first-line; comma-separated or None>
+Files Committed: <n>
+Summary: <one-line summary>
+Errors: <one-line error summary or None>
+```
 
 Keep it brief - just the facts.

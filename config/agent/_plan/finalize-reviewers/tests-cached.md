@@ -1,3 +1,25 @@
+---
+mode: subagent
+hidden: true
+description: Reviews step test strategy for finalized plans (cached)
+model: sewer-axonhub/GLM-5.1  # HIGH
+permission:
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
+  edit:
+    "*PROMPT-PLAN*.review-tests.md": allow
+    "*PROMPT-PLAN*.review-tests.actions.*.md": allow
+  grep: allow
+  glob: allow
+  list: allow
+  todowrite: allow
+  external_directory: allow
+---
+
 Review step test strategy. Initial review only — re-review handled by dedicated agent.
 
 # Inputs

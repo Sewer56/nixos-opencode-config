@@ -30,6 +30,8 @@ Source Cache: <cache_path>
 
 {{
   file="./agent/_templates/review-output/pointer.txt"
+  with_cache_path=1
+  with_actions_path=1
   agent="_plugin/finalize-reviewers/audit"
   prefix=AUD
   return_rule_extra="- Every ID in the response must exist in both `actions_path` and `cache_path`.\n- BLOCKING: max 6 findings."

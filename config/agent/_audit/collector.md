@@ -117,6 +117,38 @@ Enumeration: full | truncated (<enumerated> of <total> items)
 ---END---
 ```
 
+# Output
+
+Return ONLY one fenced `text` block containing all `---ITEM---` blocks followed by exactly one `---SUMMARY---` block.
+
+```text
+---ITEM---
+Item: <name>
+File: <relative_path:line>
+Visibility: <keyword>
+External Usages: <count> - <paths or none>
+Internal Usages (same file): <count>
+Internal Usages (other files, non-test): <count> - <paths or none>
+Internal Usages (other files, test): <count> - <paths or none>
+Test Usages (external): <count> - <paths or none>
+Used In Tests Only: yes | no
+Preliminary: keep-public | candidate-high | candidate-medium | review
+Restriction Hint: none | can-be-private | can-be-package-private | can-be-internal | can-be-pub-super | can-be-pub-in(<path>)
+---END---
+
+---SUMMARY---
+Module: <target_path>
+Language: <language>
+Tool Used: <cargo-public-api | grep>
+Tool Available: yes | no | n/a
+Total Public Items: <count>
+Keep Public (not returned): <count>
+Zero External Usage: <count>
+Test-only External usage: <count>
+Enumeration: full | truncated (<enumerated> of <total> items)
+---END---
+```
+
 # Language-Specific Rules
 
 Language files are under `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_audit/_templates/`. Read the matching file before enumeration:

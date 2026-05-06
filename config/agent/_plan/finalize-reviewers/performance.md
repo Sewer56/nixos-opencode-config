@@ -1,3 +1,22 @@
+---
+mode: subagent
+hidden: true
+description: Reviews performance-sensitive finalized plan steps
+model: sewer-axonhub/GLM-5.1  # HIGH
+permission:
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
+  grep: allow
+  glob: allow
+  list: allow
+  todowrite: allow
+  external_directory: allow
+---
+
 Review only the performance-sensitive parts of step artifacts.
 
 # Inputs

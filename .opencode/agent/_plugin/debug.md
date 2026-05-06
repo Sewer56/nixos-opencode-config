@@ -61,6 +61,7 @@ Summary: <one-line summary>
 
 ---
 
-# Input
+# Inputs
 
-Pass the full plugin file path through unchanged — the user must supply an absolute path to the plugin TypeScript file.
+- `plugin_path`: absolute path to the plugin TypeScript file. Pass it through unchanged.
+- `model` (optional): model to use for debug run; default to current OpenCode model when absent.

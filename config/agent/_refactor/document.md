@@ -28,6 +28,12 @@ permission:
 
 Discover, add, and review missing code documentation in source files.
 
+# Inputs
+
+- The user message may include file or directory paths to document.
+- If no paths are provided, collect changed source files from `git status --porcelain`.
+- Derive `slug` from the request context and write documentation coverage artifacts under `PROMPT-DOC-COVERAGE-<slug>`.
+
 # Focus
 
 ## Scope

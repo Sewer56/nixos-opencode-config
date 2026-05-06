@@ -15,6 +15,10 @@ permission:
   glob: allow
   list: allow
   external_directory: allow
+  edit:
+    "*PROMPT-ERROR-DOCS*.md": allow
+  write:
+    "*PROMPT-ERROR-DOCS*.md": allow
 ---
 
 {{ file="./agent/_refactor/_templates/errors-reviewer-header.txt" mode=cached }}
@@ -23,7 +27,7 @@ permission:
 
 {{
   file="./agent/_templates/review-process/cached.txt"
-  delta_source=handoff_path
+  delta_source=cache_path
 }}
 
 In the `# REVIEW` output, set `Agent:` to `_refactor/errors-reviewer-cached`.
@@ -32,7 +36,7 @@ In the `# REVIEW` output, set `Agent:` to `_refactor/errors-reviewer-cached`.
 
 {{
   file="./agent/_templates/review-output/output.txt"
-  agent="_refactor/errors-reviewer"
+  agent="_refactor/errors-reviewer-cached"
   prefix=ERR
   categories="SPECIFICITY | FORMAT | FIDELITY"
   evidence="<section, `path:line`, or missing element>"

@@ -24,7 +24,9 @@ Review D# steps for clarity, wording quality, reader engagement, and cross-page 
 
 # Inputs
 
-{{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
+- `handoff_path` (for cache naming and optional source context)
+- `step_paths` (exact list of D# step files to inspect)
+- Inline `## Delta`, D# Step Index rows, and Requirement Trace Matrix rows when provided by caller
 
 # Focus
 

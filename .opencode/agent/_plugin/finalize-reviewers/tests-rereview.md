@@ -46,6 +46,8 @@ Verify resolved verification findings and check changed steps for new gaps. Trus
 
 {{
   file="./agent/_templates/review-output/pointer.txt"
+  with_cache_path=1
+  with_actions_path=1
   agent="_plugin/finalize-reviewers/tests-rereview"
   prefix=TST
 }}

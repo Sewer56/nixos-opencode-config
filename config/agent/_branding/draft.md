@@ -115,6 +115,8 @@ g. On malformed reviewer output when Delta and Decisions are unchanged, retry fr
 
 # Output
 
+Return exactly:
+
 ```text
 Status: DRAFT | READY
 Branding Path: <absolute path to `<artifact_base>.draft.md`>

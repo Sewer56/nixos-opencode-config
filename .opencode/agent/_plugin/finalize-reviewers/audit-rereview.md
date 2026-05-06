@@ -46,6 +46,8 @@ Verify resolved audit findings. Check only changed steps for new audit issues. T
 
 {{
   file="./agent/_templates/review-output/pointer.txt"
+  with_cache_path=1
+  with_actions_path=1
   agent="_plugin/finalize-reviewers/audit-rereview"
   prefix=AUD
 }}

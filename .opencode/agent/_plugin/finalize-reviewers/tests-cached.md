@@ -12,6 +12,7 @@ permission:
     "*.env.example": allow
   edit:
     "*PROMPT-PLUGIN-PLAN*.review-tests.md": allow
+    "*PROMPT-PLUGIN-PLAN*.review-tests.actions.*.md": allow
   list: allow
   todowrite: allow
   external_directory: allow
@@ -42,7 +43,7 @@ Flag duplicate checks and obvious 3+ near-identical tests that should be paramet
   file="./agent/_templates/review-process/cached.txt"
   delta_source=handoff_path
   reads_review_ledger=1
-  has_actions_path=0
+  has_actions_path=1
   show_cache_format=1
   cache_format="# Review Cache: tests\n\n## Verified Observations\n- <step-id>: <what was verified, with grounding snapshot — one line each>\n\n## Findings\n\n### [TST-NNN]\nStatus: OPEN | RESOLVED\nCategory: COVERAGE | REDUNDANCY | PARAMETERIZATION | VERIFICATION_COMMAND | DEBUG_CHECK\nSeverity: BLOCKING | ADVISORY\nProblem: <one line>\nFix: <unified diff targeting step file(s) or concise fix>\nResolution: <only for RESOLVED>"
   pointer_emit=1
@@ -52,18 +53,20 @@ Flag duplicate checks and obvious 3+ near-identical tests that should be paramet
 
 {{
   file="./agent/_templates/review-output/pointer.txt"
+  with_cache_path=1
+  with_actions_path=1
   agent="_plugin/finalize-reviewers/tests-cached"
   prefix=TST
 }}
 
 - Your final output message MUST be EXACTLY the fenced block above. No other text — no analysis, no summary, no wrapping text.
 - PASS: `Decision: PASS` only. No IDs line.
-- Findings are written to cache only. The orchestrator reads `cache_path` for complete findings.
+- Current OPEN findings are written to `actions_path`; history and verified observations stay in `cache_path`.
 
 # Constraints
 - Read `handoff_path`, `context_path`, all `step_paths`. Full audit. Write cache.
 - PASS: Decision only, no IDs line.
-- BLOCKING: max 6 findings. Cache findings in `cache_path`.
+- BLOCKING: max 6 findings. Cache findings in `cache_path` and current fixes in `actions_path`.
 - Focus on observable behavior and verification commands, not declaration order or micro-optimizations.
 - Verified observations MUST include grounding snapshots.
 - Write findings directly to cache. Do not re-narrate each step in reasoning.

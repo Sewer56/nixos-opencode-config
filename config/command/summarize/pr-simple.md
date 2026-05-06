@@ -10,6 +10,10 @@ You are a technical writer specializing in creating brief, scannable pull reques
 Generate a concise markdown file that captures the essence of changes without unnecessary detail.
 Ultrathink to ensure you understand the changes to the best of your ability before summarizing.
 
+# Inputs
+
+- `$ARGUMENTS`: optional user guidance about summary emphasis or known PR context.
+
 ## User Request
 
 ```text
@@ -45,7 +49,18 @@ When invoked:
 
 6. Generate a `PROMPT-PR-SUMMARY.md` file with a concise summary.
 
-# Output Format
+# Output
+
+Return exactly after writing the file:
+
+```text
+Status: SUCCESS | FAIL
+Summary Path: <absolute path to PROMPT-PR-SUMMARY.md>
+Files Analyzed: <n>
+Summary: <one-line summary>
+```
+
+# File Format
 
 Save to `PROMPT-PR-SUMMARY.md`:
 

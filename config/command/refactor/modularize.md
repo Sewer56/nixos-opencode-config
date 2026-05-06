@@ -10,6 +10,10 @@ Aggressive renaming of modules, files, structs/classes, and functions is allowed
 
 This command is **plan-first** and requires explicit user confirmation before any code edits.
 
+# Inputs
+
+- `$ARGUMENTS`: one or more target files/directories to modularize plus any constraints.
+
 ## User Input
 
 ```text
@@ -80,6 +84,18 @@ Say "go" to apply this plan, or suggest changes.
   - Symbol renames and final locations
 - Any compatibility shims or intentional breaking changes
 - Verification command results
+
+# Output
+
+Return exactly:
+
+```text
+Status: PLANNED | SUCCESS | NEEDS_CONFIRMATION | FAIL
+Targets: <comma-separated paths>
+Files Changed: <comma-separated paths or None>
+Verification: PASS | FAIL | NOT_RUN
+Summary: <one-line summary>
+```
 
 ## Example
 
