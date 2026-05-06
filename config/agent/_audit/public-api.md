@@ -65,4 +65,6 @@ Use `whole repo` as the scope value and `N modules (languages)` as the scope lin
 
 ### Rules
 
-{{ file="./agent/_audit/_templates/analysis-rules.txt" }}
+{{ file="./rules/groups/audit/search-public-api-analysis.md" }}
+
+{{ file="./agent/_audit/_templates/analysis-report.txt" }}

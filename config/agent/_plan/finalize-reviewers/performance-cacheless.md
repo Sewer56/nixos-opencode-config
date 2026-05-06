@@ -38,7 +38,3 @@ Read `handoff_path`, `plan_path`, all `step_paths` in full.
 - If the plan is not performance-sensitive: `Decision: PASS` with `Performance Sensitive: NO` in `## Notes`.
 - If a performance finding depends on the repo surface, cite repo evidence.
 - Omit the diff when the finding is a performance budget concern with no single correct implementation.
-
-# Rules
-
-{{ file="./rules/quality/performance.md" }}

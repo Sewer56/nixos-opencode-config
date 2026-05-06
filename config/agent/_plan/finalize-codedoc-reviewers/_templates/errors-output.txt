@@ -15,7 +15,3 @@
 }}
 
 - Target diffs to the affected error-returning function's source file{{arg:diff_target_note}}.
-
-# Rules
-
-{{ file="./rules/docs/errors.md" }}

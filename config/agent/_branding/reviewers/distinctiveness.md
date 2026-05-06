@@ -32,34 +32,7 @@ Review branding for distinctiveness.
 Read `<artifact_base>.draft.md` for in-scope sections: Candidate Shortlist, Top Recommendation, Risk and Availability Notes.
 Cross-reference search findings from the handoff for external collisions.
 
-## Generic name
-Block common dictionary words used without distinctive combination or branding treatment.
-
-Bad: `Fast`, `Cloud`, `Build`.
-Good: a name with a specific metaphor, coined form, or distinctive combination.
-
-## Overused startup suffix
-Block names relying on overused suffixes (`-ify`, `-ly`, `-io`, `-hub`, `-base`, `-flow`, `-kit`) without a distinctive prefix.
-
-Bad: `Taskify`.
-Good: suffix earns its place through a specific, memorable root.
-
-## Near-duplicate within list (ADVISORY)
-Flag shortlist candidates so similar they confuse choice rather than clarify it.
-
-Bad: `FlowKit`, `FlowBase`, `FlowHub` in same shortlist.
-Good: candidates explore different naming territories.
-
-## Duplicate or collision with existing project
-Block exact or confusingly similar matches to known packages, repos, products, or competitors found in handoff search findings. ADVISORY for partial/domain-adjacent collisions.
-
-Bad: candidate matches an existing npm package in handoff search findings.
-Good: candidate differs enough to avoid package/product confusion.
-
-## Weak searchability (ADVISORY)
-Flag names drowned by unrelated search results or indistinguishable from common words.
-
-Good: candidate can be searched with project domain and still find relevant results.
+{{ file="./rules/groups/branding/self-distinctiveness.md" }}
 
 # Process
 

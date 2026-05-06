@@ -180,5 +180,6 @@ Say "go" to apply this plan, or suggest changes.
 
 # Rules
 
-{{ file="./rules/testing/testing.md" }}
-{{ file="./rules/testing/test-parameterization.md" }}
+{{ file="./rules/groups/tests/target-test-strategy.md" }}
+
+{{ file="./rules/groups/tests/target-test-parameterization.md" }}

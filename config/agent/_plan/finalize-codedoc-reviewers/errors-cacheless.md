@@ -21,7 +21,6 @@ permission:
   file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-header.txt"
   description="Review step artifacts' code-adjacent error documentation."
   variant=codedoc
-  focus_file="errors-focus.plan.md"
 }}
 
 # Process

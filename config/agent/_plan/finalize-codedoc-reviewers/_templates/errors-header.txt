@@ -13,4 +13,4 @@
 {{ else }}Ground checks in applied source docs and handoff content. Open referenced source files only when a diff is ambiguous or missing context for public API status or reachable error variants.
 {{ endif }}
 
-{{ file="./rules/code-doc-review/{{arg:focus_file}}" }}
+{{ file="./rules/groups/docs/target-error-docs.md" }}

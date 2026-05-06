@@ -34,68 +34,13 @@ Inspect DOC first, then WORDING. Report all BLOCKING findings in one pass. If DO
 
 ## Doc coverage (DOC domain)
 
-### Referenced-doc coverage
-Each `[P#]` item changing code that end-user docs reference needs a matching docs `[P#]` item to update or create docs.
-
-Bad: changes CLI flag behavior with no README/guide update item.
-Good: code item plus docs item naming affected file and section.
-
-### New-surface docs coverage
-Each `[P#]` item adding user-facing surface without existing docs needs a docs creation item.
-
-Bad: adds public command but no docs plan.
-Good: adds command and creates/updates user guide.
-
-### Specificity
-Generic `update docs` blocks. Specify file, scope level, affected sections, and what changes.
-
-Bad: `Update docs.`
-Good: `Update README Usage section to document --watch behavior and example command.`
-
-### Scope boundary
-Focus on end-user documentation only: READMEs, wiki, guides, changelogs. In-code API docs are owned by another reviewer.
-
-Do not flag: in-code API docs, comments, or internal developer docs unless the user asked for end-user docs.
+{{ file="./rules/groups/docs/self-draft-docs.md" }}
 
 ## Wording quality (WORDING domain)
 
-### Token density
-Flag filler in operational instructions. Narrative sections are exempt.
+{{ file="./rules/groups/style/self-wording.md" }}
 
-Bad: `Please make sure to ensure that the plan is able to update the file.`
-Good: `Update the file.`
-
-### Wording optimization (ADVISORY)
-Flag phrasing that can be tightened without changing meaning. Prefer fewer tokens and flat instruction structure.
-
-Bad: `in order to make it possible for reviewers to determine`
-Good: `so reviewers can determine`
-
-### Bullet atomicity (ADVISORY)
-Each Focus, Process, or Constraint bullet should carry one checkable condition.
-
-Bad: `Read the draft, check paths, and update cache.`
-Good: split into three bullets.
-
-### Undefined jargon
-Flag internal taxonomy or project-specific terms without inline definition.
-
-Bad: `Apply the hydration pathway.`
-Good: `Initialize state before rendering starts.`
-
-### Compound-term compression
-Flag phrases that compress meaning at the cost of comprehension.
-
-Bad: `cache-delta ledger handshake`
-Good: `handoff Delta tells reviewers which cached findings to re-check`
-
-### Opaque references
-Flag `follow the Foo convention` or `apply the Bar pattern` when Foo/Bar are not standard and not defined in the same file.
-
-Good: inline the convention or point to a path when navigation is enough.
-
-### Exclusions
-Do not block common programming terms (`unified diff`, `markdown`, `frontmatter`), path pointers, terms defined earlier, headings, section names, or standard domain terms.
+{{ file="./rules/groups/style/self-readability.md" }}
 
 # Process
 

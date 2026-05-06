@@ -25,7 +25,6 @@ permission:
   variant=refactor
   doc_domain=DDOC
   read_domain=DREAD
-  doc_focus_file="documentation-focus.source.md"
 }}
 
 # Process

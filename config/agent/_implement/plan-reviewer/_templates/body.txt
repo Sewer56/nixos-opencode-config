@@ -8,7 +8,7 @@ Review an implementation against its plan.
 ## Read strategy
 Read all files listed in the handoff index's File column in one batch. Inspect all changes via `git diff`. Inspect the full implementation diff against the full handoff.
 
-{{ file="./rules/implement/implement-review.md" }}
+{{ file="./rules/groups/implementation/target-implementation-review.md" }}
 
 {{ file="./agent/_templates/review-mission.txt" artifact_type="implementation" domain="implementation" }}
 

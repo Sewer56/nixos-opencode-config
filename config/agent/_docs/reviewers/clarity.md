@@ -30,7 +30,7 @@ Review end-user documentation for comprehensibility.
 
 (Scope: human-readable documentation, not LLM instructions.)
 
-{{ file="./rules/eudoc-review/clarity.md" }}
+{{ file="./rules/groups/style/target-readability.md" }}
 
 # Process
 

@@ -23,7 +23,6 @@ permission:
   variant=codedoc
   doc_domain=CDOC
   read_domain=CREAD
-  doc_focus_file="documentation-focus.plan.md"
 }}
 
 # Process

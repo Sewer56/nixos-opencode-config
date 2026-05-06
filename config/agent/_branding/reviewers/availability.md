@@ -32,49 +32,7 @@ Review branding for availability.
 Read `<artifact_base>.draft.md` for in-scope sections: Candidate Shortlist, Top Recommendation, Risk and Availability Notes, Next Checks.
 Cross-reference search findings from the handoff for external availability data.
 
-## Domain caveat
-Flag candidate names whose primary domains (`.com`, `.io`, `.dev`) are likely taken or not recorded in Risk and Availability Notes. ADVISORY unless confirmed collision blocks intended use.
-
-Bad: `AcmeFlow is available.` with no domain check.
-Good: `Domain availability not verified; check acmeflow.com and acmeflow.dev.`
-
-## Package/crate caveat
-Flag missing or conflicting package-registry checks for the project's likely ecosystem. BLOCKING for confirmed collision; ADVISORY for missing check.
-
-Bad: Rust project name chosen without crates.io check.
-Good: Risk notes record crates.io/GitHub check or mark it unverified.
-
-## Social-handle caveat
-Flag likely social handle collisions or missing handle checks. ADVISORY.
-
-Good: Notes say handles were not checked and list follow-up checks.
-
-## Missing trademark disclaimer
-Branding section must state that name availability does not equal legal clearance. BLOCKING when absent.
-
-Bad: `This name is legally safe.`
-Good: `Availability checks are not trademark/legal clearance; run legal search before launch.`
-
-## Risky availability claim
-Block unqualified claims that a name is available without external evidence or caveat.
-
-Bad: `The name is available everywhere.`
-Good: `Availability appears unverified; perform domain, registry, handle, and trademark checks.`
-
-## Missing ecosystem duplicate check
-Flag when likely ecosystem duplicates (package manager, GitHub/GitLab, repo namespace) are not listed. ADVISORY.
-
-Bad: no GitHub or package registry check for a library name.
-Good: notes list checked ecosystems or mark each as unverified follow-up.
-
-## Missing next checks
-Next Checks must recommend concrete follow-ups: domain registration, trademark search, handle claim, and package publish. BLOCKING when absent; ADVISORY when incomplete.
-
-Bad: `Do availability checks later.`
-Good: `Check domain, trademark, social handles, and package registry before launch.`
-
-## Provisional availability
-Treat live availability claims (domains, packages, handles) as provisional unless the handoff records an explicit external check via `mcp-search`.
+{{ file="./rules/groups/branding/self-availability.md" }}
 
 # Process
 

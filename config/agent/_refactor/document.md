@@ -128,6 +128,8 @@ None
 
 # Rules
 
-{{ file="./rules/quality/general.md" }}
-{{ file="./rules/docs/documentation.md" }}
-{{ file="./rules/docs/errors.md" }}
+{{ file="./rules/groups/quality/target-general.md" }}
+
+{{ file="./rules/groups/docs/target-code-docs.md" }}
+
+{{ file="./rules/groups/docs/target-error-docs.md" }}

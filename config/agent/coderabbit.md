@@ -138,9 +138,14 @@ Details: <commit report summary or amending note>
 
 Apply these rules:
 
-{{ file="./rules/quality/general.md" }}
-{{ file="./rules/quality/performance.md" }}
-{{ file="./rules/testing/testing.md" }}
-{{ file="./rules/testing/test-parameterization.md" }}
-{{ file="./rules/quality/code-placement.md" }}
-{{ file="./rules/docs/documentation.md" }}
+{{ file="./rules/groups/quality/target-general.md" }}
+
+{{ file="./rules/groups/performance/target-performance.md" }}
+
+{{ file="./rules/groups/tests/target-test-strategy.md" }}
+
+{{ file="./rules/groups/tests/target-test-parameterization.md" }}
+
+{{ file="./rules/groups/quality/target-placement.md" }}
+
+{{ file="./rules/groups/docs/target-code-docs.md" }}

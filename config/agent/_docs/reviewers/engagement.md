@@ -32,7 +32,7 @@ Review end-user documentation for reader engagement and structural quality.
 
 Consider page type (landing, getting-started, guide, reference, changelog, migration guide) when applying checks.
 
-{{ file="./rules/eudoc-review/engagement.md" }}
+{{ file="./rules/groups/style/target-engagement.md" }}
 
 # Process
 

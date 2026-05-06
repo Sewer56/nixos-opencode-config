@@ -158,5 +158,6 @@ Summary: <one-line summary>
 
 # Rules
 
-{{ file="./rules/docs/documentation.md" }}
-{{ file="./rules/docs/errors.md" }}
+{{ file="./rules/groups/docs/target-code-docs.md" }}
+
+{{ file="./rules/groups/docs/target-error-docs.md" }}

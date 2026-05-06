@@ -84,13 +84,6 @@ Reorder declarations so reading top-to-bottom follows the call flow. This comman
 - Summarize symbol movements per file.
 - Summarize verification command results.
 
-## Ordering Rules
-
-1. **Visibility tier**: public/entry-point declarations before private/internal ones.
-2. **Reading order**: within each visibility tier, callers before callees.
-3. **Entry point first**: place the entry point (e.g. `main`, the primary exported function) first; then direct callees in the order called; then their callees, and so on.
-4. **Stability**: when two declarations have equal priority (same tier, no call dependency between them), preserve the existing relative order.
-
 # Rules
 
-{{ file="./rules/quality/code-placement.md" }}
+{{ file="./rules/groups/quality/target-placement.md" }}

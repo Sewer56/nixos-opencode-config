@@ -12,7 +12,7 @@ Review an implementation against request intent from conversation context.
 ## Read strategy
 Inspect all changes via `git diff`. Inspect the full implementation diff against request intent.
 
-{{ file="./rules/implement/implement-review.md" }}
+{{ file="./rules/groups/implementation/target-implementation-review.md" }}
 
 {{ file="./agent/_templates/review-mission.txt" artifact_type="implementation" domain="implementation" }}
 

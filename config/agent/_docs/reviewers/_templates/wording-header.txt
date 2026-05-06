@@ -8,4 +8,4 @@ Review end-user documentation for wording quality.
 
 (Scope: human-readable documentation, not LLM token density.)
 
-{{ file="./rules/eudoc-review/wording.md" }}
+{{ file="./rules/groups/style/target-wording.md" }}

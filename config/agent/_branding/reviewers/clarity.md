@@ -31,47 +31,7 @@ Review branding for clarity.
 ## Read scope
 Read `<artifact_base>.draft.md` for in-scope sections: Candidate Shortlist, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone.
 
-## Unpronounceable name
-Block names that are hard to say aloud without prior exposure or have no obvious syllable breaks.
-
-Bad: `Xqtrnly`
-Good: name has clear syllables and expected sounds.
-
-## Ambiguous spelling
-Block names with multiple plausible spellings, silent letters, or nonstandard letter combinations that confuse spoken recall.
-
-Bad: `Phlow` when audience will hear `Flow`.
-Good: spelling follows how the name sounds or notes the intentional spelling risk.
-
-## Poor memorability (ADVISORY)
-Flag names that are too long, too generic, or too similar to common words to stick after one exposure.
-
-Bad: long generic name that blends into common words.
-Good: short, repeatable name with distinctive sound or image.
-
-## Awkward word shape (ADVISORY)
-Flag unbalanced visual shape, odd capitalization requirements, or letter combinations that look strange in lowercase.
-
-Bad: name only reads well with special caps.
-Good: name works in lowercase, package names, and docs.
-
-## Ambiguous meaning (common)
-Block unintended connotations widely recognized across audiences.
-
-Bad: name implies surveillance for a privacy tool.
-Good: name connotation supports brand promise.
-
-## Ambiguous meaning (niche) (ADVISORY)
-Flag unintended connotations limited to specific cultural, linguistic, or domain groups.
-
-Bad: name has an awkward meaning in a known target-language audience.
-Good: risk is documented or name avoids the niche collision.
-
-## One-read explainability
-Block when a reader cannot explain the name and brand promise after one read of the Branding section.
-
-Bad: name, tagline, and positioning point to different ideas.
-Good: name and tagline make the promise repeatable in one sentence.
+{{ file="./rules/groups/branding/self-clarity.md" }}
 
 # Process
 

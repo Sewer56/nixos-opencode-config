@@ -23,7 +23,6 @@ permission:
   file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-header.txt"
   description="Review source files' error documentation."
   variant=refactor
-  focus_file="errors-focus.source.md"
 }}
 
 # Process

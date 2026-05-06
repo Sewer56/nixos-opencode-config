@@ -15,7 +15,7 @@ Inspect {{arg:doc_domain}} first, including inline comments in non-trivial code 
 
 ## Doc coverage ({{arg:doc_domain}} domain)
 
-{{ file="./rules/code-doc-review/{{arg:doc_focus_file}}" }}
+{{ file="./rules/groups/docs/target-code-docs.md" }}
 
 {{ endif }}## Read strategy
 {{ if=variant==codedoc }}Ground checks in step file diffs and handoff content. Open referenced source files only when a step diff is ambiguous or missing context for public surface, doc placement, or body intent.
@@ -24,5 +24,6 @@ Inspect {{arg:doc_domain}} first, including inline comments in non-trivial code 
 
 ## Readability ({{arg:read_domain}} domain)
 
-{{ file="./rules/code-doc-review/clarity.md" }}
-{{ file="./rules/code-doc-review/wording.md" }}
+{{ file="./rules/groups/style/target-readability.md" }}
+
+{{ file="./rules/groups/style/target-wording.md" }}

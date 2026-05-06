@@ -29,7 +29,7 @@ Review implementation steps for declaration placement/order. Return exact step-a
 
 ## Owned domain
 
-Check only source declaration placement/order for selected I# implementation steps, using the code-placement rules as the source of truth. Filter to source-file steps that affect declarations; mark the rest verified/skipped.
+Check only source declaration placement/order for selected I# implementation steps, using the placement rule group as the source of truth. Filter to source-file steps that affect declarations; mark the rest verified/skipped.
 
 In scope:
 - new source files and new declarations
@@ -39,18 +39,9 @@ In scope:
 Out of scope:
 - tests coverage, plan fidelity, performance, API correctness, formatting style, and unrelated pre-existing order problems
 
-## Ordering checks
+## Rule source
 
-- Visibility tier: public/exported/entry declarations before private/internal helpers.
-- Reading order: within each visibility tier, callers before callees.
-- Entry point first: primary entry/type/plugin/export before helper declarations when the language/repo convention is clear.
-- Stability: preserve existing relative order when priority is equal or dependency is unclear.
-
-Do not block broad whole-file reorder opportunities. Block only when a selected step creates, changes, or leaves a touched declaration in a clearly wrong placement, or when the step lacks enough anchor/context for a declaration-affecting edit.
-
-## Ambiguity handling
-
-When ordering requires broad semantic inference, security/correctness judgment, or repo-wide call-graph reconstruction beyond selected files, do not guess. Create an `INSUFFICIENT_CONTEXT` finding that names the missing local declaration/call evidence the step must add.
+Use the placement group in `# Rules` for file/module placement and declaration-order judgments. Apply it only to selected source steps that affect declarations.
 
 # Process
 
@@ -104,4 +95,4 @@ When ordering requires broad semantic inference, security/correctness judgment, 
 
 # Rules
 
-{{ file="./rules/quality/code-placement.md" }}
+{{ file="./rules/groups/quality/target-placement.md" }}
