@@ -2,14 +2,14 @@
 {{ if=has_cache_derivation }}
 - Derive `cache_path` from `{{arg:delta_source}}`: {{arg:cache_derivation}}.
 {{ else }}
-- Parse `cache_path:` and `actions_path:` from the task input. REQUIRED.
+- Parse `cache_path:` from the task input. REQUIRED.
 {{ endif }}
 - Read `cache_path` if exists; treat missing/malformed as empty.
 {{ if=cache_record_type }}
 - Treat cache as one record {{arg:cache_record_type}} with fields `last_decision`, `open_findings`, `evidence`, `verified`.
 {{ endif }}
 {{ if=has_actions_path }}
-- Use parsed `actions_path`. If absent, glob `<cache_path without .md>.actions.*.md` → next `<nnn>`, start `001`.
+- Parse `actions_path:` if provided. If absent, glob `<cache_path without .md>.actions.*.md` → next `<nnn>`, start `001`.
 {{ endif }}
 
 2. Read handoff
@@ -46,12 +46,6 @@
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output.
 
 5. Write files
-{{ if=show_cache_format }}
-- Write cache in this format:
-```markdown
-{{arg:cache_format}}
-```
-{{ endif }}
 - If cache file missing/malformed: write the full cache file at `cache_path`.
 - Otherwise: use targeted edits to update only entries that changed{{ if=preserve_byte_exact }}, preserving unchanged cache text byte-for-byte{{ endif }}.
 {{ if=show_cache_update_detail }}
@@ -67,8 +61,4 @@
 - GATE: `cache_path`{{ if=has_actions_path }} and `actions_path`{{ endif }} MUST exist on disk before proceeding. If not: write them. Do not proceed until written.
 
 6. Emit output
-{{ if=pointer_emit }}
 - Emit ONLY the `# REVIEW` fenced block from `# Output`.
-{{ else }}
-- Emit ONLY the `# REVIEW` fenced block from `# Output`.
-{{ endif }}

@@ -1,0 +1,12 @@
+# Review Cache: correctness
+{{ if=has_actions_path }}
+Latest Actions: <actions_path>
+{{ endif }}
+
+## Verified Observations
+- [P#]: <grounding snapshot — one line each>
+
+## Finding Ledger
+| ID | Status | Category | Severity | Introduced In | Latest Action | Resolution |
+|---|---|---|---|---|---|---|
+| XXX-NNN | OPEN | — | — | — | — | — |

@@ -53,5 +53,7 @@ Adjudicate implementation review against a plan (cached). Validate A/B reviewer 
 
 {{
   file="./agent/_templates/review-output/pointer.txt"
+  with_cache_path=1
+  with_actions_path=1
   prefix=F
 }}

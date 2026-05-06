@@ -140,9 +140,8 @@ Follow the ordered steps below.
 ## 6. Confirmation boundary
 - If the latest user message explicitly confirms the draft is ready for finalize, run one final correctness audit before returning READY.
 - Final correctness audit:
-  - Call `_plan/draft-reviewers/correctness-adjudicator-cacheless` with `context_path: plan_path`, `draft_handoff_path`, and `cache_path: <artifact_base>.draft.review-correctness.md`.
-  - Treat the cache as audit ledger state; the caller does not read it.
-  - Read `actions_path` for current BLOCKING and ADVISORY findings.
+  - Call `_plan/draft-reviewers/correctness-adjudicator-cacheless` with `context_path: plan_path` and `draft_handoff_path`.
+  - Parse current BLOCKING and ADVISORY findings from its inline `# REVIEW` block.
   - If BLOCKING: fix, recompute `## Delta`, rerun touched reviewers, then repeat final correctness audit.
 - Run final docs-and-wording audit with the audit reviewer only after late user-facing doc changes or prior wording BLOCKING findings.
 - Do not continue into finalize.

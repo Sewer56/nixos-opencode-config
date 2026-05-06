@@ -1,7 +1,9 @@
 # Cache file format
 ```markdown
 # Review Cache: {{arg:domain}}
+{{ if=has_actions_path }}
 Latest Actions: <actions_path>
+{{ endif }}
 
 ## Verified Observations
 - <{{arg:ref_type}}>: <grounding snapshot — one line each>

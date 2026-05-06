@@ -1,5 +1,8 @@
 ```text
 # REVIEW
+{{ if=with_cache_path }}Cache: <cache_path>
+{{ endif }}{{ if=with_actions_path }}Actions: <actions_path>
+{{ endif }}
 {{ if=agent }}Agent: {{arg:agent}}
 {{ endif }}Decision: PASS | ADVISORY | BLOCKING
 {{ if=domains }}Domains: {{arg:domains}}

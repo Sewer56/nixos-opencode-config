@@ -57,5 +57,7 @@ Adjudicate implementation review against request intent (cached). Validate A/B r
 
 {{
   file="./agent/_templates/review-output/pointer.txt"
+  with_cache_path=1
+  with_actions_path=1
   prefix=F
 }}

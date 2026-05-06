@@ -55,6 +55,8 @@ Adjudicate the COR domain (cached). Validate A/B reviewer pointers, merge eviden
 
 {{
   file="./agent/_templates/review-output/pointer.txt"
+  with_cache_path=1
+  with_actions_path=1
   agent="correctness"
   domains="COR"
   prefix=COR

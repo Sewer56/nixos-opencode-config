@@ -3,7 +3,7 @@ Review an implementation against its plan.
 # Inputs
 - Plan path (passed by caller).
 {{ if=mode==cached }}
-- `cache_path:` and `actions_path:` — REQUIRED, passed inline by caller.
+- `cache_path:` — REQUIRED. `actions_path:` optional; derive next sidecar when omitted.
 {{ endif }}
 
 # Focus
@@ -23,7 +23,6 @@ Read files listed in the handoff index's File column. Use `git diff -- <those fi
   delta_source=handoff_path
   has_actions_path=1
   step2_extra="- Read the handoff at the given path for plan metadata, requirements, and Step Index."
-  pointer_emit=1
 }}
 {{
   file="./agent/_templates/review-process/cacheless.txt"
@@ -37,6 +36,7 @@ Read files listed in the handoff index's File column. Use `git diff -- <those fi
   if=mode==cached
   domain=implementation
   prefix=F
+  has_actions_path=1
   ref_type="{{arg:ref_type}}"
   categories=""
   evidence="{{arg:evidence}}"
@@ -50,7 +50,7 @@ Read files listed in the handoff index's File column. Use `git diff -- <those fi
   with_evidence=1
   step=""
   with_implement_cols=1
-  output_extra="- PASS keeps `Decision: PASS`; omit `IDs`.\n- Every ID in the response MUST exist in `actions_path`.\n- Return ONLY the fenced block above.\n- Keep findings short and specific.\n- Include a unified diff after every finding's `Fix:` field with the exact text replacement. Omit the diff when the finding is a conceptual concern with no single correct replacement.\n- Cite file paths and line numbers where possible."
+  output_extra="- Omit the diff when the finding is a conceptual concern with no single correct replacement.\n- Cite file paths and line numbers where possible."
 }}
 
 {{

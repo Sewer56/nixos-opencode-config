@@ -6,10 +6,12 @@
    - sidecar actions: replace `.md` with `.actions.<same nnn>.md`.
 4. Run `{{arg:reviewer_a}}` and `{{arg:reviewer_b}}` independently {{arg:run_context}}.
 5. Do not pass either leg the other leg's output. Do not apply raw leg findings. Do not allow either leg to edit {{arg:no_edit_targets}}.
-6. Validate both outputs: `# REVIEW`{{arg:validation_extra}} and `Decision: PASS | ADVISORY | BLOCKING`. Treat `IDs:` as routing data only.
-7. Read sidecar actions first. Read sidecar state only when actions are malformed, truncated, contradictory, or insufficient to adjudicate evidence.
-8. Merge findings: {{arg:merge_scope}}.
-9. Merge duplicates and resolve conflicting fixes by preferring concrete evidence over reviewer confidence and minimal diffs over broad rewrites.
-10. Write `state_path` as the canonical cache.
-11. Write canonical `actions_path` with current OPEN findings only. Do not copy raw reviewer transcripts.
-12. Emit only the pointer review block.
+6. Validate both outputs: `# REVIEW`, expected `Cache:`/`Actions:` sidecar paths{{arg:validation_extra}}, and `Decision: PASS | ADVISORY | BLOCKING`. Treat `IDs:` as routing data only.
+7. GATE: each sidecar cache/actions file MUST exist before adjudication. If missing, rerun that leg for protocol compliance; do not mine cache as a substitute for actions.
+8. Read sidecar actions first. Read sidecar state only for evidence behind valid action IDs.
+9. Merge findings: {{arg:merge_scope}}.
+10. Merge duplicates and resolve conflicting fixes by preferring concrete evidence over reviewer confidence and minimal diffs over broad rewrites.
+11. Write `state_path` as the canonical cache.
+12. Write canonical `actions_path` with current OPEN findings only. Do not copy raw reviewer transcripts.
+13. GATE: `state_path` and `actions_path` MUST exist on disk before output.
+14. Emit only the pointer review block.

@@ -25,7 +25,17 @@ Read `handoff_path`, `plan_path`, all `step_paths` in full.
 # Output
 
 {{
-  file="./agent/_templates/review-output/pointer.txt"
+  file="./agent/_templates/review-output/output.txt"
   agent="_plan/finalize-reviewers/tests-cacheless"
   prefix=TST
+  categories="COVERAGE | REDUNDANCY | PARAMETERIZATION | PLACEMENT"
+  evidence="<step-id, section, path:line, or missing element>"
+  problem="<one line>"
+  fix="<unified diff targeting step file(s)>"
+  file_ref="<path/to/step/file>"
+  bad="--proposed test step"
+  good="+corrected test step with proper coverage"
+  with_lines=1
+  with_evidence=1
+  step=""
 }}

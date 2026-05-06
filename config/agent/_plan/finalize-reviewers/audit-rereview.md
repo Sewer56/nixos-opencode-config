@@ -62,12 +62,15 @@ Read only: `cache_path` + `changed_step_paths`. Max 5 tool calls. No grep, no so
 5. Scan changed steps for new fidelity/structure/completeness/economy/dead-code issues.
 6. Update `cache_path` if needed.
 7. Write `actions_path` with only current OPEN findings the caller must fix.
-8. Emit `# REVIEW`.
+8. GATE: `cache_path` and `actions_path` MUST exist on disk before proceeding. If not: write them.
+9. Emit only the fenced `# REVIEW` block.
 
 # Output
 
 {{
   file="./agent/_templates/review-output/pointer.txt"
+  with_cache_path=1
+  with_actions_path=1
   agent="_plan/finalize-reviewers/audit-rereview"
   prefix=AUD
 }}

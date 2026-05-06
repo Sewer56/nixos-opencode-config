@@ -1,0 +1,26 @@
+# Review Cache: tests
+{{ if=has_actions_path }}
+Latest Actions: <actions_path>
+{{ endif }}
+
+## Verified Observations
+- <step-id>: <what was verified, with grounding snapshot — one line each>
+
+## Findings
+
+### [TST-NNN]
+Status: OPEN | RESOLVED
+Category: COVERAGE | REDUNDANCY | PARAMETERIZATION | PLACEMENT
+Severity: BLOCKING | ADVISORY
+Problem: <one line>
+Fix: <unified diff targeting step file(s)>
+~~~diff
+<path/to/step/file>
+--- a/<path/to/step/file>
++++ b/<path/to/step/file>
+ unchanged context
+-proposed test step
++corrected test step with proper coverage
+ unchanged context
+~~~
+Resolution: <only for RESOLVED>

@@ -55,9 +55,8 @@ Implement a plan from conversation context with an automated review loop.
 - Repeat until reviewer returns `Decision: PASS` or 5 iterations reached.
 - At cap with any findings remaining: FAIL.
 - Before `Status: SUCCESS`:
-  - Run one final audit with `_implement/freeform-reviewer-adjudicator-cacheless`, updated inline context, and same `cache_path`.
-  - Read `actions_path` for current findings and fixes.
-  - The cache is audit ledger state; the caller does not read it.
+  - Run one final audit with `_implement/freeform-reviewer-adjudicator-cacheless` and updated inline context.
+  - Parse current findings and fixes from its inline `# REVIEW` block.
   - If BLOCKING: fix, rerun touched, then re-audit.
 
 ## 5. Report

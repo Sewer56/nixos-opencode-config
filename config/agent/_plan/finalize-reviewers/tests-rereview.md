@@ -62,12 +62,15 @@ Do NOT read `handoff_path`, `plan_path`, or rules files. Max 5 tool calls. Read 
 5. Check changed steps for new test gaps.
 6. Update `cache_path`: carry forward unchanged, update changed, add new findings.
 7. Write `actions_path` with only current OPEN findings the caller must fix.
-8. Emit `# REVIEW` block.
+8. GATE: `cache_path` and `actions_path` MUST exist on disk before proceeding. If not: write them.
+9. Emit only the fenced `# REVIEW` block.
 
 # Output
 
 {{
   file="./agent/_templates/review-output/pointer.txt"
+  with_cache_path=1
+  with_actions_path=1
   agent="_plan/finalize-reviewers/tests-rereview"
   prefix=TST
 }}
