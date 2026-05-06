@@ -1,4 +1,18 @@
-{{ file="./agent/_implement/freeform-reviewer/_templates/header.txt" }}
+Review an implementation against request intent from conversation context.
+
+# Inputs
+- Inline context passed by the primary via task parameters:
+  - `## Request`: original user request (verbatim or summarized)
+  - `## Plan Summary`: what was planned from conversation context
+  - `## Changes Made`: files changed and what was done in each
+  - `## Notes`: additional context or `None`
+
+# Focus
+
+## Read strategy
+Inspect all changes via `git diff`. Inspect the full implementation diff against request intent.
+
+{{ file="./rules/implement/implement-review.md" }}
 
 # Process
 
