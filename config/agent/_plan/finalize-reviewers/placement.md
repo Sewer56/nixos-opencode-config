@@ -82,40 +82,22 @@ When ordering requires broad semantic inference, security/correctness judgment, 
 
 # Output
 
-```text
-# REVIEW
-Agent: _plan/finalize-reviewers/placement
-Decision: PASS | ADVISORY | BLOCKING
-IDs: <PLC-001, PLC-002, ... | None>
-
-## Findings
-- None | finding entries below:
-
-### [PLC-NNN]
-Category: VISIBILITY | CALL_ORDER | ENTRY_POINT | STABILITY | ANCHOR | INSUFFICIENT_CONTEXT | RULES_MISSING
-Severity: BLOCKING | ADVISORY
-Step: <I#>
-File: <target source path or step path>
-Problem: <one line>
-Fix: <prose or exact step-file diff>
-~~~diff
-<path/to/step/file>
---- a/<path/to/step/file>
-+++ b/<path/to/step/file>
- unchanged context
--problem
-+fix
- unchanged context
-~~~
-
-## Verified
-- <step-id or file>: <one-line verified condition> | None
-
-## Notes
-- <optional one-line note> | None
-```
-
-Your final response MUST be exactly the fenced block above. No prose before or after it.
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plan/finalize-reviewers/placement"
+  prefix=PLC
+  categories="VISIBILITY | CALL_ORDER | ENTRY_POINT | STABILITY | ANCHOR | INSUFFICIENT_CONTEXT | RULES_MISSING"
+  problem="<one line>"
+  fix="<prose or exact step-file diff>"
+  file_ref="<path/to/step/file>"
+  bad="-problem"
+  good="+fix"
+  with_evidence=0
+  with_step_file=1
+  step="<I#>"
+  with_verified=1
+  verified_ref="<step-id or file>: <one-line verified condition> | None"
+}}
 
 # Constraints
 

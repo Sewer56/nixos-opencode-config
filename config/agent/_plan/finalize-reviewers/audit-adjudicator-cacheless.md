@@ -41,35 +41,22 @@ Adjudicate the AUD domain (cacheless). Validate A/B reviewer outputs, merge evid
 
 # Output
 
-```text
-# REVIEW
-Agent: _plan/finalize-reviewers/audit
-Decision: PASS | ADVISORY | BLOCKING
-IDs: AUD-001, AUD-002, ...
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plan/finalize-reviewers/audit"
+  prefix=AUD
+  categories="FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE"
+  evidence="<step-id, section, path:line, diff header, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<path/to/step/file>"
+  bad="-problem"
+  good="+fix"
+  with_evidence=1
+}}
 
-## Findings
-### [AUD-NNN]
-Category: FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE
-Severity: BLOCKING | ADVISORY
-Evidence: <step-id, section, path:line, diff header, or missing element>
-Problem: <one line>
-Fix: <smallest concrete correction>
-~~~
-<path/to/step/file>
---- a/<path/to/step/file>
-+++ b/<path/to/step/file>
- unchanged context
--problem
-+fix
- unchanged context
-~~~
-
-## Notes
-- <optional short notes>
-```
 - PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
-- Return ONLY the fenced block.
 
 # Constraints
 - Inspect all artifacts yourself, do not read prior review caches, and answer whether the step artifacts are free of blocking issues in AUD.

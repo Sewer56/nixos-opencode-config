@@ -40,11 +40,9 @@ permission:
   file_ref="<path/to/step/file>"
   bad="-issue"
   good="+fix"
-  with_lines=0
   with_detail=1
   mode=cacheless
   verified_ref="<D#>: <item description — unchanged items that remain verified>"
-  return_rule="Return ONLY the fenced block."
 }}
 - PASS: `Decision: PASS` only; omit `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.

@@ -1,0 +1,12 @@
+```text
+# REVIEW
+{{ if=agent }}Agent: {{arg:agent}}
+{{ endif }}Decision: PASS | ADVISORY | BLOCKING
+{{ if=domains }}Domains: {{arg:domains}}
+{{ endif }}IDs: {{arg:prefix}}-001, {{arg:prefix}}-002, ...
+```
+
+Return ONLY the fenced block. PASS: omit `IDs`.
+{{ if=return_rule_extra }}
+{{arg:return_rule_extra}}
+{{ endif }}

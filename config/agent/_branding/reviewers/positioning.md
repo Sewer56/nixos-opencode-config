@@ -101,9 +101,7 @@ Good: name, values, and messages reinforce one promise.
   bad="-misaligned name or messaging"
   good="+coherent alternative"
   with_lines=1
-  with_detail=0
   verified_ref="[<ID>]: <candidate name or section — unchanged items that remain verified>"
-  return_rule="Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections."
 }}
 
 # Constraints

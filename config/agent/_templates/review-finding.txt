@@ -6,8 +6,8 @@ Detail: {{arg:detail}}
 {{ if=with_file==1 }}File: <path>
 {{ endif }}{{ if=with_lines==1 }}
 Lines: ~<start line>-<end line> | None
-{{ endif }}Evidence: {{arg:evidence}}
-{{ if=with_step_file==1 }}
+{{ endif }}{{ if=with_evidence==0 }}{{ else }}Evidence: {{arg:evidence}}
+{{ endif }}{{ if=with_step_file==1 }}
 Step: {{arg:step}}
 File: {{arg:file}}
 {{ endif }}Problem: {{arg:problem}}

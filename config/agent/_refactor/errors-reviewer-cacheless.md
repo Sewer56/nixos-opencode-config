@@ -88,10 +88,8 @@ Read `lang-<language>-errors.txt` once per language, per `# Focus`.
   bad="-proposed error docs with vague trigger"
   good="+proposed error docs with concrete trigger"
   with_lines=1
-  with_detail=0
   mode=cacheless
   verified_ref="<path>: <item description — unchanged items that remain verified>"
-  return_rule="Return ONLY the fenced block."
 }}
 - PASS: `Decision: PASS` only; omit `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.

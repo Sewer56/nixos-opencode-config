@@ -49,11 +49,9 @@ In the `# REVIEW` output, set `Agent:` to `_plan/finalize-eudoc-reviewers/correc
   file_ref="<path/to/step/file>"
   bad="-issue"
   good="+fix"
-  with_lines=0
   with_detail=1
   mode=cached
   verified_ref="<D#>: <item description — unchanged items that remain verified>"
-  return_rule="Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line."
 }}
 
 # Constraints

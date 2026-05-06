@@ -101,9 +101,7 @@ Good: name and tagline make the promise repeatable in one sentence.
   bad="-unclear name or messaging"
   good="+clearer alternative"
   with_lines=1
-  with_detail=0
   verified_ref="[<ID>]: <candidate name or section — unchanged items that remain verified>"
-  return_rule="Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections."
 }}
 
 # Constraints

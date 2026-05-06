@@ -20,7 +20,7 @@ permission:
 ---
 
 {{
-  file="./agent/_shared/code-doc-reviewers/docs-readability-header.txt"
+  file="./agent/_plan/finalize-codedoc-reviewers/_templates/docs-readability-header.txt"
   description="Review source files for documentation coverage, specificity, fidelity, inline comments, and readability."
   inputs="- `handoff_path`"
   doc_domain=DDOC
@@ -42,7 +42,7 @@ permission:
 # Output
 
 {{
-  file="./agent/_shared/code-doc-reviewers/docs-readability-output.txt"
+  file="./agent/_plan/finalize-codedoc-reviewers/_templates/docs-readability-output.txt"
   mode=cached
   variant=refactor
   agent_name="_refactor/document-reviewers/docs-and-readability-cached"

@@ -18,7 +18,7 @@ permission:
 ---
 
 {{
-  file="./agent/_shared/code-doc-reviewers/docs-readability-header.txt"
+  file="./agent/_plan/finalize-codedoc-reviewers/_templates/docs-readability-header.txt"
   description="Review code/test steps for code-adjacent documentation coverage, specificity, fidelity, inline comments, and readability."
   inputs="- `handoff_path` (e.g., `<artifact_base>.handoff.md`)\n- `plan_path` (e.g., `<artifact_base>.draft.md`)\n- `step_pattern` (e.g., `<artifact_base>.step.*.md`)"
   doc_domain=CDOC
@@ -36,7 +36,7 @@ permission:
 # Output
 
 {{
-  file="./agent/_shared/code-doc-reviewers/docs-readability-output.txt"
+  file="./agent/_plan/finalize-codedoc-reviewers/_templates/docs-readability-output.txt"
   mode=cacheless
   variant=codedoc
   agent_name="_plan/finalize-codedoc-reviewers/docs-and-readability-cacheless"

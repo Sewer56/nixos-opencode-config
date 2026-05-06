@@ -1,9 +1,9 @@
 ```text
 # REVIEW
-Agent: {{arg:agent}}
-Decision: PASS | ADVISORY | BLOCKING
+{{ if=agent }}Agent: {{arg:agent}}
+{{ endif }}Decision: PASS | ADVISORY | BLOCKING
 {{ if=domains }}Domains: {{arg:domains}}
-{{ endif }}
+{{ endif }}IDs: {{arg:prefix}}-001, {{arg:prefix}}-002, ...
 
 ## Findings
 {{
@@ -16,9 +16,13 @@ Decision: PASS | ADVISORY | BLOCKING
   file_ref="{{arg:file_ref}}"
   bad="{{arg:bad}}"
   good="{{arg:good}}"
+  with_file={{arg:with_file}}
   with_lines={{arg:with_lines}}
+  with_evidence={{arg:with_evidence}}
   with_detail={{arg:with_detail}}
   detail="{{arg:detail}}"
+  with_step_file={{arg:with_step_file}}
+  step="{{arg:step}}"
 }}
 {{ if=prefix_b }}
 
@@ -32,12 +36,32 @@ Decision: PASS | ADVISORY | BLOCKING
   file_ref="{{arg:file_ref_b}}"
   bad="{{arg:bad_b}}"
   good="{{arg:good_b}}"
+  with_file={{arg:with_file}}
   with_lines={{arg:with_lines}}
+  with_evidence={{arg:with_evidence}}
   with_detail={{arg:with_detail}}
   detail="{{arg:detail_b}}"
+  with_step_file={{arg:with_step_file}}
+  step="{{arg:step_b}}"
 }}
 {{ endif }}
+{{ if=with_verified }}
 
-{{ file="./agent/_templates/review-output/footer.txt" verified_ref="{{arg:verified_ref}}" mode={{arg:mode}} }}
+## Verified
+- {{arg:verified_ref}}
+{{ else }}
+{{ if=mode==cached }}
 
-{{arg:return_rule}}
+## Verified
+- {{arg:verified_ref}}
+{{ endif }}
+{{ endif }}
+
+## Notes
+- <optional short notes>
+```
+
+Return ONLY the fenced block.{{ if=with_verified }} Always include `## Findings` and `## Verified`; write `- None` under empty sections.{{ else }}{{ if=mode==cached }} Always include `## Findings` and `## Verified`; write `- None` under empty sections.{{ endif }}{{ endif }}
+{{ if=return_rule_extra }}
+{{arg:return_rule_extra}}
+{{ endif }}

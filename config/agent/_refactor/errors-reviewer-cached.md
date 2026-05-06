@@ -94,10 +94,8 @@ In the `# REVIEW` output, set `Agent:` to `_refactor/errors-reviewer-cached`.
   bad="-+proposed error docs with vague trigger"
   good="++proposed error docs with concrete trigger"
   with_lines=1
-  with_detail=0
   mode=cached
   verified_ref="<list items checked with no issues found>"
-  return_rule="Return ONLY the block above. Write `- None` under empty sections."
 }}
 
 # Constraints

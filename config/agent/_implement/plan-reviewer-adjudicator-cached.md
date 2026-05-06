@@ -46,13 +46,11 @@ Adjudicate implementation review against a plan (cached). Validate A/B reviewer 
 }}
 
 # Output
-```text
-# REVIEW
-Decision: PASS | ADVISORY | BLOCKING
-IDs: F-001, F-002, ...
-```
-- PASS keeps `Decision: PASS`; omit `IDs`.
-- Return ONLY the fenced block above.
+
+{{
+  file="./agent/_templates/review-output/pointer.txt"
+  prefix=F
+}}
 
 # Constraints
 - Do not recursively call an adjudicator.

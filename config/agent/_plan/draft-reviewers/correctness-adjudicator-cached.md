@@ -49,16 +49,12 @@ Adjudicate the COR domain (cached). Validate A/B reviewer pointers, merge eviden
 
 # Output
 
-```text
-# REVIEW
-Agent: correctness
-Decision: PASS | ADVISORY | BLOCKING
-Domains: COR
-IDs: COR-001, COR-002, ...
-```
-- PASS keeps `Agent:`, `Decision: PASS`, and `Domains: COR`; omit `IDs`.
-
-Return ONLY the block above. Always include `Domains: COR`.
+{{
+  file="./agent/_templates/review-output/pointer.txt"
+  agent="correctness"
+  domains="COR"
+  prefix=COR
+}}
 
 # Constraints
 - Do not search for unrelated issues; adjudicate the two reviewer caches.

@@ -102,9 +102,7 @@ Good: `Check domain, trademark, social handles, and package registry before laun
   bad="-missing or risky availability claim"
   good="+qualified claim or disclaimer"
   with_lines=1
-  with_detail=0
   verified_ref="[<ID>]: <candidate name or section — unchanged items that remain verified>"
-  return_rule="Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections."
 }}
 
 # Constraints

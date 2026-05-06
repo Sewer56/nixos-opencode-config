@@ -9,11 +9,8 @@
   file_ref="{{arg:file_ref}}"
   bad="{{arg:bad_example}}"
   good="{{arg:good_example}}"
-  with_lines=0
-  with_detail=0
   mode={{arg:mode}}
   verified_ref="<file:section>: <item description — unchanged items that remain verified>"
-  return_rule="Return ONLY the block above. Write `- None` under empty sections."
 }}
 
 # Constraints

@@ -11,18 +11,8 @@
   bad="-old or missing docs"
   good="+new docs"
   with_lines=1
-  with_detail=0
-  prefix_b={{arg:read_domain}}
-  categories_b="{{arg:read_categories}}"
-  evidence_b="{{arg:evidence2}}"
-  problem_b="<what readability issue degrades the documentation>"
-  fix_b="<concise replacement>"
-  file_ref_b="{{arg:file_ref}}"
-  bad_b="-problematic"
-  good_b="+improved"
   mode={{arg:mode}}
   verified_ref="{{arg:verified_ref}}"
-  return_rule="Return ONLY the block above. Write `- None` under empty sections."
 }}
 
 # Constraints

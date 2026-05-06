@@ -20,7 +20,7 @@ permission:
 ---
 
 {{
-  file="./agent/_shared/code-doc-reviewers/errors-header.txt"
+  file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-header.txt"
   description="Review step artifacts' code-adjacent error documentation."
   inputs="- `handoff_path` (e.g., `<artifact_base>.handoff.md`)\n- `plan_path` (e.g., `<artifact_base>.draft.md`)\n- `step_pattern` (e.g., `<artifact_base>.step.*.md`)"
   focus_file="errors-focus.plan.md"
@@ -40,7 +40,7 @@ permission:
 # Output
 
 {{
-  file="./agent/_shared/code-doc-reviewers/errors-output.txt"
+  file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-output.txt"
   mode=cached
   variant=codedoc
   agent_name="_plan/finalize-codedoc-reviewers/errors-cached"

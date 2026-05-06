@@ -127,55 +127,30 @@ Resolution: <only for RESOLVED>
 
 # Output
 
-```text
-# REVIEW
-Agent: _plan/draft-reviewers/docs-and-wording
-Decision: PASS | ADVISORY | BLOCKING
-Domains: DOC, WORDING
-
-## Findings
-### [DOC-NNN]
-Category: COVERAGE | SPECIFICITY
-Severity: BLOCKING | ADVISORY
-Evidence: <section, `path:line`, or missing element>
-Lines: ~<start line>-<end line> | None
-Problem: <what is wrong>
-Fix: <smallest concrete correction>
-~~~diff
-<artifact_base>.draft.md
---- a/<artifact_base>.draft.md
-+++ b/<artifact_base>.draft.md
- unchanged context
--missing doc [P#] item
-+added doc [P#] item with file path and change description
- unchanged context
-~~~
-
-### [WRD-NNN]
-Category: TOKEN_DENSITY | WORDING_OPTIMIZATION | BULLET_ATOMICITY | UNDEFINED_JARGON | COMPOUND_TERM | OPAQUE_REFERENCE
-Severity: BLOCKING | ADVISORY
-Evidence: <section, `path:line`, or field>
-Lines: ~<start line>-<end line> | None
-Problem: <what is unnecessarily verbose or poorly structured>
-Fix: <smallest simplification>
-~~~diff
-<artifact_base>.draft.md
---- a/<artifact_base>.draft.md
-+++ b/<artifact_base>.draft.md
- unchanged context
--verbose or poorly structured text
-+tightened replacement text
- unchanged context
-~~~
-
-## Verified
-- [P#]: <item description — unchanged items that remain verified>
-
-## Notes
-- <optional short notes>
-```
-
-Return ONLY the block above. Always include `## Findings` and `## Verified`; write `- None` under empty sections.
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plan/draft-reviewers/docs-and-wording"
+  domains="DOC, WORDING"
+  prefix=DOC
+  categories="COVERAGE | SPECIFICITY"
+  evidence="<section, `path:line`, or missing element>"
+  problem="<what is wrong>"
+  fix="<smallest concrete correction>"
+  file_ref="<artifact_base>.draft.md"
+  bad="-missing doc [P#] item"
+  good="+added doc [P#] item with file path and change description"
+  with_lines=1
+  prefix_b=WRD
+  categories_b="TOKEN_DENSITY | WORDING_OPTIMIZATION | BULLET_ATOMICITY | UNDEFINED_JARGON | COMPOUND_TERM | OPAQUE_REFERENCE"
+  evidence_b="<section, `path:line`, or field>"
+  problem_b="<what is unnecessarily verbose or poorly structured>"
+  fix_b="<smallest simplification>"
+  file_ref_b="<artifact_base>.draft.md"
+  bad_b="-verbose or poorly structured text"
+  good_b="+tightened replacement text"
+  with_verified=1
+  verified_ref="[P#]: <item description — unchanged items that remain verified>"
+}}
 
 # Constraints
 - DOC: block for missing documentation `[P#]` items when code changes affect user-facing surface. Block for generic "update docs" descriptions that lack file path and change specifics. Block for new public features without corresponding documentation steps. End-user docs must not contradict the implementation. Internal-only refactoring with no user-facing impact is acceptable without a doc `[P#]` item.

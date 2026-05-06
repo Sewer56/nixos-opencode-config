@@ -18,7 +18,7 @@ permission:
 ---
 
 {{
-  file="./agent/_shared/code-doc-reviewers/errors-header.txt"
+  file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-header.txt"
   description="Review source files' error documentation."
   inputs="- `handoff_path`"
   focus_file="errors-focus.source.md"
@@ -36,7 +36,7 @@ permission:
 # Output
 
 {{
-  file="./agent/_shared/code-doc-reviewers/errors-output.txt"
+  file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-output.txt"
   mode=cacheless
   variant=refactor
   agent_name="_refactor/document-reviewers/errors-cacheless"

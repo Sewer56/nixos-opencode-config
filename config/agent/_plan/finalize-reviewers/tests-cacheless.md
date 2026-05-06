@@ -34,13 +34,12 @@ Review step test strategy. Audit pass — reads all artifacts from scratch, does
 
 # Output
 
-```text
-# REVIEW
-Agent: _plan/finalize-reviewers/tests-cacheless
-Decision: PASS | ADVISORY | BLOCKING
-IDs: TST-001, TST-002, ...
-```
-- Your final output message MUST be EXACTLY the fenced block above. No other text — no analysis, no summary, no wrapping text.
+{{
+  file="./agent/_templates/review-output/pointer.txt"
+  agent="_plan/finalize-reviewers/tests-cacheless"
+  prefix=TST
+}}
+
 - PASS block: `Decision: PASS` only. No IDs line.
 - BLOCKING: max 6 findings. Detail each finding inline after the fenced block.
 

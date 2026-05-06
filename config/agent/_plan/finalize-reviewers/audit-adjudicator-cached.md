@@ -43,13 +43,12 @@ Adjudicate the AUD domain (cached). Validate A/B reviewer pointers, merge eviden
 }}
 
 # Output
-```text
-# REVIEW
-Agent: _plan/finalize-reviewers/audit
-Decision: PASS | ADVISORY | BLOCKING
-IDs: AUD-001, AUD-002, ...
-```
-- Return exactly the fenced block. PASS keeps `Agent:` and `Decision: PASS`; omit `IDs`.
+
+{{
+  file="./agent/_templates/review-output/pointer.txt"
+  agent="_plan/finalize-reviewers/audit"
+  prefix=AUD
+}}
 
 # Constraints
 - Do not recursively call an adjudicator.

@@ -43,36 +43,23 @@ Adjudicate the COR domain (cacheless). Validate A/B reviewer outputs, merge evid
 
 # Output
 
-```text
-# REVIEW
-Agent: correctness
-Decision: PASS | ADVISORY | BLOCKING
-Domains: COR
-IDs: COR-001, COR-002, ...
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="correctness"
+  domains="COR"
+  prefix=COR
+  categories="FIDELITY | ACTION | FILE_PATH | TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS"
+  evidence="<section, [P#], path:line, diff header, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<artifact_base>.draft.md"
+  bad="-incorrect content"
+  good="+correct content"
+  with_evidence=1
+}}
 
-## Findings
-### [COR-NNN]
-Category: FIDELITY | ACTION | FILE_PATH | TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS
-Severity: BLOCKING | ADVISORY
-Evidence: <section, [P#], path:line, diff header, or missing element>
-Problem: <one line>
-Fix: <smallest concrete correction>
-~~~
-<artifact_base>.draft.md
---- a/<artifact_base>.draft.md
-+++ b/<artifact_base>.draft.md
- unchanged context
--incorrect content
-+correct content
- unchanged context
-~~~
-
-## Notes
-- <optional short notes>
-```
 - PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
-- Return ONLY the fenced block.
 
 # Constraints
 - Inspect the full draft and handoff yourself, do not read prior review caches, and answer whether the draft is free of blocking issues in COR.

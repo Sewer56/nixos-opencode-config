@@ -62,14 +62,12 @@ Good: `Decision: PASS` only when no new findings exist.
 8. Emit `# REVIEW`.
 
 # Output
-```text
-# REVIEW
-Agent: _plan/finalize-reviewers/audit-rereview
-Decision: PASS | ADVISORY | BLOCKING
-IDs: AUD-NNN, AUD-NNN, ...
-```
-- Your final output message MUST be EXACTLY the fenced block above. No other text.
-- PASS keeps `Agent:` and `Decision: PASS`; omit `IDs`.
+
+{{
+  file="./agent/_templates/review-output/pointer.txt"
+  agent="_plan/finalize-reviewers/audit-rereview"
+  prefix=AUD
+}}
 
 # Constraints
 - BLOCKING: max 2 findings. ADVISORY findings → DEFERRED, do not block.

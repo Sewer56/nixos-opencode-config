@@ -36,35 +36,22 @@ Review only the performance-sensitive parts of step artifacts. Audit pass — re
 
 # Output
 
-```text
-# REVIEW
-Agent: _plan/finalize-reviewers/performance-cacheless
-Decision: PASS | ADVISORY | BLOCKING
-IDs: PERF-001, PERF-002, ...
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plan/finalize-reviewers/performance-cacheless"
+  prefix=PERF
+  categories="ALGORITHM | DATA | DATABASE | CONCURRENCY | VALIDATION"
+  problem="<one line>"
+  fix="<diff or prose>"
+  file_ref="<path/to/step/file>"
+  bad="-problem"
+  good="+fix"
+  with_evidence=0
+}}
 
-## Findings
-### [PERF-NNN]
-Category: ALGORITHM | DATA | DATABASE | CONCURRENCY | VALIDATION
-Severity: BLOCKING | ADVISORY
-Problem: <one line>
-Fix: <diff or prose>
-~~~
-<path/to/step/file>
---- a/<path/to/step/file>
-+++ b/<path/to/step/file>
- unchanged context
--problem
-+fix
- unchanged context
-~~~
-
-## Notes
-- <optional short notes>
-```
 - PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - If the plan is not performance-sensitive: `Decision: PASS` with `Performance Sensitive: NO` in `## Notes`.
 - BLOCKING: max 6 findings.
-- Return ONLY the fenced block.
 
 # Constraints
 - Read `handoff_path`, `plan_path`, all `step_paths` in full.
