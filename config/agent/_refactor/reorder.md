@@ -15,6 +15,14 @@ permission:
 
 Reorder declarations so reading top-to-bottom follows the call flow. This command is **plan-first** and requires explicit user confirmation before any code edits.
 
+# Focus
+
+## Scope boundaries
+- Do not reorder across files; only reorder within a single file.
+- Do not change logic, types, imports, or documentation.
+- Preserve blank lines and section comments between declarations.
+- When the language has a conventional entry point (e.g. `main`, `__init__`, `mod.rs` with `pub fn`), place it first regardless of other rules.
+
 ## Workflow
 
 1. Scope targets
@@ -82,13 +90,6 @@ Reorder declarations so reading top-to-bottom follows the call flow. This comman
 2. **Reading order**: within each visibility tier, callers before callees.
 3. **Entry point first**: place the entry point (e.g. `main`, the primary exported function) first; then direct callees in the order called; then their callees, and so on.
 4. **Stability**: when two declarations have equal priority (same tier, no call dependency between them), preserve the existing relative order.
-
-## Constraints
-
-- Do not reorder across files; only reorder within a single file.
-- Do not change logic, types, imports, or documentation.
-- Preserve blank lines and section comments between declarations.
-- When the language has a conventional entry point (e.g. `main`, `__init__`, `mod.rs` with `pub fn`), place it first regardless of other rules.
 
 # Rules
 

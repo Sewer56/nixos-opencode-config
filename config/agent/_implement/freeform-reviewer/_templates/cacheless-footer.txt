@@ -24,6 +24,5 @@ IDs: F-001, F-002, ...
 ```
 
 Return ONLY the block above. Write `- None` under empty sections.
-
-# Constraints
-- Drop broad rewrites. Answer whether the implementation is free of blocking issues.
+- Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` field with the exact text replacement.

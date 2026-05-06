@@ -51,6 +51,11 @@ Convert a confirmed draft plan into reviewed code and test steps. Write `<artifa
   - `<artifact_base>.review-audit.md`
   - `<artifact_base>.review-tests.md`
 
+# Focus
+
+## Scope
+Only write planning artifacts `<artifact_base>.handoff.md` and I#/T# step files matching `<artifact_base>.step.*.md` during finalize. Never modify product code while planning. Never rewrite `<artifact_base>.draft.md`.
+
 # Process
 
 ## 1. Preconditions and source of truth
@@ -207,9 +212,6 @@ Next Command: /plan/finalize-code-docs
 ```
 
 # Constraints
-- Only write planning artifacts `<artifact_base>.handoff.md` and I#/T# step files matching `<artifact_base>.step.*.md` during finalize.
-- Never modify product code while planning.
-- Never rewrite `<artifact_base>.draft.md` in this command.
 - Within each step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
 - Each diff block within a step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). The step header `Lines: ~` lists the comma-separated union of hunk ranges. Per-hunk labels are the authoritative locators.
 - Full-file `Lines:` ranges are invalid for localized changes — use only for ADD actions that add complete files.

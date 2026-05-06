@@ -41,13 +41,17 @@ Generate and review end-user documentation steps for finalized implementation/te
 - `handoff_path`: `<artifact_base>.handoff.md`
 - `step_pattern`: `<artifact_base>.step.*.md`
 
+# Focus
+
+## Scope
+Only modify `<artifact_base>.handoff.md` and D# step files. Do not modify I#/T# step files, product code, or `<artifact_base>.draft.md`.
+
 # Process
 
 ## 1. Preconditions and source of truth
 - Read `handoff_path`. Use its Step Index, Requirement Trace Matrix, Settled Facts, and Draft Plan Mapping as the primary source for user-facing behavior changes.
 - Read existing I# and T# step files only when the handoff lacks sufficient detail about a specific user-facing effect.
 - Treat the finalized steps as the source of truth.
-- Do not modify I# or T# step files.
 
 ## 2. Deepen discovery
 - Read existing user documentation files that may describe changed behavior.
@@ -105,7 +109,6 @@ Summary: <one-line summary>
 ```
 
 # Constraints
-- Only modify `<artifact_base>.handoff.md` and D# step files. Do not modify I#/T# step files, product code, or `<artifact_base>.draft.md`.
 - Each diff hunk: 2+ context lines, per-hunk `**Lines: ~start-end**` label. Full-file Lines only for NEW files.
 - Nested fences: outer ```, inner ~~~.
 - Keep user-facing responses brief and factual.

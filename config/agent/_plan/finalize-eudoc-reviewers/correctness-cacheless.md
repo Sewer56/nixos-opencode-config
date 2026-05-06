@@ -46,10 +46,4 @@ permission:
 }}
 - PASS: `Decision: PASS` only; omit `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
-
-# Constraints
-
-- Block for: docs contradicting implementation, unspecified "update docs", missing docs for new features, broken internal links.
-- Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` targeting the affected D# step file.
-- Only generate findings on in-scope D# steps. Findings on frozen regions are invalid.
+- Target diffs to the affected D# step file.

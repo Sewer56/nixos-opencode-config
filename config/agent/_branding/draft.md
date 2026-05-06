@@ -39,6 +39,14 @@ Draft project names and brand direction with a reviewer loop.
 - `branding_path`: `<artifact_base>.draft.md`
 - `handoff_path`: `<artifact_base>.draft.handoff.md`
 
+# Focus
+
+## Write scope
+Write only `<artifact_base>.draft.md`, `<artifact_base>.draft.handoff.md`, and `<artifact_base>.draft.review-*.md`. Do not modify other files.
+
+## Provisional availability
+Treat live availability claims (domains, packages, handles) as provisional unless the handoff records an explicit external check via `mcp-search`.
+
 # Process
 
 ## 1. Parse user inputs
@@ -115,7 +123,5 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Write only `<artifact_base>.draft.md`, `<artifact_base>.draft.handoff.md`, and `<artifact_base>.draft.review-*.md`.
 - Use fenced `text` code blocks for plain structured output.
 - Outer fence uses backticks (```), inner fences use tildes (~~~) whenever a code block contains another code block.
-- Treat live availability claims (domains, packages, handles) as provisional unless the handoff records an explicit external check via `mcp-search`.

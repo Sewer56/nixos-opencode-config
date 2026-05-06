@@ -33,6 +33,11 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
 - Use `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, and `step_pattern` = `<artifact_base>.step.*.md`.
 - Required local artifacts for this run: `plan_path`, `handoff_path`, and existing I#/T# files matching `step_pattern`.
 
+# Focus
+
+## Scope
+Only modify `<artifact_base>.handoff.md` and existing I#/T# step files matching `<artifact_base>.step.*.md`. Never create D# step files. Never modify product code while planning. Never rewrite `<artifact_base>.draft.md`.
+
 # Process
 
 ## 1. Preconditions and source of truth
@@ -91,10 +96,6 @@ Next Command: /plan/finalize-user-docs
 ```
 
 # Constraints
-- Only modify `<artifact_base>.handoff.md` and existing I#/T# step files matching `<artifact_base>.step.*.md`.
-- Never create D# step files.
-- Never modify product code while planning.
-- Never rewrite `<artifact_base>.draft.md`.
 - Within each step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
 - Each diff block within a step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Per-hunk labels are the authoritative locators.
 - Full-file `Lines:` ranges are invalid for localized changes — use only for ADD actions that add complete files.

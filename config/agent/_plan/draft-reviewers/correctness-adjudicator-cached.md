@@ -33,6 +33,10 @@ Adjudicate the COR domain (cached). Validate A/B reviewer pointers, merge eviden
 - `cache_path` (optional): canonical `<artifact_base>.draft.review-correctness.md`; derive from `draft_handoff_path` when omitted.
 - `actions_path` (optional): derive next iteration path from `cache_path` when omitted.
 
+# Focus
+
+{{ file="./agent/_templates/adjudicator/cache-contract.txt" domain="correctness" }}
+
 # Process
 
 {{
@@ -55,8 +59,3 @@ Adjudicate the COR domain (cached). Validate A/B reviewer pointers, merge eviden
   domains="COR"
   prefix=COR
 }}
-
-# Constraints
-- Do not search for unrelated issues; adjudicate the two reviewer caches.
-- Do not recursively call an adjudicator.
-- Preserve the canonical correctness pointer/actions/cache contract.

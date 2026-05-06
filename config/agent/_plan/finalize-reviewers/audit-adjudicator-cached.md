@@ -30,6 +30,10 @@ Adjudicate the AUD domain (cached). Validate A/B reviewer pointers, merge eviden
 - `handoff_path`, `plan_path`, `step_paths`, `cache_path`
 - `actions_path` (optional; derive next `<state_path without .md>.actions.<nnn>.md` path when omitted)
 
+# Focus
+
+{{ file="./agent/_templates/adjudicator/cache-contract.txt" domain="audit" }}
+
 # Process
 
 {{
@@ -49,7 +53,3 @@ Adjudicate the AUD domain (cached). Validate A/B reviewer pointers, merge eviden
   agent="_plan/finalize-reviewers/audit"
   prefix=AUD
 }}
-
-# Constraints
-- Do not recursively call an adjudicator.
-- Preserve the canonical audit pointer/actions/cache contract.

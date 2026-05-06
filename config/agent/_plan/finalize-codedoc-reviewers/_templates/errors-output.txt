@@ -14,10 +14,7 @@
   verified_ref="{{arg:verified_ref}}"
 }}
 
-# Constraints
-
-- Flag missing `# Errors` sections on public error-returning APIs as BLOCKING per the errors rules.
-- Include a unified diff after every finding's `Fix:` field{{arg:diff_target_note}}.
+- Target diffs to the affected error-returning function's source file{{arg:diff_target_note}}.
 
 # Rules
 

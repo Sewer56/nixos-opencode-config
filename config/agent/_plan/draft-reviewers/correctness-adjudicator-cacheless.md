@@ -28,6 +28,11 @@ Adjudicate the COR domain (cacheless). Validate A/B reviewer outputs, merge evid
 - `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
+# Focus
+
+## Mission
+Determine whether the draft plan is free of blocking correctness issues.
+
 # Process
 
 {{
@@ -60,7 +65,3 @@ Adjudicate the COR domain (cacheless). Validate A/B reviewer outputs, merge evid
 
 - PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
-
-# Constraints
-- Inspect the full draft and handoff yourself, do not read prior review caches, and answer whether the draft is free of blocking issues in COR.
-- Do not recursively call an adjudicator.

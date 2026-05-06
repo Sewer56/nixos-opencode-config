@@ -26,6 +26,11 @@ Adjudicate the AUD domain (cacheless). Validate A/B reviewer outputs, merge evid
 # Inputs
 - `handoff_path`, `plan_path`, `step_paths`
 
+# Focus
+
+## Mission
+Determine whether step artifacts are free of blocking audit issues.
+
 # Process
 
 {{
@@ -57,7 +62,3 @@ Adjudicate the AUD domain (cacheless). Validate A/B reviewer outputs, merge evid
 
 - PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
-
-# Constraints
-- Inspect all artifacts yourself, do not read prior review caches, and answer whether the step artifacts are free of blocking issues in AUD.
-- Do not recursively call an adjudicator.

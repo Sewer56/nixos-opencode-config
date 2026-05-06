@@ -62,6 +62,8 @@
 ```
 
 Return ONLY the fenced block.{{ if=with_verified }} Always include `## Findings` and `## Verified`; write `- None` under empty sections.{{ else }}{{ if=mode==cached }} Always include `## Findings` and `## Verified`; write `- None` under empty sections.{{ endif }}{{ endif }}
+- Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` field with the exact text replacement.
 {{ if=return_rule_extra }}
 {{arg:return_rule_extra}}
 {{ endif }}

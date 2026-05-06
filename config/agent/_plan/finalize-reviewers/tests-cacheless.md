@@ -25,6 +25,14 @@ Review step test strategy. Audit pass — reads all artifacts from scratch, does
 
 {{ file="./agent/_plan/finalize-reviewers/_templates/tests-shared-focus.txt" }}
 
+## Read strategy
+Read `handoff_path`, `plan_path`, all `step_paths` in full.
+
+{{ file="./agent/_plan/finalize-reviewers/_templates/source-file-access.txt" grounding_refs="step file diffs and handoff `## Settled Facts`" }}
+
+## Mission
+Determine whether the test artifacts are free of blocking issues.
+
 # Process
 
 {{
@@ -42,11 +50,3 @@ Review step test strategy. Audit pass — reads all artifacts from scratch, does
 
 - PASS block: `Decision: PASS` only. No IDs line.
 - BLOCKING: max 6 findings. Detail each finding inline after the fenced block.
-
-# Constraints
-- Read `handoff_path`, `plan_path`, all `step_paths` in full.
-- PASS: Decision only, no IDs line.
-- BLOCKING: max 6 findings. Detail findings inline after the fenced block.
-- Focus on behavior, not implementation-detail tests.
-- Source files are NOT available in the worktree. Trust step file diffs and handoff `## Settled Facts` for all repo grounding. Do not attempt to read source file paths.
-- Answer whether the test artifacts are free of blocking issues.

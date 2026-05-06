@@ -37,6 +37,14 @@ Review D# steps for clarity, wording quality, reader engagement, and cross-page 
 ## Plan-step context
 - Do not flag frozen regions.
 
+## Read strategy
+On first review: If Delta was passed inline, skip reading `handoff_path` — use the inline Step Index and Requirement Trace Matrix rows. Read all D# step files in one batch. For UPDATE scope: read target doc files at the line ranges D# steps specify. Read all D# step files for cross-page polish checks (only if multiple exist). Skip ARCHITECTURE.md, source code, draft.md, or I#/T# step files unless a D# step explicitly references them.
+
+On re-review: Read `## Delta` from `handoff_path` for status changes. Read ONLY D# steps marked Changed or New in Delta — skip Unchanged steps (they are in cache as Verified). Do NOT re-read the full handoff, target doc files, or all D# steps for Unchanged items. For cross-page checks on re-review, only examine Changed D# steps against each other — skip cross-checks involving only Unchanged steps.
+
+## Domain ownership
+Do NOT read the correctness reviewer cache (`<artifact_base>.review-eudoc-correctness.md`). Polish owns wording/clarity/engagement/consistency; correctness owns EDOC findings. If a cross-domain concern arises, note it as a short pointer in `## Notes`.
+
 # Process
 
  {{
@@ -68,13 +76,4 @@ Review D# steps for clarity, wording quality, reader engagement, and cross-page 
   verified_ref="<D#>: <item description — unchanged items that remain verified>"
 }}
 
-# Constraints
-- **First review** (cache empty or no prior findings): If Delta was passed inline, skip reading `handoff_path` — use the inline Step Index and Requirement Trace Matrix rows. Read all D# step files in one batch. For UPDATE scope: read target doc files at the line ranges D# steps specify. Read all D# step files for cross-page polish checks (only if multiple exist). Skip ARCHITECTURE.md, source code, draft.md, or I#/T# step files unless a D# step explicitly references them.
-- **Re-review** (cache has prior findings): Read `## Delta` from `handoff_path` for status changes. Read ONLY D# steps marked Changed or New in Delta — skip Unchanged steps (they are in cache as Verified). Do NOT re-read the full handoff, target doc files, or all D# steps for Unchanged items. For cross-page checks on re-review, only examine Changed D# steps against each other — skip cross-checks involving only Unchanged steps.
-- Do NOT read the correctness reviewer cache (`<artifact_base>.review-eudoc-correctness.md`). Polish owns wording/clarity/engagement/consistency; correctness owns EDOC findings. If a cross-domain concern arises, note it as a short pointer in `## Notes`.
-- Block for: undefined project jargon, ambiguous phrasing, compound-term compression, opaque references, project-specific acronyms, filler, passive voice in instructions, ambiguous terminology within a D# step, missing hooks on landing pages, missing examples on getting-started/guide pages, progressive-complexity violations.
-- Do not block for: standard domain terms, descriptive passive voice, stylistic variation, minor wordiness, reference-page hook issues, scannability on non-landing pages, fluff, terminology drift, content duplication, orphaned references — ADVISORY only.
-- Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` targeting the affected D# step file.
-- Follow the `# Process` section for cache, Delta, and skip handling.
-- Only generate findings on in-scope D# steps. Findings on frozen regions are invalid.
+- Target diffs to the affected D# step file.

@@ -65,6 +65,9 @@ When a finding contains multiple diff blocks, label each block with its own `**L
 Bad: one finding-level range for multiple hunks.
 Good: each hunk has its own bold line label.
 
+## Delta-scoped verification
+If `## Delta` is non-empty, verify only source files for Delta items; otherwise verify all cache items on first pass.
+
 # Language Rules Directory
 
 `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor/_templates`
@@ -98,12 +101,8 @@ In the `# REVIEW` output, set `Agent:` to `_refactor/errors-reviewer-cached`.
   verified_ref="<list items checked with no issues found>"
 }}
 
+- Cite source file evidence when grounding a finding.
+
 # Constraints
 
 - On malformed-output retry, do not re-read source files that were already analyzed.
-- If `## Delta` is non-empty, verify only source files for Delta items; otherwise verify all cache items on first pass.
-- Block for wrong variant names, format violations, or missing zero-path fallbacks.
-- Do not block for minor wording preferences when specificity and format are correct.
-- Cite source file evidence when grounding a finding.
-- Keep findings short and specific.
-- `Lines: ~` values must be valid range specifiers (`~<start>-<end>`) matching the diff context; every `Lines:` reference must have corresponding unchanged lines in the accompanying diff.

@@ -27,6 +27,11 @@ Review step test strategy. Initial review only — re-review handled by dedicate
 
 {{ file="./agent/_plan/finalize-reviewers/_templates/tests-shared-focus.txt" }}
 
+## Read strategy
+Read `handoff_path`, `plan_path`, all `step_paths`. Full audit. Write cache.
+
+{{ file="./agent/_plan/finalize-reviewers/_templates/source-file-access.txt" grounding_refs="step file diffs and handoff `## Settled Facts`" }}
+
 # Process
 
  {{
@@ -49,12 +54,6 @@ IDs: TST-001, TST-002, ...
 - Your final output message MUST be EXACTLY the fenced block above. No other text — no analysis, no summary, no wrapping text.
 - PASS block: `Decision: PASS` only. No IDs line.
 - Findings are written to cache only. The orchestrator reads `cache_path` for complete findings.
-
-# Constraints
-- Read `handoff_path`, `plan_path`, all `step_paths`. Full audit. Write cache.
-- PASS: Decision only, no IDs line.
 - BLOCKING: max 6 findings. Cache findings in `cache_path`.
-- Focus on behavior, not implementation-detail tests.
 - Verified observations MUST include grounding snapshots.
-- Source files are NOT available in the worktree. Trust step file diffs and handoff `## Settled Facts` for all repo grounding. Do not attempt to read source file paths.
 - Write findings directly to cache. Do not re-narrate each step in reasoning.

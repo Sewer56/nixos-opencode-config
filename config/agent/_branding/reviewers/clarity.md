@@ -104,9 +104,4 @@ Good: name and tagline make the promise repeatable in one sentence.
   verified_ref="[<ID>]: <candidate name or section — unchanged items that remain verified>"
 }}
 
-# Constraints
-
-- Apply the severity tiers in `# Focus`.
-- Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` field targeting `<artifact_base>.draft.md` with the exact text replacement.
-- Follow the `# Process` section for cache, Delta, and skip handling.
+- Target diffs to `<artifact_base>.draft.md`.

@@ -14,6 +14,9 @@ Inspect all changes via `git diff`. Inspect the full implementation diff against
 
 {{ file="./rules/implement/implement-review.md" }}
 
+## Mission
+Determine whether the implementation is free of blocking issues.
+
 # Process
 
 {{

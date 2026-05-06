@@ -21,6 +21,11 @@ Read a confirmed draft plan and gather the repo facts needed to write implementa
 # Inputs
 - `plan_path`: the confirmed draft plan (`<artifact_base>.draft.md`)
 
+# Focus
+
+## Scope
+Do not write any plan artifacts. Return manifest only.
+
 # Process
 1. Read `plan_path`. Identify all file paths from [P#] sections, diff block headers, and Open Questions.
 2. For each identified file: read it, capture its current state (key symbols, line ranges, imports, structure).
@@ -51,7 +56,7 @@ Read a confirmed draft plan and gather the repo facts needed to write implementa
 - <anything the draft leaves unresolved that repo facts can answer>
 ```
 
+- Output ≤80 lines. Be dense — one line per fact.
+
 # Constraints
 - Read each file once. Capture enough detail for the orchestrator to write step files without further discovery.
-- Output ≤80 lines. Be dense — one line per fact.
-- Do not write any plan artifacts. Return manifest only.

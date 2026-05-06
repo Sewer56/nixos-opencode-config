@@ -104,10 +104,4 @@ Good: name, values, and messages reinforce one promise.
   verified_ref="[<ID>]: <candidate name or section — unchanged items that remain verified>"
 }}
 
-# Constraints
-
-- Block for purpose mismatch, audience mismatch, emotional tone inconsistency, tagline-message disconnect, and value-name disconnect.
-- Do not block for weak brand story or extensibility limitations alone — ADVISORY only.
-- Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` field targeting `<artifact_base>.draft.md` with the exact text replacement.
-- Follow the `# Process` section for cache, Delta, and skip handling.
+- Target diffs to `<artifact_base>.draft.md`.

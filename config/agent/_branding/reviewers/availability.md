@@ -73,6 +73,9 @@ Next Checks must recommend concrete follow-ups: domain registration, trademark s
 Bad: `Do availability checks later.`
 Good: `Check domain, trademark, social handles, and package registry before launch.`
 
+## Provisional availability
+Treat live availability claims (domains, packages, handles) as provisional unless the handoff records an explicit external check via `mcp-search`.
+
 # Process
 
  {{
@@ -105,11 +108,4 @@ Good: `Check domain, trademark, social handles, and package registry before laun
   verified_ref="[<ID>]: <candidate name or section — unchanged items that remain verified>"
 }}
 
-# Constraints
-
-- Block for confirmed package collisions, missing trademark disclaimer, risky availability claims, and absent Next Checks section.
-- Do not block for domain, social-handle, or ecosystem check gaps alone — ADVISORY only (unless a collision is confirmed).
-- Treat live availability as provisional unless the handoff records an explicit external check via `mcp-search`.
-- Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` field targeting `<artifact_base>.draft.md` with the exact text replacement.
-- Follow the `# Process` section for cache, Delta, and skip handling.
+- Target diffs to `<artifact_base>.draft.md`.

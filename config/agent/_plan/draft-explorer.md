@@ -22,6 +22,11 @@ Survey the repo for files relevant to a user request. Return a compact structure
 # Inputs
 - `request`: the user's request text — a description of what they want to do
 
+# Focus
+
+## Scope
+Do NOT write any files. Do NOT edit any files. Return manifest only. Do NOT recommend actions — just report facts.
+
 # Process
 1. Parse the request. Identify the domains, technologies, file patterns, and documentation surfaces it implies.
 2. Search the repo with glob, grep, and list to find all files relevant to the request — source files, config files, test files, documentation files, and neighboring files in the same packages/directories.
@@ -50,7 +55,7 @@ Survey the repo for files relevant to a user request. Return a compact structure
 - <constraint or pattern to respect>
 ```
 
+- Output ≤80 lines.
+
 # Constraints
-- Read each file once. Output ≤80 lines. Be dense — one line per fact.
-- Do NOT write any files. Do NOT edit any files. Return manifest only.
-- Do NOT recommend actions — just report facts.
+- Read each file once. Be dense — one line per fact.

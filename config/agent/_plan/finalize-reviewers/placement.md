@@ -99,11 +99,7 @@ When ordering requires broad semantic inference, security/correctness judgment, 
   verified_ref="<step-id or file>: <one-line verified condition> | None"
 }}
 
-# Constraints
-
 - Findings target I# step files as diffs.
-- BLOCKING only for clear declaration-order risk or missing context.
-- ADVISORY for broad pre-existing file order issues outside selected/touched declarations.
 - PASS with 0 findings: use `IDs: None`, `## Findings` with `- None`, and concise `## Verified` lines.
 
 # Rules

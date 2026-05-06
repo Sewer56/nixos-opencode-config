@@ -36,6 +36,10 @@ Adjudicate implementation review against request intent (cached). Validate A/B r
 - `cache_path` (optional; derive by replacing `.handoff.md` with `.review-implementation.md`).
 - `actions_path` (optional; derive next `<cache_path without .md>.actions.<nnn>.md` path when omitted).
 
+# Focus
+
+{{ file="./agent/_templates/adjudicator/cache-contract.txt" domain="implementation" }}
+
 # Process
 
 {{
@@ -55,7 +59,3 @@ Adjudicate implementation review against request intent (cached). Validate A/B r
   file="./agent/_templates/review-output/pointer.txt"
   prefix=F
 }}
-
-# Constraints
-- Do not recursively call an adjudicator.
-- Preserve the canonical implementation pointer/actions/cache contract.

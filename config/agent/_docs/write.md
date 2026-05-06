@@ -33,6 +33,14 @@ Write or substantially rewrite end-user-facing documentation with a four-reviewe
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-DOCS-WRITE-<slug>`.
 - `handoff_path`: `<artifact_base>.handoff.md`
 
+# Focus
+
+## Write scope
+Write or modify end-user-facing documentation (guides, READMEs, mkdocs pages) only. Do not add doc comments to source code — that is `/refactor/document`. Write only the target documentation files, `<artifact_base>.handoff.md`, and `<artifact_base>.review-*.md`. Do not modify files outside the target paths unless explicitly requested.
+
+## Frozen regions
+Respect scope boundaries: do not edit frozen regions. Reject reviewer diffs that land in frozen regions.
+
 # Process
 
 ## 1. Parse request
@@ -81,7 +89,7 @@ c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: 
 
 d. Record decisions in `handoff_path` for cross-domain arbitration. Apply domain ownership: CLARITY → clarity; WORDING → wording; ENGAGEMENT → engagement; CONSISTENCY → consistency.
 
-e. Apply reviewer diffs via targeted edits; fall back to `Fix:` prose. Reject diffs in frozen regions (see Constraints).
+e. Apply reviewer diffs via targeted edits; fall back to `Fix:` prose. Reject diffs in frozen regions (see Focus → Frozen regions).
 
 f. Recompute Delta. Re-run all reviewers after every material revision (any substantive change to doc content — not cosmetic fixes like whitespace or typo corrections). Loop until no findings or 5 iterations.
 
@@ -110,9 +118,5 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Write only the target documentation files, `<artifact_base>.handoff.md`, and `<artifact_base>.review-*.md`.
-- Do not modify files outside the target paths unless explicitly requested.
-- Respect scope boundaries: do not edit frozen regions. Reject reviewer diffs that land in frozen regions.
 - Wrap prose at 80–100 characters per line. Code blocks and URLs are exempt.
 - Insert a blank line before the first bullet item when a list follows prose, and between adjacent bullet items whenever either wraps past one line; tight single-line lists (flags, enums) need no inter-item spacing.
-- This command writes end-user-facing documentation (guides, READMEs, mkdocs pages). It does NOT add doc comments to source code — that is `/refactor/document`.

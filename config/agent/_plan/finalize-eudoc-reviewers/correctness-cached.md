@@ -21,6 +21,13 @@ permission:
 
 {{ file="./agent/_plan/finalize-eudoc-reviewers/_templates/correctness-header.txt" }}
 
+# Focus
+
+## Read strategy
+On first review: If Delta was passed inline, skip reading `handoff_path` — use the inline Step Index and Requirement Trace Matrix rows. Read all D# step files. For UPDATE scope: read target doc files at the line ranges the D# step specifies — do not read full target files beyond those ranges unless evidence is insufficient. For NEW: read sibling pages. Skip ARCHITECTURE.md, source code, or I#/T# step files unless a D# step explicitly references them as evidence.
+
+On re-review: Read `## Delta` from `handoff_path` for status changes. Read ONLY D# steps marked Changed or New in Delta — skip Unchanged steps (they are in cache as Verified). Do NOT re-read the full handoff, target doc files, or sibling pages for Unchanged items.
+
 # Process
 
  {{
@@ -54,11 +61,4 @@ In the `# REVIEW` output, set `Agent:` to `_plan/finalize-eudoc-reviewers/correc
   verified_ref="<D#>: <item description — unchanged items that remain verified>"
 }}
 
-# Constraints
-
-- **First review** (cache empty or no prior findings): If Delta was passed inline, skip reading `handoff_path` — use the inline Step Index and Requirement Trace Matrix rows. Read all D# step files. For UPDATE scope: read target doc files at the line ranges the D# step specifies — do not read full target files beyond those ranges unless evidence is insufficient. For NEW: read sibling pages. Skip ARCHITECTURE.md, source code, or I#/T# step files unless a D# step explicitly references them as evidence.
-- **Re-review** (cache has prior findings): Read `## Delta` from `handoff_path` for status changes. Read ONLY D# steps marked Changed or New in Delta — skip Unchanged steps (they are in cache as Verified). Do NOT re-read the full handoff, target doc files, or sibling pages for Unchanged items.
-- Block for: docs contradicting implementation, unspecified "update docs", missing docs for new features, broken internal links.
-- Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` targeting the affected D# step file.
-- Only generate findings on in-scope D# steps. Findings on frozen regions are invalid.
+- Target diffs to the affected D# step file.

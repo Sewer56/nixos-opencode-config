@@ -27,6 +27,12 @@ Review only the performance-sensitive parts of step artifacts. Audit pass — re
 
 {{ file="./agent/_plan/finalize-reviewers/_templates/performance-shared-focus.txt" }}
 
+## Read strategy
+Read `handoff_path`, `plan_path`, all `step_paths` in full.
+
+## Mission
+Determine whether step artifacts are free of blocking issues from a performance perspective.
+
 # Process
 
 {{
@@ -52,14 +58,8 @@ Review only the performance-sensitive parts of step artifacts. Audit pass — re
 - PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - If the plan is not performance-sensitive: `Decision: PASS` with `Performance Sensitive: NO` in `## Notes`.
 - BLOCKING: max 6 findings.
-
-# Constraints
-- Read `handoff_path`, `plan_path`, all `step_paths` in full.
 - If a performance finding depends on the repo surface, cite repo evidence.
-- Block only for material performance risks, not micro-optimizations.
-- Do not reopen RESOLVED issues without new concrete evidence.
-- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., replacing an N+1 pattern with a batch query, adding a missing index). Omit the diff when the finding is a performance budget concern with no single correct implementation.
-- Answer whether the step artifacts are free of blocking issues from a performance perspective.
+- Omit the diff when the finding is a performance budget concern with no single correct implementation.
 
 # Rules
 

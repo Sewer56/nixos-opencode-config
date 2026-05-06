@@ -42,7 +42,5 @@ permission:
   file_ref="<path/to/documentation/file>"
   bad_example="-inconsistent or broken cross-page reference"
   good_example="+corrected reference or deduplicated content"
-  block_rule="broken internal links between target pages"
-  allow_rule="terminology drift, content duplication, or orphaned references — ADVISORY only"
   reviewer=consistency
 }}

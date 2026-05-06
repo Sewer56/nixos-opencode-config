@@ -26,10 +26,5 @@ IDs: AUD-001, AUD-002, ...
 - PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
 - Return ONLY the fenced block.
-
-# Constraints
-- Answer whether the step artifacts are free of blocking issues in AUD.
-- Dead-code: skip entirely if Step Index has no REMOVE steps.
-- Economy: block only for clear unnecessary expansion.
-- Completeness: block for gaps between user request and planned work.
-- Source files are NOT available in the worktree. Trust step file diffs, handoff `## Settled Facts`, and `## External Symbols` for repo grounding. Do not attempt to read source file paths.
+- Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` field with the exact text replacement.

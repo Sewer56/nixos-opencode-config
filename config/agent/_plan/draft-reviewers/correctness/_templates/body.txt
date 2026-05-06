@@ -52,6 +52,9 @@ Code snippets in draft items are illustrative, not binding implementation instru
 Bad: full exact function body for speculative implementation.
 Good: short shape or signature plus intent.
 
+## Mission
+Determine whether the draft is free of blocking correctness issues.
+
 # Process
 
 {{

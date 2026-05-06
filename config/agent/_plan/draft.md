@@ -47,6 +47,11 @@ Create and maintain a collaborative plan. Write only `<artifact_base>.draft.md`.
 - `plan_path`: `<artifact_base>.draft.md`
 - `draft_handoff_path`: `<artifact_base>.draft.handoff.md`
 
+# Focus
+
+## Scope
+Write only `<artifact_base>.draft.md` and `<artifact_base>.draft.handoff.md`. Do not modify other files. Never modify product code while drafting.
+
 # Process
 
 ## 1. Start from the request
@@ -155,10 +160,6 @@ Summary: <one-line summary>
 ```
 
 # Constraints
-- Only write planning artifact `<artifact_base>.draft.md`.
-- Write `<artifact_base>.draft.handoff.md` during the review loop.
-- Write only `<artifact_base>.draft.md` and `<artifact_base>.draft.handoff.md`. Do not modify other files.
-- Never modify product code while drafting.
 - Keep `<artifact_base>.draft.md` short, scannable, and easy to discuss with the user.
 - Keep user-facing responses brief and factual.
 - Nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block. Applies to template sections and code snippets within the plan.

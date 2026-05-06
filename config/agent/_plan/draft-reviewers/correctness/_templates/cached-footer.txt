@@ -35,10 +35,5 @@ IDs: COR-001, COR-002, ...
 
 Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final line.
 
-# Constraints
-- Block for missing required sections, invalid diff headers, or implementation-prescriptive snippets that should be illustrative.
-- Do not block for minor wording when structure and snippet style are valid.
 - Cite section names and specific `[P#]` items as evidence.
-- Keep findings short and specific.
-- In the cache, include a unified diff after every finding's `Fix:` field targeting `context_path` with the exact text replacement.
-- Follow the `# Process` section for cache and skip handling.
+- Target diffs to `context_path`.

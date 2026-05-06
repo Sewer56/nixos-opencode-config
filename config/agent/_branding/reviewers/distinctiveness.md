@@ -93,10 +93,4 @@ Good: candidate can be searched with project domain and still find relevant resu
   verified_ref="[<ID>]: <candidate name or section — unchanged items that remain verified>"
 }}
 
-# Constraints
-
-- Block for generic names, overused suffixes, and exact or confusingly similar duplicates with existing projects.
-- Do not block for near-duplicates within the candidate list or weak searchability alone — ADVISORY only.
-- Keep findings short and specific.
-- Include a unified diff after every finding's `Fix:` field targeting `<artifact_base>.draft.md` with the exact text replacement.
-- Follow the `# Process` section for cache, Delta, and skip handling.
+- Target diffs to `<artifact_base>.draft.md`.

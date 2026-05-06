@@ -37,6 +37,11 @@ Review only the performance-sensitive parts of step artifacts.
 
 {{ file="./agent/_plan/finalize-reviewers/_templates/performance-shared-focus.txt" }}
 
+## Read strategy
+On initial review: read `handoff_path`, `plan_path`, `step_paths`, rules. Audit perf-sensitive changes. Read the `## Review Ledger` section from `handoff_path` before reviewing.
+
+On re-review: `plan_path` is withheld. `handoff_path` is available — read only `## Delta`, `## Review Ledger`, `## Step Index`; stable sections are covered by cache. Read `changed_step_paths`. Verify resolved findings, check for new perf risks.
+
 # Process
 
 {{
@@ -65,16 +70,10 @@ Severity: BLOCKING | ADVISORY
 Problem: <one line>
 Fix: <diff or prose>
 
-# Constraints
-- On initial review: read `handoff_path`, `plan_path`, `step_paths`, rules. Audit perf-sensitive changes.
-- On re-review: `plan_path` is withheld. `handoff_path` is available — read only `## Delta`, `## Review Ledger`, `## Step Index`; stable sections are covered by cache. Read `changed_step_paths`. Verify resolved findings, check for new perf risks.
 - If the plan is not performance-sensitive, return `PASS` with `Performance Sensitive: NO`.
 - If a performance finding depends on the repo surface, cite repo evidence.
-- Block only for material performance risks, not micro-optimizations.
-- Read the `## Review Ledger` section from `handoff_path` before reviewing. Do not reopen RESOLVED issues without new concrete evidence.
-- Include a unified diff after the finding's `Fix:` field when the fix is concrete (e.g., replacing an N+1 pattern with a batch query, adding a missing index). Omit the diff when the finding is a performance budget concern with no single correct implementation.
-- Follow the `# Process` section for Delta and skip handling.
 - Verified lists only changed/open items; do not restate every requirement or step on PASS.
+- Omit the diff when the finding is a performance budget concern with no single correct implementation.
 
 # Rules
 

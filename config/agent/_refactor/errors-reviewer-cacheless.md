@@ -93,11 +93,4 @@ Read `lang-<language>-errors.txt` once per language, per `# Focus`.
 }}
 - PASS: `Decision: PASS` only; omit `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
-
-# Constraints
-
-- Block for wrong variant names, format violations, or missing zero-path fallbacks.
-- Do not block for minor wording preferences when specificity and format are correct.
 - Cite source file evidence when grounding a finding.
-- Keep findings short and specific.
-- `Lines: ~` values must be valid range specifiers (`~<start>-<end>`) matching the diff context; every `Lines:` reference must have corresponding unchanged lines in the accompanying diff.

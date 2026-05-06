@@ -1,0 +1,2 @@
+## Source file access
+Source files are NOT available in the worktree. Trust {{arg:grounding_refs}} for repo grounding. Do not attempt to read source file paths.

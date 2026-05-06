@@ -36,7 +36,7 @@ Review existing end-user-facing documentation and apply fixes with a four-review
 # Focus
 
 ## Existing-doc scope
-Review existing end-user-facing documentation only. Do not create new pages or source-code doc comments.
+Review existing end-user-facing documentation only. Do not create new pages or source-code doc comments. Write only the target documentation files, `<artifact_base>.handoff.md`, and `<artifact_base>.review-*.md`. Do not modify files outside the target paths unless explicitly requested.
 
 Bad: turn a section review into a new-page creation task.
 Good: edit only requested existing docs within declared scope.
@@ -89,7 +89,7 @@ c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: 
 
 d. Record decisions in `handoff_path` for cross-domain arbitration. Apply domain ownership: CLARITY → clarity; WORDING → wording; ENGAGEMENT → engagement; CONSISTENCY → consistency.
 
-e. Apply reviewer diffs via targeted edits; fall back to `Fix:` prose. Reject diffs in frozen regions (see Constraints).
+e. Apply reviewer diffs via targeted edits; fall back to `Fix:` prose. Reject diffs in frozen regions (see Focus → Frozen regions).
 
 f. Recompute Delta. Re-run all reviewers after every material revision (any substantive change to doc content — not cosmetic fixes like whitespace or typo corrections). Loop until no findings or 5 iterations.
 
@@ -118,9 +118,4 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Write only the target documentation files, `<artifact_base>.handoff.md`, and `<artifact_base>.review-*.md`.
-- Do not modify files outside the target paths unless explicitly requested.
-- Respect scope boundaries: do not edit frozen regions. Reject reviewer diffs that land in frozen regions.
 - Wrap prose at 80–100 characters per line. Code blocks and URLs are exempt.
-- This command reviews end-user-facing documentation. It does NOT add doc comments to source code — that is `/refactor/document`.
-- Review does not create new pages — use `/docs/write` for that.

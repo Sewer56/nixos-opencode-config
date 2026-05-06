@@ -17,6 +17,3 @@
 
 - PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
-
-# Constraints
-- Answer whether the draft is free of blocking issues in COR.

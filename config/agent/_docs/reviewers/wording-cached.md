@@ -50,7 +50,5 @@ permission:
   file_ref="<path/to/documentation/file>"
   bad_example="-wordy or awkward phrasing"
   good_example="+concise replacement"
-  block_rule="filler, passive voice in instructional steps, and genuinely ambiguous terminology inconsistencies within a single page"
-  allow_rule="stylistic terminology variation, descriptive passive voice, or minor wordiness"
   reviewer=wording
 }}

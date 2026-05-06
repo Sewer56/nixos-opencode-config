@@ -23,6 +23,11 @@ Block unnecessary steps beyond confirmed intent and wrong file placement. Do not
 ## Dead code
 Run only when steps contain REMOVE or symbol-deletion UPDATE. Flag orphaned imports, callers, type refs, unreachable paths, dead dispatch arms, and cross-file dead imports.
 
+{{ file="./agent/_plan/finalize-reviewers/_templates/source-file-access.txt" grounding_refs="step file diffs, handoff `## Settled Facts`, and `## External Symbols`" }}
+
+## Mission
+Determine whether step artifacts are free of blocking audit issues.
+
 # Process
 
 {{

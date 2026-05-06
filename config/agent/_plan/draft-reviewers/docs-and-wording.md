@@ -152,8 +152,4 @@ Resolution: <only for RESOLVED>
   verified_ref="[P#]: <item description — unchanged items that remain verified>"
 }}
 
-# Constraints
-- DOC: block for missing documentation `[P#]` items when code changes affect user-facing surface. Block for generic "update docs" descriptions that lack file path and change specifics. Block for new public features without corresponding documentation steps. End-user docs must not contradict the implementation. Internal-only refactoring with no user-facing impact is acceptable without a doc `[P#]` item.
-- WORDING: do not block for concise but complete instructions, or when different sections reference the same concept for different analytical purposes. Narrative wording is exempt when it stays jargon-free and easy to discuss.
-- Include a unified diff after every finding's `Fix:` field targeting `context_path` with the exact text replacement.
-- Follow the `# Process` section for cache, Delta, and skip handling.
+- Target diffs to `context_path`.

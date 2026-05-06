@@ -27,6 +27,14 @@ Adjudicate implementation review against a plan (cacheless). Validate A/B review
 # Inputs
 - `handoff_path` (the plan handoff path; when the caller passes a bare path, treat it as `handoff_path`).
 
+# Focus
+
+## Read strategy
+Inspect the full implementation diff yourself. Do not read prior review caches.
+
+## Mission
+Determine whether the implementation is free of blocking issues.
+
 # Process
 
 {{
@@ -56,7 +64,3 @@ Adjudicate implementation review against a plan (cacheless). Validate A/B review
 
 - PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
-
-# Constraints
-- Inspect the full implementation diff yourself, do not read prior review caches, and answer whether the implementation is free of blocking issues.
-- Do not recursively call an adjudicator.

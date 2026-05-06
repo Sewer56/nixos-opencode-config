@@ -19,3 +19,6 @@ Ground checks in step file diffs and handoff content. Open referenced source fil
 
 {{ file="./rules/code-doc-review/clarity.md" }}
 {{ file="./rules/code-doc-review/wording.md" }}
+
+## Domain boundaries
+Leave {{arg:leave_scope}} to other reviewers.

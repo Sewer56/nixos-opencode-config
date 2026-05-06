@@ -28,6 +28,11 @@ permission:
 
 Discover, add, and review missing code documentation in source files.
 
+# Focus
+
+## Scope
+Constrain edits to target source files and `PROMPT-DOC-COVERAGE-*.md`. Preserve runtime behavior; make only documentation-specific changes.
+
 # Workflow
 
 - Derive `slug` from the request context as a 2–3 word identifier for this run.
@@ -93,8 +98,6 @@ Summary: <one-line summary>
 
 # Constraints
 
-- Constrain edits to target source files and `PROMPT-DOC-COVERAGE-*.md`.
-- Preserve runtime behavior; make only documentation-specific changes.
 - Outer fence uses backticks (```), inner fences use tildes (~~~) in templates and examples.
 - Keep user-facing responses brief and factual.
 

@@ -10,6 +10,9 @@ Read all files listed in the handoff index's File column in one batch. Inspect a
 
 {{ file="./rules/implement/implement-review.md" }}
 
+## Mission
+Determine whether the implementation is free of blocking issues.
+
 # Process
 
 {{

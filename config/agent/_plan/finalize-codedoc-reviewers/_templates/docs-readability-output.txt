@@ -15,13 +15,4 @@
   verified_ref="{{arg:verified_ref}}"
 }}
 
-# Constraints
-
-- {{arg:doc_domain}}: block for documentation rule Review Blocking Criteria{{arg:doc_constraint_extra}}.
-- {{arg:read_domain}}: block for filler, passive voice in instructions, ambiguous terminology, undefined project-specific jargon, ambiguous language, project-specific acronyms without expansion.
-- Do not block for obvious code without comments, standard terms, common programming terms, exact identifiers, stylistic variation, descriptive passive voice, minor wordiness, compound-term compression, or opaque references.
-{{ if=variant==codedoc }}
-- In plan steps, generic `update docs` notes are insufficient; required docs must appear in the relevant diff/snippet.
-{{ endif }}
-- Include a unified diff after every finding's `Fix:` field targeting the affected {{arg:target_type}}.
-- Leave {{arg:leave_scope}} to other reviewers.
+- Target diffs to the affected {{arg:target_type}}.

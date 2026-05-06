@@ -29,6 +29,11 @@ permission:
 
 Discover error-returning functions with missing or vague documentation. Trace error paths, draft documentation, verify coverage via collector convergence (re-spawn until stable), apply corrections, and review.
 
+# Focus
+
+## Scope
+Never modify product code while collecting or reviewing. Write only per-collector cache files and the unified cache.
+
 # Workflow
 
 - `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor/_templates`
@@ -122,7 +127,6 @@ Summary: <one-line summary>
 # Constraints
 
 - Only write per-collector cache files while collectors are running. Write the unified cache only after the gate converges.
-- Never modify product code while collecting.
 - Apply corrections only after the gate converges.
 - Treat the unified `PROMPT-ERROR-DOCS.cache.md` as read-only after the gate converges; reviewer may update it.
 

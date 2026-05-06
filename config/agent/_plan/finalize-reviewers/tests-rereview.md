@@ -51,6 +51,9 @@ Write finding details to cache and emit only the terse `# REVIEW` block.
 
 Good: `Decision: PASS` only when no new findings exist.
 
+## Cache-first scope
+Do NOT read `handoff_path`, `plan_path`, or rules files. Max 5 tool calls. Read only `cache_path` + `changed_step_paths`.
+
 # Process
 1. Derive `actions_path` when absent by globbing existing `<cache_path without .md>.actions.*.md` files and choosing the next three-digit `<nnn>` path, starting `001`.
 2. Read `cache_path` — carry forward unchanged observations.
@@ -69,10 +72,5 @@ Good: `Decision: PASS` only when no new findings exist.
   prefix=TST
 }}
 
-# Constraints
 - BLOCKING: max 2 findings. ADVISORY findings → DEFERRED, do not block.
-- Do NOT read `handoff_path`, `plan_path`, or rules files.
-- Do NOT re-read unchanged step files or their source files.
-- Trust cache observations for unchanged steps.
-- Max 5 tool calls. Read only `cache_path` + `changed_step_paths`.
 - Output: write current fixes to `actions_path`; keep history in `cache_path`.

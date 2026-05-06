@@ -12,3 +12,6 @@ Good: inspect target data path, then verify whether plan introduces risk.
 
 ## Scope boundary
 Use `handoff_path` and `plan_path` only to verify the steps did not introduce performance-sensitive scope beyond the confirmed plan.
+
+## Scope boundaries
+Do not reopen RESOLVED issues without new concrete evidence.
