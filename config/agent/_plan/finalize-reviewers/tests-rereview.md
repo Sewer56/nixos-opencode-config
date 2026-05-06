@@ -72,5 +72,4 @@ Do NOT read `handoff_path`, `plan_path`, or rules files. Max 5 tool calls. Read 
   prefix=TST
 }}
 
-- BLOCKING: max 2 findings. ADVISORY findings → DEFERRED, do not block.
 - Output: write current fixes to `actions_path`; keep history in `cache_path`.

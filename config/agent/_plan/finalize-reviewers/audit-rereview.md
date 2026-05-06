@@ -72,5 +72,4 @@ Read only: `cache_path` + `changed_step_paths`. Max 5 tool calls. No grep, no so
   prefix=AUD
 }}
 
-- BLOCKING: max 2 findings. ADVISORY findings → DEFERRED, do not block.
 - Output: write current fixes to `actions_path`; keep history in `cache_path`.

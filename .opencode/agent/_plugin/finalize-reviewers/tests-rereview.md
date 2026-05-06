@@ -52,5 +52,4 @@ Verify resolved verification findings and check changed steps for new gaps. Trus
 
 # Constraints
 - Return only the fenced `text` block. PASS keeps `Agent:` and `Decision: PASS`; omit `IDs`.
-- BLOCKING: max 2 findings. ADVISORY findings may be DEFERRED.
 - Do not read `handoff_path`, `context_path`, rules, or unchanged step files.
