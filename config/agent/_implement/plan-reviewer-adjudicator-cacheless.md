@@ -31,6 +31,7 @@ Adjudicate implementation review against a plan (cacheless). Validate A/B review
 
 {{
   file="./agent/_templates/adjudicator/adjudicator-cacheless.txt"
+  no_edit_targets="input artifacts"
   reviewer_a="_implement/plan-reviewer/plan-reviewer-a-cacheless"
   reviewer_b="_implement/plan-reviewer/plan-reviewer-b-cacheless"
   run_context="with the same handoff_path"

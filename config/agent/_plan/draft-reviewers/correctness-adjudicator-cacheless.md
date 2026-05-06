@@ -32,6 +32,7 @@ Adjudicate the COR domain (cacheless). Validate A/B reviewer outputs, merge evid
 
 {{
   file="./agent/_templates/adjudicator/adjudicator-cacheless.txt"
+  no_edit_targets="`context_path` or `draft_handoff_path`"
   reviewer_a="_plan/draft-reviewers/correctness/correctness-a-cacheless"
   reviewer_b="_plan/draft-reviewers/correctness/correctness-b-cacheless"
   run_context="with identical `context_path` and `draft_handoff_path`"

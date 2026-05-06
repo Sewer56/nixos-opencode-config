@@ -1,5 +1,5 @@
 1. Run `{{arg:reviewer_a}}` and `{{arg:reviewer_b}}` independently {{arg:run_context}}.
-2. Do not pass either leg the other leg's output. Do not apply raw leg findings. Do not allow either leg to edit input artifacts.
+2. Do not pass either leg the other leg's output. Do not apply raw leg findings. Do not allow either leg to edit {{arg:no_edit_targets}}.
 3. Validate both outputs: `# REVIEW`{{arg:validation_extra}} and `Decision: PASS | ADVISORY | BLOCKING`. Treat `IDs:` as routing data only.
 4. Parse findings from each leg's inline `## Findings` section. Do not read sidecar files.
 5. Merge findings: {{arg:merge_scope}}.

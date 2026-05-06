@@ -39,7 +39,7 @@ Implement a plan from conversation context with an automated review loop.
 - Iterate until all checks pass clean.
 
 ## 3. Review
-- Spawn `@_implement/freeform-reviewer-adjudicator-cached`, passing inline:
+- Spawn `_implement/freeform-reviewer-adjudicator-cached`, passing inline:
   - `## Request`: original user request (verbatim or summarized)
   - `## Plan Summary`: what was planned from conversation context
   - `## Changes Made`: files changed and what was done in each
@@ -55,7 +55,7 @@ Implement a plan from conversation context with an automated review loop.
 - Repeat until reviewer returns `Decision: PASS` or 5 iterations reached.
 - At cap with any findings remaining: FAIL.
 - Before `Status: SUCCESS`:
-  - Run one final audit with `@_implement/freeform-reviewer-adjudicator-cacheless`, updated inline context, and same `cache_path`.
+  - Run one final audit with `_implement/freeform-reviewer-adjudicator-cacheless`, updated inline context, and same `cache_path`.
   - Read `actions_path` for current findings and fixes.
   - The cache is audit ledger state; the caller does not read it.
   - If BLOCKING: fix, rerun touched, then re-audit.

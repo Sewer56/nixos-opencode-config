@@ -35,7 +35,7 @@ Discover error-returning functions with missing or vague documentation. Trace er
 
 ## 1. Discover structure
 
-Spawn `@codebase-explorer` to map the repository:
+Spawn `codebase-explorer` to map the repository:
 
 - Every language present
 - Every module/crate boundary: Cargo.toml (Rust workspace members), package.json (Node). For Go: each directory containing `.go` files is a separate module.
@@ -49,13 +49,13 @@ Read the user message. If it contains file or directory paths, restrict collecto
 
 ## 3. Collect
 
-Spawn one `@_refactor/errors-collector` per (library or application module, language) pair in a single parallel call.
+Spawn one `_refactor/errors-collector` per (library or application module, language) pair in a single parallel call.
 Derive a per-collector cache path: `PROMPT-ERROR-DOCS.<module_name>.cache.md` where `<module_name>` is the last path component of `target_path` (e.g. `src` → `PROMPT-ERROR-DOCS.src.cache.md`). Each collector writes to its own file — no concurrent writes to a shared file.
 
 Per collector, pass:
 
 - `target_path`: absolute path to the module root
-- `language`: language name as reported by `@codebase-explorer`
+- `language`: language name as reported by `codebase-explorer`
 - `repo_root`: absolute path to the repository root
 - `cache_path`: absolute path to the per-collector `PROMPT-ERROR-DOCS.<module_name>.cache.md`
 
@@ -86,14 +86,14 @@ After applying all items, run formatter, linter, build, and tests. Iterate until
 
 ## 6. Review
 
-Spawn `@_refactor/errors-reviewer-cached`, passing `cache_path`. Wait for the review packet.
+Spawn `_refactor/errors-reviewer-cached`, passing `cache_path`. Wait for the review packet.
 
 - If findings (BLOCKING or ADVISORY): revise the applied docs in source files, update the cache, populate `## Delta` with the list of items revised in this iteration, re-run reviewer.
 - Loop until no findings of any severity remain or 10 iterations.
 - At cap with only ADVISORY findings: SUCCESS with risks.
 - After each fix, rerun the reviewer when changed docs alter an error path, public API contract, `# Errors` wording, source file path, or cache item status. Do not rerun unrelated modules.
 - Before `Status: SUCCESS`:
-  - Run final error-doc audit with `@_refactor/errors-reviewer-cacheless` over all applied docs.
+  - Run final error-doc audit with `_refactor/errors-reviewer-cacheless` over all applied docs.
   - Ignore caches and Delta shortcuts.
   - Return all current findings.
   - If BLOCKING: fix, update cache/Delta, rerun touched reviewer, then re-audit.

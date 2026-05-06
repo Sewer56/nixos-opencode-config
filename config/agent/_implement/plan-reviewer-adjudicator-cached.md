@@ -36,6 +36,7 @@ Adjudicate implementation review against a plan (cached). Validate A/B reviewer 
 
 {{
   file="./agent/_templates/adjudicator/adjudicator-cached.txt"
+  no_edit_targets="input artifacts"
   has_cache_derivation=1
   cache_derivation="replacing `.handoff.md` with `.review-implementation.md`"
   reviewer_a="_implement/plan-reviewer/plan-reviewer-a-cached"

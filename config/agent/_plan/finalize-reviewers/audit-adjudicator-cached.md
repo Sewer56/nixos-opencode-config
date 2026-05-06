@@ -34,11 +34,12 @@ Adjudicate the AUD domain (cached). Validate A/B reviewer pointers, merge eviden
 
 {{
   file="./agent/_templates/adjudicator/adjudicator-cached.txt"
+  no_edit_targets="input artifacts"
   reviewer_a="_plan/finalize-reviewers/audit/audit-a-cached"
   reviewer_b="_plan/finalize-reviewers/audit/audit-b-cached"
   run_context="with identical artifact inputs and separate sidecar `cache_path`/`actions_path` values"
   validation_extra=", `Agent: _plan/finalize-reviewers/audit`"
-  merge_scope="keep only AUD findings in fidelity, structure, completeness, economy, or dead-code; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain or unsupported findings; resolve conflicts with the smallest safe fix"
+  merge_scope="keep only AUD findings in fidelity, structure, completeness, economy, or dead-code; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain or unsupported findings"
 }}
 
 # Output

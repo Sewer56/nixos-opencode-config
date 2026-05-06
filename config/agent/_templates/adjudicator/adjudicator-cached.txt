@@ -1,11 +1,11 @@
 1. {{ if=has_cache_derivation }}Derive `cache_path` when absent by {{arg:cache_derivation}}. {{ endif }}Set `state_path` to `cache_path`.
 2. Derive `actions_path` when absent by globbing existing `<state_path without .md>.actions.*.md` files and choosing the next three-digit `<nnn>` path, starting `001`.
 3. Derive sidecar state paths from `state_path`:
-   - `@{{arg:reviewer_a}}`: `<state_path without .md>.a.md`
-   - `@{{arg:reviewer_b}}`: `<state_path without .md>.b.md`
+   - `{{arg:reviewer_a}}`: `<state_path without .md>.a.md`
+   - `{{arg:reviewer_b}}`: `<state_path without .md>.b.md`
    - sidecar actions: replace `.md` with `.actions.<same nnn>.md`.
-4. Run `@{{arg:reviewer_a}}` and `@{{arg:reviewer_b}}` independently {{arg:run_context}}.
-5. Do not pass either leg the other leg's output. Do not apply raw leg findings. Do not allow either leg to edit input artifacts.
+4. Run `{{arg:reviewer_a}}` and `{{arg:reviewer_b}}` independently {{arg:run_context}}.
+5. Do not pass either leg the other leg's output. Do not apply raw leg findings. Do not allow either leg to edit {{arg:no_edit_targets}}.
 6. Validate both outputs: `# REVIEW`{{arg:validation_extra}} and `Decision: PASS | ADVISORY | BLOCKING`. Treat `IDs:` as routing data only.
 7. Read sidecar actions first. Read sidecar state only when actions are malformed, truncated, contradictory, or insufficient to adjudicate evidence.
 8. Merge findings: {{arg:merge_scope}}.

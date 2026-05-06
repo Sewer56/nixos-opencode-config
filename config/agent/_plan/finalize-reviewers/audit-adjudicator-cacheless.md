@@ -30,11 +30,12 @@ Adjudicate the AUD domain (cacheless). Validate A/B reviewer outputs, merge evid
 
 {{
   file="./agent/_templates/adjudicator/adjudicator-cacheless.txt"
+  no_edit_targets="input artifacts"
   reviewer_a="_plan/finalize-reviewers/audit/audit-a-cacheless"
   reviewer_b="_plan/finalize-reviewers/audit/audit-b-cacheless"
   run_context="with identical artifact inputs"
   validation_extra=", `Agent: _plan/finalize-reviewers/audit`"
-  merge_scope="keep only AUD findings in fidelity, structure, completeness, economy, or dead-code; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain or unsupported findings; resolve conflicts with the smallest safe fix"
+  merge_scope="keep only AUD findings in fidelity, structure, completeness, economy, or dead-code; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain or unsupported findings"
   inspect_context="`handoff_path`, `plan_path`, and all `step_paths`"
 }}
 

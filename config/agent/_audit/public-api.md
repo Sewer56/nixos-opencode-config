@@ -33,7 +33,7 @@ Audit every library module in the repository for items that are public/exported 
 
 ## 1. Discover structure
 
-Spawn `@codebase-explorer` to map the repository:
+Spawn `codebase-explorer` to map the repository:
 
 - Every language present
 - Every module/crate boundary: Cargo.toml (Rust workspace members), package.json (Node), pyproject.toml / setup.py (Python), build.gradle / build.gradle.kts (JVM). For Go: each directory containing `.go` files is a separate module (not one module per go.mod — Go packages are the cross-reference boundary per lang-go.txt).
@@ -43,7 +43,7 @@ Only library modules are audited. Skip binaries, applications, and test-only fix
 
 ## 2. Collect
 
-Spawn one `@_audit/collector` per (library module, language) pair in a single parallel call. When a module directory contains markers for multiple languages (e.g. a Python package with Rust extensions), spawn one collector per language with the same `target_path` but different `language` values. For Go, each package directory is a separate collector invocation. Skip Go packages under `internal/` directories (compiler-enforced private; no items to audit).
+Spawn one `_audit/collector` per (library module, language) pair in a single parallel call. When a module directory contains markers for multiple languages (e.g. a Python package with Rust extensions), spawn one collector per language with the same `target_path` but different `language` values. For Go, each package directory is a separate collector invocation. Skip Go packages under `internal/` directories (compiler-enforced private; no items to audit).
 
 Per collector, pass:
 

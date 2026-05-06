@@ -37,6 +37,7 @@ Adjudicate the COR domain (cached). Validate A/B reviewer pointers, merge eviden
 
 {{
   file="./agent/_templates/adjudicator/adjudicator-cached.txt"
+  no_edit_targets="`context_path` or `draft_handoff_path`"
   has_cache_derivation=1
   cache_derivation="replacing `.draft.handoff.md` with `.draft.review-correctness.md`"
   reviewer_a="_plan/draft-reviewers/correctness/correctness-a-cached"

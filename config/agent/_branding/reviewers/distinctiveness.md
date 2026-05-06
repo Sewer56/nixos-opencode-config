@@ -24,7 +24,7 @@ Review branding for distinctiveness.
 
 # Inputs
 
-- `handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `@mcp-search` runs.
+- `handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `mcp-search` runs.
 
 # Focus
 

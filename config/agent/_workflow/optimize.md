@@ -57,10 +57,10 @@ Optimize OpenCode workflow prompts/tools by running real 3-sample experiments an
 
 # Helpers
 
-- `@_workflow/optimize-setup` — parse request, resolve command/agent/reviewer files, cleanup patterns.
+- `_workflow/optimize-setup` — parse request, resolve command/agent/reviewer files, cleanup patterns.
 - `python3 tools/workflow-optimize/run_batch.py` — run 3 samples in isolated folder copies, token metadata.
 - `python3 tools/workflow-optimize/export_digest.py <export_path>` — compact tree + child token digest.
-- `@_workflow/export-analyzer` — one export per call, digest-first waste analysis.
+- `_workflow/export-analyzer` — one export per call, digest-first waste analysis.
 
 # Artifacts
 
@@ -78,7 +78,7 @@ Optimize OpenCode workflow prompts/tools by running real 3-sample experiments an
 
 ## 1. Setup
 
-- Call `@_workflow/optimize-setup` with raw request.
+- Call `_workflow/optimize-setup` with raw request.
 - If `NEEDS_INPUT`, ask one question and stop. If `FAIL`, stop.
 - Use setup result as source of truth: task cases, CLI command(s), files under test, cleanup patterns, model, goal, max batches.
 - Use exactly 3 samples.
@@ -106,7 +106,7 @@ Initialize `## Strategy Matrix` from `# Strategy Sources`, status `UNTRIED`. Do 
 
 Run each task case with exactly 3 samples. Multi-task batches run 3 samples per task; compare per task and equal-weight aggregate across tasks.
 
-Determine current `--max-parallel-subagents`: max subagents the command under test can spawn in parallel (e.g. `Run @_plan/draft-explorer and @mcp-search in parallel` == 2). Re-evaluate after each edit batch (topology may change).
+Determine current `--max-parallel-subagents`: max subagents the command under test can spawn in parallel (e.g. `Run _plan/draft-explorer and mcp-search in parallel` == 2). Re-evaluate after each edit batch (topology may change).
 
 ```bash
 python3 tools/workflow-optimize/run_batch.py \
@@ -152,7 +152,7 @@ If `run_batch.py` root metrics disagree with export tree metrics, trust export t
 
 ## 6. Analyze exports
 
-- Spawn one `@_workflow/export-analyzer` per completed export, not one mega-call.
+- Spawn one `_workflow/export-analyzer` per completed export, not one mega-call.
 - Pass: export path, enriched digest, goal, target command, workflow shape, files under test, baseline metrics, current metrics, prior common findings, and relevant design/optimize pattern excerpts.
 - Ask analyzer to scan observable focus signals and counterevidence, then map hypotheses to `WOPT-###`, `OPT-###`, or `LOCAL:<name>` refs only after evidence is clear. Optimizer still owns strategy choice and 3-sample proof.
 - Validate analyzer output shape. Malformed analyzer output contributes no hypotheses and gets `DEC-###`.

@@ -39,7 +39,7 @@ Discover, add, and review missing code documentation in source files.
 - Read the user message for file or directory paths. If the message contains paths, use those paths directly.
 - If no paths provided, collect changed source files with `git status --porcelain`.
 - Skip generated files, vendored code, lockfiles, snapshots, fixtures, and binary assets.
-- Use `@codebase-explorer` only when file ownership or language documentation conventions are unclear.
+- Use `codebase-explorer` only when file ownership or language documentation conventions are unclear.
 
 ## 2. Enumerate missing or vague required docs
 
@@ -60,8 +60,8 @@ Discover, add, and review missing code documentation in source files.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
 - Run these independent reviewers in parallel on the first pass:
-  - `@_refactor/document-reviewers/docs-and-readability-cached`
-  - `@_refactor/document-reviewers/errors-cached`
+  - `_refactor/document-reviewers/docs-and-readability-cached`
+  - `_refactor/document-reviewers/errors-cached`
 - Include in each reviewer prompt only task-specific data: `handoff_path` and user notes.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: DDOC, DREAD → docs-and-readability reviewer; DERR → errors reviewer. DDOC owns required inline readability comments. Arbitrate cross-domain conflicts.
@@ -73,8 +73,8 @@ Discover, add, and review missing code documentation in source files.
   No blocking: SUCCESS with recorded/deferred advisories. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 - Validate each reviewer response against the review block shape: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified` headings. Treat malformed responses as BLOCKING with a synthetic finding.
 - Before `Status: SUCCESS`:
-  - Audit errors with `@_refactor/document-reviewers/errors-cacheless` when public API/`# Errors` changed.
-  - Audit docs-and-readability with `@_refactor/document-reviewers/docs-and-readability-cacheless` when doc comments changed.
+  - Audit errors with `_refactor/document-reviewers/errors-cacheless` when public API/`# Errors` changed.
+  - Audit docs-and-readability with `_refactor/document-reviewers/docs-and-readability-cacheless` when doc comments changed.
   - Ignore caches and Delta shortcuts.
   - Return all current findings.
   - If BLOCKING: fix, recompute Delta, rerun touched reviewers, then re-audit.

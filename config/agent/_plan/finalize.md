@@ -85,11 +85,11 @@ Next Command: /plan/draft
 
 ## 2. Dispatch explorer to gather repo facts
 - Only enter this phase after `plan_path` is resolved and read successfully.
-- Dispatch `@_plan/finalize-explorer` with `plan_path`. The explorer reads the draft, identifies all touched files, gathers current state (symbols, line ranges, imports, test files), and returns a compact structured manifest.
+- Dispatch `_plan/finalize-explorer` with `plan_path`. The explorer reads the draft, identifies all touched files, gathers current state (symbols, line ranges, imports, test files), and returns a compact structured manifest.
 - Use the explorer manifest for ALL subsequent steps — it provides shared, cached context. Do not re-discover files the explorer already surveyed.
 - The explorer manifest reduces orchestrator reasoning and prevents duplicate file reads by reviewers.
 - If the explorer fails (unlikely), fall back to direct `glob`/`grep`/`read` for discovery.
-- Use `@mcp-search` for external libraries or APIs first when needed.
+- Use `mcp-search` for external libraries or APIs first when needed.
 
 ## 3. Write the handoff file
 - Rewrite `handoff_path` from scratch for this run.
@@ -109,8 +109,8 @@ Next Command: /plan/draft
 - Write and maintain `## Delta` in `handoff_path` before the first reviewer pass. Record each `REQ-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields. Add artifact markers for `Source Plan` and `Review Ledger`. Recompute `## Delta` after every material revision.
 - Also record each I# and T# step as a Delta entry so reviewers can skip Unchanged step files.
 - Before initial reviewer pass, derive `reviewer_set`:
-  - Always include `@_plan/finalize-reviewers/audit-adjudicator-cached` for the audit domain.
-  - Always include `@_plan/finalize-reviewers/tests-cached` for the tests domain.
+  - Always include `_plan/finalize-reviewers/audit-adjudicator-cached` for the audit domain.
+  - Always include `_plan/finalize-reviewers/tests-cached` for the tests domain.
   - Do NOT include performance in the initial pass. Performance runs after audit+tests converge (see 5d).
 
 ### 5a. Initial reviewer dispatch (full reviewers)
@@ -133,8 +133,8 @@ Next Command: /plan/draft
 
 ### 5b. Re-review dispatch (dedicated rereview agents, after fixes)
 - After applying fixes, dispatch dedicated rereview agents — NOT the full reviewers:
-  - If audit had BLOCKING findings or audit-domain steps changed: dispatch `@_plan/finalize-reviewers/audit-rereview`.
-  - If tests had BLOCKING findings or test-domain steps changed: dispatch `@_plan/finalize-reviewers/tests-rereview`.
+  - If audit had BLOCKING findings or audit-domain steps changed: dispatch `_plan/finalize-reviewers/audit-rereview`.
+  - If tests had BLOCKING findings or test-domain steps changed: dispatch `_plan/finalize-reviewers/tests-rereview`.
 - Re-reviewers receive only change state and finding IDs.
 - Pass to rereview agent:
   - `cache_path` (required — the initial review cache with grounding snapshots)
@@ -168,7 +168,7 @@ Next Command: /plan/draft
   No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
 ### 5d. Final gates (after audit+tests converge)
-- Dispatch placement and `@_plan/finalize-reviewers/performance` in the same final-gate phase after audit+tests converge.
+- Dispatch placement and `_plan/finalize-reviewers/performance` in the same final-gate phase after audit+tests converge.
 - Placement: pass `handoff_path` and all I# step paths. It owns declaration-order checks and exact step-file diffs.
 - Performance: pass `handoff_path`, `plan_path`, and all step paths. The explorer manifest is still in context — pre-inline relevant `## Key Symbols` and `## Files Touched`.
 - Performance reviews algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, missing validation.
@@ -178,9 +178,9 @@ Next Command: /plan/draft
 ### 5e. Final full audit before SUCCESS
 - Before returning `Status: SUCCESS`, run a final full audit after all normal reviewers and final gates have zero unresolved BLOCKING findings.
 - Always run final audit and final tests audits:
-  - `@_plan/finalize-reviewers/audit-adjudicator-cacheless` with `handoff_path`, `plan_path`, all step paths, and the canonical audit cache.
-  - `@_plan/finalize-reviewers/tests-cacheless` with `handoff_path`, `plan_path`, verification-relevant step paths, and the canonical tests cache.
-- Run final performance audit with `@_plan/finalize-reviewers/performance-cacheless` only when steps touch performance-sensitive paths, algorithms, data access, concurrency, validation, logging, or workload size.
+  - `_plan/finalize-reviewers/audit-adjudicator-cacheless` with `handoff_path`, `plan_path`, all step paths, and the canonical audit cache.
+  - `_plan/finalize-reviewers/tests-cacheless` with `handoff_path`, `plan_path`, verification-relevant step paths, and the canonical tests cache.
+- Run final performance audit with `_plan/finalize-reviewers/performance-cacheless` only when steps touch performance-sensitive paths, algorithms, data access, concurrency, validation, logging, or workload size.
 - Final audit rules:
   - Read the full artifact.
   - Ignore Delta shortcuts and prior cache entries.

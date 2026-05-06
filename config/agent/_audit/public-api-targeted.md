@@ -49,7 +49,7 @@ If no valid source paths remain after resolution, stop and tell the user.
 
 ## 2. Collect
 
-Group resolved paths by parent module and language. When a module directory contains source files in multiple languages, group by (parent module, language) so each language gets its own collector. Spawn one `@_audit/collector` per group in a single parallel call.
+Group resolved paths by parent module and language. When a module directory contains source files in multiple languages, group by (parent module, language) so each language gets its own collector. Spawn one `_audit/collector` per group in a single parallel call.
 
 Per collector, pass:
 

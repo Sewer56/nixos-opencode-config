@@ -44,8 +44,8 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
 
 ## 2. Deepen discovery only where needed
 - Inspect I#/T# step diffs first. Read referenced target source files only when a step diff lacks context for public API status, doc placement, reachable error variants, or body intent.
-- Use `@codebase-explorer` for repo discovery first when file ownership, public API surface, or documentation placement is unclear.
-- Use `@mcp-search` for external library or API documentation expectations first when needed.
+- Use `codebase-explorer` for repo discovery first when file ownership, public API surface, or documentation placement is unclear.
+- Use `mcp-search` for external library or API documentation expectations first when needed.
 
 ## 3. Apply an initial code-documentation pass
 - Scan I#/T# diffs for missing API docs, parameter/return docs, `# Errors` sections, and inline readability comments required by the documentation and errors rules.
@@ -58,8 +58,8 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
 - Run these independent shared code-doc reviewers in parallel on the first pass:
-  - `@_plan/finalize-codedoc-reviewers/docs-and-readability-cached`
-  - `@_plan/finalize-codedoc-reviewers/errors-cached`
+  - `_plan/finalize-codedoc-reviewers/docs-and-readability-cached`
+  - `_plan/finalize-codedoc-reviewers/errors-cached`
 - Include in each reviewer prompt only task-specific data: artifact paths (`plan_path`, `handoff_path`), `step_pattern`, and user notes.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: CDOC and CREAD → docs-and-readability reviewer; CERR → errors reviewer. CDOC owns required API docs and inline readability comments in planned code diffs. Arbitrate cross-domain conflicts.
@@ -71,8 +71,8 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
   No blocking: SUCCESS with recorded/deferred advisories. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 - Validate each reviewer response against the review block shape: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified` headings. Treat malformed responses as BLOCKING with a synthetic finding.
 - Before `Status: SUCCESS`:
-  - Audit errors with `@_plan/finalize-codedoc-reviewers/errors-cacheless` when public API/error-docs changed.
-  - Audit docs-and-readability with `@_plan/finalize-codedoc-reviewers/docs-and-readability-cacheless` when doc comments changed.
+  - Audit errors with `_plan/finalize-codedoc-reviewers/errors-cacheless` when public API/error-docs changed.
+  - Audit docs-and-readability with `_plan/finalize-codedoc-reviewers/docs-and-readability-cacheless` when doc comments changed.
   - Ignore caches and Delta shortcuts.
   - Return all current findings.
   - If BLOCKING: fix, recompute Delta, rerun touched reviewers, then re-audit.

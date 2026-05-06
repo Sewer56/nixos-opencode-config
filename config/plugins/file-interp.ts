@@ -1387,6 +1387,12 @@ async function readRawFile(
   token: string,
   ctx: ExpandContext,
 ): Promise<string> {
+  // Skip diagnostics when the path contains unresolved arg tokens
+  // (standalone expansion has no caller context, so cascaded args in paths resolve to empty)
+  if (rawPath.includes("FILE_INTERP_EMPTY")) {
+    if (DEBUG) debugLog(`file: ${token} → skipped (unresolved arg in path)`)
+    return EMPTY_EXPANSION_MARKER
+  }
   try {
     const raw = (await Bun.file(resolved).text()).trim()
     if (DEBUG) debugLog(`file: ${token} → ${resolved} (${raw.length} chars)`)

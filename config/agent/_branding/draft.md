@@ -47,7 +47,7 @@ Extract project brief, audience, tone, constraints, dislikes, existing candidate
 
 ## 2. Discover context
 
-Spawn `@codebase-explorer` to map: project purpose, language/ecosystem, existing naming, target audience signals, README or marketing copy. Spawn `@mcp-search` for duplicate, package, crate, project, repository, product, domain, or availability checks — user-requested or inferred from the project's language or platform ecosystem.
+Spawn `codebase-explorer` to map: project purpose, language/ecosystem, existing naming, target audience signals, README or marketing copy. Spawn `mcp-search` for duplicate, package, crate, project, repository, product, domain, or availability checks — user-requested or inferred from the project's language or platform ecosystem.
 
 Record search scope and findings in `handoff_path`.
 
@@ -79,7 +79,7 @@ Max 5 iterations.
 a. Write `<artifact_base>.draft.handoff.md` with scope, Delta, and search findings before first reviewer pass.
    Track per-section Delta entries with: section name, status (New/Changed/Unchanged), and reason.
 
-b. Run four reviewers in parallel: `@_branding/reviewers/clarity`, `@_branding/reviewers/distinctiveness`, `@_branding/reviewers/positioning`, `@_branding/reviewers/availability`. Pass only: `branding_path` (`<artifact_base>.draft.md`), `handoff_path` (`<artifact_base>.draft.handoff.md`), scope boundaries, and user notes.
+b. Run four reviewers in parallel: `_branding/reviewers/clarity`, `_branding/reviewers/distinctiveness`, `_branding/reviewers/positioning`, `_branding/reviewers/availability`. Pass only: `branding_path` (`<artifact_base>.draft.md`), `handoff_path` (`<artifact_base>.draft.handoff.md`), scope boundaries, and user notes.
 
 c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified`. All 4 reviewers are diff-mandated — confirm each finding contains a unified diff block. Treat missing diffs as protocol violation requiring retry.
 
@@ -118,4 +118,4 @@ Summary: <one-line summary>
 - Write only `<artifact_base>.draft.md`, `<artifact_base>.draft.handoff.md`, and `<artifact_base>.draft.review-*.md`.
 - Use fenced `text` code blocks for plain structured output.
 - Outer fence uses backticks (```), inner fences use tildes (~~~) whenever a code block contains another code block.
-- Treat live availability claims (domains, packages, handles) as provisional unless the handoff records an explicit external check via `@mcp-search`.
+- Treat live availability claims (domains, packages, handles) as provisional unless the handoff records an explicit external check via `mcp-search`.

@@ -24,7 +24,7 @@ Review branding for availability.
 
 # Inputs
 
-- `handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `@mcp-search` runs.
+- `handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `mcp-search` runs.
 
 # Focus
 
@@ -111,7 +111,7 @@ Good: `Check domain, trademark, social handles, and package registry before laun
 
 - Block for confirmed package collisions, missing trademark disclaimer, risky availability claims, and absent Next Checks section.
 - Do not block for domain, social-handle, or ecosystem check gaps alone — ADVISORY only (unless a collision is confirmed).
-- Treat live availability as provisional unless the handoff records an explicit external check via `@mcp-search`.
+- Treat live availability as provisional unless the handoff records an explicit external check via `mcp-search`.
 - Keep findings short and specific.
 - Include a unified diff after every finding's `Fix:` field targeting `<artifact_base>.draft.md` with the exact text replacement.
 - Follow the `# Process` section for cache, Delta, and skip handling.

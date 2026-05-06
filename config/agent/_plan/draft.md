@@ -54,9 +54,9 @@ Create and maintain a collaborative plan. Write only `<artifact_base>.draft.md`.
 - Treat the user's explicit requirements, constraints, and answers in this conversation as the source of truth.
 
 ## 2. Run discovery
-- Run `@_plan/draft-explorer` and `@mcp-search` in parallel before writing the plan.
-- Pass the user's request text to `@_plan/draft-explorer` as `request`. The explorer surveys the repo for relevant files and returns a compact manifest.
-- `@mcp-search` fetches external libraries, APIs, or docs relevant to the request, or reports that none are needed.
+- Run `_plan/draft-explorer` and `mcp-search` in parallel before writing the plan.
+- Pass the user's request text to `_plan/draft-explorer` as `request`. The explorer surveys the repo for relevant files and returns a compact manifest.
+- `mcp-search` fetches external libraries, APIs, or docs relevant to the request, or reports that none are needed.
 - After both return, read the external facts from mcp-search that matter.
 
 ## 3. Write the draft plan
@@ -88,7 +88,7 @@ Follow the ordered steps below.
 - Recompute `## Delta` after every material revision to `plan_path`.
 
 2. Stage 1 — Correctness (fidelity + structure)
-- Run `@_plan/draft-reviewers/correctness-adjudicator-cached` first.
+- Run `_plan/draft-reviewers/correctness-adjudicator-cached` first.
 - Pass only `context_path: plan_path`, `draft_handoff_path`, and `cache_path: <artifact_base>.draft.review-correctness.md`.
 - Do not pass output schemas, focus lists, role text, blanket read orders, or reviewer-internal details.
 - Treat correctness as a single reviewer contract.
@@ -102,7 +102,7 @@ Follow the ordered steps below.
 - If correctness returns PASS or ADVISORY-only: proceed to stage 2.
 
 3. Stage 2 — Documentation and Wording
-- Run `@_plan/draft-reviewers/docs-and-wording`.
+- Run `_plan/draft-reviewers/docs-and-wording`.
 - Include: `plan_path` and `draft_handoff_path`.
 - Validate, apply fixes, recompute Delta.
 
@@ -135,7 +135,7 @@ Follow the ordered steps below.
 ## 6. Confirmation boundary
 - If the latest user message explicitly confirms the draft is ready for finalize, run one final correctness audit before returning READY.
 - Final correctness audit:
-  - Call `@_plan/draft-reviewers/correctness-adjudicator-cacheless` with `context_path: plan_path`, `draft_handoff_path`, and `cache_path: <artifact_base>.draft.review-correctness.md`.
+  - Call `_plan/draft-reviewers/correctness-adjudicator-cacheless` with `context_path: plan_path`, `draft_handoff_path`, and `cache_path: <artifact_base>.draft.review-correctness.md`.
   - Treat the cache as audit ledger state; the caller does not read it.
   - Read `actions_path` for current BLOCKING and ADVISORY findings.
   - If BLOCKING: fix, recompute `## Delta`, rerun touched reviewers, then repeat final correctness audit.

@@ -33,9 +33,6 @@ async function main(): Promise<void> {
     const rel = path.relative(CONFIG_DIR, file) || path.basename(file)
 
     for (const diagnostic of result.diagnostics) {
-      // Skip missing-file diagnostics caused by unresolved arg tokens in paths
-      // (standalone validation has no caller context, so cascaded args resolve to empty)
-      if (diagnostic.kind === "missing-file" && diagnostic.message.includes("FILE_INTERP_EMPTY")) continue
       failures.push(formatDiagnostic(rel, source, diagnostic))
     }
 

@@ -35,6 +35,7 @@ Adjudicate implementation review against request intent (cacheless). Validate A/
 
 {{
   file="./agent/_templates/adjudicator/adjudicator-cacheless.txt"
+  no_edit_targets="input artifacts"
   reviewer_a="_implement/freeform-reviewer/freeform-reviewer-a-cacheless"
   reviewer_b="_implement/freeform-reviewer/freeform-reviewer-b-cacheless"
   run_context="with the same inline context"
