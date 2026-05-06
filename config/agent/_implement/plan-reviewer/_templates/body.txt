@@ -18,5 +18,14 @@
   reads_decisions=1
 }}
 
-{{ file="./agent/_implement/plan-reviewer/_templates/cached-footer.txt" if=mode==cached }}
-{{ file="./agent/_implement/plan-reviewer/_templates/cacheless-footer.txt" if=mode==cacheless }}
+{{
+  file="./agent/_templates/implement-footer/cached.txt"
+  if=mode==cached
+  ref_type="<step-id or file>"
+  evidence="<step-id, diff hunk, path:line, command output, or behavior note>"
+}}
+{{
+  file="./agent/_templates/implement-footer/cacheless.txt"
+  if=mode==cacheless
+  evidence="<step-id, diff hunk, path:line, command output, or behavior note>"
+}}

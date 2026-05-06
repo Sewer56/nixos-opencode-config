@@ -1,16 +1,4 @@
-# Cache file format
-```markdown
-# Review Cache: implementation
-Latest Actions: <actions_path>
-
-## Verified Observations
-- <file or goal>: <grounding snapshot — one line each>
-
-## Finding Ledger
-| ID | Status, File, Lines | Category | Severity | Introduced In | Latest Action | Resolution |
-|---|---|---|---|---|---|---|---|---|
-| F-NNN | OPEN | — | — | — | — | — | — |
-```
+{{ file="./agent/_templates/review-cache-table.txt" domain=implementation ref_type="{{arg:ref_type}}" prefix=F with_implement_cols=1 }}
 
 # Actions file format
 ```markdown
@@ -18,11 +6,11 @@ Latest Actions: <actions_path>
 Source Cache: <cache_path>
 
 ## Findings
-### [F-001]
+### [F-NNN]
 Severity: BLOCKING | ADVISORY
 File: <path>
 Lines: ~<start line>-<end line> | None
-Evidence: <request goal, diff hunk, path:line, command output, or behavior note>
+Evidence: {{arg:evidence}}
 Problem: <one line>
 Fix: <smallest concrete correction>
 ~~~diff

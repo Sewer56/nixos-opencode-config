@@ -14,7 +14,7 @@ Severity: BLOCKING | ADVISORY
 Evidence: <section, [P#], path:line, diff header, or missing element>
 Problem: <one line>
 Fix: <smallest concrete correction>
-~~~
+~~~diff
 <artifact_base>.draft.md
 --- a/<artifact_base>.draft.md
 +++ b/<artifact_base>.draft.md

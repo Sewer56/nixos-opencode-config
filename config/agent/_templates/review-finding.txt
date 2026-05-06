@@ -1,17 +1,16 @@
 ### [{{arg:prefix}}-NNN]
-Category: {{arg:categories}}
-{{ if=with_detail==1 }}
+{{ if=categories }}Category: {{arg:categories}}
+{{ endif }}{{ if=with_detail==1 }}
 Detail: {{arg:detail}}
 {{ endif }}Severity: BLOCKING | ADVISORY
-Evidence: {{arg:evidence}}
-{{ if=with_lines==1 }}
+{{ if=with_file==1 }}File: <path>
+{{ endif }}{{ if=with_lines==1 }}
 Lines: ~<start line>-<end line> | None
-{{ endif }}
+{{ endif }}Evidence: {{arg:evidence}}
 {{ if=with_step_file==1 }}
 Step: {{arg:step}}
 File: {{arg:file}}
-{{ endif }}
-Problem: {{arg:problem}}
+{{ endif }}Problem: {{arg:problem}}
 Fix: {{arg:fix}}
 ~~~diff
 {{arg:file_ref}}

@@ -10,10 +10,10 @@ IDs: F-001, F-002, ...
 Severity: BLOCKING | ADVISORY
 File: <path>
 Lines: ~<start line>-<end line> | None
-Evidence: <step-id, diff hunk, path:line, command output, or behavior note>
+Evidence: {{arg:evidence}}
 Problem: <one line>
 Fix: <smallest concrete correction>
-~~~
+~~~diff
 src/lib.rs
 --- a/src/lib.rs
 +++ b/src/lib.rs

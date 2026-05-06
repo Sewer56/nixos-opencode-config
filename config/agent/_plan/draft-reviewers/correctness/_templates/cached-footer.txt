@@ -4,7 +4,7 @@
 Source Cache: <cache_path>
 
 ## Findings
-### [COR-001]
+### [COR-NNN]
 Category: FIDELITY | ACTION | FILE_PATH | TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS
 Severity: BLOCKING | ADVISORY
 Evidence: <section, [P#], path:line, diff header, or missing element>
