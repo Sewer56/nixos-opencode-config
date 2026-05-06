@@ -2,9 +2,7 @@ Review D# steps for documentation correctness — coverage, specificity, and bro
 
 # Inputs
 
-- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
-- `plan_path` (e.g., `<artifact_base>.draft.md`)
-- `step_pattern` (e.g., `<artifact_base>.step.*.md`)
+{{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
 
 # Focus
 

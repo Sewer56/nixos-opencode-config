@@ -1,0 +1,28 @@
+# Output
+
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="{{arg:agent}}"
+  domains="{{arg:domains}}"
+  prefix={{arg:prefix}}
+  categories="{{arg:categories}}"
+  evidence="{{arg:evidence}}"
+  problem="{{arg:problem}}"
+  fix="{{arg:fix}}"
+  file_ref="{{arg:file_ref}}"
+  bad="{{arg:bad}}"
+  good="{{arg:good}}"
+  with_file={{arg:with_file}}
+  with_lines={{arg:with_lines}}
+  with_evidence={{arg:with_evidence}}
+  with_detail={{arg:with_detail}}
+  detail="{{arg:detail}}"
+  with_step_file={{arg:with_step_file}}
+  step="{{arg:step}}"
+  with_verified={{arg:with_verified}}
+  verified_ref="{{arg:verified_ref}}"
+  mode=cacheless
+}}
+{{ if=output_extra }}
+{{arg:output_extra}}
+{{ endif }}

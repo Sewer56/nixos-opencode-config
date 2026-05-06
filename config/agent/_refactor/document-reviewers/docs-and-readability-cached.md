@@ -22,7 +22,7 @@ permission:
 {{
   file="./agent/_plan/finalize-codedoc-reviewers/_templates/docs-readability-header.txt"
   description="Review source files for documentation coverage, specificity, fidelity, inline comments, and readability."
-  inputs="- `handoff_path`"
+  variant=refactor
   doc_domain=DDOC
   read_domain=DREAD
   doc_focus_file="documentation-focus.source.md"
@@ -30,7 +30,7 @@ permission:
 
 # Process
 
- {{
+{{
   file="./agent/_templates/review-process/cached.txt"
   has_cache_derivation=1
   delta_source=handoff_path

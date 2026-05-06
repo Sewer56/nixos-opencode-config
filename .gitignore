@@ -2,3 +2,7 @@
 PROMPT-*.md
 
 tools/workflow-optimize/__pycache__/
+
+# Review logs
+*.review-implementation.md
+*.review-implementation.actions.*.md

@@ -1,25 +1,8 @@
----
-mode: subagent
-hidden: true
-description: Checks test coverage and test minimality for finalized implementation/test steps (cacheless)
-model: sewer-axonhub/GLM-5.1  # HIGH
-permission:
-  "*": deny
-  read:
-    "*": allow
-    "*.env": deny
-    "*.env.*": deny
-    "*.env.example": allow
-  list: allow
-  todowrite: allow
-  external_directory: allow
----
-
 Review step test strategy. Audit pass — reads all artifacts from scratch, does not read prior review caches.
 
 # Inputs
 
-- `handoff_path`, `plan_path`, `step_paths`
+{{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
 
 # Focus
 
@@ -28,10 +11,9 @@ Review step test strategy. Audit pass — reads all artifacts from scratch, does
 ## Read strategy
 Read `handoff_path`, `plan_path`, all `step_paths` in full.
 
-{{ file="./agent/_plan/finalize-reviewers/_templates/source-file-access.txt" grounding_refs="step file diffs and handoff `## Settled Facts`" }}
+{{ file="./agent/_templates/review-read-strategy/source-access.txt" grounding_refs="step file diffs and handoff `## Settled Facts`" }}
 
-## Mission
-Determine whether the test artifacts are free of blocking issues.
+{{ file="./agent/_templates/review-mission.txt" artifact_type="test artifacts" domain="test" }}
 
 # Process
 
@@ -47,4 +29,3 @@ Determine whether the test artifacts are free of blocking issues.
   agent="_plan/finalize-reviewers/tests-cacheless"
   prefix=TST
 }}
-

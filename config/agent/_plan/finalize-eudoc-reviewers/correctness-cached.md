@@ -28,7 +28,7 @@ On re-review: Read `## Delta` from `handoff_path` for status changes. Read ONLY 
 
 # Process
 
- {{
+{{
   file="./agent/_templates/review-process/cached.txt"
   has_cache_derivation=1
   delta_source=handoff_path

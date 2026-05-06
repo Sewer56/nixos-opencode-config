@@ -23,9 +23,8 @@ permission:
 Review D# steps for clarity, wording quality, reader engagement, and cross-page polish. Domain owner for ECLR, EWRD, EENG, and ECNS findings. If only one D# step is in scope, skip cross-page checks.
 
 # Inputs
-- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
-- `plan_path` (e.g., `<artifact_base>.draft.md`)
-- `step_pattern` (e.g., `<artifact_base>.step.*.md`)
+
+{{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
 
 # Focus
 
@@ -47,7 +46,7 @@ Do NOT read the correctness reviewer cache (`<artifact_base>.review-eudoc-correc
 
 # Process
 
- {{
+{{
   file="./agent/_templates/review-process/cached.txt"
   has_cache_derivation=1
   delta_source=handoff_path

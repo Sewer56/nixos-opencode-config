@@ -1,6 +1,7 @@
 Review artifacts for fidelity to user requirements, template structure, diff header validity, and snippet illustrativeness.
 
 # Inputs
+
 - `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
@@ -52,8 +53,7 @@ Code snippets in draft items are illustrative, not binding implementation instru
 Bad: full exact function body for speculative implementation.
 Good: short shape or signature plus intent.
 
-## Mission
-Determine whether the draft is free of blocking correctness issues.
+{{ file="./agent/_templates/review-mission.txt" artifact_type="draft" domain="correctness" }}
 
 # Process
 
@@ -72,10 +72,46 @@ Determine whether the draft is free of blocking correctness issues.
   pointer_emit=1
 }}
 {{
-   file="./agent/_templates/review-process/cacheless.txt"
+  file="./agent/_templates/review-process/cacheless.txt"
   if=mode==cacheless
   read_context="Read the full `context_path` and relevant `draft_handoff_path` sections from scratch."
 }}
 
-{{ file="./agent/_plan/draft-reviewers/correctness/_templates/cached-footer.txt" if=mode==cached }}
-{{ file="./agent/_plan/draft-reviewers/correctness/_templates/cacheless-footer.txt" if=mode==cacheless }}
+{{
+  file="./agent/_templates/review-footer/cached.txt"
+  if=mode==cached
+  agent="correctness"
+  domains="COR"
+  domain=correctness
+  ref_type="[P#]"
+  prefix=COR
+  categories="FIDELITY | ACTION | FILE_PATH | TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS"
+  evidence="<section, [P#], path:line, diff header, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<artifact_base>.draft.md"
+  bad="-incorrect content"
+  good="+correct content"
+  with_evidence=1
+  step=""
+  output_extra="- Cite section names and specific `[P#]` items as evidence.\n- Target diffs to `context_path`."
+}}
+
+{{
+  file="./agent/_templates/review-footer/cacheless.txt"
+  if=mode==cacheless
+  agent="correctness"
+  domains="COR"
+  prefix=COR
+  categories="FIDELITY | ACTION | FILE_PATH | TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS"
+  evidence="<section, [P#], path:line, diff header, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<artifact_base>.draft.md"
+  bad="-incorrect content"
+  good="+correct content"
+  with_evidence=1
+  step=""
+  verified_ref=""
+  output_extra="- Cite section names and specific `[P#]` items as evidence.\n- Target diffs to `context_path`."
+}}

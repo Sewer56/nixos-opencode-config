@@ -22,7 +22,7 @@ Review implementation steps for declaration placement/order. Return exact step-a
 
 # Inputs
 
-- Initial review: `handoff_path`, `step_paths` (all I# step files)
+{{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
 - Rerun only when requested: `changed_step_paths`
 
 # Focus

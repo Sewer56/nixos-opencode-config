@@ -22,13 +22,13 @@ permission:
 {{
   file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-header.txt"
   description="Review source files' error documentation."
-  inputs="- `handoff_path`"
+  variant=refactor
   focus_file="errors-focus.source.md"
 }}
 
 # Process
 
- {{
+{{
   file="./agent/_templates/review-process/cached.txt"
   has_cache_derivation=1
   delta_source=handoff_path

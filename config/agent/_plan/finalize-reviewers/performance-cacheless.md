@@ -1,27 +1,8 @@
----
-mode: subagent
-hidden: true
-description: Checks performance-sensitive decisions in finalized steps (cacheless)
-model: sewer-axonhub/GLM-5.1  # HIGH
-permission:
-  "*": deny
-  read:
-    "*": allow
-    "*.env": deny
-    "*.env.*": deny
-    "*.env.example": allow
-  grep: allow
-  list: allow
-  todowrite: allow
-  external_directory: allow
----
-
 Review only the performance-sensitive parts of step artifacts. Audit pass — reads all artifacts from scratch, does not read prior review caches.
 
 # Inputs
-- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
-- `plan_path` (e.g., `<artifact_base>.draft.md`)
-- `step_paths` (exact list of step files to inspect)
+
+{{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
 
 # Focus
 
@@ -30,8 +11,7 @@ Review only the performance-sensitive parts of step artifacts. Audit pass — re
 ## Read strategy
 Read `handoff_path`, `plan_path`, all `step_paths` in full.
 
-## Mission
-Determine whether step artifacts are free of blocking issues from a performance perspective.
+{{ file="./agent/_templates/review-mission.txt" artifact_type="step artifacts" domain="performance" }}
 
 # Process
 

@@ -20,7 +20,7 @@ permission:
 {{
   file="./agent/_plan/finalize-codedoc-reviewers/_templates/docs-readability-header.txt"
   description="Review code/test steps for code-adjacent documentation coverage, specificity, fidelity, inline comments, and readability."
-  inputs="- `handoff_path` (e.g., `<artifact_base>.handoff.md`)\n- `plan_path` (e.g., `<artifact_base>.draft.md`)\n- `step_pattern` (e.g., `<artifact_base>.step.*.md`)"
+  variant=codedoc
   doc_domain=CDOC
   read_domain=CREAD
   doc_focus_file="documentation-focus.plan.md"

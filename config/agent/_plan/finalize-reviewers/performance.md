@@ -1,37 +1,8 @@
----
-mode: subagent
-hidden: true
-description: Checks performance-sensitive decisions in finalized steps
-model: sewer-axonhub/GLM-5.1  # HIGH
-permission:
-  "*": deny
-  read:
-    "*": allow
-    "*.env": deny
-    "*.env.*": deny
-    "*.env.example": allow
-  grep: allow
-  list: allow
-  todowrite: allow
-  external_directory: allow
-  # edit: deny
-  # bash: deny
-  # task: deny
-  # question: deny
-  # webfetch: deny
-  # websearch: deny
-  # codesearch: deny
-  # lsp: deny
-  # doom_loop: deny
-  # skill: deny
----
-
 Review only the performance-sensitive parts of step artifacts.
 
 # Inputs
-- `handoff_path` (e.g., `<artifact_base>.handoff.md`)
-- `plan_path` (e.g., `<artifact_base>.draft.md`)
-- `step_paths` (exact list of step files to inspect)
+
+{{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
 
 # Focus
 
@@ -53,26 +24,21 @@ On re-review: `plan_path` is withheld. `handoff_path` is available — read only
 
 # Output
 
-```text
-# REVIEW
-Agent: _plan/finalize-reviewers/performance
-Decision: PASS | ADVISORY | BLOCKING
-IDs: PERF-001, PERF-002, ...
-```
-- Your final output message MUST be EXACTLY the fenced block above. No other text — no analysis, no summary, no "## Findings", no "## Verified", no "## Notes".
-- Performance has no cache — if you HAVE findings, detail goes in cache-like inline sections AFTER the fenced block. But if PASS: just the fenced block, nothing else.
-- PASS with 0 findings: `Decision: PASS` only. No IDs line. No extra text.
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plan/finalize-reviewers/performance"
+  prefix=PERF
+  categories="ALGORITHM | DATA | DATABASE | CONCURRENCY | VALIDATION"
+  problem="<one line>"
+  fix="<diff or prose>"
+  file_ref="<path/to/step/file>"
+  bad="-problem"
+  good="+fix"
+  with_evidence=0
+}}
 
-## Findings (only when IDs listed — after fenced block)
-### [PERF-001]
-Category: ALGORITHM | DATA | DATABASE | CONCURRENCY | VALIDATION
-Severity: BLOCKING | ADVISORY
-Problem: <one line>
-Fix: <diff or prose>
-
-- If the plan is not performance-sensitive, return `PASS` with `Performance Sensitive: NO`.
+- If the plan is not performance-sensitive: `Decision: PASS` with `Performance Sensitive: NO` in `## Notes`.
 - If a performance finding depends on the repo surface, cite repo evidence.
-- Verified lists only changed/open items; do not restate every requirement or step on PASS.
 - Omit the diff when the finding is a performance budget concern with no single correct implementation.
 
 # Rules

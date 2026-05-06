@@ -1,11 +1,14 @@
 Review implementation/test step artifacts for correctness and scope. Initial review only — re-review is handled separately.
 
 # Inputs
-- `handoff_path`, `plan_path`, `step_paths`
+
+{{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
 
 # Focus
+
 ## Read strategy
 Trust step file diffs and handoff `## Settled Facts` for repo grounding. Only open source files for specific verification when a diff context line does not match or a finding needs exact confirmation.
+
 Audit in order: fidelity → structure → completeness → economy → dead-code. Stop dead-code if no REMOVE steps.
 
 ## Fidelity
@@ -23,10 +26,12 @@ Block unnecessary steps beyond confirmed intent and wrong file placement. Do not
 ## Dead code
 Run only when steps contain REMOVE or symbol-deletion UPDATE. Flag orphaned imports, callers, type refs, unreachable paths, dead dispatch arms, and cross-file dead imports.
 
-{{ file="./agent/_plan/finalize-reviewers/_templates/source-file-access.txt" grounding_refs="step file diffs, handoff `## Settled Facts`, and `## External Symbols`" }}
+{{
+  file="./agent/_templates/review-read-strategy/source-access.txt"
+  grounding_refs="step file diffs, handoff `## Settled Facts`, and `## External Symbols`"
+}}
 
-## Mission
-Determine whether step artifacts are free of blocking audit issues.
+{{ file="./agent/_templates/review-mission.txt" artifact_type="step artifacts" domain="audit" }}
 
 # Process
 
@@ -46,5 +51,41 @@ Determine whether step artifacts are free of blocking audit issues.
   read_context="Read `plan_path` and all `step_paths`. Read `handoff_path` for full context."
 }}
 
-{{ file="./agent/_plan/finalize-reviewers/audit/_templates/cached-footer.txt" if=mode==cached }}
-{{ file="./agent/_plan/finalize-reviewers/audit/_templates/cacheless-footer.txt" if=mode==cacheless }}
+{{
+  file="./agent/_templates/review-footer/cached.txt"
+  if=mode==cached
+  agent="_plan/finalize-reviewers/audit"
+  domain=audit
+  ref_type=step-id
+  prefix=AUD
+  with_audit_ledger=1
+  categories="FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE"
+  evidence="<step-id, section, path:line, diff header, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<path/to/step/file>"
+  bad=-problem
+  good=+fix
+  with_lines=1
+  with_evidence=1
+  step=""
+  output_extra="- BLOCKING: max 6 findings. Cache findings in `cache_path`.\n- Verified observations MUST include grounding snapshots."
+}}
+
+{{
+  file="./agent/_templates/review-footer/cacheless.txt"
+  if=mode==cacheless
+  agent="_plan/finalize-reviewers/audit"
+  prefix=AUD
+  categories="FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE"
+  evidence="<step-id, section, path:line, diff header, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<path/to/step/file>"
+  bad=-problem
+  good=+fix
+  with_lines=1
+  with_evidence=1
+  step=""
+  verified_ref=""
+}}

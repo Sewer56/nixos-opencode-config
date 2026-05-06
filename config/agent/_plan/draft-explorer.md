@@ -38,10 +38,7 @@ Do NOT write any files. Do NOT edit any files. Return manifest only. Do NOT reco
 
 {{
   file="./agent/_templates/explorer/output.txt"
-  has_action=0
   row_example="path/to/file | <brief: line count, key symbols, imports>"
-  has_plan_ref=0
-  has_open_questions=0
 }}
 
 # Constraints

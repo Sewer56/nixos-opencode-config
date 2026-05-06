@@ -1,0 +1,66 @@
+Review applied error docs for correctness — verify that the applied source docs meet quality standards.
+
+{{ if=mode==cached }}
+# Inputs
+
+- `cache_path`: absolute path to `PROMPT-ERROR-DOCS.cache.md`
+{{ else }}
+# Inputs
+
+- Source files with applied error documentation.
+{{ endif }}
+
+# Focus
+
+{{ if=mode==cached }}
+## Read scope
+Read `cache_path` fully and the lang rules file for each language in the cache.
+Do not scan source for functions missing from cache; collector owns enumeration.
+{{ endif }}
+
+## Application fidelity
+Applied source docs must match each {{ if=mode==cached }}cache item's `**Proposed:**` section{{ else }}intended error doc section{{ endif }}. Function names, paths, and line numbers must align.
+
+Bad: source doc drops one proposed error variant.
+Good: source doc preserves every proposed bullet with matching trigger.
+
+## Specificity
+Each {{ if=mode==cached }}`**Proposed:**` section{{ else }}proposed section{{ endif }} needs one bullet per traced error path. Variant names match source; triggers are predictable from inputs/state.
+
+Bad: `if an error occurs`.
+Good: `when the config file is missing`.
+
+## Format
+Proposed docs must match the {{ if=mode==cached }}matching language rule file's{{ else }}language's{{ endif }} doc format.
+
+Bad: Rust function gets TypeScript-style `@throws` tags.
+Good: format follows {{ if=mode==cached }}`lang-rust-errors.txt`{{ else }}the language's error doc convention{{ endif }}.
+
+## Zero-path fallback
+When {{ if=mode==cached }}`Traced Error Paths: (none)`{{ else }}no error paths were traced{{ endif }}, proposed docs must apply the language file's Zero-Path Fallback.
+
+Bad: omit docs because no error paths were traced.
+Good: apply the {{ if=mode==cached }}language file's{{ else }}explicit{{ endif }} zero-path wording.
+
+## No placeholders
+Block `TODO`, `TBD`, `FIXME`, `...`, and vague stubs in {{ if=mode==cached }}`**Proposed:**` sections{{ else }}proposed sections{{ endif }}.
+
+Bad: `TODO: document errors`.
+Good: concrete {{ if=mode==cached }}proposed docs{{ else }}docs{{ endif }} or explicit zero-path fallback.
+
+## Per-hunk line labels
+When a finding contains multiple diff blocks, label each block with its own `**Lines: ~start-end**` before the diff fence.
+
+Bad: one finding-level range for multiple hunks.
+Good: each hunk has its own bold line label.
+
+{{ if=mode==cached }}
+## Delta-scoped verification
+If `## Delta` is non-empty, verify only source files for Delta items; otherwise verify all cache items on first pass.
+{{ endif }}
+
+# Language Rules Directory
+
+`LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor/_templates`
+
+Read `lang-<language>-errors.txt` once per language, per `# Focus`.

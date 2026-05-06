@@ -20,7 +20,7 @@ permission:
 {{
   file="./agent/_plan/finalize-codedoc-reviewers/_templates/docs-readability-header.txt"
   description="Review source files for documentation coverage, specificity, fidelity, inline comments, and readability."
-  inputs="- `handoff_path`"
+  variant=refactor
   doc_domain=DDOC
   read_domain=DREAD
   doc_focus_file="documentation-focus.source.md"

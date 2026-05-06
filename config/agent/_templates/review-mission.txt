@@ -1,0 +1,2 @@
+## Mission
+Determine whether the {{arg:artifact_type}} is free of blocking {{arg:domain}} issues.

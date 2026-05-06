@@ -1,7 +1,12 @@
 {{arg:description}}
 
 # Inputs
-{{arg:inputs}}
+
+{{ if=doc_domain }}{{ if=variant==codedoc }}{{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
+{{ else }}{{ file="./agent/_templates/review-inputs/refactor.txt" }}
+{{ endif }}
+{{ else }}{{ file="./agent/_templates/review-inputs/refactor.txt" }}
+{{ endif }}
 
 # Focus
 
@@ -13,7 +18,9 @@ Inspect {{arg:doc_domain}} first, including inline comments in non-trivial code 
 {{ file="./rules/code-doc-review/{{arg:doc_focus_file}}" }}
 
 {{ endif }}## Read strategy
-Ground checks in step file diffs and handoff content. Open referenced source files only when a step diff is ambiguous or missing context for public surface, doc placement, or body intent.
+{{ if=variant==codedoc }}Ground checks in step file diffs and handoff content. Open referenced source files only when a step diff is ambiguous or missing context for public surface, doc placement, or body intent.
+{{ else }}Ground checks in applied source docs and handoff content. Open referenced source files only when a diff is ambiguous or missing context for public surface, doc placement, or body intent.
+{{ endif }}
 
 ## Readability ({{arg:read_domain}} domain)
 

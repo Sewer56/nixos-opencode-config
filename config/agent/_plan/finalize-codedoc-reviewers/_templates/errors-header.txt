@@ -1,11 +1,16 @@
 {{arg:description}}
 
 # Inputs
-{{arg:inputs}}
+
+{{ if=variant==codedoc }}{{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
+{{ else }}{{ file="./agent/_templates/review-inputs/refactor.txt" }}
+{{ endif }}
 
 # Focus
 
 ## Read strategy
-Ground checks in step file diffs and handoff content. Open referenced source files only when a step diff is ambiguous or missing context for public API status or reachable error variants.
+{{ if=variant==codedoc }}Ground checks in step file diffs and handoff content. Open referenced source files only when a step diff is ambiguous or missing context for public API status or reachable error variants.
+{{ else }}Ground checks in applied source docs and handoff content. Open referenced source files only when a diff is ambiguous or missing context for public API status or reachable error variants.
+{{ endif }}
 
 {{ file="./rules/code-doc-review/{{arg:focus_file}}" }}

@@ -20,7 +20,7 @@ permission:
 {{
   file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-header.txt"
   description="Review step artifacts' code-adjacent error documentation."
-  inputs="- `handoff_path` (e.g., `<artifact_base>.handoff.md`)\n- `plan_path` (e.g., `<artifact_base>.draft.md`)\n- `step_pattern` (e.g., `<artifact_base>.step.*.md`)"
+  variant=codedoc
   focus_file="errors-focus.plan.md"
 }}
 
