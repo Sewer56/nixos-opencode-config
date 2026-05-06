@@ -6,22 +6,18 @@
 Source Cache: <cache_path>
 
 ## Findings
-### [F-NNN]
-Severity: BLOCKING | ADVISORY
-File: <path>
-Lines: ~<start line>-<end line> | None
-Evidence: {{arg:evidence}}
-Problem: <one line>
-Fix: <smallest concrete correction>
-~~~diff
-src/lib.rs
---- a/src/lib.rs
-+++ b/src/lib.rs
- unchanged context
--old content
-+new content
- unchanged context
-~~~
+{{
+  file="./agent/_templates/review-finding.txt"
+  prefix=F
+  evidence="{{arg:evidence}}"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="src/lib.rs"
+  bad="-old content"
+  good="+new content"
+  with_file=1
+  with_lines=1
+}}
 ```
 
 # Output
