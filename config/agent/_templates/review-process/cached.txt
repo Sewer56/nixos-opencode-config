@@ -24,8 +24,8 @@
 {{ if=reads_review_ledger }}
 - Read `## Review Ledger` for prior review state.
 {{ endif }}
-{{arg:step2_extra}}
-
+{{ if=step2_extra }}{{arg:step2_extra}}
+{{ endif }}
 3. Select in-scope content
 - Carry forward Verified entries that are Unchanged in Delta.
 - Re-evaluate Changed and New entries.

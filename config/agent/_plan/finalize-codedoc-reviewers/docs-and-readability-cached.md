@@ -53,7 +53,6 @@ permission:
   file_ref="<path/to/step/file>"
   read_categories="C_SENTENCE_FLOW | C_PASSIVE_VOICE | C_FILLER | C_WORDINESS | C_TERMINOLOGY_CONSISTENCY | C_UNDEFINED_JARGON | C_AMBIGUOUS_LANGUAGE | C_COMPOUND_TERM_COMPRESSION | C_OPAQUE_REFERENCE | C_ACRONYM_WITHOUT_EXPANSION"
   target_type="I#/T# step file and hunk"
-  leave_scope="D# steps, end-user pages, cross-step consistency, implementation correctness, and `# Errors` completeness"
   doc_constraint_extra=", including missing required inline comments in non-trivial planned code diff hunks"
   verified_ref="<I#/T#>: <item description — unchanged items that remain verified>"
 }}

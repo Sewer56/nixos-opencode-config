@@ -11,7 +11,7 @@ Latest Actions: <actions_path>
 - <full-artifact pass note or arbitration note>
 {{ endif }}
 ## Finding Ledger
-| ID | Status{{ if=with_implement_cols }}, File, Lines{{ endif }} | Category | Severity | Introduced In | Latest Action | Resolution |
-|---|---|---|---|---|---|---|---|---|
-| {{arg:prefix}}-NNN | OPEN | — | — | — | — | — | — |
+| ID | Status |{{ if=with_implement_cols }} File | Lines |{{ endif }} Category | Severity | Introduced In | Latest Action | Resolution |
+|---|---|{{ if=with_implement_cols }}---|---|{{ endif }}---|---|---|---|---|
+| {{arg:prefix}}-NNN | OPEN |{{ if=with_implement_cols }} — | — |{{ endif }} — | — | — | — | — |
 ```

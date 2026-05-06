@@ -49,7 +49,6 @@ permission:
   file_ref="<path/to/source/file>"
   read_categories="D_UNDEFINED_JARGON | D_AMBIGUOUS_LANGUAGE | D_COMPOUND_TERM_COMPRESSION | D_OPAQUE_REFERENCE | D_ACRONYM_WITHOUT_EXPANSION | D_SENTENCE_FLOW | D_PASSIVE_VOICE | D_FILLER | D_WORDINESS | D_TERMINOLOGY_CONSISTENCY"
   target_type="source file"
-  leave_scope="`# Errors` completeness and implementation correctness"
   doc_constraint_extra=" and missing required inline comments in non-trivial changed bodies"
   verified_ref="<path>: <item description — unchanged items that remain verified>"
 }}

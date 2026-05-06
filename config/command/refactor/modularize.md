@@ -101,8 +101,8 @@ Example rename map:
 # Rules
 
 {{ file="./rules/quality/general.md" }}
-{{ file="./rules/docs/documentation.md" }}
 {{ file="./rules/quality/performance.md" }}
 {{ file="./rules/testing/testing.md" }}
 {{ file="./rules/testing/test-parameterization.md" }}
 {{ file="./rules/quality/code-placement.md" }}
+{{ file="./rules/docs/documentation.md" }}

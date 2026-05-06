@@ -20,12 +20,11 @@ Determine whether the implementation is free of blocking issues.
   if=mode==cached
   delta_source=handoff_path
   has_actions_path=1
-  step2_extra="Read the handoff at the given path for plan metadata, requirements, and Step Index."
+  step2_extra="- Read the handoff at the given path for plan metadata, requirements, and Step Index."
   pointer_emit=1
 }}
-
 {{
-  file="./agent/_templates/review-process/cacheless.txt"
+   file="./agent/_templates/review-process/cacheless.txt"
   if=mode==cacheless
   read_context="Read all files listed in the handoff index's File Column in one batch."
   reads_decisions=1
