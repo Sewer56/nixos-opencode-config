@@ -1,0 +1,22 @@
+{{ file="./agent/_plan/finalize-reviewers/audit/_templates/header.txt" }}
+
+# Process
+
+{{
+  file="./agent/_templates/review-process/cached.txt"
+  if=mode==cached
+  delta_source=handoff_path
+  has_actions_path=1
+  reads_review_ledger=1
+  step2_extra="- Read `## Step Index` from `handoff_path`.\n- Use the cache's `Latest Actions` field and finding ledger for grounding."
+  pointer_emit=1
+}}
+
+{{
+  file="./agent/_templates/review-process/cacheless.txt"
+  if=mode==cacheless
+  read_context="Read `plan_path` and all `step_paths`. Read `handoff_path` for full context."
+}}
+
+{{ file="./agent/_plan/finalize-reviewers/audit/_templates/cached-footer.txt" if=mode==cached }}
+{{ file="./agent/_plan/finalize-reviewers/audit/_templates/cacheless-footer.txt" if=mode==cacheless }}

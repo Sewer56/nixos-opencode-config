@@ -21,17 +21,4 @@ permission:
   todowrite: allow
   external_directory: allow
 ---
-{{ file="./agent/_plan/finalize-reviewers/audit/_templates/header.txt" }}
-
-# Process
-
- {{
-  file="./agent/_templates/review-process/cached.txt"
-  delta_source=handoff_path
-  has_actions_path=1
-  reads_review_ledger=1
-  step2_extra="- Read `## Step Index` from `handoff_path`.\n- Use the cache's `Latest Actions` field and finding ledger for grounding."
-  pointer_emit=1
-}}
-
-{{ file="./agent/_plan/finalize-reviewers/audit/_templates/cached-footer.txt" }}
+{{ file="./agent/_plan/finalize-reviewers/audit/_templates/body.txt" mode=cached }}

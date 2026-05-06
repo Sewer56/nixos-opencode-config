@@ -18,13 +18,4 @@ permission:
   todowrite: allow
   external_directory: allow
 ---
-{{ file="./agent/_plan/draft-reviewers/correctness/_templates/header.txt" }}
-
-# Process
-
-{{
-  file="./agent/_templates/review-process/cacheless.txt"
-  read_context="Read the full `context_path` and relevant `draft_handoff_path` sections from scratch."
-}}
-
-{{ file="./agent/_plan/draft-reviewers/correctness/_templates/cacheless-footer.txt" }}
+{{ file="./agent/_plan/draft-reviewers/correctness/_templates/body.txt" mode=cacheless }}

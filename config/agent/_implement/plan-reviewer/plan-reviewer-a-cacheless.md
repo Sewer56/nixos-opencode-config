@@ -18,14 +18,4 @@ permission:
   todowrite: allow
   external_directory: allow
 ---
-{{ file="./agent/_implement/plan-reviewer/_templates/header.txt" }}
-
-# Process
-
-{{
-  file="./agent/_templates/review-process/cacheless.txt"
-  read_context="Read all files listed in the handoff index's File Column in one batch."
-  reads_decisions=1
-}}
-
-{{ file="./agent/_implement/plan-reviewer/_templates/cacheless-footer.txt" }}
+{{ file="./agent/_implement/plan-reviewer/_templates/body.txt" mode=cacheless }}
