@@ -28,6 +28,10 @@ Review branding for availability.
 
 # Focus
 
+## Read scope
+Read `<artifact_base>.draft.md` for in-scope sections: Candidate Shortlist, Top Recommendation, Risk and Availability Notes, Next Checks.
+Cross-reference search findings from the handoff for external availability data.
+
 ## Domain caveat
 Flag candidate names whose primary domains (`.com`, `.io`, `.dev`) are likely taken or not recorded in Risk and Availability Notes. ADVISORY unless confirmed collision blocks intended use.
 
@@ -60,7 +64,6 @@ Good: `Availability appears unverified; perform domain, registry, handle, and tr
 ## Missing ecosystem duplicate check
 Flag when likely ecosystem duplicates (package manager, GitHub/GitLab, repo namespace) are not listed. ADVISORY.
 
-
 Bad: no GitHub or package registry check for a library name.
 Good: notes list checked ecosystems or mark each as unverified follow-up.
 
@@ -72,51 +75,37 @@ Good: `Check domain, trademark, social handles, and package registry before laun
 
 # Process
 
-{{ file="./rules/branding-review/shared-process-pre.md" }}
-
-4. Inspect selected content
-- Read `<artifact_base>.draft.md` for in-scope sections (Candidate Shortlist, Top Recommendation, Risk and Availability Notes, Next Checks).
-- Cross-reference search findings from the handoff for external availability data.
-- Apply each Focus check to candidate names and the Risk and Availability Notes section.
-- Check Open→Resolved transitions.
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
-
-{{ file="./rules/branding-review/shared-process-post.md" }}
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=handoff_path
+  cache_derivation="replace the `.handoff.md` suffix with `.review-availability.md`"
+  cache_record_type="per candidate name or brand element"
+  step2_extra="- When the reviewer's Focus includes search-findings references: also read the search findings section for external data."
+  show_cache_update_detail=1
+  pruned_unit=entries
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _branding/reviewers/availability
-Decision: PASS | ADVISORY | BLOCKING
-Domains: AVL
-
-## Findings
-### [AVL-NNN]
-Category: DOMAIN_CAVEAT | PACKAGE_CRATE_CAVEAT | SOCIAL_HANDLE_CAVEAT | MISSING_TRADEMARK_DISCLAIMER | RISKY_AVAILABILITY_CLAIM | MISSING_ECOSYSTEM_CHECK | MISSING_NEXT_CHECKS
-Severity: BLOCKING | ADVISORY
-Evidence: <section, `path:line`, or field>
-Lines: ~<start line>-<end line> | None
-Problem: <what availability issue creates risk or misleading claims>
-Fix: <concrete correction or addition>
-~~~diff
-<artifact_base>.draft.md
---- a/<artifact_base>.draft.md
-+++ b/<artifact_base>.draft.md
-  unchanged context
--missing or risky availability claim
-+qualified claim or disclaimer
-  unchanged context
-~~~
-
-## Verified
-- [<ID>]: <candidate name or section — unchanged items that remain verified>
-
-## Notes
-- <optional short notes>
-```
-
-Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections.
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_branding/reviewers/availability"
+  domains=AVL
+  mode=cached
+  prefix=AVL
+  categories="DOMAIN_CAVEAT | PACKAGE_CRATE_CAVEAT | SOCIAL_HANDLE_CAVEAT | MISSING_TRADEMARK_DISCLAIMER | RISKY_AVAILABILITY_CLAIM | MISSING_ECOSYSTEM_CHECK | MISSING_NEXT_CHECKS"
+  evidence="<section, `path:line`, or field>"
+  problem="<what availability issue creates risk or misleading claims>"
+  fix="<concrete correction or addition>"
+  file_ref="<artifact_base>.draft.md"
+  bad="-missing or risky availability claim"
+  good="+qualified claim or disclaimer"
+  with_lines=1
+  with_detail=0
+  verified_ref="[<ID>]: <candidate name or section — unchanged items that remain verified>"
+  return_rule="Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections."
+}}
 
 # Constraints
 

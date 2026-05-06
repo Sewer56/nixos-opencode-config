@@ -28,6 +28,9 @@ Review branding for positioning.
 
 # Focus
 
+## Read scope
+Read `<artifact_base>.draft.md` for in-scope sections: Project Read, Naming Criteria, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone, Visual Direction.
+
 ## Purpose mismatch
 Block names or brand directions that do not align with the project's stated purpose or problem domain.
 
@@ -49,20 +52,17 @@ Good: tagline reinforces reliability.
 ## Weak brand story (ADVISORY)
 Flag Brand Positioning that lacks a coherent narrative connecting name to value proposition.
 
-
 Bad: name explanation is a loose metaphor unrelated to value.
 Good: story connects name, audience pain, and project benefit.
 
 ## Tagline-message disconnect
 Block taglines that fail to support or actively contradict supporting messages or elevator pitch.
 
-
 Bad: tagline promises speed while supporting messages focus on safety.
 Good: tagline reinforces the same value as supporting messages.
 
 ## Extensibility limitation (ADVISORY)
 Flag names or directions that do not extend naturally to docs, packages, domains, or sub-products.
-
 
 Bad: name only fits one current feature and blocks future packages/docs.
 Good: name can extend to modules, docs, domains, and sub-products.
@@ -75,50 +75,36 @@ Good: name, values, and messages reinforce one promise.
 
 # Process
 
-{{ file="./rules/branding-review/shared-process-pre.md" }}
-
-4. Inspect selected content
-- Read `<artifact_base>.draft.md` for in-scope sections (Project Read, Naming Criteria, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone, Visual Direction).
-- Apply each Focus check to evaluate positioning coherence.
-- Check Open→Resolved transitions.
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
-
-{{ file="./rules/branding-review/shared-process-post.md" }}
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=handoff_path
+  cache_derivation="replace the `.handoff.md` suffix with `.review-positioning.md`"
+  cache_record_type="per candidate name or brand element"
+  show_cache_update_detail=1
+  pruned_unit=entries
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _branding/reviewers/positioning
-Decision: PASS | ADVISORY | BLOCKING
-Domains: POS
-
-## Findings
-### [POS-NNN]
-Category: PURPOSE_MISMATCH | AUDIENCE_MISMATCH | EMOTIONAL_TONE_INCONSISTENCY | WEAK_BRAND_STORY | TAGLINE_MESSAGE_DISCONNECT | EXTENSIBILITY_LIMITATION | VALUE_NAME_DISCONNECT
-Severity: BLOCKING | ADVISORY
-Evidence: <section, `path:line`, or field>
-Lines: ~<start line>-<end line> | None
-Problem: <what positioning issue undermines brand coherence>
-Fix: <concrete correction or alternative>
-~~~diff
-<artifact_base>.draft.md
---- a/<artifact_base>.draft.md
-+++ b/<artifact_base>.draft.md
-  unchanged context
--misaligned name or messaging
-+coherent alternative
-  unchanged context
-~~~
-
-## Verified
-- [<ID>]: <candidate name or section — unchanged items that remain verified>
-
-## Notes
-- <optional short notes>
-```
-
-Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections.
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_branding/reviewers/positioning"
+  domains=POS
+  mode=cached
+  prefix=POS
+  categories="PURPOSE_MISMATCH | AUDIENCE_MISMATCH | EMOTIONAL_TONE_INCONSISTENCY | WEAK_BRAND_STORY | TAGLINE_MESSAGE_DISCONNECT | EXTENSIBILITY_LIMITATION | VALUE_NAME_DISCONNECT"
+  evidence="<section, `path:line`, or field>"
+  problem="<what positioning issue undermines brand coherence>"
+  fix="<concrete correction or alternative>"
+  file_ref="<artifact_base>.draft.md"
+  bad="-misaligned name or messaging"
+  good="+coherent alternative"
+  with_lines=1
+  with_detail=0
+  verified_ref="[<ID>]: <candidate name or section — unchanged items that remain verified>"
+  return_rule="Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections."
+}}
 
 # Constraints
 

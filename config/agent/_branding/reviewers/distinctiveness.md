@@ -28,6 +28,10 @@ Review branding for distinctiveness.
 
 # Focus
 
+## Read scope
+Read `<artifact_base>.draft.md` for in-scope sections: Candidate Shortlist, Top Recommendation, Risk and Availability Notes.
+Cross-reference search findings from the handoff for external collisions.
+
 ## Generic name
 Block common dictionary words used without distinctive combination or branding treatment.
 
@@ -49,7 +53,6 @@ Good: candidates explore different naming territories.
 ## Duplicate or collision with existing project
 Block exact or confusingly similar matches to known packages, repos, products, or competitors found in handoff search findings. ADVISORY for partial/domain-adjacent collisions.
 
-
 Bad: candidate matches an existing npm package in handoff search findings.
 Good: candidate differs enough to avoid package/product confusion.
 
@@ -60,51 +63,37 @@ Good: candidate can be searched with project domain and still find relevant resu
 
 # Process
 
-{{ file="./rules/branding-review/shared-process-pre.md" }}
-
-4. Inspect selected content
-- Read `<artifact_base>.draft.md` for in-scope sections (Candidate Shortlist, Top Recommendation, Risk and Availability Notes).
-- Cross-reference search findings from the handoff for external collisions.
-- Apply each Focus check to candidate names.
-- Check Open→Resolved transitions.
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
-
-{{ file="./rules/branding-review/shared-process-post.md" }}
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=handoff_path
+  cache_derivation="replace the `.handoff.md` suffix with `.review-distinctiveness.md`"
+  cache_record_type="per candidate name or brand element"
+  step2_extra="- When the reviewer's Focus includes search-findings references: also read the search findings section for external data."
+  show_cache_update_detail=1
+  pruned_unit=entries
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _branding/reviewers/distinctiveness
-Decision: PASS | ADVISORY | BLOCKING
-Domains: DST
-
-## Findings
-### [DST-NNN]
-Category: GENERIC_NAME | OVERUSED_SUFFIX | NEAR_DUPLICATE_LIST | DUPLICATE_COLLISION | WEAK_SEARCHABILITY
-Severity: BLOCKING | ADVISORY
-Evidence: <section, `path:line`, or field>
-Lines: ~<start line>-<end line> | None
-Problem: <what distinctiveness issue undermines the name choice>
-Fix: <concrete correction or alternative>
-~~~diff
-<artifact_base>.draft.md
---- a/<artifact_base>.draft.md
-+++ b/<artifact_base>.draft.md
-  unchanged context
--generic or colliding name
-+distinctive alternative
-  unchanged context
-~~~
-
-## Verified
-- [<ID>]: <candidate name or section — unchanged items that remain verified>
-
-## Notes
-- <optional short notes>
-```
-
-Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections.
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_branding/reviewers/distinctiveness"
+  domains=DST
+  mode=cached
+  prefix=DST
+  categories="GENERIC_NAME | OVERUSED_SUFFIX | NEAR_DUPLICATE_LIST | DUPLICATE_COLLISION | WEAK_SEARCHABILITY"
+  evidence="<section, `path:line`, or field>"
+  problem="<what distinctiveness issue undermines the name choice>"
+  fix="<concrete correction or alternative>"
+  file_ref="<artifact_base>.draft.md"
+  bad="-generic or colliding name"
+  good="+distinctive alternative"
+  with_lines=1
+  with_detail=0
+  verified_ref="[<ID>]: <candidate name or section — unchanged items that remain verified>"
+  return_rule="Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections."
+}}
 
 # Constraints
 

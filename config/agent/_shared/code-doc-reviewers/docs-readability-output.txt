@@ -1,0 +1,37 @@
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="{{arg:agent_name}}"
+  domains="{{arg:doc_domain}}, {{arg:read_domain}}"
+  prefix={{arg:doc_domain}}
+  categories="COVERAGE | SPECIFICITY | FIDELITY | INLINE_COMMENT"
+  evidence="{{arg:evidence1}}"
+  problem="<what is wrong>"
+  fix="<smallest concrete correction>"
+  file_ref="{{arg:file_ref}}"
+  bad="-old or missing docs"
+  good="+new docs"
+  with_lines=1
+  with_detail=0
+  prefix_b={{arg:read_domain}}
+  categories_b="{{arg:read_categories}}"
+  evidence_b="{{arg:evidence2}}"
+  problem_b="<what readability issue degrades the documentation>"
+  fix_b="<concise replacement>"
+  file_ref_b="{{arg:file_ref}}"
+  bad_b="-problematic"
+  good_b="+improved"
+  mode={{arg:mode}}
+  verified_ref="{{arg:verified_ref}}"
+  return_rule="Return ONLY the block above. Write `- None` under empty sections."
+}}
+
+# Constraints
+
+- {{arg:doc_domain}}: block for documentation rule Review Blocking Criteria{{arg:doc_constraint_extra}}.
+- {{arg:read_domain}}: block for filler, passive voice in instructions, ambiguous terminology, undefined project-specific jargon, ambiguous language, project-specific acronyms without expansion.
+- Do not block for obvious code without comments, standard terms, common programming terms, exact identifiers, stylistic variation, descriptive passive voice, minor wordiness, compound-term compression, or opaque references.
+{{ if=variant==codedoc }}
+- In plan steps, generic `update docs` notes are insufficient; required docs must appear in the relevant diff/snippet.
+{{ endif }}
+- Include a unified diff after every finding's `Fix:` field targeting the affected {{arg:target_type}}.
+- Leave {{arg:leave_scope}} to other reviewers.

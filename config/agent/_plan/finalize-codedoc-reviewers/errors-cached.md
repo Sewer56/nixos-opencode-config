@@ -19,15 +19,34 @@ permission:
   external_directory: allow
 ---
 
-{{ file="./agent/_plan/finalize-codedoc-reviewers/errors-shared-pre.txt" }}
+{{
+  file="./agent/_shared/code-doc-reviewers/errors-header.txt"
+  description="Review step artifacts' code-adjacent error documentation."
+  inputs="- `handoff_path` (e.g., `<artifact_base>.handoff.md`)\n- `plan_path` (e.g., `<artifact_base>.draft.md`)\n- `step_pattern` (e.g., `<artifact_base>.step.*.md`)"
+  focus_file="errors-focus.plan.md"
+}}
 
 # Process
 
-1. Load `handoff_path` sections: `## Delta`, `## Review Ledger`, and non-empty `### Decisions`. Load cache by replacing `.handoff.md` with `.review-codedoc-errors.md`; missing/malformed cache is empty.
-2. Inspect Changed/New I#/T# steps, own Open findings, and decision-referenced items; carry forward Verified entries only for Unchanged Delta items.
-3. Read selected step files in one batch. Open referenced source files only when the step diff lacks context for public API status or reachable error variants.
-4. Check Open→Resolved transitions. Update only changed cache entries, preserving unchanged cache text byte-for-byte, then emit the `# REVIEW` block. On malformed-output retry without new Delta/Decision entries, reuse prior analysis/cache and re-emit valid output.
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=handoff_path
+  cache_derivation="replace `.handoff.md` with `.review-codedoc-errors.md`"
+  reads_review_ledger=1
+  preserve_byte_exact=1
+}}
 
-In the `# REVIEW` output, set `Agent:` to `_plan/finalize-codedoc-reviewers/errors-cached`.
+# Output
 
-{{ file="./agent/_plan/finalize-codedoc-reviewers/errors-cached-post.txt" }}
+{{
+  file="./agent/_shared/code-doc-reviewers/errors-output.txt"
+  mode=cached
+  variant=codedoc
+  agent_name="_plan/finalize-codedoc-reviewers/errors-cached"
+  err_prefix=CERR
+  evidence1="<section, `path:line`, or missing element>"
+  file_ref="<path/to/step/file>"
+  diff_target_note=" targeting the affected step file with the exact `# Errors` section to add or fix"
+  verified_ref="<I#/T#>: <item description — unchanged items that remain verified>"
+}}

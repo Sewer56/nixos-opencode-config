@@ -10,6 +10,7 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
+  grep: allow
   glob: allow
   list: allow
   todowrite: allow
@@ -26,13 +27,16 @@ Adjudicate the AUD domain (cacheless). Validate A/B reviewer outputs, merge evid
 - `handoff_path`, `plan_path`, `step_paths`
 
 # Process
-1. Run `@_plan/finalize-reviewers/audit/audit-a-cacheless` and `@_plan/finalize-reviewers/audit/audit-b-cacheless` independently with identical artifact inputs.
-2. Do not pass either leg the other leg's output. Do not apply raw leg findings.
-3. Validate both outputs: `# REVIEW`, `Agent: _plan/finalize-reviewers/audit`, `Decision: PASS | ADVISORY | BLOCKING`. Treat `IDs:` as routing data only.
-4. Parse findings from each leg's inline `## Findings` section. Do not read sidecar files.
-5. Merge findings: keep only AUD findings in fidelity, structure, completeness, economy, or dead-code; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; merge duplicates; drop out-of-domain or unsupported findings; resolve conflicts with the smallest safe fix.
-6. Inspect `handoff_path`, `plan_path`, and all `step_paths` yourself. Do not read prior review caches.
-7. Emit merged findings inline in the output block. Do not write cache or actions files.
+
+{{
+  file="./agent/_templates/adjudicator/adjudicator-cacheless.txt"
+  reviewer_a="_plan/finalize-reviewers/audit/audit-a-cacheless"
+  reviewer_b="_plan/finalize-reviewers/audit/audit-b-cacheless"
+  run_context="with identical artifact inputs"
+  validation_extra=", `Agent: _plan/finalize-reviewers/audit`"
+  merge_scope="keep only AUD findings in fidelity, structure, completeness, economy, or dead-code; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain or unsupported findings; resolve conflicts with the smallest safe fix"
+  inspect_context="`handoff_path`, `plan_path`, and all `step_paths`"
+}}
 
 # Output
 

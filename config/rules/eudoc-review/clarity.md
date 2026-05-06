@@ -28,6 +28,15 @@ Flag acronyms not expanded on first use. BLOCKING for project-specific acronyms;
 Bad: `SSR must stay enabled.`
 Good: `Server-side rendering (SSR) must stay enabled.`
 
+### Scope boundary
+Review linguistic comprehensibility only. Do not judge correctness, duplication, or wording style unless unclear language causes the issue.
+
+Bad finding: `This API call is wrong.`
+Good finding: `The text says "bridge" without explaining which module or behavior it means.`
+
+Bad: flag a wrong hook name as clarity.
+Good: flag undefined wording that prevents knowing which hook is meant.
+
 ### Exclusions
 Do not block these as clarity issues:
 - Common programming terms such as `API`, `HTTP`, `markdown`, `frontmatter`.

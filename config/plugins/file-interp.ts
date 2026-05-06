@@ -1,5 +1,5 @@
 /**
- * File Interpolation plugin — recursively expands {arg:...}, {env:...},
+ * File Interpolation plugin — recursively expands {{arg:...}}, {{env:...}},
  * inline `{{ if=... }}...{{ endif }}` conditionals, and `{{ file="..." }}`
  * templates in .md agent prompts.
  *
@@ -16,7 +16,7 @@
  *
  * Agents and commands load into the system prompt; templates in those files are
  * expanded before the LLM sees them. Plain-text variable references like
- * `GENERAL_RULES_PATH` are left untouched — only {arg:...}, {env:...}, inline
+ * `GENERAL_RULES_PATH` are left untouched — only {{arg:...}}, {{env:...}}, inline
  * conditionals, and `{{ file="..." }}` match.
  *
  * # Supported tokens
@@ -28,28 +28,31 @@
  * - `{{ file="./path" if=mode==cached }}` — include only when arg exactly matches
  * - `{{ if=arg_key }}...{{ endif }}` — include block only when arg is non-empty
  * - `{{ if=mode==cached }}...{{ endif }}` — include block only when arg exactly matches
+ * - `{{ if=arg_key }}...{{ else }}...{{ endif }}` — include first block when true, second when false
  * - `{{ if=env:VAR_NAME }}...{{ endif }}` — include block only when env var is non-empty
  * - `{{ if=env:VAR_NAME==value }}...{{ endif }}` — include block only when env var exactly matches
- * - `{env:VAR_NAME}`               — environment variable value
- * - `{arg:key}`                    — caller-provided arg value inside embedded files
+ * - `{{env:VAR_NAME}}`               — environment variable value
+ * - `{{arg:key}}`                    — caller-provided arg value inside embedded files
  *
  * # Arg rules
- * - `{arg:key}` expands to the value passed by the embedding `{{ file="..." key=val }}` call
- * - Undefined `{arg:...}` resolves to empty string
- * - Arg values are literal strings; tokens inside arg values are not expanded
- * - Args do not cascade: nested `{{ file="..." }}` calls start with empty args unless they provide their own
+ * - `{{arg:key}}` expands to the value passed by the embedding `{{ file="..." key=val }}` call
+ * - Undefined `{{arg:...}}` resolves to empty string
+ * - Arg values inside `{{ file="..." key=val }}` are literal for env/file tokens;
+ *   `{{env:...}}` and `{{ file=... }}` inside arg values are not expanded by the caller
+ * - `{{arg:...}}` tokens inside non-file, non-if arg values DO expand (arg cascade):
+ *   the parent's `{{arg:key}}` in an arg value resolves against the parent scope
  * - `if` is reserved and is not passed as an arg
  * - `if=arg_key` checks whether the current arg is non-empty
  * - `if=arg_key==value` checks exact string equality; no expression parser
  * - `if=env:VAR_NAME` checks whether an environment variable is non-empty
  * - `if=env:VAR_NAME==value` checks exact environment-variable equality
  * - Args set on the same `{{ file="..." }}` call can satisfy `if`, and override outer args
- * - Expansion order: {arg:} → {env:} → inline `{{ if=... }}` → `{{ file="..." }}`
+ * - Expansion order: {{arg:}} → {{env:}} → inline `{{ if=... }}` → `{{ file="..." }}`
  *
  * # Template style
  * - Use `{{ file="..." }}` for file imports; legacy colon syntax is not supported
  * - `file` must be the first attribute for fast detection
- * - Use `{{ if=... }}...{{ endif }}` for inline conditionals; `else` is intentionally unsupported
+ * - Use `{{ if=... }}...{{ else }}...{{ endif }}` for two-branch inline conditionals
  * - Any whitespace is allowed after `{{`, between attributes, and before `}}`
  * - Prefer multiline templates when passing args:
  *   ```markdown
@@ -64,7 +67,7 @@
  *
  * # Raw inlining
  * Inlined content is recursively expanded, then spliced into the prompt.
- * At `MAX_DEPTH`, `{{ file="..." }}` templates are left literal; `{env:...}`
+ * At `MAX_DEPTH`, `{{ file="..." }}` templates are left literal; `{{env:...}}`
  * and inline conditionals still expand.
  *
  * # Usage
@@ -72,7 +75,7 @@
  * ```markdown
  * Your API key is {{ file="~/.secrets/openai-key" }}
  * Project config: {{ file="./config/prompt-ctx.txt" }}
- * Region: {env:AWS_REGION}
+ * Region: {{env:AWS_REGION}}
  * System rules: {{ file="./config/rules/general.md" }}
  * ```
  *
@@ -93,7 +96,7 @@ import fs from "node:fs"
 // ── Entry point ──────────────────────────────────────────────────────────────
 
 /**
- * OpenCode plugin that expands {arg:...}, {env:...}, inline conditionals, and
+ * OpenCode plugin that expands {{arg:...}}, {{env:...}}, inline conditionals, and
  * `{{ file="..." }}` templates in .md agent system prompts.
  *
  * Captures `directory` from `PluginInput` at init time to resolve relative
@@ -159,9 +162,10 @@ interface ExpandContext {
  * Half-open `[start, end)` text span that must not be scanned for tokens.
  *
  * Used for two cases:
- * 1. Text inserted from `{arg:key}` values. Arg values are literal by design,
- *    so `{env:FOO}` or `{{ file="./x" }}` inside the value must stay untouched.
- * 2. Non-file arg values of `{{ file="./path" key="{env:FOO}" }}` while
+ * 1. Text inserted from `{{arg:key}}` values. Arg substitution is single-pass,
+ *    so `{{env:FOO}}` or `{{ file="./x" }}` inside the value must stay untouched
+ *    by later env/file passes.
+ * 2. Non-file arg values of `{{ file="./path" key="{{env:FOO}}" }}` while
  *    scanning the caller text. Those tokens belong to the arg string, not to
  *    the caller prompt.
  */
@@ -173,7 +177,7 @@ interface ProtectedRange {
 /**
  * Replacement metadata for one sync token substitution.
  *
- * Protected ranges are offsets into the current string. If `{env:LONG_NAME}`
+ * Protected ranges are offsets into the current string. If `{{env:LONG_NAME}}`
  * before a protected range becomes `x`, following protected offsets shift left.
  * This compact record lets `remapProtectedRanges` adjust only when needed.
  */
@@ -269,24 +273,27 @@ const FILE_ATTR = "file"
 const IF_ATTR = "if"
 const ENDIF_ATTR = "endif"
 const ENV_CONDITION_PREFIX = "env:"
-const ENV_PREFIX = "{env:"
-const ARG_PREFIX = "{arg:"
-const TOKEN_END = "}"
+const ENV_PREFIX = "{{env:"
+const ARG_PREFIX = "{{arg:"
+const TOKEN_END = "}}"
 
 /** Fast transform gate. Exact file expansion still requires a closing `}}` later. */
 function hasExpandableToken(text: string): boolean {
   let start = text.indexOf(TOKEN_START)
   while (start !== -1) {
-    const next = text.charCodeAt(start + 1)
-    if (next === 123 && (startsFileTemplate(text, start) || startsInlineIfTemplate(text, start))) return true // {
-    if (next === 101 && text.startsWith(ENV_PREFIX, start)) return true // e
-    if (next === 97 && text.startsWith(ARG_PREFIX, start)) return true // a
+    // All expandable tokens start with `{{`: file templates, inline ifs,
+    // {{arg:...}}, and {{env:...}}.
+    if (text.charCodeAt(start + 1) === 123) { // {
+      if (startsFileTemplate(text, start) || startsInlineIfTemplate(text, start)) return true
+      if (text.startsWith(ARG_PREFIX, start)) return true
+      if (text.startsWith(ENV_PREFIX, start)) return true
+    }
     start = text.indexOf(TOKEN_START, start + 1)
   }
   return false
 }
 
-/** Fast check for `{{ file=... }}`. Requires `file` first by style rule. */
+/** Fast check for `{{ file=... }}`. Requires `file` first by style rule. Rejects `{{arg:}}` and `{{env:}}`. */
 function startsFileTemplate(text: string, start: number): boolean {
   if (!text.startsWith(FILE_TEMPLATE_START, start)) return false
   let i = start + FILE_TEMPLATE_START.length
@@ -327,15 +334,15 @@ export function resolvePath(raw: string, baseDir: string): string {
 }
 
 /**
- * Expand {arg:key}, {env:VAR}, inline `{{ if=... }}` blocks, and
+ * Expand {{arg:key}}, {{env:VAR}}, inline `{{ if=... }}` blocks, and
  * `{{ file="path" }}` templates in `text`.
  *
  * Arg substitution runs first (synchronous), then environment substitution
  * (synchronous), then inline conditional substitution (synchronous), then file
  * substitution (async reads). File content is recursively expanded if it contains
- * further {arg:...}, {env:...}, inline conditionals, or file templates, up to
+ * further {{arg:...}}, {{env:...}}, inline conditionals, or file templates, up to
  * MAX_DEPTH levels deep. At depth ≥ MAX_DEPTH, file templates are left as literal
- * text; {arg:...}, {env:...}, and inline conditionals are still expanded. Cycles
+ * text; {{arg:...}}, {{env:...}}, and inline conditionals are still expanded. Cycles
  * are detected via ancestor-path tracking — a template referencing a file in its
  * own ancestor chain resolves to empty string.
  *
@@ -390,21 +397,20 @@ export async function expand(text: string, baseDir: string, ctx?: ExpandContext)
 }
 
 /**
- * Expand `{arg:key}` tokens with manual scanning.
+ * Expand `{{arg:key}}` tokens with manual scanning.
  *
  * Notes:
  * - Runs before env/file expansion so args can compose later file paths, e.g.
- *   `{{ file="./rules/{arg:topic}.md" }}`.
- * - Skips `{arg:...}` text inside non-file template args because those tokens are
- *   literal arg values for the callee, not caller-level tokens.
+ *   `{{ file="./rules/{{arg:topic}}.md" }}`.
+ * - All `{{arg:key}}` tokens expand everywhere, including inside non-file,
+ *   non-if arg values of `{{ file="..." }}` templates (arg cascade). The
+ *   expanded value replaces the token before the file template is parsed,
+ *   so `{{ file="./tmpl" x="{{arg:y}}" }}` passes the parent's `y` value to
+ *   the callee.
  * - Marks inserted arg values as protected when they contain braces; later
  *   env/file passes must not expand token-looking text from arg values.
  */
 function expandArgTokens(text: string, args: Map<string, string>): SyncExpandResult {
-  // Arg expansion sees the original caller text. Compute template arg-value
-  // spans once so `{{ file="./tmpl" x="{arg:y}" }}` passes literal `{arg:y}`.
-  const fileArgRanges = collectFileArgRanges(text, EMPTY_RANGES)
-  let fileArgIndex = 0
   let out = ""
   let cursor = 0
   let searchFrom = 0
@@ -414,12 +420,6 @@ function expandArgTokens(text: string, args: Map<string, string>): SyncExpandRes
   while (true) {
     const start = text.indexOf(ARG_PREFIX, searchFrom)
     if (start === -1) break
-
-    fileArgIndex = advanceRangeIndex(fileArgRanges, fileArgIndex, start)
-    if (isInRange(fileArgRanges, fileArgIndex, start)) {
-      searchFrom = fileArgRanges[fileArgIndex].end
-      continue
-    }
 
     const valueStart = start + ARG_PREFIX.length
     const end = text.indexOf(TOKEN_END, valueStart)
@@ -437,12 +437,12 @@ function expandArgTokens(text: string, args: Map<string, string>): SyncExpandRes
     out += value
 
     // Only allocate protected spans for values that could contain tokens or
-    // template closers. Literal `foo` needs no later skip check; `{env:FOO}` does.
+    // template closers. Literal `foo` needs no later skip check; `{{env:FOO}}` does.
     if (value.indexOf(TOKEN_START) !== -1 || value.indexOf(TOKEN_END) !== -1) {
       protectedRanges.push({ start: outStart, end: outStart + value.length })
     }
 
-    cursor = end + 1
+    cursor = end + TOKEN_END.length
     searchFrom = cursor
     changed = true
   }
@@ -453,10 +453,10 @@ function expandArgTokens(text: string, args: Map<string, string>): SyncExpandRes
 }
 
 /**
- * Expand `{env:VAR}` tokens with manual scanning to avoid regex allocation/state.
+ * Expand `{{env:VAR}}` tokens with manual scanning to avoid regex allocation/state.
  *
  * `protectedRanges` come from earlier arg expansion. `fileArgRanges` are added
- * for the current string so `{{ file="./tmpl" x="{env:FOO}" }}` keeps `{env:FOO}` as a
+ * for the current string so `{{ file="./tmpl" x="{{env:FOO}}" }}` keeps `{{env:FOO}}` as a
  * literal callee arg. If replacements happen before protected text, offsets are
  * remapped before returning.
  */
@@ -484,7 +484,7 @@ function expandEnvTokens(text: string, protectedRanges: ProtectedRange[]): SyncE
     const end = text.indexOf(TOKEN_END, valueStart)
     if (end === -1) break
 
-    // Preserve /\{env:([^}]+)\}/ semantics: empty `{env:}` is not a token.
+    // Empty `{{env:}}` is not a valid token.
     if (end === valueStart) {
       searchFrom = valueStart
       continue
@@ -497,8 +497,8 @@ function expandEnvTokens(text: string, protectedRanges: ProtectedRange[]): SyncE
 
     out += text.slice(cursor, start) + value
     // Track offset delta only when there are protected ranges to preserve.
-    replacements?.push({ start, end: end + 1, length: value.length })
-    cursor = end + 1
+    replacements?.push({ start, end: end + TOKEN_END.length, length: value.length })
+    cursor = end + TOKEN_END.length
     searchFrom = cursor
     changed = true
   }
@@ -618,14 +618,27 @@ async function expandFileTokens(
   if (!reads.length) return text
 
   const tail = text.slice(cursor)
+
+  // Strip one trailing newline from each expanded file content to prevent
+  // double blank lines at include boundaries. The expanded content may end
+  // with \n (e.g. when a conditional at the end of the file is removed),
+  // and the parent file adds its own \n after }}, producing \n\n.
+  // Stripping the trailing \n from the included content lets the parent's
+  // newline serve as the single correct line break.
+  const stripTrailingNewline = (s: string): string => {
+    if (s.endsWith("\r\n")) return s.slice(0, -2)
+    if (s.endsWith("\n")) return s.slice(0, -1)
+    return s
+  }
+
   if (reads.length === 1) {
-    return parts[0] + (await reads[0]) + tail
+    return parts[0] + stripTrailingNewline(await reads[0]) + tail
   }
 
   const contents = await Promise.all(reads)
   let out = ""
   for (let i = 0; i < contents.length; i++) {
-    out += parts[i] + contents[i]
+    out += parts[i] + stripTrailingNewline(contents[i])
   }
   return out + tail
 }
@@ -641,6 +654,20 @@ interface InlineEndifTemplateSpec {
   start: number
   /** Inclusive offset of the second `}` in the closing `{{ endif }}` marker. */
   end: number
+}
+
+interface InlineElseTemplateSpec {
+  /** Inclusive offset of the first `{` in the `{{ else }}` marker. */
+  start: number
+  /** Inclusive offset of the second `}` in the `{{ else }}` marker. */
+  end: number
+}
+
+interface InlineIfCloseResult {
+  /** The `{{ endif }}` that closes the block. */
+  endif: InlineEndifTemplateSpec
+  /** The `{{ else }}` at the same depth, if present. */
+  elseMarker?: InlineElseTemplateSpec
 }
 
 /**
@@ -662,6 +689,11 @@ function expandInlineConditionals(
 
 /**
  * Expand all complete inline conditional blocks within one absolute text range.
+ *
+ * Supports `{{ else }}` for two-branch conditionals. When `{{ else }}` is
+ * present, the true branch spans from after `{{ if=... }}` to before
+ * `{{ else }}`, and the false branch spans from after `{{ else }}` to before
+ * `{{ endif }}`. When no `{{ else }}` is present, the false branch is empty.
  *
  * The scanner works on absolute offsets so protected arg-literal ranges remain
  * valid through recursive calls. Malformed or unclosed blocks are left literal;
@@ -696,25 +728,50 @@ function expandInlineConditionalsInRange(
       continue
     }
 
-    const closing = findMatchingInlineEndif(text, parsed.end + 1, rangeEnd, protectedRanges)
-    if (!closing) {
+    const closeResult = findMatchingInlineEndif(text, parsed.end + 1, rangeEnd, protectedRanges)
+    if (!closeResult) {
       searchFrom = parsed.end + 1
       continue
     }
 
+    const isTrue = shouldExpandForCondition(parsed.condition, ctx.args, EMPTY_ARGS)
     out += text.slice(cursor, start) + EMPTY_EXPANSION_MARKER
-    if (shouldExpandForCondition(parsed.condition, ctx.args, EMPTY_ARGS)) {
-      out += expandInlineConditionalsInRange(
-        text,
-        parsed.end + 1,
-        closing.start,
-        ctx,
-        protectedRanges,
-      )
+
+    if (closeResult.elseMarker) {
+      // Two-branch conditional: if-branch is (parsed.end+1, elseMarker.start),
+      // else-branch is (elseMarker.end+1, endif.start).
+      if (isTrue) {
+        out += expandInlineConditionalsInRange(
+          text,
+          parsed.end + 1,
+          closeResult.elseMarker.start,
+          ctx,
+          protectedRanges,
+        )
+      } else {
+        out += expandInlineConditionalsInRange(
+          text,
+          closeResult.elseMarker.end + 1,
+          closeResult.endif.start,
+          ctx,
+          protectedRanges,
+        )
+      }
+    } else {
+      // Single-branch conditional (no else).
+      if (isTrue) {
+        out += expandInlineConditionalsInRange(
+          text,
+          parsed.end + 1,
+          closeResult.endif.start,
+          ctx,
+          protectedRanges,
+        )
+      }
     }
     out += EMPTY_EXPANSION_MARKER
 
-    cursor = closing.end + 1
+    cursor = closeResult.endif.end + 1
     searchFrom = cursor
     changed = true
   }
@@ -723,7 +780,8 @@ function expandInlineConditionalsInRange(
 }
 
 /**
- * Find the `{{ endif }}` marker that closes an opening inline `{{ if=... }}`.
+ * Find the `{{ endif }}` marker that closes an opening inline `{{ if=... }}`,
+ * and optionally the `{{ else }}` marker at the same nesting depth.
  *
  * Nested conditionals increment depth and must close before the outer block can
  * close. Invalid marker-looking text is ignored so unrelated `{{ ... }}` content
@@ -734,10 +792,11 @@ function findMatchingInlineEndif(
   searchStart: number,
   rangeEnd: number,
   protectedRanges: ProtectedRange[],
-): InlineEndifTemplateSpec | undefined {
+): InlineIfCloseResult | undefined {
   let depth = 1
   let searchFrom = searchStart
   let protectedIndex = advanceRangeIndex(protectedRanges, 0, searchStart)
+  let elseMarker: InlineElseTemplateSpec | undefined
 
   while (searchFrom < rangeEnd) {
     const start = text.indexOf(FILE_TEMPLATE_START, searchFrom)
@@ -756,10 +815,19 @@ function findMatchingInlineEndif(
       continue
     }
 
+    const elseParsed = parseInlineElseTemplate(text, start)
+    if (elseParsed && elseParsed.end + 1 <= rangeEnd) {
+      if (depth === 1 && !elseMarker) {
+        elseMarker = elseParsed
+      }
+      searchFrom = elseParsed.end + 1
+      continue
+    }
+
     const closing = parseInlineEndifTemplate(text, start)
     if (closing && closing.end + 1 <= rangeEnd) {
       depth--
-      if (depth === 0) return closing
+      if (depth === 0) return { endif: closing, elseMarker }
       searchFrom = closing.end + 1
       continue
     }
@@ -820,6 +888,29 @@ function parseInlineEndifTemplate(text: string, start: number): InlineEndifTempl
   const keyStart = i
   i = scanTemplateKey(text, i)
   if (i === keyStart || text.slice(keyStart, i) !== ENDIF_ATTR) return undefined
+
+  i = skipTemplateSpace(text, i)
+  if (!text.startsWith(FILE_TEMPLATE_END, i)) return undefined
+  return { start, end: i + FILE_TEMPLATE_END.length - 1 }
+}
+
+const ELSE_ATTR = "else"
+
+/**
+ * Parse an inline else marker: `{{ else }}`.
+ *
+ * Else markers accept surrounding whitespace but no attributes. Non-matching
+ * `{{ ... }}` text returns `undefined` so other template forms can coexist.
+ */
+function parseInlineElseTemplate(text: string, start: number): InlineElseTemplateSpec | undefined {
+  if (!text.startsWith(FILE_TEMPLATE_START, start)) return undefined
+
+  let i = start + FILE_TEMPLATE_START.length
+  i = skipTemplateSpace(text, i)
+
+  const keyStart = i
+  i = scanTemplateKey(text, i)
+  if (i === keyStart || text.slice(keyStart, i) !== ELSE_ATTR) return undefined
 
   i = skipTemplateSpace(text, i)
   if (!text.startsWith(FILE_TEMPLATE_END, i)) return undefined
@@ -1130,7 +1221,7 @@ function decodeTemplateEscape(code: number): string {
     case 114: return "\r"
     case 116: return "\t"
     case 118: return "\v"
-    default: return "\\" + String.fromCharCode(code)
+    default: return String.fromCharCode(code)
   }
 }
 
@@ -1176,10 +1267,10 @@ function isArgKeyChar(code: number): boolean {
 /**
  * Find non-file arg value spans in `{{ file="..." key=value }}` templates.
  *
- * Example: in `{{ file="./tmpl" x="{env:FOO}" }}`, this returns the span
- * covering `{env:FOO}`. The env pass ignores it at caller level; later,
+ * Example: in `{{ file="./tmpl" x="{{env:FOO}}" }}`, this returns the span
+ * covering `{{env:FOO}}`. The env pass ignores it at caller level; later,
  * `parseFileTemplate` passes it as literal `x` to `tmpl`. The `file` value is
- * not protected so `{arg:topic}` and `{env:PATH_PART}` can compose paths.
+ * not protected so `{{arg:topic}}` and `{{env:PATH_PART}}` can compose paths.
  */
 function collectFileArgRanges(text: string, protectedRanges: ProtectedRange[]): ProtectedRange[] {
   if (text.indexOf(FILE_TEMPLATE_START) === -1) return EMPTY_RANGES

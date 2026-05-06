@@ -19,37 +19,48 @@ permission:
   external_directory: allow
 ---
 
-{{ file="./agent/_plan/finalize-eudoc-reviewers/correctness-shared-pre.txt" }}
+{{ file="./agent/_plan/finalize-eudoc-reviewers/_templates/correctness-header.txt" }}
 
 # Process
 
-1. Load cache
-- Cache: `<artifact_base>.handoff.md` → `<artifact_base>.review-eudoc-correctness.md`. Read if exists; treat missing/malformed as empty.
-- One record per item (D#) with fields `last_decision`, `open_findings`, `evidence`, `verified`.
-
-2. Read Delta and Decisions
-- Use the `## Delta` passed inline in the task prompt. If Delta was passed inline, skip reading `handoff_path` for it.
-- If Delta was NOT passed inline, read `## Delta` from `handoff_path`.
-- Read `### Decisions` only when non-empty.
-
-3. Select items to inspect
-- Carry forward Verified items that are Unchanged in Delta.
-- Re-evaluate Changed and New items.
-- Re-evaluate own Open items from cache and decision-referenced items.
-- Exclude frozen regions.
-
-4. Inspect selected content
-- **First review** (cache empty or no prior findings): If Delta was passed inline, skip reading `handoff_path` — use the inline Step Index and Requirement Trace Matrix rows. Read all D# step files. For UPDATE scope: read target doc files at the line ranges the D# step specifies — do not read full target files beyond those ranges unless evidence is insufficient. For NEW: read sibling pages. Skip ARCHITECTURE.md, source code, or I#/T# step files unless a D# step explicitly references them as evidence.
-- **Re-review** (cache has prior findings): Read `## Delta` from `handoff_path` for status changes. Read ONLY D# steps marked Changed or New in Delta — skip Unchanged steps (they are in cache as Verified). Do NOT re-read the full handoff, target doc files, or sibling pages for Unchanged items. Check Open→Resolved transitions against cache.
-- Check coverage/specificity on selected D# steps. Check broken links across D# steps (only if multiple exist).
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output.
-
-5. Update cache
-- Missing/malformed cache: write full file.
-- Otherwise: targeted edits for changed entries only.
-
-6. Emit the final review block
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=handoff_path
+  cache_derivation="replace the `.handoff.md` suffix with `.review-eudoc-correctness.md`"
+  cache_record_type="per item (D#)"
+  has_inline_delta=1
+  has_frozen_regions=1
+}}
 
 In the `# REVIEW` output, set `Agent:` to `_plan/finalize-eudoc-reviewers/correctness-cached`.
 
-{{ file="./agent/_plan/finalize-eudoc-reviewers/correctness-cached-post.txt" }}
+# Output
+
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plan/finalize-eudoc-reviewers/correctness"
+  prefix=EDOC
+  categories="COVERAGE | BROKEN_LINK"
+  detail="E_CONTRADICTION | E_UNSPECIFIC | E_MISSING_DOCS | E_FROZEN_REGIONS | E_BROKEN_LINK"
+  evidence="<D# step, `path:line`, or cross-step reference>"
+  problem="<what is wrong>"
+  fix="<smallest concrete correction>"
+  file_ref="<path/to/step/file>"
+  bad="-issue"
+  good="+fix"
+  with_lines=0
+  with_detail=1
+  mode=cached
+  verified_ref="<D#>: <item description — unchanged items that remain verified>"
+  return_rule="Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line."
+}}
+
+# Constraints
+
+- **First review** (cache empty or no prior findings): If Delta was passed inline, skip reading `handoff_path` — use the inline Step Index and Requirement Trace Matrix rows. Read all D# step files. For UPDATE scope: read target doc files at the line ranges the D# step specifies — do not read full target files beyond those ranges unless evidence is insufficient. For NEW: read sibling pages. Skip ARCHITECTURE.md, source code, or I#/T# step files unless a D# step explicitly references them as evidence.
+- **Re-review** (cache has prior findings): Read `## Delta` from `handoff_path` for status changes. Read ONLY D# steps marked Changed or New in Delta — skip Unchanged steps (they are in cache as Verified). Do NOT re-read the full handoff, target doc files, or sibling pages for Unchanged items.
+- Block for: docs contradicting implementation, unspecified "update docs", missing docs for new features, broken internal links.
+- Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` targeting the affected D# step file.
+- Only generate findings on in-scope D# steps. Findings on frozen regions are invalid.

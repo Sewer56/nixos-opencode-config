@@ -119,7 +119,7 @@ Enumeration: full | truncated (<enumerated> of <total> items)
 
 # Language-Specific Rules
 
-Language files are under `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_audit/`. Read the matching file before enumeration:
+Language files are under `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_audit/_templates/`. Read the matching file before enumeration:
 
 - Rust → `lang-rust.txt`
 - TypeScript/JS → `lang-typescript.txt`

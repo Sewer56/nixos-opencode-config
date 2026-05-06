@@ -34,28 +34,17 @@ Adjudicate the COR domain (cached). Validate A/B reviewer pointers, merge eviden
 - `actions_path` (optional): derive next iteration path from `cache_path` when omitted.
 
 # Process
-1. Derive `cache_path` when absent by replacing `.draft.handoff.md` with `.draft.review-correctness.md`.
-2. Set `state_path` to `cache_path`.
-3. Derive `actions_path` when absent by globbing existing `<state_path without .md>.actions.*.md` files and choosing the next three-digit `<nnn>` path, starting `001`.
-4. Derive sidecar state paths from `state_path`:
-   - `@_plan/draft-reviewers/correctness/correctness-a-cached`: `<state_path without .md>.a.md`
-   - `@_plan/draft-reviewers/correctness/correctness-b-cached`: `<state_path without .md>.b.md`
-   - sidecar actions: replace `.md` with `.actions.<same nnn>.md`.
-5. Run `@_plan/draft-reviewers/correctness/correctness-a-cached` and `@_plan/draft-reviewers/correctness/correctness-b-cached` independently with identical `context_path` and `draft_handoff_path`, but with their own sidecar `cache_path` and `actions_path`.
-6. Do not pass either leg the other leg's output. Do not allow either leg to edit `context_path` or `draft_handoff_path`.
-7. Validate both outputs: `# REVIEW`, `Decision: PASS | ADVISORY | BLOCKING`, and `Domains: COR` must be present. Treat `IDs:` as routing data only.
-8. Read sidecar actions first. Read sidecar state only when actions are malformed, truncated, contradictory, or insufficient to adjudicate evidence.
-9. Merge findings:
-   - Keep only COR findings about fidelity, action appropriateness, file path validity, template structure, diff headers, or illustrative snippets.
-   - Require concrete evidence: `[P#]`, section name, path, line, diff header, or missing required element.
-   - Keep a single-leg finding when evidence is concrete and in scope; two-leg agreement is a confidence signal, not a requirement.
-   - Merge duplicate root causes and choose the smallest safe fix.
-   - Drop findings without evidence, outside COR, broad rewrites, or speculative style advice.
-   - Use BLOCKING only when the draft would be invalid, incomplete, misleading, or structurally malformed.
-10. Resolve conflicting fixes by preferring concrete evidence over reviewer confidence and minimal diffs over broad rewrites.
-11. Write `state_path` as the canonical cache.
-12. Write canonical `actions_path` with current OPEN findings only. Do not copy raw reviewer transcripts.
-13. Emit only the pointer review block.
+
+{{
+  file="./agent/_templates/adjudicator/adjudicator-cached.txt"
+  has_cache_derivation=1
+  cache_derivation="replacing `.draft.handoff.md` with `.draft.review-correctness.md`"
+  reviewer_a="_plan/draft-reviewers/correctness/correctness-a-cached"
+  reviewer_b="_plan/draft-reviewers/correctness/correctness-b-cached"
+  run_context="with identical `context_path` and `draft_handoff_path`, but with their own sidecar `cache_path` and `actions_path`"
+  validation_extra=", `Agent: correctness`, `Domains: COR`"
+  merge_scope="keep only COR findings about fidelity, action appropriateness, file path validity, template structure, diff headers, or illustrative snippets; require concrete evidence (`[P#]`, section name, path, line, diff header, or missing required element); keep single-leg findings when evidence is concrete and in scope — two-leg agreement is a confidence signal, not a requirement; drop findings without evidence, outside COR, broad rewrites, or speculative style advice; use BLOCKING only when the draft would be invalid, incomplete, misleading, or structurally malformed"
+}}
 
 # Output
 

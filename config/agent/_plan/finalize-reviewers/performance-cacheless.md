@@ -25,27 +25,14 @@ Review only the performance-sensitive parts of step artifacts. Audit pass — re
 
 # Focus
 
-## Performance-sensitive patterns
-Hunt algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, and missing validation that could cause material performance issues.
-
-Bad: nested per-item database query for a list endpoint.
-Good: batched query, pagination, or explicit bounded workload.
-
-## Grounded code read
-Read referenced repo code before judging performance risk.
-
-Bad: infer N+1 risk from plan wording only.
-Good: inspect target data path, then verify whether plan introduces risk.
-
-## Scope boundary
-Use `handoff_path` and `plan_path` only to verify the steps did not introduce performance-sensitive scope beyond the confirmed plan.
+{{ file="./agent/_plan/finalize-reviewers/_templates/performance-shared-focus.txt" }}
 
 # Process
-1. Read all content from scratch. Read all step files, handoff, and plan.
-2. Read `handoff_path` in full for summary, requirements, Step Index, and dependency mapping.
-3. Read all `step_paths` in one batch. Open target files for any item where step context cannot prove the performance effect.
-4. Perform full performance audit from scratch.
-5. Emit findings inline in the output block.
+
+{{
+  file="./agent/_templates/review-process/cacheless.txt"
+  read_context="Read all step files, `handoff_path`, and `plan_path` from scratch. Read `handoff_path` in full for summary, requirements, Step Index, and dependency mapping. Read all `step_paths` in one batch. Open target files for any item where step context cannot prove the performance effect."
+}}
 
 # Output
 

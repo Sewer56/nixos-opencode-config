@@ -1,9 +1,0 @@
-Review source files' error documentation.
-
-# Inputs
-
-- `handoff_path`
-
-# Focus
-
-{{ file="./rules/code-doc-review/errors-focus.source.md" }}

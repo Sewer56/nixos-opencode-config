@@ -1,8 +1,0 @@
-# Process
-1. Load cache and derive actions path: Read `cache_path` if it exists; treat missing/malformed as empty. Use its `Latest Actions` field and finding ledger for grounding. Derive `actions_path` when absent by globbing existing `<cache_path without .md>.actions.*.md` files and choosing the next three-digit `<nnn>` path, starting `001`. Parse inline context from the task input. Extract `## Request`, `## Plan Summary`, `## Changes Made`, `## Notes`.
-2. Inspect all changes via `git diff`.
-3. Validate all four Focus domains from the shared card above.
-4. Write `cache_path`:
-   - Verified observations and finding ledger with `Latest Actions: <actions_path>`.
-5. Write `actions_path` with only current OPEN findings the caller/adjudicator must act on. Keep resolved findings, full Verified Observations, and prior history only in `cache_path`.
-6. Emit only the pointer `# REVIEW` block.

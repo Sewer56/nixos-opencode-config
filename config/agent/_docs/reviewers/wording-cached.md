@@ -20,43 +20,37 @@ permission:
   external_directory: allow
 ---
 
-{{ file="./agent/_docs/reviewers/wording-shared-pre.txt" }}
+{{ file="./agent/_docs/reviewers/_templates/wording-header.txt" }}
 
 # Process
 
-1. Load cache
-- Cache: `PROMPT-DOCS-WRITE-api-reference.handoff.md` → `PROMPT-DOCS-WRITE-api-reference.review-wording.md`. Read the cache file if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per target file with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=handoff_path
+  cache_derivation="replace the `.handoff.md` suffix with `.review-wording.md`"
+  cache_record_type="per target file"
+  reads_change_plan=1
+  has_frozen_regions=1
+  show_cache_update_detail=1
+  pruned_unit="file entries"
+}}
 
-2. Read handoff
-- Read `## Change Plan` for per-file scope levels and frozen regions.
-- Read `## Delta` for per-file change tracking.
-- Read `### Decisions` only when non-empty.
+# Output
 
-3. Select in-scope content
-- Carry forward Verified entries that are Unchanged in Delta.
-- Re-evaluate Changed and New entries.
-- Re-evaluate own Open entries from cache and decision-referenced entries.
-- Exclude frozen regions from review.
-
-4. Inspect selected content
-- Read the target documentation files for in-scope sections only.
-- Apply each Focus check to in-scope content.
-- Check Open→Resolved transitions.
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
-
-5. Update cache
-- If the derived cache file is missing or malformed: write the full cache file.
-- Otherwise: use targeted edits to update only entries that changed.
-  - Replace entries whose fields changed.
-  - Insert new entries in the appropriate section.
-  - Remove pruned file entries.
-  - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Leave entries whose content has not changed exactly as they are.
-
-6. Emit the final review block
-- Emit the `# REVIEW` block from `# Output`.
-
-In the `# REVIEW` output, set `Agent:` to `_docs/reviewers/wording-cached`.
-
-{{ file="./agent/_docs/reviewers/wording-cached-post.txt" }}
+{{
+  file="./agent/_docs/reviewers/_templates/shared-output.txt"
+  mode=cached
+  agent_name="_docs/reviewers/wording-cached"
+  finding_prefix=WRD
+  categories="SENTENCE_FLOW | PASSIVE_VOICE | FILLER | WORDINESS | TERMINOLOGY_CONSISTENCY | PARAGRAPH_LENGTH"
+  evidence_ref="<section, `path:line`, or field>"
+  problem_template="<what wording issue degrades readability>"
+  fix_template="<concise replacement>"
+  file_ref="<path/to/documentation/file>"
+  bad_example="-wordy or awkward phrasing"
+  good_example="+concise replacement"
+  block_rule="filler, passive voice in instructional steps, and genuinely ambiguous terminology inconsistencies within a single page"
+  allow_rule="stylistic terminology variation, descriptive passive voice, or minor wordiness"
+  reviewer=wording
+}}

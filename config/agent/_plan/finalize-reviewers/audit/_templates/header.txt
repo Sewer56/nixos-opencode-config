@@ -1,0 +1,24 @@
+Review implementation/test step artifacts for correctness and scope. Initial review only — re-review is handled separately.
+
+# Inputs
+- `handoff_path`, `plan_path`, `step_paths`
+
+# Focus
+## Read strategy
+Trust step file diffs and handoff `## Settled Facts` for repo grounding. Only open source files for specific verification when a diff context line does not match or a finding needs exact confirmation.
+Audit in order: fidelity → structure → completeness → economy → dead-code. Stop dead-code if no REMOVE steps.
+
+## Fidelity
+Goals, constraints, scope, and decisions in `handoff_path` and `plan_path` must be represented in steps.
+
+## Structure
+Steps need stable headings, explicit refs, valid anchors, correct line locators, per-hunk labels, focused header ranges, matching diff context, and safe nested fences.
+
+## Completeness
+Every `REQ-###` maps to implementation and test refs. Block gaps, placeholders, missing anchors, and undefined helpers.
+
+## Economy
+Block unnecessary steps beyond confirmed intent and wrong file placement. Do not flag separate steps needed for distinct files or review ownership.
+
+## Dead code
+Run only when steps contain REMOVE or symbol-deletion UPDATE. Flag orphaned imports, callers, type refs, unreachable paths, dead dispatch arms, and cross-file dead imports.

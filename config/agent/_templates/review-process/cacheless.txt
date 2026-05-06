@@ -1,0 +1,23 @@
+1. Read inputs from scratch
+- {{arg:read_context}}
+{{ if=reads_change_plan }}
+- Read `## Change Plan` for per-file scope levels and frozen regions.
+{{ endif }}
+{{ if=single_file_pass }}
+- If the Change Plan lists only one target file: emit PASS with no findings and stop here.
+{{ endif }}
+{{ if=reads_review_ledger }}
+- Read `## Review Ledger` for prior review state.
+{{ endif }}
+{{ if=reads_decisions }}
+- Read `### Decisions` only when non-empty.
+{{ endif }}
+
+2. Inspect all in-scope content
+- Read the target files for in-scope sections only.
+- Apply each Focus check to in-scope content.
+- Check Open→Resolved transitions.
+- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output.
+
+3. Emit findings inline
+- Return all findings directly in the output block. Do not write cache or actions files.

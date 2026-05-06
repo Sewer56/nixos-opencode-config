@@ -1,0 +1,7 @@
+{{ if=mode==cached }}
+## Verified
+- {{arg:verified_ref}}
+
+{{ endif }}## Notes
+- <optional short notes>
+```

@@ -18,10 +18,13 @@ permission:
   todowrite: allow
   external_directory: allow
 ---
-{{ file="./agent/_implement/freeform-reviewer/shared-pre.txt" }}
+{{ file="./agent/_implement/freeform-reviewer/_templates/header.txt" }}
+
+# Process
+
 {{
-  file="./agent/_implement/_shared/cacheless.txt"
+  file="./agent/_templates/review-process/cacheless.txt"
   read_context="Parse inline context from the task input. Extract `## Request`, `## Plan Summary`, `## Changes Made`, `## Notes`."
-  diff_target="request intent"
-  evidence="request goal"
 }}
+
+{{ file="./agent/_implement/freeform-reviewer/_templates/cacheless-footer.txt" }}

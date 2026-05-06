@@ -31,7 +31,7 @@ Discover error-returning functions with missing or vague documentation. Trace er
 
 # Workflow
 
-- `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor`
+- `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor/_templates`
 
 ## 1. Discover structure
 

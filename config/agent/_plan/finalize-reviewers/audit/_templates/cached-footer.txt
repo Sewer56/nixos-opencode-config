@@ -1,0 +1,45 @@
+{{
+  file="./agent/_templates/review-cache-table.txt"
+  domain=audit
+  ref_type=step-id
+  prefix=AUD
+  with_audit_ledger=1
+}}
+
+# Actions file format
+```markdown
+# Review Actions: audit
+Source Cache: <cache_path>
+
+## Findings
+{{
+  file="./agent/_templates/review-finding.txt"
+  prefix=AUD
+  categories="FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE"
+  evidence="<step-id, section, path:line, diff header, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<path/to/step/file>"
+  bad=-problem
+  good=+fix
+  with_lines=1
+}}
+```
+
+# Output
+```text
+# REVIEW
+Agent: _plan/finalize-reviewers/audit
+Decision: PASS | ADVISORY | BLOCKING
+IDs: AUD-001, AUD-002, ...
+```
+- Return exactly the fenced block. PASS keeps `Agent:` and `Decision: PASS`; omit `IDs`.
+- Every ID in the response MUST exist in `actions_path`.
+
+# Constraints
+- BLOCKING: max 6 findings. Cache findings in `cache_path`.
+- Dead-code: skip entirely if Step Index has no REMOVE steps.
+- Economy: block only for clear unnecessary expansion.
+- Completeness: block for gaps between user request and planned work.
+- Verified observations MUST include grounding snapshots.
+- Source files are NOT available in the worktree. Trust step file diffs, handoff `## Settled Facts`, and `## External Symbols` for repo grounding. Do not attempt to read source file paths.

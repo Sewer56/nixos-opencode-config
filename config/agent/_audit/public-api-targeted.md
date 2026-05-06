@@ -80,4 +80,4 @@ Use `targeted: <paths>` as the scope value and `N paths (languages)` as the scop
 
 ### Rules
 
-{{ file="./agent/_audit/analysis-rules.txt" }}
+{{ file="./agent/_audit/_templates/analysis-rules.txt" }}

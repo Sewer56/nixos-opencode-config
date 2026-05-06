@@ -12,6 +12,8 @@ const CONFIG_DIR = path.resolve(SCRIPT_DIR, "../config")
 const SKIP_DIRS = new Set([".git", ".logs", "node_modules"])
 const FILE_TEMPLATE_RE = /\{\{\s*file\s*=/g
 const INLINE_CONDITIONAL_RE = /\{\{\s*(?:if\s*=|endif\b)/g
+const ARG_TOKEN_RE = /\{\{arg:/g
+const ENV_TOKEN_RE = /\{\{env:/g
 
 interface ValidationFailure {
   file: string
@@ -31,6 +33,9 @@ async function main(): Promise<void> {
     const rel = path.relative(CONFIG_DIR, file) || path.basename(file)
 
     for (const diagnostic of result.diagnostics) {
+      // Skip missing-file diagnostics caused by unresolved arg tokens in paths
+      // (standalone validation has no caller context, so cascaded args resolve to empty)
+      if (diagnostic.kind === "missing-file" && diagnostic.message.includes("FILE_INTERP_EMPTY")) continue
       failures.push(formatDiagnostic(rel, source, diagnostic))
     }
 
@@ -54,6 +59,28 @@ async function main(): Promise<void> {
         line: loc.line,
         column: loc.column,
         message: "unexpanded inline conditional remains after render",
+      })
+    }
+
+    ARG_TOKEN_RE.lastIndex = 0
+    while ((match = ARG_TOKEN_RE.exec(result.text)) !== null) {
+      const loc = lineColumn(result.text, match.index)
+      failures.push({
+        file: rel,
+        line: loc.line,
+        column: loc.column,
+        message: "unexpanded arg token remains after render",
+      })
+    }
+
+    ENV_TOKEN_RE.lastIndex = 0
+    while ((match = ENV_TOKEN_RE.exec(result.text)) !== null) {
+      const loc = lineColumn(result.text, match.index)
+      failures.push({
+        file: rel,
+        line: loc.line,
+        column: loc.column,
+        message: "unexpanded env token remains after render",
       })
     }
   }

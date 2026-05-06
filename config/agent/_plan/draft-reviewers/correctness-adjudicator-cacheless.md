@@ -29,20 +29,16 @@ Adjudicate the COR domain (cacheless). Validate A/B reviewer outputs, merge evid
 - `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
 
 # Process
-1. Run `@_plan/draft-reviewers/correctness/correctness-a-cacheless` and `@_plan/draft-reviewers/correctness/correctness-b-cacheless` independently with identical `context_path` and `draft_handoff_path`.
-2. Do not pass either leg the other leg's output. Do not allow either leg to edit `context_path` or `draft_handoff_path`.
-3. Validate both outputs: `# REVIEW`, `Decision: PASS | ADVISORY | BLOCKING`, and `Domains: COR` must be present. Treat `IDs:` as routing data only.
-4. Parse findings from each leg's inline `## Findings` section. Do not read sidecar files.
-5. Merge findings:
-   - Keep only COR findings about fidelity, action appropriateness, file path validity, template structure, diff headers, or illustrative snippets.
-   - Require concrete evidence: `[P#]`, section name, path, line, diff header, or missing required element.
-   - Keep a single-leg finding when evidence is concrete and in scope; two-leg agreement is a confidence signal, not a requirement.
-   - Merge duplicate root causes and choose the smallest safe fix.
-   - Drop findings without evidence, outside COR, broad rewrites, or speculative style advice.
-   - Use BLOCKING only when the draft would be invalid, incomplete, misleading, or structurally malformed.
-6. Resolve conflicting fixes by preferring concrete evidence over reviewer confidence and minimal diffs over broad rewrites.
-7. Inspect the full draft and handoff yourself after reviewer validation. Do not read prior review caches.
-8. Emit merged findings inline in the output block. Do not write cache or actions files.
+
+{{
+  file="./agent/_templates/adjudicator/adjudicator-cacheless.txt"
+  reviewer_a="_plan/draft-reviewers/correctness/correctness-a-cacheless"
+  reviewer_b="_plan/draft-reviewers/correctness/correctness-b-cacheless"
+  run_context="with identical `context_path` and `draft_handoff_path`"
+  validation_extra=", `Agent: correctness`, `Domains: COR`"
+  merge_scope="keep only COR findings about fidelity, action appropriateness, file path validity, template structure, diff headers, or illustrative snippets; require concrete evidence (`[P#]`, section name, path, line, diff header, or missing required element); keep single-leg findings when evidence is concrete and in scope — two-leg agreement is a confidence signal, not a requirement; drop findings without evidence, outside COR, broad rewrites, or speculative style advice; use BLOCKING only when the draft would be invalid, incomplete, misleading, or structurally malformed"
+  inspect_context="the full draft and handoff"
+}}
 
 # Output
 

@@ -1,0 +1,21 @@
+{{arg:description}}
+
+# Inputs
+{{arg:inputs}}
+
+# Focus
+
+{{ if=doc_domain }}## Inspection order
+Inspect {{arg:doc_domain}} first, including inline comments in non-trivial code diff hunks, then {{arg:read_domain}}. Report all BLOCKING findings in one pass. If {{arg:doc_domain}} blockers exist, report {{arg:read_domain}} blockers and defer {{arg:read_domain}} advisories.
+
+## Doc coverage ({{arg:doc_domain}} domain)
+
+{{ file="./rules/code-doc-review/{{arg:doc_focus_file}}" }}
+
+{{ endif }}## Read strategy
+Ground checks in step file diffs and handoff content. Open referenced source files only when a step diff is ambiguous or missing context for public surface, doc placement, or body intent.
+
+## Readability ({{arg:read_domain}} domain)
+
+{{ file="./rules/code-doc-review/clarity.md" }}
+{{ file="./rules/code-doc-review/wording.md" }}

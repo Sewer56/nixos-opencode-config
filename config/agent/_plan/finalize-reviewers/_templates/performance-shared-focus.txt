@@ -1,0 +1,14 @@
+## Performance-sensitive patterns
+Hunt algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, and missing validation that could cause material performance issues.
+
+Bad: nested per-item database query for a list endpoint.
+Good: batched query, pagination, or explicit bounded workload.
+
+## Grounded code read
+Read referenced repo code before judging performance risk. Open target files only for the selected items — do not scan broadly.
+
+Bad: infer N+1 risk from plan wording only.
+Good: inspect target data path, then verify whether plan introduces risk.
+
+## Scope boundary
+Use `handoff_path` and `plan_path` only to verify the steps did not introduce performance-sensitive scope beyond the confirmed plan.

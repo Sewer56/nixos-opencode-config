@@ -1,0 +1,11 @@
+{{arg:description}}
+
+# Inputs
+{{arg:inputs}}
+
+# Focus
+
+## Read strategy
+Ground checks in step file diffs and handoff content. Open referenced source files only when a step diff is ambiguous or missing context for public API status or reachable error variants.
+
+{{ file="./rules/code-doc-review/{{arg:focus_file}}" }}

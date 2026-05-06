@@ -35,41 +35,16 @@ Review only the performance-sensitive parts of step artifacts.
 
 # Focus
 
-## Performance-sensitive patterns
-Hunt algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, and missing validation that could cause material performance issues.
-
-Bad: nested per-item database query for a list endpoint.
-Good: batched query, pagination, or explicit bounded workload.
-
-## Grounded code read
-Read referenced repo code before judging performance risk.
-
-Bad: infer N+1 risk from plan wording only.
-Good: inspect target data path, then verify whether plan introduces risk.
-
-## Scope boundary
-Use `handoff_path` and `plan_path` only to verify the steps did not introduce performance-sensitive scope beyond the confirmed plan.
+{{ file="./agent/_plan/finalize-reviewers/_templates/performance-shared-focus.txt" }}
 
 # Process
-1. Read Delta and Decisions
-- Read `## Delta` from `handoff_path`.
-- Read `### Decisions` only when non-empty.
 
-2. Select items to inspect
-- Carry forward Unchanged items from Delta.
-- Re-evaluate Changed and New items.
-- Re-evaluate own Open items from Review Ledger and decision-referenced items.
-
-3. Inspect selected content
-- Read `handoff_path` for summary, requirements, Step Index, and dependency mapping.
-- Read selected exact `step_paths` in one batch.
-- Open target files only for the selected items.
-- Check Open→Resolved transitions.
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis and re-emit valid protocol output from the existing review state.
-
-
-4. Emit the final review block
-- Emit the `# REVIEW` block from `# Output`.
+{{
+  file="./agent/_templates/review-process/cacheless.txt"
+  read_context="Read `## Delta` from `handoff_path`.\n- Read `handoff_path` for summary, requirements, Step Index, and dependency mapping.\n- Read selected exact `step_paths` in one batch."
+  reads_review_ledger=1
+  reads_decisions=1
+}}
 
 # Output
 

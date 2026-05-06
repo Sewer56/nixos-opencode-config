@@ -16,5 +16,13 @@ permission:
   todowrite: allow
   external_directory: allow
 ---
-{{ file="./agent/_plan/finalize-reviewers/audit/shared-pre.txt" }}
-{{ file="./agent/_plan/finalize-reviewers/audit/shared-cacheless.txt" }}
+{{ file="./agent/_plan/finalize-reviewers/audit/_templates/header.txt" }}
+
+# Process
+
+{{
+  file="./agent/_templates/review-process/cacheless.txt"
+  read_context="Read `plan_path` and all `step_paths`. Read `handoff_path` for full context."
+}}
+
+{{ file="./agent/_plan/finalize-reviewers/audit/_templates/cacheless-footer.txt" }}

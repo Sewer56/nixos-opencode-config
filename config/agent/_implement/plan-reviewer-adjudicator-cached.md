@@ -33,27 +33,21 @@ Adjudicate implementation review against a plan (cached). Validate A/B reviewer 
 - `actions_path` (optional; derive next `<cache_path without .md>.actions.<nnn>.md` path when omitted).
 
 # Process
-1. Derive `cache_path` when absent by replacing `.handoff.md` with `.review-implementation.md`.
-2. Set `state_path` to `cache_path`.
-3. Derive `actions_path` when absent by globbing existing `<state_path without .md>.actions.*.md` files and choosing the next three-digit `<nnn>` path, starting `001`.
-4. Derive sidecar state paths from `state_path`:
-   - `@_implement/plan-reviewer/plan-reviewer-a-cached`: `<state_path without .md>.a.md`
-   - `@_implement/plan-reviewer/plan-reviewer-b-cached`: `<state_path without .md>.b.md`
-   - sidecar actions: replace `.md` with `.actions.<same nnn>.md`.
-5. Run `@_implement/plan-reviewer/plan-reviewer-a-cached` and `@_implement/plan-reviewer/plan-reviewer-b-cached` independently with the same `handoff_path` and separate sidecar `cache_path`/`actions_path` values.
-6. Do not pass either leg the other leg's output. Do not apply raw leg findings.
-7. Validate both outputs: `# REVIEW` and `Decision: PASS | BLOCKING | ADVISORY`. Treat `IDs:` as routing data only.
-8. Read sidecar actions first. Read sidecar state only when actions are malformed, truncated, contradictory, or insufficient to adjudicate evidence.
-9. Merge only evidence-backed implementation findings about objectives met, plan fidelity, regressions, validation, tests, or changed behavior. Keep single-leg findings when evidence is concrete and in scope; drop out-of-domain style advice, unsupported findings, and broad rewrites.
-10. Merge duplicates and resolve conflicting fixes by choosing the smallest safe correction with concrete evidence.
-11. Write `state_path` as the canonical cache.
-12. Write canonical `actions_path` with current OPEN finding details only. Do not copy raw reviewer transcripts.
-13. Emit only the pointer review block.
+
+{{
+  file="./agent/_templates/adjudicator/adjudicator-cached.txt"
+  has_cache_derivation=1
+  cache_derivation="replacing `.handoff.md` with `.review-implementation.md`"
+  reviewer_a="_implement/plan-reviewer/plan-reviewer-a-cached"
+  reviewer_b="_implement/plan-reviewer/plan-reviewer-b-cached"
+  run_context="with the same handoff_path and separate sidecar cache_path/actions_path values"
+  merge_scope="keep only evidence-backed implementation findings about objectives met, plan fidelity, regressions, validation, tests, or changed behavior; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain style advice, unsupported findings, and broad rewrites"
+}}
 
 # Output
 ```text
 # REVIEW
-Decision: PASS | BLOCKING | ADVISORY
+Decision: PASS | ADVISORY | BLOCKING
 IDs: F-001, F-002, ...
 ```
 - PASS keeps `Decision: PASS`; omit `IDs`.

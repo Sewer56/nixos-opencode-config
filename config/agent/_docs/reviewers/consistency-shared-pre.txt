@@ -1,9 +1,0 @@
-Review end-user documentation for cross-page coherence.
-
-# Inputs
-
-- `handoff_path` (`<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
-
-# Focus
-
-{{ file="./rules/eudoc-review/consistency.md" }}

@@ -25,69 +25,18 @@ Review step test strategy. Initial review only — re-review handled by dedicate
 
 # Focus
 
-## Acceptance lens
-Planned tests should prove stated acceptance criteria, not implementation trivia.
-
-Bad: tests assert private helper call order.
-Good: tests assert observable behavior tied to acceptance criteria.
-
-## Coverage
-Judge whether critical new or changed behavior has tests.
-
-Bad: new error path has no test.
-Good: test covers success, failure, and relevant edge case.
-
-## Redundancy
-Flag duplicate tests that prove the same behavior without added value.
-
-Do not flag: intentionally repeated coverage across different public entry points.
-
-## Parameterization
-Flag obvious 3+ near-identical tests that should be parameterized.
-
-Bad: three copied tests differ only in input value.
-Good: one table-driven test with named cases.
-
-## Trust snapshots
-Trust step file diffs and handoff snapshots. Open repo test files only for specific verification needs.
-
-Bad: reread unrelated repo tests for every item.
-Good: trust step diffs and open repo tests only to resolve a specific coverage question.
+{{ file="./agent/_plan/finalize-reviewers/_templates/tests-shared-focus.txt" }}
 
 # Process
-1. Read `handoff_path` for Delta, Review Ledger, Decisions.
-2. Read `step_paths` in one batch. Only open repo test files for specific verification needs.
-3. Perform full test-strategy audit.
-4. Write `cache_path` with `## Verified Observations` (with grounding snapshots) and `## Findings`.
-5. Emit `# REVIEW` block.
 
-# Cache file format
-
-```markdown
-# Review Cache: tests
-
-## Verified Observations
-- <step-id>: <what was verified, with grounding snapshot — one line each>
-
-## Findings
-
-### [TST-NNN]
-Status: OPEN | RESOLVED
-Category: COVERAGE | REDUNDANCY | PARAMETERIZATION | PLACEMENT
-Severity: BLOCKING | ADVISORY
-Problem: <one line>
-Fix: <unified diff targeting step file(s)>
-~~~diff
-<path/to/step/file>
---- a/<path/to/step/file>
-+++ b/<path/to/step/file>
-  unchanged context
--+proposed test step
-++corrected test step with proper coverage
-  unchanged context
-~~~
-Resolution: <only for RESOLVED>
-```
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  delta_source=handoff_path
+  reads_review_ledger=1
+  show_cache_format=1
+  cache_format="# Review Cache: tests\n\n## Verified Observations\n- <step-id>: <what was verified, with grounding snapshot — one line each>\n\n## Findings\n\n### [TST-NNN]\nStatus: OPEN | RESOLVED\nCategory: COVERAGE | REDUNDANCY | PARAMETERIZATION | PLACEMENT\nSeverity: BLOCKING | ADVISORY\nProblem: <one line>\nFix: <unified diff targeting step file(s)>\n~~~diff\n<path/to/step/file>\n--- a/<path/to/step/file>\n+++ b/<path/to/step/file>\n  unchanged context\n--+proposed test step\n++corrected test step with proper coverage\n  unchanged context\n~~~\nResolution: <only for RESOLVED>"
+  pointer_emit=1
+}}
 
 # Output
 

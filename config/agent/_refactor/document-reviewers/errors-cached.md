@@ -19,15 +19,33 @@ permission:
   external_directory: allow
 ---
 
-{{ file="./agent/_refactor/document-reviewers/errors-shared-pre.txt" }}
+{{
+  file="./agent/_shared/code-doc-reviewers/errors-header.txt"
+  description="Review source files' error documentation."
+  inputs="- `handoff_path`"
+  focus_file="errors-focus.source.md"
+}}
 
 # Process
 
-1. Load `handoff_path` sections: `## Delta`, `## Review Ledger`, and non-empty `### Decisions`. Load cache by replacing `.handoff.md` with `.review-errors.md`; missing/malformed cache is empty.
-2. Inspect Changed/New source files, own Open findings, and decision-referenced items; carry forward Verified entries only for Unchanged Delta items.
-3. Read selected source files in one batch.
-4. Check Open→Resolved transitions. Update only changed cache entries, preserving unchanged cache text byte-for-byte, then emit the `# REVIEW` block. On malformed-output retry without new Delta/Decision entries, reuse prior analysis/cache and re-emit valid output.
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=handoff_path
+  cache_derivation="replace `.handoff.md` with `.review-errors.md`"
+  reads_review_ledger=1
+  preserve_byte_exact=1
+}}
 
-In the `# REVIEW` output, set `Agent:` to `_refactor/document-reviewers/errors-cached`.
+# Output
 
-{{ file="./agent/_refactor/document-reviewers/errors-cached-post.txt" }}
+{{
+  file="./agent/_shared/code-doc-reviewers/errors-output.txt"
+  mode=cached
+  variant=refactor
+  agent_name="_refactor/document-reviewers/errors-cached"
+  err_prefix=DERR
+  evidence1="<`path:line`, or missing element>"
+  file_ref="<path/to/source/file>"
+  verified_ref="<path>: <item description — unchanged items that remain verified>"
+}}

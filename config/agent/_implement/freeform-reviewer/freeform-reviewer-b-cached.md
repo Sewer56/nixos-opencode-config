@@ -23,10 +23,16 @@ permission:
   todowrite: allow
   external_directory: allow
 ---
-{{ file="./agent/_implement/freeform-reviewer/shared-pre.txt" }}
-{{ file="./agent/_implement/freeform-reviewer/shared-cached.txt" }}
-{{
-  file="./agent/_implement/_shared/cached-post.txt"
-  verified_subject="file or goal"
-  evidence="request goal"
+{{ file="./agent/_implement/freeform-reviewer/_templates/header.txt" }}
+
+# Process
+
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  delta_source=task_prompt
+  has_actions_path=1
+  step2_extra="Parse inline context from the task input. Extract `## Request`, `## Plan Summary`, `## Changes Made`, `## Notes`."
+  pointer_emit=1
 }}
+
+{{ file="./agent/_implement/freeform-reviewer/_templates/cached-footer.txt" }}

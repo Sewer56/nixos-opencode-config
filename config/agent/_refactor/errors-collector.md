@@ -113,6 +113,6 @@ If the caller reports that the output does not start with `# REVIEW`, reuse the 
 
 # Language Rules
 
-Language file directory: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor/`
+Language file directory: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor/_templates/`
 
 Read `lang-<language>-errors.txt` from that directory (e.g. `lang-rust-errors.txt`, `lang-typescript-errors.txt`). If the file does not exist for the given language, return only the summary block with a note: `No language rules for <language> — skipped.`

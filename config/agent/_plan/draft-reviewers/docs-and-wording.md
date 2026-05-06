@@ -29,6 +29,9 @@ Review plan draft artifacts for documentation coverage, specificity, and wording
 # Focus
 (All items BLOCKING unless marked ADVISORY.)
 
+## Inspection order
+Inspect DOC first, then WORDING. Report all BLOCKING findings in one pass. If DOC blockers exist, report WORDING blockers and defer WORDING advisories.
+
 ## Doc coverage (DOC domain)
 
 ### Referenced-doc coverage
@@ -96,12 +99,14 @@ Do not block common programming terms (`unified diff`, `markdown`, `frontmatter`
 
 # Process
 
-1. Load `draft_handoff_path` sections: `## Delta`, `### Decisions`. Load cache by replacing `.handoff.md` with `.draft.review-docs-wording.md`; missing/malformed cache is empty.
-- Treat the cache as one record per `[P#]` with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
-
-2. Inspect Changed/New `[P#]` items, own Open findings, and decision-referenced items; carry forward Verified entries only for Unchanged Delta items.
-3. Read selected content from `context_path` in one batch. Inspect DOC first, then WORDING. Report all BLOCKING findings in one pass. If DOC blockers exist, report WORDING blockers and defer WORDING advisories.
-4. Check Open→Resolved transitions. If the cache file is missing or malformed: write the full cache file. Otherwise: use targeted edits to update only entries that changed, preserving unchanged cache text byte-for-byte. Then emit the `# REVIEW` block. On malformed-output retry without new Delta/Decision entries, reuse prior analysis/cache and re-emit valid output.
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=draft_handoff_path
+  cache_derivation="replace `.handoff.md` with `.draft.review-docs-wording.md`"
+  cache_record_type="per `[P#]`"
+  preserve_byte_exact=1
+}}
 
 Cache format:
 ```markdown

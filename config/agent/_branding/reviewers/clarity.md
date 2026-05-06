@@ -28,6 +28,9 @@ Review branding for clarity.
 
 # Focus
 
+## Read scope
+Read `<artifact_base>.draft.md` for in-scope sections: Candidate Shortlist, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone.
+
 ## Unpronounceable name
 Block names that are hard to say aloud without prior exposure or have no obvious syllable breaks.
 
@@ -42,7 +45,6 @@ Good: spelling follows how the name sounds or notes the intentional spelling ris
 
 ## Poor memorability (ADVISORY)
 Flag names that are too long, too generic, or too similar to common words to stick after one exposure.
-
 
 Bad: long generic name that blends into common words.
 Good: short, repeatable name with distinctive sound or image.
@@ -62,7 +64,6 @@ Good: name connotation supports brand promise.
 ## Ambiguous meaning (niche) (ADVISORY)
 Flag unintended connotations limited to specific cultural, linguistic, or domain groups.
 
-
 Bad: name has an awkward meaning in a known target-language audience.
 Good: risk is documented or name avoids the niche collision.
 
@@ -74,50 +75,36 @@ Good: name and tagline make the promise repeatable in one sentence.
 
 # Process
 
-{{ file="./rules/branding-review/shared-process-pre.md" }}
-
-4. Inspect selected content
-- Read `<artifact_base>.draft.md` for in-scope sections (Candidate Shortlist, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone).
-- Apply each Focus check to candidate names and brand messaging.
-- Check Open→Resolved transitions.
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
-
-{{ file="./rules/branding-review/shared-process-post.md" }}
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=handoff_path
+  cache_derivation="replace the `.handoff.md` suffix with `.review-clarity.md`"
+  cache_record_type="per candidate name or brand element"
+  show_cache_update_detail=1
+  pruned_unit=entries
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _branding/reviewers/clarity
-Decision: PASS | ADVISORY | BLOCKING
-Domains: CLR
-
-## Findings
-### [CLR-NNN]
-Category: UNPRONOUNCEABLE | AMBIGUOUS_SPELLING | POOR_MEMORABILITY | AWKWARD_WORD_SHAPE | AMBIGUOUS_MEANING_COMMON | AMBIGUOUS_MEANING_NICHE | NOT_ONE_READ_EXPLAINABLE
-Severity: BLOCKING | ADVISORY
-Evidence: <section, `path:line`, or field>
-Lines: ~<start line>-<end line> | None
-Problem: <what clarity issue degrades the name or brand promise>
-Fix: <concrete correction or alternative>
-~~~diff
-<artifact_base>.draft.md
---- a/<artifact_base>.draft.md
-+++ b/<artifact_base>.draft.md
-  unchanged context
--unclear name or messaging
-+clearer alternative
-  unchanged context
-~~~
-
-## Verified
-- [<ID>]: <candidate name or section — unchanged items that remain verified>
-
-## Notes
-- <optional short notes>
-```
-
-Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections.
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_branding/reviewers/clarity"
+  domains=CLR
+  mode=cached
+  prefix=CLR
+  categories="UNPRONOUNCEABLE | AMBIGUOUS_SPELLING | POOR_MEMORABILITY | AWKWARD_WORD_SHAPE | AMBIGUOUS_MEANING_COMMON | AMBIGUOUS_MEANING_NICHE | NOT_ONE_READ_EXPLAINABLE"
+  evidence="<section, `path:line`, or field>"
+  problem="<what clarity issue degrades the name or brand promise>"
+  fix="<concrete correction or alternative>"
+  file_ref="<artifact_base>.draft.md"
+  bad="-unclear name or messaging"
+  good="+clearer alternative"
+  with_lines=1
+  with_detail=0
+  verified_ref="[<ID>]: <candidate name or section — unchanged items that remain verified>"
+  return_rule="Return ONLY the block above — no introduction, no summary, no conversational wrapper, no text before `# REVIEW` or after the final `## Notes` line. Always include `## Findings` and `## Verified`; write `- None` under empty sections."
+}}
 
 # Constraints
 

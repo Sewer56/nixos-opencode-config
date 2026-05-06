@@ -32,20 +32,21 @@ Adjudicate implementation review against request intent (cacheless). Validate A/
   - `## Notes`: additional context or `None`
 
 # Process
-1. Run `@_implement/freeform-reviewer/freeform-reviewer-a-cacheless` and `@_implement/freeform-reviewer/freeform-reviewer-b-cacheless` independently with the same inline context.
-2. Do not pass either leg the other leg's output. Do not apply raw leg findings.
-3. Validate both outputs: `# REVIEW`, `Decision: PASS | BLOCKING | ADVISORY`. Treat `IDs:` as routing data only.
-4. Parse findings from each leg's inline `## Findings` section. Do not read sidecar files.
-5. Merge only evidence-backed implementation findings about objectives met, plan fidelity, regressions, validation, tests, or changed behavior. Keep single-leg findings when evidence is concrete and in scope; drop out-of-domain style advice, unsupported findings, and broad rewrites.
-6. Merge duplicates and resolve conflicting fixes by choosing the smallest safe correction with concrete evidence.
-7. Inspect the full implementation diff yourself after reviewer validation. Do not read prior review caches.
-8. Emit merged findings inline in the output block. Do not write cache or actions files.
+
+{{
+  file="./agent/_templates/adjudicator/adjudicator-cacheless.txt"
+  reviewer_a="_implement/freeform-reviewer/freeform-reviewer-a-cacheless"
+  reviewer_b="_implement/freeform-reviewer/freeform-reviewer-b-cacheless"
+  run_context="with the same inline context"
+  merge_scope="keep only evidence-backed implementation findings about objectives met, plan fidelity, regressions, validation, tests, or changed behavior; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain style advice, unsupported findings, and broad rewrites"
+  inspect_context="the full implementation diff"
+}}
 
 # Output
 
 ```text
 # REVIEW
-Decision: PASS | BLOCKING | ADVISORY
+Decision: PASS | ADVISORY | BLOCKING
 IDs: F-001, F-002, ...
 
 ## Findings
@@ -69,6 +70,7 @@ src/lib.rs
 ## Notes
 - <optional short notes>
 ```
+
 - PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
 - Return ONLY the fenced block.

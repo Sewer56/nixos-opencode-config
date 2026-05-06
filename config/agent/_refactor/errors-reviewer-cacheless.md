@@ -63,46 +63,38 @@ Good: each hunk has its own bold line label.
 
 # Language Rules Directory
 
-`LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor`
+`LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor/_templates`
 
 Read `lang-<language>-errors.txt` once per language, per `# Focus`.
 
 # Process
 
-1. Read all applied source docs from scratch.
-2. Verify all applied error docs. Write fresh audit. Answer whether the error docs are free of blocking issues.
+{{
+  file="./agent/_templates/review-process/cacheless.txt"
+  read_context="Read all applied source docs from scratch."
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _refactor/errors-reviewer-cacheless
-Decision: PASS | ADVISORY | BLOCKING
-
-## Findings
-### [ERR-NNN]
-Category: SPECIFICITY | FORMAT | FIDELITY
-Severity: BLOCKING | ADVISORY
-Lines: ~<start>-<end> | None
-Evidence: <section, `path:line`, or missing element>
-Problem: <what is wrong>
-Fix: <smallest concrete correction>
-~~~
-<path/to/plan/item/file>
---- a/<path/to/plan/item/file>
-+++ b/<path/to/plan/item/file>
- unchanged context
--proposed error docs with vague trigger
-+proposed error docs with concrete trigger
- unchanged context
-~~~
-
-## Notes
-- <optional short notes>
-```
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_refactor/errors-reviewer-cacheless"
+  prefix=ERR
+  categories="SPECIFICITY | FORMAT | FIDELITY"
+  evidence="<section, `path:line`, or missing element>"
+  problem="<what is wrong>"
+  fix="<smallest concrete correction>"
+  file_ref="<path/to/plan/item/file>"
+  bad="-proposed error docs with vague trigger"
+  good="+proposed error docs with concrete trigger"
+  with_lines=1
+  with_detail=0
+  mode=cacheless
+  verified_ref="<path>: <item description — unchanged items that remain verified>"
+  return_rule="Return ONLY the fenced block."
+}}
 - PASS: `Decision: PASS` only; omit `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
-- Return ONLY the fenced block.
 
 # Constraints
 

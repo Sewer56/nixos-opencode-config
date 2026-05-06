@@ -1,0 +1,35 @@
+# Output
+
+```text
+# REVIEW
+Agent: _plan/finalize-reviewers/audit
+Decision: PASS | ADVISORY | BLOCKING
+IDs: AUD-001, AUD-002, ...
+
+## Findings
+{{
+  file="./agent/_templates/review-finding.txt"
+  prefix=AUD
+  categories="FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE"
+  evidence="<step-id, section, path:line, diff header, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<path/to/step/file>"
+  bad=-problem
+  good=+fix
+  with_lines=1
+}}
+
+## Notes
+- <optional short notes>
+```
+- PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
+- BLOCKING: max 6 findings.
+- Return ONLY the fenced block.
+
+# Constraints
+- Answer whether the step artifacts are free of blocking issues in AUD.
+- Dead-code: skip entirely if Step Index has no REMOVE steps.
+- Economy: block only for clear unnecessary expansion.
+- Completeness: block for gaps between user request and planned work.
+- Source files are NOT available in the worktree. Trust step file diffs, handoff `## Settled Facts`, and `## External Symbols` for repo grounding. Do not attempt to read source file paths.

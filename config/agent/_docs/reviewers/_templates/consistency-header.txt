@@ -1,0 +1,11 @@
+Review end-user documentation for cross-page coherence.
+
+# Inputs
+
+- `handoff_path` (`<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
+
+# Focus
+
+Apply Focus checks across pages — not within a single page (that is the wording reviewer's domain).
+
+{{ file="./rules/eudoc-review/consistency.md" }}

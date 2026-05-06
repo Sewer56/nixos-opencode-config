@@ -1,0 +1,28 @@
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="{{arg:agent_name}}"
+  prefix={{arg:finding_prefix}}
+  categories="{{arg:categories}}"
+  evidence="{{arg:evidence_ref}}"
+  problem="{{arg:problem_template}}"
+  fix="{{arg:fix_template}}"
+  file_ref="{{arg:file_ref}}"
+  bad="{{arg:bad_example}}"
+  good="{{arg:good_example}}"
+  with_lines=0
+  with_detail=0
+  mode={{arg:mode}}
+  verified_ref="<file:section>: <item description — unchanged items that remain verified>"
+  return_rule="Return ONLY the block above. Write `- None` under empty sections."
+}}
+
+# Constraints
+
+- Block for {{arg:block_rule}}.
+- Do not block for {{arg:allow_rule}}.
+- Keep findings short and specific.
+- Include a unified diff after every finding's `Fix:` field targeting the affected documentation file with the exact text replacement.
+- Only generate findings on in-scope sections per the Change Plan. Findings on frozen regions are invalid.
+{{ if=reviewer==consistency }}
+- Skip with PASS when only one target file is in scope — consistency requires multiple pages.
+{{ endif }}

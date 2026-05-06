@@ -17,51 +17,30 @@ permission:
   external_directory: allow
 ---
 
-{{ file="./agent/_plan/finalize-codedoc-reviewers/errors-shared-pre.txt" }}
+{{
+  file="./agent/_shared/code-doc-reviewers/errors-header.txt"
+  description="Review step artifacts' code-adjacent error documentation."
+  inputs="- `handoff_path` (e.g., `<artifact_base>.handoff.md`)\n- `plan_path` (e.g., `<artifact_base>.draft.md`)\n- `step_pattern` (e.g., `<artifact_base>.step.*.md`)"
+  focus_file="errors-focus.plan.md"
+}}
 
 # Process
 
-1. Load `handoff_path` sections. Inspect all in-scope I#/T# steps from scratch.
-2. Read all in-scope step files in one batch. Open referenced source files only when the step diff lacks context for public API status or reachable error variants.
-3. Emit findings inline. Answer whether the error documentation is free of blocking issues.
+{{
+  file="./agent/_templates/review-process/cacheless.txt"
+  read_context="Load `handoff_path` sections."
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _plan/finalize-codedoc-reviewers/errors-cacheless
-Decision: PASS | ADVISORY | BLOCKING
-
-## Findings
-### [CERR-NNN]
-Category: COVERAGE | SPECIFICITY | FIDELITY
-Severity: BLOCKING | ADVISORY
-Evidence: <section, `path:line`, or missing element>
-Lines: ~<start line>-<end line> | None
-Problem: <what is wrong>
-Fix: <smallest concrete correction>
-~~~
-<path/to/step/file>
---- a/<path/to/step/file>
-+++ b/<path/to/step/file>
- unchanged context
--missing or vague error docs
-+concrete # Errors docs
- unchanged context
-~~~
-
-## Notes
-- <optional short notes>
-```
-- PASS: `Decision: PASS` only; omit `## Findings`, `## Notes`.
-- BLOCKING: max 6 findings.
-- Return ONLY the fenced block.
-
-# Constraints
-
-- Flag missing `# Errors` sections on public error-returning APIs as BLOCKING per the errors rules.
-- Include a unified diff after every finding's `Fix:` field targeting the affected step file with the exact `# Errors` section to add or fix.
-
-# Rules
-
-{{ file="./rules/docs/errors.md" }}
+{{
+  file="./agent/_shared/code-doc-reviewers/errors-output.txt"
+  mode=cacheless
+  variant=codedoc
+  agent_name="_plan/finalize-codedoc-reviewers/errors-cacheless"
+  err_prefix=CERR
+  evidence1="<section, `path:line`, or missing element>"
+  file_ref="<path/to/step/file>"
+  diff_target_note=" targeting the affected step file with the exact `# Errors` section to add or fix"
+  verified_ref="<I#/T#>: <item description — unchanged items that remain verified>"
+}}

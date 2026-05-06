@@ -17,45 +17,37 @@ permission:
   external_directory: allow
 ---
 
-{{ file="./agent/_plan/finalize-eudoc-reviewers/correctness-shared-pre.txt" }}
+{{ file="./agent/_plan/finalize-eudoc-reviewers/_templates/correctness-header.txt" }}
 
 # Process
 
-1. Read all D# step files and relevant handoff mappings.
-2. Inspect all D# steps. Check coverage/specificity on all D# steps. Check broken links across D# steps (only if multiple exist). Exclude frozen regions.
-3. Emit findings inline. Answer whether the end-user docs are free of blocking issues.
+{{
+  file="./agent/_templates/review-process/cacheless.txt"
+  read_context="Read all D# step files and relevant handoff mappings."
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _plan/finalize-eudoc-reviewers/correctness-cacheless
-Decision: PASS | ADVISORY | BLOCKING
-
-## Findings
-### [EDOC-NNN]
-Category: COVERAGE | BROKEN_LINK
-Detail: E_CONTRADICTION | E_UNSPECIFIC | E_MISSING_DOCS | E_FROZEN_REGIONS | E_BROKEN_LINK
-Severity: BLOCKING | ADVISORY
-Evidence: <D# step, `path:line`, or cross-step reference>
-Problem: <what is wrong>
-Fix: <smallest concrete correction>
-~~~
-<path/to/step/file>
---- a/<path/to/step/file>
-+++ b/<path/to/step/file>
- unchanged context
--issue
-+fix
- unchanged context
-~~~
-
-## Notes
-- <optional short notes>
-```
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plan/finalize-eudoc-reviewers/correctness-cacheless"
+  prefix=EDOC
+  categories="COVERAGE | BROKEN_LINK"
+  detail="E_CONTRADICTION | E_UNSPECIFIC | E_MISSING_DOCS | E_FROZEN_REGIONS | E_BROKEN_LINK"
+  evidence="<D# step, `path:line`, or cross-step reference>"
+  problem="<what is wrong>"
+  fix="<smallest concrete correction>"
+  file_ref="<path/to/step/file>"
+  bad="-issue"
+  good="+fix"
+  with_lines=0
+  with_detail=1
+  mode=cacheless
+  verified_ref="<D#>: <item description — unchanged items that remain verified>"
+  return_rule="Return ONLY the fenced block."
+}}
 - PASS: `Decision: PASS` only; omit `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
-- Return ONLY the fenced block.
 
 # Constraints
 

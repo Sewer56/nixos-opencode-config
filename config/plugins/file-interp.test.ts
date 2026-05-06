@@ -83,21 +83,21 @@ describe("resolvePath", () => {
 
 // ── expand: env tokens ────────────────────────────────────────────────────────
 
-describe("expand: {env:...} tokens", () => {
-  test("replaces {env:VAR} with the value", async () => {
+describe("expand: {{env:...}} tokens", () => {
+  test("replaces {{env:VAR}} with the value", async () => {
     const restore = withEnv("FILE_INTERP_TEST_ENV", "hello")
     try {
-      const result = await expand("value={env:FILE_INTERP_TEST_ENV}", "/tmp")
+      const result = await expand("value={{env:FILE_INTERP_TEST_ENV}}", "/tmp")
       expect(result).toBe("value=hello")
     } finally {
       restore()
     }
   })
 
-  test("replaces {env:VAR} with empty string when unset", async () => {
+  test("replaces {{env:VAR}} with empty string when unset", async () => {
     const restore = withEnv("FILE_INTERP_DEFINITELY_NOT_SET", undefined)
     try {
-      const result = await expand("value=[{env:FILE_INTERP_DEFINITELY_NOT_SET}]", "/tmp")
+      const result = await expand("value=[{{env:FILE_INTERP_DEFINITELY_NOT_SET}}]", "/tmp")
       expect(result).toBe("value=[]")
     } finally {
       restore()
@@ -112,7 +112,7 @@ describe("expand: {env:...} tokens", () => {
   test("removes full line when unset env token is alone", async () => {
     const restore = withEnv("FILE_INTERP_DEFINITELY_NOT_SET", undefined)
     try {
-      const result = await expand("before\n{env:FILE_INTERP_DEFINITELY_NOT_SET}\nafter", "/tmp")
+      const result = await expand("before\n{{env:FILE_INTERP_DEFINITELY_NOT_SET}}\nafter", "/tmp")
       expect(result).toBe("before\nafter")
     } finally {
       restore()
@@ -210,30 +210,30 @@ describe("expand: file templates", () => {
 
 // ── expand: file args and arg tokens ─────────────────────────────────────────
 
-describe("expand: file template args and {arg:...} tokens", () => {
+describe("expand: file template args and {{arg:...}} tokens", () => {
   test("passes a basic arg into an embedded file", async () => {
-    const dir = await makeTmpDir({ "tmpl.txt": "domain={arg:domain}" })
+    const dir = await makeTmpDir({ "tmpl.txt": "domain={{arg:domain}}" })
     cleanup.push(dir)
     const result = await expand(`{{ file="./tmpl.txt" domain=correctness }}`, dir)
     expect(result).toBe("domain=correctness")
   })
 
   test("supports quoted arg values with spaces", async () => {
-    const dir = await makeTmpDir({ "tmpl.txt": "value={arg:key}" })
+    const dir = await makeTmpDir({ "tmpl.txt": "value={{arg:key}}" })
     cleanup.push(dir)
     const result = await expand(`{{ file="./tmpl.txt" key="val with spaces" }}`, dir)
     expect(result).toBe("value=val with spaces")
   })
 
   test("supports multiple args", async () => {
-    const dir = await makeTmpDir({ "tmpl.txt": "{arg:key1}/{arg:key2}" })
+    const dir = await makeTmpDir({ "tmpl.txt": "{{arg:key1}}/{{arg:key2}}" })
     cleanup.push(dir)
     const result = await expand(`{{ file="./tmpl.txt" key1=a key2=b }}`, dir)
     expect(result).toBe("a/b")
   })
 
   test("supports multiline file templates with whitespace between attrs", async () => {
-    const dir = await makeTmpDir({ "tmpl.txt": "{arg:key1}/{arg:key2}" })
+    const dir = await makeTmpDir({ "tmpl.txt": "{{arg:key1}}/{{arg:key2}}" })
     cleanup.push(dir)
     const result = await expand(
       `{{
@@ -247,7 +247,7 @@ describe("expand: file template args and {arg:...} tokens", () => {
   })
 
   test("decodes common escapes in template args", async () => {
-    const dir = await makeTmpDir({ "tmpl.txt": "{arg:lines}|{arg:tab}|{arg:quote}|{arg:slash}" })
+    const dir = await makeTmpDir({ "tmpl.txt": "{{arg:lines}}|{{arg:tab}}|{{arg:quote}}|{{arg:slash}}" })
     cleanup.push(dir)
     const result = await expand(
       `{{ file="./tmpl.txt" lines="one\\ntwo" tab=a\\tb quote="say \\"hi\\"" slash="a\\\\b" }}`,
@@ -256,15 +256,26 @@ describe("expand: file template args and {arg:...} tokens", () => {
     expect(result).toBe("one\ntwo|a\tb|say \"hi\"|a\\b")
   })
 
+  test("unrecognized escapes drop the backslash (backtick, letters)", async () => {
+    const dir = await makeTmpDir({ "tmpl.txt": "{{arg:a}}|{{arg:b}}" })
+    cleanup.push(dir)
+    const bt = "`"
+    const result = await expand(
+      `{{ file="./tmpl.txt" a="\\${bt}x\\${bt}" b="\\z" }}`,
+      dir,
+    )
+    expect(result).toBe("`x`|z")
+  })
+
   test("undefined args resolve to empty string", async () => {
-    const dir = await makeTmpDir({ "tmpl.txt": "before[{arg:missing}]after" })
+    const dir = await makeTmpDir({ "tmpl.txt": "before[{{arg:missing}}]after" })
     cleanup.push(dir)
     const result = await expand(`{{ file="./tmpl.txt" }}`, dir)
     expect(result).toBe("before[]after")
   })
 
   test("undefined arg removes full line when alone", async () => {
-    const dir = await makeTmpDir({ "tmpl.txt": "before\n{arg:missing}\nafter" })
+    const dir = await makeTmpDir({ "tmpl.txt": "before\n{{arg:missing}}\nafter" })
     cleanup.push(dir)
     const result = await expand(`{{ file="./tmpl.txt" }}`, dir)
     expect(result).toBe("before\nafter")
@@ -272,7 +283,7 @@ describe("expand: file template args and {arg:...} tokens", () => {
 
   test("args can compose nested file paths", async () => {
     const dir = await makeTmpDir({
-      "tmpl.txt": `{{ file="./rules/{arg:topic}.md" }}`,
+      "tmpl.txt": `{{ file="./rules/{{arg:topic}}.md" }}`,
       "rules/testing.md": "TEST_RULE",
     })
     cleanup.push(dir)
@@ -282,8 +293,8 @@ describe("expand: file template args and {arg:...} tokens", () => {
 
   test("nested files without args do not inherit parent args", async () => {
     const dir = await makeTmpDir({
-      "outer.txt": `outer={arg:key}; inner={{ file="./inner.txt" }}`,
-      "inner.txt": "inner={arg:key}",
+      "outer.txt": `outer={{arg:key}}; inner={{ file="./inner.txt" }}`,
+      "inner.txt": "inner={{arg:key}}",
     })
     cleanup.push(dir)
     const result = await expand(`{{ file="./outer.txt" key=OUTER }}`, dir)
@@ -292,8 +303,8 @@ describe("expand: file template args and {arg:...} tokens", () => {
 
   test("nested files receive only their own args", async () => {
     const dir = await makeTmpDir({
-      "outer.txt": `outer={arg:key}; inner={{ file="./inner.txt" key=INNER other=2 }}`,
-      "inner.txt": "inner={arg:key}/{arg:other}/{arg:missing}",
+      "outer.txt": `outer={{arg:key}}; inner={{ file="./inner.txt" key=INNER other=2 }}`,
+      "inner.txt": "inner={{arg:key}}/{{arg:other}}/{{arg:missing}}",
     })
     cleanup.push(dir)
     const result = await expand(`{{ file="./outer.txt" key=OUTER other=1 }}`, dir)
@@ -301,26 +312,26 @@ describe("expand: file template args and {arg:...} tokens", () => {
   })
 
   test("supports quoted file paths with spaces", async () => {
-    const dir = await makeTmpDir({ "path with spaces.txt": "{arg:key}" })
+    const dir = await makeTmpDir({ "path with spaces.txt": "{{arg:key}}" })
     cleanup.push(dir)
     const result = await expand(`{{ file="./path with spaces.txt" key=val }}`, dir)
     expect(result).toBe("val")
   })
 
   test("duplicate arg keys use the last value", async () => {
-    const dir = await makeTmpDir({ "tmpl.txt": "{arg:key}" })
+    const dir = await makeTmpDir({ "tmpl.txt": "{{arg:key}}" })
     cleanup.push(dir)
     const result = await expand(`{{ file="./tmpl.txt" key=a key=b }}`, dir)
     expect(result).toBe("b")
   })
 
   test("arg values containing env tokens remain literal", async () => {
-    const dir = await makeTmpDir({ "tmpl.txt": "{arg:key}" })
+    const dir = await makeTmpDir({ "tmpl.txt": "{{arg:key}}" })
     cleanup.push(dir)
     const restore = withEnv("FILE_INTERP_ARG_LITERAL", "EXPANDED")
     try {
-      const result = await expand(`{{ file="./tmpl.txt" key="{env:FILE_INTERP_ARG_LITERAL}" }}`, dir)
-      expect(result).toBe("{env:FILE_INTERP_ARG_LITERAL}")
+      const result = await expand(`{{ file="./tmpl.txt" key="{{env:FILE_INTERP_ARG_LITERAL}}" }}`, dir)
+      expect(result).toBe("{{env:FILE_INTERP_ARG_LITERAL}}")
     } finally {
       restore()
     }
@@ -328,7 +339,7 @@ describe("expand: file template args and {arg:...} tokens", () => {
 
   test("arg values containing file templates remain literal", async () => {
     const dir = await makeTmpDir({
-      "tmpl.txt": "{arg:key}",
+      "tmpl.txt": "{{arg:key}}",
       "secret.txt": "SHOULD_NOT_EXPAND",
     })
     cleanup.push(dir)
@@ -336,11 +347,14 @@ describe("expand: file template args and {arg:...} tokens", () => {
     expect(result).toBe(`{{ file="./secret.txt" }}`)
   })
 
-  test("arg values containing arg tokens remain literal", async () => {
-    const dir = await makeTmpDir({ "tmpl.txt": "{arg:key}" })
+  test("arg tokens in arg values cascade from parent scope", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": `{{ file="./inner.txt" x="{{arg:subject}}" }}`,
+      "inner.txt": "x={{arg:x}}",
+    })
     cleanup.push(dir)
-    const result = await expand(`{{ file="./tmpl.txt" key="{arg:other}" other=expanded }}`, dir)
-    expect(result).toBe("{arg:other}")
+    const result = await expand(`{{ file="./outer.txt" subject=hello }}`, dir)
+    expect(result).toBe("x=hello")
   })
 
   test("file templates work with zero args", async () => {
@@ -438,6 +452,17 @@ describe("expand: inline conditional blocks", () => {
     cleanup.push(dir)
     const result = await expand(`{{ file="./outer.txt" }}`, dir)
     expect(result).toBe("before\nafter")
+  })
+
+  test("if=arg with empty string arg is equivalent to omitted arg", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "before\n{{ if=flag }}\nFLAG\n{{ endif }}\nafter",
+    })
+    cleanup.push(dir)
+    const omitted = await expand(`{{ file="./outer.txt" }}`, dir)
+    const empty = await expand(`{{ file="./outer.txt" flag="" }}`, dir)
+    expect(empty).toBe(omitted)
+    expect(empty).toBe("before\nafter")
   })
 
   test("if=arg==value includes only exact matches", async () => {
@@ -538,7 +563,7 @@ describe("expand: inline conditional blocks", () => {
   })
 
   test("inline conditional markers in arg values remain literal", async () => {
-    const dir = await makeTmpDir({ "tmpl.txt": "{arg:snippet}" })
+    const dir = await makeTmpDir({ "tmpl.txt": "{{arg:snippet}}" })
     cleanup.push(dir)
     const result = await expand(
       `{{ file="./tmpl.txt" snippet="{{ if=flag }}YES{{ endif }}" flag=1 }}`,
@@ -556,18 +581,103 @@ describe("expand: inline conditional blocks", () => {
     const result = await expand("before\n{{ if=flag }}\nX", "/tmp")
     expect(result).toBe("before\n{{ if=flag }}\nX")
   })
+
+  test("if/else/endif: includes true branch when arg is non-empty", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "before\n{{ if=flag }}\nTRUE\n{{ else }}\nFALSE\n{{ endif }}\nafter",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./outer.txt" flag=1 }}`, dir)
+    expect(result).toBe("before\nTRUE\nafter")
+  })
+
+  test("if/else/endif: includes false branch when arg is absent", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "before\n{{ if=flag }}\nTRUE\n{{ else }}\nFALSE\n{{ endif }}\nafter",
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./outer.txt" }}`, dir)
+    expect(result).toBe("before\nFALSE\nafter")
+  })
+
+  test("if/else/endif: inline else on a single line", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "prefix {{ if=mode==cached }}CACHED{{ else }}CACHELESS{{ endif }} suffix",
+    })
+    cleanup.push(dir)
+    const cached = await expand(`{{ file="./outer.txt" mode=cached }}`, dir)
+    const cacheless = await expand(`{{ file="./outer.txt" mode=cacheless }}`, dir)
+    expect(cached).toBe("prefix CACHED suffix")
+    expect(cacheless).toBe("prefix CACHELESS suffix")
+  })
+
+  test("if/else/endif: nested if inside true branch", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": [
+        "start",
+        "{{ if=outer }}",
+        "OUTER-TRUE",
+        "{{ if=inner }}",
+        "INNER",
+        "{{ endif }}",
+        "{{ else }}",
+        "OUTER-FALSE",
+        "{{ endif }}",
+        "end",
+      ].join("\n"),
+    })
+    cleanup.push(dir)
+    const both = await expand(`{{ file="./outer.txt" outer=1 inner=1 }}`, dir)
+    const outerOnly = await expand(`{{ file="./outer.txt" outer=1 }}`, dir)
+    const neither = await expand(`{{ file="./outer.txt" }}`, dir)
+    expect(both).toBe("start\nOUTER-TRUE\nINNER\nend")
+    expect(outerOnly).toBe("start\nOUTER-TRUE\nend")
+    expect(neither).toBe("start\nOUTER-FALSE\nend")
+  })
+
+  test("if/else/endif: nested if inside false branch", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": [
+        "start",
+        "{{ if=outer }}",
+        "TRUE",
+        "{{ else }}",
+        "FALSE",
+        "{{ if=inner }}",
+        "INNER",
+        "{{ endif }}",
+        "{{ endif }}",
+        "end",
+      ].join("\n"),
+    })
+    cleanup.push(dir)
+    const withInner = await expand(`{{ file="./outer.txt" inner=1 }}`, dir)
+    const withoutInner = await expand(`{{ file="./outer.txt" }}`, dir)
+    expect(withInner).toBe("start\nFALSE\nINNER\nend")
+    expect(withoutInner).toBe("start\nFALSE\nend")
+  })
+
+  test("if/else/endif: false branch does not read file imports inside", async () => {
+    const dir = await makeTmpDir({
+      "outer.txt": "before\n{{ if=flag }}\n{{ file=\"./missing.txt\" }}\n{{ else }}\nFALLBACK\n{{ endif }}\nafter",
+    })
+    cleanup.push(dir)
+    const result = await expandWithDiagnostics(`{{ file="./outer.txt" }}`, dir)
+    expect(result.text).toBe("before\nFALLBACK\nafter")
+    expect(result.diagnostics).toEqual([])
+  })
 })
 
 // ── expand: mixed tokens ──────────────────────────────────────────────────────
 
-describe("expand: mixed {env:...} and file templates", () => {
+describe("expand: mixed {{env:...}} and file templates", () => {
   test("env tokens and file templates both expand in same string", async () => {
     const dir = await makeTmpDir({ "name.txt": "Alice" })
     cleanup.push(dir)
     const restore = withEnv("FILE_INTERP_TEST_REGION", "us-west")
     try {
       const result = await expand(
-        `name={{ file="./name.txt" }} region={env:FILE_INTERP_TEST_REGION}`,
+        `name={{ file="./name.txt" }} region={{env:FILE_INTERP_TEST_REGION}}`,
         dir,
       )
       expect(result).toBe("name=Alice region=us-west")
@@ -581,7 +691,7 @@ describe("expand: mixed {env:...} and file templates", () => {
     cleanup.push(dir)
     const restore = withEnv("FILE_INTERP_TEST_FILE_TOKEN", `{{ file="./from-env.txt" }}`)
     try {
-      const result = await expand(`value={env:FILE_INTERP_TEST_FILE_TOKEN}`, dir)
+      const result = await expand(`value={{env:FILE_INTERP_TEST_FILE_TOKEN}}`, dir)
       expect(result).toBe("value=ENV_TO_FILE_MARKER")
     } finally {
       restore()
@@ -603,8 +713,8 @@ describe("expand: no tokens", () => {
   })
 
   test("leaves empty env token form unchanged", async () => {
-    const result = await expand(`empty {env:}`, "/tmp")
-    expect(result).toBe(`empty {env:}`)
+    const result = await expand(`empty {{env:}}`, "/tmp")
+    expect(result).toBe(`empty {{env:}}`)
   })
 
   test("blanks empty file template path", async () => {
@@ -613,8 +723,8 @@ describe("expand: no tokens", () => {
   })
 
   test("leaves unclosed token forms unchanged", async () => {
-    const result = await expand(`broken {env:FOO and {{ file="./x.txt"`, "/tmp")
-    expect(result).toBe(`broken {env:FOO and {{ file="./x.txt"`)
+    const result = await expand(`broken {{env:FOO and {{ file="./x.txt"`, "/tmp")
+    expect(result).toBe(`broken {{env:FOO and {{ file="./x.txt"`)
   })
 })
 
@@ -783,7 +893,7 @@ describe("expand: recursive file templates", () => {
     const files: Record<string, string> = {}
     for (let i = 0; i < MAX_DEPTH; i++) {
       if (i === MAX_DEPTH - 1) {
-        files[`e${i}.txt`] = `DEEP_{{ file="./e-leaf.txt" }}_{env:FILE_INTERP_DEPTH_ENV}`
+        files[`e${i}.txt`] = `DEEP_{{ file="./e-leaf.txt" }}_{{env:FILE_INTERP_DEPTH_ENV}}`
       } else {
         files[`e${i}.txt`] = `E${i}:{{ file="./e${i + 1}.txt" }}`
       }
@@ -804,9 +914,9 @@ describe("expand: recursive file templates", () => {
     }
   })
 
-  test("expands {env:...} inside recursively imported content", async () => {
+  test("expands {{env:...}} inside recursively imported content", async () => {
     const dir = await makeTmpDir({
-      "with-env.txt": "region={env:FILE_INTERP_RECURSE_ENV}",
+      "with-env.txt": "region={{env:FILE_INTERP_RECURSE_ENV}}",
     })
     cleanup.push(dir)
     const restore = withEnv("FILE_INTERP_RECURSE_ENV", "eu-west")
@@ -858,5 +968,91 @@ describe("expand: recursive file templates", () => {
     //   ref-a file template: ref-a NOT in visited → "A_CONTENT"
     // So shared.txt expands to "S:A_CONTENT" from ref-b's perspective
     expect(result).toBe("A_CONTENT | B:S:A_CONTENT")
+  })
+})
+
+describe("expand: include boundary whitespace", () => {
+  test("standalone file include does not produce double blank lines at boundary", async () => {
+    // When {{ file=... }} is on its own line, the expanded content may end
+    // with \n (e.g. from conditional processing), and the parent adds its own
+    // \n after }}, producing \n\n. The engine should strip the trailing \n
+    // from the included content so only one blank line remains.
+    const dir = await makeTmpDir({
+      "header.txt": `Step 1\nStep 2\nStep 3`,
+      "main.md": `{{ file="./header.txt" }}\n\nStep 4`,
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./main.md" }}`, dir)
+    // One blank line between step 3 and step 4, not two
+    expect(result).toBe("Step 1\nStep 2\nStep 3\n\nStep 4")
+  })
+
+  test("file include ending with conditional does not produce double blank lines", async () => {
+    // This is the most common cause: a conditional at the end of an included
+    // file that evaluates false, leaving a trailing \n from the last content line.
+    const dir = await makeTmpDir({
+      "header.txt": `Step 1\nStep 2\nStep 3\n{{ if=show_extra }}\nExtra\n{{ endif }}`,
+      "main.md": `{{ file="./header.txt" }}\n\nStep 4`,
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./main.md" }}`, dir)
+    // show_extra is not set, so conditional is false. The trailing \n from
+    // "Step 3" before the conditional becomes the last char of the expanded
+    // header. The engine strips it so only one blank line appears.
+    expect(result).toBe("Step 1\nStep 2\nStep 3\n\nStep 4")
+  })
+
+  test("file include with if/else at end does not produce double blank lines", async () => {
+    const dir = await makeTmpDir({
+      "footer.txt": `Step 5\n{{ if=pointer }}\nPointer\n{{ else }}\nFull\n{{ endif }}`,
+      "main.md": `Step 4\n\n{{ file="./footer.txt" }}\n\n# Output`,
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./main.md" }}`, dir)
+    // pointer is not set, so else branch "Full" is used. The \n after "Full"
+    // (before {{ endif }}) becomes trailing; engine strips it.
+    expect(result).toBe("Step 4\n\nStep 5\nFull\n\n# Output")
+  })
+
+  test("inline file include (not on own line) is unaffected", async () => {
+    // When the file include is mid-line (not standalone), the trailing newline
+    // stripping should still apply, but the parent's line structure is different.
+    const dir = await makeTmpDir({
+      "name.txt": `Alice\n`,
+      "main.md": `Hello {{ file="./name.txt" }}!`,
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./main.md" }}`, dir)
+    // name.txt content "Alice\n" is trimmed to "Alice" by readRawFile, then
+    // expanded (no tokens), then trailing \n stripped (but it's already gone
+    // after trim). Result: "Hello Alice!"
+    expect(result).toBe("Hello Alice!")
+  })
+
+  test("multiple file includes in sequence do not accumulate extra blank lines", async () => {
+    const dir = await makeTmpDir({
+      "a.txt": `A-content`,
+      "b.txt": `B-content`,
+      "c.txt": `C-content`,
+      "main.md": `{{ file="./a.txt" }}\n{{ file="./b.txt" }}\n{{ file="./c.txt" }}`,
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./main.md" }}`, dir)
+    // Each include's trailing \n is stripped, so each parent \n after }}
+    // serves as the single line break. Result: one line per content.
+    expect(result).toBe("A-content\nB-content\nC-content")
+  })
+
+  test("deeply nested includes do not produce double blank lines at any boundary", async () => {
+    const dir = await makeTmpDir({
+      "inner.txt": `Inner-content`,
+      "middle.txt": `Middle-before\n{{ file="./inner.txt" }}\nMiddle-after`,
+      "outer.md": `Outer-before\n{{ file="./middle.txt" }}\nOuter-after`,
+    })
+    cleanup.push(dir)
+    const result = await expand(`{{ file="./outer.md" }}`, dir)
+    // Each boundary: expanded content's trailing \n is stripped, parent's
+    // \n after }} provides the single line break.
+    expect(result).toBe("Outer-before\nMiddle-before\nInner-content\nMiddle-after\nOuter-after")
   })
 })

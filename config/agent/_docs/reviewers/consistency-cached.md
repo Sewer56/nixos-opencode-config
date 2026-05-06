@@ -20,44 +20,38 @@ permission:
   external_directory: allow
 ---
 
-{{ file="./agent/_docs/reviewers/consistency-shared-pre.txt" }}
+{{ file="./agent/_docs/reviewers/_templates/consistency-header.txt" }}
 
 # Process
 
-1. Load cache
-- Cache: `PROMPT-DOCS-WRITE-api-reference.handoff.md` → `PROMPT-DOCS-WRITE-api-reference.review-consistency.md`. Read the cache file if it exists. Treat missing or malformed cache as empty.
-- Treat the cache as one record per target file pair with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
+ {{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=handoff_path
+  cache_derivation="replace the `.handoff.md` suffix with `.review-consistency.md`"
+  cache_record_type="per target file pair"
+  reads_change_plan=1
+  single_file_pass=1
+  has_frozen_regions=1
+  show_cache_update_detail=1
+  pruned_unit="file entries"
+}}
 
-2. Read handoff
-- Read `## Change Plan` for per-file scope levels and frozen regions.
-- If the Change Plan lists only one target file: emit PASS with no findings and stop here.
-- Read `## Delta` for per-file change tracking.
-- Read `### Decisions` only when non-empty.
+# Output
 
-3. Select in-scope content
-- Carry forward Verified entries that are Unchanged in Delta.
-- Re-evaluate Changed and New entries.
-- Re-evaluate own Open entries from cache and decision-referenced entries.
-- Exclude frozen regions from review.
-
-4. Inspect selected content
-- Read all target documentation files to evaluate cross-page coherence.
-- Apply each Focus check across pages (not within a single page — that is the wording reviewer's domain).
-- Check Open→Resolved transitions.
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
-
-5. Update cache
-- If the derived cache file is missing or malformed: write the full cache file.
-- Otherwise: use targeted edits to update only entries that changed.
-  - Replace entries whose fields changed.
-  - Insert new entries in the appropriate section.
-  - Remove pruned file entries.
-  - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Leave entries whose content has not changed exactly as they are.
-
-6. Emit the final review block
-- Emit the `# REVIEW` block from `# Output`.
-
-In the `# REVIEW` output, set `Agent:` to `_docs/reviewers/consistency-cached`.
-
-{{ file="./agent/_docs/reviewers/consistency-cached-post.txt" }}
+{{
+  file="./agent/_docs/reviewers/_templates/shared-output.txt"
+  mode=cached
+  agent_name="_docs/reviewers/consistency-cached"
+  finding_prefix=CON
+  categories="BROKEN_LINK | TERMINOLOGY_DRIFT | CONTENT_DUPLICATION | ORPHANED_REFERENCE"
+  evidence_ref="<section, `path:line`, or cross-page reference>"
+  problem_template="<what cross-page inconsistency degrades coherence>"
+  fix_template="<smallest concrete correction>"
+  file_ref="<path/to/documentation/file>"
+  bad_example="-inconsistent or broken cross-page reference"
+  good_example="+corrected reference or deduplicated content"
+  block_rule="broken internal links between target pages"
+  allow_rule="terminology drift, content duplication, or orphaned references — ADVISORY only"
+  reviewer=consistency
+}}
