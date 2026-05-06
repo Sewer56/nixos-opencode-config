@@ -91,6 +91,4 @@ Read `lang-<language>-errors.txt` once per language, per `# Focus`.
   mode=cacheless
   verified_ref="<path>: <item description — unchanged items that remain verified>"
 }}
-- PASS: `Decision: PASS` only; omit `## Findings`, `## Notes`.
-- BLOCKING: max 6 findings.
 - Cite source file evidence when grounding a finding.

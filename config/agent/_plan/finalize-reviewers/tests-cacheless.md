@@ -48,5 +48,3 @@ Determine whether the test artifacts are free of blocking issues.
   prefix=TST
 }}
 
-- PASS block: `Decision: PASS` only. No IDs line.
-- BLOCKING: max 6 findings. Detail each finding inline after the fenced block.

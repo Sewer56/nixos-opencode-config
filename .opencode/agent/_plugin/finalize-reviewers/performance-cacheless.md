@@ -54,9 +54,7 @@ Review only the performance-sensitive parts of step artifacts. Audit pass — re
   step="<STEP-###>"
 }}
 
-- PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - If the plan is not performance-sensitive: `Decision: PASS` with `Performance Sensitive: NO` in `## Notes`.
-- BLOCKING: max 6 findings.
 
 # Constraints
 - Read `handoff_path`, `context_path`, all `step_paths` in full.

@@ -55,9 +55,7 @@ Determine whether step artifacts are free of blocking issues from a performance 
   with_evidence=0
 }}
 
-- PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - If the plan is not performance-sensitive: `Decision: PASS` with `Performance Sensitive: NO` in `## Notes`.
-- BLOCKING: max 6 findings.
 - If a performance finding depends on the repo surface, cite repo evidence.
 - Omit the diff when the finding is a performance budget concern with no single correct implementation.
 

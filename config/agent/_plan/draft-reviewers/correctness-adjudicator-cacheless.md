@@ -63,5 +63,3 @@ Determine whether the draft plan is free of blocking correctness issues.
   with_evidence=1
 }}
 
-- PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
-- BLOCKING: max 6 findings.

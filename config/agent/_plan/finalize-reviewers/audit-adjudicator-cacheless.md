@@ -60,5 +60,3 @@ Determine whether step artifacts are free of blocking audit issues.
   with_evidence=1
 }}
 
-- PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
-- BLOCKING: max 6 findings.

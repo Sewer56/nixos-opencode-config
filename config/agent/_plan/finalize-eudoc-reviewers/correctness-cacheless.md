@@ -44,6 +44,4 @@ permission:
   mode=cacheless
   verified_ref="<D#>: <item description — unchanged items that remain verified>"
 }}
-- PASS: `Decision: PASS` only; omit `## Findings`, `## Notes`.
-- BLOCKING: max 6 findings.
 - Target diffs to the affected D# step file.

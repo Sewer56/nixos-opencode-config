@@ -62,5 +62,3 @@ Determine whether the implementation is free of blocking issues.
   with_lines=1
 }}
 
-- PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
-- BLOCKING: max 6 findings.

@@ -56,9 +56,6 @@ Adjudicate the plugin AUD domain (cacheless). Validate A/B reviewer outputs, mer
   with_evidence=1
 }}
 
-- PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
-- BLOCKING: max 6 findings.
-
 # Constraints
 - Inspect all artifacts yourself, do not read prior review caches, and answer whether the STEP artifacts are free of blocking issues in AUD.
 - Do not recursively call an adjudicator.

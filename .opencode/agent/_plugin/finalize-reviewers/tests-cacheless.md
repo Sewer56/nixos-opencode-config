@@ -49,13 +49,8 @@ Flag duplicate checks and obvious 3+ near-identical tests that should be paramet
   prefix=TST
 }}
 
-- PASS: `Decision: PASS` only. No IDs line.
-- BLOCKING: max 6 findings. Detail each finding inline after the fenced block.
-
 # Constraints
 - Read `handoff_path`, `context_path`, all `step_paths` in full.
-- PASS: Decision only, no IDs line.
-- BLOCKING: max 6 findings. Detail findings inline after the fenced block.
 - Focus on observable behavior and verification commands, not declaration order or micro-optimizations.
 - Do not judge fidelity, plugin constraints, declaration order, or performance; mention out-of-scope concerns at most once in Notes without blocking.
 - Answer whether the test artifacts are free of blocking issues.

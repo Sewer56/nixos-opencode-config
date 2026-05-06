@@ -23,8 +23,6 @@ IDs: AUD-001, AUD-002, ...
 ## Notes
 - <optional short notes>
 ```
-- PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
-- BLOCKING: max 6 findings.
 - Return ONLY the fenced block.
 - Keep findings short and specific.
 - Include a unified diff after every finding's `Fix:` field with the exact text replacement.
