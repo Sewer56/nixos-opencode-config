@@ -34,29 +34,17 @@ Do not write any plan artifacts. Return manifest only.
 
 # Output
 
-```text
-# Explorer Manifest
-
-## Files Touched
-| Path | Action | Current State |
-|------|--------|---------------|
-| path/to/file | UPDATE/INSERT/REMOVE | <brief: line count, key symbols, imports> |
-
-## Key Symbols
-- `path/to/file:line` — `SymbolName` (<type>): <what it does>
-
-## Test Files
-- `path/to/file_test.go`: covers `SymbolName` at line N
-
-## Observations
-- <repo fact relevant to the plan>
-- <constraint or pattern the plan must respect>
-
-## Open Questions
-- <anything the draft leaves unresolved that repo facts can answer>
-```
-
-- Output ≤80 lines. Be dense — one line per fact.
+{{
+  file="./agent/_templates/explorer/output.txt"
+  has_action=1
+  row_example="path/to/file | UPDATE/INSERT/REMOVE | <brief: line count, key symbols, imports>"
+  has_plan_ref=1
+  has_open_questions=1
+}}
 
 # Constraints
-- Read each file once. Capture enough detail for the orchestrator to write step files without further discovery.
+{{
+  file="./agent/_templates/explorer/constraints.txt"
+  constraint_extra="Capture enough detail for the orchestrator to write step files without further discovery."
+  density_rule="Be dense — one line per fact."
+}}

@@ -36,26 +36,16 @@ Do NOT write any files. Do NOT edit any files. Return manifest only. Do NOT reco
 
 # Output
 
-```text
-# Explorer Manifest
-
-## Files Touched
-| Path | Current State |
-|------|---------------|
-| path/to/file | <brief: line count, key symbols, imports> |
-
-## Key Symbols
-- `path/to/file:line` — `SymbolName` (<type>): <what it does>
-
-## Test Files
-- `path/to/file_test.go`: covers `SymbolName` at line N
-
-## Observations
-- <repo fact relevant>
-- <constraint or pattern to respect>
-```
-
-- Output ≤80 lines.
+{{
+  file="./agent/_templates/explorer/output.txt"
+  has_action=0
+  row_example="path/to/file | <brief: line count, key symbols, imports>"
+  has_plan_ref=0
+  has_open_questions=0
+}}
 
 # Constraints
-- Read each file once. Be dense — one line per fact.
+{{
+  file="./agent/_templates/explorer/constraints.txt"
+  density_rule="Be dense — one line per fact."
+}}

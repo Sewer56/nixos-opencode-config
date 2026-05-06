@@ -1,0 +1,23 @@
+```text
+# Explorer Manifest
+
+## Files Touched
+| Path{{ if=has_action }} | Action{{ endif }} | Current State |
+|------{{ if=has_action }}|--------{{ endif }}|---------------|
+| {{arg:row_example}} |
+
+## Key Symbols
+- `path/to/file:line` — `SymbolName` (<type>): <what it does>
+
+## Test Files
+- `path/to/file_test.go`: covers `SymbolName` at line N
+
+## Observations
+- <repo fact{{ if=has_plan_ref }} to the plan{{ endif }}>
+- <constraint or pattern {{ if=has_plan_ref }}the plan {{ endif }}to respect>
+{{ if=has_open_questions }}
+
+## Open Questions
+- <anything the draft leaves unresolved that repo facts can answer>
+{{ endif }}
+```

@@ -1,0 +1,2 @@
+- Read each file once.{{ if=constraint_extra }} {{arg:constraint_extra}}{{ else }} Be dense — one line per fact.{{ endif }}
+- Output ≤80 lines.{{ if=density_rule }} {{arg:density_rule}}{{ endif }}
