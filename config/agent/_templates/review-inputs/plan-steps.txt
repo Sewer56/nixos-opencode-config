@@ -1,3 +1,4 @@
 - `handoff_path` (e.g., `<artifact_base>.handoff.md`)
 - `plan_path` (e.g., `<artifact_base>.draft.md`)
 - `step_paths` (exact list of step files to inspect)
+- `cache_path:` and `actions_path:` — REQUIRED.

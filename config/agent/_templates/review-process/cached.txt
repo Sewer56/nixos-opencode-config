@@ -1,10 +1,15 @@
-1. Load cache
-- {{ if=has_cache_derivation }}Derive cache path from `{{arg:delta_source}}`: {{arg:cache_derivation}}.{{ else }}Use explicit `cache_path`.{{ endif }} Read if exists; treat missing/malformed as empty.
+1. Extract paths
+{{ if=has_cache_derivation }}
+- Derive `cache_path` from `{{arg:delta_source}}`: {{arg:cache_derivation}}.
+{{ else }}
+- Parse `cache_path:` and `actions_path:` from the task input. REQUIRED.
+{{ endif }}
+- Read `cache_path` if exists; treat missing/malformed as empty.
 {{ if=cache_record_type }}
-- Treat the cache as one record {{arg:cache_record_type}} with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
+- Treat cache as one record {{arg:cache_record_type}} with fields `last_decision`, `open_findings`, `evidence`, `verified`.
 {{ endif }}
 {{ if=has_actions_path }}
-- Use explicit `actions_path` when provided. Otherwise glob existing `<cache_path without .md>.actions.*.md` files and choose the next three-digit `<nnn>` path, starting `001`.
+- Use parsed `actions_path`. If absent, glob `<cache_path without .md>.actions.*.md` → next `<nnn>`, start `001`.
 {{ endif }}
 
 2. Read handoff
@@ -34,20 +39,20 @@
 - Exclude frozen regions from review.
 {{ endif }}
 
-4. Inspect selected content
-- Read the target files for in-scope sections only.
+4. Inspect content
+- Read files listed in Changes Made / Delta. Do not explore repo or search broadly.
 - Apply each Focus check to in-scope content.
 - Check Open→Resolved transitions.
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output.
 
-5. Update cache
+5. Write files
 {{ if=show_cache_format }}
 - Write cache in this format:
 ```markdown
 {{arg:cache_format}}
 ```
 {{ endif }}
-- If the cache file is missing or malformed: write the full cache file.
+- If cache file missing/malformed: write the full cache file at `cache_path`.
 - Otherwise: use targeted edits to update only entries that changed{{ if=preserve_byte_exact }}, preserving unchanged cache text byte-for-byte{{ endif }}.
 {{ if=show_cache_update_detail }}
   - Replace entries whose fields changed.
@@ -56,13 +61,14 @@
   - Move entries between sections when status transitions (e.g., Open → Resolved).
   - Leave entries whose content has not changed exactly as they are.
 {{ endif }}
-
-6. Emit the final review block
 {{ if=has_actions_path }}
-- Write `actions_path` with only current OPEN findings the caller/adjudicator must act on. Do not include resolved findings, full Verified Observations, prior history, or merge notes.
+- Write `actions_path` with only current OPEN findings. No resolved, no Verified Observations, no history, no merge notes.
 {{ endif }}
+- GATE: `cache_path`{{ if=has_actions_path }} and `actions_path`{{ endif }} MUST exist on disk before proceeding. If not: write them. Do not proceed until written.
+
+6. Emit output
 {{ if=pointer_emit }}
-- Emit only the pointer `# REVIEW` block from `# Output`.
+- Emit ONLY the `# REVIEW` fenced block from `# Output`.
 {{ else }}
-- Emit the `# REVIEW` block from `# Output`.
+- Emit ONLY the `# REVIEW` fenced block from `# Output`.
 {{ endif }}

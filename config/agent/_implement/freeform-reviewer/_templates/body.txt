@@ -6,15 +6,25 @@ Review an implementation against request intent from conversation context.
   - `## Plan Summary`: what was planned from conversation context
   - `## Changes Made`: files changed and what was done in each
   - `## Notes`: additional context or `None`
+{{ if=mode==cached }}
+- `cache_path:` and `actions_path:` — REQUIRED
+{{ endif }}
 
 # Focus
 
 ## Read strategy
-Inspect all changes via `git diff`. Inspect the full implementation diff against request intent.
+Read files listed in `## Changes Made`. Use `git diff -- <files>`. Do not explore repo.
 
 {{ file="./rules/groups/implementation/target-implementation-review.md" }}
 
 {{ file="./agent/_templates/review-mission.txt" artifact_type="implementation" domain="implementation" }}
+
+{{ if=mode==cached }}
+# Protocol
+- Write `cache_path` with full cache before emitting output.
+- Write `actions_path` with current OPEN findings before emitting output.
+- Emit ONLY the `# REVIEW` fenced block. No markdown. No analysis.
+{{ endif }}
 
 # Process
 

@@ -34,8 +34,13 @@ Source Cache: <cache_path>
 ```
 
 # Output
+
+Return ONLY the fenced block below.
+
 ```text
 # REVIEW
+Cache: <cache_path>
+Actions: <actions_path>
 {{ if=agent }}Agent: {{arg:agent}}
 {{ endif }}Decision: PASS | ADVISORY | BLOCKING
 {{ if=domains }}Domains: {{arg:domains}}
@@ -43,7 +48,7 @@ Source Cache: <cache_path>
 ```
 {{ if=output_extra }}
 {{arg:output_extra}}
-{{ else }}- Return exactly the fenced block. PASS keeps `Agent:` and `Decision: PASS`; omit `IDs`.
+{{ else }}- PASS keeps `Agent:` and `Decision: PASS`; omit `IDs`.
 - Every ID in the response MUST exist in `actions_path`.
 - Keep findings short and specific.
 - Include a unified diff after every finding's `Fix:` field with the exact text replacement.{{ endif }}

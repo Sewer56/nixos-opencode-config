@@ -2,11 +2,14 @@ Review an implementation against its plan.
 
 # Inputs
 - Plan path (passed by caller).
+{{ if=mode==cached }}
+- `cache_path:` and `actions_path:` — REQUIRED, passed inline by caller.
+{{ endif }}
 
 # Focus
 
 ## Read strategy
-Read all files listed in the handoff index's File column in one batch. Inspect all changes via `git diff`. Inspect the full implementation diff against the full handoff.
+Read files listed in the handoff index's File column. Use `git diff -- <those files>`. Do not explore repo.
 
 {{ file="./rules/groups/implementation/target-implementation-review.md" }}
 
