@@ -34,7 +34,6 @@ On re-review: `plan_path` is withheld. `handoff_path` is available — read only
   file_ref="<path/to/step/file>"
   bad="-problem"
   good="+fix"
-  with_evidence=0
 }}
 
 - If the plan is not performance-sensitive: `Decision: PASS` with `Performance Sensitive: NO` in `## Notes`.

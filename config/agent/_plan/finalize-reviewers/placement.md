@@ -83,7 +83,6 @@ Use the placement group in `# Rules` for file/module placement and declaration-o
   file_ref="<path/to/step/file>"
   bad="-problem"
   good="+fix"
-  with_evidence=0
   with_step_file=1
   step="<I#>"
   with_verified=1

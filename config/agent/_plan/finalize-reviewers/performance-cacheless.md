@@ -32,7 +32,6 @@ Read `handoff_path`, `plan_path`, all `step_paths` in full.
   file_ref="<path/to/step/file>"
   bad="-problem"
   good="+fix"
-  with_evidence=0
 }}
 
 - If the plan is not performance-sensitive: `Decision: PASS` with `Performance Sensitive: NO` in `## Notes`.
