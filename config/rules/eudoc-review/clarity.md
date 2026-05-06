@@ -37,6 +37,10 @@ Good finding: `The text says "bridge" without explaining which module or behavio
 Bad: flag a wrong hook name as clarity.
 Good: flag undefined wording that prevents knowing which hook is meant.
 
+### Review Blocking Criteria
+- Block for ambiguous language and project-specific acronyms without expansion.
+- Do not block for undefined jargon, compound-term compression, opaque references, widely known acronyms, or exclusions listed below.
+
 ### Exclusions
 Do not block these as clarity issues:
 - Common programming terms such as `API`, `HTTP`, `markdown`, `frontmatter`.

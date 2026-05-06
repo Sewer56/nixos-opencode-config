@@ -33,3 +33,7 @@ Flag paragraphs over 4 sentences or 4 rendered lines. ADVISORY.
 
 Bad: one paragraph covers setup, usage, caveats, and troubleshooting.
 Good: split into short paragraphs or list items by task.
+
+### Review Blocking Criteria
+- Block for filler, passive voice in instructional steps, and genuinely ambiguous terminology inconsistencies within a single page.
+- Do not block for stylistic terminology variation, descriptive passive voice, minor wordiness, sentence flow, or paragraph length (unless egregious inflation).

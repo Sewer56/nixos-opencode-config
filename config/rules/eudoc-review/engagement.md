@@ -51,6 +51,10 @@ Quick starts should be ≤3 steps, copy-pasteable, and reach running code within
 Bad: quick start has six conceptual steps before first command.
 Good: three copy-pasteable steps reach running code.
 
+### Review Blocking Criteria
+- Block for missing hooks on landing pages, missing concrete examples on getting-started/guide pages, fluff, progressive-complexity violations, and quick-start sections exceeding 3 steps or 30 seconds.
+- Do not block for reference-page hook issues, scannability on non-landing pages, peer-point bullet style, bullet spacing, or minor engagement concerns.
+
 ### Exclusions
 API reference pages are exempt from hook-first, progressive complexity, and quick start. Changelogs and migration guides are exempt from progressive complexity.
 

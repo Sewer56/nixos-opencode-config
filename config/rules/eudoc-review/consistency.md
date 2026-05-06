@@ -21,5 +21,9 @@ Flag a target page referencing a concept, feature, or page that no target page e
 Bad: `Use profiles` with no page or section explaining profiles.
 Good: add explanation or link to the owning page.
 
+### Review Blocking Criteria
+- Block for broken internal links between target pages.
+- Do not block for terminology drift, content duplication, or orphaned references — ADVISORY only.
+
 ### Exclusions
 Skip entirely for single-file scope. Do not review API reference pages or changelogs for cross-page consistency.

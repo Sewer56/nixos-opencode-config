@@ -34,10 +34,6 @@ Consider page type (landing, getting-started, guide, reference, changelog, migra
 
 {{ file="./rules/eudoc-review/engagement.md" }}
 
-### Blocking policy
-- Block for missing hooks on landing pages, missing concrete examples on getting-started/guide pages, fluff, and progressive-complexity violations.
-- Do not block for reference-page hook issues, scannability on non-landing pages, or minor engagement concerns.
-
 # Process
 
  {{

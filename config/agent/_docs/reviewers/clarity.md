@@ -32,10 +32,6 @@ Review end-user documentation for comprehensibility.
 
 {{ file="./rules/eudoc-review/clarity.md" }}
 
-### Blocking policy
-- Block for undefined project-specific jargon, ambiguous phrasing, compound-term compression, opaque references, and project-specific acronyms without expansion.
-- Do not block for standard domain terms, common programming terms, or terms defined earlier on the same page.
-
 # Process
 
  {{
