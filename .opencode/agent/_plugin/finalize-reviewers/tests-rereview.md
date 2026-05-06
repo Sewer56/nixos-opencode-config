@@ -43,12 +43,12 @@ Verify resolved verification findings and check changed steps for new gaps. Trus
 7. Emit `# REVIEW`.
 
 # Output
-```text
-# REVIEW
-Agent: _plugin/finalize-reviewers/tests-rereview
-Decision: PASS | ADVISORY | BLOCKING
-IDs: TST-NNN, TST-NNN, ...
-```
+
+{{
+  file="./agent/_templates/review-output/pointer.txt"
+  agent="_plugin/finalize-reviewers/tests-rereview"
+  prefix=TST
+}}
 
 # Constraints
 - Return only the fenced `text` block. PASS keeps `Agent:` and `Decision: PASS`; omit `IDs`.

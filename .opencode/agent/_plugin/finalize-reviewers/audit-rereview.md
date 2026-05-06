@@ -43,12 +43,12 @@ Verify resolved audit findings. Check only changed steps for new audit issues. T
 7. Emit `# REVIEW`.
 
 # Output
-```text
-# REVIEW
-Agent: _plugin/finalize-reviewers/audit-rereview
-Decision: PASS | ADVISORY | BLOCKING
-IDs: AUD-NNN, AUD-NNN, ...
-```
+
+{{
+  file="./agent/_templates/review-output/pointer.txt"
+  agent="_plugin/finalize-reviewers/audit-rereview"
+  prefix=AUD
+}}
 
 # Constraints
 - Return only the fenced `text` block. PASS keeps `Agent:` and `Decision: PASS`; omit `IDs`.

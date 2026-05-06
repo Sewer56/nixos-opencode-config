@@ -35,61 +35,27 @@ Check changed prompt files against selected workflow patterns.
 - `risk_flags`: compact flags.
 
 # Process
-1. Use provided `cache_path` exactly.
-2. Read `log_path` and `pattern_contract_path`.
-3. Read selected source sections named by the contract, such as `config/doc/workflow/design-patterns.md#OPT-###` or `config/doc/workflow/optimize-patterns.md#WOPT-###`.
-4. Read changed files and any `Apply To` files from the contract.
-5. Check each selected Carry-In, Quality Guard, Apply To path, and Validation bullet against the generated prompt text.
-6. Findings are about generated files not matching selected patterns.
-7. Write/update `cache_path` before final response.
-8. Emit the final review block from `# Output`.
 
-# Cache
-
-Write cache in this shape:
-
-```text
-# Cache: _iterate/edit-reviewers/pattern-compliance
-Source Log: <log_path>
-Pattern Contract: <pattern_contract_path>
-Changed Paths: <paths>
-
-## Findings
-### [PAT-001]
-Status: OPEN | RESOLVED | DEFERRED
-Severity: BLOCKING | ADVISORY
-Pattern: OPT-### | WOPT-### | None
-Path: <repo-relative path>
-Evidence: <path:line or section>
-Problem: <selected pattern not satisfied>
-Expected Fix: <smallest prompt edit>
-
-## Verified
-- <pattern id or path>: <selected pattern satisfied>
-```
+{{
+  file="./agent/_templates/review-process/cached.txt"
+  delta_source=log_path
+  has_actions_path=0
+  reads_review_ledger=0
+  step2_extra="- Read `pattern_contract_path`.\n- Read selected source sections named by the contract, such as `config/doc/workflow/design-patterns.md#OPT-###` or `config/doc/workflow/optimize-patterns.md#WOPT-###`.\n- Read changed files and any `Apply To` files from the contract.\n- Check each selected Carry-In, Quality Guard, Apply To path, and Validation bullet against the generated prompt text.\n- Findings are about generated files not matching selected patterns."
+  preserve_byte_exact=1
+  show_cache_format=1
+  cache_format="# Cache: _iterate/edit-reviewers/pattern-compliance\nSource Log: <log_path>\nPattern Contract: <pattern_contract_path>\nChanged Paths: <paths>\n\n## Findings\n### [PAT-001]\nStatus: OPEN | RESOLVED | DEFERRED\nSeverity: BLOCKING | ADVISORY\nPattern: OPT-### | WOPT-### | None\nPath: <repo-relative path>\nEvidence: <path:line or section>\nProblem: <selected pattern not satisfied>\nExpected Fix: <smallest prompt edit>\n\n## Verified\n- <pattern id or path>: <selected pattern satisfied>"
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _iterate/edit-reviewers/pattern-compliance
-Decision: PASS | ADVISORY | BLOCKING
-Cache: <cache_path>
-
-## Findings
-- [PAT-001] BLOCKING | <pattern> | <path> | <one-line problem>
-- None
-
-## Verified
-- <pattern id or path>: <one-line verification>
-- None
-
-## Notes
-- <optional short note>
-- None
-```
-
-Return only the block above. No prose before or after it.
+{{
+  file="./agent/_templates/review-output/compact-output.txt"
+  agent="_iterate/edit-reviewers/pattern-compliance"
+  prefix=PAT
+  finding_detail="<pattern> | <path>"
+  verified_ref="<pattern id or path>: <one-line verification>"
+}}
 
 # Constraints
 - BLOCKING: selected Carry-In, Quality Guard, or Validation bullet missing or contradicted in generated prompt text.

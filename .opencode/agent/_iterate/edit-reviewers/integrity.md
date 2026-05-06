@@ -142,61 +142,27 @@ Requested reviewer merge updates only caller routing, task permissions, and affe
 ```
 
 # Process
-1. Use provided `cache_path` exactly.
-2. Read `log_path`; use its Delta, changed paths, and risk flags.
-3. Read existing cache if present; treat missing/malformed cache as empty.
-4. Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or changed paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`.
-5. Inspect only changed paths plus directly referenced files needed to validate wiring.
-6. Carry forward unchanged verified records from cache.
-7. Reopen records whose path is changed, whose finding is open, or whose risk flag changed.
-8. Write/update `cache_path` before final response. Preserve unchanged records byte-for-byte.
-9. Emit the final review block from `# Output`.
 
-# Cache
-
-Write cache in this shape:
-
-```text
-# Cache: _iterate/edit-reviewers/integrity
-Source Log: <log_path>
-Changed Paths: <paths>
-Risk Flags: <flags>
-
-## Findings
-### [INT-001]
-Status: OPEN | RESOLVED | DEFERRED
-Severity: BLOCKING | ADVISORY
-Path: <repo-relative path>
-Evidence: <path:line or section>
-Problem: <specific issue>
-Expected Fix: <smallest concrete correction>
-
-## Verified
-- <path>: <verified condition>
-```
+{{
+  file="./agent/_templates/review-process/cached.txt"
+  delta_source=log_path
+  has_actions_path=0
+  reads_review_ledger=0
+  step2_extra="- Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or changed paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`.\n- Inspect only changed paths plus directly referenced files needed to validate wiring."
+  preserve_byte_exact=1
+  show_cache_format=1
+  cache_format="# Cache: _iterate/edit-reviewers/integrity\nSource Log: <log_path>\nChanged Paths: <paths>\nRisk Flags: <flags>\n\n## Findings\n### [INT-001]\nStatus: OPEN | RESOLVED | DEFERRED\nSeverity: BLOCKING | ADVISORY\nPath: <repo-relative path>\nEvidence: <path:line or section>\nProblem: <specific issue>\nExpected Fix: <smallest concrete correction>\n\n## Verified\n- <path>: <verified condition>"
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _iterate/edit-reviewers/integrity
-Decision: PASS | ADVISORY | BLOCKING
-Cache: <cache_path>
-
-## Findings
-- [INT-001] BLOCKING | <path> | <one-line problem>
-- None
-
-## Verified
-- <path>: <one-line verified condition>
-- None
-
-## Notes
-- <optional short note>
-- None
-```
-
-Return only the block above. No prose before or after it.
+{{
+  file="./agent/_templates/review-output/compact-output.txt"
+  agent="_iterate/edit-reviewers/integrity"
+  prefix=INT
+  finding_detail="<path>"
+  verified_ref="<path>: <one-line verified condition>"
+}}
 
 # Constraints
 - BLOCKING: broken command/agent wiring, unsafe permissions, invalid frontmatter, missing model-facing self-iteration rule, optimizer architecture regression, or target-scope violation.

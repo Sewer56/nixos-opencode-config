@@ -97,83 +97,38 @@ Good: `Create the debug log directory under <plugin-dir>/.logs/<name>/ before wr
 Own wording, style, clarity, and duplication. Mention correctness or documentation concerns at most once in `## Notes` without blocking.
 
 # Process
-1. Load cache
-- Derive cache path from `draft_handoff_path`: `<artifact_base>.draft.handoff.md` → `<artifact_base>.draft.review-wording.md`.
-- Read the cache if it exists; treat missing or malformed cache as empty.
-- Treat the cache as one record per `[P#]` with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
-2. Read Delta and Decisions
-- Read `## Delta` from `draft_handoff_path`.
-- Read `### Decisions` only when it is non-empty.
-
-3. Select [P#] items to inspect
-- Carry forward Verified items that are Unchanged in Delta.
-- Re-evaluate Changed and New items.
-- Re-evaluate own Open items from cache and decision-referenced items.
-
-4. Inspect selected content
-- Read `context_path` for the selected `[P#]` items.
-- Check Open→Resolved transitions.
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
-
-5. Update cache
-- Write cache in this format:
-```markdown
-# Review Cache: wording
-
-## Verified Observations
-- [P#]: <grounding snapshot — one line each>
-
-## Findings
-### [WRD-NNN]
-Status: OPEN | RESOLVED
-Category: TOKEN_DENSITY | WORDING_OPTIMIZATION | BULLET_ATOMICITY | IMPERATIVE_VOICE | SELF_CONTAINED | DUPLICATION | UNDEFINED_JARGON | OPAQUE_REFERENCE
-Severity: BLOCKING | ADVISORY
-Problem: <one line>
-Fix: <one line or diff>
-Resolution: <only for RESOLVED>
-```
-- If the derived cache file is missing or malformed: write the full cache file.
-- Otherwise: use targeted edits to update only entries that changed.
-  - Replace entries whose fields changed.
-  - Insert new entries in the appropriate section.
-  - Remove pruned `[P#]` ids.
-  - Move entries between sections when status transitions (e.g., Open → Resolved).
-- Leave entries whose content has not changed exactly as they are.
-
-6. Emit the final review block
-- Emit the `# REVIEW` block from `# Output`.
+{{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=draft_handoff_path
+  cache_derivation="replace .draft.handoff.md with .draft.review-wording.md"
+  cache_record_type="per [P#]"
+  has_actions_path=0
+  preserve_byte_exact=1
+  show_cache_format=1
+  cache_format="# Review Cache: wording\n\n## Verified Observations\n- [P#]: <grounding snapshot — one line each>\n\n## Findings\n### [WRD-NNN]\nStatus: OPEN | RESOLVED\nCategory: TOKEN_DENSITY | WORDING_OPTIMIZATION | BULLET_ATOMICITY | IMPERATIVE_VOICE | SELF_CONTAINED | DUPLICATION | UNDEFINED_JARGON | OPAQUE_REFERENCE\nSeverity: BLOCKING | ADVISORY\nProblem: <one line>\nFix: <one line or diff>\nResolution: <only for RESOLVED>"
+  show_cache_update_detail=1
+  pruned_unit="[P#] ids"
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _plugin/draft-reviewers/wording
-Decision: PASS | ADVISORY | BLOCKING
-
-## Findings
-### [WRD-001]
-Category: TOKEN_DENSITY | WORDING_OPTIMIZATION | BULLET_ATOMICITY | IMPERATIVE_VOICE | SELF_CONTAINED | DUPLICATION | UNDEFINED_JARGON | OPAQUE_REFERENCE
-Severity: BLOCKING | ADVISORY
-Evidence: <section, `path:line`, or field>
-Problem: <what is unnecessarily verbose or poorly structured>
-Fix: <smallest simplification>
-~~~diff
-<artifact_base>.draft.md
---- a/<artifact_base>.draft.md
-+++ b/<artifact_base>.draft.md
- unchanged context
--verbose or poorly structured text
-+tightened replacement text
- unchanged context
-~~~
-
-## Verified
-- [P#]: <item description — unchanged items that remain verified>
-
-## Notes
-- <optional short notes>
-```
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plugin/draft-reviewers/wording"
+  prefix=WRD
+  categories="TOKEN_DENSITY | WORDING_OPTIMIZATION | BULLET_ATOMICITY | IMPERATIVE_VOICE | SELF_CONTAINED | DUPLICATION | UNDEFINED_JARGON | OPAQUE_REFERENCE"
+  evidence="<section, `path:line`, or field>"
+  problem="<what is unnecessarily verbose or poorly structured>"
+  fix="<smallest simplification>"
+  file_ref="<artifact_base>.draft.md"
+  bad="-verbose or poorly structured text"
+  good="+tightened replacement text"
+  with_evidence=1
+  with_verified=1
+  verified_ref="[P#]: <item description — unchanged items that remain verified>"
+}}
 
 Return ONLY the fenced `text` block above — no introduction, no summary, no conversational wrapper.
 Any content outside this format is a protocol violation.

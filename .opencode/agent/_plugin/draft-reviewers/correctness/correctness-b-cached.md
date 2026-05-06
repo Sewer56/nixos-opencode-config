@@ -23,6 +23,4 @@ permission:
   todowrite: allow
   external_directory: allow
 ---
-{file:./agent/_plugin/draft-reviewers/correctness/shared-pre.txt}
-{file:./agent/_plugin/draft-reviewers/correctness/shared-cached.txt}
-{file:./agent/_plugin/draft-reviewers/correctness/cached-post.txt}
+{{ file="./.opencode/agent/_plugin/draft-reviewers/correctness/_templates/body.txt" mode=cached }}

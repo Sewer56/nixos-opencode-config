@@ -1,0 +1,25 @@
+# Output
+
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plugin/finalize-reviewers/audit"
+  prefix=AUD
+  categories="FIDELITY | STRUCTURE | COMPLETENESS | PLUGIN_CONSTRAINTS | ECONOMY | DEAD_CODE"
+  evidence="<step-id, section, path:line, diff header, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<path/to/step/file>"
+  bad="-problem"
+  good="+fix"
+  with_lines=1
+}}
+
+- PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
+- BLOCKING: max 6 findings.
+- Return ONLY the fenced block.
+
+# Constraints
+- Answer whether the STEP artifacts are free of blocking issues in AUD.
+- Dead-code: skip entirely if Step Index has no REMOVE steps.
+- Economy: block only for clear unnecessary expansion.
+- Completeness: block for gaps between user request and planned work.

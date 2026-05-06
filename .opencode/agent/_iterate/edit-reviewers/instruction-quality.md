@@ -164,62 +164,27 @@ Good:
 ````
 
 # Process
-1. Use provided `cache_path` exactly.
-2. Read `log_path`; use Delta, changed paths, and risk flags.
-3. Do not read workflow pattern catalogs or pattern contracts; pattern-compliance owns selected-pattern application checks.
-4. Read existing cache if present; treat missing/malformed cache as empty.
-5. Inspect only changed prompt files and directly referenced files needed to detect duplication or topology overlap.
-6. Carry forward unchanged verified records from cache.
-7. Reopen records whose path is changed, whose finding is open, or whose risk flag changed.
-8. Write/update `cache_path` before final response. Preserve unchanged records byte-for-byte.
-9. Emit the final review block from `# Output`.
 
-# Cache
-
-Write cache in this shape:
-
-```text
-# Cache: _iterate/edit-reviewers/instruction-quality
-Source Log: <log_path>
-Changed Paths: <paths>
-Risk Flags: <flags>
-
-## Findings
-### [IQ-001]
-Status: OPEN | RESOLVED | DEFERRED
-Severity: BLOCKING | ADVISORY
-Category: RUNTIME_WRITING | PROMPT_LOCAL_RULES | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CLARITY | DEDUP | TOPOLOGY | MARKDOWN
-Path: <repo-relative path>
-Evidence: <path:line or section>
-Problem: <specific issue>
-Expected Fix: <smallest concrete correction>
-
-## Verified
-- <path>: <verified condition>
-```
+{{
+  file="./agent/_templates/review-process/cached.txt"
+  delta_source=log_path
+  has_actions_path=0
+  reads_review_ledger=0
+  step2_extra="- Do not read workflow pattern catalogs or pattern contracts; pattern-compliance owns selected-pattern application checks.\n- Inspect only changed prompt files and directly referenced files needed to detect duplication or topology overlap."
+  preserve_byte_exact=1
+  show_cache_format=1
+  cache_format="# Cache: _iterate/edit-reviewers/instruction-quality\nSource Log: <log_path>\nChanged Paths: <paths>\nRisk Flags: <flags>\n\n## Findings\n### [IQ-001]\nStatus: OPEN | RESOLVED | DEFERRED\nSeverity: BLOCKING | ADVISORY\nCategory: RUNTIME_WRITING | PROMPT_LOCAL_RULES | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CLARITY | DEDUP | TOPOLOGY | MARKDOWN\nPath: <repo-relative path>\nEvidence: <path:line or section>\nProblem: <specific issue>\nExpected Fix: <smallest concrete correction>\n\n## Verified\n- <path>: <verified condition>"
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _iterate/edit-reviewers/instruction-quality
-Decision: PASS | ADVISORY | BLOCKING
-Cache: <cache_path>
-
-## Findings
-- [IQ-001] BLOCKING | <category> | <path> | <one-line problem>
-- None
-
-## Verified
-- <path>: <one-line verified condition>
-- None
-
-## Notes
-- <optional short note>
-- None
-```
-
-Return only the block above. No prose before or after it.
+{{
+  file="./agent/_templates/review-output/compact-output.txt"
+  agent="_iterate/edit-reviewers/instruction-quality"
+  prefix=IQ
+  finding_detail="<category> | <path>"
+  verified_ref="<path>: <one-line verified condition>"
+}}
 
 # Constraints
 - BLOCKING: LLM runtime prompt written as documentation instead of executable instruction, operational behavior delegated only to docs, callee-owned instructions duplicated in caller, unstable machine output, confusing behavior-governing text, or reviewer topology merge that loses high-risk ownership.

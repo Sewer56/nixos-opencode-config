@@ -38,37 +38,26 @@ Review plugin steps for declaration placement/order. Return exact STEP diffs whe
 5. Emit one output block.
 
 # Output
-```text
-# REVIEW
-Agent: _plugin/finalize-reviewers/placement
-Decision: PASS | ADVISORY | BLOCKING
-IDs: <PLC-001, PLC-002, ... | None>
 
-## Findings
-- None | finding entries below:
-
-### [PLC-NNN]
-Category: VISIBILITY | CALL_ORDER | ENTRY_POINT | STABILITY | ANCHOR | INSUFFICIENT_CONTEXT | RULES_MISSING
-Severity: BLOCKING | ADVISORY
-Step: <STEP-###>
-File: <target source path or step path>
-Problem: <one line>
-Fix: <prose or exact STEP-file diff>
-~~~diff
-<path/to/step/file>
---- a/<path/to/step/file>
-+++ b/<path/to/step/file>
- unchanged context
--problem
-+fix
- unchanged context
-~~~
-
-## Verified
-- <step-id or file>: <one-line verified condition> | None
-```
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plugin/finalize-reviewers/placement"
+  prefix=PLC
+  categories="VISIBILITY | CALL_ORDER | ENTRY_POINT | STABILITY | ANCHOR | INSUFFICIENT_CONTEXT | RULES_MISSING"
+  problem="<one line>"
+  fix="<prose or exact STEP-file diff>"
+  file_ref="<path/to/step/file>"
+  bad="-problem"
+  good="+fix"
+  with_evidence=0
+  with_step_file=1
+  step="<STEP-###>"
+  with_verified=1
+  verified_ref="<step-id or file>: <one-line verified condition> | None"
+}}
 
 # Constraints
-- Return only the fenced `text` block.
+- Findings target STEP files as diffs.
 - BLOCKING only for clear declaration-order risk or missing context.
-- PASS with no findings uses `IDs: None`, `## Findings` with `- None`, and concise `## Verified` lines.
+- ADVISORY for broad pre-existing file order issues outside selected/touched declarations.
+- PASS with 0 findings: use `IDs: None`, `## Findings` with `- None`, and concise `## Verified` lines.

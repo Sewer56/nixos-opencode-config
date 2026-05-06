@@ -51,78 +51,38 @@ Good: `Add JSDoc to config/plugins/foo.ts explaining the chat.message hook and F
 Own documentation coverage only. Mention correctness, hook validity, or wording concerns at most once in `## Notes` without blocking.
 
 # Process
-1. Load cache
-- Derive cache path from `draft_handoff_path`: `<artifact_base>.draft.handoff.md` → `<artifact_base>.draft.review-documentation.md`.
-- Read the cache if it exists; treat missing or malformed cache as empty.
-- Treat the cache as one record per `[P#]` with fields `last_decision`, `open_findings`, `evidence`, and `verified`.
 
-2. Read Delta and Decisions
-- Read `## Delta` from `draft_handoff_path`.
-- Read `### Decisions` only when it is non-empty.
-
-3. Select `[P#]` items to inspect
-- Carry forward Verified items that are Unchanged in Delta.
-- Re-evaluate Changed and New items.
-- Re-evaluate own Open items from cache and decision-referenced items.
-
-4. Inspect selected content
-- Read `context_path` for the selected `[P#]` items.
-- Check Open→Resolved transitions.
-- On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output from the existing review state.
-
-5. Update cache
-- Write cache in this format:
-```markdown
-# Review Cache: documentation
-
-## Verified Observations
-- [P#]: <grounding snapshot — one line each>
-
-## Findings
-### [DOC-NNN]
-Status: OPEN | RESOLVED
-Category: COVERAGE | DEBUG_DOCS | SPECIFICITY
-Severity: BLOCKING | ADVISORY
-Problem: <one line>
-Fix: <one line or diff>
-Resolution: <only for RESOLVED>
-```
-- If the derived cache file is missing or malformed: write the full cache file.
-- Otherwise: update only changed records and preserve unchanged entries exactly.
-
-6. Emit the final review block
-- Emit the `# REVIEW` block from `# Output`.
+{{
+  file="./agent/_templates/review-process/cached.txt"
+  has_cache_derivation=1
+  delta_source=draft_handoff_path
+  cache_derivation="replace .draft.handoff.md with .draft.review-documentation.md"
+  cache_record_type="per [P#]"
+  has_actions_path=0
+  preserve_byte_exact=1
+  show_cache_format=1
+  cache_format="# Review Cache: documentation\n\n## Verified Observations\n- [P#]: <grounding snapshot — one line each>\n\n## Findings\n### [DOC-NNN]\nStatus: OPEN | RESOLVED\nCategory: COVERAGE | DEBUG_DOCS | SPECIFICITY\nSeverity: BLOCKING | ADVISORY\nProblem: <one line>\nFix: <one line or diff>\nResolution: <only for RESOLVED>"
+  show_cache_update_detail=1
+  pruned_unit="[P#] ids"
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _plugin/draft-reviewers/documentation
-Decision: PASS | ADVISORY | BLOCKING
-
-## Findings
-### [DOC-001]
-Category: COVERAGE | DEBUG_DOCS | SPECIFICITY
-Severity: BLOCKING | ADVISORY
-Evidence: <section, `path:line`, or missing element>
-Problem: <what is wrong>
-Fix: <smallest concrete correction>
-~~~diff
-<artifact_base>.draft.md
---- a/<artifact_base>.draft.md
-+++ b/<artifact_base>.draft.md
- unchanged context
--missing or vague docs item
-+specific docs/JSDoc item
- unchanged context
-~~~
-
-## Verified
-- [P#]: <item description — unchanged items that remain verified>
-
-## Notes
-- <optional short notes>
-```
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plugin/draft-reviewers/documentation"
+  prefix=DOC
+  categories="COVERAGE | DEBUG_DOCS | SPECIFICITY"
+  evidence="<section, `path:line`, or missing element>"
+  problem="<what is wrong>"
+  fix="<smallest concrete correction>"
+  file_ref="<artifact_base>.draft.md"
+  bad="-missing or vague docs item"
+  good="+specific docs/JSDoc item"
+  with_evidence=1
+  with_verified=1
+  verified_ref="[P#]: <item description — unchanged items that remain verified>"
+}}
 
 Return ONLY the fenced `text` block above — no introduction, no summary, no conversational wrapper.
 

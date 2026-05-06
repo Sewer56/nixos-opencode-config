@@ -37,39 +37,33 @@ When the repo has a matching test surface, planned test steps should cover succe
 Flag duplicate checks and obvious 3+ near-identical tests that should be parameterized.
 
 # Process
-1. Read `handoff_path` for Delta, Review Ledger, Decisions, Step Index, and verification commands.
-2. Read `context_path` and all verification-relevant `step_paths`.
-3. Write `cache_path` with verified observations and findings.
-4. Emit `# REVIEW`.
 
-# Cache file format
-```markdown
-# Review Cache: tests
-
-## Verified Observations
-- <step-id>: <what was verified, with grounding snapshot — one line each>
-
-## Findings
-### [TST-NNN]
-Status: OPEN | RESOLVED | DEFERRED
-Category: COVERAGE | REDUNDANCY | PARAMETERIZATION | VERIFICATION_COMMAND | DEBUG_CHECK
-Severity: BLOCKING | ADVISORY
-Problem: <one line>
-Fix: <unified diff targeting step file(s) or concise fix>
-Resolution: <only for RESOLVED>
-```
+{{
+  file="./agent/_templates/review-process/cached.txt"
+  delta_source=handoff_path
+  reads_review_ledger=1
+  has_actions_path=0
+  show_cache_format=1
+  cache_format="# Review Cache: tests\n\n## Verified Observations\n- <step-id>: <what was verified, with grounding snapshot — one line each>\n\n## Findings\n\n### [TST-NNN]\nStatus: OPEN | RESOLVED\nCategory: COVERAGE | REDUNDANCY | PARAMETERIZATION | VERIFICATION_COMMAND | DEBUG_CHECK\nSeverity: BLOCKING | ADVISORY\nProblem: <one line>\nFix: <unified diff targeting step file(s) or concise fix>\nResolution: <only for RESOLVED>"
+  pointer_emit=1
+}}
 
 # Output
-```text
-# REVIEW
-Agent: _plugin/finalize-reviewers/tests-cached
-Decision: PASS | ADVISORY | BLOCKING
-IDs: TST-001, TST-002, ...
-```
+
+{{
+  file="./agent/_templates/review-output/pointer.txt"
+  agent="_plugin/finalize-reviewers/tests-cached"
+  prefix=TST
+}}
+
+- Your final output message MUST be EXACTLY the fenced block above. No other text — no analysis, no summary, no wrapping text.
+- PASS: `Decision: PASS` only. No IDs line.
+- Findings are written to cache only. The orchestrator reads `cache_path` for complete findings.
 
 # Constraints
-- Return only the fenced `text` block. PASS uses `Decision: PASS` only; omit `IDs`.
-- Findings are written to `cache_path`; the orchestrator reads `cache_path` for details.
-- BLOCKING: max 6 findings.
+- Read `handoff_path`, `context_path`, all `step_paths`. Full audit. Write cache.
+- PASS: Decision only, no IDs line.
+- BLOCKING: max 6 findings. Cache findings in `cache_path`.
 - Focus on observable behavior and verification commands, not declaration order or micro-optimizations.
-- Do not judge fidelity, plugin constraints, declaration order, or performance; mention out-of-scope concerns at most once in cache Notes without blocking.
+- Verified observations MUST include grounding snapshots.
+- Write findings directly to cache. Do not re-narrate each step in reasoning.

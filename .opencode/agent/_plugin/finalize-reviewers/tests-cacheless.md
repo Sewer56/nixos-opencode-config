@@ -35,24 +35,27 @@ When the repo has a matching test surface, planned test steps should cover succe
 Flag duplicate checks and obvious 3+ near-identical tests that should be parameterized.
 
 # Process
-1. Read `handoff_path` in full. Read all step files and handoff from scratch.
-2. Read `context_path` in full.
-3. Read all `step_paths` in one batch.
-4. Perform full verification-strategy audit from scratch.
-5. Emit `# REVIEW`.
+
+{{
+  file="./agent/_templates/review-process/cacheless.txt"
+  read_context="Read `handoff_path` in full. Read `context_path` in full. Read all `step_paths` in one batch. Only open repo test files for specific verification needs."
+}}
 
 # Output
-```text
-# REVIEW
-Agent: _plugin/finalize-reviewers/tests-cacheless
-Decision: PASS | ADVISORY | BLOCKING
-IDs: TST-001, TST-002, ...
-```
+
+{{
+  file="./agent/_templates/review-output/pointer.txt"
+  agent="_plugin/finalize-reviewers/tests-cacheless"
+  prefix=TST
+}}
+
+- PASS: `Decision: PASS` only. No IDs line.
+- BLOCKING: max 6 findings. Detail each finding inline after the fenced block.
 
 # Constraints
-- Return only the fenced `text` block. PASS uses `Decision: PASS` only; omit `IDs`.
-- BLOCKING: max 6 findings. Detail each finding inline after the fenced block.
+- Read `handoff_path`, `context_path`, all `step_paths` in full.
+- PASS: Decision only, no IDs line.
+- BLOCKING: max 6 findings. Detail findings inline after the fenced block.
 - Focus on observable behavior and verification commands, not declaration order or micro-optimizations.
 - Do not judge fidelity, plugin constraints, declaration order, or performance; mention out-of-scope concerns at most once in Notes without blocking.
-- Read `handoff_path`, `context_path`, all `step_paths` in full.
 - Answer whether the test artifacts are free of blocking issues.

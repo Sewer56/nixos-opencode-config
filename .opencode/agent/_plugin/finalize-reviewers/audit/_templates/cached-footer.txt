@@ -1,0 +1,45 @@
+{{
+  file="./agent/_templates/review-cache-table.txt"
+  domain=audit
+  ref_type=step-id
+  prefix=AUD
+  with_audit_ledger=1
+}}
+
+# Actions file format
+```markdown
+# Review Actions: audit
+Source Cache: <cache_path>
+
+## Findings
+{{
+  file="./agent/_templates/review-finding.txt"
+  prefix=AUD
+  categories="FIDELITY | STRUCTURE | COMPLETENESS | PLUGIN_CONSTRAINTS | ECONOMY | DEAD_CODE"
+  evidence="<step-id, section, path:line, diff header, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<path/to/step/file>"
+  bad="-problem"
+  good="+fix"
+  with_lines=1
+}}
+```
+
+# Output
+
+{{
+  file="./agent/_templates/review-output/pointer.txt"
+  agent="_plugin/finalize-reviewers/audit"
+  prefix=AUD
+  return_rule_extra="- Every ID in the response must exist in both `actions_path` and `cache_path`.\n- BLOCKING: max 6 findings."
+}}
+
+Return ONLY the fenced `text` block above.
+
+# Constraints
+- BLOCKING: max 6 findings. Cache findings in `cache_path`.
+- Dead-code: skip entirely if Step Index has no REMOVE steps.
+- Economy: block only for clear unnecessary expansion.
+- Completeness: block for gaps between user request and planned work.
+- Verified observations MUST include grounding snapshots.

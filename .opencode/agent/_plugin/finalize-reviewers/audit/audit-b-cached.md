@@ -23,6 +23,4 @@ permission:
   todowrite: allow
   external_directory: allow
 ---
-{file:./agent/_plugin/finalize-reviewers/audit/shared-pre.txt}
-{file:./agent/_plugin/finalize-reviewers/audit/shared-cached.txt}
-{file:./agent/_plugin/finalize-reviewers/audit/cached-post.txt}
+{{ file="./.opencode/agent/_plugin/finalize-reviewers/audit/_templates/body.txt" mode=cached }}

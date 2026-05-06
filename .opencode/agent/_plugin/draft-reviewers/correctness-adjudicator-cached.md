@@ -33,36 +33,26 @@ Adjudicate the plugin COR domain (cached). Validate A/B reviewer pointers, merge
 - `actions_path` (optional)
 
 # Process
-1. Derive canonical `cache_path` when absent by replacing `.draft.handoff.md` with `.draft.review-correctness.md`.
-2. Set `state_path` to `cache_path`.
-3. Derive `actions_path` when absent by globbing existing `<state_path without .md>.actions.*.md` files and choosing the next three-digit `<nnn>` path, starting `001`.
-4. Derive sidecar state paths from `state_path`:
-   - `@_plugin/draft-reviewers/correctness/correctness-a-cached`: `<state_path without .md>.a.md`
-   - `@_plugin/draft-reviewers/correctness/correctness-b-cached`: `<state_path without .md>.b.md`
-   - sidecar actions: replace `.md` with `.actions.<same nnn>.md`
-5. Run `@_plugin/draft-reviewers/correctness/correctness-a-cached` and `@_plugin/draft-reviewers/correctness/correctness-b-cached` independently with identical artifact inputs and separate sidecar `cache_path`/`actions_path` values.
-6. Validate both outputs: `# REVIEW`, `Decision: PASS | ADVISORY | BLOCKING`, and `Domains: COR`. Treat `IDs:` as routing data only.
-7. Read sidecar actions first.
-8. Read sidecar state only when actions are malformed, truncated, contradictory, or insufficient to adjudicate evidence.
-9. Merge only evidence-backed COR findings in fidelity, action, template, diff-header, and plugin-constraint scope.
-10. Keep concrete single-leg findings when in scope.
-11. Drop out-of-domain, unsupported, duplicate, or non-actionable findings.
-12. Choose minimal fixes.
-13. Write `state_path` as the canonical cache.
-14. Write canonical `actions_path` with current OPEN findings only.
-15. Emit only the pointer review block.
+
+{{
+  file="./agent/_templates/adjudicator/adjudicator-cached.txt"
+  no_edit_targets="input artifacts"
+  reviewer_a="_plugin/draft-reviewers/correctness/correctness-a-cached"
+  reviewer_b="_plugin/draft-reviewers/correctness/correctness-b-cached"
+  run_context="with identical artifact inputs and separate sidecar `cache_path`/`actions_path` values"
+  validation_extra=", `Domains: COR`"
+  merge_scope="keep only COR findings in fidelity, action, template, diff-header, and plugin-constraint scope; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain or unsupported findings"
+  cache_derivation="replacing `.draft.handoff.md` with `.draft.review-correctness.md`"
+}}
 
 # Output
-```text
-# REVIEW
-Agent: _plugin/draft-reviewers/correctness
-Decision: PASS | ADVISORY | BLOCKING
-Domains: COR
-IDs: COR-001, COR-002, ...
-```
-- PASS keeps `Agent:`, `Decision: PASS`, and `Domains: COR`; omit `IDs`.
 
-Return ONLY the fenced `text` block above.
+{{
+  file="./agent/_templates/review-output/pointer.txt"
+  agent="_plugin/draft-reviewers/correctness"
+  prefix=COR
+  domains=COR
+}}
 
 # Constraints
 - Do not recursively call an adjudicator.

@@ -1,0 +1,20 @@
+```text
+# REVIEW
+{{ if=agent }}Agent: {{arg:agent}}
+{{ endif }}Decision: PASS | ADVISORY | BLOCKING
+Cache: <cache_path>
+
+## Findings
+- [{{arg:prefix}}-NNN] BLOCKING | {{arg:finding_detail}} | <one-line problem>
+- None
+
+## Verified
+- {{arg:verified_ref}}
+- None
+
+## Notes
+- <optional short note>
+- None
+```
+
+Return only the block above. No prose before or after it.

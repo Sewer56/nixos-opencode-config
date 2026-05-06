@@ -28,49 +28,38 @@ Adjudicate the plugin COR domain (cacheless). Validate A/B reviewer outputs, mer
 - `context_path`, `draft_handoff_path`
 
 # Process
-1. Run `@_plugin/draft-reviewers/correctness/correctness-a-cacheless` and `@_plugin/draft-reviewers/correctness/correctness-b-cacheless` independently with identical artifact inputs.
-2. Validate both outputs: `# REVIEW`, `Decision: PASS | ADVISORY | BLOCKING`, and `Domains: COR`. Treat `IDs:` as routing data only.
-3. Parse findings from each leg's inline `## Findings` section. Do not read sidecar files.
-4. Merge only evidence-backed COR findings in fidelity, action, template, diff-header, and plugin-constraint scope.
-5. Keep concrete single-leg findings when in scope.
-6. Drop out-of-domain, unsupported, duplicate, or non-actionable findings.
-7. Choose minimal fixes.
-8. Inspect the full draft and handoff. Do not read prior review caches.
-9. Emit merged findings inline in the output block. Do not write cache or actions files.
+
+{{
+  file="./agent/_templates/adjudicator/adjudicator-cacheless.txt"
+  no_edit_targets="input artifacts"
+  reviewer_a="_plugin/draft-reviewers/correctness/correctness-a-cacheless"
+  reviewer_b="_plugin/draft-reviewers/correctness/correctness-b-cacheless"
+  run_context="with identical artifact inputs"
+  validation_extra=", `Domains: COR`"
+  merge_scope="keep only COR findings in fidelity, action, template, diff-header, and plugin-constraint scope; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain or unsupported findings"
+  inspect_context="`context_path` and `draft_handoff_path`"
+}}
 
 # Output
 
-```text
-# REVIEW
-Agent: _plugin/draft-reviewers/correctness
-Decision: PASS | ADVISORY | BLOCKING
-Domains: COR
-IDs: COR-001, COR-002, ...
+{{
+  file="./agent/_templates/review-output/output.txt"
+  agent="_plugin/draft-reviewers/correctness"
+  prefix=COR
+  domains=COR
+  categories="FIDELITY | ACTION | TEMPLATE_STRUCTURE | DIFF_HEADERS | PLUGIN_CONSTRAINTS"
+  evidence="<section, [P#], path:line, diff header, or missing element>"
+  problem="<one line>"
+  fix="<smallest concrete correction>"
+  file_ref="<artifact_base>.draft.md"
+  bad="-incorrect content"
+  good="+correct content"
+  with_evidence=1
+}}
 
-## Findings
-### [COR-NNN]
-Category: FIDELITY | ACTION | TEMPLATE_STRUCTURE | DIFF_HEADERS | PLUGIN_CONSTRAINTS
-Severity: BLOCKING | ADVISORY
-Evidence: <section, [P#], path:line, diff header, or missing element>
-Problem: <one line>
-Fix: <smallest concrete correction>
-~~~
-<artifact_base>.draft.md
---- a/<artifact_base>.draft.md
-+++ b/<artifact_base>.draft.md
- unchanged context
--incorrect content
-+correct content
- unchanged context
-~~~
-
-## Notes
-- <optional short notes>
-```
 - PASS: `Decision: PASS` only; omit `IDs`, `## Findings`, `## Notes`.
 - BLOCKING: max 6 findings.
-- Return ONLY the fenced block.
 
 # Constraints
-- Inspect the full draft and handoff, do not read prior review caches, and answer whether the draft is free of blocking issues in COR.
+- Inspect all artifacts yourself, do not read prior review caches, and answer whether the draft is free of blocking issues in COR.
 - Do not recursively call an adjudicator.
