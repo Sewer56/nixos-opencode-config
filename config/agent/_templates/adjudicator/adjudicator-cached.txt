@@ -16,3 +16,4 @@
 12. Write canonical `actions_path` with current OPEN findings only. Do not copy raw reviewer transcripts.
 13. GATE: `state_path` and `actions_path` MUST exist on disk before output.
 14. Emit only the pointer review block.
+15. GATE: your response MUST contain exactly one `# REVIEW` fenced block with `Cache:`, `Actions:`, `Decision:`{{arg:validation_extra}}, and conditional `IDs:`. Do not add headings, tables, summaries, narrative prose, or content outside the block. The caller validates this exact shape and rejects malformed responses as protocol failures.

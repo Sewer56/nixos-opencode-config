@@ -9,7 +9,7 @@
 {{ endif }}IDs: {{arg:prefix}}-001, {{arg:prefix}}-002, ...
 ```
 
-Return ONLY the fenced block. PASS: omit `IDs`.
+Return ONLY the fenced block exactly as shown. Do not wrap it in headings, summaries, tables, or prose. Do not add "Reviewer Pointer" headings or freeform descriptions. The caller validates the exact `# REVIEW` block shape and rejects non-matching responses. PASS: omit `IDs`.
 {{ if=return_rule_extra }}
 {{arg:return_rule_extra}}
 {{ endif }}

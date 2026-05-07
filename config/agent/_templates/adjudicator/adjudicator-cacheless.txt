@@ -6,3 +6,4 @@
 6. Merge duplicates and resolve conflicting fixes by preferring concrete evidence over reviewer confidence and minimal diffs over broad rewrites.
 7. Inspect {{arg:inspect_context}} yourself after reviewer validation. Do not read prior review caches.
 8. Emit merged findings inline in the output block. Do not write cache or actions files.
+9. GATE: your response MUST contain exactly one `# REVIEW` fenced block with `Decision:`{{arg:validation_extra}}, `## Findings`, and conditional `IDs:`. Do not add `Cache:`, `Actions:`, headings, tables, summaries, narrative prose, or content outside the block. The caller validates this exact shape and rejects malformed responses as protocol failures.
