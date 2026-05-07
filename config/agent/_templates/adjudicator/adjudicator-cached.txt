@@ -4,6 +4,7 @@
    - `{{arg:reviewer_a}}`: `<state_path without .md>.a.md`
    - `{{arg:reviewer_b}}`: `<state_path without .md>.b.md`
    - sidecar actions: replace `.md` with `.actions.<same nnn>.md`.
+   Note: use dot as separator before the sidecar letter (a/b), e.g. `base.a.md`.
 4. Run `{{arg:reviewer_a}}` and `{{arg:reviewer_b}}` independently {{arg:run_context}}.
 5. Do not pass either leg the other leg's output. Do not apply raw leg findings. Do not allow either leg to edit {{arg:no_edit_targets}}.
 6. Validate both outputs: `# REVIEW`, expected `Cache:`/`Actions:` sidecar paths{{arg:validation_extra}}, and `Decision: PASS | ADVISORY | BLOCKING`. Treat `IDs:` as routing data only.

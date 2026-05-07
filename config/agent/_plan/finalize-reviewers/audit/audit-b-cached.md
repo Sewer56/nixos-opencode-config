@@ -14,8 +14,8 @@ permission:
   edit:
     "*PROMPT-PLAN*.review-audit.md": allow
     "*PROMPT-PLAN*.review-audit.actions.*.md": allow
-    "*PROMPT-PLAN*.review-audit.b.md": allow
-    "*PROMPT-PLAN*.review-audit.b.actions.*.md": allow
+    "*PROMPT-PLAN*.review-audit?b.md": allow
+    "*PROMPT-PLAN*.review-audit?b.actions.*.md": allow
   glob: allow
   grep: allow
   list: allow

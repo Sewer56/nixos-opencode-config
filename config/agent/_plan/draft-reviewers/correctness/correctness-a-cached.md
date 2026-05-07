@@ -15,8 +15,8 @@ permission:
   edit:
     "*PROMPT-PLAN*.draft.review-correctness.md": allow
     "*PROMPT-PLAN*.draft.review-correctness.actions.*.md": allow
-    "*PROMPT-PLAN*.draft.review-correctness.a.md": allow
-    "*PROMPT-PLAN*.draft.review-correctness.a.actions.*.md": allow
+    "*PROMPT-PLAN*.draft.review-correctness?a.md": allow
+    "*PROMPT-PLAN*.draft.review-correctness?a.actions.*.md": allow
   grep: allow
   glob: allow
   list: allow

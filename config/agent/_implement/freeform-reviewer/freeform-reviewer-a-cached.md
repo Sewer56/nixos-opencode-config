@@ -17,8 +17,8 @@ permission:
   edit:
     "*IMPLEMENT-FREEFORM*.review-implementation.md": allow
     "*IMPLEMENT-FREEFORM*.review-implementation.actions.*.md": allow
-    "*IMPLEMENT-FREEFORM*.review-implementation.a.md": allow
-    "*IMPLEMENT-FREEFORM*.review-implementation.a.actions.*.md": allow
+    "*IMPLEMENT-FREEFORM*.review-implementation?a.md": allow
+    "*IMPLEMENT-FREEFORM*.review-implementation?a.actions.*.md": allow
   list: allow
   todowrite: allow
   external_directory: allow

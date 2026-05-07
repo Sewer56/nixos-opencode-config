@@ -17,8 +17,8 @@ permission:
   edit:
     "*PROMPT-PLAN*.review-implementation.md": allow
     "*PROMPT-PLAN*.review-implementation.actions.*.md": allow
-    "*PROMPT-PLAN*.review-implementation.a.md": allow
-    "*PROMPT-PLAN*.review-implementation.a.actions.*.md": allow
+    "*PROMPT-PLAN*.review-implementation?a.md": allow
+    "*PROMPT-PLAN*.review-implementation?a.actions.*.md": allow
   list: allow
   todowrite: allow
   external_directory: allow

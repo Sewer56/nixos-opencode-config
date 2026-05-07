@@ -15,8 +15,8 @@ permission:
   edit:
     "*PROMPT-PLUGIN-PLAN*.review-audit.md": allow
     "*PROMPT-PLUGIN-PLAN*.review-audit.actions.*.md": allow
-    "*PROMPT-PLUGIN-PLAN*.review-audit.b.md": allow
-    "*PROMPT-PLUGIN-PLAN*.review-audit.b.actions.*.md": allow
+    "*PROMPT-PLUGIN-PLAN*.review-audit?b.md": allow
+    "*PROMPT-PLUGIN-PLAN*.review-audit?b.actions.*.md": allow
   grep: allow
   glob: allow
   list: allow
