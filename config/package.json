@@ -12,8 +12,8 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "bun test plugins/opencode-plugin-md-expand/test/md-expand.test.ts",
-    "md-expand": "bun plugins/opencode-plugin-md-expand/src/cli/cli.ts",
+    "test": "bun test ../plugins/opencode-plugin-md-expand/test/md-expand.test.ts",
+    "md-expand": "bun ../plugins/opencode-plugin-md-expand/src/cli/cli.ts",
     "validate:templates": "sh ../scripts/validate-file-interp.sh",
     "check": "bun run typecheck && bun run test && bun run validate:templates",
     "hooks:install": "git config core.hooksPath .githooks"

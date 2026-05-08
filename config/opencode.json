@@ -1,7 +1,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": false,
-"small_model": "sewer-axonhub/MiniMax-M2.7",
+  "small_model": "sewer-axonhub/MiniMax-M2.7",
   "permission": {
     "bash": {
       "*": "allow"
@@ -82,7 +82,7 @@
         "-c",
         "if [ ! -f \"$HOME/.secrets/discord-token\" ]; then echo \"Error: Discord token secret file not found\" >&2; exit 1; fi; export DISCORD_TOKEN=\"$(cat \"$HOME/.secrets/discord-token\")\"; exec docker run -i --rm -e DISCORD_TOKEN barryy625/mcp-discord:latest"
       ],
-      "enabled": true
+      "enabled": false
     }
   },
   "provider": {

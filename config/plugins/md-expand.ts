@@ -1,1 +1,1 @@
-export { default } from "./opencode-plugin-md-expand/src/index"
+export { default } from "../../plugins/opencode-plugin-md-expand/src/index"

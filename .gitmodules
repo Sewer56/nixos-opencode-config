@@ -1,7 +1,7 @@
 [submodule "opencode-source"]
 	path = opencode-source
 	url = https://github.com/Sewer56/opencode.git
-[submodule "config/plugins/opencode-plugin-md-expand"]
-	path = config/plugins/opencode-plugin-md-expand
+[submodule "plugins/opencode-plugin-md-expand"]
+	path = plugins/opencode-plugin-md-expand
 	url = https://github.com/Sewer56/opencode-plugin-md-expand.git
 	branch = main
