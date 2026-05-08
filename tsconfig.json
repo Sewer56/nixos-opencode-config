@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+"types": ["node", "bun"],
+  "typeRoots": ["./config/node_modules/@types"],
+  "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "config/**/*.ts",
+    "config/**/*.js",
+    "scripts/**/*.ts"
+  ],
+  "exclude": [
+    "config/node_modules",
+    "config/plugins/opencode-plugin-md-expand/node_modules",
+    "config/plugins/opencode-plugin-md-expand/dist"
+  ]
+}

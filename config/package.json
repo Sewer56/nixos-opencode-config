@@ -12,12 +12,11 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "bun test plugins/file-interp.test.ts",
-    "validate:templates": "bun run ../scripts/validate-file-interp.ts",
+    "test": "bun test plugins/opencode-plugin-md-expand/test/md-expand.test.ts",
+    "md-expand": "bun plugins/opencode-plugin-md-expand/src/cli/cli.ts",
+    "validate:templates": "sh ../scripts/validate-file-interp.sh",
     "check": "bun run typecheck && bun run test && bun run validate:templates",
     "hooks:install": "git config core.hooksPath .githooks"
   },
-  "dependencies": {
-    "@opencode-ai/plugin": "0.0.0-production-202604141138"
-  }
+  "dependencies": {}
 }
