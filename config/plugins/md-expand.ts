@@ -1,0 +1,1 @@
+export { default } from "./opencode-plugin-md-expand/src/index"
