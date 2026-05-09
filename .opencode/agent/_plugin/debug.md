@@ -20,7 +20,7 @@ Inspect a plugin file, extract its debug flag and log path, execute it with debu
 
 ## 2. Extract the debug flag
 - Search the file content for `process.env.<SCREAMING_SNAKE_DEBUG>` assignments using the regex `process\.env\.(\w*DEBUG\w*)`.
-- Capture the environment variable name (e.g. `FILE_INTERP_DEBUG`, `CAVEMAN_DEBUG`).
+- Capture the environment variable name (e.g. `OPENCODE_PLUGIN_MD_EXPAND_DEBUG`, `CAVEMAN_DEBUG`).
 - If no match is found, report that the plugin does not expose a debug flag and stop here without launching the command.
 
 ## 3. Extract the log path
