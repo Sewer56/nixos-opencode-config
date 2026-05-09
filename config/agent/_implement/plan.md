@@ -21,8 +21,7 @@ permission:
   external_directory: allow
   task:
     "*": "deny"
-    "_implement/plan-reviewer-adjudicator-cached": "allow",
-    "_implement/plan-reviewer-adjudicator-cacheless": "allow"
+    "_implement/plan-reviewer": "allow"
 ---
 
 Implements a finalized plan with automated review.
@@ -128,21 +127,20 @@ Reason: this merges `~11-16`, `~28-35`, and `~79-85` into one large range.
 Apply steps in Step Index order using the ranged reads from step 1. After each cohesive group of changes: format, lint, build, test. Iterate until all checks pass.
 
 ## 3. Review loop
-Spawn `_implement/plan-reviewer-adjudicator-cached` with:
+Spawn `_implement/plan-reviewer` with:
 - `handoff_path: HANDOFF_DOCUMENT`
-- `cache_path: HANDOFF_DOCUMENT` with `.handoff.md` replaced by `.review-implementation.md`
 
 After each review response:
-- Read `actions_path` for current findings and fixes.
-- If the actions file is malformed, truncated, ambiguous, or insufficient: retry/rerun the reviewer.
-- The cache is reviewer-owned state; the caller does not read it.
-- If findings are BLOCKING or ADVISORY: fix all, then re-review.
+- Parse `Decision:` and `## Findings` from the inline `# REVIEW` block.
+- If the response is malformed or missing the block: retry.
+- If BLOCKING or ADVISORY findings: fix all, then re-review.
 - Repeat until `Decision: PASS` or 5 total iterations.
+- At cap with any findings remaining: FAIL.
 
 Before `Status: SUCCESS`:
-- Run one final audit with `_implement/plan-reviewer-adjudicator-cacheless`.
-  - Parse current findings and fixes from its inline `# REVIEW` block.
-- If BLOCKING: fix, rerun touched, then re-audit.
+- Run one final audit with `_implement/plan-reviewer` and the same `handoff_path`.
+- Parse current findings from its inline `# REVIEW` block.
+- If BLOCKING: fix, re-run touched, then re-audit.
 
 # Output
 

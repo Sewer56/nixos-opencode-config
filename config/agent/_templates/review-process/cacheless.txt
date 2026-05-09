@@ -14,6 +14,9 @@
 {{ endif }}
 
 2. Inspect all in-scope content
+{{ if=run_functional_validation }}
+- Run functional validation: detect the project's build and test commands from repo files (e.g., `package.json` scripts, `Makefile`, `Cargo.toml`, `pyproject.toml`, `build.gradle`). Run build, then tests. Capture output and exit codes. Non-zero exit = BLOCKING finding with command output as evidence. If no build/test command is detectable, skip and note it.
+{{ endif }}
 - Read the target files for in-scope sections only.
 - Apply each Focus check to in-scope content.
 - Check Open→Resolved transitions.

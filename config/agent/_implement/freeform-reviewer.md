@@ -1,3 +1,23 @@
+---
+mode: subagent
+hidden: true
+description: Reviews an implementation against request intent from conversation context
+model: sewer-axonhub/GLM-5.1  # HIGH
+permission:
+  "*": deny
+  read:
+    "*": allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": allow
+  grep: allow
+  glob: allow
+  bash: allow
+  list: allow
+  todowrite: allow
+  external_directory: allow
+---
+
 Review an implementation against request intent from conversation context.
 
 # Inputs
@@ -6,9 +26,6 @@ Review an implementation against request intent from conversation context.
   - `## Plan Summary`: what was planned from conversation context
   - `## Changes Made`: files changed and what was done in each
   - `## Notes`: additional context or `None`
-{{ if=mode==cached }}
-- `cache_path:` — REQUIRED. `actions_path:` optional; derive next sidecar when omitted.
-{{ endif }}
 
 # Focus
 
@@ -19,53 +36,16 @@ Read files listed in `## Changes Made`. Use `git diff -- <files>`. Do not explor
 
 {{ file="./agent/_templates/review-mission.txt" artifact_type="implementation" domain="implementation" }}
 
-{{ if=mode==cached }}
-# Protocol
-- Write `cache_path` with full cache before emitting output.
-- Write `actions_path` with current OPEN findings before emitting output.
-- Emit ONLY the `# REVIEW` fenced block. No markdown. No analysis.
-{{ endif }}
-
 # Process
 
 {{
-  file="./agent/_templates/review-process/cached.txt"
-  if=mode==cached
-  delta_source=task_prompt
-  has_actions_path=1
-  step2_extra="- Parse inline context from the task input. Extract `## Request`, `## Plan Summary`, `## Changes Made`, `## Notes`."
-}}
-{{
   file="./agent/_templates/review-process/cacheless.txt"
-  if=mode==cacheless
   read_context="Parse inline context from the task input. Extract `## Request`, `## Plan Summary`, `## Changes Made`, `## Notes`."
-}}
-
-{{
-  file="./agent/_templates/review-footer/cached.txt"
-  if=mode==cached
-  domain=implementation
-  prefix=F
-  has_actions_path=1
-  ref_type="{{arg:ref_type}}"
-  categories=""
-  evidence="{{arg:evidence}}"
-  problem="<one line>"
-  fix="<smallest concrete correction>"
-  file_ref="src/lib.rs"
-  bad="-old content"
-  good="+new content"
-  with_file=1
-  with_lines=1
-  with_evidence=1
-  step=""
-  with_implement_cols=1
-  output_extra="- Omit the diff when the finding is a conceptual concern with no single correct replacement.\n- Cite file paths and line numbers where possible."
+  run_functional_validation=1
 }}
 
 {{
   file="./agent/_templates/review-footer/cacheless.txt"
-  if=mode==cacheless
   agent=""
   prefix=F
   categories=""

@@ -18,15 +18,13 @@ permission:
   external_directory: allow
   task:
     "*": "deny"
-    "_implement/freeform-reviewer-adjudicator-cached": "allow",
-    "_implement/freeform-reviewer-adjudicator-cacheless": "allow"
+    "_implement/freeform-reviewer": "allow"
 ---
 
 Implement a plan from conversation context with an automated review loop.
 
 # Inputs
 - A plan already exists in the conversation (from opencode's built-in plan mode).
-- Derive `slug` from the request context as a 2–3 word identifier. Use `review_cache_path`: absolute `<current working directory>/IMPLEMENT-FREEFORM-<slug>.review-implementation.md`.
 
 # Workflow
 
@@ -39,24 +37,22 @@ Implement a plan from conversation context with an automated review loop.
 - Iterate until all checks pass clean.
 
 ## 3. Review
-- Spawn `_implement/freeform-reviewer-adjudicator-cached`, passing inline:
+- Spawn `_implement/freeform-reviewer`, passing inline:
   - `## Request`: original user request (verbatim or summarized)
   - `## Plan Summary`: what was planned from conversation context
   - `## Changes Made`: files changed and what was done in each
   - `## Notes`: additional context or `None`
-  - `cache_path: review_cache_path`
-- Wait for the review packet.
+- Wait for the response.
 
 ## 4. Loop
-- After each review response, read `actions_path` for current findings and fixes.
-- If the actions file is malformed, truncated, ambiguous, or insufficient: retry/rerun the reviewer.
-- The cache is reviewer-owned state; the caller does not read it.
-- If any findings (BLOCKING or ADVISORY): fix all, re-run reviewer with updated inline context and the same `cache_path`.
-- Repeat until reviewer returns `Decision: PASS` or 5 iterations reached.
+- After each review response, parse `Decision:` and `## Findings` from the inline `# REVIEW` block.
+- If the response is malformed or missing the block: retry.
+- If any findings (BLOCKING or ADVISORY): fix all, re-run reviewer with updated inline context.
+- Repeat until `Decision: PASS` or 5 iterations reached.
 - At cap with any findings remaining: FAIL.
 - Before `Status: SUCCESS`:
-  - Run one final audit with `_implement/freeform-reviewer-adjudicator-cacheless` and updated inline context.
-  - Parse current findings and fixes from its inline `# REVIEW` block.
+  - Run one final audit with `_implement/freeform-reviewer` and updated inline context.
+  - Parse current findings from its inline `# REVIEW` block.
   - If BLOCKING: fix, rerun touched, then re-audit.
 
 ## 5. Report
