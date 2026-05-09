@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks code-adjacent error documentation coverage and specificity for finalized steps (cacheless)
-model: sewer-axonhub/MiniMax-M2.7  # LOW
+model: sewer-axonhub/minimax/MiniMax-M2.7-highspeed  # LOW
 permission:
   "*": deny
   read:

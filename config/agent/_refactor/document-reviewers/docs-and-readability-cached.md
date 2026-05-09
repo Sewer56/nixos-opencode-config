@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews documentation coverage, inline comments, and readability for source files (cached)
-model: sewer-axonhub/MiniMax-M2.7  # LOW
+model: sewer-axonhub/minimax/MiniMax-M2.7-highspeed  # LOW
 permission:
   "*": deny
   read:

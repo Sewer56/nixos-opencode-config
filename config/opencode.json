@@ -39,7 +39,7 @@
       }
     },
     "general": {
-      "model": "sewer-axonhub/DeepSeek-V4-Pro",
+      "model": "sewer-axonhub/minimax/MiniMax-M2.7-highspeed",
       "permission": {
         "task": {
           "*": "deny",

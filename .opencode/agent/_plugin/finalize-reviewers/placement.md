@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks declaration placement/order in finalized plugin steps
-model: sewer-axonhub/MiniMax-M2.7  # LOW
+model: sewer-axonhub/minimax/MiniMax-M2.7-highspeed  # LOW
 reasoningEffort: medium
 permission:
   "*": deny

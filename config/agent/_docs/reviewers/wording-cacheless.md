@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for wording quality — sentence flow, passive voice, filler, and wordiness (cacheless)
-model: sewer-axonhub/MiniMax-M2.7  # LOW
+model: sewer-axonhub/minimax/MiniMax-M2.7-highspeed  # LOW
 reasoningEffort: medium
 permission:
   "*": deny

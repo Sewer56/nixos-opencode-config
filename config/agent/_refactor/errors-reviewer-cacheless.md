@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews applied error docs for specificity, format, and fidelity (cacheless)
-model: sewer-axonhub/MiniMax-M2.7  # LOW
+model: sewer-axonhub/minimax/MiniMax-M2.7-highspeed  # LOW
 reasoningEffort: medium
 permission:
   "*": deny
