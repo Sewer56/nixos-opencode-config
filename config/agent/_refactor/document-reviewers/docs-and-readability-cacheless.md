@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews documentation coverage, inline comments, and readability for source files (cacheless)
-model: sewer-axonhub/minimax/MiniMax-M2.7-highspeed  # LOW
+model: sewer-axonhub/Qwen3.5-397B-A17B  # LOW
 permission:
   "*": deny
   read:

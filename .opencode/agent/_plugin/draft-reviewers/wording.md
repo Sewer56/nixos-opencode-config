@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks wording, clarity, style, and duplication in plugin draft artifacts
-model: sewer-axonhub/minimax/MiniMax-M2.7-highspeed  # LOW
+model: sewer-axonhub/Qwen3.5-397B-A17B  # LOW
 reasoningEffort: medium
 permission:
   "*": deny

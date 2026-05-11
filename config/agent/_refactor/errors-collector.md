@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Enumerates error-returning functions in one module, traces error paths, and classifies error docs
-model: sewer-axonhub/minimax/MiniMax-M2.7-highspeed  # LOW
+model: sewer-axonhub/Qwen3.5-397B-A17B  # LOW
 permission:
   "*": deny
   read:

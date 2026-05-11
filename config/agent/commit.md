@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Creates semantic commits matching repository style
-model: sewer-axonhub/minimax/MiniMax-M2.7-highspeed
+model: sewer-axonhub/Qwen3.5-397B-A17B
 permission:
   "*": deny
   read:
