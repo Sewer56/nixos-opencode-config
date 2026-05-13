@@ -21,15 +21,19 @@ You are rebasing the `production` branch in `opencode-source/` onto a new upstre
 - Verify with: `git merge-base <old-base-tag> production`
 
 ## Step 3: Rebase
-- Run: `git checkout production` then `git rebase --onto $ARGUMENTS <old-base-tag> production`
+- Run `bun install` first (deps required for per-commit testing below)
+- Run: `git checkout production` then `git rebase --exec 'bun install && cd packages/opencode && bun run typecheck && bun test' --onto $ARGUMENTS <old-base-tag> production`
+- Do NOT squash, amend, or reorganize commits — preserve each commit as-is
 - Resolve conflicts using these known patterns:
   - Release commits (message starts with `release: v`) → SKIP with `GIT_EDITOR=true git rebase --skip` (upstream has its own release)
   - `import { Flag } from "@opencode-ai/core/flag/flag"` → resolve to `import { Flag } from "@/flag/flag"`
   - `import { SystemPrompt } from "./system"` → drop the import entirely (replaced by system-prompt-builder)
+- `--exec` pauses the rebase automatically on test failure — fix the breakage, `git add`, `git rebase --continue` (test re-runs)
+- If breakage is unfixable: `git rebase --abort`, emit FAIL output below, stop immediately — do NOT continue to Steps 4–8
 - After rebase, verify: `git log --oneline $ARGUMENTS..production` shows only custom commits (no release commits)
 
 ## Step 4: Install dependencies
-- Run: `bun install` in `opencode-source/`
+- Run `bun install` in `opencode-source/`
 
 ## Step 5: Measure system prompt
 - Run: `cd opencode-source/packages/opencode && bun run script/preview-system-prompt.ts`
