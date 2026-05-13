@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-DOCS-*.review-wording.md": allow
+    "*PROMPT-DOCS-*.review-wording*.md": allow
   grep: allow
   glob: allow
   list: allow

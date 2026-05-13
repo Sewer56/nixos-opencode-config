@@ -11,8 +11,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-PLUGIN-PLAN*.review-audit.md": allow
-    "*PROMPT-PLUGIN-PLAN*.review-audit.actions.*.md": allow
+    "*PROMPT-PLUGIN-PLAN*.review-audit*.md": allow  # both A and B sidecars
   glob: allow
   list: allow
   todowrite: allow

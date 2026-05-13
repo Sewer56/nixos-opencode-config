@@ -11,8 +11,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-PLAN*.review-audit.md": allow
-    "*PROMPT-PLAN*.review-audit.actions.*.md": allow
+    "*PROMPT-PLAN*.review-audit*.md": allow
   grep: allow
   glob: allow
   list: allow

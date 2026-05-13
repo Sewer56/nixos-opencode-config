@@ -15,7 +15,7 @@ permission:
   list: allow
   todowrite: allow
   edit:
-    "*PROMPT-PLAN*.review-codedoc-errors.md": allow
+    "*PROMPT-PLAN*.review-codedoc-errors*.md": allow
   external_directory: allow
 ---
 

@@ -17,8 +17,6 @@ permission:
   external_directory: allow
   edit:
     "*PROMPT-ERROR-DOCS*.md": allow
-  write:
-    "*PROMPT-ERROR-DOCS*.md": allow
 ---
 
 Enumerate all error-returning functions in one module, trace every error path in each function body, and classify the existing error documentation.

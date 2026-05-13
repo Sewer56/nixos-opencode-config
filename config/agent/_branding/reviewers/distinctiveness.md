@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-BRANDING*.draft.review-distinctiveness.md": allow
+    "*PROMPT-BRANDING*.draft.review-distinctiveness*.md": allow
   grep: allow
   glob: allow
   list: allow

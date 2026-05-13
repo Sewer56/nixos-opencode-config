@@ -15,7 +15,7 @@ permission:
   list: allow
   todowrite: allow
   edit:
-    "*PROMPT-DOC-COVERAGE-*.review-docs-readability.md": allow
+    "*PROMPT-DOC-COVERAGE-*.review-docs-readability*.md": allow
   external_directory: allow
 ---
 

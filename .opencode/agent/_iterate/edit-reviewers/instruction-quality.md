@@ -13,7 +13,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-ITERATE-EDIT*.review-instruction-quality.md": allow
+    "*PROMPT-ITERATE-EDIT*.review-instruction-quality*.md": allow
   glob:
     "*": allow
     "opencode-source/**": deny

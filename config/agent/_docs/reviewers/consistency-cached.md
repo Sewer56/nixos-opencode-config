@@ -12,7 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
-    "*PROMPT-DOCS-*.review-consistency.md": allow
+    "*PROMPT-DOCS-*.review-consistency*.md": allow
   grep: allow
   glob: allow
   list: allow

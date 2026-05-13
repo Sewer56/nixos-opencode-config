@@ -17,8 +17,6 @@ permission:
   external_directory: allow
   edit:
     "*PROMPT-ERROR-DOCS*.md": allow
-  write:
-    "*PROMPT-ERROR-DOCS*.md": allow
 ---
 
 {{ file="./agent/_refactor/_templates/errors-reviewer-header.txt" mode=cached }}

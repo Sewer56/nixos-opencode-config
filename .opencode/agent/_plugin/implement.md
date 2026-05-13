@@ -9,7 +9,6 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit: allow
-  write: allow
   bash: allow
   glob: allow
   grep: allow

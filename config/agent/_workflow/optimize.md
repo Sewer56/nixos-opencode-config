@@ -10,8 +10,6 @@ permission:
     "tools/opencode-sessions/exports/**": deny
   edit:
     "*": allow
-  write:
-    "*": allow
   bash: allow
   glob:
     "*": allow

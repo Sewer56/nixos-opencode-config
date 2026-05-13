@@ -15,7 +15,7 @@ permission:
   list: allow
   todowrite: allow
   edit:
-    "*PROMPT-PLAN*.review-eudoc-correctness.md": allow
+    "*PROMPT-PLAN*.review-eudoc-correctness*.md": allow
   external_directory: allow
 ---
 

@@ -10,9 +10,6 @@ permission:
     "*.env.example": allow
   edit:
     "*": allow
-  write:
-    "*": deny
-    "*PROMPT-DOC-COVERAGE-*.md": allow
   bash: allow
   grep: allow
   glob: allow

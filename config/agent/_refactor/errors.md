@@ -10,21 +10,19 @@ permission:
     "*.env.example": allow
   edit:
     "*": allow
-  write:
-    "*": deny
-    "*PROMPT-ERROR-DOCS*.md": allow
   bash: allow
   grep: allow
   glob: allow
   list: allow
   todowrite: allow
   external_directory: allow
-  task:
-    "*": "deny"
-    "codebase-explorer": "allow"
-    "_refactor/errors-collector": "allow"
+  task: {
+    "*": "deny",
+    "codebase-explorer": "allow",
+    "_refactor/errors-collector": "allow",
     "_refactor/errors-reviewer-cached": "allow",
     "_refactor/errors-reviewer-cacheless": "allow"
+  }
 ---
 
 Discover error-returning functions with missing or vague documentation. Trace error paths, draft documentation, verify coverage via collector convergence (re-spawn until stable), apply corrections, and review.
