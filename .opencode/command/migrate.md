@@ -20,17 +20,24 @@ You are rebasing the `production` branch in `opencode-source/` onto a new upstre
 - That release tag is the old base. Example: if last release commit is `release: v1.14.25`, the old base is `v1.14.25`
 - Verify with: `git merge-base <old-base-tag> production`
 
-## Step 3: Rebase
-- Run `bun install` first (deps required for per-commit testing below)
-- Run: `git checkout production` then `git rebase --exec 'bun install && cd packages/opencode && bun run typecheck && bun test' --onto $ARGUMENTS <old-base-tag> production`
-- Do NOT squash, amend, or reorganize commits — preserve each commit as-is
+## Step 3: Rebase (commit-by-commit cherry-pick)
+- Do NOT use `git rebase --exec`. Apply commits one at a time and test manually between each.
+- Run: `git log --oneline --reverse <old-base-tag>..production` to list custom commits in oldest-first order
+- Run: `git checkout -b production-rebase $ARGUMENTS` to create a working branch at the new base
+- Run `bun install` once before starting the loop
+- For each commit in the list:
+  1. Skip release commits (message starts with `release: v`) — upstream has its own release, do not cherry-pick these
+  2. `git cherry-pick <sha>`
+  3. If conflict → resolve using known patterns below, `git add`, `git cherry-pick --continue`
+  4. `bun install && cd packages/opencode && bun run typecheck && bun test`
+  5. If test failure → fix the breakage, `git add -A && git commit --amend --no-edit`, re-run tests (amend only to fold fixes into the same commit — do not squash multiple commits or reorganize)
+  6. If unfixable → `git cherry-pick --abort`, emit FAIL output below, stop immediately — do NOT continue to Steps 4–8
+- After all commits: `git branch -f production production-rebase && git checkout production && git branch -d production-rebase`
+- Verify: `git log --oneline $ARGUMENTS..production` shows only custom commits (no release commits)
+- Do NOT squash commits or reorganize the commit sequence — preserve each commit as-is
 - Resolve conflicts using these known patterns:
-  - Release commits (message starts with `release: v`) → SKIP with `GIT_EDITOR=true git rebase --skip` (upstream has its own release)
   - `import { Flag } from "@opencode-ai/core/flag/flag"` → resolve to `import { Flag } from "@/flag/flag"`
   - `import { SystemPrompt } from "./system"` → drop the import entirely (replaced by system-prompt-builder)
-- `--exec` pauses the rebase automatically on test failure — fix the breakage, `git add`, `git rebase --continue` (test re-runs)
-- If breakage is unfixable: `git rebase --abort`, emit FAIL output below, stop immediately — do NOT continue to Steps 4–8
-- After rebase, verify: `git log --oneline $ARGUMENTS..production` shows only custom commits (no release commits)
 
 ## Step 4: Install dependencies
 - Run `bun install` in `opencode-source/`
