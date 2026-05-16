@@ -116,7 +116,7 @@ or SUCCESS.
 
 Both legs currently use GLM-5.1 (A at temp 1.0, B at temp 0.7) because
 DeepSeek-V4-Pro is unreliable right now. Once it stabilizes, the intended
-setup is GLM + DeepSeek — model diversity beats temperature diversity.
+setup is GLM + DeepSeek - model diversity beats temperature diversity.
 
 #### Single review (low-risk)
 
@@ -133,7 +133,7 @@ unchanged steps, and only inspects what changed.
 #### Cache isolation
 
 Each cached reviewer leg writes to its own sidecar cache. Neither leg sees the
-other's output or the canonical cache. Cacheless legs return findings inline —
+other's output or the canonical cache. Cacheless legs return findings inline -
 no sidecar files, no file I/O.
 
 Why isolate? Shared cache lets Leg B see Leg A's findings before forming its
