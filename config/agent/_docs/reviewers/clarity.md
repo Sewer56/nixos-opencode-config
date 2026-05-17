@@ -25,7 +25,8 @@ Review end-user documentation for comprehensibility.
 
 # Inputs
 
-- `handoff_path` (`artifact/<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
+- `handoff_path`: `artifact/<artifact_base>.handoff.md`
+- `cache_path` (required): `artifact/<artifact_base>.review-clarity.md`
 
 # Focus
 
@@ -59,5 +60,4 @@ Review end-user documentation for comprehensibility.
   file_ref="<path/to/documentation/file>"
   bad_example="-undefined jargon or compressed term"
   good_example="+expanded inline definition"
-  reviewer=clarity
 }}

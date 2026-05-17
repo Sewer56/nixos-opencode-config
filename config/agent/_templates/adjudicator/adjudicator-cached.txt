@@ -1,4 +1,4 @@
-1. Set `state_path = cache_path`; set `base = state_path` without `.md`.
+1. If `cache_path` is absent, stop and report the missing required input. Set `state_path = cache_path`; set `base = state_path` without `.md`.
 2. If `actions_path` is absent, glob `${base}.actions.*.md`; accept only `${base}.actions.<3 digits>.md`; choose the next `<nnn>`, starting `001`.
 3. Derive sidecar paths exactly, using the same `<nnn>`:
    - `{{arg:reviewer_a}}`: cache `${base}.a.md`; actions `${base}.a.actions.<nnn>.md`
@@ -11,8 +11,9 @@
 8. Read sidecar actions first. Read sidecar state only for evidence behind valid action IDs.
 9. Merge findings: {{arg:merge_scope}}.
 10. Merge duplicates and resolve conflicting fixes by preferring concrete evidence over reviewer confidence and minimal diffs over broad rewrites.
-11. Write `state_path` as reviewer-owned cache.
-12. Write `actions_path` as primary-runner current-fix input with OPEN findings only. Do not copy raw reviewer transcripts.
-13. GATE: `state_path` and `actions_path` MUST exist on disk before output.
-14. Emit only the pointer review block.
-15. GATE: your response MUST contain exactly one `# REVIEW` fenced block with `Cache:`, `Actions:`, `Decision:`{{arg:validation_extra}}, and conditional `IDs:`. Do not add headings, tables, summaries, narrative prose, or content outside the block. The caller validates this exact shape and rejects malformed responses as protocol failures.
+11. Create parent directories for `state_path`, `actions_path`, and sidecar cache/action paths before writing.
+12. Write `state_path` as reviewer-owned cache.
+13. Write `actions_path` as primary-runner current-fix input with OPEN findings only. Do not copy raw leg transcripts.
+14. GATE: `state_path` and `actions_path` MUST exist on disk before output.
+15. Emit only the pointer review block.
+16. GATE: your response MUST contain exactly one `# REVIEW` fenced block with `Cache:`, `Actions:`, `Decision:`{{arg:validation_extra}}, and conditional `IDs:`. Do not add headings, tables, summaries, narrative prose, or content outside the block. The caller validates this exact shape and rejects malformed responses as protocol failures.

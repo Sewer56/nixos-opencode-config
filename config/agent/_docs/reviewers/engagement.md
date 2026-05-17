@@ -25,7 +25,8 @@ Review end-user documentation for reader engagement and structural quality.
 
 # Inputs
 
-- `handoff_path` (`artifact/<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
+- `handoff_path`: `artifact/<artifact_base>.handoff.md`
+- `cache_path` (required): `artifact/<artifact_base>.review-engagement.md`
 
 # Focus
 
@@ -61,5 +62,4 @@ Consider page type (landing, getting-started, guide, reference, changelog, migra
   file_ref="<path/to/documentation/file>"
   bad_example="-engagement issue"
   good_example="+corrected structure or content"
-  reviewer=engagement
 }}

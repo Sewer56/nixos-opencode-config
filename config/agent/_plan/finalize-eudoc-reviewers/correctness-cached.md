@@ -3,6 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews D# steps for coverage, specificity, and broken links (cached)
 model: sewer-axonhub/GLM-5.1
+reasoningEffort: medium
 permission:
   "*": deny
   read:
@@ -20,7 +21,7 @@ permission:
   external_directory: allow
 ---
 
-{{ file="./agent/_plan/finalize-eudoc-reviewers/_templates/correctness-header.txt" }}
+{{ file="./agent/_plan/finalize-eudoc-reviewers/_templates/correctness-header.txt" mode=cached }}
 
 ## Read strategy
 On first review: If Delta was passed inline, skip reading `handoff_path` — use the inline Step Index and Requirement Trace Matrix rows. Read all D# step files. For UPDATE scope: read target doc files at the line ranges the D# step specifies — do not read full target files beyond those ranges unless evidence is insufficient. For NEW: read sibling pages. Skip ARCHITECTURE.md, source code, or I#/T# step files unless a D# step explicitly references them as evidence.

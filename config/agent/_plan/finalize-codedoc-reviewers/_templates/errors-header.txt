@@ -5,6 +5,9 @@
 {{ if=variant==codedoc }}{{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
 {{ else }}{{ file="./agent/_templates/review-inputs/refactor.txt" }}
 {{ endif }}
+{{ if=mode==cached }}
+- `cache_path` (required): artifact reviewer cache path
+{{ endif }}
 
 # Focus
 

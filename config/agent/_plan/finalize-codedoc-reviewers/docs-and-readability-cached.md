@@ -3,6 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews code-adjacent documentation in I#/T# steps for coverage, specificity, inline comments, and readability (cached)
 model: sewer-axonhub/Qwen3.5-397B-A17B  # LOW
+reasoningEffort: medium
 permission:
   "*": deny
   read:
@@ -24,6 +25,7 @@ permission:
   file="./agent/_plan/finalize-codedoc-reviewers/_templates/docs-readability-header.txt"
   description="Review code/test steps for code-adjacent documentation coverage, specificity, fidelity, inline comments, and readability."
   variant=codedoc
+  mode=cached
   doc_domain=CDOC
   read_domain=CREAD
 }}

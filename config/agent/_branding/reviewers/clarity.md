@@ -25,12 +25,14 @@ Review branding for clarity.
 
 # Inputs
 
-- `handoff_path` (`artifact/<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking and `### Decisions` for cross-domain arbitration.
+- `branding_path`: `<artifact_base>.draft.md`
+- `handoff_path`: `artifact/<artifact_base>.draft.handoff.md`
+- `cache_path` (required): `artifact/<artifact_base>.draft.review-clarity.md`
 
 # Focus
 
 ## Read scope
-Read `<artifact_base>.draft.md` for in-scope sections: Candidate Shortlist, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone.
+Read `branding_path` for in-scope sections: Candidate Shortlist, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone.
 
 {{ file="./rules/groups/branding/self-clarity.md" }}
 

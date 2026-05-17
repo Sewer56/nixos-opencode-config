@@ -21,7 +21,7 @@ permission:
   external_directory: allow
 ---
 
-{{ file="./agent/_docs/reviewers/_templates/wording-header.txt" }}
+{{ file="./agent/_docs/reviewers/_templates/wording-header.txt" mode=cached reviewer=wording }}
 
 # Process
 
@@ -49,5 +49,4 @@ permission:
   file_ref="<path/to/documentation/file>"
   bad_example="-wordy or awkward phrasing"
   good_example="+concise replacement"
-  reviewer=wording
 }}

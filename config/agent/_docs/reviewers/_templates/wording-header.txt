@@ -2,7 +2,10 @@ Review end-user documentation for wording quality.
 
 # Inputs
 
-- `handoff_path` (`artifact/<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
+- `handoff_path`: `artifact/<artifact_base>.handoff.md`
+{{ if=mode==cached }}
+- `cache_path` (required): `artifact/<artifact_base>.review-{{arg:reviewer}}.md`
+{{ endif }}
 
 # Focus
 

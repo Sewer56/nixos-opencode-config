@@ -21,7 +21,7 @@ permission:
   external_directory: allow
 ---
 
-{{ file="./agent/_docs/reviewers/_templates/consistency-header.txt" }}
+{{ file="./agent/_docs/reviewers/_templates/consistency-header.txt" mode=cached reviewer=consistency }}
 
 # Process
 
@@ -50,5 +50,4 @@ permission:
   file_ref="<path/to/documentation/file>"
   bad_example="-inconsistent or broken cross-page reference"
   good_example="+corrected reference or deduplicated content"
-  reviewer=consistency
 }}

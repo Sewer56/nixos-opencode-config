@@ -3,6 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews D# steps for clarity, wording, engagement, and cross-page polish
 model: sewer-axonhub/GLM-5.1
+reasoningEffort: medium
 permission:
   "*": deny
   read:
@@ -25,9 +26,10 @@ Review D# steps for clarity, wording quality, reader engagement, and cross-page 
 
 # Inputs
 
-- `handoff_path` (for optional source context and re-review Delta)
-- `step_paths` (exact list of D# step files to inspect)
-- Inline `## Delta`, D# Step Index rows, and Requirement Trace Matrix rows when provided by caller
+- `handoff_path`
+- `step_paths`
+- Inline `## Delta`, D# Step Index rows, and Requirement Trace Matrix rows when provided
+- `cache_path` (required): `artifact/<artifact_base>.review-eudoc-polish.md`
 
 # Focus
 

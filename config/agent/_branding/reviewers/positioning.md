@@ -25,12 +25,14 @@ Review branding for positioning.
 
 # Inputs
 
-- `handoff_path` (`artifact/<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking and `### Decisions` for cross-domain arbitration.
+- `branding_path`: `<artifact_base>.draft.md`
+- `handoff_path`: `artifact/<artifact_base>.draft.handoff.md`
+- `cache_path` (required): `artifact/<artifact_base>.draft.review-positioning.md`
 
 # Focus
 
 ## Read scope
-Read `<artifact_base>.draft.md` for in-scope sections: Project Read, Naming Criteria, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone, Visual Direction.
+Read `branding_path` for in-scope sections: Project Read, Naming Criteria, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone, Visual Direction.
 
 {{ file="./rules/groups/branding/self-positioning.md" }}
 

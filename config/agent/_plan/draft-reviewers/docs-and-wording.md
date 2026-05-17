@@ -24,8 +24,9 @@ permission:
 Review plan draft artifacts for documentation coverage, specificity, and wording quality.
 
 # Inputs
-- `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
-- `draft_handoff_path` (e.g. `artifact/<artifact_base>.draft.handoff.md`)
+- `context_path`: `<artifact_base>.draft.md`
+- `draft_handoff_path`: `artifact/<artifact_base>.draft.handoff.md`
+- `cache_path` (required): `artifact/<artifact_base>.draft.review-docs-wording.md`
 
 # Focus
 (All items BLOCKING unless marked ADVISORY.)

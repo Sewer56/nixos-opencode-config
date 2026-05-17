@@ -3,6 +3,7 @@ mode: subagent
 hidden: true
 description: Checks code-adjacent error documentation coverage and specificity for finalized steps (cached)
 model: sewer-axonhub/Qwen3.5-397B-A17B  # LOW
+reasoningEffort: medium
 permission:
   "*": deny
   read:
@@ -24,6 +25,7 @@ permission:
   file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-header.txt"
   description="Review step artifacts' code-adjacent error documentation."
   variant=codedoc
+  mode=cached
 }}
 
 # Process

@@ -3,6 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews error documentation coverage and specificity for source files (cached)
 model: sewer-axonhub/Qwen3.5-397B-A17B  # LOW
+reasoningEffort: medium
 permission:
   "*": deny
   read:
@@ -24,6 +25,7 @@ permission:
   file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-header.txt"
   description="Review source files' error documentation."
   variant=refactor
+  mode=cached
 }}
 
 # Process

@@ -25,12 +25,14 @@ Review branding for distinctiveness.
 
 # Inputs
 
-- `handoff_path` (`artifact/<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `mcp-search` runs.
+- `branding_path`: `<artifact_base>.draft.md`
+- `handoff_path`: `artifact/<artifact_base>.draft.handoff.md`
+- `cache_path` (required): `artifact/<artifact_base>.draft.review-distinctiveness.md`
 
 # Focus
 
 ## Read scope
-Read `<artifact_base>.draft.md` for in-scope sections: Candidate Shortlist, Top Recommendation, Risk and Availability Notes.
+Read `branding_path` for in-scope sections: Candidate Shortlist, Top Recommendation, Risk and Availability Notes.
 Cross-reference search findings from the handoff for external collisions.
 
 {{ file="./rules/groups/branding/self-distinctiveness.md" }}
