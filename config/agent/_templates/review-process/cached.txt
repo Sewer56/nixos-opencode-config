@@ -10,7 +10,8 @@
 - Treat cache as one record {{arg:cache_record_type}} with fields `last_decision`, `open_findings`, `evidence`, `verified`.
 {{ endif }}
 {{ if=has_actions_path }}
-- Parse `actions_path:` if provided. If absent, glob `<cache_path without .md>.actions.*.md` → next `<nnn>`, start `001`.
+- If `actions_path:` was provided, use it as-is. Do not derive or transform.
+- Otherwise, set `base = cache_path` without `.md`; glob `${base}.actions.*.md`; accept only `${base}.actions.<3 digits>.md`; choose next `<nnn>`, starting `001`.
 {{ endif }}
 
 2. Read handoff
@@ -57,7 +58,7 @@
   - Leave entries whose content has not changed exactly as they are.
 {{ endif }}
 {{ if=has_actions_path }}
-- Write `actions_path` with only current OPEN findings. No resolved, no Verified Observations, no history, no merge notes.
+- Write `actions_path` as primary-runner current-fix input with current OPEN findings only. Cache remains reviewer-owned state. No resolved, no Verified Observations, no history, no merge notes.
 {{ endif }}
 - GATE: `cache_path`{{ if=has_actions_path }} and `actions_path`{{ endif }} MUST exist on disk before proceeding. If not: write them. Do not proceed until written.
 
