@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Use this for third-party library research and repository documentation analysis.
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/Qwen3.5-397B-A17B  # MED
 permission:
   "*": deny
   read:

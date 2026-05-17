@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Surveys plugin request context and returns a compact plugin file manifest
-model: sewer-axonhub/GLM-5.1  # HIGH
+model: sewer-axonhub/Qwen3.5-397B-A17B  # MED
 permission:
   "*": deny
   read:

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Gathers repo facts from a draft plan, returns structured file manifest + observations
-model: sewer-axonhub/GLM-5.1  # HIGH
+model: sewer-axonhub/Qwen3.5-397B-A17B  # MED
 permission:
   "*": deny
   read:
