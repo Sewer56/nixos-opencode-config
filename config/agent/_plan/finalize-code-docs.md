@@ -10,7 +10,7 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "*PROMPT-PLAN*.handoff.md": allow
+    "*PROMPT-PLAN*.handoff*.md": allow
     "*PROMPT-PLAN*.step.*.md": allow
   todowrite: allow
   external_directory: allow

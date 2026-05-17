@@ -11,7 +11,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-PLUGIN-PLAN*.draft.md": allow
-    "*PROMPT-PLUGIN-PLAN*.draft.handoff.md": allow
+    "*PROMPT-PLUGIN-PLAN*.draft.handoff*.md": allow
   question: allow
   todowrite: allow
   external_directory: allow

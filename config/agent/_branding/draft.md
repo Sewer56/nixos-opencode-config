@@ -11,7 +11,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-BRANDING*.draft.md": allow
-    "*PROMPT-BRANDING*.draft.handoff.md": allow
+    "*PROMPT-BRANDING*.draft.handoff*.md": allow
   question: allow
   todowrite: allow
   external_directory: allow
