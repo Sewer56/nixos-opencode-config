@@ -25,7 +25,7 @@ Review end-user documentation for comprehensibility.
 
 # Inputs
 
-- `handoff_path` (`<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
+- `handoff_path` (`artifact/<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
 
 # Focus
 
@@ -37,9 +37,7 @@ Review end-user documentation for comprehensibility.
 
 {{
   file="./agent/_templates/review-process/cached.txt"
-  has_cache_derivation=1
   delta_source=handoff_path
-  cache_derivation="replace the `.handoff.md` suffix with `.review-clarity.md`"
   cache_record_type="per target file"
   reads_change_plan=1
   has_frozen_regions=1

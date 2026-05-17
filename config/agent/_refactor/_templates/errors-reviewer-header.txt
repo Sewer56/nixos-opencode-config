@@ -3,7 +3,7 @@ Review applied error docs for correctness — verify that the applied source doc
 {{ if=mode==cached }}
 # Inputs
 
-- `cache_path`: absolute path to `PROMPT-ERROR-DOCS.cache.md`
+- `cache_path`: absolute path to `artifact/PROMPT-ERROR-DOCS.cache.md`
 {{ else }}
 # Inputs
 

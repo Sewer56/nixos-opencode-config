@@ -25,7 +25,7 @@ Review D# steps for clarity, wording quality, reader engagement, and cross-page 
 
 # Inputs
 
-- `handoff_path` (for cache naming and optional source context)
+- `handoff_path` (for optional source context and re-review Delta)
 - `step_paths` (exact list of D# step files to inspect)
 - Inline `## Delta`, D# Step Index rows, and Requirement Trace Matrix rows when provided by caller
 
@@ -42,15 +42,13 @@ On first review: If Delta was passed inline, skip reading `handoff_path` — use
 On re-review: Read `## Delta` from `handoff_path` for status changes. Read ONLY D# steps marked Changed or New in Delta — skip Unchanged steps (they are in cache as Verified). Do NOT re-read the full handoff, target doc files, or all D# steps for Unchanged items. For cross-page checks on re-review, only examine Changed D# steps against each other — skip cross-checks involving only Unchanged steps.
 
 ## Domain ownership
-Do NOT read the correctness reviewer cache (`<artifact_base>.review-eudoc-correctness.md`). Polish owns wording/clarity/engagement/consistency; correctness owns EDOC findings. If a cross-domain concern arises, note it as a short pointer in `## Notes`.
+Do NOT read the correctness reviewer cache (`artifact/<artifact_base>.review-eudoc-correctness.md`). Polish owns wording/clarity/engagement/consistency; correctness owns EDOC findings. If a cross-domain concern arises, note it as a short pointer in `## Notes`.
 
 # Process
 
 {{
   file="./agent/_templates/review-process/cached.txt"
-  has_cache_derivation=1
   delta_source=handoff_path
-  cache_derivation="replace the `.handoff.md` suffix with `.review-eudoc-polish.md`"
   cache_record_type="per item (D#)"
   has_inline_delta=1
   has_frozen_regions=1

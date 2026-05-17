@@ -51,7 +51,7 @@ Normalize workflow-optimize input and return small experiment brief.
       - `single-agent` when no local helper/reviewer agents are resolved.
       - `nested-run` when target explicitly launches `opencode run`, `run_batch.py`, or session export harnesses.
       - `mixed` when multiple task cases use different shapes; `unknown` when evidence is insufficient.
-   - Derive cleanup patterns only for generated artifacts (review caches, logs, exports). Exclude draft, handoff, step, and source files; they are task inputs/state. Example: `/plan/*` → `PROMPT-PLAN-*.review-*.md`. If unclear, return `None`.
+   - Derive cleanup patterns only for generated artifacts (review caches, logs, exports). Exclude draft, handoff, step, and source files; they are task inputs/state. Example: `/plan/*` → `artifact/PROMPT-PLAN-*.review-*.md`. If unclear, return `None`.
 4. Return compact brief. Keep notes short.
 
 # Output

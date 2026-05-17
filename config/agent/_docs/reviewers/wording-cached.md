@@ -27,9 +27,7 @@ permission:
 
 {{
   file="./agent/_templates/review-process/cached.txt"
-  has_cache_derivation=1
   delta_source=handoff_path
-  cache_derivation="replace the `.handoff.md` suffix with `.review-wording.md`"
   cache_record_type="per target file"
   reads_change_plan=1
   has_frozen_regions=1

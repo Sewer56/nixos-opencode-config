@@ -25,7 +25,7 @@ Review branding for positioning.
 
 # Inputs
 
-- `handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking and `### Decisions` for cross-domain arbitration.
+- `handoff_path` (`artifact/<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking and `### Decisions` for cross-domain arbitration.
 
 # Focus
 
@@ -38,9 +38,7 @@ Read `<artifact_base>.draft.md` for in-scope sections: Project Read, Naming Crit
 
  {{
   file="./agent/_templates/review-process/cached.txt"
-  has_cache_derivation=1
   delta_source=handoff_path
-  cache_derivation="replace the `.handoff.md` suffix with `.review-positioning.md`"
   cache_record_type="per candidate name or brand element"
   show_cache_update_detail=1
   pruned_unit=entries

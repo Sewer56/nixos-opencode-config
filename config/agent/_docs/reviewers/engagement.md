@@ -25,7 +25,7 @@ Review end-user documentation for reader engagement and structural quality.
 
 # Inputs
 
-- `handoff_path` (`<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
+- `handoff_path` (`artifact/<artifact_base>.handoff.md`) — contains `## Change Plan` with per-file scope levels and frozen regions.
 
 # Focus
 
@@ -39,9 +39,7 @@ Consider page type (landing, getting-started, guide, reference, changelog, migra
 
 {{
   file="./agent/_templates/review-process/cached.txt"
-  has_cache_derivation=1
   delta_source=handoff_path
-  cache_derivation="replace the `.handoff.md` suffix with `.review-engagement.md`"
   cache_record_type="per target file"
   reads_change_plan=1
   has_frozen_regions=1

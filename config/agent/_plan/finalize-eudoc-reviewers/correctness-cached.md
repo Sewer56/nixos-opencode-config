@@ -31,9 +31,7 @@ On re-review: Read `## Delta` from `handoff_path` for status changes. Read ONLY 
 
 {{
   file="./agent/_templates/review-process/cached.txt"
-  has_cache_derivation=1
   delta_source=handoff_path
-  cache_derivation="replace the `.handoff.md` suffix with `.review-eudoc-correctness.md`"
   cache_record_type="per item (D#)"
   has_inline_delta=1
   has_frozen_regions=1

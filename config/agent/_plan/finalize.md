@@ -48,8 +48,8 @@ Convert a confirmed draft plan into reviewed code and test steps. Write `<artifa
 - `handoff_path`: `<artifact_base>.handoff.md`
 - `step_pattern`: `<artifact_base>.step.*.md`
 - Cache paths (written by reviewers on initial review, read by reviewers/rereview agents on re-review):
-  - `<artifact_base>.review-audit.md`
-  - `<artifact_base>.review-tests.md`
+  - `artifact/<artifact_base>.review-audit.md`
+  - `artifact/<artifact_base>.review-tests.md`
 
 # Focus
 
@@ -317,8 +317,8 @@ Source Plan: <absolute path to `<artifact_base>.draft.md`>
 ## Review Ledger
 
 ### Domain Summaries
-- AUDIT: <n> BLOCKING, <m> ADVISORY → cache: `<artifact_base>.review-audit.md`
-- TEST: <n> BLOCKING, <m> ADVISORY → cache: `<artifact_base>.review-tests.md`
+- AUDIT: <n> BLOCKING, <m> ADVISORY → cache: `artifact/<artifact_base>.review-audit.md`
+- TEST: <n> BLOCKING, <m> ADVISORY → cache: `artifact/<artifact_base>.review-tests.md`
 - PLACEMENT: <n> BLOCKING, <m> ADVISORY (inline)
 - PERF: <n> BLOCKING, <m> ADVISORY (inline)
 

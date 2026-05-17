@@ -2,7 +2,7 @@ Review D# steps for documentation correctness — coverage, specificity, and bro
 
 # Inputs
 
-- `handoff_path` (for cache naming and optional source context)
+- `handoff_path` (for optional source context and re-review Delta)
 - `step_paths` (exact list of D# step files to inspect)
 - Inline `## Delta`, D# Step Index rows, and Requirement Trace Matrix rows when provided by caller
 

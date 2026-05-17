@@ -27,7 +27,7 @@ Enumerate all error-returning functions in one module, trace every error path in
 - `target_path`: absolute path to the module root, crate directory, or source file
 - `language`: language name as reported by `codebase-explorer`
 - `repo_root`: absolute path to the repository root
-- `cache_path`: absolute path to the per-module cache file (e.g. `PROMPT-ERROR-DOCS.<module_name>.cache.md`). Each collector receives its own file — no concurrent writes to a shared cache.
+- `cache_path`: absolute path to the per-module cache file (e.g. `artifact/PROMPT-ERROR-DOCS.<module_name>.cache.md`). Each collector receives its own file — no concurrent writes to a shared cache.
 
 # Focus
 
@@ -61,7 +61,7 @@ Do **not** emit per-item blocks for `specific` functions. Omit them entirely; re
 
 ## 4. Return
 
-Write to `cache_path` using the `## PROMPT-ERROR-DOCS.cache.md` template from `config/agent/_refactor/errors.md`:
+Write to `cache_path` using the `## artifact/PROMPT-ERROR-DOCS.cache.md` template from `config/agent/_refactor/errors.md`:
 - If the file does not exist, write it from the template.
 - If it exists, use targeted edits to insert new items into `## Items` and update the summary counts.
 - Do not modify items already in the cache.

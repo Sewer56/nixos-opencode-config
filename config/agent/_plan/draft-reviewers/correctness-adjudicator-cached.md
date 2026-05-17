@@ -29,8 +29,8 @@ Adjudicate the COR domain (cached). Validate A/B reviewer pointers, merge eviden
 
 # Inputs
 - `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
-- `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
-- `cache_path` (optional): canonical `<artifact_base>.draft.review-correctness.md`; derive from `draft_handoff_path` when omitted.
+- `draft_handoff_path` (e.g. `artifact/<artifact_base>.draft.handoff.md`)
+- `cache_path` (required): `artifact/<artifact_base>.draft.review-correctness.md`
 - `actions_path` (optional): derive next iteration path from `cache_path` when omitted.
 
 # Focus
@@ -42,8 +42,6 @@ Adjudicate the COR domain (cached). Validate A/B reviewer pointers, merge eviden
 {{
   file="./agent/_templates/adjudicator/adjudicator-cached.txt"
   no_edit_targets="`context_path` or `draft_handoff_path`"
-  has_cache_derivation=1
-  cache_derivation="replacing `.draft.handoff.md` with `.draft.review-correctness.md`"
   reviewer_a="_plan/draft-reviewers/correctness/correctness-a-cached"
   reviewer_b="_plan/draft-reviewers/correctness/correctness-b-cached"
   run_context="with identical `context_path` and `draft_handoff_path`, but with their own sidecar `cache_path` and `actions_path`"

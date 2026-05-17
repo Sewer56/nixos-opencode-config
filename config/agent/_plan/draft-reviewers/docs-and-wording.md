@@ -25,7 +25,7 @@ Review plan draft artifacts for documentation coverage, specificity, and wording
 
 # Inputs
 - `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
-- `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
+- `draft_handoff_path` (e.g. `artifact/<artifact_base>.draft.handoff.md`)
 
 # Focus
 (All items BLOCKING unless marked ADVISORY.)
@@ -47,9 +47,7 @@ Inspect DOC first, then WORDING. Report all BLOCKING findings in one pass. If DO
 
  {{
   file="./agent/_templates/review-process/cached.txt"
-  has_cache_derivation=1
   delta_source=draft_handoff_path
-  cache_derivation="replace `.handoff.md` with `.draft.review-docs-wording.md`"
   cache_record_type="per `[P#]`"
   preserve_byte_exact=1
 }}

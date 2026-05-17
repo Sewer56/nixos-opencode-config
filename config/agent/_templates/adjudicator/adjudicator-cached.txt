@@ -1,4 +1,4 @@
-1. {{ if=has_cache_derivation }}Derive `cache_path` when absent by {{arg:cache_derivation}}. {{ endif }}Set `state_path = cache_path`; set `base = state_path` without `.md`.
+1. Set `state_path = cache_path`; set `base = state_path` without `.md`.
 2. If `actions_path` is absent, glob `${base}.actions.*.md`; accept only `${base}.actions.<3 digits>.md`; choose the next `<nnn>`, starting `001`.
 3. Derive sidecar paths exactly, using the same `<nnn>`:
    - `{{arg:reviewer_a}}`: cache `${base}.a.md`; actions `${base}.a.actions.<nnn>.md`

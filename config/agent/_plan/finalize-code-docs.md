@@ -33,6 +33,11 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
 - Use `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, and `step_pattern` = `<artifact_base>.step.*.md`.
 - Required local artifacts for this run: `plan_path`, `handoff_path`, and existing I#/T# files matching `step_pattern`.
 
+# Artifacts
+- Cache paths (written by reviewers, stored under `artifact/`):
+  - `artifact/<artifact_base>.review-codedoc-docs-readability.md`
+  - `artifact/<artifact_base>.review-codedoc-errors.md`
+
 # Focus
 
 ## Scope
@@ -66,7 +71,9 @@ Only modify `<artifact_base>.handoff.md` and existing I#/T# step files matching 
 - Run these independent shared code-doc reviewers in parallel on the first pass:
   - `_plan/finalize-codedoc-reviewers/docs-and-readability-cached`
   - `_plan/finalize-codedoc-reviewers/errors-cached`
-- Include in each reviewer prompt only task-specific data: `plan_path`, `handoff_path`, exact `step_paths`, and user notes.
+- Include in each reviewer prompt only task-specific data: `plan_path`, `handoff_path`, exact `step_paths`, `cache_path`, and user notes.
+  - For docs-and-readability: `cache_path: artifact/<artifact_base>.review-codedoc-docs-readability.md`
+  - For errors: `cache_path: artifact/<artifact_base>.review-codedoc-errors.md`
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: CDOC and CREAD → docs-and-readability reviewer; CERR → errors reviewer. CDOC owns required API docs and inline readability comments in planned code diffs. Arbitrate cross-domain conflicts.
 - Apply all BLOCKING fixes before advisories. Resolve CDOC/CERR before CREAD when fixes conflict. Record or defer advisories when no blockers remain.

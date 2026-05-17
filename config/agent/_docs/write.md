@@ -31,12 +31,17 @@ Write or substantially rewrite end-user-facing documentation with a four-reviewe
 # Artifacts
 
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-DOCS-WRITE-<slug>`.
-- `handoff_path`: `<artifact_base>.handoff.md`
+- `handoff_path`: `artifact/<artifact_base>.handoff.md`
+- Cache paths (written by reviewers, stored under `artifact/`):
+  - `artifact/<artifact_base>.review-clarity.md`
+  - `artifact/<artifact_base>.review-wording.md`
+  - `artifact/<artifact_base>.review-engagement.md`
+  - `artifact/<artifact_base>.review-consistency.md`
 
 # Focus
 
 ## Write scope
-Write or modify end-user-facing documentation (guides, READMEs, mkdocs pages) only. Do not add doc comments to source code — that is `/refactor/document`. Write only the target documentation files, `<artifact_base>.handoff.md`, and `<artifact_base>.review-*.md`. Do not modify files outside the target paths unless explicitly requested.
+Write or modify end-user-facing documentation (guides, READMEs, mkdocs pages) only. Do not add doc comments to source code — that is `/refactor/document`. Write only the target documentation files, `artifact/<artifact_base>.handoff.md`, and `artifact/<artifact_base>.review-*.md`. Do not modify files outside the target paths unless explicitly requested.
 
 ## Frozen regions
 Respect scope boundaries: do not edit frozen regions. Reject reviewer diffs that land in frozen regions.
@@ -83,7 +88,7 @@ Max 5 iterations.
 a. Write `handoff_path` with scope, per-file Delta, and Change Plan before first reviewer pass. Per-file Delta entries track: file path, sections changed, scope level.
    Include `Status: New | Changed | Unchanged` in each entry. Mark unchanged files as `Unchanged`.
 
-b. Run four reviewers in parallel: `_docs/reviewers/clarity`, `_docs/reviewers/wording-cached`, `_docs/reviewers/engagement`, `_docs/reviewers/consistency-cached`. Pass only: `handoff_path`. Reviewers read the actual documentation files and use the handoff to determine which files and sections are in scope.
+b. Run four reviewers in parallel: `_docs/reviewers/clarity`, `_docs/reviewers/wording-cached`, `_docs/reviewers/engagement`, `_docs/reviewers/consistency-cached`. Pass only: `handoff_path` and `cache_path` (artifact/<artifact_base>.review-<domain>.md). Reviewers read the actual documentation files and use the handoff to determine which files and sections are in scope.
 
 c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified`. All 4 reviewers are diff-mandated — confirm each finding contains a unified diff block. Treat missing diffs as protocol violation requiring retry.
 

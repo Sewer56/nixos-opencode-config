@@ -25,7 +25,7 @@ Review branding for distinctiveness.
 
 # Inputs
 
-- `handoff_path` (`<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `mcp-search` runs.
+- `handoff_path` (`artifact/<artifact_base>.draft.handoff.md`) — contains `## Delta` for change tracking, `### Decisions` for cross-domain arbitration, and search findings from `mcp-search` runs.
 
 # Focus
 
@@ -39,9 +39,7 @@ Cross-reference search findings from the handoff for external collisions.
 
  {{
   file="./agent/_templates/review-process/cached.txt"
-  has_cache_derivation=1
   delta_source=handoff_path
-  cache_derivation="replace the `.handoff.md` suffix with `.review-distinctiveness.md`"
   cache_record_type="per candidate name or brand element"
   step2_extra="- When the reviewer's Focus includes search-findings references: also read the search findings section for external data."
   show_cache_update_detail=1

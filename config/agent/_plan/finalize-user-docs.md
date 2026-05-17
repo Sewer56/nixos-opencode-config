@@ -40,6 +40,9 @@ Generate and review end-user documentation steps for finalized implementation/te
 - `plan_path`: `<artifact_base>.draft.md`
 - `handoff_path`: `<artifact_base>.handoff.md`
 - `step_pattern`: `<artifact_base>.step.*.md`
+- Cache paths (written by reviewers, stored under `artifact/`):
+  - `artifact/<artifact_base>.review-eudoc-correctness.md`
+  - `artifact/<artifact_base>.review-eudoc-polish.md`
 
 # Focus
 
@@ -79,7 +82,9 @@ Only modify `<artifact_base>.handoff.md` and D# step files. Do not modify I#/T# 
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
 - **Stage 1: Correctness** — Run `_plan/finalize-eudoc-reviewers/correctness-cached` first. Checks coverage, specificity, and broken links. Apply its diffs, update `## Review Ledger`, append to `## Revision History`. Recompute `## Delta`.
 - **Stage 2: Polish** — Run `_plan/finalize-eudoc-reviewers/polish` after Stage 1 fixes are applied. Checks clarity, wording, engagement, and cross-page polish.
-- Include in each reviewer prompt only task-specific data. For first review, pass `handoff_path`, exact D# `step_paths`, extracted inline `## Delta`, D# Step Index rows, and relevant Requirement Trace Matrix rows from `handoff_path`. Reviewers use `handoff_path` for cache file naming and may skip reading the full handoff when the inline excerpts are complete.
+- Include in each reviewer prompt only task-specific data. For first review, pass `handoff_path`, exact D# `step_paths`, extracted inline `## Delta`, D# Step Index rows, and relevant Requirement Trace Matrix rows from `handoff_path`. Also pass `cache_path`:
+  - For correctness: `cache_path: artifact/<artifact_base>.review-eudoc-correctness.md`
+  - For polish: `cache_path: artifact/<artifact_base>.review-eudoc-polish.md`
   - Re-review: pass `cache_path`, `changed_ids=[D# list]`, `handoff_path`, exact changed D# `step_paths`, and one-line fix summaries. Withhold unchanged step paths only when those unchanged paths are already verified in cache.
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply end-user documentation domain ownership: EDOC → correctness; ECLR/EWRD/EENG/ECNS → polish. Arbitrate cross-domain conflicts.

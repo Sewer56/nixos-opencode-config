@@ -29,18 +29,21 @@ Discover, add, and review missing code documentation in source files.
 
 - The user message may include file or directory paths to document.
 - If no paths are provided, collect changed source files from `git status --porcelain`.
-- Derive `slug` from the request context and write documentation coverage artifacts under `PROMPT-DOC-COVERAGE-<slug>`.
+- Derive `slug` from the request context and write documentation coverage artifacts under `artifact/PROMPT-DOC-COVERAGE-<slug>`.
 
 # Focus
 
 ## Scope
-Constrain edits to target source files and `PROMPT-DOC-COVERAGE-*.md`. Preserve runtime behavior; make only documentation-specific changes.
+Constrain edits to target source files and `artifact/PROMPT-DOC-COVERAGE-*.md`. Preserve runtime behavior; make only documentation-specific changes.
 
 # Workflow
 
 - Derive `slug` from the request context as a 2–3 word identifier for this run.
 - `artifact_base`: `PROMPT-DOC-COVERAGE-<slug>` (derived from `slug`)
-- `handoff_path`: `<artifact_base>.handoff.md`
+- `handoff_path`: `artifact/<artifact_base>.handoff.md`
+- Cache paths (written by reviewers, stored under `artifact/`):
+  - `artifact/<artifact_base>.review-docs-readability.md`
+  - `artifact/<artifact_base>.review-errors.md`
 
 ## 1. Resolve target source files
 
@@ -58,7 +61,7 @@ Constrain edits to target source files and `PROMPT-DOC-COVERAGE-*.md`. Preserve 
 ## 3. Apply documentation edits
 
 - Add the documentation required by the rule files to in-scope source files, including short inline comments at non-obvious logical steps inside non-trivial function bodies.
-- Constrain edits to target source files and `PROMPT-DOC-COVERAGE-*.md`.
+- Constrain edits to target source files and `artifact/PROMPT-DOC-COVERAGE-*.md`.
 - Preserve runtime behavior; make only documentation-specific changes.
 - Run obvious formatters or linters for touched files.
 
@@ -70,7 +73,9 @@ Constrain edits to target source files and `PROMPT-DOC-COVERAGE-*.md`. Preserve 
 - Run these independent reviewers in parallel on the first pass:
   - `_refactor/document-reviewers/docs-and-readability-cached`
   - `_refactor/document-reviewers/errors-cached`
-- Include in each reviewer prompt only task-specific data: `handoff_path` and user notes.
+- Include in each reviewer prompt only task-specific data: `handoff_path`, `cache_path`, and user notes.
+  - For docs-and-readability: `cache_path: artifact/<artifact_base>.review-docs-readability.md`
+  - For errors: `cache_path: artifact/<artifact_base>.review-errors.md`
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
 - Apply domain ownership: DDOC, DREAD → docs-and-readability reviewer; DERR → errors reviewer. DDOC owns required inline readability comments. Arbitrate cross-domain conflicts.
 - Apply all BLOCKING fixes before advisories. Resolve DDOC/DERR before DREAD when fixes conflict. Record or defer advisories when no blockers remain.
@@ -106,7 +111,7 @@ Summary: <one-line summary>
 
 # Templates
 
-## `<artifact_base>.handoff.md`
+## `artifact/<artifact_base>.handoff.md`
 
 ```markdown
 # Documentation Coverage Handoff

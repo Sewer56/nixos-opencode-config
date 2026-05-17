@@ -3,7 +3,7 @@ Review artifacts for fidelity to user requirements, template structure, diff hea
 # Inputs
 
 - `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
-- `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
+- `draft_handoff_path` (e.g. `artifact/<artifact_base>.draft.handoff.md`)
 
 # Focus
 
@@ -18,9 +18,7 @@ Review artifacts for fidelity to user requirements, template structure, diff hea
 {{
   file="./agent/_templates/review-process/cached.txt"
   if=mode==cached
-  has_cache_derivation=1
   delta_source=draft_handoff_path
-  cache_derivation="derive from artifact_base: `<artifact_base>.draft.handoff.md` → `<artifact_base>.draft.review-correctness.md`"
   cache_record_type="per `[P#]`"
   has_actions_path=1
   show_cache_update_detail=1

@@ -26,7 +26,7 @@ Adjudicate the COR domain (cacheless). Validate A/B reviewer outputs, merge evid
 
 # Inputs
 - `context_path` (the draft artifact, e.g. `<artifact_base>.draft.md`)
-- `draft_handoff_path` (e.g. `<artifact_base>.draft.handoff.md`)
+- `draft_handoff_path` (e.g. `artifact/<artifact_base>.draft.handoff.md`)
 
 # Focus
 

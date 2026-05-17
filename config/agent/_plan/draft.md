@@ -45,12 +45,12 @@ Create and maintain a collaborative plan. Write only `<artifact_base>.draft.md`.
 # Artifacts
 - `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
 - `plan_path`: `<artifact_base>.draft.md`
-- `draft_handoff_path`: `<artifact_base>.draft.handoff.md`
+- `draft_handoff_path`: `artifact/<artifact_base>.draft.handoff.md`
 
 # Focus
 
 ## Scope
-Write only `<artifact_base>.draft.md` and `<artifact_base>.draft.handoff.md`. Do not modify other files. Never modify product code while drafting.
+Write only `<artifact_base>.draft.md` and `artifact/<artifact_base>.draft.handoff.md`. Do not modify other files. Never modify product code while drafting.
 
 # Process
 
@@ -87,14 +87,14 @@ Skip for items where the explorer found nothing beyond what's already listed.
 Follow the ordered steps below.
 
 1. Write and maintain `## Delta`
-- Write `draft_handoff_path` (`<artifact_base>.draft.handoff.md`) before the first reviewer pass.
+- Write `draft_handoff_path` (`artifact/<artifact_base>.draft.handoff.md`) before the first reviewer pass.
 - Record each `[P#]` item as a compact entry with `Status:` and `Why:` fields.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Recompute `## Delta` after every material revision to `plan_path`.
 
 2. Stage 1 — Correctness (fidelity + structure)
 - Run `_plan/draft-reviewers/correctness-adjudicator-cached` first.
-- Pass only `context_path: plan_path`, `draft_handoff_path`, and `cache_path: <artifact_base>.draft.review-correctness.md`.
+- Pass only `context_path: plan_path`, `draft_handoff_path`, and `cache_path: artifact/<artifact_base>.draft.review-correctness.md`.
 - Do not pass output schemas, focus lists, role text, blanket read orders, or reviewer-internal details.
 - Treat correctness as a single reviewer contract.
 - Validate `# REVIEW`, `Decision:`, `Domains: COR`, and conditional `IDs:`.
@@ -108,7 +108,7 @@ Follow the ordered steps below.
 
 3. Stage 2 — Documentation and Wording
 - Run `_plan/draft-reviewers/docs-and-wording`.
-- Include: `plan_path` and `draft_handoff_path`.
+- Include: `plan_path`, `draft_handoff_path`, and `cache_path: artifact/<artifact_base>.draft.review-docs-wording.md`.
 - Validate, apply fixes, recompute Delta.
 
 4. Validate each reviewer response

@@ -31,7 +31,7 @@ Discover error-returning functions with missing or vague documentation. Trace er
 
 - The user message may include file or directory paths to restrict the scan.
 - If no paths are provided, scan the repository's library/application modules discovered by `codebase-explorer`.
-- Derive all cache paths from `PROMPT-ERROR-DOCS` in the current workspace.
+- Derive all cache paths from `PROMPT-ERROR-DOCS` under `artifact/` in the current workspace.
 
 # Focus
 
@@ -59,14 +59,14 @@ Read the user message. If it contains file or directory paths, restrict collecto
 ## 3. Collect
 
 Spawn one `_refactor/errors-collector` per (library or application module, language) pair in a single parallel call.
-Derive a per-collector cache path: `PROMPT-ERROR-DOCS.<module_name>.cache.md` where `<module_name>` is the last path component of `target_path` (e.g. `src` → `PROMPT-ERROR-DOCS.src.cache.md`). Each collector writes to its own file — no concurrent writes to a shared file.
+Derive a per-collector cache path: `artifact/PROMPT-ERROR-DOCS.<module_name>.cache.md` where `<module_name>` is the last path component of `target_path` (e.g. `src` → `artifact/PROMPT-ERROR-DOCS.src.cache.md`). Each collector writes to its own file — no concurrent writes to a shared file.
 
 Per collector, pass:
 
 - `target_path`: absolute path to the module root
 - `language`: language name as reported by `codebase-explorer`
 - `repo_root`: absolute path to the repository root
-- `cache_path`: absolute path to the per-collector `PROMPT-ERROR-DOCS.<module_name>.cache.md`
+- `cache_path`: absolute path to the per-collector `artifact/PROMPT-ERROR-DOCS.<module_name>.cache.md`
 
 ## 4. Gate
 
@@ -80,11 +80,11 @@ For each collector that reported new items (New items > 0 in its summary), re-sp
 **Wrong**: Waiting for one round only and proceeding regardless of whether collectors found new items.
 **Correct**: Re-spawn collectors with new items, wait, repeat. Proceed only when all re-spawned collectors return zero new items.
 
-After convergence, merge per-collector caches into the unified cache (`PROMPT-ERROR-DOCS.cache.md`): concatenate all `## Items` entries, merge `## Settled Facts` (deduplicate by ID), and sum the `## Summary` counts. Delete per-collector cache files after merging.
+After convergence, merge per-collector caches into the unified cache (`artifact/PROMPT-ERROR-DOCS.cache.md`): concatenate all `## Items` entries, merge `## Settled Facts` (deduplicate by ID), and sum the `## Summary` counts. Delete per-collector cache files after merging.
 
 ## 5. Apply corrections
 
-Read `PROMPT-ERROR-DOCS.cache.md`. For each item:
+Read `artifact/PROMPT-ERROR-DOCS.cache.md`. For each item:
 
 1. Read the source file at the path and line given.
 2. If `missing`: insert the drafted error docs after existing doc sections, before the function signature.
@@ -113,8 +113,8 @@ Spawn `_refactor/errors-reviewer-cached`, passing `cache_path`. Wait for the rev
 
 # Artifacts
 
-- `cache_path`: `PROMPT-ERROR-DOCS.cache.md` (repo root, unified after convergence)
-- `collector_cache_paths`: `PROMPT-ERROR-DOCS.<module_name>.cache.md` (one per collector, deleted after merge)
+- `cache_path`: `artifact/PROMPT-ERROR-DOCS.cache.md` (unified after convergence)
+- `collector_cache_paths`: `artifact/PROMPT-ERROR-DOCS.<module_name>.cache.md` (one per collector, deleted after merge)
 
 # Output
 
@@ -132,11 +132,11 @@ Summary: <one-line summary>
 
 - Only write per-collector cache files while collectors are running. Write the unified cache only after the gate converges.
 - Apply corrections only after the gate converges.
-- Treat the unified `PROMPT-ERROR-DOCS.cache.md` as read-only after the gate converges; reviewer may update it.
+- Treat the unified `artifact/PROMPT-ERROR-DOCS.cache.md` as read-only after the gate converges; reviewer may update it.
 
 # Templates
 
-## `PROMPT-ERROR-DOCS.cache.md`
+## `artifact/PROMPT-ERROR-DOCS.cache.md`
 
 ```markdown
 # Error Docs Cache
