@@ -44,7 +44,7 @@
 - On malformed-output retry without new Delta or Decision entries, reuse prior analysis/cache and re-emit valid protocol output.
 
 5. Write files
-- Create parent directories for `cache_path`{{ if=has_actions_path }} and `actions_path`{{ endif }} before writing.
+- Create parent directories for `cache_path`{{ if=has_actions_path }} and `actions_path`{{ endif }} unconditionally before writing (mkdir -p semantics: no overwrite, no existence check).
 - If cache file missing/malformed: write the full cache file at `cache_path`.
 - Otherwise: use targeted edits to update only entries that changed{{ if=preserve_byte_exact }}, preserving unchanged cache text byte-for-byte{{ endif }}.
 {{ if=show_cache_update_detail }}

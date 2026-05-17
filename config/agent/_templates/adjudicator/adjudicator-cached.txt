@@ -11,7 +11,7 @@
 8. Read sidecar actions first. Read sidecar state only for evidence behind valid action IDs.
 9. Merge findings: {{arg:merge_scope}}.
 10. Merge duplicates and resolve conflicting fixes by preferring concrete evidence over reviewer confidence and minimal diffs over broad rewrites.
-11. Create parent directories for `state_path`, `actions_path`, and sidecar cache/action paths before writing.
+11. Create parent directories for `state_path`, `actions_path`, and sidecar cache/action paths unconditionally before writing (mkdir -p semantics: no overwrite, no existence check).
 12. Write `state_path` as reviewer-owned cache.
 13. Write `actions_path` as primary-runner current-fix input with OPEN findings only. Do not copy raw leg transcripts.
 14. GATE: `state_path` and `actions_path` MUST exist on disk before output.

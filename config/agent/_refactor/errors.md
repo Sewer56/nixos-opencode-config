@@ -32,6 +32,7 @@ Discover error-returning functions with missing or vague documentation. Trace er
 - The user message may include file or directory paths to restrict the scan.
 - If no paths are provided, scan the repository's library/application modules discovered by `codebase-explorer`.
 - Derive all cache paths from `PROMPT-ERROR-DOCS` under `artifact/` in the current workspace.
+- Create parent directories unconditionally before writing any `artifact/...` path (mkdir -p semantics: no overwrite, no existence check).
 
 # Focus
 

@@ -44,6 +44,7 @@ Constrain edits to target source files and `artifact/PROMPT-DOC-COVERAGE-*.md`. 
 - Cache paths (written by reviewers, stored under `artifact/`):
   - `artifact/<artifact_base>.review-docs-readability.md`
   - `artifact/<artifact_base>.review-errors.md`
+- Create parent directories unconditionally before writing any `artifact/...` path (mkdir -p semantics: no overwrite, no existence check).
 
 ## 1. Resolve target source files
 

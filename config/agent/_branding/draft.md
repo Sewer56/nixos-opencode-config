@@ -43,6 +43,7 @@ Draft project names and brand direction with a reviewer loop.
   - `artifact/<artifact_base>.draft.review-distinctiveness.md`
   - `artifact/<artifact_base>.draft.review-positioning.md`
   - `artifact/<artifact_base>.draft.review-availability.md`
+- Create parent directories unconditionally before writing any `artifact/...` path (mkdir -p semantics: no overwrite, no existence check).
 
 # Focus
 

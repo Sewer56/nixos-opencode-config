@@ -62,33 +62,12 @@ Do **not** emit per-item blocks for `specific` functions. Omit them entirely; re
 ## 4. Return
 
 Write to `cache_path` using the `## artifact/PROMPT-ERROR-DOCS.cache.md` template from `config/agent/_refactor/errors.md`:
+- Create parent directories for `cache_path` unconditionally before writing (mkdir -p semantics: no overwrite, no existence check).
 - If the file does not exist, write it from the template.
 - If it exists, use targeted edits to insert new items into `## Items` and update the summary counts.
 - Do not modify items already in the cache.
 
-EMIT a review block summarizing what was found:
-
-```text
-# REVIEW
-Agent: _refactor/errors-collector
-Decision: PASS
-
-## Findings
-### [ITEM-###]
-Category: NEW_ITEM | UPDATED_ITEM
-Function: <name>
-File: <relative_path:line>
-Classification: missing | vague
-Traced Paths: <count>
-
-## Summary
-- Module: <target_path>
-- Language: <language>
-- New items: <count>
-- Total items in cache: <count>
-```
-
-- `Decision: PASS` when the scan is complete and cache is updated. The primary agent re-runs collectors until convergence (step 4), verifying exhaustiveness.
+Return the `# Output` review block summarizing found items and counts. Use `Decision: PASS` when the scan is complete and cache is updated. The primary agent re-runs collectors until convergence (step 4), verifying exhaustiveness.
 
 # Output
 

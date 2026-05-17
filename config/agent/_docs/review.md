@@ -37,6 +37,7 @@ Review existing end-user-facing documentation and apply fixes with a four-review
   - `artifact/<artifact_base>.review-wording.md`
   - `artifact/<artifact_base>.review-engagement.md`
   - `artifact/<artifact_base>.review-consistency.md`
+- Create parent directories unconditionally before writing any `artifact/...` path (mkdir -p semantics: no overwrite, no existence check).
 
 # Focus
 

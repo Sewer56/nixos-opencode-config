@@ -46,6 +46,7 @@ Create and maintain a collaborative plan. Write only `<artifact_base>.draft.md`.
 - `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
 - `plan_path`: `<artifact_base>.draft.md`
 - `draft_handoff_path`: `artifact/<artifact_base>.draft.handoff.md`
+- Create parent directories unconditionally before writing any `artifact/...` path (mkdir -p semantics: no overwrite, no existence check).
 
 # Focus
 
