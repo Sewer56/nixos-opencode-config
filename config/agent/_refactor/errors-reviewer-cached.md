@@ -16,6 +16,7 @@ permission:
   list: allow
   external_directory: allow
   edit:
+    "*": deny
     "*PROMPT-ERROR-DOCS*.md": allow
 ---
 

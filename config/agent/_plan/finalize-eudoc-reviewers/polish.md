@@ -15,6 +15,7 @@ permission:
   list: allow
   todowrite: allow
   edit:
+    "*": deny
     "*PROMPT-PLAN*.review-eudoc-polish*.md": allow
   external_directory: allow
   task: deny

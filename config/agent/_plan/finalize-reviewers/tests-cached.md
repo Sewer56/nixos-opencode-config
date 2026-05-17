@@ -11,6 +11,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
+    "*": deny
     "*PROMPT-PLAN*.review-tests*.md": allow
   grep: allow
   glob: allow

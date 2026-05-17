@@ -11,6 +11,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
+    "*": deny
     "*PROMPT-PLUGIN-PLAN*.review-tests*.md": allow
   list: allow
   todowrite: allow

@@ -11,6 +11,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
+    "*": deny
     "*PROMPT-ITERATE-EDIT*.patterns*.md": allow
   external_directory: allow
 ---

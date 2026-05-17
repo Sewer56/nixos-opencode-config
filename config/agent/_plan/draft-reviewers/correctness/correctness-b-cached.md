@@ -13,6 +13,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
+    "*": deny
     "*PROMPT-PLAN*.draft.review-correctness.b*.md": allow
   grep: allow
   glob: allow

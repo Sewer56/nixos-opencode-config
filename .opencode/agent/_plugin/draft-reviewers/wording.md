@@ -12,6 +12,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
+    "*": deny
     "*PROMPT-PLUGIN-PLAN*.draft.review-wording*.md": allow
   grep: allow
   glob: allow

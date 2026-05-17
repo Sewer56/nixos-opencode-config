@@ -13,6 +13,7 @@ permission:
     "*.env.*": deny
     "*.env.example": allow
   edit:
+    "*": deny
     "*PROMPT-ITERATE-EDIT*.review-instruction-quality*.md": allow
   glob:
     "*": allow
