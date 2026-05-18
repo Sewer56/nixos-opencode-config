@@ -93,7 +93,7 @@ Max 5 iterations.
 a. Write `artifact/<artifact_base>.draft.handoff.md` with scope, Delta, and search findings before first reviewer pass.
    Track per-section Delta entries with: section name, status (New/Changed/Unchanged), and reason.
 
-b. Run four reviewers in parallel: `_branding/reviewers/clarity`, `_branding/reviewers/distinctiveness`, `_branding/reviewers/positioning`, `_branding/reviewers/availability`. Pass only: `branding_path` (`<artifact_base>.draft.md`), `handoff_path`, `cache_path` (artifact/<artifact_base>.draft.review-<domain>.md), scope boundaries, and user notes.
+b. Run four reviewers in parallel: `_branding/reviewers/clarity`, `_branding/reviewers/distinctiveness`, `_branding/reviewers/positioning`, `_branding/reviewers/availability`. Pass only run data: `branding_path` (`<artifact_base>.draft.md`), `handoff_path`, `cache_path` (`artifact/<artifact_base>.draft.review-<domain>.md`), trigger flags, and short `user_notes`.
 
 c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified`. All 4 reviewers are diff-mandated — confirm each finding contains a unified diff block. Treat missing diffs as protocol violation requiring retry.
 

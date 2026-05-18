@@ -4,8 +4,8 @@
    - `{{arg:reviewer_a}}`: cache `${base}.a.md`; actions `${base}.a.actions.<nnn>.md`
    - `{{arg:reviewer_b}}`: cache `${base}.b.md`; actions `${base}.b.actions.<nnn>.md`
    - Invalid: `${base}.actions.<nnn>.a.md`, `${base}.actions.<nnn>.b.md`
-4. Run `{{arg:reviewer_a}}` and `{{arg:reviewer_b}}` independently {{arg:run_context}}. Pass each leg its exact sidecar `cache_path` and `actions_path`.
-5. Do not pass either leg the other leg's output. Do not apply raw leg findings. Do not allow either leg to edit {{arg:no_edit_targets}}.
+4. Run only `{{arg:reviewer_a}}` and `{{arg:reviewer_b}}` independently {{arg:run_context}}. Pass each leg only artifact paths, changed ids/paths, trigger flags, decision ids, short `user_notes`, and that leg's exact sidecar `cache_path`/`actions_path`.
+5. Keep leg inputs isolated. Apply only adjudicated merged findings. Leg writes are limited to sidecar cache/action files.
 6. Validate both outputs: `# REVIEW`, exact assigned `Cache:`/`Actions:` sidecar paths{{arg:validation_extra}}, and `Decision: PASS | ADVISORY | BLOCKING`. Treat path mismatches as protocol failures; rerun that leg. Treat `IDs:` as routing data only.
 7. GATE: each sidecar cache/actions file MUST exist before adjudication. If missing, rerun that leg for protocol compliance; do not mine cache as a substitute for actions.
 8. Read sidecar actions first. Read sidecar state only for evidence behind valid action IDs.
@@ -13,7 +13,7 @@
 10. Merge duplicates and resolve conflicting fixes by preferring concrete evidence over reviewer confidence and minimal diffs over broad rewrites.
 11. Create parent directories for `state_path`, `actions_path`, and sidecar cache/action paths unconditionally before writing (mkdir -p semantics: no overwrite, no existence check).
 12. Write `state_path` as reviewer-owned cache.
-13. Write `actions_path` as primary-runner current-fix input with OPEN findings only. Do not copy raw leg transcripts.
+13. Write `actions_path` as primary-runner current-fix input with OPEN findings only; exclude raw leg transcripts.
 14. GATE: `state_path` and `actions_path` MUST exist on disk before output.
 15. Emit only the pointer review block.
 16. GATE: your response MUST contain exactly one `# REVIEW` fenced block with `Cache:`, `Actions:`, `Decision:`{{arg:validation_extra}}, and conditional `IDs:`. Do not add headings, tables, summaries, narrative prose, or content outside the block. The caller validates this exact shape and rejects malformed responses as protocol failures.

@@ -119,7 +119,7 @@ Next Command: /plan/draft
   - Do NOT include performance in the initial pass. Performance runs after audit+tests converge (see 5d).
 
 ### 5a. Initial reviewer dispatch (full reviewers)
-- Pass `handoff_path`, `plan_path`, exact curated `step_paths`, and `cache_path` to each selected reviewer.
+- Pass only run data: `handoff_path`, `plan_path`, domain-scoped `step_paths`, `cache_path`, trigger flags, and short `user_notes`.
 - Treat every selected reviewer as one reviewer contract.
 - Tests and performance are single-reviewer. Use their delta variants during normal iterations.
 - **Curate step paths per reviewer domain:**
@@ -128,13 +128,14 @@ Next Command: /plan/draft
 - Pre-inline essential context from the explorer manifest:
   - For audit: relevant file paths and current state from `## Files Touched` + `## Key Symbols`.
   - For tests: test file locations from `## Test Files` + existing test structure from `## Observations`.
+  - Keep excerpts minimal; do not add reviewer-owned focus, process, output, or read-order instructions.
 - Full reviewers handle INITIAL review only. They write cache files with grounding snapshots.
 - After each reviewer returns:
   - Read `actions_path` for current findings and fixes.
   - If the actions file is absent, malformed, truncated, ambiguous, or insufficient: treat the response as a protocol failure and retry/rerun the reviewer.
   - The cache is reviewer-owned state; the caller does not read it.
   - Apply only current findings exposed by the returned pointer.
-- On re-review: pass `cache_path` as reviewer state; do not pass unchanged artifacts. After it returns, read `actions_path` for current fixes.
+- On re-review: pass only `cache_path` and changed-state fields. After it returns, read `actions_path` for current fixes.
 
 ### 5b. Re-review dispatch (dedicated rereview agents, after fixes)
 - After applying fixes, dispatch dedicated rereview agents — NOT the full reviewers:
@@ -145,19 +146,14 @@ Next Command: /plan/draft
   - `cache_path` (required — the initial review cache with grounding snapshots)
   - `changed_step_paths` (only step files that changed)
   - `resolved_finding_ids`, `unresolved_finding_ids`, `finding_resolution_ledger`
-- Do NOT pass `handoff_path` or `plan_path` to rereview agents.
+- If the cache file does not exist, fall back to re-dispatching the full reviewer with required artifact paths.
 - Rereview agents: read cache → read changed steps → verify fixes → check for new issues → update cache/actions → emit terse `# REVIEW`.
 - After rereview returns, read `Actions:` for current fixes.
 - Treat missing or malformed actions file as a protocol failure and rerun the re-reviewer.
-- If the cache file does not exist (initial review write failed), fall back to re-dispatching the full reviewer with structural withhold.
 
 ### 5c. Review loop control
 - For advisory-only findings from rereview agents, record as DEFERRED. Do not revise or re-run solely to clear advisory-only findings unless they affect explicit acceptance criteria or hard user constraints.
-- Add explicit scope boundary to each reviewer prompt:
-  - reviewer must assess only its own domain
-  - if a concern belongs to another reviewer, mention it at most once in `## Notes` without deep investigation
-  - skip broad repo exploration unless required by its own focus contract
-  - prefer changed items from `## Delta`; do not re-evaluate unchanged items without new evidence
+- Do not add scope-boundary prose to reviewer prompts. Route by reviewer domain and pass trigger flags or changed step ids only.
 - `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
 - Keep `## Review Ledger` to domain summaries and cross-domain decisions (DEC-###). Do not copy per-finding detail into handoff.
 - For cache-backed reviewers, pass `cache_path` as state; use `actions_path` for fixes and `## Review Ledger` for summaries.
@@ -175,7 +171,7 @@ Next Command: /plan/draft
 ### 5d. Final gates (after audit+tests converge)
 - Dispatch placement and `_plan/finalize-reviewers/performance` in the same final-gate phase after audit+tests converge.
 - Placement: pass `handoff_path` and all I# step paths. It owns declaration-order checks and exact step-file diffs.
-- Performance: pass `handoff_path`, `plan_path`, and all step paths. The explorer manifest is still in context — pre-inline relevant `## Key Symbols` and `## Files Touched`.
+- Performance: pass `handoff_path`, `plan_path`, performance-sensitive `step_paths`, and trigger flags. If required facts are not in `handoff_path`, add them there before dispatch.
 - Performance reviews algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, missing validation.
 - Final-gate BLOCKING findings trigger fixes; apply exact ordering-only placement diffs directly. For other fixes, rerun only touched final-gate domains. ADVISORY only → DEFERRED.
 - Final success requires zero unresolved BLOCKING findings from audit, tests, placement, and performance.

@@ -25,7 +25,7 @@ Review an implementation against request intent from conversation context.
   - `## Request`: original user request (verbatim or summarized)
   - `## Plan Summary`: what was planned from conversation context
   - `## Changes Made`: files changed and what was done in each
-  - `## Notes`: additional context or `None`
+  - `## Notes`: 0-2 current-run facts or `None`
 
 # Focus
 

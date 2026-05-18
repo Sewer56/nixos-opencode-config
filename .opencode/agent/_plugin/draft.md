@@ -95,7 +95,6 @@ Follow the ordered steps below.
   - `context_path`
   - `draft_handoff_path`
   - `cache_path: <artifact_base>.draft.review-correctness.md`
-- Do not pass output schemas, focus lists, role text, blanket read orders, or reviewer-internal details.
 - Treat correctness as a single reviewer contract.
 - Validate `# REVIEW`, `Decision:`, `Domains: COR`, and conditional `IDs:`.
 - Read `actions_path` for current findings and fixes.

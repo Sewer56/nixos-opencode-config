@@ -119,8 +119,7 @@ Next Command: /plugin/draft
   - Always include `@_plugin/finalize-reviewers/tests-cached` for the tests domain.
   - Do not include placement or performance in the initial pass; they run after audit/tests converge (see 5d).
 - Run selected initial reviewers in parallel.
-- Pass `handoff_path`, `context_path`, exact `step_paths`, `cache_path`, and finalize-time user notes.
-- Do not pass focus lists, output schemas, role text, blanket read orders, or target file lists already present in shared artifacts.
+- Pass only run data: `handoff_path`, `context_path`, domain-scoped `step_paths`, `cache_path`, trigger flags, and short `user_notes`.
 - Treat every selected reviewer as one reviewer contract.
 - Consume the returned pointer:
   - Read `actions_path` for current findings and fixes.
@@ -136,7 +135,7 @@ Next Command: /plugin/draft
   - If tests had BLOCKING findings or verification-domain steps changed: dispatch `@_plugin/finalize-reviewers/tests-rereview`.
 - Re-reviewers receive only change state and finding IDs.
 - Pass only `cache_path`, `changed_step_paths`, `resolved_finding_ids`, `unresolved_finding_ids`, and `finding_resolution_ledger`.
-- Do not pass `handoff_path`, `context_path`, or unchanged step paths to re-reviewers unless the cache is missing or malformed.
+- If the cache is missing or malformed, fall back to full reviewer inputs.
 - After re-review returns, read `actions_path` for current fixes.
 - Treat missing or malformed actions file as a protocol failure and rerun the re-reviewer.
 
@@ -152,7 +151,7 @@ Next Command: /plugin/draft
 ### 5d. Final gates
 - After audit/tests converge, run `@_plugin/finalize-reviewers/placement` and `@_plugin/finalize-reviewers/performance` in parallel.
 - Placement: pass `handoff_path` and source STEP paths that add, move, rename, or re-anchor declarations.
-- Performance: pass `handoff_path`, `context_path`, and all step paths. Pre-inline only relevant explorer facts when needed.
+- Performance: pass `handoff_path`, `context_path`, performance-sensitive `step_paths`, and trigger flags. If required explorer facts are not in `handoff_path`, add them there before dispatch.
 - Final-gate BLOCKING findings trigger STEP fixes. Rerun only touched final-gate domains.
 - Final success requires zero unresolved BLOCKING findings from audit, tests, placement, and performance.
 
@@ -224,7 +223,7 @@ Revisions produced by this finalize run must follow. Apply only the relevant rul
 - **No duplicated content**: reference information from other artifacts by section name or file path. ~~Re-quoting content already in another artifact~~ → reference by section name.
 - **Shared ledger/file**: use a shared ledger or coordination file for orchestrator state when coordinating subagents. ~~Scattering coordination state across subagent outputs~~ → single shared file.
 - **Concise docs**: include a short documentation update when the iteration changes conventions or adds new artifacts.
-- **Tight subagent inputs**: pass only artifact paths, Delta/Decision excerpts, scoping, and user notes to subagents. ~~Re-stating output formats, focus lists, role assignments, target paths already enumerated in shared artifacts, or blanket read orders~~ → pass only what the callee cannot derive from its own agent file.
+- **Tight subagent inputs**: pass only artifact paths, Delta/Decision excerpts, scoping, and user notes to subagents.
 - **Nested code fences**: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block. Applies to templates, STEP diff blocks, and reviewer output format examples.
 
 # Reference Paths

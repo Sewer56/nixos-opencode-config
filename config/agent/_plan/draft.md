@@ -96,7 +96,6 @@ Follow the ordered steps below.
 2. Stage 1 — Correctness (fidelity + structure)
 - Run `_plan/draft-reviewers/correctness-adjudicator-cached` first.
 - Pass only `context_path: plan_path`, `draft_handoff_path`, and `cache_path: artifact/<artifact_base>.draft.review-correctness.md`.
-- Do not pass output schemas, focus lists, role text, blanket read orders, or reviewer-internal details.
 - Treat correctness as a single reviewer contract.
 - Validate `# REVIEW`, `Decision:`, `Domains: COR`, and conditional `IDs:`.
 - Read `actions_path` for current findings and fixes.
@@ -109,7 +108,7 @@ Follow the ordered steps below.
 
 3. Stage 2 — Documentation and Wording
 - Run `_plan/draft-reviewers/docs-and-wording`.
-- Include: `plan_path`, `draft_handoff_path`, and `cache_path: artifact/<artifact_base>.draft.review-docs-wording.md`.
+- Pass only `context_path: plan_path`, `draft_handoff_path`, and `cache_path: artifact/<artifact_base>.draft.review-docs-wording.md`.
 - Validate, apply fixes, recompute Delta.
 
 4. Validate each reviewer response

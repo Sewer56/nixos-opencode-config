@@ -200,7 +200,7 @@ Log shape:
   - `pattern-compliance`: `log_path`, `pattern_contract_path`, `cache_path: pattern_compliance_cache_path`, `changed_paths`, `target_summary`, `risk_flags`.
   - `instruction-quality`: `log_path`, `cache_path: instruction_quality_cache_path`, `changed_paths`, `target_summary`, `risk_flags`.
 - Reviewers must write only the provided `cache_path`.
-- Omit reviewer Focus, Process, Output, role text, and blanket read orders.
+- Reviewer task input is limited to the listed fields.
 - Validate each response starts with `# REVIEW`, has `Decision: PASS | ADVISORY | BLOCKING`, `## Findings`, and `## Verified`.
 - For BLOCKING findings, read the named cache, apply the smallest fix, update `log_path`, and rerun only reviewers whose domain or changed paths are touched.
 - For ADVISORY findings, record in log. Fix only when cheap and aligned with request.

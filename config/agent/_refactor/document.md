@@ -74,7 +74,7 @@ Constrain edits to target source files and `artifact/PROMPT-DOC-COVERAGE-*.md`. 
 - Run these independent reviewers in parallel on the first pass:
   - `_refactor/document-reviewers/docs-and-readability-cached`
   - `_refactor/document-reviewers/errors-cached`
-- Include in each reviewer prompt only task-specific data: `handoff_path`, `cache_path`, and user notes.
+- Pass each reviewer only run data: `handoff_path`, `cache_path`, changed paths, trigger flags, and short `user_notes`.
   - For docs-and-readability: `cache_path: artifact/<artifact_base>.review-docs-readability.md`
   - For errors: `cache_path: artifact/<artifact_base>.review-errors.md`
 - Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.

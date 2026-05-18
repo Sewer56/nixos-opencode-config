@@ -52,7 +52,7 @@ Read cache first. Reopen changed paths and open findings. Update cache before fi
 ```
 
 ## Tight subagent inputs
-Rule: Caller passes only run-specific data: paths, Delta, changed ids/paths, trigger flags, user notes, decisions, or cache paths. Callee prompt owns role, Focus, Process, Output, examples, model notes, and generic read policy.
+Rule: Caller passes only run-specific data: paths, Delta, changed ids/paths, trigger flags, short user notes, decisions, cache paths, or action paths. Callee prompt owns role, Focus, Process, Output, examples, model notes, and generic read policy. Adjudicators forward only allowed run data plus leg sidecars.
 
 Bad:
 ```text
@@ -64,6 +64,11 @@ Good:
 log_path=<path>
 changed_paths=[config/agent/foo.md]
 risk_flags=[permission, command-agent]
+```
+
+Adjudicator good:
+```text
+leg_input = {context_path, draft_handoff_path, cache_path, actions_path, changed_ids}
 ```
 
 ## Output and schema quality
