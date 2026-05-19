@@ -18,6 +18,7 @@ permission:
   glob: allow
   grep: allow
   list: allow
+  bash: allow
   task: {
     "*": "deny",
     "mcp-search": "allow",
@@ -26,7 +27,6 @@ permission:
     "_plan/draft-reviewers/correctness-adjudicator-cacheless": "allow",
     "_plan/draft-reviewers/docs-and-wording": "allow"
   }
-  # bash: deny
   # webfetch: deny
   # websearch: deny
   # codesearch: deny
