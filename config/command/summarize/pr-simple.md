@@ -1,7 +1,7 @@
 ---
 description: "Generate concise PR summary"
 agent: build
-model: openai/gpt-5.4
+model: sewer-axonhub/MiniMax-M2.7
 ---
 
 # Simple PR Summary
