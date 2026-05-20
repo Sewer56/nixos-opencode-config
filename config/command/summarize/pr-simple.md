@@ -1,7 +1,6 @@
 ---
 description: "Generate concise PR summary"
 agent: build
-model: sewer-axonhub/MiniMax-M2.7
 ---
 
 # Simple PR Summary
