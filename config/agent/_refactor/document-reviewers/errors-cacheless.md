@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews error documentation coverage and specificity for source files (cacheless)
-model: sewer-axonhub/Qwen3.5-397B-A17B  # LOW
+model: sewer-axonhub/MiniMax-M2.7  # LOW
 permission:
   "*": deny
   read:

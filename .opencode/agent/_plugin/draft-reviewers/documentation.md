@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks plugin draft plans for documentation coverage and specificity
-model: sewer-axonhub/Qwen3.5-397B-A17B  # LOW
+model: sewer-axonhub/MiniMax-M2.7  # LOW
 reasoningEffort: medium
 permission:
   "*": deny

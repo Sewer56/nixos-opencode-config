@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Explores codebase structure, patterns, and implementation details.
-model: sewer-axonhub/Qwen3.5-397B-A17B
+model: sewer-axonhub/MiniMax-M2.7
 permission:
   "*": deny
   read:

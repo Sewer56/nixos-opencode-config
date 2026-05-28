@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Surveys repo for files relevant to a user request, returns compact file manifest
-model: sewer-axonhub/Qwen3.5-397B-A17B  # MED
+model: sewer-axonhub/MiniMax-M2.7  # MED
 permission:
   "*": deny
   read:
