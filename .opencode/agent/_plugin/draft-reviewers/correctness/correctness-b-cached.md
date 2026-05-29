@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Independent plugin draft correctness reviewer B (cached)
-model: sewer-axonhub/GLM-5.1  # HIGH
+model: sewer-axonhub/MiniMax-M2.7  # HIGH
 temperature: 0.7  # reviewer B
 reasoningEffort: medium
 permission:

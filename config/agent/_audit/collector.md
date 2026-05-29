@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Enumerates public items in one module and cross-references usage across the repo
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/MiniMax-M2.7
 permission:
   "*": deny
   read:

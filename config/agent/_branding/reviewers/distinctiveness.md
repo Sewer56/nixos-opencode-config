@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews branding for distinctiveness — generic names, overused suffixes, near-duplicates, collisions, and weak searchability
-model: sewer-axonhub/GLM-5.1  # HIGH
+model: sewer-axonhub/MiniMax-M2.7  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

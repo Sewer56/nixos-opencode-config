@@ -2,7 +2,7 @@
 mode: primary
 hidden: true
 description: Handles Discord operations through MCP tools.
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/MiniMax-M2.7
 permission:
   "*": deny
   discord_*: ask

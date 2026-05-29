@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks direct OpenCode agent/command prompt edits for LLM instruction quality, prompt economy, and reviewer topology
-model: sewer-axonhub/GLM-5.1  # HIGH
+model: sewer-axonhub/MiniMax-M2.7  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

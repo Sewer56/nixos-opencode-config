@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews D# steps for coverage, specificity, and broken links (cacheless)
-model: sewer-axonhub/GLM-5.1
+model: sewer-axonhub/MiniMax-M2.7
 permission:
   "*": deny
   read:

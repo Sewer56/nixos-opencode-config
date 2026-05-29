@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Independent audit reviewer A (cacheless) for finalize adjudication
-model: sewer-axonhub/GLM-5.1  # HIGH
+model: sewer-axonhub/MiniMax-M2.7  # HIGH
 temperature: 1.0  # reviewer A
 permission:
   "*": deny
