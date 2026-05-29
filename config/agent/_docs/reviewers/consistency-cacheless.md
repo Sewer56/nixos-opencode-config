@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for cross-page coherence — broken links, terminology drift, and content duplication (cacheless)
-model: sewer-axonhub/MiniMax-M2.7  # LOW
+model: sewer-axonhub/step-3.7-flash  # LOW
 reasoningEffort: medium
 permission:
   "*": deny

@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Use this for third-party library research and repository documentation analysis.
-model: sewer-axonhub/MiniMax-M2.7  # MED
+model: sewer-axonhub/step-3.7-flash  # MED
 permission:
   "*": deny
   read:

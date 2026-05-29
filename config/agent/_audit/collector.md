@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Enumerates public items in one module and cross-references usage across the repo
-model: sewer-axonhub/MiniMax-M2.7
+model: sewer-axonhub/step-3.7-flash
 permission:
   "*": deny
   read:

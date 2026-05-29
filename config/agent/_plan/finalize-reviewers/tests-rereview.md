@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Re-verifies test fixes against cache, checks changed steps for new test gaps
-model: sewer-axonhub/MiniMax-M2.7  # HIGH
+model: sewer-axonhub/step-3.7-flash  # HIGH
 permission:
   "*": deny
   read:

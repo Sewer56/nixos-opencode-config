@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Runs CodeRabbit CLI review and fixes findings
-model: sewer-axonhub/MiniMax-M2.7
+model: sewer-axonhub/step-3.7-flash
 permission:
   "*": deny
   read:

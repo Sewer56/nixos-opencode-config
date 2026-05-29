@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews step test strategy for finalized plans (cached)
-model: sewer-axonhub/MiniMax-M2.7  # HIGH
+model: sewer-axonhub/step-3.7-flash  # HIGH
 permission:
   "*": deny
   read:

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews branding for availability — domain, package, handle, trademark, and ecosystem caveats
-model: sewer-axonhub/MiniMax-M2.7  # HIGH
+model: sewer-axonhub/step-3.7-flash  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

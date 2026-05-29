@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Independent correctness reviewer A (cacheless) for plan draft adjudication
-model: sewer-axonhub/MiniMax-M2.7  # HIGH
+model: sewer-axonhub/step-3.7-flash  # HIGH
 temperature: 1.0  # reviewer A
 reasoningEffort: medium
 permission:
