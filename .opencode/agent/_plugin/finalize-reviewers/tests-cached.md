@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks verification coverage and minimality for finalized plugin plans (cached)
-model: sewer-axonhub/MiniMax-M2.7  # HIGH
+model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
   read:

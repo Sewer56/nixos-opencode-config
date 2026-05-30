@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Re-verifies plugin verification fixes against cache and checks changed steps for new verification gaps
-model: sewer-axonhub/MiniMax-M2.7  # HIGH
+model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
   read:

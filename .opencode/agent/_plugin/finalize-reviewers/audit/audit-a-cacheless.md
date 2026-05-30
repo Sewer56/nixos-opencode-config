@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Independent plugin finalize audit reviewer A (cacheless)
-model: sewer-axonhub/MiniMax-M2.7  # HIGH
+model: sewer-axonhub/GLM-5.1  # HIGH
 temperature: 1.0  # reviewer A
 reasoningEffort: medium
 permission:

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Independent correctness reviewer B (cached) for plan draft adjudication
-model: sewer-axonhub/step-3.7-flash  # HIGH
+model: sewer-axonhub/GLM-5.1  # HIGH
 temperature: 0.7  # reviewer B
 reasoningEffort: medium
 permission:

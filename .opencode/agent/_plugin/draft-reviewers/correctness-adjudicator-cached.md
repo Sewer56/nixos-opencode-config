@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Adjudicates two independent plugin draft correctness reviews (cached)
-model: sewer-axonhub/MiniMax-M2.7  # HIGH
+model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

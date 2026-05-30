@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Adjudicates two independent plan-draft correctness reviews (cacheless)
-model: sewer-axonhub/step-3.7-flash  # HIGH
+model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews an implementation against its plan
-model: sewer-axonhub/step-3.7-flash  # HIGH
+model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
   read:
