@@ -179,7 +179,6 @@
             ]
           }
         },
-
         "MiniMax-M2.7": {
           "name": "MiniMax-M2.7",
           "family": "minimax",
@@ -212,7 +211,7 @@
           "temperature": true,
           "tool_call": true,
           "cost": {
-            "input": 0.20,
+            "input": 0.2,
             "output": 1.15
           },
           "limit": {
@@ -223,6 +222,56 @@
             "input": [
               "text",
               "image"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "deepseek-v4-flash": {
+          "name": "DeepSeek V4 Flash",
+          "family": "deepseek",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0.14,
+            "output": 0.28,
+            "cache_read": 0.0028
+          },
+          "limit": {
+            "context": 1048576,
+            "output": 393216
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "deepseek-v4-pro": {
+          "name": "DeepSeek V4 Pro",
+          "family": "deepseek",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0.435,
+            "output": 0.87,
+            "cache_read": 0.003625
+          },
+          "limit": {
+            "context": 1048576,
+            "output": 393216
+          },
+          "modalities": {
+            "input": [
+              "text"
             ],
             "output": [
               "text"
