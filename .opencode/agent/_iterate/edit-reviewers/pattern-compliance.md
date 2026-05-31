@@ -56,11 +56,22 @@ Check changed prompt files against selected workflow patterns.
 # Output
 
 {{
-  file="../config/agent/_templates/review-output/compact-output.txt"
+  file="../config/agent/_templates/review-output/output.txt"
+  mode=cached
   agent="_iterate/edit-reviewers/pattern-compliance"
   prefix=PAT
-  finding_detail="<pattern> | <path>"
+  categories="CARRY_IN | QUALITY_GUARD | APPLY_TO | VALIDATION"
+  evidence="<pattern id or missing element>"
+  problem="<one-line problem>"
+  fix="<exact correction>"
+  file_ref="<repo-relative path>"
+  bad="-<wrong line>"
+  good="+<correct line>"
+  with_file=1
+  with_lines=1
+  with_evidence=1
   verified_ref="<pattern id or path>: <one-line verification>"
+  return_rule_extra="- Only include the diff when exact replacement text and surrounding context are known. Otherwise write prose fix only and note 'diff not applicable' in the diff block."
 }}
 
 # Constraints

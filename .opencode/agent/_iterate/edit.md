@@ -222,7 +222,7 @@ Log shape:
 - Reviewers must write only the provided `cache_path`.
 - Reviewer task input is limited to the listed fields.
 - Validate each response starts with `# REVIEW`, has `Decision: PASS | ADVISORY | BLOCKING`, `## Findings`, and `## Verified`.
-- For BLOCKING findings, read the named cache, apply the smallest fix, update `log_path`, and rerun only reviewers whose domain or changed paths are touched.
+- For BLOCKING findings, apply the `Fix:` diff from the reviewer response inline. Read the named cache for open-finding context when needed. Update `log_path`, and rerun only reviewers whose domain or changed paths are touched.
 - For ADVISORY findings, record in log. Fix only when cheap and aligned with request.
 - Stop when no BLOCKING findings remain or after 5 review iterations. At cap, return `INCOMPLETE` if BLOCKING remains.
 

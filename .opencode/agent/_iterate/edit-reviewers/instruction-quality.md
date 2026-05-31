@@ -294,11 +294,22 @@ Good:
 # Output
 
 {{
-  file="../config/agent/_templates/review-output/compact-output.txt"
+  file="../config/agent/_templates/review-output/output.txt"
+  mode=cached
   agent="_iterate/edit-reviewers/instruction-quality"
   prefix=IQ
-  finding_detail="<category> | <path>"
+  categories="RUNTIME_INSTRUCTION | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CLARITY | DEDUP | TEMPLATE | TOPOLOGY | MARKDOWN"
+  evidence="<section, rule, or rendered artifact>"
+  problem="<one-line problem>"
+  fix="<exact correction>"
+  file_ref="<repo-relative path>"
+  bad="-<wrong line>"
+  good="+<correct line>"
+  with_file=1
+  with_lines=1
+  with_evidence=1
   verified_ref="<path>: <one-line verified condition>"
+  return_rule_extra="- Only include the diff when exact replacement text and surrounding context are known. Otherwise write prose fix only and note 'diff not applicable' in the diff block."
 }}
 
 # Constraints
