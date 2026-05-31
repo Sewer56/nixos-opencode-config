@@ -1,32 +1,51 @@
 # Renderer Template Syntax
 
-Reference file for the OpenCode template renderer. Loaded via `read` tool, never embedded.
+Usage guide for OpenCode prompt template imports, arguments, conditionals, and env tokens. This file intentionally contains live renderer tokens and is excluded from broad interpolation validation.
 
 ## File Imports
 
 - Import a file: `{{file="./path/to/file.md"}}`
 - Import with arguments: `{{file="./path/to/file.txt" arg1="value1" arg2="value2"}}`
-- Block imports: keep one `file="./..."` and one argument per line.
+- Use block imports for readability when passing multiple arguments.
+
+Good:
+```markdown
+{{ file="./rules/groups/tests/target-test-strategy.md" }}
+```
+
+Good parameterized import:
+```markdown
+{{
+  file="../config/agent/_templates/review-mission.txt"
+  artifact_type="implementation"
+  domain="implementation"
+}}
+```
 
 ## Template Placeholders
 
-- Use only inside template files: `{{arg:name}}`
-- Scoped args: apply to one include; nested includes receive args only when forwarded as `key=value`.
+- Use only inside reusable template files: `{{arg:name}}`
+- Args apply to one file include.
+- Nested includes receive args only when forwarded as `key=value` pairs.
 
 ## Conditionals
 
-- Use only in shared templates: `{{if=name}}`, `{{if=name==value}}`, `{{if=name!=value}}`, `{{if=env:CI}}`, `{{else}}`, `{{endif}}`
+- Truthy arg: `{{if=name}} ... {{endif}}`
+- Equality: `{{if=name==value}} ... {{endif}}`
+- Inequality: `{{if=name!=value}} ... {{endif}}`
+- Env condition: `{{if=env:CI}} ... {{else}} ... {{endif}}`
 
 ## Env Tokens
 
-- `{{env:VAR}}` for runtime environment values only.
-- Do not use for local file paths that should be imports.
+- Runtime environment value: `{{env:VAR}}`
+- Do not use env tokens for local prompt/rule paths; use file imports.
 
-## Booleans
+## Boolean Args
 
-- Pass `1` for true; never `=0`. Omit entirely for false.
+- Pass `1` for true.
+- Omit false flags entirely; do not pass `=0`.
 
 ## Validation
 
 - Do not pass args the target template does not consume.
-- Validate with `bash scripts/render-file.sh <repo-relative-path>` when imports, args, env tokens, or conditionals change.
+- Validate changed agent and command prompts with `bash scripts/render-file.sh <repo-relative-path>` when imports, args, env tokens, or conditionals change.

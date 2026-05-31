@@ -155,6 +155,13 @@ Requested reviewer merge updates only caller routing, task permissions, and affe
   preserve_byte_exact=1
 }}
 
+{{
+  file="../config/agent/_templates/review-cache-table.txt"
+  domain=integrity
+  ref_type=path
+  prefix=INT
+}}
+
 # Output
 
 {{

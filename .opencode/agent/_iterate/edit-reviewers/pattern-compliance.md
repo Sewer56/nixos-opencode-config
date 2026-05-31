@@ -48,6 +48,13 @@ Check changed prompt files against selected workflow patterns.
   preserve_byte_exact=1
 }}
 
+{{
+  file="../config/agent/_templates/review-cache-table.txt"
+  domain=pattern-compliance
+  ref_type=pattern-or-path
+  prefix=PAT
+}}
+
 # Output
 
 {{

@@ -193,12 +193,6 @@ Good:
 Reference existing content by path or id; do not paste full catalogs.
 ```
 
-Good runtime import:
-```markdown
-{ { file="./rules/groups/tests/target-test-strategy.md" } }
-```
-Remove the spaces after `{` and before `}` in real prompts.
-
 Import bloat rule:
 - Do not flag an import solely because the renderer expands it.
 - Flag an import only when the imported content is:
@@ -207,49 +201,13 @@ Import bloat rule:
   - duplicative with callee-owned rules
 
 ## Template feature use
+
 Check:
 - Prefer renderer-supported imports and arguments over copied boilerplate.
-- Use repo-relative renderer paths (`./...`) in imports, not absolute paths.
+- Use repo-relative renderer paths in imports, not absolute paths.
 - For `.opencode/` files importing from `config/`, use `../config/` prefix.
-- Use block form for multi-argument imports when it improves readability.
-- Remember include arg scope:
-  - Args apply to one file include.
-  - Nested includes receive args only when forwarded as `key=value` pairs.
-- Keep template placeholders in shared template files unless editing a reusable template:
-  - `{ {arg:name} }` without brace spacing
-- Keep conditionals in shared template files unless editing a reusable template:
-  - `{ { if=name } }` without brace spacing
-  - `{ { if=name==value } }` without brace spacing
-  - `{ { if=name!=value } }` without brace spacing
-  - `{ { if=env:CI } }` without brace spacing
-  - `{ { else } }` without brace spacing
-  - `{ { endif } }` without brace spacing
-- Use env tokens only for true runtime environment values:
-  - `{ {env:VAR} }` without brace spacing
-- Do not use env tokens for local prompt/rule paths.
-- Do not pass false-flag args (`=0`); the renderer treats any non-empty string as truthy. Omit the arg entirely for false.
-- Do not pass args that the target template does not consume (as `{ {arg:name} }` or `{ { if=name } }`).
-- Keep existing numeric flags as `1` only; never use `=0`.
-
-Bad:
-```text
-Read /home/sewer/opencode/config/rules/groups/tests/target-test-strategy.md and follow it.
-```
-
-Good:
-```markdown
-{ { file="./rules/groups/tests/target-test-strategy.md" } }
-```
-
-Good parameterized import:
-```markdown
-{ {
-  file="../config/agent/_templates/review-mission.txt"
-  artifact_type="implementation"
-  domain="implementation"
-} }
-```
-Remove the brace spacing in real prompts.
+- Read `.opencode/agent/_iterate/rules/renderer-template-use-checks.txt` with the read tool before judging template feature use; it contains live renderer tokens and stays excluded from broad interpolation validation.
+- Read `.opencode/agent/_iterate/rules/renderer-syntax.txt` with the read tool when exact syntax is needed.
 
 ## Reviewer topology
 Check:
@@ -302,8 +260,6 @@ Good:
   step2_extra="- Do not read workflow pattern catalogs or pattern contracts; pattern-compliance owns selected-pattern application checks.\n- Inspect only changed prompt files and directly referenced files needed to detect duplication or topology overlap."
   preserve_byte_exact=1
 }}
-
-Cache format:
 
 {{
   file="../config/agent/_templates/review-cache-table.txt"

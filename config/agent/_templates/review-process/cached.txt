@@ -40,7 +40,8 @@
 4. Inspect content
 - Read files listed in Changes Made / Delta. Do not explore repo or search broadly.
 {{ if=render_expanded }}
-- For each changed file that contains template imports, args, conditionals, or env tokens: render-expand it with `bash scripts/render-file.sh <repo-relative-path>`.
+- For each changed file that contains template imports, args, conditionals, or env tokens: render-expand it once with `bash scripts/render-file.sh <repo-relative-path>`.
+- Reuse that rendered output for all Focus checks in this reviewer pass.
 - Apply all Focus checks against the expanded output, not just the source.
 - Treat render errors as BLOCKING for the affected file.
 {{ endif }}

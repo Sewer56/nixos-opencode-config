@@ -55,7 +55,7 @@ Intent: write executable instructions for large language models. Use proven prom
 - Embed runtime rule/template content with renderer file imports instead of telling the model to read a local file manually.
 - Reference existing docs by path/section/id only when they are explanatory docs or broad catalogs not needed as runtime rules.
 - Use full absolute paths for prose references to local files; use renderer-compatible relative paths inside file imports.
-- Use renderer features when they reduce duplication. Read `.opencode/agent/_iterate/rules/renderer-syntax.txt` for syntax.
+- Use renderer features when they reduce duplication. Read `.opencode/agent/_iterate/rules/renderer-syntax.txt` for exact syntax.
 - Add examples only for conventions likely to be misread.
 - Remove rationale, filler, motivational text, vague advice, duplicate rules, and documentation-only wording.
 - Apply selected OPT/WOPT carry-ins from `pattern_contract_path`; keep reusable workflow strategies in `config/doc/workflow/*`, not hardcoded here.
@@ -203,7 +203,8 @@ Log shape:
 
 ## 8. Review
 - Use reconciled `changed_paths` from static smoke checks.
-- Before each reviewer pass, render-validate every file touched since the last reviewer pass with `bash scripts/render-file.sh <repo-relative-path>`. Fix render errors before dispatching reviewers.
+- Before each reviewer pass, reuse the static smoke-check render results when no files changed since that check.
+- Render-validate only files touched since the last successful render check with `bash scripts/render-file.sh <repo-relative-path>`. Fix render errors before dispatching reviewers.
 - Run `@_iterate/edit-reviewers/integrity` first when any changed path changes frontmatter, permissions, command-agent wiring, self-iteration behavior, optimizer workflow behavior, or reviewer topology.
 - Run `@_iterate/edit-reviewers/pattern-compliance` every run after integrity. It validates generated edits against selected pattern carry-ins, quality guards, apply-to paths, and validation bullets.
 - Run `@_iterate/edit-reviewers/instruction-quality` when any changed path changes an agent prompt, command body, output schema, subagent call, or reviewer topology.
