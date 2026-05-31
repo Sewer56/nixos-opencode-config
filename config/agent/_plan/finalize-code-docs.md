@@ -20,6 +20,7 @@ permission:
   task: {
     "*": "deny",
     "mcp-search": "allow",
+    "_plan/finalize-codedoc-prep": "allow",
     "_plan/finalize-codedoc-reviewers/*": "allow"
   }
 ---
@@ -34,6 +35,7 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
 - Read `discovery_path` when it exists; treat it as read-only shared repo context.
 
 # Artifacts
+- `state_path`: `<artifact_base>.codedoc-state.md`
 - `discovery_path`: `artifact/<artifact_base>.repo-discovery.md` (read-only if present)
 - Cache paths (written by reviewers, stored under `artifact/`):
   - `artifact/<artifact_base>.review-codedoc-docs-readability.md`
@@ -46,30 +48,21 @@ Modify only `<artifact_base>.handoff.md` and existing I#/T# step files matching 
 
 # Process
 
-## 1. Preconditions and source of truth
-- Read `handoff_path`.
-- Resolve exact `step_paths` by reading all existing I# and T# step files matching `step_pattern`.
-- Read `discovery_path` if it exists.
-- Treat the cache as stale when `Artifact Base` mismatches `artifact_base`, `Source Plan` mismatches `plan_path` when available, or cache facts contradict exact current step paths/symbols.
-- If the cache is missing, stale, or lacks an exact path/symbol needed for code-doc work, record the named gap and use only targeted local `glob`/`grep`/`read` fallback.
-- Pass exact `step_paths` to all reviewers.
+## 1. Run pipeline prep and read state
+- Dispatch `_plan/finalize-codedoc-prep` with `handoff_path`, `discovery_path`, `step_pattern`, and compact notes.
+- If prep returns `Status: FAIL`, emit its failure reason and stop.
+- Read `state_path`. Derive exact `step_paths` from the pipeline state.
+- Read `discovery_path` if prep indicates it is present and valid.
 - Treat the finalized code/test steps as the source of truth.
 - Modify existing I#/T# step files only when the initial code-documentation pass or reviewer findings target them.
 
-## 2. Deepen discovery only where needed
-- Use I#/T# step diffs plus `discovery_path` before any new repo discovery.
-- Read referenced target source files only when both the step diff and cache lack context for public API status, documentation placement, reachable error variants, or body intent.
-- For explicit gaps such as unclear public API status, unclear documentation placement, unclear reachable error variants, or missing/stale cache evidence, use targeted local `glob`/`grep`/`read` scoped to the exact file, path, symbol, and named gap.
-- Use `mcp-search` for external library or API documentation expectations first when needed.
-- Keep `discovery_path` read-only.
-
-## 3. Apply an initial code-documentation pass
+## 2. Apply an initial code-documentation pass
 - Scan I#/T# diffs for missing API docs, parameter/return docs, `# Errors` sections, and inline readability comments required by the documentation and errors rules.
 - For non-trivial function-body changes, apply the imported inline readability-comment rules inside the affected planned code diff; place comments at logical steps, not as generic notes.
 - Put documentation changes in the relevant step diff or snippet. A generic note such as `update docs` does not satisfy the rule files.
 - Preserve the step's existing action, intent, and approximate line labels; add or adjust only the minimal affected diff hunks.
 
-## 4. Run the code-documentation review loop
+## 3. Run the code-documentation review loop
 - Write and maintain `## Delta` in `handoff_path`. Record each I# and T# step as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Recompute `## Delta` after every material revision.
 - Mark unchanged items as `Unchanged` with `Why: no content change`.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
@@ -83,8 +76,7 @@ Modify only `<artifact_base>.handoff.md` and existing I#/T# step files matching 
 - Apply domain ownership: CDOC and CREAD → docs-and-readability reviewer; CERR → errors reviewer. CDOC owns required API docs and inline readability comments in planned code diffs. Arbitrate cross-domain conflicts.
 - Apply all BLOCKING fixes before advisories. Resolve CDOC/CERR before CREAD when fixes conflict. Record or defer advisories when no blockers remain.
 - Apply reviewer diffs to existing I# and T# step files only. Append one line to `## Revision History`.
-- Re-run only reviewers whose owned domain or touched step changed after a material revision; rerun both reviewers when a fix changes both code docs and error docs.
-- After a fix, rerun only reviewers whose domain changed. Do not rerun unrelated domains.
+- Re-run only reviewers whose owned domain or touched step changed after a material revision; rerun both reviewers when a fix changes both code docs and error docs. Do not rerun unrelated domains.
 - Loop until no BLOCKING findings remain or 10 iterations.
   No blocking: SUCCESS with recorded/deferred advisories. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 - Validate each reviewer response against the review block shape: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified` headings. Treat malformed responses as BLOCKING with a synthetic finding.

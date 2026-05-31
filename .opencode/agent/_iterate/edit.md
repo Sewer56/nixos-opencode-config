@@ -111,8 +111,8 @@ Intent: write executable instructions for large language models. Use proven prom
 ## 2. Classify traits and risks
 - `prompt_kind`: command, agent, reviewer, docs, or mixed.
 - `consumer`: LLM-runtime, human-doc, machine-output, or mixed.
-- `behavior_traits`: command delegation, primary runner + review subagents, review loop, subagent coordination, repeated subagent/task calls, machine-readable output, diff-based artifacts, failure-path validation, path-only helper sections, shared pattern selection, optimizer workflow, reviewer topology, action/cache split.
-- `focus_signals`: prompt/context bloat, missing prompt-writing contract, tight input violation, overbroad handoff, duplicate reads, duplicate reasoning, scope leakage, review-loop churn, cache/delta failure, action/cache confusion, output bloat, topology mismatch, model/risk mismatch.
+- `behavior_traits`: command delegation, primary runner + review subagents, review loop, subagent coordination, repeated subagent/task calls, machine-readable output, diff-based artifacts, failure-path validation, path-only helper sections, shared pattern selection, optimizer workflow, reviewer topology, action/cache split, pipeline decomposition.
+- `focus_signals`: prompt/context bloat, missing prompt-writing contract, tight input violation, overbroad handoff, duplicate reads, duplicate reasoning, scope leakage, review-loop churn, cache/delta failure, action/cache confusion, output bloat, topology mismatch, model/risk mismatch, monolithic prompt.
 - `risk_flags`: command-agent, permission, self-iteration, optimizer-workflow, reviewer-topology, structured-output, json-config.
 - Set `self-iteration` when paths include `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`.
 - Set `optimizer-workflow` when paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`.
@@ -142,6 +142,7 @@ Intent: write executable instructions for large language models. Use proven prom
 - When changing prompt-writing behavior, update runner prompt and reviewer enforcement together when future drift should be caught.
 - When changing review action/cache semantics, update primary runners, reviewer/adjudicator prompts, shared pattern docs, and `_iterate/edit-reviewers/instruction-quality.md` together.
 - When merging reviewers, update caller routing, task permissions, cache/output names, reviewer prompts, and scope boundaries together.
+- When splitting a monolithic prompt into a pipeline, lift phases that don't need the full global context (repo search, precondition validation, path resolution, slug derivation, discovery, external lookups) into a prep agent that writes a pipeline state file. Update the downstream agent to read it first and fast-fail if missing.
 - Prefer structural prompt changes over added prose.
 
 ## 6. Write log

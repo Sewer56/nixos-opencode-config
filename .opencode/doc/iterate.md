@@ -64,6 +64,20 @@ The old wording/style/clarity/dedup/performance/correctness/diff/meta reviewer s
 
 Keep high-risk correctness/security/data-loss checks separate from wording/polish checks. Merge reviewers when they read the same artifacts and emit overlapping findings.
 
+### Pipeline Decomposition
+
+When a monolithic agent prompt bundles phases that don't require the full global context — such as repo search, precondition validation, path resolution, slug derivation, external lookups, or broad discovery — split those phases into standalone pipeline stages:
+
+1. Identify phases that can run with narrow inputs and produce a compact output file.
+2. Create a prep agent for each such phase that writes a pipeline state file.
+3. Update the downstream agent to read the state file first and fast-fail if missing.
+4. Make the prep agent a separate user-facing command when it is a prerequisite gate.
+5. Pipeline state file is the single handoff between stages — each stage's prompt contains only its phase.
+
+Example: repo search, slug derivation, and precondition validation can all run before the main agent needs to generate artifacts or run review loops. Lift them into a prep command, have it write a state file, and have the main agent read that file.
+
+See OPT-017 for full carry-in rules and quality guards.
+
 ## Direct Edit Loop
 
 - coordination file: `PROMPT-ITERATE-EDIT-<slug>.md`

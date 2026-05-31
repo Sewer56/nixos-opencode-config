@@ -33,6 +33,7 @@ Related files:
 | subagent review of partial plan | OPT-014 |
 | shared pattern selection | OPT-015 |
 | adjudicated high-risk review | OPT-016 |
+| pipeline decomposition | OPT-017 |
 
 ## Approved Patterns
 
@@ -504,4 +505,43 @@ Topology (<domain> = correctness, audit, plan-reviewer, freeform-reviewer):
 
   RE-REVIEW:
     single <domain>-rereview (cache + changed material)
+```
+
+### OPT-017 — Pipeline Decomposition
+
+- Scope: cross-workflow
+- Apply When: a monolithic prompt contains phases that do not need the full context of later phases — such as repo search, precondition validation, path resolution, external lookups, discovery, or slug derivation — and those phases can run with limited inputs to produce a compact output file.
+- Skip When: the workflow is already lean (≤80 lines of process) or every phase requires full global context and splitting would duplicate more context than it saves.
+- Carry-In:
+  - Identify phases that can run independently with narrow inputs and produce a compact output file.
+  - Split each such phase into its own pipeline stage: a prep agent that writes a state file, followed by a downstream agent that reads it.
+  - Prep agent MUST own only its phase — precondition checks, discovery, path derivation, external lookups, etc.
+  - Prep agent MUST write a compact pipeline state file with all resolved outputs, validation results, and pointers.
+  - Prep agent MUST be a separate user-facing command when its output is a prerequisite gate for later stages.
+  - Downstream agent MUST read the pipeline state file first and fast-fail if it is missing.
+  - Downstream agent MUST NOT dispatch the prep agent internally.
+  - Pipeline state file MUST be the single handoff artifact between stages.
+  - Each stage's prompt MUST contain only its owned phase instructions.
+  - Callers that chain multiple pipeline workflows MUST call prep stages first, then pass state-derived paths to downstream phases.
+- Expected Gain: smaller per-agent prompts, clearer phase ownership, less monolithic context, reusable prep for different downstream agents, user-visible pipeline stages.
+
+```text
+Before (monolithic):
+  agent.md (400 lines)
+    ├── slug derivation + path resolution
+    ├── repo search / discovery
+    ├── core generation work
+    └── review loop
+
+After (pipelined):
+  agent-prep.md (80 lines) — separate command
+    ├── slug derivation
+    ├── path resolution
+    ├── repo search / discovery
+    └── writes pipeline state file
+
+  agent.md (250 lines) — reads state file
+    ├── reads pipeline state file
+    ├── core generation work
+    └── review loop
 ```

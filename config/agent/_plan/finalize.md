@@ -20,7 +20,6 @@ permission:
   task: {
     "*": "deny",
     "mcp-search": "allow",
-    "_plan/finalize-explorer": "allow",
     "_plan/finalize-reviewers/audit-adjudicator-cached": "allow",
     "_plan/finalize-reviewers/audit-adjudicator-cacheless": "allow",
     "_plan/finalize-reviewers/audit-rereview": "allow",
@@ -38,12 +37,11 @@ Convert a confirmed draft plan into reviewed code and test steps. Write `<artifa
 # Inputs
 - The latest user message may confirm the draft, provide small finalize-time notes, or point out changes since the draft.
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
-- Required local artifacts for this run:
-  - `<artifact_base>.draft.md`
-- If request does not identify exact draft path or slug, you may use one targeted glob for `PROMPT-PLAN-*.draft.md` in current workspace to disambiguate. Do not broaden search beyond that precondition check.
+- Required: `<artifact_base>.pipeline-state.md` must exist from a prior `/plan/finalize-prep` run.
 
 # Artifacts
 - `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
+- `state_path`: `<artifact_base>.pipeline-state.md`
 - `plan_path`: `<artifact_base>.draft.md`
 - `handoff_path`: `<artifact_base>.handoff.md`
 - `discovery_path`: `artifact/<artifact_base>.repo-discovery.md`
@@ -59,73 +57,44 @@ Only write planning artifacts `<artifact_base>.handoff.md` and I#/T# step files 
 
 # Process
 
-## 1. Preconditions and source of truth
-
-**⚠ PRECONDITION GATE: Do not load rule files, read repo files, or run any tool calls beyond Step 1a until `plan_path` is confirmed.**
-
-### Step 1a — Resolve draft path (one tool call maximum)
-- If latest user message names exact `PROMPT-PLAN-*.draft.md` path, use it directly. Skip glob.
-- Else if latest user message or command arguments clearly imply `slug`, derive `artifact_base` as `PROMPT-PLAN-<slug>` and use `<artifact_base>.draft.md`. Skip glob.
-- Else run exactly ONE glob for `PROMPT-PLAN-*.draft.md` in current workspace.
-  - If exactly one match exists → proceed to Step 1b.
-  - If zero matches exist → IMMEDIATELY output the FAIL template below. Do NOT run any additional globs, reads, searches, or rule loads. Do NOT broaden or retry the pattern. Stop.
-  - If multiple matches exist → IMMEDIATELY output the FAIL template below with "multiple drafts" reason. Stop.
-
-**FAIL output template (use verbatim when precondition fails):**
-```
-Status: FAIL
-Plan Path: N/A
-Handoff Path: N/A
-Step Pattern: N/A
-Review Iterations: 0
-Summary: <"No PROMPT-PLAN-*.draft.md file found" or "Multiple draft files found, specify slug or path">
-Next Command: /plan/draft
-```
-
-### Step 1b — Confirm draft and load rules (only after Step 1a succeeds)
-- Derive `artifact_base` from resolved path. All artifact paths derive from `artifact_base`.
-- Read `plan_path` (`<artifact_base>.draft.md`). If read fails or file is missing, return `Status: FAIL` and stop.
-- Treat `plan_path` and any explicit finalize-time notes from the latest user message as the source of truth for this run.
-- Treat the `/plan/finalize` invocation itself as the confirmation boundary.
-- Do not rewrite `plan_path`.
-
-## 2. Build shared repo discovery cache
-- Only enter this phase after `plan_path` is resolved and read successfully.
-- Dispatch `_plan/finalize-explorer` with `plan_path` and `discovery_path`.
-- After `Status: SUCCESS`, read `discovery_path`.
-- Use the cache for file ownership, key symbols, public API surfaces, error surfaces, test files, and docs-relevant behavior.
+## 1. Read pipeline state
+- Read `state_path` (`<artifact_base>.pipeline-state.md`).
+- If `state_path` is missing or cannot be read, return `Status: FAIL` immediately. Do not run discovery, write artifacts, or dispatch reviewers.
+- Derive `artifact_base`, `plan_path`, `handoff_path`, `discovery_path`, and `step_pattern` from the pipeline state.
+- Read `discovery_path` when explorer status is SUCCESS.
+- Treat `plan_path` and any explicit finalize-time notes from the pipeline state as the source of truth for this run.
+- Use the discovery cache for file ownership, key symbols, public API surfaces, error surfaces, test files, and docs-relevant behavior.
 - Use only targeted `glob`/`grep`/`read` for the named missing fact when:
-  - The explorer returns `Status: FAIL`.
+  - The explorer returned `Status: FAIL`.
   - `discovery_path` cannot be read.
   - Cache metadata mismatches `artifact_base` or `plan_path`.
   - `## Known Gaps` names a fact needed for a step.
-- Leave `discovery_path` writes to `_plan/finalize-explorer`.
 - Use `mcp-search` for external libraries or APIs first when needed.
+- Do not rewrite `plan_path` or `state_path`.
 
-## 3. Write the handoff file
+## 2. Write the handoff file
 - Rewrite `handoff_path` from scratch for this run.
 - Preserve the latest consolidated user request verbatim under `## Raw Request`.
 - Include selected `## Settled Facts` only when the fact is needed for stable handoff evidence, step evidence, or reviewer grounding.
 - Write `handoff_path` using the `# Templates` section below.
 
-## 4. Write the implementation/test steps
+## 3. Write the implementation/test steps
 - Derive discrete `REQ-###` items from the confirmed draft plan and handoff.
 - Record the settled repo facts that the plan depends on.
 - Keep the step plan concrete enough that an implementer does not need to invent file placement, major structure, missing test coverage, verification commands, or code shape.
 - Ground each implementation and test step in the current repo surface with a real file path, an anchor, repo evidence, and a short code snippet or diff.
 - Stable numbering: number implementation steps (I#) and test steps (T#) sequentially within each type. If a step is removed during revision, leave the gap — do not renumber other items.
-- Write `handoff_path` with all plan content.
 - Write each implementation step and test step to its own file matching `step_pattern`.
 
-## 5. Run the code/test review loop
+## 4. Run the code/test review loop
 - Write and maintain `## Delta` in `handoff_path` before the first reviewer pass. Record each `REQ-###` item as a compact entry with `Status:`, `Touched:`, and `Why:` fields. Add artifact markers for `Source Plan` and `Review Ledger`. Recompute `## Delta` after every material revision.
 - Also record each I# and T# step as a Delta entry so reviewers can skip Unchanged step files.
 - Before initial reviewer pass, derive `reviewer_set`:
   - Always include `_plan/finalize-reviewers/audit-adjudicator-cached` for the audit domain.
   - Always include `_plan/finalize-reviewers/tests-cached` for the tests domain.
-  - Do NOT include performance in the initial pass. Performance runs after audit+tests converge (see 5d).
+  - Do NOT include performance in the initial pass. Performance runs after audit+tests converge (see 4d).
 
-### 5a. Initial reviewer dispatch (full reviewers)
+### 4a. Initial reviewer dispatch (full reviewers)
 - Pass only run data: `handoff_path`, `plan_path`, domain-scoped `step_paths`, `cache_path`, trigger flags, and short `user_notes`.
 - Treat every selected reviewer as one reviewer contract.
 - Tests and performance are single-reviewer. Use their delta variants during normal iterations.
@@ -145,7 +114,7 @@ Next Command: /plan/draft
   - Apply only current findings exposed by the returned pointer.
 - On re-review: pass only `cache_path` and changed-state fields. After it returns, read `actions_path` for current fixes.
 
-### 5b. Re-review dispatch (dedicated rereview agents, after fixes)
+### 4b. Re-review dispatch (dedicated rereview agents, after fixes)
 - After applying fixes, dispatch dedicated rereview agents — NOT the full reviewers:
   - If audit had BLOCKING findings or audit-domain steps changed: dispatch `_plan/finalize-reviewers/audit-rereview`.
   - If tests had BLOCKING findings or test-domain steps changed: dispatch `_plan/finalize-reviewers/tests-rereview`.
@@ -159,7 +128,7 @@ Next Command: /plan/draft
 - After rereview returns, read `Actions:` for current fixes.
 - Treat missing or malformed actions file as a protocol failure and rerun the re-reviewer.
 
-### 5c. Review loop control
+### 4c. Review loop control
 - For advisory-only findings from rereview agents, record as DEFERRED. Do not revise or re-run solely to clear advisory-only findings unless they affect explicit acceptance criteria or hard user constraints.
 - Do not add scope-boundary prose to reviewer prompts. Route by reviewer domain and pass trigger flags or changed step ids only.
 - Keep `## Review Ledger` to domain summaries and cross-domain decisions (DEC-###). Do not copy per-finding detail into handoff.
@@ -169,7 +138,7 @@ Next Command: /plan/draft
 - Do not reopen RESOLVED issues without new concrete evidence.
 - Revise step files only where needed. Append one line to `## Revision History`.
 - **PASS-stays-PASS gate:** Do not re-dispatch a reviewer that returned PASS with 0 findings unless revisions address a domain that overlaps with its focus. AUDIT covers fidelity+structure+completeness+economy+dead-code; TESTS covers test coverage; PLACEMENT covers declaration placement/order; PERF covers performance.
-- Recompute `reviewer_set` and re-run only reviewers with BLOCKING findings or domains touched by BLOCKING fixes, using dedicated rereview agents (5b). Advisory-only reviewers are recorded as DEFERRED and carried forward.
+- Recompute `reviewer_set` and re-run only reviewers with BLOCKING findings or domains touched by BLOCKING fixes, using dedicated rereview agents (4b). Advisory-only reviewers are recorded as DEFERRED and carried forward.
 - Rerun every domain whose assumptions changed:
   - Audit: changes to REQ items, step structure, file paths, diff headers, output schema, requirement mapping, or required sections.
   - Tests: changes to behavior, acceptance criteria, verification commands, or test steps.
@@ -179,7 +148,7 @@ Next Command: /plan/draft
 - Loop until no findings of any severity remain or 10 iterations.
   No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
 
-### 5d. Final gates (after audit+tests converge)
+### 4d. Final gates (after audit+tests converge)
 - Dispatch placement and `_plan/finalize-reviewers/performance` in the same final-gate phase after audit+tests converge.
 - Placement: pass `handoff_path` and all I# step paths. It owns declaration-order checks and exact step-file diffs.
 - Performance: pass `handoff_path`, `plan_path`, performance-sensitive `step_paths`, and trigger flags. If required facts are not in `handoff_path`, add them there before dispatch.
@@ -187,7 +156,7 @@ Next Command: /plan/draft
 - Final-gate BLOCKING findings trigger fixes; apply exact ordering-only placement diffs directly. For other fixes, rerun only touched final-gate domains. ADVISORY only → DEFERRED.
 - Final success requires zero unresolved BLOCKING findings from audit, tests, placement, and performance.
 
-### 5e. Final full audit before SUCCESS
+### 4e. Final full audit before SUCCESS
 - Before returning `Status: SUCCESS`, run a final full audit after all normal reviewers and final gates have zero unresolved BLOCKING findings.
 - Always run final audit and final tests audits:
   - `_plan/finalize-reviewers/audit-adjudicator-cacheless` with `handoff_path`, `plan_path`, and all step paths.

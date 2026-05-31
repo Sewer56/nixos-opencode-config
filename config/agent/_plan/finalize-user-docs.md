@@ -20,6 +20,7 @@ permission:
   task: {
     "*": "deny",
     "mcp-search": "allow",
+    "_plan/finalize-eudoc-prep": "allow",
     "_plan/finalize-eudoc-reviewers/*": "allow"
   }
 ---
@@ -37,6 +38,7 @@ Generate and review end-user documentation steps for finalized implementation/te
 
 # Artifacts
 - `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
+- `state_path`: `<artifact_base>.eudoc-state.md`
 - `plan_path`: `<artifact_base>.draft.md`
 - `handoff_path`: `<artifact_base>.handoff.md`
 - `discovery_path`: `artifact/<artifact_base>.repo-discovery.md`
@@ -52,30 +54,21 @@ Modify only `<artifact_base>.handoff.md` and D# step files. Keep I#/T# steps, pr
 
 # Process
 
-## 1. Preconditions and source of truth
-- Read `handoff_path`. Use its Step Index, Requirement Trace Matrix, Settled Facts, and Draft Plan Mapping as the primary source for user-facing behavior changes.
-- Read `discovery_path` if it exists; use it as read-only source behavior and evidence context.
-- Treat the cache as stale when `Artifact Base` mismatches `artifact_base`, `Source Plan` mismatches `plan_path` when available, or cache facts contradict exact current handoff/step evidence.
+## 1. Run pipeline prep and read state
+- Dispatch `_plan/finalize-eudoc-prep` with `plan_path`, `handoff_path`, `discovery_path`, `step_pattern`, and compact notes.
+- If prep returns `Status: FAIL`, emit its failure reason and stop.
+- Read `state_path`. Use its resolved paths and discovery context.
+- Read `discovery_path` if prep indicates it is present and valid.
 - Read existing I# and T# step files only when `handoff_path` plus `discovery_path` lack sufficient detail about a specific user-facing effect.
 - Treat the finalized steps as the source of truth.
 
-## 2. Deepen discovery
-- Trust `discovery_path` for source behavior and evidence when it has relevant file, symbol, public surface, error surface, or user-facing behavior facts.
-- Read existing user documentation files that may describe changed behavior.
-- For NEW documentation, read sibling pages for style/structure consistency.
-- Use cached source evidence when `discovery_path` has relevant facts.
-- Only read a source file when both `handoff_path` and `discovery_path` lack the exact line reference needed for a D# step's Evidence field.
-- When documentation ownership, placement, or exact source evidence is missing from the cache, use only targeted local `glob`/`grep`/`read` scoped to the exact docs or source gap.
-- Use `mcp-search` for external libraries or APIs first when needed.
-- Keep `discovery_path` read-only.
-
-## 3. Generate D# steps
+## 2. Generate D# steps
 - Derive D# steps from user-facing effects in the finalized steps and current documentation surface.
 - Ground each D# step in a real documentation file path, scope level (page, section, paragraph, new), affected sections, and content diff or description.
 - For NEW pages, ground in the plan requirement and sibling-page conventions.
 - Stable numbering: number documentation steps (D#) sequentially. If a step is removed during revision, leave the gap — do not renumber other items.
 
-## 4. Extend the handoff file
+## 3. Extend the handoff file
 - Add D# entries to the Step Index table in `handoff_path`.
 - Add or update documentation mapping fields in Draft Plan Mapping and Requirement Trace Matrix so D# steps trace to requirements.
 - Add D# entries to `## Delta` for reviewer cache tracking.
@@ -83,7 +76,7 @@ Modify only `<artifact_base>.handoff.md` and D# step files. Keep I#/T# steps, pr
 - Maintain exact `step_paths` for all D# step files written in this run.
 - Append one line to `## Revision History`.
 
-## 5. Run the end-user documentation review loop
+## 4. Run the end-user documentation review loop
 - Write and maintain `## Delta` in `handoff_path`. Record each D# step as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Mark existing I#/T# entries as Unchanged with `Why: pre-existing step`. Recompute `## Delta` after every material revision.
 - Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
 - **Stage 1: Correctness** — Run `_plan/finalize-eudoc-reviewers/correctness-cached` first. Checks coverage, specificity, and broken links. Apply its diffs, update `## Review Ledger`, append to `## Revision History`. Recompute `## Delta`.

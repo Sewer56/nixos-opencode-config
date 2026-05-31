@@ -14,6 +14,7 @@ permission:
   external_directory: allow
   task:
     "*": "deny"
+    "_plan/finalize-prep": "allow"
     "_plan/finalize": "allow"
     "_plan/finalize-code-docs": "allow"
     "_plan/finalize-user-docs": "allow"
@@ -28,11 +29,10 @@ Run the three existing finalize workflows as one chain. Preserve the same artifa
 
 # Workflow
 
-## 1. Resolve draft
-- If the user names an exact draft path, use it directly.
-- Else if a slug is clear, derive `plan_path` from `artifact_base`.
-- Else run one targeted glob for `PROMPT-PLAN-*.draft.md`; stop with `FAIL` if zero or multiple drafts match.
-- Do not read broad repo context before `plan_path` is resolved.
+## 1. Finalize prep
+- Dispatch `_plan/finalize-prep` with the user message.
+- Stop if it returns `Status: FAIL`.
+- Use the returned `Plan Path` for downstream phases.
 
 ## 2. Finalize code and tests
 - Dispatch `_plan/finalize` with `plan_path` and compact finalize-time notes.
@@ -68,6 +68,6 @@ Summary: <one-line summary>
 # Constraints
 - Pass children only paths, trigger flags, and short notes.
 - Child workflows use the shared discovery cache and targeted local reads for named gaps.
-- Call only the three finalize parent agents.
+- Call only the four finalize agents: prep + three finalize parent agents.
 - Preserve child cache/action ownership. Use the handoff as the shared ledger.
 - Leave product code and git history unchanged.
