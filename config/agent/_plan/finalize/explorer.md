@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Writes the shared repo discovery cache for plan-finalize workflows
-model: sewer-axonhub/step-3.7-flash  # MED
+model: sewer-axonhub/step-3.7-flash  # LOW
 permission:
   "*": deny
   read:
