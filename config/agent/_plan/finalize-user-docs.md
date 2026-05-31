@@ -83,11 +83,12 @@ Modify only `<artifact_base>.handoff.md` and D# step files. Keep I#/T# steps, pr
   - For polish: `cache_path: artifact/<artifact_base>.review-eudoc-polish.md`
 - Update `## Review Ledger`: assign IDs to new findings, preserve existing IDs, mark resolved RESOLVED, defer non-blocking DEFERRED.
 - Apply domain ownership: EDOC → correctness; ECLR/EWRD/EENG/ECNS → polish. Arbitrate cross-domain conflicts.
-- Apply reviewer diffs to D# step files only. Trust reviewer evidence — apply diffs directly without re-reading target files to verify. Only re-read if the edit fails to apply.
+- Apply reviewer diffs to D# step files only.
+- Trust reviewer evidence — apply diffs directly without re-reading target files to verify. Only re-read if the edit fails to apply.
 - Append one line to `## Revision History`.
 - After a fix, rerun only the reviewer whose domain changed. Do not rerun unrelated domains.
 - ADVISORY-only deferral: if only ADVISORY findings remain, record as DEFERRED and do not rerun.
-- Loop until no findings of any severity remain or 3 iterations. No findings: proceed to Section 5. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
+- Loop until no BLOCKING findings remain or 3 iterations. No blockers: proceed to Section 5. At cap: FAIL if BLOCKING remains, SUCCESS with risks if only ADVISORY.
 
 ## 5. Cacheless audit
 - Run these reviewers in sequence, both in cacheless mode (ignore caches, return all current findings):

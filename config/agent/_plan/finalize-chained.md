@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Runs prep, finalize, doc-prep, code-doc finalize, and user-doc finalize as one chained plan-finalize workflow
+description: Runs prep, finalize-review, doc-prep, code-docs, and user-docs as one chained plan-finalize workflow
 permission:
   "*": deny
   read:

@@ -63,7 +63,9 @@ Modify only `<artifact_base>.handoff.md` and existing I#/T# step files matching 
   - For errors: `cache_path: artifact/<artifact_base>.review-codedoc-errors.md`
 - Update `## Review Ledger`: assign IDs to new findings, preserve existing IDs, mark resolved RESOLVED, defer non-blocking DEFERRED.
 - Apply domain ownership: CDOC and CREAD → docs-and-readability reviewer; CERR → errors reviewer. Arbitrate cross-domain conflicts.
-- Apply all BLOCKING fixes before advisories. Apply reviewer diffs to I#/T# step files only. Append one line to `## Revision History`.
+- Apply all BLOCKING fixes before advisories.
+- Apply reviewer diffs to I#/T# step files only.
+- Append one line to `## Revision History`.
 - Re-run only reviewers whose owned domain or touched step changed. Rerun both when a fix changes both doc and error domains.
 - Loop until no BLOCKING findings remain or 3 iterations. No blockers: proceed to Section 3. At cap: FAIL if BLOCKING remains.
 
