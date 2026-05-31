@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Reviews and revises code-adjacent documentation in finalized implementation/test steps
+description: Runs code-documentation reviewers against finalized I#/T# steps and applies their findings
 permission:
   "*": deny
   read:
@@ -24,19 +24,18 @@ permission:
   }
 ---
 
-Review and revise code-adjacent documentation (API references, doc comments, inline comments inside non-trivial code bodies, parameter descriptions, error message strings, developer-facing READMEs) inside finalized code/test steps. Apply documentation and error-doc fixes to existing Implementation (I#) and Test (T#) step files. Leave end-user documentation steps (D# steps) to `/plan/finalize-user-docs`.
+Run code-documentation reviewers against finalized I#/T# step files. Apply their findings. Loop until no blockers, then run a cacheless audit. Leave D# steps to `/plan/finalize-user-docs`.
 
 # Inputs
 - The latest user message may provide code-documentation notes.
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
 - Use `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `discovery_path` = `artifact/<artifact_base>.repo-discovery.md`, and `step_pattern` = `<artifact_base>.step.*.md`.
-- Required local artifacts for this run: `plan_path`, `handoff_path`, and existing I#/T# files matching `step_pattern`.
-- Read `discovery_path` when it exists; treat it as read-only shared repo context.
+- Required local artifacts: `plan_path`, `handoff_path`, and existing I#/T# files matching `step_pattern`.
 
 # Artifacts
 - `state_path`: `<artifact_base>.doc-pipeline-state.md`
 - `discovery_path`: `artifact/<artifact_base>.repo-discovery.md` (read-only if present)
-- Cache paths (written by reviewers, stored under `artifact/`):
+- Cache paths (written by cached reviewers, stored under `artifact/`):
   - `artifact/<artifact_base>.review-codedoc-docs-readability.md`
   - `artifact/<artifact_base>.review-codedoc-errors.md`
 
@@ -51,40 +50,31 @@ Modify only `<artifact_base>.handoff.md` and existing I#/T# step files matching 
 - Read `state_path` (`<artifact_base>.doc-pipeline-state.md`).
 - If `state_path` is missing or cannot be read, return `Status: FAIL` immediately.
 - Derive exact `step_paths` from the pipeline state.
-- Read `discovery_path` when present and valid.
-- Treat the finalized code/test steps as the source of truth.
-- Modify existing I#/T# step files only when the initial code-documentation pass or reviewer findings target them.
+- Read `handoff_path` for Step Index and existing Delta/Ledger context.
 
-## 2. Apply an initial code-documentation pass
-- Scan I#/T# diffs for missing API docs, parameter/return docs, `# Errors` sections, and inline readability comments required by the documentation and errors rules.
-- For non-trivial function-body changes, apply the imported inline readability-comment rules inside the affected planned code diff; place comments at logical steps, not as generic notes.
-- Put documentation changes in the relevant step diff or snippet. A generic note such as `update docs` does not satisfy the rule files.
-- Preserve the step's existing action, intent, and approximate line labels; add or adjust only the minimal affected diff hunks.
-
-## 3. Run the code-documentation review loop
-- Write and maintain `## Delta` in `handoff_path`. Record each I# and T# step as a Delta entry with `Status:`, `Touched:`, and `Why:` fields. Recompute `## Delta` after every material revision.
-- Mark unchanged items as `Unchanged` with `Why: no content change`.
-- Treat `handoff_path` as the shared ledger for reviewer findings, statuses, and arbitration decisions. Reviewers maintain their own cache files; do not copy cache state into the handoff.
-- Run these independent shared code-doc reviewers in parallel on the first pass:
+## 2. Cached review loop
+- Write and maintain `## Delta` in `handoff_path`. Record each I#/T# step with `Status:`, `Touched:`, and `Why:`. Recompute after every material revision.
+- Treat `handoff_path` as the shared ledger. Reviewers maintain their own cache files; do not copy cache state into the handoff.
+- Run these independent cached reviewers in parallel on the first pass:
   - `_plan/finalize-codedoc-reviewers/docs-and-readability-cached`
   - `_plan/finalize-codedoc-reviewers/errors-cached`
-- Pass each reviewer only run data: `plan_path`, `handoff_path`, exact `step_paths`, `cache_path`, changed ids/paths, trigger flags, and short `user_notes`.
+- Pass each reviewer only run data: `plan_path`, `handoff_path`, exact `step_paths`, `cache_path`, changed ids/paths, and short `user_notes`.
   - For docs-and-readability: `cache_path: artifact/<artifact_base>.review-codedoc-docs-readability.md`
   - For errors: `cache_path: artifact/<artifact_base>.review-codedoc-errors.md`
-- Update the `## Review Ledger` in `handoff_path`: assign IDs to new findings, preserve existing IDs when the underlying issue is unchanged, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED.
-- Apply domain ownership: CDOC and CREAD → docs-and-readability reviewer; CERR → errors reviewer. CDOC owns required API docs and inline readability comments in planned code diffs. Arbitrate cross-domain conflicts.
-- Apply all BLOCKING fixes before advisories. Resolve CDOC/CERR before CREAD when fixes conflict. Record or defer advisories when no blockers remain.
-- Apply reviewer diffs to existing I# and T# step files only. Append one line to `## Revision History`.
-- Re-run only reviewers whose owned domain or touched step changed after a material revision; rerun both reviewers when a fix changes both code docs and error docs. Do not rerun unrelated domains.
-- Loop until no BLOCKING findings remain or 10 iterations.
-  No blocking: SUCCESS with recorded/deferred advisories. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
-- Validate each reviewer response against the review block shape: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified` headings. Treat malformed responses as BLOCKING with a synthetic finding.
-- Before `Status: SUCCESS`:
-  - Audit errors with `_plan/finalize-codedoc-reviewers/errors-cacheless` when public API/error-docs changed.
-  - Audit docs-and-readability with `_plan/finalize-codedoc-reviewers/docs-and-readability-cacheless` when doc comments changed.
-  - Ignore caches and Delta shortcuts.
-  - Return all current findings.
-  - If BLOCKING: fix, recompute Delta, rerun touched reviewers, then re-audit.
+- Update `## Review Ledger`: assign IDs to new findings, preserve existing IDs, mark resolved RESOLVED, defer non-blocking DEFERRED.
+- Apply domain ownership: CDOC and CREAD → docs-and-readability reviewer; CERR → errors reviewer. Arbitrate cross-domain conflicts.
+- Apply all BLOCKING fixes before advisories. Apply reviewer diffs to I#/T# step files only. Append one line to `## Revision History`.
+- Re-run only reviewers whose owned domain or touched step changed. Rerun both when a fix changes both doc and error domains.
+- Loop until no BLOCKING findings remain or 3 iterations. No blockers: proceed to Section 3. At cap: FAIL if BLOCKING remains.
+
+## 3. Cacheless audit
+- Run these reviewers in parallel, both in cacheless mode (ignore caches, return all current findings):
+  - `_plan/finalize-codedoc-reviewers/docs-and-readability-cacheless`
+  - `_plan/finalize-codedoc-reviewers/errors-cacheless`
+- Pass each reviewer only run data: `plan_path`, `handoff_path`, exact `step_paths`, and short `user_notes`. Do not pass cache paths.
+- Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified` headings. Treat malformed responses as BLOCKING.
+- If only ADVISORY: record as DEFERRED in `## Review Ledger`.
+- If BLOCKING: apply fixes, update `## Delta`, append `## Revision History`, then re-audit once. At cap (2 audit passes): FAIL if BLOCKING remains, SUCCESS with risks if only ADVISORY.
 
 # Output
 Return exactly:
@@ -115,3 +105,7 @@ Apply these rules:
 {{ file="./rules/groups/docs/target-code-docs.md" }}
 
 {{ file="./rules/groups/docs/target-error-docs.md" }}
+
+{{ file="./rules/groups/style/target-readability.md" }}
+
+{{ file="./rules/groups/style/target-wording.md" }}

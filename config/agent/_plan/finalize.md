@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Synthesizes the plan handoff with step decomposition and writes step body files from draft and discovery cache
+description: Generates the plan handoff and step body files from draft and discovery cache
 model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
@@ -20,7 +20,7 @@ permission:
   grep: allow
 ---
 
-Read the confirmed draft plan and repo discovery cache. Write the complete plan handoff with step decomposition.
+Read the confirmed draft plan and repo discovery cache. Generate the plan handoff and implementation/test step body files.
 
 # Inputs
 - `plan_path`: absolute path to `<artifact_base>.draft.md`
