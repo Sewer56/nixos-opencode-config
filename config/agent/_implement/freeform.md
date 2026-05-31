@@ -22,5 +22,5 @@ permission:
     "*": "deny"
     "_implement/freeform-implementer": "allow"
     "_implement/freeform-reviewer": "allow"
-    "_plan/finalize-chained": "allow"
+    "_plan/finalize": "allow"
 ---

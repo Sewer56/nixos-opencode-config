@@ -88,7 +88,6 @@ Handoff Path: <absolute path to `<artifact_base>.handoff.md`>
 Step Pattern: `<artifact_base>.step.*.md`
 Review Iterations: <n>
 Summary: <one-line summary>
-Next Command: /plan/finalize-user-docs
 ```
 
 # Constraints

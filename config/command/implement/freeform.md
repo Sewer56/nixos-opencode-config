@@ -29,7 +29,7 @@ $ARGUMENTS
 - Treat the draft as confirmed for chained finalize. Do not rewrite unrelated `PROMPT-PLAN-*` artifacts.
 
 ## 3. Chained finalize
-- Dispatch `_plan/finalize-chained` with `plan_path`, `artifact_base`, and short user notes only.
+- Dispatch `_plan/finalize` with `plan_path`, `artifact_base`, and short user notes only.
 - Require `Status: SUCCESS` before implementation.
 - Resolve exact step paths from the returned `handoff_path` Step Index; do not infer from stale globs when the handoff lists files.
 
@@ -42,7 +42,7 @@ $ARGUMENTS
 - Accept only a fenced `# REVIEW` pointer containing `Cache:`, `Actions:`, `Agent: _implement/freeform-reviewer`, and `Decision: PASS | ADVISORY | BLOCKING`.
 - Read `actions_path` for current findings. Do not read reviewer cache for fixes.
 - If BLOCKING: rerun `_implement/freeform-implementer` with `reviewer_findings` from `actions_path`, affected step paths, and touched validation expectations; then re-review with the same cache path.
-- If fixes invalidate plan assumptions, rerun `_plan/finalize-chained` before the next implementer pass.
+- If fixes invalidate plan assumptions, rerun `_plan/finalize` before the next implementer pass.
 - Stop after 5 implementation-review iterations. Success requires zero unresolved BLOCKING findings.
 
 # Output

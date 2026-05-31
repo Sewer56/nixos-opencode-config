@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Resolves draft, validates preconditions, dispatches explorer, dispatches finalize, and writes pipeline state
+description: Resolves draft, validates preconditions, dispatches explorer, dispatches code generation, and writes pipeline state
 permission:
   "*": deny
   read:
@@ -18,10 +18,10 @@ permission:
   task:
     "*": deny
     "_plan/finalize-explorer": allow
-    "_plan/finalize": allow
+    "_plan/finalize-code-generate": allow
 ---
 
-Resolve the confirmed draft plan, validate preconditions, dispatch repo discovery, dispatch finalize, and write a pipeline state file.
+Resolve the confirmed draft plan, validate preconditions, dispatch repo discovery, dispatch code generation, and write a pipeline state file.
 
 # Inputs
 - The latest user message may name an exact `PROMPT-PLAN-*.draft.md` path, imply a slug, or provide finalize-time notes.
@@ -54,9 +54,9 @@ Resolve the confirmed draft plan, validate preconditions, dispatch repo discover
 - Dispatch `_plan/finalize-explorer` with `plan_path` and `discovery_path`.
 - Record explorer status and any gaps.
 
-## 4. Dispatch finalize
-- Dispatch `_plan/finalize` with `plan_path`, `discovery_path`, `handoff_path`, and user notes from the latest message.
-- If explorer returned FAIL or discovery is missing, still dispatch — finalize can proceed with gaps.
+## 4. Dispatch code generation
+- Dispatch `_plan/finalize-code-generate` with `plan_path`, `discovery_path`, `handoff_path`, and user notes from the latest message.
+- If explorer returned FAIL or discovery is missing, still dispatch — code generation can proceed with gaps.
 - On `Status: FAIL`: record the failure, write minimal state, and return `Status: FAIL`.
 - On success: record step count.
 
@@ -105,5 +105,4 @@ Plan Path: <absolute plan_path>
 Handoff Path: <absolute handoff_path | N/A>
 Discovery Path: <absolute discovery_path>
 Summary: <one-line summary>
-Next Command: /plan/finalize
 ```
