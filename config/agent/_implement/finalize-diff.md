@@ -19,7 +19,7 @@ permission:
   external_directory: allow
   task:
     "*": "deny"
-    "_plan/finalize-chained": "allow"
+    "_plan/finalize": "allow"
     "_implement/freeform-implementer": "allow"
     "_implement/freeform-reviewer": "allow"
 ---
@@ -57,7 +57,7 @@ Turn the current uncommitted git diff into a cleanup plan, run chained finalize,
 - Scope the draft to finishing the existing diff: fix correctness issues, missing critical error handling, missing code/error docs, tests or validation gaps, and changed-scope cleanup. Do not introduce unrelated feature work.
 
 ## 3. Chained finalize
-- Dispatch `_plan/finalize-chained` with `plan_path`, `artifact_base`, changed-path inventory, and compact cleanup notes.
+- Dispatch `_plan/finalize` with `plan_path`, `artifact_base`, changed-path inventory, and compact cleanup notes.
 - Require `Status: SUCCESS` before implementation.
 - Resolve exact step paths from the returned `handoff_path` Step Index.
 

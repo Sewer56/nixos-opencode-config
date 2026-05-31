@@ -111,7 +111,7 @@ Initialize `## Strategy Matrix` from `# Strategy Sources`, status `UNTRIED`. Do 
 
 Run each task case with exactly 3 samples. Multi-task batches run 3 samples per task; compare per task and equal-weight aggregate across tasks.
 
-Determine current `--max-parallel-subagents`: max subagents the command under test can spawn in parallel (e.g. `Run _plan/draft-explorer and mcp-search in parallel` == 2). Re-evaluate after each edit batch (topology may change).
+Determine current `--max-parallel-subagents`: max subagents the command under test can spawn in parallel (e.g. `Run _plan/draft/explorer and mcp-search in parallel` == 2). Re-evaluate after each edit batch (topology may change).
 
 ```bash
 python3 tools/workflow-optimize/run_batch.py \
