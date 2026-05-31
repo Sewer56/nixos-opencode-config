@@ -24,7 +24,7 @@ Run the three existing finalize workflows as one chain. Preserve the same artifa
 # Inputs
 - The latest user message may name an exact `PROMPT-PLAN-*.draft.md` path, a slug, or finalize-time notes.
 - Derive `slug` from request context as a 2–3 word identifier and `artifact_base = PROMPT-PLAN-<slug>`.
-- Use `plan_path = <cwd>/<artifact_base>.draft.md`, `handoff_path = <cwd>/<artifact_base>.handoff.md`, and `step_pattern = <cwd>/<artifact_base>.step.*.md`.
+- Use `plan_path = <cwd>/<artifact_base>.draft.md`, `handoff_path = <cwd>/<artifact_base>.handoff.md`, `step_pattern = <cwd>/<artifact_base>.step.*.md`, and shared cache `<cwd>/artifact/<artifact_base>.repo-discovery.md`.
 
 # Workflow
 
@@ -51,7 +51,7 @@ Run the three existing finalize workflows as one chain. Preserve the same artifa
 
 ## 5. Finish
 - Read only returned status blocks and, when needed, the shared `handoff_path` Step Index to confirm current step files.
-- Do not modify plan artifacts directly; child finalize workflows own all artifact writes and review loops.
+- Let child finalize workflows own artifact writes and review loops.
 
 # Output
 Return exactly one fenced `text` block:
@@ -66,7 +66,8 @@ Summary: <one-line summary>
 ```
 
 # Constraints
-- Pass children only paths, trigger flags, and short notes; never paste child prompts, schemas, or reviewer instructions.
-- Do not call finalize reviewers directly; only call the three finalize parent agents.
+- Pass children only paths, trigger flags, and short notes.
+- Child workflows use the shared discovery cache and targeted local reads for named gaps.
+- Call only the three finalize parent agents.
 - Preserve child cache/action ownership. Use the handoff as the shared ledger.
-- No product-code edits. No auto-commit.
+- Leave product code and git history unchanged.

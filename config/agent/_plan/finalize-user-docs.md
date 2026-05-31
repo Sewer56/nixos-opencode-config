@@ -19,7 +19,6 @@ permission:
   list: allow
   task: {
     "*": "deny",
-    "codebase-explorer": "allow",
     "mcp-search": "allow",
     "_plan/finalize-eudoc-reviewers/*": "allow"
   }
@@ -34,11 +33,13 @@ Generate and review end-user documentation steps for finalized implementation/te
   - `<artifact_base>.draft.md`
   - `<artifact_base>.handoff.md`
   - existing I#/T# files matching `<artifact_base>.step.*.md`
+- Use `discovery_path = artifact/<artifact_base>.repo-discovery.md`.
 
 # Artifacts
 - `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
 - `plan_path`: `<artifact_base>.draft.md`
 - `handoff_path`: `<artifact_base>.handoff.md`
+- `discovery_path`: `artifact/<artifact_base>.repo-discovery.md`
 - `step_pattern`: `<artifact_base>.step.*.md`
 - Cache paths (written by reviewers, stored under `artifact/`):
   - `artifact/<artifact_base>.review-eudoc-correctness.md`
@@ -47,21 +48,26 @@ Generate and review end-user documentation steps for finalized implementation/te
 # Focus
 
 ## Scope
-Only modify `<artifact_base>.handoff.md` and D# step files. Do not modify I#/T# step files, product code, or `<artifact_base>.draft.md`.
+Modify only `<artifact_base>.handoff.md` and D# step files. Keep I#/T# steps, product code, `<artifact_base>.draft.md`, and `discovery_path` unchanged.
 
 # Process
 
 ## 1. Preconditions and source of truth
 - Read `handoff_path`. Use its Step Index, Requirement Trace Matrix, Settled Facts, and Draft Plan Mapping as the primary source for user-facing behavior changes.
-- Read existing I# and T# step files only when the handoff lacks sufficient detail about a specific user-facing effect.
+- Read `discovery_path` if it exists; use it as read-only source behavior and evidence context.
+- Treat the cache as stale when `Artifact Base` mismatches `artifact_base`, `Source Plan` mismatches `plan_path` when available, or cache facts contradict exact current handoff/step evidence.
+- Read existing I# and T# step files only when `handoff_path` plus `discovery_path` lack sufficient detail about a specific user-facing effect.
 - Treat the finalized steps as the source of truth.
 
 ## 2. Deepen discovery
+- Trust `discovery_path` for source behavior and evidence when it has relevant file, symbol, public surface, error surface, or user-facing behavior facts.
 - Read existing user documentation files that may describe changed behavior.
 - For NEW documentation, read sibling pages for style/structure consistency.
-- Skip source code reads — the handoff's Settled Facts already capture key code evidence and locations. Only read a source file when the handoff lacks the exact line reference needed for a D# step's Evidence field.
-- Use `codebase-explorer` for repo discovery first when documentation ownership or placement is unclear.
+- Use cached source evidence when `discovery_path` has relevant facts.
+- Only read a source file when both `handoff_path` and `discovery_path` lack the exact line reference needed for a D# step's Evidence field.
+- When documentation ownership, placement, or exact source evidence is missing from the cache, use only targeted local `glob`/`grep`/`read` scoped to the exact docs or source gap.
 - Use `mcp-search` for external libraries or APIs first when needed.
+- Keep `discovery_path` read-only.
 
 ## 3. Generate D# steps
 - Derive D# steps from user-facing effects in the finalized steps and current documentation surface.

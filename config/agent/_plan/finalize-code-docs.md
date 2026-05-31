@@ -19,7 +19,6 @@ permission:
   list: allow
   task: {
     "*": "deny",
-    "codebase-explorer": "allow",
     "mcp-search": "allow",
     "_plan/finalize-codedoc-reviewers/*": "allow"
   }
@@ -30,10 +29,12 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
 # Inputs
 - The latest user message may provide code-documentation notes.
 - Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
-- Use `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, and `step_pattern` = `<artifact_base>.step.*.md`.
+- Use `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `discovery_path` = `artifact/<artifact_base>.repo-discovery.md`, and `step_pattern` = `<artifact_base>.step.*.md`.
 - Required local artifacts for this run: `plan_path`, `handoff_path`, and existing I#/T# files matching `step_pattern`.
+- Read `discovery_path` when it exists; treat it as read-only shared repo context.
 
 # Artifacts
+- `discovery_path`: `artifact/<artifact_base>.repo-discovery.md` (read-only if present)
 - Cache paths (written by reviewers, stored under `artifact/`):
   - `artifact/<artifact_base>.review-codedoc-docs-readability.md`
   - `artifact/<artifact_base>.review-codedoc-errors.md`
@@ -41,26 +42,30 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
 # Focus
 
 ## Scope
-Only modify `<artifact_base>.handoff.md` and existing I#/T# step files matching `<artifact_base>.step.*.md`. Never create D# step files. Never modify product code while planning. Never rewrite `<artifact_base>.draft.md`.
+Modify only `<artifact_base>.handoff.md` and existing I#/T# step files matching `<artifact_base>.step.*.md`. Keep D# steps, product code, `<artifact_base>.draft.md`, and `discovery_path` unchanged.
 
 # Process
 
 ## 1. Preconditions and source of truth
 - Read `handoff_path`.
 - Resolve exact `step_paths` by reading all existing I# and T# step files matching `step_pattern`.
+- Read `discovery_path` if it exists.
+- Treat the cache as stale when `Artifact Base` mismatches `artifact_base`, `Source Plan` mismatches `plan_path` when available, or cache facts contradict exact current step paths/symbols.
+- If the cache is missing, stale, or lacks an exact path/symbol needed for code-doc work, record the named gap and use only targeted local `glob`/`grep`/`read` fallback.
 - Pass exact `step_paths` to all reviewers.
 - Treat the finalized code/test steps as the source of truth.
 - Modify existing I#/T# step files only when the initial code-documentation pass or reviewer findings target them.
-- Do not create D# step files.
 
 ## 2. Deepen discovery only where needed
-- Inspect I#/T# step diffs first. Read referenced target source files only when a step diff lacks context for public API status, doc placement, reachable error variants, or body intent.
-- Use `codebase-explorer` for repo discovery first when file ownership, public API surface, or documentation placement is unclear.
+- Use I#/T# step diffs plus `discovery_path` before any new repo discovery.
+- Read referenced target source files only when both the step diff and cache lack context for public API status, documentation placement, reachable error variants, or body intent.
+- For explicit gaps such as unclear public API status, unclear documentation placement, unclear reachable error variants, or missing/stale cache evidence, use targeted local `glob`/`grep`/`read` scoped to the exact file, path, symbol, and named gap.
 - Use `mcp-search` for external library or API documentation expectations first when needed.
+- Keep `discovery_path` read-only.
 
 ## 3. Apply an initial code-documentation pass
 - Scan I#/T# diffs for missing API docs, parameter/return docs, `# Errors` sections, and inline readability comments required by the documentation and errors rules.
-- For non-trivial function-body changes, add short inline comments inside the planned code diff at logical steps when names/control flow do not make intent obvious. Skip obvious assignments, getters, direct delegation, and code already explained by names.
+- For non-trivial function-body changes, apply the imported inline readability-comment rules inside the affected planned code diff; place comments at logical steps, not as generic notes.
 - Put documentation changes in the relevant step diff or snippet. A generic note such as `update docs` does not satisfy the rule files.
 - Preserve the step's existing action, intent, and approximate line labels; add or adjust only the minimal affected diff hunks.
 

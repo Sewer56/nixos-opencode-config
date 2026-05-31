@@ -138,13 +138,16 @@ Cache: <cache_path>
 
 ## Wording economy
 Check:
+- Prefer concise positive actions over prohibitions.
 - Use imperative, concrete instructions.
-- Prefer bullets/checklists for behavior-governing runtime rules.
+- Prefer bullets/checklists for runtime rules.
 - Number sequential process/workflow phase headers (`## 1.`, `## 2.`, etc.) so execution order is explicit; leave reference, schema, constraint, and scope sections unnumbered.
 - Keep one operational requirement per bullet when practical.
-- Remove filler, hedging, and soft token budgets.
-- Replace prohibition-led wording when a positive action says the same thing.
-- Flag dense paragraph-style rule blocks when bullets would be easier for an LLM to follow.
+- Delete filler, hedging, soft token budgets, and rationale.
+- Flag dense paragraph rules when bullets would be easier to follow.
+- Flag disabled-tool mentions when frontmatter already removes the tool.
+- Flag direct-vs-child or mode branches unless the prompt has an observable input for that branch.
+- Flag repeated path derivations and duplicate rule statements.
 
 Bad:
 ```text
@@ -182,6 +185,8 @@ Check:
   - non-runtime evidence
 - Keep human docs explanatory.
 - Keep agent prompts operational.
+- Flag copied pattern rationale when a compact behavior rule would suffice.
+- Flag multiple rules that restate the same path, cache, or tool policy.
 
 Bad:
 ```text
@@ -285,6 +290,7 @@ Good:
   - callee-owned instructions duplicated in caller
   - unstable machine output
   - confusing behavior-governing text
+  - redundant direct/child or disabled-tool instructions that change or obscure runtime behavior
   - reviewer topology merge that loses high-risk ownership
-- ADVISORY: local wording economy, dense paragraph-style rules, or doc clarity improvements that do not affect correctness.
+- ADVISORY: local wording economy, positive-wording opportunities, dense paragraph-style rules, or doc clarity improvements that do not affect correctness.
 - Keep response compact; detailed evidence belongs in cache.

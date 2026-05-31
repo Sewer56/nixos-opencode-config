@@ -45,20 +45,21 @@ Intent: write executable instructions for large language models. Use proven prom
 - When future prompt-writing behavior changes, update the runner prompt and reviewer enforcement together.
 
 ## Instruction Economy
-- Use imperative bullets/checklists with concrete verbs: read, derive, compare, write, return, stop, ask.
-- Write model-facing rules as scannable lists:
-  - Use headings for phases or rule cards.
-  - Number sequential process/workflow phases (`## 1. Preflight`, `## 2. Draft`, etc.) so execution order is explicit. Leave reference, schema, constraint, and scope sections unnumbered.
-  - Use one behavior requirement per bullet when practical.
-  - Split dense paragraph-style rules into bullets before committing.
-  - Keep long examples fenced; keep operational prose short.
-- Embed runtime rule/template content with renderer file imports instead of telling the model to read a local file manually.
-- Reference existing docs by path/section/id only when they are explanatory docs or broad catalogs not needed as runtime rules.
-- Use full absolute paths for prose references to local files; use renderer-compatible relative paths inside file imports.
-- Use renderer features when they reduce duplication. Read `.opencode/agent/_iterate/rules/renderer-syntax.txt` for exact syntax.
+- Write the shortest executable instruction that preserves behavior.
+- Prefer positive actions over prohibitions.
+  - Use `Read the cache first.` instead of `Do not rediscover before reading the cache.`
+- Use concrete verbs: read, derive, compare, write, return, stop, ask.
+- Use one behavior per bullet.
+- Number sequential workflow phases only.
+- Delete rationale, filler, hedging, motivational text, and duplicate rules.
+- Omit disabled-tool warnings when permissions already remove the tool.
+- Omit runtime-mode branches the agent cannot observe, such as direct command vs child call.
+- Define derived paths once, then reuse the variable.
+- Prefer allow-list scope bullets over repeated `do not` lists.
+- Use renderer imports for shared runtime templates.
+- Reference docs by path/id only for explanatory catalogs or non-runtime evidence.
 - Add examples only for conventions likely to be misread.
-- Remove rationale, filler, motivational text, vague advice, duplicate rules, and documentation-only wording.
-- Apply selected OPT/WOPT carry-ins from `pattern_contract_path`; keep reusable workflow strategies in `config/doc/workflow/*`, not hardcoded here.
+- Apply only selected OPT/WOPT carry-ins that change the target prompt.
 
 ## Machine Output
 - Use one exact fenced `text` block for machine-consumed responses.
@@ -80,7 +81,7 @@ Intent: write executable instructions for large language models. Use proven prom
 - Local subagents are called as `@agent/name`; callers also need matching `permission.task` allows.
 - Prefer deny-all permissions with narrow allows. Keep `*.env` and `*.env.*` denied; allow `*.env.example` only as safe sample input.
 - Keep documentation outside `agent/` and `command/` unless the markdown file is an executable agent or command.
-- Do not read `opencode-source/`. Direct prompt edits rely on local command/agent conventions and workflow docs, not OpenCode implementation internals.
+- Use local command/agent conventions and workflow docs for prompt edits.
 - Use `bash` only for git metadata/diff/status, `git diff --check`, and requested validation commands. Prefer `read`, `grep`, and `glob` for file inspection.
 
 # Pattern Sources
@@ -132,11 +133,16 @@ Intent: write executable instructions for large language models. Use proven prom
 - Edit target files directly. Keep changes limited to requested OpenCode agent/command behavior.
 - For model-facing behavior, write rules into executable command/agent/reviewer prompts.
 - Write command bodies as user messages and agent/reviewer bodies as system prompts.
+- Before saving each changed prompt, run this minimality gate:
+  - Remove instructions for tools unavailable in frontmatter.
+  - Remove direct-vs-child wording unless the prompt can observe and branch on it.
+  - Replace prohibition-led rules with the positive action when equivalent.
+  - Collapse repeated path derivations into one variable definition.
+  - Keep only pattern carry-ins needed for the requested behavior.
 - When changing prompt-writing behavior, update runner prompt and reviewer enforcement together when future drift should be caught.
 - When changing review action/cache semantics, update primary runners, reviewer/adjudicator prompts, shared pattern docs, and `_iterate/edit-reviewers/instruction-quality.md` together.
 - When merging reviewers, update caller routing, task permissions, cache/output names, reviewer prompts, and scope boundaries together.
 - Prefer structural prompt changes over added prose.
-- Do not read or modify `opencode-source/`.
 
 ## 6. Write log
 - Write `log_path` before review.

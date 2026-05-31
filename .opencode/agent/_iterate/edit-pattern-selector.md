@@ -31,12 +31,15 @@ Select compact pattern guidance for a direct OpenCode agent or command prompt ed
 2. Read `config/doc/workflow/optimize-patterns.md`.
 3. Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or `target_paths` match `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`.
 4. Read `config/doc/workflow/unproven-patterns.md` only when the request is about `IDEA-###`, unproven pattern intake, or pattern promotion.
-5. Do not read `opencode-source/`; direct prompt edits use local pattern docs and target prompts.
-6. Select `OPT-###` patterns from the Trait Matrix when they describe the desired prompt/workflow shape.
-7. Select `WOPT-###` tactics only for existing workflow refactors with matching focus signals. Do not use WOPT entries as a generic creation catalog.
-8. Write `pattern_contract_path` before final response using `# Pattern Contract` shape below.
-9. Return compact carry-in rules. Do not paste full catalog text.
-10. Do not invent pattern ids.
+5. Select the fewest patterns that change the target prompt.
+6. Prefer `- None` over weak matches.
+7. Cap selection at 4 OPT entries and 2 WOPT entries unless the request names more pattern ids.
+8. Merge overlapping carry-ins into one direct rule.
+9. Select `OPT-###` patterns when they describe the desired prompt/workflow shape.
+10. Select `WOPT-###` tactics only for existing workflow refactors with matching focus signals.
+11. Write `pattern_contract_path` before final response using `# Pattern Contract` shape below.
+12. Return compact carry-in rules. Do not paste full catalog text.
+13. Do not invent pattern ids.
 
 # Pattern Contract
 

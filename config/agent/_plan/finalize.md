@@ -33,7 +33,7 @@ permission:
   }
 ---
 
-Convert a confirmed draft plan into reviewed code and test steps. Write `<artifact_base>.handoff.md` (handoff, includes manifest) and individual implementation/test step files matching `<artifact_base>.step.*.md`.
+Convert a confirmed draft plan into reviewed code and test steps. Write `<artifact_base>.handoff.md` with a repo discovery cache pointer, and individual implementation/test step files matching `<artifact_base>.step.*.md`.
 
 # Inputs
 - The latest user message may confirm the draft, provide small finalize-time notes, or point out changes since the draft.
@@ -46,6 +46,7 @@ Convert a confirmed draft plan into reviewed code and test steps. Write `<artifa
 - `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
 - `plan_path`: `<artifact_base>.draft.md`
 - `handoff_path`: `<artifact_base>.handoff.md`
+- `discovery_path`: `artifact/<artifact_base>.repo-discovery.md`
 - `step_pattern`: `<artifact_base>.step.*.md`
 - Cache paths (written by reviewers on initial review, read by reviewers/rereview agents on re-review):
   - `artifact/<artifact_base>.review-audit.md`
@@ -88,17 +89,23 @@ Next Command: /plan/draft
 - Treat the `/plan/finalize` invocation itself as the confirmation boundary.
 - Do not rewrite `plan_path`.
 
-## 2. Dispatch explorer to gather repo facts
+## 2. Build shared repo discovery cache
 - Only enter this phase after `plan_path` is resolved and read successfully.
-- Dispatch `_plan/finalize-explorer` with `plan_path`. The explorer reads the draft, identifies all touched files, gathers current state (symbols, line ranges, imports, test files), and returns a compact structured manifest.
-- Use the explorer manifest for ALL subsequent steps — it provides shared, cached context. Do not re-discover files the explorer already surveyed.
-- The explorer manifest reduces orchestrator reasoning and prevents duplicate file reads by reviewers.
-- If the explorer fails (unlikely), fall back to direct `glob`/`grep`/`read` for discovery.
+- Dispatch `_plan/finalize-explorer` with `plan_path` and `discovery_path`.
+- After `Status: SUCCESS`, read `discovery_path`.
+- Use the cache for file ownership, key symbols, public API surfaces, error surfaces, test files, and docs-relevant behavior.
+- Use only targeted `glob`/`grep`/`read` for the named missing fact when:
+  - The explorer returns `Status: FAIL`.
+  - `discovery_path` cannot be read.
+  - Cache metadata mismatches `artifact_base` or `plan_path`.
+  - `## Known Gaps` names a fact needed for a step.
+- Leave `discovery_path` writes to `_plan/finalize-explorer`.
 - Use `mcp-search` for external libraries or APIs first when needed.
 
 ## 3. Write the handoff file
 - Rewrite `handoff_path` from scratch for this run.
 - Preserve the latest consolidated user request verbatim under `## Raw Request`.
+- Include selected `## Settled Facts` only when the fact is needed for stable handoff evidence, step evidence, or reviewer grounding.
 - Write `handoff_path` using the `# Templates` section below.
 
 ## 4. Write the implementation/test steps
@@ -124,11 +131,12 @@ Next Command: /plan/draft
 - Tests and performance are single-reviewer. Use their delta variants during normal iterations.
 - **Curate step paths per reviewer domain:**
   - Audit: all step paths (I# + T#).
-  - Tests: test step paths (T#) + implementation steps that directly affect test assertions/coverage. Do NOT include steps that only change UI, config, docs, or non-testable surface.
-- Pre-inline essential context from the explorer manifest:
+  - Tests: test step paths (T#) + implementation steps that directly affect test assertions/coverage.
+- Use `discovery_path` contents as the source for minimal reviewer context excerpts:
   - For audit: relevant file paths and current state from `## Files Touched` + `## Key Symbols`.
   - For tests: test file locations from `## Test Files` + existing test structure from `## Observations`.
-  - Keep excerpts minimal; do not add reviewer-owned focus, process, output, or read-order instructions.
+  - Keep excerpts minimal and leave focus, process, output, and read-order rules to reviewer prompts.
+  - Pass named gaps only when cache evidence is missing or stale.
 - Full reviewers handle INITIAL review only. They write cache files with grounding snapshots.
 - After each reviewer returns:
   - Read `actions_path` for current findings and fixes.
@@ -154,7 +162,6 @@ Next Command: /plan/draft
 ### 5c. Review loop control
 - For advisory-only findings from rereview agents, record as DEFERRED. Do not revise or re-run solely to clear advisory-only findings unless they affect explicit acceptance criteria or hard user constraints.
 - Do not add scope-boundary prose to reviewer prompts. Route by reviewer domain and pass trigger flags or changed step ids only.
-- `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `step_pattern` = `<artifact_base>.step.*.md`
 - Keep `## Review Ledger` to domain summaries and cross-domain decisions (DEC-###). Do not copy per-finding detail into handoff.
 - For cache-backed reviewers, pass `cache_path` as state; use `actions_path` for fixes and `## Review Ledger` for summaries.
 - Assign IDs to new findings, preserve existing IDs for unchanged root causes, mark resolved issues RESOLVED, defer non-blocking issues DEFERRED. Update cache files where present.
@@ -163,7 +170,11 @@ Next Command: /plan/draft
 - Revise step files only where needed. Append one line to `## Revision History`.
 - **PASS-stays-PASS gate:** Do not re-dispatch a reviewer that returned PASS with 0 findings unless revisions address a domain that overlaps with its focus. AUDIT covers fidelity+structure+completeness+economy+dead-code; TESTS covers test coverage; PLACEMENT covers declaration placement/order; PERF covers performance.
 - Recompute `reviewer_set` and re-run only reviewers with BLOCKING findings or domains touched by BLOCKING fixes, using dedicated rereview agents (5b). Advisory-only reviewers are recorded as DEFERRED and carried forward.
-- Rerun every domain whose assumptions changed: audit for changes to REQ items, step structure, file paths, diff headers, output schema, requirement mapping, or required sections; tests for changes to behavior, acceptance criteria, verification commands, or test steps; placement for declaration anchors/order; performance for algorithmic, data, concurrency, validation, logging, or workload changes.
+- Rerun every domain whose assumptions changed:
+  - Audit: changes to REQ items, step structure, file paths, diff headers, output schema, requirement mapping, or required sections.
+  - Tests: changes to behavior, acceptance criteria, verification commands, or test steps.
+  - Placement: changes to declaration anchors or order.
+  - Performance: changes to algorithms, data access, concurrency, validation, logging, or workload size.
 - Use audit variants after changes to structure, schema, output contract, numbering, file paths, diff headers, or requirement mapping, or after multiple fix rounds.
 - Loop until no findings of any severity remain or 10 iterations.
   No findings: SUCCESS. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
@@ -239,7 +250,8 @@ Source Plan: <absolute path to `<artifact_base>.draft.md`>
 - Why: <why this work matters>
 
 ## Supplementary Context
-- <repo fact, boundary, or pattern not already in source plan [P#] sections; omit section if none>
+- Repo Discovery Cache: `artifact/<artifact_base>.repo-discovery.md`
+- <selected repo fact, boundary, or pattern not already in source plan [P#] sections; omit non-cache bullets if none>
 
 ## Required Reads
 - `path/to/file-or-dir`: <why it matters; omit section if none>
