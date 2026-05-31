@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Resolves draft path, validates preconditions, dispatches explorer, and writes pipeline state for plan-finalize
+description: Resolves draft, validates preconditions, dispatches explorer, dispatches handoff synthesis, and writes pipeline state for plan-finalize
 permission:
   "*": deny
   read:
@@ -18,9 +18,10 @@ permission:
   task:
     "*": deny
     "_plan/finalize-explorer": allow
+    "_plan/finalize-handoff": allow
 ---
 
-Resolve the confirmed draft plan, validate preconditions, dispatch repo discovery, and write a pipeline state file.
+Resolve the confirmed draft plan, validate preconditions, dispatch repo discovery, dispatch handoff synthesis, and write a pipeline state file.
 
 # Inputs
 - The latest user message may name an exact `PROMPT-PLAN-*.draft.md` path, imply a slug, or provide finalize-time notes.
@@ -53,9 +54,15 @@ Resolve the confirmed draft plan, validate preconditions, dispatch repo discover
 - Dispatch `_plan/finalize-explorer` with `plan_path` and `discovery_path`.
 - Record explorer status and any gaps.
 
-## 4. Write pipeline state
+## 4. Dispatch handoff synthesis
+- Dispatch `_plan/finalize-handoff` with `plan_path`, `discovery_path`, `handoff_path`, and user notes from the latest message.
+- If explorer returned FAIL or discovery is missing, still dispatch — the handoff agent can proceed with gaps.
+- On `Status: FAIL`: record the failure, write minimal state, and return `Status: FAIL`.
+- On success: record step count.
+
+## 5. Write pipeline state
 - Overwrite `state_path` with the `# Pipeline State Format` below.
-- Include all resolved paths, validation results, and explorer outcome.
+- Include all resolved paths, validation results, explorer outcome, and handoff outcome.
 
 # Pipeline State Format
 
@@ -78,6 +85,11 @@ Artifact Base: <artifact_base>
 - Discovery Path: <discovery_path>
 - Gaps: <summary or none>
 
+## Handoff
+- Status: SUCCESS | FAIL | NOT_RUN
+- Handoff Path: <handoff_path>
+- Step Count: <n> implementation, <m> test
+
 ## User Notes
 - <finalize-time notes from user message or none>
 ```
@@ -90,6 +102,7 @@ Return exactly:
 Status: SUCCESS | FAIL
 State Path: <absolute state_path>
 Plan Path: <absolute plan_path>
+Handoff Path: <absolute handoff_path | N/A>
 Discovery Path: <absolute discovery_path>
 Summary: <one-line summary>
 Next Command: /plan/finalize

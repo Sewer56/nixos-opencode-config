@@ -21,9 +21,7 @@ permission:
   grep:
     "*": allow
     "opencode-source/**": deny
-  bash:
-    "*render-file.sh*": allow
-    "*cli.ts*render*": allow
+  bash: allow
   list: allow
   external_directory: allow
 ---
