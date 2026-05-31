@@ -18,7 +18,7 @@ permission:
 ---
 
 {{
-  file="./agent/_plan/finalize-codedoc-reviewers/_templates/docs-readability-header.txt"
+  file="./agent/_plan/finalize/codedoc-reviewers/_templates/docs-readability-header.txt"
   description="Review source files for documentation coverage, specificity, fidelity, inline comments, and readability."
   variant=refactor
   doc_domain=DDOC
@@ -37,7 +37,7 @@ permission:
 # Output
 
 {{
-  file="./agent/_plan/finalize-codedoc-reviewers/_templates/docs-readability-output.txt"
+  file="./agent/_plan/finalize/codedoc-reviewers/_templates/docs-readability-output.txt"
   mode=cacheless
   variant=refactor
   agent_name="_refactor/document-reviewers/docs-and-readability-cacheless"

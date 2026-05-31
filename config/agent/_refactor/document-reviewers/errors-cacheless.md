@@ -18,7 +18,7 @@ permission:
 ---
 
 {{
-  file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-header.txt"
+  file="./agent/_plan/finalize/codedoc-reviewers/_templates/errors-header.txt"
   description="Review source files' error documentation."
   variant=refactor
 }}
@@ -35,7 +35,7 @@ permission:
 # Output
 
 {{
-  file="./agent/_plan/finalize-codedoc-reviewers/_templates/errors-output.txt"
+  file="./agent/_plan/finalize/codedoc-reviewers/_templates/errors-output.txt"
   mode=cacheless
   variant=refactor
   agent_name="_refactor/document-reviewers/errors-cacheless"

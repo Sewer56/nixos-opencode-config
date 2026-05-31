@@ -14,11 +14,11 @@ permission:
   external_directory: allow
   task:
     "*": "deny"
-    "_plan/finalize-prep": "allow"
-    "_plan/finalize-review": "allow"
-    "_plan/finalize-doc-prep": "allow"
-    "_plan/finalize-code-docs": "allow"
-    "_plan/finalize-user-docs": "allow"
+    "_plan/finalize/prep": "allow"
+    "_plan/finalize/review": "allow"
+    "_plan/finalize/doc-prep": "allow"
+    "_plan/finalize/code-docs": "allow"
+    "_plan/finalize/user-docs": "allow"
 ---
 
 Run the full plan-finalize pipeline: prep, code generation, review, code-adjacent documentation, and end-user documentation.
@@ -31,26 +31,26 @@ Run the full plan-finalize pipeline: prep, code generation, review, code-adjacen
 # Workflow
 
 ## 1. Finalize prep
-- Dispatch `_plan/finalize-prep` with the user message.
+- Dispatch `_plan/finalize/prep` with the user message.
 - Stop if it returns `Status: FAIL`.
 - Use the returned `Plan Path` for downstream phases.
 
 ## 2. Finalize code and tests
-- Dispatch `_plan/finalize-review` with `plan_path` and compact finalize-time notes.
+- Dispatch `_plan/finalize/review` with `plan_path` and compact finalize-time notes.
 - Stop if it returns `Status: FAIL` or unresolved BLOCKING findings.
 - Use its returned `handoff_path` and `step_pattern` as the shared context for later stages.
 
 ## 3. Doc prep
-- Dispatch `_plan/finalize-doc-prep` with `plan_path`, `handoff_path`, `step_pattern`, `discovery_path`, and compact notes.
+- Dispatch `_plan/finalize/doc-prep` with `plan_path`, `handoff_path`, `step_pattern`, `discovery_path`, and compact notes.
 - Stop if it returns `Status: FAIL`.
 
 ## 4. Finalize code-adjacent docs
-- Dispatch `_plan/finalize-code-docs` with `plan_path`, `handoff_path`, `step_pattern`, and compact notes.
+- Dispatch `_plan/finalize/code-docs` with `plan_path`, `handoff_path`, `step_pattern`, and compact notes.
 - Stop if it returns `Status: FAIL` or unresolved BLOCKING findings.
 - Keep code-doc findings and caches owned by that child workflow.
 
 ## 5. Finalize user docs
-- Dispatch `_plan/finalize-user-docs` with `plan_path`, `handoff_path`, `step_pattern`, and compact notes.
+- Dispatch `_plan/finalize/user-docs` with `plan_path`, `handoff_path`, `step_pattern`, and compact notes.
 - If the child determines no user-facing documentation work applies, accept its `Status: SUCCESS` and keep the shared handoff as the ledger.
 - Stop if it returns `Status: FAIL` or unresolved BLOCKING findings.
 

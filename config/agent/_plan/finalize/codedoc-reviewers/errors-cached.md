@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews error documentation coverage and specificity for source files (cached)
+description: Checks code-adjacent error documentation coverage and specificity for finalized steps (cached)
 model: sewer-axonhub/step-3.7-flash  # LOW
 reasoningEffort: medium
 permission:
@@ -17,14 +17,14 @@ permission:
   todowrite: allow
   edit:
     "*": deny
-    "*PROMPT-DOC-COVERAGE-*.review-errors*.md": allow
+    "*PROMPT-PLAN*.review-codedoc-errors*.md": allow
   external_directory: allow
 ---
 
 {{
   file="./agent/_plan/finalize/codedoc-reviewers/_templates/errors-header.txt"
-  description="Review source files' error documentation."
-  variant=refactor
+  description="Review step artifacts' code-adjacent error documentation."
+  variant=codedoc
   mode=cached
 }}
 
@@ -42,10 +42,11 @@ permission:
 {{
   file="./agent/_plan/finalize/codedoc-reviewers/_templates/errors-output.txt"
   mode=cached
-  variant=refactor
-  agent_name="_refactor/document-reviewers/errors-cached"
-  err_prefix=DERR
-  evidence1="<`path:line`, or missing element>"
-  file_ref="<path/to/source/file>"
-  verified_ref="<path>: <item description — unchanged items that remain verified>"
+  variant=codedoc
+  agent_name="_plan/finalize/codedoc-reviewers/errors-cached"
+  err_prefix=CERR
+  evidence1="<section, `path:line`, or missing element>"
+  file_ref="<path/to/step/file>"
+  diff_target_note=" targeting the affected step file with the exact `# Errors` section to add or fix"
+  verified_ref="<I#/T#>: <item description — unchanged items that remain verified>"
 }}
