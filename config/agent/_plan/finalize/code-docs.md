@@ -1,6 +1,7 @@
 ---
 mode: primary
 description: Runs code-documentation reviewers against finalized I#/T# steps and applies their findings
+model: sewer-axonhub/step-3.7-flash  # MED
 permission:
   "*": deny
   read:

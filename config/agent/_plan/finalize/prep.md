@@ -1,6 +1,7 @@
 ---
 mode: primary
 description: Resolves draft, validates preconditions, dispatches explorer, dispatches code generation, and writes pipeline state
+model: sewer-axonhub/step-3.7-flash  # LOW
 permission:
   "*": deny
   read:

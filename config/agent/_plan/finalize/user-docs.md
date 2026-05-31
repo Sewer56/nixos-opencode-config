@@ -1,6 +1,7 @@
 ---
 mode: primary
 description: Generates minimal D# stubs and runs end-user documentation reviewers to fill content
+model: sewer-axonhub/step-3.7-flash  # MED
 permission:
   "*": deny
   read:
