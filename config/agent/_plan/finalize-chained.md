@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Runs finalize, code-doc finalize, and user-doc finalize as one chained plan-finalize workflow
+description: Runs prep, finalize, doc-prep, code-doc finalize, and user-doc finalize as one chained plan-finalize workflow
 permission:
   "*": deny
   read:
@@ -16,6 +16,7 @@ permission:
     "*": "deny"
     "_plan/finalize-prep": "allow"
     "_plan/finalize": "allow"
+    "_plan/finalize-doc-prep": "allow"
     "_plan/finalize-code-docs": "allow"
     "_plan/finalize-user-docs": "allow"
 ---
@@ -39,17 +40,21 @@ Run the three existing finalize workflows as one chain. Preserve the same artifa
 - Stop if it returns `Status: FAIL` or unresolved BLOCKING findings.
 - Use its returned `handoff_path` and `step_pattern` as the shared context for later stages.
 
-## 3. Finalize code-adjacent docs
+## 3. Doc prep
+- Dispatch `_plan/finalize-doc-prep` with `plan_path`, `handoff_path`, `step_pattern`, `discovery_path`, and compact notes.
+- Stop if it returns `Status: FAIL`.
+
+## 4. Finalize code-adjacent docs
 - Dispatch `_plan/finalize-code-docs` with `plan_path`, `handoff_path`, `step_pattern`, and compact notes.
 - Stop if it returns `Status: FAIL` or unresolved BLOCKING findings.
 - Keep code-doc findings and caches owned by that child workflow.
 
-## 4. Finalize user docs
+## 5. Finalize user docs
 - Dispatch `_plan/finalize-user-docs` with `plan_path`, `handoff_path`, `step_pattern`, and compact notes.
 - If the child determines no user-facing documentation work applies, accept its `Status: SUCCESS` and keep the shared handoff as the ledger.
 - Stop if it returns `Status: FAIL` or unresolved BLOCKING findings.
 
-## 5. Finish
+## 6. Finish
 - Read only returned status blocks and, when needed, the shared `handoff_path` Step Index to confirm current step files.
 - Let child finalize workflows own artifact writes and review loops.
 
@@ -68,6 +73,6 @@ Summary: <one-line summary>
 # Constraints
 - Pass children only paths, trigger flags, and short notes.
 - Child workflows use the shared discovery cache and targeted local reads for named gaps.
-- Call only the four finalize agents: prep + three finalize parent agents.
+- Call only the five finalize agents: prep, finalize, doc-prep, code-docs, user-docs.
 - Preserve child cache/action ownership. Use the handoff as the shared ledger.
 - Leave product code and git history unchanged.

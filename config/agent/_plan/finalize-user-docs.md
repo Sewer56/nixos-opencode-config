@@ -20,7 +20,6 @@ permission:
   task: {
     "*": "deny",
     "mcp-search": "allow",
-    "_plan/finalize-eudoc-prep": "allow",
     "_plan/finalize-eudoc-reviewers/*": "allow"
   }
 ---
@@ -38,7 +37,7 @@ Generate and review end-user documentation steps for finalized implementation/te
 
 # Artifacts
 - `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
-- `state_path`: `<artifact_base>.eudoc-state.md`
+- `state_path`: `<artifact_base>.doc-pipeline-state.md`
 - `plan_path`: `<artifact_base>.draft.md`
 - `handoff_path`: `<artifact_base>.handoff.md`
 - `discovery_path`: `artifact/<artifact_base>.repo-discovery.md`
@@ -54,11 +53,11 @@ Modify only `<artifact_base>.handoff.md` and D# step files. Keep I#/T# steps, pr
 
 # Process
 
-## 1. Run pipeline prep and read state
-- Dispatch `_plan/finalize-eudoc-prep` with `plan_path`, `handoff_path`, `discovery_path`, `step_pattern`, and compact notes.
-- If prep returns `Status: FAIL`, emit its failure reason and stop.
-- Read `state_path`. Use its resolved paths and discovery context.
-- Read `discovery_path` if prep indicates it is present and valid.
+## 1. Read pipeline state
+- Read `state_path` (`<artifact_base>.doc-pipeline-state.md`).
+- If `state_path` is missing or cannot be read, return `Status: FAIL` immediately.
+- Use its resolved paths, discovery context, and user-doc context.
+- Read `discovery_path` when present and valid.
 - Read existing I# and T# step files only when `handoff_path` plus `discovery_path` lack sufficient detail about a specific user-facing effect.
 - Treat the finalized steps as the source of truth.
 

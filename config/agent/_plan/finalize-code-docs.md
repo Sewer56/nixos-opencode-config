@@ -20,7 +20,6 @@ permission:
   task: {
     "*": "deny",
     "mcp-search": "allow",
-    "_plan/finalize-codedoc-prep": "allow",
     "_plan/finalize-codedoc-reviewers/*": "allow"
   }
 ---
@@ -35,7 +34,7 @@ Review and revise code-adjacent documentation (API references, doc comments, inl
 - Read `discovery_path` when it exists; treat it as read-only shared repo context.
 
 # Artifacts
-- `state_path`: `<artifact_base>.codedoc-state.md`
+- `state_path`: `<artifact_base>.doc-pipeline-state.md`
 - `discovery_path`: `artifact/<artifact_base>.repo-discovery.md` (read-only if present)
 - Cache paths (written by reviewers, stored under `artifact/`):
   - `artifact/<artifact_base>.review-codedoc-docs-readability.md`
@@ -48,11 +47,11 @@ Modify only `<artifact_base>.handoff.md` and existing I#/T# step files matching 
 
 # Process
 
-## 1. Run pipeline prep and read state
-- Dispatch `_plan/finalize-codedoc-prep` with `handoff_path`, `discovery_path`, `step_pattern`, and compact notes.
-- If prep returns `Status: FAIL`, emit its failure reason and stop.
-- Read `state_path`. Derive exact `step_paths` from the pipeline state.
-- Read `discovery_path` if prep indicates it is present and valid.
+## 1. Read pipeline state
+- Read `state_path` (`<artifact_base>.doc-pipeline-state.md`).
+- If `state_path` is missing or cannot be read, return `Status: FAIL` immediately.
+- Derive exact `step_paths` from the pipeline state.
+- Read `discovery_path` when present and valid.
 - Treat the finalized code/test steps as the source of truth.
 - Modify existing I#/T# step files only when the initial code-documentation pass or reviewer findings target them.
 
