@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Implements a plan from conversation context with an automated review loop
+description: Implements a plan from conversation context with an automated review loop and code-quality cleanup
 permission:
   "*": deny
   read:
@@ -19,4 +19,8 @@ permission:
   task:
     "*": "deny"
     "_implement/freeform-reviewer": "allow"
+    "_implement/reviewers/code-docs": "allow"
+    "_implement/reviewers/errors": "allow"
+    "_implement/reviewers/user-docs": "allow"
+    "_implement/reviewers/polish": "allow"
 ---
