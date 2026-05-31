@@ -75,7 +75,7 @@ Return ONLY the fenced `text` block below.
 
 ```text
 # REVIEW
-Agent: _refactor/errors-collector
+Agent: _refactor/errors/collector
 Decision: PASS
 
 ## Findings

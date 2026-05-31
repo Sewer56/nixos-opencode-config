@@ -29,13 +29,13 @@ permission:
   delta_source=cache_path
 }}
 
-In the `# REVIEW` output, set `Agent:` to `_refactor/errors-reviewer-cached`.
+In the `# REVIEW` output, set `Agent:` to `_refactor/errors/reviewer-cached`.
 
 # Output
 
 {{
   file="./agent/_templates/review-output/output.txt"
-  agent="_refactor/errors-reviewer-cached"
+  agent="_refactor/errors/reviewer-cached"
   prefix=ERR
   categories="SPECIFICITY | FORMAT | FIDELITY"
   evidence="<section, `path:line`, or missing element>"

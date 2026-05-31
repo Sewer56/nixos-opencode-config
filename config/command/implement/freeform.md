@@ -31,7 +31,7 @@ $ARGUMENTS
 - Iterate until all checks pass clean.
 
 ## 4. Review
-- Spawn `_implement/freeform-reviewer` with:
+- Spawn `_implement/freeform/reviewer` with:
   - `plan_path`: absolute path to the plan file.
   - `changed_paths`: comma-separated list of changed files.
   - `notes`: 0-2 current-run facts or `None`.
@@ -43,7 +43,7 @@ $ARGUMENTS
 - If any findings remain, fix them and re-run reviewer with updated run data.
 - Repeat until `Decision: PASS` or 5 iterations.
 - At cap with findings remaining, return `FAIL`.
-- Before proceeding, run one final audit with `_implement/freeform-reviewer` and updated run data.
+- Before proceeding, run one final audit with `_implement/freeform/reviewer` and updated run data.
 - If final audit has BLOCKING findings, fix, rerun touched work, and re-audit.
 
 ## 6. Cleanup review phase

@@ -1,8 +1,9 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews documentation coverage, inline comments, and readability for source files (cacheless)
+description: Reviews documentation coverage, inline comments, and readability for source files (cached)
 model: sewer-axonhub/step-3.7-flash  # LOW
+reasoningEffort: medium
 permission:
   "*": deny
   read:
@@ -14,6 +15,9 @@ permission:
   glob: allow
   list: allow
   todowrite: allow
+  edit:
+    "*": deny
+    "*PROMPT-DOC-COVERAGE-*.review-docs-readability*.md": allow
   external_directory: allow
 ---
 
@@ -21,6 +25,7 @@ permission:
   file="./agent/_plan/finalize/codedoc-reviewers/_templates/docs-readability-header.txt"
   description="Review source files for documentation coverage, specificity, fidelity, inline comments, and readability."
   variant=refactor
+  mode=cached
   doc_domain=DDOC
   read_domain=DREAD
 }}
@@ -28,19 +33,19 @@ permission:
 # Process
 
 {{
-  file="./agent/_templates/review-process/cacheless.txt"
-  read_context="Load `handoff_path`."
+  file="./agent/_templates/review-process/cached.txt"
+  delta_source=handoff_path
   reads_review_ledger=1
-  reads_decisions=1
+  preserve_byte_exact=1
 }}
 
 # Output
 
 {{
   file="./agent/_plan/finalize/codedoc-reviewers/_templates/docs-readability-output.txt"
-  mode=cacheless
+  mode=cached
   variant=refactor
-  agent_name="_refactor/document-reviewers/docs-and-readability-cacheless"
+  agent_name="_refactor/document/reviewers/docs-and-readability-cached"
   doc_domain=DDOC
   read_domain=DREAD
   evidence1="<`path:line`, or missing element>"

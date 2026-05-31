@@ -18,7 +18,7 @@ permission:
   external_directory: allow
   task:
     "*": "deny"
-    "_implement/freeform-reviewer": "allow"
+    "_implement/freeform/reviewer": "allow"
     "_implement/reviewers/code-docs": "allow"
     "_implement/reviewers/errors": "allow"
     "_implement/reviewers/user-docs": "allow"

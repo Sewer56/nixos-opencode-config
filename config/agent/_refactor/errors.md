@@ -19,9 +19,9 @@ permission:
   task: {
     "*": "deny",
     "codebase-explorer": "allow",
-    "_refactor/errors-collector": "allow",
-    "_refactor/errors-reviewer-cached": "allow",
-    "_refactor/errors-reviewer-cacheless": "allow"
+    "_refactor/errors/collector": "allow",
+    "_refactor/errors/reviewer-cached": "allow",
+    "_refactor/errors/reviewer-cacheless": "allow"
   }
 ---
 
@@ -59,7 +59,7 @@ Read the user message. If it contains file or directory paths, restrict collecto
 
 ## 3. Collect
 
-Spawn one `_refactor/errors-collector` per (library or application module, language) pair in a single parallel call.
+Spawn one `_refactor/errors/collector` per (library or application module, language) pair in a single parallel call.
 Derive a per-collector cache path: `artifact/PROMPT-ERROR-DOCS.<module_name>.cache.md` where `<module_name>` is the last path component of `target_path` (e.g. `src` → `artifact/PROMPT-ERROR-DOCS.src.cache.md`). Each collector writes to its own file — no concurrent writes to a shared file.
 
 Per collector, pass:
@@ -96,17 +96,17 @@ After applying all items, run formatter, linter, build, and tests. Iterate until
 
 ## 6. Review
 
-Spawn `_refactor/errors-reviewer-cached`, passing `cache_path`. Wait for the review packet.
+Spawn `_refactor/errors/reviewer-cached`, passing `cache_path`. Wait for the review packet.
 
 - If findings (BLOCKING or ADVISORY): revise the applied docs in source files, update the cache, populate `## Delta` with the list of items revised in this iteration, re-run reviewer.
 - Loop until no findings of any severity remain or 10 iterations.
 - At cap with only ADVISORY findings: SUCCESS with risks.
 - After each fix, rerun the reviewer when changed docs alter an error path, public API contract, `# Errors` wording, source file path, or cache item status. Do not rerun unrelated modules.
 - Before `Status: SUCCESS`:
-  - Run final error-doc audit with `_refactor/errors-reviewer-cacheless` over all applied docs.
-  - Ignore caches and Delta shortcuts.
-  - Return all current findings.
-  - If BLOCKING: fix, update cache/Delta, rerun touched reviewer, then re-audit.
+- Run final error-doc audit with `_refactor/errors/reviewer-cacheless` over all applied docs.
+- Ignore caches and Delta shortcuts.
+- Return all current findings.
+- If BLOCKING: fix, update cache/Delta, rerun touched reviewer, then re-audit.
 
 ## 7. Report
 

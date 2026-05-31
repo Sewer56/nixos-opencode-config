@@ -21,7 +21,7 @@ permission:
   external_directory: allow
   task:
     "*": "deny"
-    "_implement/plan-reviewer": "allow"
+    "_implement/plan/reviewer": "allow"
 ---
 
 Implements a finalized plan with automated review.
@@ -127,7 +127,7 @@ Reason: this merges `~11-16`, `~28-35`, and `~79-85` into one large range.
 Apply steps in Step Index order using the ranged reads from step 1. After each cohesive group of changes: format, lint, build, test. Iterate until all checks pass.
 
 ## 3. Review loop
-Spawn `_implement/plan-reviewer` with:
+Spawn `_implement/plan/reviewer` with:
 - `handoff_path: HANDOFF_DOCUMENT`
 
 After each review response:
@@ -138,7 +138,7 @@ After each review response:
 - At cap with any findings remaining: FAIL.
 
 Before `Status: SUCCESS`:
-- Run one final audit with `_implement/plan-reviewer` and the same `handoff_path`.
+- Run one final audit with `_implement/plan/reviewer` and the same `handoff_path`.
 - Parse current findings from its inline `# REVIEW` block.
 - If BLOCKING: fix, re-run touched, then re-audit.
 

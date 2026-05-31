@@ -1,9 +1,8 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews error documentation coverage and specificity for source files (cached)
+description: Reviews error documentation coverage and specificity for source files (cacheless)
 model: sewer-axonhub/step-3.7-flash  # LOW
-reasoningEffort: medium
 permission:
   "*": deny
   read:
@@ -15,9 +14,6 @@ permission:
   glob: allow
   list: allow
   todowrite: allow
-  edit:
-    "*": deny
-    "*PROMPT-DOC-COVERAGE-*.review-errors*.md": allow
   external_directory: allow
 ---
 
@@ -25,25 +21,24 @@ permission:
   file="./agent/_plan/finalize/codedoc-reviewers/_templates/errors-header.txt"
   description="Review source files' error documentation."
   variant=refactor
-  mode=cached
 }}
 
 # Process
 
 {{
-  file="./agent/_templates/review-process/cached.txt"
-  delta_source=handoff_path
+  file="./agent/_templates/review-process/cacheless.txt"
+  read_context="Load `handoff_path`."
   reads_review_ledger=1
-  preserve_byte_exact=1
+  reads_decisions=1
 }}
 
 # Output
 
 {{
   file="./agent/_plan/finalize/codedoc-reviewers/_templates/errors-output.txt"
-  mode=cached
+  mode=cacheless
   variant=refactor
-  agent_name="_refactor/document-reviewers/errors-cached"
+  agent_name="_refactor/document/reviewers/errors-cacheless"
   err_prefix=DERR
   evidence1="<`path:line`, or missing element>"
   file_ref="<path/to/source/file>"

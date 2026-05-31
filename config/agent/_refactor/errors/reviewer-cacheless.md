@@ -30,7 +30,7 @@ permission:
 
 {{
   file="./agent/_templates/review-output/output.txt"
-  agent="_refactor/errors-reviewer-cacheless"
+  agent="_refactor/errors/reviewer-cacheless"
   prefix=ERR
   categories="SPECIFICITY | FORMAT | FIDELITY"
   evidence="<section, `path:line`, or missing element>"

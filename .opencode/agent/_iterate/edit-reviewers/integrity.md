@@ -118,7 +118,7 @@ Update _iterate/edit.md routing and task permissions, then update affected revie
 ```
 
 ## Optimize workflow integrity
-Rule: If target touches `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`, preserve `config/doc/workflow/optimize-maintenance.md` architecture: signal-first analysis, strategy docs as sources, and quality gate before token savings.
+Rule: If target touches `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/optimize/export-analyzer.md`, preserve `config/doc/workflow/optimize-maintenance.md` architecture: signal-first analysis, strategy docs as sources, and quality gate before token savings.
 
 Bad:
 ```text
@@ -149,7 +149,7 @@ Requested reviewer merge updates only caller routing, task permissions, and affe
   file="../config/agent/_templates/review-process/cached.txt"
   delta_source=log_path
   render_expanded=1
-  step2_extra="- Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or changed paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`.\n- Inspect only changed paths plus directly referenced files needed to validate wiring."
+  step2_extra="- Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or changed paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/optimize/export-analyzer.md`.\n- Inspect only changed paths plus directly referenced files needed to validate wiring."
   preserve_byte_exact=1
 }}
 

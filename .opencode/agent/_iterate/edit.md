@@ -115,7 +115,7 @@ Intent: write executable instructions for large language models. Use proven prom
 - `focus_signals`: prompt/context bloat, missing prompt-writing contract, tight input violation, overbroad handoff, duplicate reads, duplicate reasoning, scope leakage, review-loop churn, cache/delta failure, action/cache confusion, output bloat, topology mismatch, model/risk mismatch, monolithic prompt.
 - `risk_flags`: command-agent, permission, self-iteration, optimizer-workflow, reviewer-topology, structured-output, json-config.
 - Set `self-iteration` when paths include `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`.
-- Set `optimizer-workflow` when paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`.
+- Set `optimizer-workflow` when paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/optimize/export-analyzer.md`.
 
 ## 3. Discover
 - When the user names explicit target paths, read those files and directly related callers/reviewers with `read`, `grep`, and `glob` first.

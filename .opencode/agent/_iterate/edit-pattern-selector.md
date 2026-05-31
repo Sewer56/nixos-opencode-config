@@ -29,7 +29,7 @@ Select compact pattern guidance for a direct OpenCode agent or command prompt ed
 # Process
 1. Read `config/doc/workflow/design-patterns.md`.
 2. Read `config/doc/workflow/optimize-patterns.md`.
-3. Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or `target_paths` match `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`.
+3. Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or `target_paths` match `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/optimize/export-analyzer.md`.
 4. Read `config/doc/workflow/unproven-patterns.md` only when the request is about `IDEA-###`, unproven pattern intake, or pattern promotion.
 5. Select the fewest patterns that change the target prompt.
 6. Prefer `- None` over weak matches.
