@@ -25,8 +25,7 @@ Review changed source files for error documentation quality: error-section exist
 - `notes`: short caller notes or `None`.
 
 # Scope
-Own: error documentation existence, placement, format, specificity, and completeness in changed source files.
-Do not check: code documentation, inline comments, readability, user-facing docs, implementation correctness, or test coverage.
+Do not check: user-facing docs or test coverage.
 Out-of-scope concerns get at most one short Advisory note in `## Notes`; never a BLOCKING finding.
 
 # Focus

@@ -203,6 +203,26 @@ Import bloat rule:
   - duplicative with another imported rule
   - duplicative with callee-owned rules
 
+## Redundancy across sections and imports
+Compare the rendered output for duplication across sections and imported content:
+- Flag when a section restates ownership, scope, or exclusion rules already declared by an imported rule group.
+- Flag when any rule, constraint, path, or policy appears verbatim in more than one section.
+- Imported content is the source of truth; local sections may add new constraints but must not duplicate what imports already declare.
+
+Bad:
+```markdown
+# Scope
+Own: error documentation existence, placement, format, specificity, and completeness.
+Do not check: code documentation, inline comments, readability, or implementation correctness.
+```
+(Rendered Focus already says `Owns: error-section existence, placement, format, specificity, completeness` and `Do not judge: general docs coverage, inline comments, prose polish, or implementation correctness`.)
+
+Good:
+```markdown
+# Scope
+Do not check: user-facing docs or test coverage.
+```
+
 ## Template feature use
 
 Check:
@@ -260,7 +280,7 @@ Good:
   file="../config/agent/_templates/review-process/cached.txt"
   delta_source=log_path
   render_expanded=1
-  step2_extra="- Do not read workflow pattern catalogs or pattern contracts; pattern-compliance owns selected-pattern application checks.\n- Inspect only changed prompt files and directly referenced files needed to detect duplication or topology overlap."
+  step2_extra="- Do not read workflow pattern catalogs or pattern contracts; pattern-compliance owns selected-pattern application checks.\n- Inspect only changed prompt files and directly referenced files needed to detect duplication or topology overlap.\n- Render every changed prompt with `bash scripts/render-file.sh` and compare rendered output for duplication across sections and imported content."
   preserve_byte_exact=1
 }}
 
@@ -290,5 +310,6 @@ Good:
   - confusing behavior-governing text
   - redundant direct/child or disabled-tool instructions that change or obscure runtime behavior
   - reviewer topology merge that loses high-risk ownership
+  - rendered sections duplicate ownership, scope, or exclusion rules already declared by imported content
 - ADVISORY: local wording economy, positive-wording opportunities, dense paragraph-style rules, or doc clarity improvements that do not affect correctness.
 - Keep response compact; detailed evidence belongs in cache.

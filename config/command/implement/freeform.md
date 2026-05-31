@@ -52,6 +52,7 @@ $ARGUMENTS
 - Spawn in parallel:
   - `_implement/reviewers/code-docs` with `changed_paths=changed_source_files` and short notes.
   - `_implement/reviewers/errors` with `changed_paths=changed_source_files` and short notes.
+  - `_implement/reviewers/placement` with `changed_paths=changed_source_files` and short notes.
 - If `changed_doc_files` is non-empty, also spawn in parallel:
   - `_implement/reviewers/user-docs` with `changed_paths=changed_doc_files` and short notes.
   - `_implement/reviewers/polish` with `changed_paths=changed_doc_files` and short notes.

@@ -23,4 +23,5 @@ permission:
     "_implement/reviewers/errors": "allow"
     "_implement/reviewers/user-docs": "allow"
     "_implement/reviewers/polish": "allow"
+    "_implement/reviewers/placement": "allow"
 ---

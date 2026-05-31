@@ -25,8 +25,7 @@ Review changed user-facing documentation files for correctness, coverage, specif
 - `notes`: short caller notes or `None`.
 
 # Scope
-Own: user-facing documentation correctness, feature coverage, specificity, and broken internal links in changed doc files.
-Do not check: code documentation, error documentation, wording polish, engagement, implementation correctness, or test coverage.
+Do not check: error documentation.
 Out-of-scope concerns get at most one short Advisory note in `## Notes`; never a BLOCKING finding.
 
 # Focus

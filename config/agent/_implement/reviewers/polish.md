@@ -25,8 +25,7 @@ Review changed user-facing documentation files for clarity, wording quality, rea
 - `notes`: short caller notes or `None`.
 
 # Scope
-Own: clarity, wording, engagement, terminology consistency, and content shape in changed user-facing doc files.
-Do not check: correctness, broken internal links, feature coverage, code documentation, error documentation, or implementation correctness. Broken-link checking is owned by the user-docs reviewer.
+Do not check: code documentation.
 Out-of-scope concerns get at most one short Advisory note in `## Notes`; never a BLOCKING finding.
 
 # Focus

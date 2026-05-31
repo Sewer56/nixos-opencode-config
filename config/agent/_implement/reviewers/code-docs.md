@@ -25,8 +25,7 @@ Review changed source files for code-adjacent documentation quality: coverage, p
 - `notes`: short caller notes or `None`.
 
 # Scope
-Own: code-adjacent documentation coverage, placement, fidelity, inline comments, and readability in changed source files.
-Do not check: error documentation, user-facing docs, implementation correctness, test coverage, declaration order, or performance.
+Do not check: user-facing docs.
 Out-of-scope concerns get at most one short Advisory note in `## Notes`; never a BLOCKING finding.
 
 # Focus
