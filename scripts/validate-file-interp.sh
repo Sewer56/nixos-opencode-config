@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
 set -eu
-cd "$(dirname "$0")/../config"
-exec bun ../plugins/opencode-plugin-md-expand/src/cli/cli.ts validate --config-dir . ${@:-agent command rules}
+root="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$root"
+bun plugins/opencode-plugin-md-expand/src/cli/cli.ts validate \
+  --exclude renderer-syntax.txt \
+  ${*:-.opencode config}

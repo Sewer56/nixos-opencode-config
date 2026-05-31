@@ -1,0 +1,32 @@
+# Renderer Template Syntax
+
+Reference file for the OpenCode template renderer. Loaded via `read` tool, never embedded.
+
+## File Imports
+
+- Import a file: `{{file="./path/to/file.md"}}`
+- Import with arguments: `{{file="./path/to/file.txt" arg1="value1" arg2="value2"}}`
+- Block imports: keep one `file="./..."` and one argument per line.
+
+## Template Placeholders
+
+- Use only inside template files: `{{arg:name}}`
+- Scoped args: apply to one include; nested includes receive args only when forwarded as `key=value`.
+
+## Conditionals
+
+- Use only in shared templates: `{{if=name}}`, `{{if=name==value}}`, `{{if=name!=value}}`, `{{if=env:CI}}`, `{{else}}`, `{{endif}}`
+
+## Env Tokens
+
+- `{{env:VAR}}` for runtime environment values only.
+- Do not use for local file paths that should be imports.
+
+## Booleans
+
+- Pass `1` for true; never `=0`. Omit entirely for false.
+
+## Validation
+
+- Do not pass args the target template does not consume.
+- Validate with `bash scripts/render-file.sh <repo-relative-path>` when imports, args, env tokens, or conditionals change.

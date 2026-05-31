@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
 set -eu
-cd "$(dirname "$0")/../config"
-exec bun ../plugins/opencode-plugin-md-expand/src/cli/cli.ts render --config-dir . "$@"
+root="$(cd "$(dirname "$0")/.." && pwd)"
+path="${1:?Usage: render-file.sh <config/path.md | .opencode/path.md> [render-options...]}"
+shift
+cd "$root"
+exec bun plugins/opencode-plugin-md-expand/src/cli/cli.ts render "${path}" "$@"

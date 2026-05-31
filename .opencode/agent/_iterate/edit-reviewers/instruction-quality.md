@@ -21,6 +21,9 @@ permission:
   grep:
     "*": allow
     "opencode-source/**": deny
+  bash:
+    "*render-file.sh*": allow
+    "*cli.ts*render*": allow
   list: allow
   external_directory: allow
 ---
@@ -39,7 +42,22 @@ Review direct OpenCode command, agent, and reviewer prompt edits for LLM runtime
 Use compact rule cards. Each finding should map to one card.
 
 ## LLM runtime instruction writing
-Rule: Command, agent, and reviewer prompt bodies are LLM-facing runtime instructions, not human documentation. Agent and reviewer bodies are system prompts; command bodies are user messages. Target prompts state operational behavior directly: role, scope, inputs, process, constraints, output shape, failure behavior, and stop/ask conditions when relevant. Docs and `OPT-###`/`WOPT-###` refs may guide edits, but target prompts must not depend on users reading docs or catalogs.
+Check:
+- Treat command, agent, and reviewer prompt bodies as LLM-facing runtime instructions.
+- Remember execution context:
+  - Agent and reviewer bodies are system prompts.
+  - Command bodies are user messages.
+- Require operational behavior in the executable prompt that uses it:
+  - role
+  - scope
+  - inputs
+  - process
+  - constraints
+  - output shape
+  - failure behavior
+  - stop/ask conditions when relevant
+- Allow docs and `OPT-###`/`WOPT-###` refs as edit guidance only.
+- Block target prompts that require users or models to read docs/catalogs for runtime behavior.
 
 Bad:
 ```text
@@ -52,7 +70,25 @@ Read cache first. Reopen changed paths and open findings. Update cache before fi
 ```
 
 ## Tight subagent inputs
-Rule: Caller passes only run-specific data: paths, Delta, changed ids/paths, trigger flags, short user notes, decisions, cache paths, or action paths. Callee prompt owns role, Focus, Process, Output, examples, model notes, and generic read policy. Adjudicators forward only allowed run data plus leg sidecars.
+Check:
+- Caller passes only run-specific data:
+  - paths
+  - Delta
+  - changed ids/paths
+  - trigger flags
+  - short user notes
+  - decisions
+  - cache paths
+  - action paths
+- Callee prompt owns:
+  - role
+  - Focus
+  - Process
+  - Output
+  - examples
+  - model notes
+  - generic read policy
+- Adjudicators forward only allowed run data plus leg sidecars.
 
 Bad:
 ```text
@@ -72,7 +108,13 @@ leg_input = {context_path, draft_handoff_path, cache_path, actions_path, changed
 ```
 
 ## Output and schema quality
-Rule: Machine-consumed final responses use one exact fenced `text` block with stable headings, field names, order, allowed values, and required empty sections.
+Check machine-consumed final responses for:
+- one exact fenced `text` block
+- stable headings
+- stable field names
+- stable field order
+- allowed values
+- required empty sections
 
 Bad:
 ```text
@@ -95,7 +137,14 @@ Cache: <cache_path>
 ```
 
 ## Wording economy
-Rule: Use imperative, concrete instructions. Remove filler, hedging, soft token budgets, and prohibition-led wording when a positive action says the same thing.
+Check:
+- Use imperative, concrete instructions.
+- Prefer bullets/checklists for behavior-governing runtime rules.
+- Number sequential process/workflow phase headers (`## 1.`, `## 2.`, etc.) so execution order is explicit; leave reference, schema, constraint, and scope sections unnumbered.
+- Keep one operational requirement per bullet when practical.
+- Remove filler, hedging, and soft token budgets.
+- Replace prohibition-led wording when a positive action says the same thing.
+- Flag dense paragraph-style rule blocks when bullets would be easier for an LLM to follow.
 
 Bad:
 ```text
@@ -108,7 +157,10 @@ Read only changed paths and open findings.
 ```
 
 ## Clarity
-Rule: Define project-specific terms where they govern behavior. Expand compressed phrases that hide meaning. Use wrong/correct examples only for conventions likely to be misread.
+Check:
+- Define project-specific terms where they govern behavior.
+- Expand compressed phrases that hide meaning.
+- Use wrong/correct examples only for conventions likely to be misread.
 
 Bad:
 ```text
@@ -121,7 +173,15 @@ Merge reviewers when they read the same artifacts and emit overlapping wording/s
 ```
 
 ## Dedup and context bloat
-Rule: Reference existing content by path, section, item id, or finding id instead of requoting. Keep human docs explanatory and agent prompts operational.
+Check:
+- Embed runtime rule/template content with renderer file imports.
+- Do not tell the model to read a local file manually for runtime rules.
+- Reference by path, section, item id, or finding id only for:
+  - explanatory docs
+  - broad catalogs
+  - non-runtime evidence
+- Keep human docs explanatory.
+- Keep agent prompts operational.
 
 Bad:
 ```text
@@ -133,8 +193,70 @@ Good:
 Reference existing content by path or id; do not paste full catalogs.
 ```
 
+Good runtime import:
+```markdown
+{ { file="./rules/groups/tests/target-test-strategy.md" } }
+```
+Remove the spaces after `{` and before `}` in real prompts.
+
+Import bloat rule:
+- Do not flag an import solely because the renderer expands it.
+- Flag an import only when the imported content is:
+  - unrelated to target behavior
+  - duplicative with another imported rule
+  - duplicative with callee-owned rules
+
+## Template feature use
+Check:
+- Prefer renderer-supported imports and arguments over copied boilerplate.
+- Use repo-relative renderer paths (`./...`) in imports, not absolute paths.
+- For `.opencode/` files importing from `config/`, use `../config/` prefix.
+- Use block form for multi-argument imports when it improves readability.
+- Remember include arg scope:
+  - Args apply to one file include.
+  - Nested includes receive args only when forwarded as `key=value` pairs.
+- Keep template placeholders in shared template files unless editing a reusable template:
+  - `{ {arg:name} }` without brace spacing
+- Keep conditionals in shared template files unless editing a reusable template:
+  - `{ { if=name } }` without brace spacing
+  - `{ { if=name==value } }` without brace spacing
+  - `{ { if=name!=value } }` without brace spacing
+  - `{ { if=env:CI } }` without brace spacing
+  - `{ { else } }` without brace spacing
+  - `{ { endif } }` without brace spacing
+- Use env tokens only for true runtime environment values:
+  - `{ {env:VAR} }` without brace spacing
+- Do not use env tokens for local prompt/rule paths.
+- Do not pass false-flag args (`=0`); the renderer treats any non-empty string as truthy. Omit the arg entirely for false.
+- Do not pass args that the target template does not consume (as `{ {arg:name} }` or `{ { if=name } }`).
+- Keep existing numeric flags as `1` only; never use `=0`.
+
+Bad:
+```text
+Read /home/sewer/opencode/config/rules/groups/tests/target-test-strategy.md and follow it.
+```
+
+Good:
+```markdown
+{ { file="./rules/groups/tests/target-test-strategy.md" } }
+```
+
+Good parameterized import:
+```markdown
+{ {
+  file="../config/agent/_templates/review-mission.txt"
+  artifact_type="implementation"
+  domain="implementation"
+} }
+```
+Remove the brace spacing in real prompts.
+
 ## Reviewer topology
-Rule: Merge reviewers that read the same artifacts and emit overlapping wording/style/clarity/dedup findings. Keep high-risk integrity/security/data-loss checks separate from wording/polish checks.
+Check:
+- Merge reviewers that read the same artifacts and emit overlapping wording/style/clarity/dedup findings.
+- Keep high-risk integrity/security/data-loss checks separate from wording/polish checks.
+- Own readability, LLM-followability, bullet/checklist structure, output schema, and topology economy.
+- Do not take over product correctness, permission integrity, or pattern-compliance domains.
 
 Bad:
 ```text
@@ -147,7 +269,9 @@ Run one instruction-quality reviewer for wording, style, clarity, dedup, output 
 ```
 
 ## Markdown safety
-Rule: When nested fences are needed, outer fence uses backticks and inner fence uses tildes. Diff examples inside markdown examples use `~~~diff`.
+Check:
+- When nested fences are needed, outer fence uses backticks and inner fence uses tildes.
+- Diff examples inside markdown examples use `~~~diff`.
 
 Bad:
 ````markdown
@@ -172,20 +296,26 @@ Good:
 # Process
 
 {{
-  file="./agent/_templates/review-process/cached.txt"
+  file="../config/agent/_templates/review-process/cached.txt"
   delta_source=log_path
-  has_actions_path=0
-  reads_review_ledger=0
+  render_expanded=1
   step2_extra="- Do not read workflow pattern catalogs or pattern contracts; pattern-compliance owns selected-pattern application checks.\n- Inspect only changed prompt files and directly referenced files needed to detect duplication or topology overlap."
   preserve_byte_exact=1
-  show_cache_format=1
-  cache_format="# Cache: _iterate/edit-reviewers/instruction-quality\nSource Log: <log_path>\nChanged Paths: <paths>\nRisk Flags: <flags>\n\n## Findings\n### [IQ-001]\nStatus: OPEN | RESOLVED | DEFERRED\nSeverity: BLOCKING | ADVISORY\nCategory: RUNTIME_WRITING | PROMPT_LOCAL_RULES | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CLARITY | DEDUP | TOPOLOGY | MARKDOWN\nPath: <repo-relative path>\nEvidence: <path:line or section>\nProblem: <specific issue>\nExpected Fix: <smallest concrete correction>\n\n## Verified\n- <path>: <verified condition>"
+}}
+
+Cache format:
+
+{{
+  file="../config/agent/_templates/review-cache-table.txt"
+  domain=instruction-quality
+  ref_type=path
+  prefix=IQ
 }}
 
 # Output
 
 {{
-  file="./agent/_templates/review-output/compact-output.txt"
+  file="../config/agent/_templates/review-output/compact-output.txt"
   agent="_iterate/edit-reviewers/instruction-quality"
   prefix=IQ
   finding_detail="<category> | <path>"
@@ -193,6 +323,12 @@ Good:
 }}
 
 # Constraints
-- BLOCKING: LLM runtime prompt written as documentation instead of executable instruction, operational behavior delegated only to docs, callee-owned instructions duplicated in caller, unstable machine output, confusing behavior-governing text, or reviewer topology merge that loses high-risk ownership.
-- ADVISORY: local wording economy or doc clarity improvements that do not affect correctness.
+- BLOCKING:
+  - LLM runtime prompt written as documentation instead of executable instruction
+  - operational behavior delegated only to docs
+  - callee-owned instructions duplicated in caller
+  - unstable machine output
+  - confusing behavior-governing text
+  - reviewer topology merge that loses high-risk ownership
+- ADVISORY: local wording economy, dense paragraph-style rules, or doc clarity improvements that do not affect correctness.
 - Keep response compact; detailed evidence belongs in cache.

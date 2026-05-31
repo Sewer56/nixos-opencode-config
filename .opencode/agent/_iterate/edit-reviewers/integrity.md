@@ -21,6 +21,9 @@ permission:
   grep:
     "*": allow
     "opencode-source/**": deny
+  bash:
+    "*render-file.sh*": allow
+    "*cli.ts*render*": allow
   list: allow
   external_directory: allow
 ---
@@ -145,20 +148,17 @@ Requested reviewer merge updates only caller routing, task permissions, and affe
 # Process
 
 {{
-  file="./agent/_templates/review-process/cached.txt"
+  file="../config/agent/_templates/review-process/cached.txt"
   delta_source=log_path
-  has_actions_path=0
-  reads_review_ledger=0
+  render_expanded=1
   step2_extra="- Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or changed paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/export-analyzer.md`.\n- Inspect only changed paths plus directly referenced files needed to validate wiring."
   preserve_byte_exact=1
-  show_cache_format=1
-  cache_format="# Cache: _iterate/edit-reviewers/integrity\nSource Log: <log_path>\nChanged Paths: <paths>\nRisk Flags: <flags>\n\n## Findings\n### [INT-001]\nStatus: OPEN | RESOLVED | DEFERRED\nSeverity: BLOCKING | ADVISORY\nPath: <repo-relative path>\nEvidence: <path:line or section>\nProblem: <specific issue>\nExpected Fix: <smallest concrete correction>\n\n## Verified\n- <path>: <verified condition>"
 }}
 
 # Output
 
 {{
-  file="./agent/_templates/review-output/compact-output.txt"
+  file="../config/agent/_templates/review-output/compact-output.txt"
   agent="_iterate/edit-reviewers/integrity"
   prefix=INT
   finding_detail="<path>"
