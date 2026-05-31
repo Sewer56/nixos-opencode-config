@@ -15,7 +15,7 @@ permission:
   task:
     "*": "deny"
     "_plan/finalize-prep": "allow"
-    "_plan/finalize": "allow"
+    "_plan/finalize-review": "allow"
     "_plan/finalize-doc-prep": "allow"
     "_plan/finalize-code-docs": "allow"
     "_plan/finalize-user-docs": "allow"
@@ -36,7 +36,7 @@ Run the three existing finalize workflows as one chain. Preserve the same artifa
 - Use the returned `Plan Path` for downstream phases.
 
 ## 2. Finalize code and tests
-- Dispatch `_plan/finalize` with `plan_path` and compact finalize-time notes.
+- Dispatch `_plan/finalize-review` with `plan_path` and compact finalize-time notes.
 - Stop if it returns `Status: FAIL` or unresolved BLOCKING findings.
 - Use its returned `handoff_path` and `step_pattern` as the shared context for later stages.
 
@@ -73,6 +73,6 @@ Summary: <one-line summary>
 # Constraints
 - Pass children only paths, trigger flags, and short notes.
 - Child workflows use the shared discovery cache and targeted local reads for named gaps.
-- Call only the five finalize agents: prep, finalize, doc-prep, code-docs, user-docs.
+- Call only the five finalize agents: prep, finalize-review, doc-prep, code-docs, user-docs.
 - Preserve child cache/action ownership. Use the handoff as the shared ledger.
 - Leave product code and git history unchanged.

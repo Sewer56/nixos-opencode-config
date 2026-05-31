@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Synthesizes the plan handoff with step decomposition from draft and discovery cache
+description: Synthesizes the plan handoff with step decomposition and writes step body files from draft and discovery cache
 model: sewer-axonhub/GLM-5.1  # HIGH
 permission:
   "*": deny
@@ -13,6 +13,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-PLAN*.handoff*.md": allow
+    "*PROMPT-PLAN*.step.*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -29,7 +30,7 @@ Read the confirmed draft plan and repo discovery cache. Write the complete plan 
 - Derive `artifact_base` from `plan_path` as `PROMPT-PLAN-<slug>`.
 
 # Scope
-Write only `handoff_path`. Do not write step body files. Do not modify `plan_path` or `discovery_path`.
+Write `handoff_path` and a step body file for every I#/T# in the Step Index. Do not modify `plan_path` or `discovery_path`.
 
 # Process
 
@@ -61,14 +62,87 @@ Write only `handoff_path`. Do not write step body files. Do not modify `plan_pat
 - Ground every step in repo evidence from the discovery cache.
 - Prefer existing test files over creating new test files.
 
-## 6. Build mapping and trace
+## 6. Write step body files
+- For each I# and T# in the Step Index, write a step body file named as the Step Index `File` column.
+- Use the implementation step template for I# entries and the test step template for T# entries (see Step Templates below).
+- Ground every step in repo evidence from the discovery cache: use real file paths, real symbols, real line ranges.
+- Keep the step plan concrete: an implementer must not need to invent file placement, major structure, missing test coverage, verification commands, or code shape.
+- Stable numbering: use the I#/T# numbers from the Step Index. Do not renumber.
+- Collect written `step_paths` for the output summary.
+- Do not overwrite the handoff until all step files are written.
+
+## 7. Build mapping and trace
 - Draft Plan Mapping: link each `[P#]` to its I# and T# refs.
 - Requirement Trace Matrix: link each `REQ-###` to its I# and T# refs with acceptance criteria.
 
-## 7. Write handoff
+## 8. Write handoff
 - Overwrite `handoff_path` using the template below.
 - Omit any section whose only content would be `None`, a placeholder, or empty.
 - Leave `## Review Ledger` domain summaries as placeholders; the review phase populates them.
+
+# Step Templates
+
+## Implementation Step (`<artifact_base>.step.I1.md`)
+
+```markdown
+# I1: `path/to/file`
+
+Action: UPDATE | INSERT | ADD | REMOVE
+Why: <why this file changes>
+Anchor: `<existing symbol or section>` | `None`
+Lines: ~<start>-<end> | `None`
+Insert at: before | after | replace `<anchor or region>` | `None`
+
+Import diff:
+
+~~~diff
+<import changes or `None`>
+~~~
+
+Code Shape:
+
+Use the target file language or `diff`. Generate code only.
+
+Changes:
+- <concrete code change>
+Dependencies: None | I#
+Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
+```
+
+## Test Step (`<artifact_base>.step.T1.md`)
+
+```markdown
+# T1: `path/to/test-or-module`
+
+Action: UPDATE | INSERT | ADD | REMOVE
+Purpose: <behavior to prove>
+Covers: REQ-###
+Anchor: `<existing symbol or section>` | `None`
+Lines: ~<start>-<end> | `None`
+Insert at: before | after | replace `<anchor or region>` | `None`
+
+Import diff:
+
+~~~diff
+<import changes or `None`>
+~~~
+
+Code shape:
+
+Use the target file language or `diff`. Generate code only.
+
+Changes:
+- <specific checks>
+Parameterization: None | <cases>
+Dependencies: None | I# | T#
+Evidence: `path/to/file:line` | `path/to/nearby/pattern:line`
+```
+
+## Step Writing Constraints
+- Within each step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
+- Each diff block within a step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). The step header `Lines: ~` lists the comma-separated union of hunk ranges. Per-hunk labels are the authoritative locators.
+- Full-file `Lines:` ranges are invalid for localized changes — use only for ADD actions that add complete files.
+- Nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~). Prevents premature closure of the outer block.
 
 # Handoff Template
 
@@ -181,5 +255,6 @@ Return exactly one fenced `text` block:
 Status: SUCCESS | FAIL
 Handoff Path: <absolute handoff_path>
 Step Count: <n> implementation, <m> test
+Step Files: <comma-separated absolute paths>
 Summary: <one-line summary>
 ```

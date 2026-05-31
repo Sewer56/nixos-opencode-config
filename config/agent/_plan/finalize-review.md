@@ -34,18 +34,25 @@ permission:
 Run the review loop against finalized step artifacts. Maintain Delta and Review Ledger in the handoff.
 
 # Inputs
-- `handoff_path`: absolute path to `<artifact_base>.handoff.md`
-- `plan_path`: absolute path to `<artifact_base>.draft.md`
-- `step_paths`: exact list of step files to review (I# and T#)
-- `discovery_path`: absolute path to `artifact/<artifact_base>.repo-discovery.md`
-- `user_notes`: finalize-time notes from user (may be empty)
-- Derive `artifact_base` from `handoff_path`.
-- Derive cache paths: `artifact/<artifact_base>.review-audit.md`, `artifact/<artifact_base>.review-tests.md`.
+- Derive `slug` from request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
+- If a `plan_path` is provided by the caller, derive `artifact_base` from it (strip `.draft.md` suffix) and skip slug derivation.
+- Required: `<artifact_base>.pipeline-state.md` must exist from a prior `/plan/finalize-prep` run.
+- User notes from the latest message (may be empty).
 
 # Scope
-Read only `handoff_path`, `plan_path`, `step_paths`, and `discovery_path`. Edit only `handoff_path` (Delta, Review Ledger) and `step_paths` (reviewer fixes). Never modify `plan_path` or `discovery_path`.
+Read only pipeline state, `handoff_path`, `plan_path`, `step_paths`, and `discovery_path`. Edit only `handoff_path` (Delta, Review Ledger) and `step_paths` (reviewer fixes). Never modify `plan_path` or `discovery_path`.
 
 # Process
+
+## 0. Preflight
+- Derive `state_path` as `<artifact_base>.pipeline-state.md`.
+- Read `state_path`. Fast-fail if missing or unreadable: return `Status: FAIL`.
+- Derive `plan_path`, `handoff_path`, `discovery_path`, and `step_pattern` from `## Resolved Paths` in state.
+- Extract `user_notes` from `## User Notes`.
+- Derive cache paths: `artifact/<artifact_base>.review-audit.md`, `artifact/<artifact_base>.review-tests.md`.
+- Read `handoff_path`. Fast-fail if missing: return `Status: FAIL`, mention that `/plan/finalize-prep` must succeed first.
+- Glob for `step_pattern`. Fast-fail if zero step files found: return `Status: FAIL`.
+- Collect matching `step_paths`.
 
 ## 1. Read artifacts
 - Read `handoff_path` in full.
