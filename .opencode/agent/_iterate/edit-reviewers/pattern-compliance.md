@@ -42,7 +42,7 @@ Check changed prompt files against selected workflow patterns.
   file="../config/agent/_templates/review-process/cached.txt"
   delta_source=log_path
   render_expanded=1
-  step2_extra="- Read `pattern_contract_path`.\n- Read selected source sections named by the contract, such as `config/doc/workflow/design-patterns.md#OPT-###` or `config/doc/workflow/optimize-patterns.md#WOPT-###`.\n- Read changed files and any `Apply To` files from the contract.\n- Check each selected Carry-In, Quality Guard, Apply To path, and Validation bullet against the generated prompt text.\n- Findings are about generated files not matching selected patterns."
+  step2_extra="- Read `pattern_contract_path`.\n- Read selected source sections named by the contract, such as `config/doc/workflow/design-patterns.md#OPT-###` or `config/doc/workflow/optimize-patterns.md#WOPT-###`.\n- Read changed files and any `Apply To` files from the contract.\n- Check each selected Carry-In, Quality Guard, Apply To path, and Validation bullet against the generated prompt text.\n- When selected patterns affect templates or output schemas, inspect rendered output for whitespace artifacts that weaken the selected validation.\n- Findings are about generated files not matching selected patterns."
   preserve_byte_exact=1
 }}
 

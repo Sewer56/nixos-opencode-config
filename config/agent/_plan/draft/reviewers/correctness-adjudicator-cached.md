@@ -57,5 +57,6 @@ Adjudicate the COR domain (cached). Validate A/B reviewer pointers, merge eviden
   with_actions_path=1
   agent="correctness"
   domains="COR"
+  with_domains=1
   prefix=COR
 }}

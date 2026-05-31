@@ -2,7 +2,8 @@
   file="./agent/_templates/review-output/output.txt"
   agent="{{arg:agent_name}}"
   prefix={{arg:err_prefix}}
-  categories="COVERAGE | SPECIFICITY | FIDELITY"
+  categories="COVERAGE | FORMAT | SPECIFICITY | FIDELITY | READABILITY | WORDING"
+  detail="MISSING_SECTION | VAGUE_TRIGGER | WRONG_FORMAT | MISSING_VARIANT | STALE | JARGON | AMBIGUOUS | COMPOUND | OPAQUE_REF | ACRONYM | PASSIVE | FILLER | WORDY | TERM_INCONSIST"
   evidence="{{arg:evidence1}}"
   problem="<what is wrong>"
   fix="<smallest concrete correction>"
@@ -10,7 +11,10 @@
   bad="-missing or vague error docs"
   good="+concrete # Errors docs"
   with_lines=1
+  with_evidence=1
+  with_detail=1
   mode={{arg:mode}}
+  with_verified=1
   verified_ref="{{arg:verified_ref}}"
 }}
 

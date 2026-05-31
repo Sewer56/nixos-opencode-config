@@ -76,6 +76,7 @@ Resolution: <only for RESOLVED>
   file="./agent/_templates/review-output/output.txt"
   agent="_plan/draft/reviewers/docs-and-wording"
   domains="DOC, WORDING"
+  with_domains=1
   prefix=DOC
   categories="COVERAGE | SPECIFICITY"
   evidence="<section, `path:line`, or missing element>"

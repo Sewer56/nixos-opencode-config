@@ -112,7 +112,7 @@ Intent: write executable instructions for large language models. Use proven prom
 - `prompt_kind`: command, agent, reviewer, docs, or mixed.
 - `consumer`: LLM-runtime, human-doc, machine-output, or mixed.
 - `behavior_traits`: command delegation, primary runner + review subagents, review loop, subagent coordination, repeated subagent/task calls, machine-readable output, diff-based artifacts, failure-path validation, path-only helper sections, shared pattern selection, optimizer workflow, reviewer topology, action/cache split, pipeline decomposition.
-- `focus_signals`: prompt/context bloat, missing prompt-writing contract, tight input violation, overbroad handoff, duplicate reads, duplicate reasoning, scope leakage, review-loop churn, cache/delta failure, action/cache confusion, output bloat, topology mismatch, model/risk mismatch, monolithic prompt.
+- `focus_signals`: prompt/context bloat, missing prompt-writing contract, tight input violation, overbroad handoff, duplicate reads, duplicate reasoning, scope leakage, review-loop churn, cache/delta failure, action/cache confusion, output bloat, topology mismatch, model/risk mismatch, monolithic prompt, rendered whitespace.
 - `risk_flags`: command-agent, permission, self-iteration, optimizer-workflow, reviewer-topology, structured-output, json-config.
 - Set `self-iteration` when paths include `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`.
 - Set `optimizer-workflow` when paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/optimize/export-analyzer.md`.
@@ -138,6 +138,7 @@ Intent: write executable instructions for large language models. Use proven prom
   - Remove direct-vs-child wording unless the prompt can observe and branch on it.
   - Replace prohibition-led rules with the positive action when equivalent.
   - Collapse repeated path derivations into one variable definition.
+  - Remove rendered trailing spaces, whitespace-only lines, and repeated blank lines.
   - Keep only pattern carry-ins needed for the requested behavior.
 - When changing prompt-writing behavior, update runner prompt and reviewer enforcement together when future drift should be caught.
 - When changing review action/cache semantics, update primary runners, reviewer/adjudicator prompts, shared pattern docs, and `_iterate/edit-reviewers/instruction-quality.md` together.
@@ -204,7 +205,8 @@ Log shape:
 - For changed agent/command files, check frontmatter delimiters and essential routing fields.
 - Render-validate every changed agent/command file with `bash scripts/render-file.sh <repo-relative-path>`.
   - For cross-config-dir imports from `.opencode/` into `config/`, use `../config/` prefix in import paths.
-  - Fix render errors and duplicate/expansion artifacts before reviewer calls.
+  - Fix render errors, duplicate/expansion artifacts, and rendered whitespace before reviewer calls.
+  - Fix source templates/import spacing, not rendered output copies.
 - Run `git diff --check` when `bash` is available; fix whitespace warnings before reviewer calls.
 - Use `read`, `grep`, and `glob` for static checks except git metadata/diff and render commands.
 
@@ -215,6 +217,7 @@ Log shape:
 - Run `@_iterate/edit-reviewers/integrity` first when any changed path changes frontmatter, permissions, command-agent wiring, self-iteration behavior, optimizer workflow behavior, or reviewer topology.
 - Run `@_iterate/edit-reviewers/pattern-compliance` every run after integrity. It validates generated edits against selected pattern carry-ins, quality guards, apply-to paths, and validation bullets.
 - Run `@_iterate/edit-reviewers/instruction-quality` when any changed path changes an agent prompt, command body, output schema, subagent call, or reviewer topology.
+- Route rendered whitespace by symptom: readability/schema clarity to instruction-quality; parsing, import, or schema breakage to integrity.
 - Pass reviewers only their owned run data:
   - `integrity`: `log_path`, `cache_path: integrity_cache_path`, `changed_paths`, `target_summary`, `risk_flags`.
   - `pattern-compliance`: `log_path`, `pattern_contract_path`, `cache_path: pattern_compliance_cache_path`, `changed_paths`, `target_summary`, `risk_flags`.

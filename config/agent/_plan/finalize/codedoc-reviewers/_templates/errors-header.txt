@@ -11,6 +11,8 @@
 
 # Focus
 
+Review error documentation for coverage, specificity, readability, and wording.
+
 ## Read strategy
 {{ if=variant==codedoc }}Ground checks in step file diffs and handoff content. Open referenced source files only when a step diff is ambiguous or missing context for public API status or reachable error variants.
 {{ else }}Ground checks in applied source docs and handoff content. Open referenced source files only when a diff is ambiguous or missing context for public API status or reachable error variants.

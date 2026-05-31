@@ -2,8 +2,10 @@
   file="./agent/_templates/review-output/output.txt"
   agent="{{arg:agent_name}}"
   domains="{{arg:doc_domain}}, {{arg:read_domain}}"
+  with_domains=1
   prefix={{arg:doc_domain}}
   categories="COVERAGE | SPECIFICITY | FIDELITY | INLINE_COMMENT"
+  detail="MISSING_DOC | OUTDATED_DOC | MISPLACED_DOC | MISSING_INLINE"
   evidence="{{arg:evidence1}}"
   problem="<what is wrong>"
   fix="<smallest concrete correction>"
@@ -11,7 +13,19 @@
   bad="-old or missing docs"
   good="+new docs"
   with_lines=1
+  with_evidence=1
+  with_detail=1
+  prefix_b={{arg:read_domain}}
+  categories_b="READABILITY | WORDING"
+  detail_b="{{arg:read_categories}}"
+  evidence_b="{{arg:evidence2}}"
+  problem_b="<readability or wording issue>"
+  fix_b="<smallest concrete wording correction>"
+  file_ref_b="{{arg:file_ref}}"
+  bad_b="-unclear or wordy docs"
+  good_b="+clear concise docs"
   mode={{arg:mode}}
+  with_verified=1
   verified_ref="{{arg:verified_ref}}"
 }}
 

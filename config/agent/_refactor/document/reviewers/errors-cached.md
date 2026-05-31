@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews error documentation coverage and specificity for source files (cached)
+description: Reviews error documentation coverage, specificity, readability, and wording for source files (cached)
 model: sewer-axonhub/step-3.7-flash  # LOW
 reasoningEffort: medium
 permission:
@@ -23,7 +23,7 @@ permission:
 
 {{
   file="./agent/_plan/finalize/codedoc-reviewers/_templates/errors-header.txt"
-  description="Review source files' error documentation."
+  description="Review source files' error documentation for coverage, specificity, fidelity, readability, and wording."
   variant=refactor
   mode=cached
 }}

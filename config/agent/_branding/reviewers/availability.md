@@ -54,6 +54,7 @@ Cross-reference search findings from the handoff for external availability data.
   file="./agent/_templates/review-output/output.txt"
   agent="_branding/reviewers/availability"
   domains=AVL
+  with_domains=1
   mode=cached
   prefix=AVL
   categories="DOMAIN_CAVEAT | PACKAGE_CRATE_CAVEAT | SOCIAL_HANDLE_CAVEAT | MISSING_TRADEMARK_DISCLAIMER | RISKY_AVAILABILITY_CLAIM | MISSING_ECOSYSTEM_CHECK | MISSING_NEXT_CHECKS"

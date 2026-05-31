@@ -4,8 +4,8 @@
 {{ endif }}{{ if=has_actions_path }}Actions: <actions_path>
 {{ endif }}{{ if=agent }}Agent: {{arg:agent}}
 {{ endif }}Decision: PASS | ADVISORY | BLOCKING
-{{ if=domains }}Domains: {{arg:domains}}
-{{ endif }}IDs: {{arg:prefix}}-001, {{arg:prefix}}-002, ...
+{{ if=with_domains==1 }}Domains: {{arg:domains}}
+{{ endif }}IDs: {{arg:prefix}}-001, {{arg:prefix}}-002, ...{{ if=prefix_b }}; {{arg:prefix_b}}-001, {{arg:prefix_b}}-002, ...{{ endif }}
 
 ## Findings
 {{

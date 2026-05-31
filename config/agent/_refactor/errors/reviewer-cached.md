@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews applied error docs for specificity, format, and fidelity (cached)
+description: Reviews applied error docs for specificity, format, fidelity, readability, and wording (cached)
 model: sewer-axonhub/step-3.7-flash  # LOW
 reasoningEffort: medium
 permission:
@@ -29,15 +29,14 @@ permission:
   delta_source=cache_path
 }}
 
-In the `# REVIEW` output, set `Agent:` to `_refactor/errors/reviewer-cached`.
-
 # Output
 
 {{
   file="./agent/_templates/review-output/output.txt"
   agent="_refactor/errors/reviewer-cached"
   prefix=ERR
-  categories="SPECIFICITY | FORMAT | FIDELITY"
+  categories="SPECIFICITY | FORMAT | FIDELITY | READABILITY | WORDING"
+  detail="VAGUE_TRIGGER | WRONG_FORMAT | STALE | PLACEHOLDER | ZERO_PATH | REVIEW_DIFF_LABEL | JARGON | AMBIGUOUS | COMPOUND | OPAQUE_REF | ACRONYM | PASSIVE | FILLER | WORDY | TERM_INCONSIST"
   evidence="<section, `path:line`, or missing element>"
   problem="<what is wrong>"
   fix="<smallest concrete correction>"
@@ -45,6 +44,8 @@ In the `# REVIEW` output, set `Agent:` to `_refactor/errors/reviewer-cached`.
   bad="-+proposed error docs with vague trigger"
   good="++proposed error docs with concrete trigger"
   with_lines=1
+  with_evidence=1
+  with_detail=1
   mode=cached
   verified_ref="<list items checked with no issues found>"
 }}

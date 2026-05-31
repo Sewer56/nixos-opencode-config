@@ -54,6 +54,7 @@ Cross-reference search findings from the handoff for external collisions.
   file="./agent/_templates/review-output/output.txt"
   agent="_branding/reviewers/distinctiveness"
   domains=DST
+  with_domains=1
   mode=cached
   prefix=DST
   categories="GENERIC_NAME | OVERUSED_SUFFIX | NEAR_DUPLICATE_LIST | DUPLICATE_COLLISION | WEAK_SEARCHABILITY"

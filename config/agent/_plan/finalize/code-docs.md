@@ -107,7 +107,3 @@ Apply these rules:
 {{ file="./rules/groups/docs/target-code-docs.md" }}
 
 {{ file="./rules/groups/docs/target-error-docs.md" }}
-
-{{ file="./rules/groups/style/target-readability.md" }}
-
-{{ file="./rules/groups/style/target-wording.md" }}

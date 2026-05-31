@@ -52,6 +52,7 @@ Read `branding_path` for in-scope sections: Project Read, Naming Criteria, Top R
   file="./agent/_templates/review-output/output.txt"
   agent="_branding/reviewers/positioning"
   domains=POS
+  with_domains=1
   mode=cached
   prefix=POS
   categories="PURPOSE_MISMATCH | AUDIENCE_MISMATCH | EMOTIONAL_TONE_INCONSISTENCY | WEAK_BRAND_STORY | TAGLINE_MESSAGE_DISCONNECT | EXTENSIBILITY_LIMITATION | VALUE_NAME_DISCONNECT"

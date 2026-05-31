@@ -17,7 +17,8 @@ Bad: `Please make sure to ensure that the plan is able to update the file.`
 Good: `Update the file.`
 
 ### Wordiness
-Flag: phrasing that can be tightened without changing meaning.
+Flag: phrasing that can be tightened without changing meaning; use the fewest words that preserve exact meaning.
+Allow: necessary technical terms and identifiers; prefer precise terms over cryptic shortcuts.
 Severity: ADVISORY; BLOCKING only for egregious inflation.
 Bad: `in order to make it possible for reviewers to determine`
 Good: `so reviewers can determine`

@@ -52,6 +52,7 @@ Read `branding_path` for in-scope sections: Candidate Shortlist, Top Recommendat
   file="./agent/_templates/review-output/output.txt"
   agent="_branding/reviewers/clarity"
   domains=CLR
+  with_domains=1
   mode=cached
   prefix=CLR
   categories="UNPRONOUNCEABLE | AMBIGUOUS_SPELLING | POOR_MEMORABILITY | AWKWARD_WORD_SHAPE | AMBIGUOUS_MEANING_COMMON | AMBIGUOUS_MEANING_NICHE | NOT_ONE_READ_EXPLAINABLE"

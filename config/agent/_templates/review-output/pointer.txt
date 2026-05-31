@@ -5,7 +5,7 @@
 {{ endif }}
 {{ if=agent }}Agent: {{arg:agent}}
 {{ endif }}Decision: PASS | ADVISORY | BLOCKING
-{{ if=domains }}Domains: {{arg:domains}}
+{{ if=with_domains==1 }}Domains: {{arg:domains}}
 {{ endif }}IDs: {{arg:prefix}}-001, {{arg:prefix}}-002, ...
 ```
 

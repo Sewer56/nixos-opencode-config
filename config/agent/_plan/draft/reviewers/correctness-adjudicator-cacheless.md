@@ -52,6 +52,7 @@ Determine whether the draft plan is free of blocking correctness issues.
   file="./agent/_templates/review-output/output.txt"
   agent="correctness"
   domains="COR"
+  with_domains=1
   prefix=COR
   categories="FIDELITY | ACTION | FILE_PATH | TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS"
   evidence="<section, [P#], path:line, diff header, or missing element>"
@@ -62,4 +63,3 @@ Determine whether the draft plan is free of blocking correctness issues.
   good="+correct content"
   with_evidence=1
 }}
-

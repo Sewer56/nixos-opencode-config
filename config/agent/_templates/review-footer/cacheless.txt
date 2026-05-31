@@ -4,6 +4,7 @@
   file="./agent/_templates/review-output/output.txt"
   agent="{{arg:agent}}"
   domains="{{arg:domains}}"
+  with_domains={{arg:with_domains}}
   prefix={{arg:prefix}}
   categories="{{arg:categories}}"
   evidence="{{arg:evidence}}"

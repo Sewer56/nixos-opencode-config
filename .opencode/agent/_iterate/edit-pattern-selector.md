@@ -22,7 +22,7 @@ Select compact pattern guidance for a direct OpenCode agent or command prompt ed
 - `target_summary`: short description of requested edit.
 - `target_paths`: repo-relative paths expected to change.
 - `behavior_traits`: compact traits such as command delegation, primary runner + review subagents, review loop, subagent coordination, repeated subagent/task calls, machine-readable output, diff-based artifacts, failure-path validation, path-only helper sections, shared pattern selection, optimizer workflow, or reviewer topology.
-- `focus_signals`: observed waste/risk signals such as prompt/context bloat, duplicate reads, duplicate reasoning, tight input violation, output bloat, topology mismatch, model/risk mismatch, scope leakage, cache/delta failure, or review-loop churn.
+- `focus_signals`: observed waste/risk signals such as prompt/context bloat, duplicate reads, duplicate reasoning, tight input violation, output bloat, topology mismatch, model/risk mismatch, scope leakage, cache/delta failure, review-loop churn, or rendered whitespace artifacts.
 - `risk_flags`: compact flags such as command-agent, permission, self-iteration, optimizer-workflow, reviewer-topology, structured-output, or json-config.
 - `pattern_contract_path`: `PROMPT-ITERATE-EDIT-<slug>.patterns.md` path to write.
 

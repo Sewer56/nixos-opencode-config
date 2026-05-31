@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks code-adjacent error documentation coverage and specificity for finalized steps (cached)
+description: Checks code-adjacent error documentation coverage, specificity, readability, and wording for finalized steps (cached)
 model: sewer-axonhub/step-3.7-flash  # LOW
 reasoningEffort: medium
 permission:
@@ -23,7 +23,7 @@ permission:
 
 {{
   file="./agent/_plan/finalize/codedoc-reviewers/_templates/errors-header.txt"
-  description="Review step artifacts' code-adjacent error documentation."
+  description="Review step artifacts' code-adjacent error documentation for coverage, specificity, fidelity, readability, and wording."
   variant=codedoc
   mode=cached
 }}

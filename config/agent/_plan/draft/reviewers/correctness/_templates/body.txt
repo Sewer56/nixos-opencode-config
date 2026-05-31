@@ -68,6 +68,7 @@ Review artifacts for fidelity to user requirements, template structure, diff hea
   if=mode==cacheless
   agent="correctness"
   domains="COR"
+  with_domains=1
   prefix=COR
   categories="FIDELITY | ACTION | FILE_PATH | TEMPLATE_STRUCTURE | DIFF_HEADERS | ILLUSTRATIVE_SNIPPETS"
   evidence="<section, [P#], path:line, diff header, or missing element>"

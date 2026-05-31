@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks direct OpenCode agent/command prompt edits for LLM instruction quality, prompt economy, and reviewer topology
+description: Checks direct OpenCode agent/command prompt edits for LLM instruction quality, prompt economy, rendered whitespace, and reviewer topology
 model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
@@ -237,7 +237,7 @@ Check:
 - Merge reviewers that read the same artifacts and emit overlapping wording/style/clarity/dedup findings.
 - Keep high-risk integrity/security/data-loss checks separate from wording/polish checks.
 - Own readability, LLM-followability, bullet/checklist structure, output schema, and topology economy.
-- Do not take over product correctness, permission integrity, or pattern-compliance domains.
+- Review prompt quality only; leave product correctness, permission safety, and selected-pattern application out of scope.
 
 Bad:
 ```text
@@ -253,6 +253,8 @@ Run one instruction-quality reviewer for wording, style, clarity, dedup, output 
 Check:
 - When nested fences are needed, outer fence uses backticks and inner fence uses tildes.
 - Diff examples inside markdown examples use `~~~diff`.
+- Rendered prompts have no trailing spaces, whitespace-only lines, or more than one consecutive blank line between sections.
+- Fix whitespace artifacts in source templates, imports, or conditionals.
 
 Bad:
 ````markdown
@@ -274,13 +276,28 @@ Good:
 ```
 ````
 
+Whitespace bad:
+```text
+# Focus
+<blank line>
+<blank line>
+## Read strategy
+```
+
+Whitespace good:
+```text
+# Focus
+<blank line>
+## Read strategy
+```
+
 # Process
 
 {{
   file="../config/agent/_templates/review-process/cached.txt"
   delta_source=log_path
   render_expanded=1
-  step2_extra="- Do not read workflow pattern catalogs or pattern contracts; pattern-compliance owns selected-pattern application checks.\n- Inspect only changed prompt files and directly referenced files needed to detect duplication or topology overlap.\n- Render every changed prompt with `bash scripts/render-file.sh` and compare rendered output for duplication across sections and imported content."
+  step2_extra="- Do not read workflow pattern catalogs or pattern contracts.\n- Inspect only changed prompt files and directly referenced files needed to detect duplication or topology overlap.\n- Render every changed prompt with `bash scripts/render-file.sh` and compare rendered output for duplication across sections and imported content.\n- Check rendered output for trailing spaces, whitespace-only lines, and more than one consecutive blank line between sections. Point fixes at the source template, import spacing, or conditional that produced the whitespace."
   preserve_byte_exact=1
 }}
 
@@ -298,7 +315,7 @@ Good:
   mode=cached
   agent="_iterate/edit-reviewers/instruction-quality"
   prefix=IQ
-  categories="RUNTIME_INSTRUCTION | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CLARITY | DEDUP | TEMPLATE | TOPOLOGY | MARKDOWN"
+  categories="RUNTIME_INSTRUCTION | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CLARITY | DEDUP | TEMPLATE | TOPOLOGY | MARKDOWN | WHITESPACE"
   evidence="<section, rule, or rendered artifact>"
   problem="<one-line problem>"
   fix="<exact correction>"
@@ -319,8 +336,9 @@ Good:
   - callee-owned instructions duplicated in caller
   - unstable machine output
   - confusing behavior-governing text
+  - rendered whitespace that breaks machine-consumed output or obscures section boundaries
   - redundant direct/child or disabled-tool instructions that change or obscure runtime behavior
   - reviewer topology merge that loses high-risk ownership
   - rendered sections duplicate ownership, scope, or exclusion rules already declared by imported content
-- ADVISORY: local wording economy, positive-wording opportunities, dense paragraph-style rules, or doc clarity improvements that do not affect correctness.
+- ADVISORY: local wording economy, positive-wording opportunities, dense paragraph-style rules, rendered whitespace cleanup, or doc clarity improvements that do not affect correctness.
 - Keep response compact; detailed evidence belongs in cache.

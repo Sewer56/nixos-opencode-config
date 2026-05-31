@@ -1,5 +1,3 @@
-Review applied error docs for correctness — verify that the applied source docs meet quality standards.
-
 {{ if=mode==cached }}
 # Inputs
 
@@ -16,11 +14,11 @@ Review applied error docs for correctness — verify that the applied source doc
 ## Read scope
 Read `cache_path` fully and the lang rules file for each language in the cache.
 Do not scan source for functions missing from cache; collector owns enumeration.
+
 {{ endif }}
-
 {{ file="./rules/groups/docs/target-error-application-review.md" }}
-
 {{ if=mode==cached }}
+
 ## Delta-scoped verification
 If `## Delta` is non-empty, verify only source files for Delta items; otherwise verify all cache items on first pass.
 {{ endif }}

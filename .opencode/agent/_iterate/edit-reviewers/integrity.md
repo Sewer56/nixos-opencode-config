@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Checks direct OpenCode agent/command prompt edits for schema, permissions, wiring, scope, and self-iteration safety
+description: Checks direct OpenCode agent/command prompt edits for schema, permissions, wiring, scope, rendered integrity, and self-iteration safety
 model: sewer-axonhub/GLM-5.1  # HIGH
 reasoningEffort: medium
 permission:
@@ -58,6 +58,9 @@ agent: _iterate/edit
 ---
 ```
 
+## Render integrity
+Rule: Rendered prompt output must preserve parseable frontmatter, imports, and machine output. Flag whitespace only when it breaks parsing, imports, schema, or section detection.
+
 ## Command→agent wiring
 Rule: Command body becomes user message; agent body becomes system prompt. Thin commands use `$ARGUMENTS`. Local `@agent/name` references and `permission.task` allows name existing local agents.
 
@@ -101,7 +104,7 @@ Open opencode-source/packages/opencode/src/... to decide command prompt behavior
 
 Good:
 ```text
-Read nearby command and agent files. Pattern-compliance owns selected-pattern application checks.
+Read nearby command and agent files. Verify wiring and source boundaries only.
 ```
 
 ## Self-iteration safety
@@ -149,7 +152,7 @@ Requested reviewer merge updates only caller routing, task permissions, and affe
   file="../config/agent/_templates/review-process/cached.txt"
   delta_source=log_path
   render_expanded=1
-  step2_extra="- Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or changed paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/optimize/export-analyzer.md`.\n- Inspect only changed paths plus directly referenced files needed to validate wiring."
+  step2_extra="- Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or changed paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/optimize/export-analyzer.md`.\n- Inspect only changed paths plus directly referenced files needed to validate wiring.\n- In rendered output, flag whitespace only when it breaks parsing, imports, schema, or section detection."
   preserve_byte_exact=1
 }}
 
@@ -167,7 +170,7 @@ Requested reviewer merge updates only caller routing, task permissions, and affe
   mode=cached
   agent="_iterate/edit-reviewers/integrity"
   prefix=INT
-  categories="FRONTMATTER | WIRING | PERMISSION | SCOPE | SELF_ITERATION | OPTIMIZER | SOURCE_BOUNDARY"
+  categories="FRONTMATTER | WIRING | PERMISSION | SCOPE | SELF_ITERATION | OPTIMIZER | SOURCE_BOUNDARY | WHITESPACE"
   evidence="<line or field showing issue>"
   problem="<one-line problem>"
   fix="<exact correction>"
@@ -182,6 +185,6 @@ Requested reviewer merge updates only caller routing, task permissions, and affe
 }}
 
 # Constraints
-- BLOCKING: broken command/agent wiring, unsafe permissions, invalid frontmatter, missing model-facing self-iteration rule, optimizer architecture regression, or target-scope violation.
+- BLOCKING: broken command/agent wiring, unsafe permissions, invalid frontmatter, missing model-facing self-iteration rule, optimizer architecture regression, whitespace that breaks parsing/schema, or target-scope violation.
 - ADVISORY: harmless documentation mismatch, minor convention drift, or cleanup that improves maintainability without changing behavior.
 - Keep response compact; detailed evidence belongs in cache.
