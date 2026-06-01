@@ -36,21 +36,19 @@ Run the review loop against finalized step artifacts. Maintain Delta and Review 
 # Inputs
 - Derive `slug` from request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
 - If a `plan_path` is provided by the caller, derive `artifact_base` from it (strip `.draft.md` suffix) and skip slug derivation.
-- Required: `<artifact_base>.pipeline-state.md` must exist from a prior `/plan/finalize-prep` run.
+- Required: code generation must have written `handoff_path` plus I#/T# step files.
 - User notes from the latest message (may be empty).
 
 # Scope
-Read only pipeline state, `handoff_path`, `plan_path`, `step_paths`, and `discovery_path`. Edit only `handoff_path` (Delta, Review Ledger) and `step_paths` (reviewer fixes). Never modify `plan_path` or `discovery_path`.
+Read only `handoff_path`, `plan_path`, and `step_paths`. Edit only `handoff_path` (Delta, Review Ledger) and `step_paths` (reviewer fixes). Never modify `plan_path` or repo files.
 
 # Process
 
 ## 0. Preflight
-- Derive `state_path` as `<artifact_base>.pipeline-state.md`.
-- Read `state_path`. Fast-fail if missing or unreadable: return `Status: FAIL`.
-- Derive `plan_path`, `handoff_path`, `discovery_path`, and `step_pattern` from `## Resolved Paths` in state.
-- Extract `user_notes` from `## User Notes`.
+- Derive `handoff_path` as `<artifact_base>.handoff.md` and `step_pattern` as `<artifact_base>.step.*.md`.
 - Derive cache paths: `artifact/<artifact_base>.review-audit.md`, `artifact/<artifact_base>.review-tests.md`.
-- Read `handoff_path`. Fast-fail if missing: return `Status: FAIL`, mention that `/plan/finalize-prep` must succeed first.
+- Read `handoff_path`. Fast-fail if missing: return `Status: FAIL`, mention that finalize code generation must succeed first.
+- Read `plan_path`. Fast-fail if missing or missing `## Relevant Files`.
 - Glob for `step_pattern`. Fast-fail if zero step files found: return `Status: FAIL`.
 - Collect matching `step_paths`.
 
@@ -58,7 +56,6 @@ Read only pipeline state, `handoff_path`, `plan_path`, `step_paths`, and `discov
 - Read `handoff_path` in full.
 - Read `plan_path` in full.
 - Read all `step_paths` in one batch.
-- Read `discovery_path`.
 
 ## 2. Write initial Delta
 - Ensure `## Delta` in `handoff_path` lists every REQ-### as New and every I#/T# step as New.
@@ -70,11 +67,8 @@ Read only pipeline state, `handoff_path`, `plan_path`, `step_paths`, and `discov
   - Audit: all step paths (I# + T#).
   - Tests: test step paths (T#) + implementation steps that directly affect test assertions/coverage.
 - Pass only run data: `handoff_path`, `plan_path`, domain-scoped `step_paths`, `cache_path`, trigger flags, and short `user_notes`.
-- Use `discovery_path` contents for minimal reviewer context excerpts:
-  - Audit: relevant file paths and current state from `## Files Touched` + `## Key Symbols`.
-  - Tests: test file locations from `## Test Files` + existing test structure from `## Observations`.
-  - Keep excerpts minimal.
-  - Pass named gaps only when cache evidence is missing or stale.
+- Use `## Relevant Files` from `plan_path` for minimal path context.
+- Pass named gaps only when step evidence is missing or stale.
 - Full reviewers handle INITIAL review only. They write cache files with grounding snapshots.
 - After each reviewer returns:
   - Pass explicit `actions_path` to every reviewer dispatch (derive as `<cache_path without .md>.actions.<nnn>.md`, starting 001, incrementing per dispatch).

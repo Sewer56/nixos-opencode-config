@@ -29,20 +29,14 @@ Generate minimal D# step stubs for user-facing effects in finalized I#/T# steps.
 
 # Inputs
 - The latest user message may provide user-documentation notes.
-- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
+- Required caller inputs: `plan_path`, `handoff_path`, and `step_pattern`.
 - Required local artifacts:
-  - `<artifact_base>.draft.md`
-  - `<artifact_base>.handoff.md`
-  - existing I#/T# files matching `<artifact_base>.step.*.md`
-- Use `discovery_path = artifact/<artifact_base>.repo-discovery.md`.
+  - `plan_path`
+  - `handoff_path`
+  - existing I#/T# files matching `step_pattern`
 
 # Artifacts
-- `artifact_base`: `PROMPT-PLAN-<slug>` (derived from `slug`)
-- `state_path`: `<artifact_base>.doc-pipeline-state.md`
-- `plan_path`: `<artifact_base>.draft.md`
-- `handoff_path`: `<artifact_base>.handoff.md`
-- `discovery_path`: `artifact/<artifact_base>.repo-discovery.md`
-- `step_pattern`: `<artifact_base>.step.*.md`
+- `artifact_base`: derive from `plan_path` by removing the `.draft.md` suffix.
 - Cache paths (written by cached reviewers, stored under `artifact/`):
   - `artifact/<artifact_base>.review-eudoc-correctness.md`
   - `artifact/<artifact_base>.review-eudoc-polish.md`
@@ -50,20 +44,19 @@ Generate minimal D# step stubs for user-facing effects in finalized I#/T# steps.
 # Focus
 
 ## Scope
-Modify only `<artifact_base>.handoff.md` and D# step files. Keep I#/T# steps, product code, `<artifact_base>.draft.md`, and `discovery_path` unchanged.
+Modify only `<artifact_base>.handoff.md` and D# step files. Keep I#/T# steps, product code, and `<artifact_base>.draft.md` unchanged.
 
 # Process
 
-## 1. Read pipeline state
-- Read `state_path` (`<artifact_base>.doc-pipeline-state.md`).
-- If `state_path` is missing or cannot be read, return `Status: FAIL` immediately.
-- Use its resolved paths, discovery context, and user-doc context.
-- Read `discovery_path` when present and valid.
-- Read `handoff_path` for Step Index, Delta, and Requirement Trace Matrix.
+## 1. Validate preconditions
+- Read `plan_path`. If missing or missing `## Relevant Files`, return `Status: FAIL`.
+- Read `handoff_path` for Step Index, Delta, and Requirement Trace Matrix. If missing, return `Status: FAIL`.
+- Derive exact I#/T# `step_paths` from the Step Index or by reading files matching `step_pattern`.
+- If zero I#/T# step files exist, return `Status: FAIL`.
 
 ## 2. Generate minimal D# stubs
 - Scan I#/T# step files for user-facing effects: changed behavior, new features, removed features, changed CLI flags, changed error messages, changed config surface.
-- Read the existing user documentation surface identified in `state_path` (User-Doc Context → Existing docs touched, Sibling pages for style).
+- Read existing user documentation surfaces named in draft `## Relevant Files` or I#/T# steps. For NEW documentation, read sibling pages for style.
 - Write one D# stub per user-facing effect that needs documentation. Each stub has: step file path, Action, Why, Scope, and file path. Leave Content diff as a placeholder — reviewers will fill it.
 - Stable numbering: number D# steps sequentially. If a step is removed during revision, leave the gap — do not renumber.
 - If no user-facing effects exist or all are already documented, emit Output with `Status: SUCCESS`.

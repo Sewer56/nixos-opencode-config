@@ -72,17 +72,16 @@ Write only `<artifact_base>.draft.md` and `artifact/<artifact_base>.draft.handof
 - Good snippet types: function signatures, interface/type shapes, route shapes, and tiny placeholder code blocks.
 - Keep snippets basic and brief. They are illustrative, not binding implementation instructions.
 - Leave unresolved decisions in `## Open Questions`.
-- When a `[P#]` item changes code that end-user documentation references, add a corresponding `[P#]` item for the documentation update or creation. When a `[P#]` item adds user-facing surface that has no existing documentation, add a `[P#]` item to create it. State the doc file path and what changes.
-- From the explorer manifest, add a `**Relevant Paths:**` bulleted list to each `[P#]` item listing files the explorer surfaced that are relevant to that item but not already in its `**Files:**` line. Include why each file is relevant. Format:
+- Add `## Relevant Files` at the end of the draft. Include every source, test, documentation, config, and neighboring file someone making the change may need.
+- Use this exact format. If no relevant files exist, write one `None` row.
 ```markdown
-[P1] Update the help page handler
-**Files:** `handlers.go`
-**Relevant Paths:**
-- `handlers_test.go` — covers handler tests
-- `help.html` — template rendered by this handler
-- `viewmodels.go` — shared types used here
+## Relevant Files
+| Path | Type | Plan Refs | Why |
+| ---- | ---- | --------- | --- |
+| `path/to/file` | source | P1 | current implementation and anchors |
+| None | none | None | no relevant files |
 ```
-Skip for items where the explorer found nothing beyond what's already listed.
+- When a `[P#]` item changes code that end-user documentation references, add a corresponding `[P#]` item for the documentation update or creation. When a `[P#]` item adds user-facing surface that has no existing documentation, add a `[P#]` item to create it. State the doc file path and what changes.
 
 ## 4. Run the draft review loop
 Follow the ordered steps below.

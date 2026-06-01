@@ -12,7 +12,8 @@ permission:
   edit:
     "*": deny
     "*PROMPT-PLAN*.handoff*.md": allow
-    "*PROMPT-PLAN*.step.*.md": allow
+    "*PROMPT-PLAN*.step.I*.md": allow
+    "*PROMPT-PLAN*.step.T*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
@@ -29,13 +30,11 @@ Run code-documentation reviewers against finalized I#/T# step files. Apply their
 
 # Inputs
 - The latest user message may provide code-documentation notes.
-- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-PLAN-<slug>`.
-- Use `plan_path` = `<artifact_base>.draft.md`, `handoff_path` = `<artifact_base>.handoff.md`, `discovery_path` = `artifact/<artifact_base>.repo-discovery.md`, and `step_pattern` = `<artifact_base>.step.*.md`.
+- Required caller inputs: `plan_path`, `handoff_path`, and `step_pattern`.
+- Derive `artifact_base` from `plan_path` by removing the `.draft.md` suffix.
 - Required local artifacts: `plan_path`, `handoff_path`, and existing I#/T# files matching `step_pattern`.
 
 # Artifacts
-- `state_path`: `<artifact_base>.doc-pipeline-state.md`
-- `discovery_path`: `artifact/<artifact_base>.repo-discovery.md` (read-only if present)
 - Cache paths (written by cached reviewers, stored under `artifact/`):
   - `artifact/<artifact_base>.review-codedoc-docs-readability.md`
   - `artifact/<artifact_base>.review-codedoc-errors.md`
@@ -43,15 +42,15 @@ Run code-documentation reviewers against finalized I#/T# step files. Apply their
 # Focus
 
 ## Scope
-Modify only `<artifact_base>.handoff.md` and existing I#/T# step files matching `<artifact_base>.step.*.md`. Keep D# steps, product code, `<artifact_base>.draft.md`, and `discovery_path` unchanged.
+Modify only `<artifact_base>.handoff.md` and existing I#/T# step files matching `<artifact_base>.step.*.md`. Keep D# steps, product code, and `<artifact_base>.draft.md` unchanged.
 
 # Process
 
-## 1. Read pipeline state
-- Read `state_path` (`<artifact_base>.doc-pipeline-state.md`).
-- If `state_path` is missing or cannot be read, return `Status: FAIL` immediately.
-- Derive exact `step_paths` from the pipeline state.
-- Read `handoff_path` for Step Index and existing Delta/Ledger context.
+## 1. Validate preconditions
+- Read `plan_path`. If missing or missing `## Relevant Files`, return `Status: FAIL`.
+- Read `handoff_path` for Step Index and existing Delta/Ledger context. If missing, return `Status: FAIL`.
+- Derive exact I#/T# `step_paths` from the Step Index or by reading files matching `step_pattern`.
+- If zero I#/T# step files exist, return `Status: FAIL`.
 
 ## 2. Cached review loop
 - Write and maintain `## Delta` in `handoff_path`. Record each I#/T# step with `Status:`, `Touched:`, and `Why:`. Recompute after every material revision.
@@ -92,11 +91,7 @@ Summary: <one-line summary>
 ```
 
 # Constraints
-- Within each step file, `Lines: ~start-end` fields are approximate (±10 lines); include 2+ context lines before and after each change.
-- Each diff block within a step file must carry its own `Lines: ~start-end` label (`**Lines: ~start-end**` before the diff fence). Per-hunk labels are the authoritative locators.
-- Full-file `Lines:` ranges are invalid for localized changes — use only for ADD actions that add complete files.
 - Nested code fences: when a fenced code block contains another fenced code block, the outer fence uses backticks (```), inner fences use tildes (~~~).
-- Keep user-facing responses brief and factual.
 
 # Rules
 
