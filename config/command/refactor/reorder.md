@@ -3,4 +3,5 @@ description: "Reorder declarations in reading order (public-first, callers befor
 agent: _refactor/reorder
 ---
 
+Additional instructions (if any):
 $ARGUMENTS

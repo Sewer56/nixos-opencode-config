@@ -3,4 +3,5 @@ description: "Clean up existing uncommitted git changes with automated review an
 agent: _implement/cleanup-diff
 ---
 
+Additional instructions (if any):
 $ARGUMENTS

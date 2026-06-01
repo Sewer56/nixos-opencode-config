@@ -86,11 +86,6 @@
     }
   },
   "provider": {
-    "openai": {
-      "options": {
-        "reasoningSummary": "concise"
-      }
-    },
     "github-copilot": {
       "options": {
         "reasoningSummary": "concise"
