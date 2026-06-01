@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Checks plugin draft plans for documentation coverage and specificity
 model: sewer-axonhub/MiniMax-M2.7 # LOW
-reasoningEffort: medium
+variant: medium
 permission:
   "*": deny
   read:

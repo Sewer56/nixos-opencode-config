@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Adjudicates two independent plugin finalize audit reviews (cached)
 model: sewer-axonhub/GLM-5.1 # HIGH
-reasoningEffort: medium
+variant: medium
 permission:
   "*": deny
   read:

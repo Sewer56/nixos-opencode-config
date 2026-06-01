@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews D# steps for coverage, specificity, and broken links (cached)
 model: sewer-axonhub/MiniMax-M3 # MED
-reasoningEffort: medium
+variant: medium
 permission:
   "*": deny
   read:

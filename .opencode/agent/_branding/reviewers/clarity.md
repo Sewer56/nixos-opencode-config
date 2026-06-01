@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews branding for clarity — pronunciation, spelling, memorability, awkward word shape, and ambiguous meaning
 model: sewer-axonhub/MiniMax-M3 # MED
-reasoningEffort: medium
+variant: medium
 permission:
   "*": deny
   read:

@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews D# steps for clarity, wording, engagement, and cross-page polish
 model: sewer-axonhub/MiniMax-M3 # MED
-reasoningEffort: medium
+variant: medium
 permission:
   "*": deny
   read:

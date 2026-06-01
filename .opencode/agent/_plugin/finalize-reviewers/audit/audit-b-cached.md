@@ -4,7 +4,7 @@ hidden: true
 description: Independent plugin finalize audit reviewer B (cached)
 model: sewer-axonhub/GLM-5.1 # HIGH
 temperature: 0.7  # reviewer B
-reasoningEffort: medium
+variant: medium
 permission:
   "*": deny
   read:

@@ -76,7 +76,7 @@ Intent: write executable instructions for large language models. Use proven prom
 - Command frontmatter routes with `agent: <agent-name>` when a command delegates.
 - Command body becomes the user message. `$ARGUMENTS` expands into that message.
 - Agent files are markdown files under `config/agent/**` or `.opencode/agent/**`.
-- Agent frontmatter sets runtime behavior: common fields in this repo are `mode`, `hidden`, `description`, `model`, `reasoningEffort`, and `permission`.
+- Agent frontmatter sets runtime behavior: common fields in this repo are `mode`, `hidden`, `description`, `model`, `variant`, and `permission`.
 - Agent markdown body becomes the system prompt.
 - Local subagents are called as `@agent/name`; callers also need matching `permission.task` allows.
 - Prefer deny-all permissions with narrow allows. Keep `*.env` and `*.env.*` denied; allow `*.env.example` only as safe sample input.

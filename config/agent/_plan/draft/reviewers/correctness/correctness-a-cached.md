@@ -4,7 +4,7 @@ hidden: true
 description: Independent correctness reviewer A (cached) for plan draft adjudication
 model: sewer-axonhub/GLM-5.1 # HIGH
 temperature: 1.0  # reviewer A
-reasoningEffort: medium
+variant: medium
 permission:
   "*": deny
   read:

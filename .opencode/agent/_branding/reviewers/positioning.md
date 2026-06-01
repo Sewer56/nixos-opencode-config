@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews branding for positioning — fit with purpose, audience, tone, brand story, messaging, and extensibility
 model: sewer-axonhub/GLM-5.1 # HIGH
-reasoningEffort: medium
+variant: medium
 permission:
   "*": deny
   read:
