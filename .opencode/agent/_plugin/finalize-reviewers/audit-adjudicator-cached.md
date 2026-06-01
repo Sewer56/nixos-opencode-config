@@ -29,13 +29,12 @@ Adjudicate the plugin AUD domain (cached). Validate A/B reviewer pointers, merge
 
 # Inputs
 - `handoff_path`, `context_path`, `step_paths`, `cache_path`
-- `actions_path` (optional; derive next `<state_path without .md>.actions.<nnn>.md` path when omitted)
+- `actions_path` (optional; derive `<cache_path without .md>.actions.md` when omitted)
 
 # Process
 
 {{
-  file="./agent/_templates/adjudicator/adjudicator-cached.txt"
-  no_edit_targets="input artifacts"
+  file="../config/agent/_templates/adjudicator/adjudicator-cached.txt"
   reviewer_a="_plugin/finalize-reviewers/audit/audit-a-cached"
   reviewer_b="_plugin/finalize-reviewers/audit/audit-b-cached"
   run_context="with identical artifact inputs and separate sidecar `cache_path`/`actions_path` values"
@@ -46,7 +45,7 @@ Adjudicate the plugin AUD domain (cached). Validate A/B reviewer pointers, merge
 # Output
 
 {{
-  file="./agent/_templates/review-output/pointer.txt"
+  file="../config/agent/_templates/review-output/pointer.txt"
   with_cache_path=1
   with_actions_path=1
   agent="_plugin/finalize-reviewers/audit"

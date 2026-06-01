@@ -475,7 +475,7 @@ Main agent applies only returned carry-ins.
     - Keep single-leg findings when evidence is concrete and in scope
     - Drop findings without evidence or outside domain
     - Pick smallest safe fix on conflicts
-    - Cached: read sidecar actions first, sidecar caches only when needed; write canonical cache plus current actions file; emit `# REVIEW` pointer with `Actions:` and `Cache:`
+    - Cached: read stable sidecar actions first, sidecar caches only when needed; write canonical cache plus current `<cache-base>.actions.md`; emit `# REVIEW` pointer with `Actions:` and `Cache:`
     - Cacheless: parse findings from each leg's inline `## Findings` section; emit merged findings inline in output block; do not read or write sidecar files
     - Primary reads `Actions:` for current fixes (cached) or inline findings (cacheless)
     - Primary treats `Cache:` as reviewer-owned state for future review calls and ledger references, not fix input
@@ -496,7 +496,7 @@ Topology (<domain> = correctness, audit, plan-reviewer, freeform-reviewer):
   CACHED path:
     caller -> <domain>-adjudicator-cached (normal iterations)
              <domain>-adjudicator-cached -> <domain>-a-cached + <domain>-b-cached (shared.txt + shared-cached.txt)
-             adjudicator reads sidecar actions/caches -> canonical actions + cache/ledger + # REVIEW pointer (Actions:, Cache:)
+             adjudicator reads sidecar actions/caches -> stable canonical actions + cache/ledger + # REVIEW pointer (Actions:, Cache:)
 
   CACHELESS path:
     caller -> <domain>-adjudicator-cacheless (final full-artifact audit)

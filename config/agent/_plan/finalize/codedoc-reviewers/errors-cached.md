@@ -47,6 +47,6 @@ permission:
   err_prefix=CERR
   evidence1="<section, `path:line`, or missing element>"
   file_ref="<path/to/step/file>"
-  diff_target_note=" targeting the affected step file with the exact `# Errors` section to add or fix"
+  diff_target_note=" with the exact `# Errors` section to add or fix"
   verified_ref="<I#/T#>: <item description — unchanged items that remain verified>"
 }}

@@ -1,9 +1,15 @@
-1. If `cache_path` is absent, stop and report the missing required input. Set `state_path = cache_path`; set `base = state_path` without `.md`.
-2. If `actions_path` is absent, glob `${base}.actions.*.md`; accept only `${base}.actions.<3 digits>.md`; choose the next `<nnn>`, starting `001`.
-3. Derive sidecar paths exactly, using the same `<nnn>`:
-   - `{{arg:reviewer_a}}`: cache `${base}.a.md`; actions `${base}.a.actions.<nnn>.md`
-   - `{{arg:reviewer_b}}`: cache `${base}.b.md`; actions `${base}.b.actions.<nnn>.md`
-   - Invalid: `${base}.actions.<nnn>.a.md`, `${base}.actions.<nnn>.b.md`
+1. Resolve paths.
+   - If `cache_path` is present, use it.
+{{ if=has_cache_derivation }}
+   - Otherwise, derive `cache_path` by {{arg:cache_derivation}}.
+{{ else }}
+   - Otherwise, stop and report the missing required input.
+{{ endif }}
+   - Set `state_path = cache_path`; set `base = state_path` without `.md`.
+2. If `actions_path` is absent, set it to `${base}.actions.md`.
+3. Derive sidecar paths exactly:
+   - `{{arg:reviewer_a}}`: cache `${base}.a.md`; actions `${base}.a.actions.md`
+   - `{{arg:reviewer_b}}`: cache `${base}.b.md`; actions `${base}.b.actions.md`
 4. Run only `{{arg:reviewer_a}}` and `{{arg:reviewer_b}}` independently {{arg:run_context}}. Pass each leg only artifact paths, changed ids/paths, trigger flags, decision ids, short `user_notes`, and that leg's exact sidecar `cache_path`/`actions_path`.
 5. Keep leg inputs isolated. Apply only adjudicated merged findings. Leg writes are limited to sidecar cache/action files.
 6. Validate both outputs: `# REVIEW`, exact assigned `Cache:`/`Actions:` sidecar paths{{arg:validation_extra}}, and `Decision: PASS | ADVISORY | BLOCKING`. Treat path mismatches as protocol failures; rerun that leg. Treat `IDs:` as routing data only.
@@ -13,7 +19,9 @@
 10. Merge duplicates and resolve conflicting fixes by preferring concrete evidence over reviewer confidence and minimal diffs over broad rewrites.
 11. Create parent directories for `state_path`, `actions_path`, and sidecar cache/action paths unconditionally before writing (mkdir -p semantics: no overwrite, no existence check).
 12. Write `state_path` as reviewer-owned cache.
-13. Write `actions_path` as primary-runner current-fix input with OPEN findings only; exclude raw leg transcripts.
-14. GATE: `state_path` and `actions_path` MUST exist on disk before output.
-15. Emit only the pointer review block.
-16. GATE: your response MUST contain exactly one `# REVIEW` fenced block with `Cache:`, `Actions:`, `Decision:`{{arg:validation_extra}}, and conditional `IDs:`. Do not add headings, tables, summaries, narrative prose, or content outside the block. The caller validates this exact shape and rejects malformed responses as protocol failures.
+13. Ensure `state_path` records `Latest Actions: <actions_path>`.
+14. Overwrite `actions_path` as primary-runner current-fix input with OPEN findings only; exclude raw leg transcripts.
+15. Every ID in the final response MUST exist in both `state_path` and `actions_path`.
+16. GATE: `state_path` and `actions_path` MUST exist on disk before output.
+17. Emit only the pointer review block.
+18. GATE: your response MUST contain exactly one `# REVIEW` fenced block with `Cache:`, `Actions:`, `Decision:`{{arg:validation_extra}}, and conditional `IDs:`. Do not add headings, tables, summaries, narrative prose, or content outside the block. The caller validates this exact shape and rejects malformed responses as protocol failures.

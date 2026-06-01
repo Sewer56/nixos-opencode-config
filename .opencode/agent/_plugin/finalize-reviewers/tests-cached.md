@@ -22,6 +22,7 @@ Review a plugin plan's verification strategy. Initial review only — re-review 
 
 # Inputs
 - `handoff_path`, `context_path`, `step_paths`, `cache_path`
+- `actions_path` (optional; derive `<cache_path without .md>.actions.md` when omitted)
 
 # Focus
 
@@ -40,33 +41,32 @@ Flag duplicate checks and obvious 3+ near-identical tests that should be paramet
 # Process
 
 {{
-  file="./agent/_templates/review-process/cached.txt"
+  file="../config/agent/_templates/review-process/cached.txt"
   delta_source=handoff_path
   reads_review_ledger=1
   has_actions_path=1
-  show_cache_format=1
-  cache_format="# Review Cache: tests\n\n## Verified Observations\n- <step-id>: <what was verified, with grounding snapshot — one line each>\n\n## Findings\n\n### [TST-NNN]\nStatus: OPEN | RESOLVED\nCategory: COVERAGE | REDUNDANCY | PARAMETERIZATION | VERIFICATION_COMMAND | DEBUG_CHECK\nSeverity: BLOCKING | ADVISORY\nProblem: <one line>\nFix: <unified diff targeting step file(s) or concise fix>\nResolution: <only for RESOLVED>"
-  pointer_emit=1
 }}
-
-# Output
 
 {{
-  file="./agent/_templates/review-output/pointer.txt"
-  with_cache_path=1
-  with_actions_path=1
+  file="../config/agent/_templates/review-footer/cached.txt"
   agent="_plugin/finalize-reviewers/tests-cached"
+  domain=tests
+  ref_type=step-id
   prefix=TST
+  has_actions_path=1
+  categories="COVERAGE | REDUNDANCY | PARAMETERIZATION | VERIFICATION_COMMAND | DEBUG_CHECK"
+  evidence="<step-id, section, path:line, or missing element>"
+  problem="<one line>"
+  fix="<unified diff targeting step file(s) or concise fix>"
+  file_ref="<path/to/step/file>"
+  bad="--proposed test step"
+  good="+corrected test step with proper coverage"
+  with_lines=1
+  with_evidence=1
+  step=""
+  output_extra="- Overwrite `actions_path` with current OPEN fixes; history and verified observations stay in `cache_path`.\n- BLOCKING: max 6 findings.\n- Verified observations MUST include grounding snapshots.\n- Do not re-narrate each step in reasoning."
 }}
-
-- Your final output message MUST be EXACTLY the fenced block above. No other text — no analysis, no summary, no wrapping text.
-- PASS: `Decision: PASS` only. No IDs line.
-- Current OPEN findings are written to `actions_path`; history and verified observations stay in `cache_path`.
 
 # Constraints
 - Read `handoff_path`, `context_path`, all `step_paths`. Full audit. Write cache.
-- PASS: Decision only, no IDs line.
-- BLOCKING: max 6 findings. Cache findings in `cache_path` and current fixes in `actions_path`.
 - Focus on observable behavior and verification commands, not declaration order or micro-optimizations.
-- Verified observations MUST include grounding snapshots.
-- Write findings directly to cache. Do not re-narrate each step in reasoning.

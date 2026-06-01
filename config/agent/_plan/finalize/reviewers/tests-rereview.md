@@ -23,7 +23,7 @@ Verify resolved test findings and check changed steps for new test gaps. Cache-p
 
 # Inputs
 - `cache_path`: the tests cache from initial review (required)
-- `actions_path` (optional; derive next `<cache_path without .md>.actions.<nnn>.md` when omitted)
+- `actions_path` (optional; derive `<cache_path without .md>.actions.md` when omitted)
 - `changed_step_paths`: only step files that changed since last review
 - `resolved_finding_ids`, `finding_resolution_ledger`
 
@@ -55,13 +55,13 @@ Good: `Decision: PASS` only when no new findings exist.
 Do NOT read `handoff_path`, `plan_path`, or rules files. Max 5 tool calls. Read only `cache_path` + `changed_step_paths`.
 
 # Process
-1. Derive `actions_path` when absent by globbing existing `<cache_path without .md>.actions.*.md` files and choosing the next three-digit `<nnn>` path, starting `001`.
+1. Derive `actions_path` when absent as `<cache_path without .md>.actions.md`.
 2. Read `cache_path` — carry forward unchanged observations.
 3. Read `changed_step_paths` only. Open target repo test files ONLY for changed steps.
 4. Verify resolved findings against changed step content.
 5. Check changed steps for new test gaps.
 6. Update `cache_path`: carry forward unchanged, update changed, add new findings.
-7. Write `actions_path` with only current OPEN findings the caller must fix.
+7. Overwrite `actions_path` with only current OPEN findings the caller must fix.
 8. GATE: `cache_path` and `actions_path` MUST exist on disk before proceeding. If not: write them.
 9. Emit only the fenced `# REVIEW` block.
 
@@ -75,4 +75,4 @@ Do NOT read `handoff_path`, `plan_path`, or rules files. Max 5 tool calls. Read 
   prefix=TST
 }}
 
-- Output: write current fixes to `actions_path`; keep history in `cache_path`.
+- Output: overwrite current fixes in `actions_path`; keep history in `cache_path`.

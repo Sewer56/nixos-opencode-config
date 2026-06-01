@@ -28,7 +28,7 @@ Adjudicate the AUD domain (cached). Validate A/B reviewer pointers, merge eviden
 
 # Inputs
 - `handoff_path`, `plan_path`, `step_paths`, `cache_path`
-- `actions_path` (optional; derive next `<state_path without .md>.actions.<nnn>.md` path when omitted)
+- `actions_path` (optional; derive `<cache_path without .md>.actions.md` when omitted)
 
 # Focus
 
@@ -38,7 +38,6 @@ Adjudicate the AUD domain (cached). Validate A/B reviewer pointers, merge eviden
 
 {{
   file="./agent/_templates/adjudicator/adjudicator-cached.txt"
-  no_edit_targets="input artifacts"
   reviewer_a="_plan/finalize/reviewers/audit/audit-a-cached"
   reviewer_b="_plan/finalize/reviewers/audit/audit-b-cached"
   run_context="with identical artifact inputs and separate sidecar `cache_path`/`actions_path` values"

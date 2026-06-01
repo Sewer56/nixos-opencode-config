@@ -83,6 +83,84 @@ Clean up after an implementation with `/implement/cleanup-diff`.
 
 ### Review Topology
 
+#### Cache/action contract
+
+Use action files only for cached pointer-output reviewers. Cache files are
+durable reviewer state; action files are the current fix queue for the caller.
+
+##### Cached single reviewer
+
+Inputs: artifact paths, `cache_path`, optional `actions_path`.
+
+1. Reviewer reads `cache_path` (memory/history).
+2. Reviewer inspects changed material and current findings.
+3. Reviewer updates `cache_path` in place.
+4. Reviewer updates `<cache-base>.actions.md` with current OPEN fixes only.
+5. Reviewer returns a pointer:
+
+```text
+# REVIEW
+Cache: <cache_path>
+Actions: <cache-base>.actions.md
+Decision: BLOCKING
+IDs: TST-001
+```
+
+6. Caller reads `Actions:` file for current fixes. Does not read cache.
+
+##### Cached A/B adjudicator
+
+Inputs: canonical `cache_path`, optional `actions_path`.
+
+1. Adjudicator dispatches leg A and leg B independently.
+2. Each leg writes its own cache and current actions:
+   - `<base>.a.md`, `<base>.a.actions.md`
+   - `<base>.b.md`, `<base>.b.actions.md`
+3. Adjudicator reads leg action files, merges findings.
+4. Adjudicator writes canonical `<base>.md` (cache) and `<base>.actions.md` (actions).
+5. Adjudicator returns pointer with `Cache:` + `Actions:`.
+6. Caller reads canonical actions file for merged fixes.
+
+##### Cached re-review
+
+Inputs: `cache_path`, changed paths/ids, optional `actions_path`.
+
+1. Reviewer reads `cache_path` — trusts observations for unchanged material.
+2. Reviewer reads only changed step/path content.
+3. Reviewer verifies resolved findings and checks for new issues.
+4. Reviewer updates `cache_path` and `<cache-base>.actions.md`.
+5. Reviewer returns pointer with `Cache:` + `Actions:`.
+6. Caller reads actions file for current fixes.
+
+##### Cacheless / inline review
+
+Inputs: artifact paths only. No sidecar files.
+
+1. Reviewer reads artifacts from scratch.
+2. Reviewer returns inline `## Findings` with exact fixes.
+3. Caller applies fixes directly from the inline response.
+4. No `Cache:`, no `Actions:`, no file I/O.
+
+##### Path conventions
+
+Stable names, updated each pass:
+
+```text
+review-audit.md             # cache/history/state
+review-audit.actions.md     # current open fixes only
+review-audit.a.md           # A-leg cache
+review-audit.a.actions.md   # A-leg current fixes
+review-audit.b.md           # B-leg cache
+review-audit.b.actions.md   # B-leg current fixes
+```
+
+##### Rules
+
+- `cache_path` owns history, evidence, resolved/deferred findings, verified observations, and ledger state.
+- `actions_path` owns only current OPEN actionable findings and exact fixes. Updated each pass.
+- Caller treats missing, malformed, or insufficient actions as reviewer protocol failure and reruns the reviewer.
+- Caller never mines the cache for fixes.
+
 #### Adjudicated review (high-risk)
 
 Correctness, audit, and implementation fidelity domains use per-domain
@@ -103,10 +181,11 @@ domain-adjudicator-cacheless (final full-artifact audit)
 ```
 
 Cached: each leg (A and B) writes findings and cache to separate sidecar files
-(`.a.` / `.b.`). The adjudicator reads sidecar actions, merges, and writes one
-canonical actions file plus one canonical cache. The caller reads the actions
-file directly. Cacheless: legs return findings inline; the adjudicator parses
-each leg's inline `## Findings` and emits merged findings inline. No file I/O.
+(`.a.` / `.b.`). The adjudicator reads sidecar actions, merges, and overwrites
+one canonical actions file plus one canonical cache. The caller reads the
+actions file directly. Cacheless: legs return findings inline; the adjudicator
+parses each leg's inline `## Findings` and emits merged findings inline. No
+sidecar file I/O.
 
 Every autonomous workflow runs a final cacheless audit before returning READY
 or SUCCESS.
@@ -120,9 +199,9 @@ setup is GLM + DeepSeek — model diversity beats temperature diversity.
 Tests, performance, docs, branding, and placement domains use one reviewer
 with `-cached` and `-cacheless` variants. No adjudicator.
 
-- **Cached**: writes findings to an actions file, cache to a separate cache
-  file. Caller reads the actions file directly.
-- **Cacheless**: returns findings inline. No file I/O.
+- **Cached**: writes history to `cache_path` and overwrites
+  `<cache-base>.actions.md` with current fixes. Caller reads the actions file.
+- **Cacheless**: returns findings inline. No sidecar file I/O.
 
 Re-review reads the canonical cache from the prior round, trusts it for
 unchanged steps, and only inspects what changed.
@@ -201,12 +280,12 @@ opt-in rather than OpenCode's default opt-out. Set permissions in
 
 Only enabled for specific agents (see `opencode.json` permissions).
 
-| Server | Transport | Purpose |
-|---|---|---|
-| GitHub | Local (Docker) | GitHub API (token from `~/.secrets/github-token`) |
-| Context7 | Local (NPX) | Library documentation lookup |
-| DeepWiki | Remote (SSE) | Repository documentation analysis |
-| Discord | Local (Docker) | Discord API — **disabled** |
+| Server   | Transport      | Purpose                                           |
+| -------- | -------------- | ------------------------------------------------- |
+| GitHub   | Local (Docker) | GitHub API (token from `~/.secrets/github-token`) |
+| Context7 | Local (NPX)    | Library documentation lookup                      |
+| DeepWiki | Remote (SSE)   | Repository documentation analysis                 |
+| Discord  | Local (Docker) | Discord API — **disabled**                        |
 
 ### TUI
 
@@ -296,14 +375,14 @@ opencode /path/to/project
 `default.nix` provides two shell wrappers and installs the dependencies
 OpenCode needs at runtime:
 
-| Package | Purpose |
-|---|---|
-| `opencode` | Wrapper — runs the self-built binary with `OPENCODE_ENABLE_EXA=1` set; defaults to `opencode .` |
-| `opencode-build` | Builds the forked OpenCode from source (`bun install` + `bun run build --single`) |
-| `coderabbit-cli` | CodeRabbit review tool (from `llm-agents` flake input) |
-| `nodejs` / `yarn` / `bun` | Runtime for MCP servers and plugin development |
-| `docker` | Container runtime for GitHub and Discord MCP servers |
-| `typescript` / `go` | Language toolchains for local development |
+| Package                   | Purpose                                                                                         |
+| ------------------------- | ----------------------------------------------------------------------------------------------- |
+| `opencode`                | Wrapper — runs the self-built binary with `OPENCODE_ENABLE_EXA=1` set; defaults to `opencode .` |
+| `opencode-build`          | Builds the forked OpenCode from source (`bun install` + `bun run build --single`)               |
+| `coderabbit-cli`          | CodeRabbit review tool (from `llm-agents` flake input)                                          |
+| `nodejs` / `yarn` / `bun` | Runtime for MCP servers and plugin development                                                  |
+| `docker`                  | Container runtime for GitHub and Discord MCP servers                                            |
+| `typescript` / `go`       | Language toolchains for local development                                                       |
 
 ### Symlinks
 

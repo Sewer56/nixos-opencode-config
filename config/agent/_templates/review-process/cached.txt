@@ -1,13 +1,17 @@
 1. Extract paths
 - If `cache_path:` was provided in the task input, use it as-is. Do not derive or transform.
+{{ if=has_cache_derivation }}
+- Otherwise, derive `cache_path` from `{{arg:delta_source}}`: {{arg:cache_derivation}}.
+{{ else }}
 - `cache_path:` from the task input is REQUIRED. Stop and report the missing input if absent.
+{{ endif }}
 - Read `cache_path` if exists; treat missing/malformed as empty.
 {{ if=cache_record_type }}
 - Treat cache as one record {{arg:cache_record_type}} with fields `last_decision`, `open_findings`, `evidence`, `verified`.
 {{ endif }}
 {{ if=has_actions_path }}
 - If `actions_path:` was provided, use it as-is. Do not derive or transform.
-- Otherwise, set `base = cache_path` without `.md`; glob `${base}.actions.*.md`; accept only `${base}.actions.<3 digits>.md`; choose next `<nnn>`, starting `001`.
+- Otherwise, set `base = cache_path` without `.md`; set `actions_path = ${base}.actions.md`.
 {{ endif }}
 
 2. Read handoff
@@ -61,7 +65,8 @@
   - Leave entries whose content has not changed exactly as they are.
 {{ endif }}
 {{ if=has_actions_path }}
-- Write `actions_path` as primary-runner current-fix input with current OPEN findings only. Cache remains reviewer-owned state. No resolved, no Verified Observations, no history, no merge notes.
+- Overwrite `actions_path` as primary-runner current-fix input with current OPEN findings only. Cache remains reviewer-owned state. No resolved, no Verified Observations, no history, no merge notes.
+- Ensure `cache_path` records `Latest Actions: <actions_path>` when its cache format includes that field.
 {{ endif }}
 - GATE: `cache_path`{{ if=has_actions_path }} and `actions_path`{{ endif }} MUST exist on disk before proceeding. If not: write them. Do not proceed until written.
 

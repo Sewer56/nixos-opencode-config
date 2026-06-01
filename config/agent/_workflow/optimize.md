@@ -55,7 +55,7 @@ Optimize OpenCode workflow prompts/tools by running real 3-sample experiments an
    - If adding double-checks: use `<domain>-adjudicator` → independent `<domain>-a` + `<domain>-b` legs sharing a sidecar `.txt`.
    - Derive leg state paths with `.a` and `.b` suffixes before `.md`.
    - Adjudicators read A/B actions before caches and merge evidence; do not make them reviewer C.
-   - Adjudicators write `actions_path` for current fixes; the cache is reviewer-owned state the caller does not read.
+   - Adjudicators overwrite stable `<cache-base>.actions.md` for current fixes; the cache is reviewer-owned state the caller does not read.
    - Primary runners read the actions file; they pass cache paths forward but do not mine caches for fixes.
    - Caches hold history/verified data; final AUDIT uses a ledger when cache state would otherwise leak shortcuts.
    - Re-review stays single: read own cache, inspect changed material, update cache/actions.

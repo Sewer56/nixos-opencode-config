@@ -134,6 +134,24 @@ Cache: <cache_path>
 ~~~
 ```
 
+## Reviewer action/cache split
+Check cached reviewer/adjudicator edits for:
+- Stable action sidecars: `<cache_path without .md>.actions.md`; A/B legs use `<base>.a.actions.md` and `<base>.b.actions.md`.
+- Cache owns history, evidence, resolved findings, verified observations, and ledger state.
+- Actions own only current OPEN actionable fixes and are updated each pass.
+- Cached pointer responses include `Cache:` and `Actions:` without duplicating findings inline.
+- Cacheless or inline-output reviewers return `## Findings` inline and omit action/cache sidecars.
+
+Bad:
+```text
+glob <cache>.actions.*.md and choose the next .actions.001.md
+```
+
+Good:
+```text
+If `actions_path` is absent, set it to `<cache_path without .md>.actions.md`.
+```
+
 ## Wording economy
 Check:
 - Prefer concise positive actions over prohibitions.
@@ -340,5 +358,6 @@ Whitespace good:
   - redundant direct/child or disabled-tool instructions that change or obscure runtime behavior
   - reviewer topology merge that loses high-risk ownership
   - rendered sections duplicate ownership, scope, or exclusion rules already declared by imported content
+  - numbered action-file runtime contracts or cacheless/inline reviewers that create/read action sidecars
 - ADVISORY: local wording economy, positive-wording opportunities, dense paragraph-style rules, rendered whitespace cleanup, or doc clarity improvements that do not affect correctness.
 - Keep response compact; detailed evidence belongs in cache.

@@ -18,4 +18,4 @@
   verified_ref="{{arg:verified_ref}}"
 }}
 
-- Target diffs to the affected error-returning function's source file{{arg:diff_target_note}}.
+- Target diffs to the affected step file{{arg:diff_target_note}}.

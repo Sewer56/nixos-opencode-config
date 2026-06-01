@@ -72,7 +72,7 @@ Read only `handoff_path`, `plan_path`, and `step_paths`. Edit only `handoff_path
 - Curate step paths per reviewer domain:
   - Audit: all step paths (I# + T#).
   - Tests: test step paths (T#) + implementation steps that directly affect test assertions/coverage.
-- Before each reviewer dispatch, derive and pass `actions_path` as `<cache_path without .md>.actions.<nnn>.md`, starting `001`, incrementing per dispatch.
+- Before each reviewer dispatch, derive and pass `actions_path` as `<cache_path without .md>.actions.md`.
 - Pass only run data: `handoff_path`, `plan_path`, domain-scoped `step_paths`, `cache_path`, trigger flags, and short `user_notes`.
 - Use `## Relevant Files` from `plan_path` for minimal path context.
 - Pass named gaps only when step evidence is missing or stale.
@@ -89,7 +89,7 @@ Read only `handoff_path`, `plan_path`, and `step_paths`. Edit only `handoff_path
 - Pass to rereview agent: `cache_path`, `changed_step_paths`, `resolved_finding_ids`, `unresolved_finding_ids`, `finding_resolution_ledger`.
 - If the cache file does not exist, fall back to re-dispatching the full reviewer with required artifact paths.
 - Rereview agents: read cache → read changed steps → verify fixes → check for new issues → update cache/actions → emit terse `# REVIEW`.
-- Pass explicit `actions_path` to every rereview dispatch (incrementing `<nnn>` per dispatch).
+- Pass the same explicit stable `actions_path` to every rereview dispatch for that reviewer.
 - After rereview returns, read the passed `actions_path` and apply its current fixes.
 - Treat invalid actions as protocol failure.
 

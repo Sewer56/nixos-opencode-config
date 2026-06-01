@@ -10,6 +10,9 @@
 ```
 
 Return ONLY the fenced block exactly as shown. Do not wrap it in headings, summaries, tables, or prose. Do not add "Reviewer Pointer" headings or freeform descriptions. The caller validates the exact `# REVIEW` block shape and rejects non-matching responses. PASS: omit `IDs`.
+{{ if=with_actions_path }}
+Every ID in a cached pointer response MUST exist in both `<actions_path>` and `<cache_path>`.
+{{ endif }}
 {{ if=return_rule_extra }}
 {{arg:return_rule_extra}}
 {{ endif }}

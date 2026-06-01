@@ -54,7 +54,7 @@ Actions: <actions_path>
 ```
 - PASS keeps `Agent:` and `Decision: PASS`; omit `IDs`.
 {{ if=has_actions_path }}
-- Every ID in the response MUST exist in `actions_path`.
+- Every ID in the response MUST exist in both `actions_path` and `cache_path`.
 {{ else }}
 - Every ID in the response MUST exist in `cache_path`.
 {{ endif }}

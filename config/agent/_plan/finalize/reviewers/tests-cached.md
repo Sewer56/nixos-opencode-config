@@ -26,7 +26,7 @@ Review step test strategy. Initial review only — re-review handled by dedicate
 
 {{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
 - `cache_path`
-- `actions_path` (optional; derive next `<cache_path without .md>.actions.<nnn>.md` when omitted)
+- `actions_path` (optional; derive `<cache_path without .md>.actions.md` when omitted)
 
 # Focus
 
@@ -71,5 +71,5 @@ Read `handoff_path`, `plan_path`, all `step_paths`. Full audit. Write cache.
   with_lines=1
   with_evidence=1
   step=""
-  output_extra="- Current OPEN fixes go in `actions_path`; history and verified observations stay in `cache_path`.\n- BLOCKING: max 6 findings.\n- Verified observations MUST include grounding snapshots.\n- Do not re-narrate each step in reasoning."
+  output_extra="- Overwrite `actions_path` with current OPEN fixes; history and verified observations stay in `cache_path`.\n- BLOCKING: max 6 findings.\n- Verified observations MUST include grounding snapshots.\n- Do not re-narrate each step in reasoning."
 }}

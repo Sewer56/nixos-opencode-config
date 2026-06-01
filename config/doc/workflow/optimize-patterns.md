@@ -172,7 +172,9 @@ Downgrade only after 3-sample PASS shows no lost required findings.
 - Trigger Signals: output bloat, cache/delta failure, duplicate reasoning.
 - Refactor Move:
   - Cached reviewer/adjudicator final response MUST be pointer-only: decision, `Actions:`, `Cache:`, and current finding IDs.
+  - Cached actions path MUST be the stable current `<cache_path without .md>.actions.md`; A/B leg actions use `<base>.a.actions.md` and `<base>.b.actions.md`.
   - Actions file MUST contain only current actionable OPEN findings needed for this loop.
+  - Actions file MUST be updated each pass. Cache history is the durable audit trail; numbered action files are debug-only and not the runtime contract.
   - Cache file MUST contain full finding text, status, evidence, prior decisions, verified observations, resolved/deferred items, expected fix conditions, and a pointer to latest actions.
   - Cacheless reviewers MUST NOT read or write cache or actions files. Findings MUST be returned inline in the output block with `## Findings` and `## Notes` sections.
   - Cacheless adjudicators MUST parse A/B findings from each leg's inline `## Findings` section. They MUST NOT read sidecar files or emit `Actions:`/`Cache:` pointers.
@@ -193,14 +195,14 @@ Downgrade only after 3-sample PASS shows no lost required findings.
 ```text
 CACHED reviewer response:
 Decision: BLOCKING
-Actions: <actions-path>
+Actions: <cache-base>.actions.md
 Cache: <path>
 
 Actions file:
 F1 current problem + smallest fix
 
 Cache file:
-Latest Actions: <actions-path>
+Latest Actions: <cache-base>.actions.md
 F1 full evidence, expected fix condition, prior decision, verified observations, resolved history
 
 CACHELESS reviewer response:

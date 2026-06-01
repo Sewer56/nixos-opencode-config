@@ -30,13 +30,12 @@ Adjudicate the plugin COR domain (cached). Validate A/B reviewer pointers, merge
 # Inputs
 - `context_path`, `draft_handoff_path`
 - `cache_path` (optional; normal review state)
-- `actions_path` (optional)
+- `actions_path` (optional; derive `<cache_path without .md>.actions.md` when omitted)
 
 # Process
 
 {{
-  file="./agent/_templates/adjudicator/adjudicator-cached.txt"
-  no_edit_targets="input artifacts"
+  file="../config/agent/_templates/adjudicator/adjudicator-cached.txt"
   has_cache_derivation=1
   reviewer_a="_plugin/draft-reviewers/correctness/correctness-a-cached"
   reviewer_b="_plugin/draft-reviewers/correctness/correctness-b-cached"
@@ -49,12 +48,13 @@ Adjudicate the plugin COR domain (cached). Validate A/B reviewer pointers, merge
 # Output
 
 {{
-  file="./agent/_templates/review-output/pointer.txt"
+  file="../config/agent/_templates/review-output/pointer.txt"
   with_cache_path=1
   with_actions_path=1
   agent="_plugin/draft-reviewers/correctness"
   prefix=COR
   domains=COR
+  with_domains=1
 }}
 
 # Constraints

@@ -4,7 +4,7 @@ Review implementation/test step artifacts for correctness and scope. Initial rev
 
 {{ file="./agent/_templates/review-inputs/plan-steps.txt" }}
 {{ if=mode==cached }}
-- `cache_path` and `actions_path` (actions optional; derive next sidecar when omitted)
+- `cache_path` and `actions_path` (actions optional; derive `<cache_path without .md>.actions.md` when omitted)
 {{ endif }}
 
 # Focus
@@ -21,7 +21,6 @@ Audit in order: fidelity → visibility → structure → completeness → econo
 {{ file="./agent/_templates/review-mission.txt" artifact_type="step artifacts" domain="audit" }}
 
 # Process
-
 {{
   file="./agent/_templates/review-process/cached.txt"
   if=mode==cached
@@ -30,7 +29,6 @@ Audit in order: fidelity → visibility → structure → completeness → econo
   reads_review_ledger=1
   step2_extra="- Read `## Step Index` from `handoff_path`.\n- Use the cache's `Latest Actions` field and finding ledger for grounding."
 }}
-
 {{
   file="./agent/_templates/review-process/cacheless.txt"
   if=mode==cacheless
@@ -58,7 +56,6 @@ Audit in order: fidelity → visibility → structure → completeness → econo
   step=""
   output_extra="- BLOCKING: max 6 findings. Cache findings in `cache_path`.\n- Verified observations MUST include grounding snapshots."
 }}
-
 {{
   file="./agent/_templates/review-footer/cacheless.txt"
   if=mode==cacheless
