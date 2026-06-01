@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for comprehensibility — undefined jargon, ambiguous language, and opaque references
-model: sewer-axonhub/step-3.7-flash  # LOW
-reasoningEffort: medium
+model: sewer-axonhub/step-3.7-flash  # HIGH
+variant: high
 permission:
   "*": deny
   read:

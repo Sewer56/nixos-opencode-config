@@ -2,7 +2,8 @@
 mode: subagent
 hidden: true
 description: Reviews code-adjacent documentation in I#/T# steps for coverage, specificity, inline comments, and readability (cacheless)
-model: sewer-axonhub/step-3.7-flash  # LOW
+model: sewer-axonhub/step-3.7-flash  # HIGH
+variant: high
 permission:
   "*": deny
   read:

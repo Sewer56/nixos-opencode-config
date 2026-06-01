@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for reader engagement and structural quality
-model: sewer-axonhub/step-3.7-flash  # LOW
-reasoningEffort: medium
+model: sewer-axonhub/step-3.7-flash  # HIGH
+variant: high
 permission:
   "*": deny
   read:

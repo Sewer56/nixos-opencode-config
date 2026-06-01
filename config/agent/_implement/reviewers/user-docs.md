@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Reviews changed user-facing documentation for correctness, coverage, specificity, and broken links
-model: sewer-axonhub/step-3.7-flash  # LOW
-reasoningEffort: medium
+model: sewer-axonhub/step-3.7-flash  # HIGH
+variant: high
 permission:
   "*": deny
   read:

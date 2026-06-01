@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for cross-page coherence — broken links, terminology drift, and content duplication (cacheless)
-model: sewer-axonhub/step-3.7-flash  # LOW
-reasoningEffort: medium
+model: sewer-axonhub/step-3.7-flash  # HIGH
+variant: high
 permission:
   "*": deny
   read:

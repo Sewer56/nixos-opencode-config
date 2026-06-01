@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Checks code-adjacent error documentation coverage, specificity, readability, and wording for finalized steps (cached)
-model: sewer-axonhub/step-3.7-flash  # LOW
-reasoningEffort: medium
+model: sewer-axonhub/step-3.7-flash  # HIGH
+variant: high
 permission:
   "*": deny
   read:

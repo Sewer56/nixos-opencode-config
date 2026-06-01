@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Checks declaration placement/order in finalized implementation steps
-model: sewer-axonhub/step-3.7-flash  # LOW
-reasoningEffort: medium
+model: sewer-axonhub/step-3.7-flash  # HIGH
+variant: high
 permission:
   "*": deny
   read:
