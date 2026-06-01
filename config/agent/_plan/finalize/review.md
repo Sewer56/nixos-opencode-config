@@ -111,7 +111,7 @@ Read only pipeline state, `handoff_path`, `plan_path`, `step_paths`, and `discov
 - Do not add scope-boundary prose to reviewer prompts. Route by reviewer domain and pass trigger flags or changed step ids only.
 
 ### Rerun triggers (canonical per-domain scope)
-- Audit: changes to REQ items, step structure, file paths, diff headers, output schema, requirement mapping, required sections, numbering, or after multiple fix rounds. Audit scope: fidelity, structure, completeness, economy, dead-code.
+- Audit: changes to REQ items, visibility/export, step structure, file paths, diff headers, output schema, requirement mapping, required sections, numbering, or after multiple fix rounds. Audit scope: fidelity, visibility, structure, completeness, economy, dead-code.
 - Tests: changes to behavior, acceptance criteria, verification commands, or test steps. Tests scope: coverage, redundancy, parameterization.
 - Placement: changes to declaration anchors or order. Placement scope: declaration placement/order.
 - Performance: changes to algorithms, data access, concurrency, validation, logging, or workload size. Performance scope: algorithmic regressions, N+1 patterns, unbounded work, unsafe concurrency, missing validation.

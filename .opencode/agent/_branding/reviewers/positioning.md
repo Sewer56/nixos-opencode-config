@@ -34,12 +34,12 @@ Review branding for positioning.
 ## Read scope
 Read `branding_path` for in-scope sections: Project Read, Naming Criteria, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone, Visual Direction.
 
-{{ file="./rules/groups/branding/self-positioning.md" }}
+{{ file="../config/rules/groups/branding/self-positioning.md" }}
 
 # Process
 
- {{
-  file="./agent/_templates/review-process/cached.txt"
+{{
+  file="../config/agent/_templates/review-process/cached.txt"
   delta_source=handoff_path
   cache_record_type="per candidate name or brand element"
   show_cache_update_detail=1
@@ -49,7 +49,7 @@ Read `branding_path` for in-scope sections: Project Read, Naming Criteria, Top R
 # Output
 
 {{
-  file="./agent/_templates/review-output/output.txt"
+  file="../config/agent/_templates/review-output/output.txt"
   agent="_branding/reviewers/positioning"
   domains=POS
   with_domains=1

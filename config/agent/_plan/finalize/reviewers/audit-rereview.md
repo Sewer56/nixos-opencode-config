@@ -13,6 +13,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-PLAN*.review-audit*.md": allow  # both A and B sidecars
+  grep: allow
   glob: allow
   list: allow
   todowrite: allow
@@ -42,7 +43,9 @@ Bad: accept resolution from ledger without checking changed step.
 Good: changed step contains the required structure/fidelity fix.
 
 ## New audit issues
-Scan changed steps for new fidelity, structure, completeness, economy, or dead-code issues.
+Scan changed steps for new fidelity, visibility, structure, completeness, economy, or dead-code issues.
+
+{{ file="./rules/groups/quality/target-minimum-visibility.md" }}
 
 Do not flag: unchanged cached items outside changed steps.
 
@@ -52,14 +55,14 @@ Write finding details to cache and emit only the terse `# REVIEW` block.
 Good: `Decision: PASS` only when no new findings exist.
 
 ## Cache-first scope
-Read only: `cache_path` + `changed_step_paths`. Max 5 tool calls. No grep, no source file reads.
+Use `cache_path` and `changed_step_paths` for artifact reads. Max 8 tool calls. No handoff, plan, rules, unchanged step files, or unrelated source reads.
 
 # Process
 1. Derive `actions_path` when absent by globbing existing `<cache_path without .md>.actions.*.md` files and choosing the next three-digit `<nnn>` path, starting `001`.
 2. Read `cache_path`. Carry forward all unchanged observations.
-3. Read `changed_step_paths` ONLY. Do NOT read handoff.md, draft.md, rules, or unchanged step files.
+3. Read only `changed_step_paths`.
 4. For each resolved finding: confirm the fix is correctly applied in changed step content. Use cache grounding snapshots to verify without re-reading source files.
-5. Scan changed steps for new fidelity/structure/completeness/economy/dead-code issues.
+5. Scan changed steps for new audit issues per Focus categories.
 6. Update `cache_path` if needed.
 7. Write `actions_path` with only current OPEN findings the caller must fix.
 8. GATE: `cache_path` and `actions_path` MUST exist on disk before proceeding. If not: write them.

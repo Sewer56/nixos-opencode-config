@@ -35,12 +35,12 @@ Review branding for availability.
 Read `branding_path` for in-scope sections: Candidate Shortlist, Top Recommendation, Risk and Availability Notes, Next Checks.
 Cross-reference search findings from the handoff for external availability data.
 
-{{ file="./rules/groups/branding/self-availability.md" }}
+{{ file="../config/rules/groups/branding/self-availability.md" }}
 
 # Process
 
- {{
-  file="./agent/_templates/review-process/cached.txt"
+{{
+  file="../config/agent/_templates/review-process/cached.txt"
   delta_source=handoff_path
   cache_record_type="per candidate name or brand element"
   step2_extra="- When the reviewer's Focus includes search-findings references: also read the search findings section for external data."
@@ -51,7 +51,7 @@ Cross-reference search findings from the handoff for external availability data.
 # Output
 
 {{
-  file="./agent/_templates/review-output/output.txt"
+  file="../config/agent/_templates/review-output/output.txt"
   agent="_branding/reviewers/availability"
   domains=AVL
   with_domains=1

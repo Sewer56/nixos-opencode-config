@@ -78,7 +78,7 @@ Clean up after an implementation with `/implement/cleanup-diff`.
 
 **Other**
 
-- `/branding/draft` — draft project names and brand direction
+- `/branding/draft` — draft project names and brand direction for a given folder path (local)
 - `/workflow/optimize` — optimize workflow patterns
 
 ### Review Topology

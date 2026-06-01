@@ -43,7 +43,7 @@ Adjudicate the AUD domain (cached). Validate A/B reviewer pointers, merge eviden
   reviewer_b="_plan/finalize/reviewers/audit/audit-b-cached"
   run_context="with identical artifact inputs and separate sidecar `cache_path`/`actions_path` values"
   validation_extra=", `Agent: _plan/finalize/reviewers/audit`"
-  merge_scope="keep only AUD findings in fidelity, structure, completeness, economy, or dead-code; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain or unsupported findings"
+  merge_scope="keep only AUD findings in fidelity, visibility, structure, completeness, economy, or dead-code; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain or unsupported findings"
 }}
 
 # Output

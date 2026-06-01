@@ -27,10 +27,12 @@ Review an implementation against request intent from conversation context.
 
 # Scope
 - Own: request fidelity, plan-step application, severe regressions, unintended scope creep, critical error handling.
-- Do not judge: declaration order, docs polish, error-doc completeness, or branding.
+- Do not judge: error-doc completeness or branding.
 - Out-of-scope concerns get at most one short Advisory note; never a BLOCKING finding.
 
 {{ file="./rules/groups/implementation/target-implementation-review.md" }}
+
+{{ file="./rules/groups/quality/target-minimum-visibility.md" }}
 
 {{ file="./agent/_templates/review-mission.txt" artifact_type="implementation" domain="implementation" }}
 
@@ -46,7 +48,7 @@ Review an implementation against request intent from conversation context.
   file="./agent/_templates/review-footer/cacheless.txt"
   agent=""
   prefix=F
-  categories=""
+  categories="REQUEST_FIDELITY | PLAN_APPLICATION | SEVERE_REGRESSION | SCOPE_CREEP | ERROR_HANDLING | VISIBILITY"
   evidence="{{arg:evidence}}"
   problem="<one line>"
   fix="<smallest concrete correction>"

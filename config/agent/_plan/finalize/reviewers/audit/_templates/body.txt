@@ -12,14 +12,11 @@ Review implementation/test step artifacts for correctness and scope. Initial rev
 ## Read strategy
 Trust step file diffs and handoff `## Settled Facts` for repo grounding. Only open source files for specific verification when a diff context line does not match or a finding needs exact confirmation.
 
-Audit in order: fidelity → structure → completeness → economy → dead-code. Stop dead-code if no REMOVE steps.
+Audit in order: fidelity → visibility → structure → completeness → economy → dead-code. Stop dead-code if no REMOVE steps.
 
 {{ file="./rules/groups/correctness/target-step-audit.md" }}
 
-{{
-  file="./agent/_templates/review-read-strategy/source-access.txt"
-  grounding_refs="step file diffs, handoff `## Settled Facts`, and `## External Symbols`"
-}}
+{{ file="./rules/groups/quality/target-minimum-visibility.md" }}
 
 {{ file="./agent/_templates/review-mission.txt" artifact_type="step artifacts" domain="audit" }}
 
@@ -49,7 +46,7 @@ Audit in order: fidelity → structure → completeness → economy → dead-cod
   prefix=AUD
   has_actions_path=1
   with_audit_ledger=1
-  categories="FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE"
+  categories="FIDELITY | VISIBILITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE"
   evidence="<step-id, section, path:line, diff header, or missing element>"
   problem="<one line>"
   fix="<smallest concrete correction>"
@@ -67,7 +64,7 @@ Audit in order: fidelity → structure → completeness → economy → dead-cod
   if=mode==cacheless
   agent="_plan/finalize/reviewers/audit"
   prefix=AUD
-  categories="FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE"
+  categories="FIDELITY | VISIBILITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE"
   evidence="<step-id, section, path:line, diff header, or missing element>"
   problem="<one line>"
   fix="<smallest concrete correction>"

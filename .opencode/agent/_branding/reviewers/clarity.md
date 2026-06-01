@@ -34,12 +34,12 @@ Review branding for clarity.
 ## Read scope
 Read `branding_path` for in-scope sections: Candidate Shortlist, Top Recommendation, Brand Positioning, Tagline and Messaging, Voice and Tone.
 
-{{ file="./rules/groups/branding/self-clarity.md" }}
+{{ file="../config/rules/groups/branding/self-clarity.md" }}
 
 # Process
 
- {{
-  file="./agent/_templates/review-process/cached.txt"
+{{
+  file="../config/agent/_templates/review-process/cached.txt"
   delta_source=handoff_path
   cache_record_type="per candidate name or brand element"
   show_cache_update_detail=1
@@ -49,7 +49,7 @@ Read `branding_path` for in-scope sections: Candidate Shortlist, Top Recommendat
 # Output
 
 {{
-  file="./agent/_templates/review-output/output.txt"
+  file="../config/agent/_templates/review-output/output.txt"
   agent="_branding/reviewers/clarity"
   domains=CLR
   with_domains=1

@@ -40,7 +40,7 @@ Determine whether step artifacts are free of blocking audit issues.
   reviewer_b="_plan/finalize/reviewers/audit/audit-b-cacheless"
   run_context="with identical artifact inputs"
   validation_extra=", `Agent: _plan/finalize/reviewers/audit`"
-  merge_scope="keep only AUD findings in fidelity, structure, completeness, economy, or dead-code; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain or unsupported findings"
+  merge_scope="keep only AUD findings in fidelity, visibility, structure, completeness, economy, or dead-code; require concrete evidence; keep single-leg findings when evidence is concrete and in scope; drop out-of-domain or unsupported findings"
   inspect_context="`handoff_path`, `plan_path`, and all `step_paths`"
 }}
 
@@ -50,7 +50,7 @@ Determine whether step artifacts are free of blocking audit issues.
   file="./agent/_templates/review-output/output.txt"
   agent="_plan/finalize/reviewers/audit"
   prefix=AUD
-  categories="FIDELITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE"
+  categories="FIDELITY | VISIBILITY | STRUCTURE | COMPLETENESS | ECONOMY | DEAD_CODE"
   evidence="<step-id, section, path:line, diff header, or missing element>"
   problem="<one line>"
   fix="<smallest concrete correction>"
@@ -59,4 +59,3 @@ Determine whether step artifacts are free of blocking audit issues.
   good="+fix"
   with_evidence=1
 }}
-

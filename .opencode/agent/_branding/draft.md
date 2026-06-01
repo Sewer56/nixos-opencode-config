@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Drafts project names and brand direction with a reviewer loop
+description: Drafts project names and brand direction for a given folder path
 permission:
   "*": deny
   read:
@@ -25,25 +25,27 @@ permission:
     "_branding/reviewers/*": allow
 ---
 
-Draft project names and brand direction with a reviewer loop.
+Draft project names and brand direction for a given folder path.
 
 # Inputs
 
-- The user message may contain any combination of: project brief, audience, tone, constraints, dislikes, existing name candidates, and output scope.
-- Derive `slug` from the request context as a 2–3 word identifier. Derive `artifact_base` as `PROMPT-BRANDING-<slug>`.
-- Derive any omitted inputs from repository context. Ask the user only when the answer materially changes the naming or branding direction and cannot be inferred.
+- The user message must contain a folder path as the first argument. This is the project folder to evaluate.
+- Optional additional inputs: project brief, audience, tone, constraints, dislikes, existing name candidates, and output scope.
+- Derive `slug` from the folder name or request context as a 2-3 word identifier. Derive `artifact_base` as `PROMPT-BRANDING-<slug>`.
+- Derive any omitted inputs from the target folder's contents. Ask the user only when the answer materially changes the naming or branding direction and cannot be inferred.
 
 # Artifacts
 
 - `artifact_base`: `PROMPT-BRANDING-<slug>` (derived from `slug`)
-- `branding_path`: `<artifact_base>.draft.md`
-- `handoff_path`: `artifact/<artifact_base>.draft.handoff.md`
-- Cache paths (written by reviewers, stored under `artifact/`):
-  - `artifact/<artifact_base>.draft.review-clarity.md`
-  - `artifact/<artifact_base>.draft.review-distinctiveness.md`
-  - `artifact/<artifact_base>.draft.review-positioning.md`
-  - `artifact/<artifact_base>.draft.review-availability.md`
-- Create parent directories unconditionally before writing any `artifact/...` path (mkdir -p semantics: no overwrite, no existence check).
+- `cwd`: current working directory.
+- `branding_path`: `<cwd>/<artifact_base>.draft.md`
+- `handoff_path`: `<cwd>/artifact/<artifact_base>.draft.handoff.md`
+- Cache paths (written by reviewers, stored under `<cwd>/artifact/`):
+  - `<cwd>/artifact/<artifact_base>.draft.review-clarity.md`
+  - `<cwd>/artifact/<artifact_base>.draft.review-distinctiveness.md`
+  - `<cwd>/artifact/<artifact_base>.draft.review-positioning.md`
+  - `<cwd>/artifact/<artifact_base>.draft.review-availability.md`
+- Create parent directories unconditionally before writing any artifact path (mkdir -p semantics: no overwrite, no existence check).
 
 # Focus
 
@@ -55,19 +57,23 @@ Treat live availability claims (domains, packages, handles) as provisional unles
 
 # Process
 
-## 1. Parse user inputs
+## 1. Parse inputs
 
-Extract project brief, audience, tone, constraints, dislikes, existing candidates, and output scope from the user message. Identify which inputs are missing.
+Extract the folder path from the user message. If missing or the path does not exist, ask for it and stop.
+Extract any additional project brief, audience, tone, constraints, dislikes, existing candidates, and output scope from the user message. Identify which inputs are missing.
 
-## 2. Discover context
+## 2. Discover context from target folder
 
-Spawn `codebase-explorer` to map: project purpose, language/ecosystem, existing naming, target audience signals, README or marketing copy. Spawn `mcp-search` for duplicate, package, crate, project, repository, product, domain, or availability checks — user-requested or inferred from the project's language or platform ecosystem.
+Read the target folder to map: project purpose, language/ecosystem, existing naming, target audience signals, README or marketing copy, package manifests, and source structure. Use `read`, `glob`, `grep`, and `list` against the target folder path.
+
+Spawn `codebase-explorer` pointing at the target folder for deeper exploration when initial reads are insufficient.
+Spawn `mcp-search` for duplicate, package, crate, project, repository, product, domain, or availability checks — user-requested or inferred from the project's language or platform ecosystem.
 
 Record search scope and findings in `handoff_path`.
 
 ## 3. Ask clarifying questions (conditional)
 
-Ask a single batch of up to 10 questions only when the derivation rule in `# Inputs` requires user input — when the answer materially changes the naming or branding direction and cannot be inferred from repository context. Otherwise, draft from discovered context.
+Ask a single batch of up to 10 questions only when the derivation rule in `# Inputs` requires user input — when the answer materially changes the naming or branding direction and cannot be inferred from the target folder. Otherwise, draft from discovered context.
 
 ## 4. Draft `<artifact_base>.draft.md`
 
@@ -75,7 +81,7 @@ Derive `artifact_base` from `slug` as `PROMPT-BRANDING-<slug>`. Write `<artifact
 
 - **Project Read**: one-paragraph summary of what the project is and who it serves.
 - **Naming Criteria**: the rules and constraints governing name choices (audience, tone, length, legal, linguistic).
-- **Candidate Shortlist**: 5–10 candidate names with one-line rationale each.
+- **Candidate Shortlist**: 5-10 candidate names with one-line rationale each.
 - **Top Recommendation**: the strongest candidate with a detailed justification.
 - **Brand Positioning**: positioning statement, differentiation, and competitive landscape.
 - **Tagline and Messaging**: primary tagline, supporting messages, elevator pitch.
@@ -97,11 +103,11 @@ b. Run four reviewers in parallel: `_branding/reviewers/clarity`, `_branding/rev
 
 c. Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified`. All 4 reviewers are diff-mandated — confirm each finding contains a unified diff block. Treat missing diffs as protocol violation requiring retry.
 
-d. Record only cross-domain arbitration (disagreements spanning two or more reviewer domains) in `### Decisions` in `handoff_path`. Apply domain ownership: CLARITY → clarity; DISTINCTIVENESS → distinctiveness; POSITIONING → positioning; AVAILABILITY → availability.
+d. Record only cross-domain arbitration (disagreements spanning two or more reviewer domains) in `### Decisions` in `handoff_path`. Apply domain ownership: CLARITY -> clarity; DISTINCTIVENESS -> distinctiveness; POSITIONING -> positioning; AVAILABILITY -> availability.
 
 e. Apply reviewer diffs via targeted edits; fall back to `Fix:` prose.
 
-f. Recompute Delta after material revisions. Re-run all reviewers after every material revision. Loop until no findings or 5 iterations.
+f. Recompute Delta after material revisions. Loop until no findings or 5 iterations.
 
    After a fix, rerun only the reviewer whose domain changed. Do not rerun untouched reviewers.
 
