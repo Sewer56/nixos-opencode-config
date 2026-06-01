@@ -97,7 +97,7 @@
       }
     },
     "sewer-axonhub": {
-      "npm": "@ai-sdk/openai-compatible",
+      "npm": "@ai-sdk/openai",
       "name": "Sewer AxonHub",
       "options": {
         "baseURL": "{file:/home/sewer/.secrets/axonhub-url}",
@@ -281,6 +281,7 @@
         "gpt-5.5": {
           "name": "GPT-5.5",
           "family": "openai",
+          "release_date": "2026-04-23",
           "attachment": true,
           "reasoning": true,
           "temperature": true,
@@ -308,6 +309,7 @@
         "gpt-5.4": {
           "name": "GPT-5.4",
           "family": "openai",
+          "release_date": "2026-03-05",
           "attachment": true,
           "reasoning": true,
           "temperature": true,
@@ -335,6 +337,7 @@
         "gpt-5.4-mini": {
           "name": "GPT-5.4 mini",
           "family": "openai",
+          "release_date": "2026-03-05",
           "attachment": true,
           "reasoning": true,
           "temperature": true,
