@@ -92,7 +92,7 @@
       }
     },
     "sewer-axonhub": {
-      "npm": "@ai-sdk/openai",
+      "npm": "@ai-sdk/openai-compatible",
       "name": "Sewer AxonHub",
       "options": {
         "baseURL": "{file:/home/sewer/.secrets/axonhub-url}",
@@ -388,7 +388,7 @@
       }
     },
     "sewer-axonhub-work": {
-      "npm": "@ai-sdk/openai",
+      "npm": "@ai-sdk/openai-compatible",
       "name": "AxonHub (Work Mode)",
       "options": {
         "baseURL": "{file:/home/sewer/.secrets/axonhub-url}",
