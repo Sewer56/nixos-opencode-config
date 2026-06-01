@@ -63,11 +63,13 @@ Modify only `<artifact_base>.handoff.md` and existing I#/T# step files matching 
   - For errors: `cache_path: artifact/<artifact_base>.review-codedoc-errors.md`
 - Update `## Review Ledger`: assign IDs to new findings, preserve existing IDs, mark resolved RESOLVED, defer non-blocking DEFERRED.
 - Apply domain ownership: CDOC and CREAD → docs-and-readability reviewer; CERR → errors reviewer. Arbitrate cross-domain conflicts.
-- Apply all BLOCKING fixes before advisories.
-- Apply reviewer diffs to I#/T# step files only.
+- Validate each response: `# REVIEW`, `Decision: PASS | ADVISORY | BLOCKING`, `## Findings`, and `## Verified`.
+- Apply all exact/actionable inline `## Findings` fixes to I#/T# step files only. Apply BLOCKING fixes before advisories.
+- Treat malformed reviewer output as protocol failure.
+- Return `FAIL` only after 10 iterations, repeated malformed reviewer output, or an unsafe/out-of-scope fix.
 - Append one line to `## Revision History`.
 - Re-run only reviewers whose owned domain or touched step changed. Rerun both when a fix changes both doc and error domains.
-- Loop until no BLOCKING findings remain or 3 iterations. No blockers: proceed to Section 3. At cap: FAIL if BLOCKING remains.
+- Loop until no BLOCKING findings remain or 10 iterations. No blockers: proceed to Section 3. At cap: FAIL if BLOCKING remains.
 
 ## 3. Cacheless audit
 - Run these reviewers in parallel, both in cacheless mode (ignore caches, return all current findings):
@@ -76,7 +78,7 @@ Modify only `<artifact_base>.handoff.md` and existing I#/T# step files matching 
 - Pass each reviewer only run data: `plan_path`, `handoff_path`, exact `step_paths`, and short `user_notes`. Do not pass cache paths.
 - Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified` headings. Treat malformed responses as BLOCKING.
 - If only ADVISORY: record as DEFERRED in `## Review Ledger`.
-- If BLOCKING: apply fixes, update `## Delta`, append `## Revision History`, then re-audit once. At cap (2 audit passes): FAIL if BLOCKING remains, SUCCESS with risks if only ADVISORY.
+- If BLOCKING: apply exact/actionable fixes, update `## Delta`, append `## Revision History`, then re-audit touched domains until no blockers or 10 total iterations. At cap: FAIL if BLOCKING remains, SUCCESS with risks if only ADVISORY.
 
 # Output
 Return exactly:

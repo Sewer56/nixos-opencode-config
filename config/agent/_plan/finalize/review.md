@@ -42,6 +42,12 @@ Run the review loop against finalized step artifacts. Maintain Delta and Review 
 # Scope
 Read only `handoff_path`, `plan_path`, and `step_paths`. Edit only `handoff_path` (Delta, Review Ledger) and `step_paths` (reviewer fixes). Never modify `plan_path` or repo files.
 
+# Failure Contract
+- Apply exact/actionable fixes from current reviewer actions or inline cacheless findings before returning `FAIL`.
+- Return `FAIL` only at the 10-iteration cap, repeated reviewer protocol failure, or an unsafe/out-of-scope fix.
+- Treat reviewer caches and the handoff ledger as state, not current fix input.
+- Keep audit, tests, placement, and performance findings in their owning domains; record out-of-domain concerns as short notes.
+
 # Process
 
 ## 0. Preflight
@@ -66,16 +72,15 @@ Read only `handoff_path`, `plan_path`, and `step_paths`. Edit only `handoff_path
 - Curate step paths per reviewer domain:
   - Audit: all step paths (I# + T#).
   - Tests: test step paths (T#) + implementation steps that directly affect test assertions/coverage.
+- Before each reviewer dispatch, derive and pass `actions_path` as `<cache_path without .md>.actions.<nnn>.md`, starting `001`, incrementing per dispatch.
 - Pass only run data: `handoff_path`, `plan_path`, domain-scoped `step_paths`, `cache_path`, trigger flags, and short `user_notes`.
 - Use `## Relevant Files` from `plan_path` for minimal path context.
 - Pass named gaps only when step evidence is missing or stale.
 - Full reviewers handle INITIAL review only. They write cache files with grounding snapshots.
 - After each reviewer returns:
-  - Pass explicit `actions_path` to every reviewer dispatch (derive as `<cache_path without .md>.actions.<nnn>.md`, starting 001, incrementing per dispatch).
-  - Read the passed `actions_path` for current findings and fixes.
-  - If the actions file is absent, malformed, truncated, ambiguous, or insufficient: treat as protocol failure and retry/rerun the reviewer.
-  - Apply only current findings exposed by the returned pointer.
-  - The cache is reviewer-owned state; do not read it.
+  - Read the passed `actions_path` and apply its current fixes.
+  - Treat invalid actions as protocol failure.
+  - Leave cache unread; it is reviewer-owned state.
 
 ## 4. Re-review dispatch (dedicated rereview agents, after fixes)
 - After applying fixes, dispatch dedicated rereview agents — NOT the full reviewers:
@@ -85,8 +90,8 @@ Read only `handoff_path`, `plan_path`, and `step_paths`. Edit only `handoff_path
 - If the cache file does not exist, fall back to re-dispatching the full reviewer with required artifact paths.
 - Rereview agents: read cache → read changed steps → verify fixes → check for new issues → update cache/actions → emit terse `# REVIEW`.
 - Pass explicit `actions_path` to every rereview dispatch (incrementing `<nnn>` per dispatch).
-- After rereview returns, read the passed `actions_path` for current fixes.
-- Treat missing or malformed actions file as a protocol failure and rerun the re-reviewer.
+- After rereview returns, read the passed `actions_path` and apply its current fixes.
+- Treat invalid actions as protocol failure.
 
 ## 5. Review loop control
 
@@ -95,13 +100,13 @@ Read only `handoff_path`, `plan_path`, and `step_paths`. Edit only `handoff_path
 - Mark resolved issues RESOLVED, defer non-blocking issues DEFERRED. Update cache files where present.
 - Do not reopen RESOLVED issues without new concrete evidence.
 - Advisory-only findings from rereview agents: record as DEFERRED. Do not revise or re-run solely to clear advisories unless they affect explicit acceptance criteria or hard user constraints.
-- Revise step files only where needed. Append one line to `## Revision History` in `handoff_path`.
+- Append one line to `## Revision History` after each material step edit.
 - Recompute `## Delta` in `handoff_path` after every material revision.
 
 ### Ledger and isolation
 - Keep `## Review Ledger` to domain summaries and cross-domain decisions (DEC-###). Do not copy per-finding detail into handoff.
 - Cache-backed reviewers read only their own cache + handoff Delta. Cross-domain findings stay isolated.
-- For cache-backed reviewers, pass `cache_path` as state; use `actions_path` for fixes and `## Review Ledger` for summaries.
+- For cache-backed reviewers, pass `cache_path` as state and `actions_path` as current action output.
 - Do not add scope-boundary prose to reviewer prompts. Route by reviewer domain and pass trigger flags or changed step ids only.
 
 ### Rerun triggers (canonical per-domain scope)
@@ -113,13 +118,13 @@ Read only `handoff_path`, `plan_path`, and `step_paths`. Edit only `handoff_path
 ### PASS-stays-PASS gate and loop termination
 - Do not re-dispatch a reviewer that returned PASS with 0 findings unless revisions address a domain that overlaps with its focus.
 - Recompute `reviewer_set` and re-run only reviewers with BLOCKING findings or domains touched by BLOCKING fixes, using dedicated rereview agents (Section 4). Advisory-only reviewers carry forward as DEFERRED.
-- Loop until no findings of any severity remain or 10 iterations. No findings: continue to final gates. At cap: FAIL if BLOCKING, SUCCESS with risks if only ADVISORY.
+- Loop until no unresolved BLOCKING findings remain. No blockers: continue to final gates. Advisory-only findings: SUCCESS with risks.
 
 ## 6. Final gates (after audit+tests converge)
 - Dispatch placement and performance in the same final-gate phase after audit+tests converge.
 - Placement: pass `handoff_path` and all I# step paths. It owns declaration-order checks and exact step-file diffs.
 - Performance: pass `handoff_path`, `plan_path`, performance-sensitive `step_paths`, and trigger flags. If required facts are not in `handoff_path`, add them there before dispatch.
-- Final-gate BLOCKING findings trigger fixes; apply exact ordering-only placement diffs directly. For other fixes, rerun only touched final-gate domains. ADVISORY only → DEFERRED.
+- Final-gate BLOCKING findings enter the same fix/rerun loop. ADVISORY only → DEFERRED.
 
 ## 7. Final full audit before SUCCESS
 - Run final audit after all normal reviewers and final gates have zero unresolved BLOCKING findings.

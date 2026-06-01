@@ -77,21 +77,24 @@ Modify only `<artifact_base>.handoff.md` and D# step files. Keep I#/T# steps, pr
   - For polish: `cache_path: artifact/<artifact_base>.review-eudoc-polish.md`
 - Update `## Review Ledger`: assign IDs to new findings, preserve existing IDs, mark resolved RESOLVED, defer non-blocking DEFERRED.
 - Apply domain ownership: EDOC → correctness; ECLR/EWRD/EENG/ECNS → polish. Arbitrate cross-domain conflicts.
-- Apply reviewer diffs to D# step files only.
+- Validate each response: `# REVIEW`, `Decision: PASS | ADVISORY | BLOCKING`, `## Findings`, and `## Verified`.
+- Apply all exact/actionable inline `## Findings` fixes to D# step files only.
+- Treat malformed reviewer output as protocol failure.
 - Trust reviewer evidence — apply diffs directly without re-reading target files to verify. Only re-read if the edit fails to apply.
 - Append one line to `## Revision History`.
 - After a fix, rerun only the reviewer whose domain changed. Do not rerun unrelated domains.
 - ADVISORY-only deferral: if only ADVISORY findings remain, record as DEFERRED and do not rerun.
-- Loop until no BLOCKING findings remain or 3 iterations. No blockers: proceed to Section 5. At cap: FAIL if BLOCKING remains, SUCCESS with risks if only ADVISORY.
+- Loop until no BLOCKING findings remain or 10 iterations. No blockers: proceed to Section 5. At cap: FAIL if BLOCKING remains, SUCCESS with risks if only ADVISORY.
 
-## 5. Cacheless audit
-- Run these reviewers in sequence, both in cacheless mode (ignore caches, return all current findings):
+## 5. Final audit
+- Run these reviewers in sequence and require all current findings:
   - Stage 1: `_plan/finalize/eudoc-reviewers/correctness-cacheless`
-  - Stage 2: `_plan/finalize/eudoc-reviewers/polish`
-- Pass each reviewer only run data: `handoff_path`, exact D# `step_paths`, and short `user_notes`. Do not pass cache paths.
+  - Stage 2: `_plan/finalize/eudoc-reviewers/polish` with `cache_path: artifact/<artifact_base>.review-eudoc-polish.md`
+- Pass correctness only run data: `handoff_path`, exact D# `step_paths`, and short `user_notes`. Do not pass a cache path.
+- Pass polish only run data: `handoff_path`, exact D# `step_paths`, `cache_path`, changed D# ids, and short `user_notes`.
 - Validate each reviewer response: starts with `# REVIEW`, contains `Decision: PASS | ADVISORY | BLOCKING`, contains `## Findings` and `## Verified` headings. Treat malformed responses as BLOCKING.
-- Apply reviewer diffs to D# step files only. Update `## Delta` and `## Review Ledger`. Append one line to `## Revision History`.
-- If BLOCKING: apply fixes, then re-audit once with both reviewers. At cap (2 audit cycles): FAIL if BLOCKING remains, SUCCESS with risks if only ADVISORY.
+- Apply exact/actionable reviewer fixes to D# step files only. Update `## Delta` and `## Review Ledger`. Append one line to `## Revision History`.
+- If BLOCKING: apply fixes, then re-audit touched domains until no blockers or 10 total iterations. At cap: FAIL if BLOCKING remains, SUCCESS with risks if only ADVISORY.
 - If only ADVISORY: record as DEFERRED and proceed to SUCCESS.
 
 # Output
