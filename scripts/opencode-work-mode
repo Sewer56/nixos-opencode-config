@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+# Usage:
+#   scripts/opencode-work-mode --dry-run
+#   scripts/opencode-work-mode
+#
+# Convenience wrapper for `scripts/opencode-model-tiers work`. Applies the
+# `work` tier profile from scripts/model-tiers.json, which is guarded to only
+# use sewer-axonhub-work/* models.
+set -eu
+exec "$(dirname "$0")/opencode-model-tiers" work "$@"

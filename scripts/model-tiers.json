@@ -1,0 +1,12 @@
+{
+  "normal": {
+    "LOW": "sewer-axonhub/step-3.7-flash",
+    "MED": "sewer-axonhub/MiniMax-M3",
+    "HIGH": "sewer-axonhub/GLM-5.1"
+  },
+  "work": {
+    "LOW": "sewer-axonhub-work/gpt-5.4-mini",
+    "MED": "sewer-axonhub-work/gpt-5.4",
+    "HIGH": "sewer-axonhub-work/gpt-5.5"
+  }
+}

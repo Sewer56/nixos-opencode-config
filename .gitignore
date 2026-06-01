@@ -3,6 +3,16 @@ PROMPT-*.md
 
 tools/workflow-optimize/__pycache__/
 
+# Nix build symlink
+result
+result-*
+
+# direnv cache
+.direnv/
+
+# Local Go build output
+tools/model-tiers/opencode-model-tiers
+
 # Review logs
 *.review-implementation.md
 *.review-implementation.actions.*.md

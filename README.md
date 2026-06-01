@@ -27,7 +27,7 @@ update it often enough that tracking OS/system changes becomes hard.
 │   └── plugins/           # TypeScript plugins
 ├── plugins/               # Local plugin source packages
 ├── scripts/               # Utility scripts
-├── tools/                 # Workflow optimization tools (Python)
+├── tools/                 # Workflow tools (Python and Go)
 └── AGENTS.md              # Repo-level agent instructions
 ```
 
@@ -223,6 +223,51 @@ A custom provider `sewer-axonhub` (OpenAI-compatible) routes to various
 providers. Configured models include GLM-5-Turbo, GLM-5.1, GLM-5V-Turbo,
 MiniMax-M2.7, Step 3.7 Flash, DeepSeek V4 Flash, and DeepSeek V4 Pro. Small
 model (used for titles) is Step 3.7 Flash.
+
+### Model tiers
+
+Agent model tiers live in `scripts/model-tiers.json`, beside the wrapper that
+runs the Go TUI/CLI. Agent files opt in with frontmatter markers:
+
+```yaml
+model: sewer-axonhub/MiniMax-M3 # MED
+```
+
+The tool rewrites only the model token and preserves `# LOW`, `# MED`, or
+`# HIGH` comments. Unmarked `model:` lines are left untouched.
+
+```bash
+scripts/opencode-model-tiers              # TUI
+scripts/opencode-model-tiers status
+scripts/opencode-model-tiers apply normal --dry-run
+scripts/opencode-model-tiers apply normal
+scripts/opencode-work-mode --dry-run
+scripts/opencode-work-mode
+scripts/opencode-model-tiers set normal MED sewer-axonhub/MiniMax-M3
+```
+
+The TUI reads choices from `opencode models`, supports typed filtering, previews
+file changes, saves `scripts/model-tiers.json`, and can apply the selected profile.
+Work mode is guarded to only use `sewer-axonhub-work/*` models.
+
+Extra CLI helpers:
+
+```bash
+scripts/opencode-model-tiers models
+scripts/opencode-model-tiers models --work
+scripts/opencode-model-tiers configure work
+```
+
+The Go app can also be run through the root flake:
+
+```bash
+nix run .#opencode-model-tiers -- status
+nix run .#opencode-model-tiers
+nix run .#opencode-work-mode -- --dry-run
+```
+
+Root `direnv` support is enabled through `.envrc` / `flake.nix`; run
+`direnv allow` after cloning or changing the dev shell.
 
 ## Building OpenCode
 

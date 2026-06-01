@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+# Usage:
+#   scripts/opencode-model-tiers                  # open TUI
+#   scripts/opencode-model-tiers status
+#   scripts/opencode-model-tiers apply normal --dry-run
+#   scripts/opencode-model-tiers apply normal
+#   scripts/opencode-model-tiers work --dry-run
+#   scripts/opencode-model-tiers work
+#   scripts/opencode-model-tiers set normal MED sewer-axonhub/MiniMax-M3
+#
+# This wrapper runs the Go TUI/CLI from source, so it works before installing
+# the flake package. The tool rewrites only config/agent/**/*.md lines tagged
+# with # LOW, # MED, or # HIGH.
+set -eu
+if ! command -v go >/dev/null 2>&1; then
+  echo "error: go not found. Run 'direnv allow' or 'nix develop'." >&2
+  exit 1
+fi
+root="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$root"
+export CGO_ENABLED=0
+exec go run ./tools/model-tiers "$@"
