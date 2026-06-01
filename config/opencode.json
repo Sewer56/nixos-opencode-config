@@ -386,6 +386,100 @@
           }
         }
       }
+    },
+    "sewer-axonhub-work": {
+      "npm": "@ai-sdk/openai",
+      "name": "AxonHub (Work Mode)",
+      "options": {
+        "baseURL": "{file:/home/sewer/.secrets/axonhub-url}",
+        "apiKey": "{file:/home/sewer/.secrets/axonhub-work-key}"
+      },
+      "models": {
+        "gpt-5.5": {
+          "name": "GPT-5.5",
+          "family": "openai",
+          "release_date": "2026-04-23",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 5,
+            "output": 30,
+            "cache_read": 0.5,
+            "cache_write": 0
+          },
+          "limit": {
+            "context": 1050000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "gpt-5.4": {
+          "name": "GPT-5.4",
+          "family": "openai",
+          "release_date": "2026-03-05",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 2.5,
+            "output": 15,
+            "cache_read": 0.25,
+            "cache_write": 0
+          },
+          "limit": {
+            "context": 1050000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "gpt-5.4-mini": {
+          "name": "GPT-5.4 mini",
+          "family": "openai",
+          "release_date": "2026-03-05",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0.75,
+            "output": 4.5,
+            "cache_read": 0.075,
+            "cache_write": 0
+          },
+          "limit": {
+            "context": 400000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        }
+      }
     }
   },
   "experimental": {
