@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews D# steps for coverage, specificity, and broken links (cacheless)
-model: sewer-axonhub/step-3.7-flash
+model: sewer-axonhub/MiniMax-M3  # MED
 permission:
   "*": deny
   read:

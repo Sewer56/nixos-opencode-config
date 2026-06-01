@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews error documentation coverage, specificity, readability, and wording for source files (cacheless)
-model: sewer-axonhub/step-3.7-flash  # HIGH
+model: sewer-axonhub/MiniMax-M3  # MED
 variant: high
 permission:
   "*": deny

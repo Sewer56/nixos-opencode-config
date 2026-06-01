@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews changed user-facing documentation for clarity, wording, engagement, and cross-page polish
-model: sewer-axonhub/step-3.7-flash  # HIGH
+model: sewer-axonhub/MiniMax-M3  # MED
 variant: high
 permission:
   "*": deny
