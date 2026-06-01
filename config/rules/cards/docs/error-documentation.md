@@ -15,7 +15,8 @@ Error sections must enumerate every reachable error variant/type/path that the c
 Error documentation must not contradict implementation. Each listed variant/type must be actually returnable from the function.
 
 ### Error doc format
-Use the language's documentation convention and link syntax: Rust `# Errors` with `[`Error::Variant`]`; TypeScript `@throws` or equivalent project convention.
+Use the language's documentation convention and link syntax: Rust `# Errors` with `[`Error::Variant`]`; TypeScript `@throws` or equivalent project convention. Prefer short in-text doc links plus reference definitions over long inline link targets.
+Bad: `[Name](long.target.path)` repeated inline. Good: `[Name]` in text and `[Name]: long.target.path` after the section.
 
 ### No vague error wording
 Block vague triggers such as `when the operation fails`, `on error`, `if something goes wrong`, or `if invalid`.

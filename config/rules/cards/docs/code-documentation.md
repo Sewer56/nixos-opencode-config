@@ -20,7 +20,8 @@ Bad: a multi-step parser normalizes aliases before validation with no comment ex
 Good: `// Normalize aliases before validation so deprecated names share one error path.`
 
 ### Documentation style
-Lead with a one-sentence purpose in plain language. Prefer goal-oriented phrasing. Use language-native doc-link syntax for types/variants when supported. Always include language tags on fenced code blocks; never use bare `ignore` fences.
+Lead with a one-sentence purpose in plain language. Prefer goal-oriented phrasing. Use language-native doc-link syntax for types/variants when supported. Prefer short in-text doc links plus reference definitions over long inline link targets. Always include language tags on fenced code blocks; never use bare `ignore` fences.
+Bad: `[Name](long.target.path)` repeated inline. Good: `[Name]` in text and `[Name]: long.target.path` after the section.
 
 ### No legacy docs backfill
 Do not backfill untouched legacy files solely for docs.
