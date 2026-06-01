@@ -46,20 +46,36 @@ Out-of-scope concerns get at most one short Advisory note in `## Notes`; never a
   read_context="Read changed source files listed in `changed_paths` that affect declarations. Skip binary, non-text, and declaration-free files. Apply Focus checks to each changed file's resulting declaration order."
 }}
 
-{{
-  file="./agent/_templates/review-footer/cacheless.txt"
-  agent="_implement/reviewers/placement"
-  prefix=CPLC
-  categories="VISIBILITY | CALL_ORDER | ENTRY_POINT | STABILITY | ANCHOR | INSUFFICIENT_CONTEXT | RULES_MISSING"
-  evidence="<section, `path:line`, or declaration name>"
-  problem="<one-line description of what is wrong>"
-  fix="<smallest concrete diff to reorder or re-anchor>"
-  file_ref="<path>"
-  bad="-old order"
-  good="+new order"
-  with_file=1
-  with_lines=1
-  with_evidence=1
-  with_detail=1
-  detail="OUT_OF_ORDER | WRONG_ANCHOR | WRONG_VISIBILITY | WRONG_FILE | MONOLITH_SPLIT | OVERSPLIT"
-}}
+Return only this fenced block:
+
+```text
+# REVIEW
+Agent: _implement/reviewers/placement
+Decision: PASS | ADVISORY | BLOCKING
+IDs: CPLC-001, CPLC-002, ...
+
+## Findings
+### [CPLC-NNN]
+Category: VISIBILITY | CALL_ORDER | ENTRY_POINT | STABILITY | ANCHOR | INSUFFICIENT_CONTEXT | RULES_MISSING
+Detail: OUT_OF_ORDER | WRONG_ANCHOR | WRONG_VISIBILITY | WRONG_FILE | MONOLITH_SPLIT | OVERSPLIT
+Severity: BLOCKING | ADVISORY
+File: <path>
+Lines: ~<start line>-<end line> | None
+Evidence: <section, `path:line`, or declaration name>
+Problem: <one-line description of what is wrong>
+Fix: <smallest concrete reorder or re-anchor instruction>
+Old Order:
+- <declaration as currently ordered>
+- <declaration as currently ordered>
+New Order:
+- <declaration in required order>
+- <declaration in required order>
+
+## Notes
+- <optional short notes>
+```
+
+- Write `- None` under `## Findings` when there are no findings.
+- Use `Old Order` and `New Order` instead of unified diffs.
+- Include only the declarations needed to show the ordering or anchor change.
+- For findings that are not order changes, write `Old Order: None` and `New Order: None`.
