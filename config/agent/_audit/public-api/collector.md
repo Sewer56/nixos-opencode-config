@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Enumerates public items in one module and cross-references usage across the repo
-model: sewer-axonhub/MiniMax-M3  # MED
+model: sewer-axonhub/MiniMax-M3 # MED
 permission:
   "*": deny
   read:

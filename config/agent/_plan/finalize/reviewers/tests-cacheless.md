@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews step test strategy for finalized plans (cacheless)
-model: sewer-axonhub/GLM-5.1  # HIGH
+model: sewer-axonhub/GLM-5.1 # HIGH
 permission:
   "*": deny
   read:

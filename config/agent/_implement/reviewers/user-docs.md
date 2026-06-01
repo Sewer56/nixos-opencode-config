@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews changed user-facing documentation for correctness, coverage, specificity, and broken links
-model: sewer-axonhub/MiniMax-M3  # MED
+model: sewer-axonhub/MiniMax-M3 # MED
 variant: high
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Surveys repo for files relevant to a user request, returns compact file manifest
-model: sewer-axonhub/step-3.7-flash  # MED
+model: sewer-axonhub/step-3.7-flash # MED
 permission:
   "*": deny
   read:

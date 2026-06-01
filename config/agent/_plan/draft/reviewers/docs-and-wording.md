@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks documentation coverage, specificity, and wording quality in plan draft artifacts
-model: sewer-axonhub/MiniMax-M3  # MED
+model: sewer-axonhub/MiniMax-M3 # MED
 variant: high
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Enumerates error-returning functions in one module, traces error paths, and classifies error docs
-model: sewer-axonhub/step-3.7-flash  # LOW
+model: sewer-axonhub/step-3.7-flash # LOW
 permission:
   "*": deny
   read:

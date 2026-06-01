@@ -2,7 +2,7 @@
 mode: primary
 hidden: true
 description: Runs the finalize review loop against step artifacts
-model: sewer-axonhub/GLM-5.1  # HIGH
+model: sewer-axonhub/GLM-5.1 # HIGH
 permission:
   "*": deny
   read:

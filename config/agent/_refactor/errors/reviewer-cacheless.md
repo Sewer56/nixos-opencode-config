@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews applied error docs for specificity, format, fidelity, readability, and wording (cacheless)
-model: sewer-axonhub/MiniMax-M3  # MED
+model: sewer-axonhub/MiniMax-M3 # MED
 variant: high
 permission:
   "*": deny

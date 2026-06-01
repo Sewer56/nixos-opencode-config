@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews changed source files for declaration placement and ordering
-model: sewer-axonhub/MiniMax-M3  # MED
+model: sewer-axonhub/MiniMax-M3 # MED
 variant: high
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews code-adjacent documentation in I#/T# steps for coverage, specificity, inline comments, and readability (cached)
-model: sewer-axonhub/MiniMax-M3  # MED
+model: sewer-axonhub/MiniMax-M3 # MED
 variant: high
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Gathers repo facts from a confirmed plugin draft plan for STEP generation
-model: sewer-axonhub/MiniMax-M2.7  # MED
+model: sewer-axonhub/MiniMax-M2.7 # MED
 permission:
   "*": deny
   read:

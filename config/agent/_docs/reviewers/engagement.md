@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for reader engagement and structural quality
-model: sewer-axonhub/MiniMax-M3  # MED
+model: sewer-axonhub/MiniMax-M3 # MED
 variant: high
 permission:
   "*": deny

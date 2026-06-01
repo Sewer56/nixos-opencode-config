@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Resolves handoff, step paths, and discovery context for both code-doc and user-doc finalize stages
-model: sewer-axonhub/step-3.7-flash  # LOW
+model: sewer-axonhub/step-3.7-flash # LOW
 permission:
   "*": deny
   read:
