@@ -384,6 +384,107 @@
               "text"
             ]
           }
+        },
+        "kimi-k2.6": {
+          "name": "Kimi K2.6",
+          "family": "kimi",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0.95,
+            "output": 4.0,
+            "cache_read": 0.16
+          },
+          "limit": {
+            "context": 131072,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "qwen3.7-max": {
+          "name": "Qwen3.7 Max",
+          "family": "qwen",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 2.5,
+            "output": 7.5,
+            "cache_read": 0.5,
+            "cache_write": 3.125
+          },
+          "limit": {
+            "context": 131072,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "mimo-v2.5": {
+          "name": "MiMo-V2.5",
+          "family": "mimo",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0.14,
+            "output": 0.28,
+            "cache_read": 0.0028
+          },
+          "limit": {
+            "context": 131072,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "mimo-v2.5-pro": {
+          "name": "MiMo-V2.5-Pro",
+          "family": "mimo",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 1.74,
+            "output": 3.48,
+            "cache_read": 0.0145
+          },
+          "limit": {
+            "context": 131072,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
         }
       }
     },
