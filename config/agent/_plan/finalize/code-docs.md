@@ -12,8 +12,7 @@ permission:
   edit:
     "*": deny
     "*PROMPT-PLAN*.handoff*.md": allow
-    "*PROMPT-PLAN*.step.I*.md": allow
-    "*PROMPT-PLAN*.step.T*.md": allow
+    "*PROMPT-PLAN*.step.*.md": allow
   todowrite: allow
   external_directory: allow
   glob: allow
