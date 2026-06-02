@@ -8,6 +8,9 @@ Review D# steps for documentation correctness — coverage, specificity, and bro
 {{ if=mode==cached }}
 - `cache_path` (required): `artifact/<artifact_base>.review-eudoc-correctness.md`
 {{ endif }}
+{{ if=has_actions_path }}
+- `actions_path` (optional; derive `<cache_path without .md>.actions.md` when omitted)
+{{ endif }}
 
 # Focus
 

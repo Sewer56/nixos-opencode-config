@@ -8,6 +8,9 @@
 {{ if=mode==cached }}
 - `cache_path` (required): artifact reviewer cache path
 {{ endif }}
+{{ if=has_actions_path }}
+- `actions_path` (optional; derive `<cache_path without .md>.actions.md` when omitted)
+{{ endif }}
 
 # Focus
 
