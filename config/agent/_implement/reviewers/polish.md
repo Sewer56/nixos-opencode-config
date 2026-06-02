@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews changed user-facing documentation for clarity, wording, engagement, and cross-page polish
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 variant: high
 permission:
   "*": deny

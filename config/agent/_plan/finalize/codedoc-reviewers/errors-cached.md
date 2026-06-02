@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks code-adjacent error documentation coverage, specificity, readability, and wording for finalized steps (cached)
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 variant: high
 permission:
   "*": deny

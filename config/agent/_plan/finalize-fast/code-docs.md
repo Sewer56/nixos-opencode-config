@@ -2,7 +2,7 @@
 mode: primary
 hidden: true
 description: Runs cached-only code-documentation reviewers against finalized I#/T# steps
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 permission:
   "*": deny
   read:

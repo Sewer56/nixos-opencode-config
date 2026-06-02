@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks performance-sensitive decisions in finalized plugin steps
-model: sewer-axonhub/GLM-5.1 # HIGH
+model: sewer-axonhub/deepseek-v4-pro # HIGH
 permission:
   "*": deny
   read:

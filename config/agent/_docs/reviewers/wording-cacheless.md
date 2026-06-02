@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews end-user documentation for wording quality — sentence flow, passive voice, filler, and wordiness (cacheless)
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 variant: high
 permission:
   "*": deny

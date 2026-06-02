@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Applies finalized freeform plan steps after reviewer approval
-model: sewer-axonhub/step-3.7-flash # LOW
+model: sewer-axonhub/deepseek-v4-flash # LOW
 permission:
   "*": deny
   read:

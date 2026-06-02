@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews documentation coverage, inline comments, and readability for source files (cached)
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 variant: high
 permission:
   "*": deny

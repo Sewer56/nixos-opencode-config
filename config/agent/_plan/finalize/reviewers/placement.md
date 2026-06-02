@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks declaration placement/order in finalized implementation steps
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 variant: high
 permission:
   "*": deny

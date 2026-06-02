@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks plugin draft plans for documentation coverage and specificity
-model: sewer-axonhub/MiniMax-M2.7 # LOW
+model: sewer-axonhub/deepseek-v4-flash # LOW
 variant: medium
 permission:
   "*": deny

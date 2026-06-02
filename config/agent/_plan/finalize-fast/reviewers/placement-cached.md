@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Cached declaration placement/order reviewer for finalize-fast implementation steps
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 variant: high
 permission:
   "*": deny

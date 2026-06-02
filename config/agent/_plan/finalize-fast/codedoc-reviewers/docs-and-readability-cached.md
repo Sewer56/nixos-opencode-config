@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Cached code-doc/readability reviewer for finalize-fast I#/T# steps
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 variant: high
 permission:
   "*": deny

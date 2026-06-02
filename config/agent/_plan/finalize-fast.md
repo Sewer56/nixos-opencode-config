@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Runs plan-finalize with cached-only review phases
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 permission:
   "*": deny
   read:

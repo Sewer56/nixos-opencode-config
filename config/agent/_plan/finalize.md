@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Runs the full plan-finalize pipeline: validate draft, code-generation, review, code-docs, user-docs
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 permission:
   "*": deny
   read:

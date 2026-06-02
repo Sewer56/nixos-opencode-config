@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Runs code-documentation reviewers against finalized I#/T# steps and applies their findings
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 permission:
   "*": deny
   read:

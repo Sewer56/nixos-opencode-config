@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews D# steps for coverage, specificity, and broken links (cached)
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 variant: medium
 permission:
   "*": deny

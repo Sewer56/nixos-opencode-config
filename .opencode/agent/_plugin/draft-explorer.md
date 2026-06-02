@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Surveys plugin request context and returns a compact plugin file manifest
-model: sewer-axonhub/MiniMax-M2.7 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 permission:
   "*": deny
   read:

@@ -2,7 +2,7 @@
 mode: primary
 hidden: true
 description: Generates D# stubs and runs cached-only end-user documentation reviewers
-model: sewer-axonhub/MiniMax-M3 # MED
+model: sewer-axonhub/deepseek-v4-flash # MED
 permission:
   "*": deny
   read:

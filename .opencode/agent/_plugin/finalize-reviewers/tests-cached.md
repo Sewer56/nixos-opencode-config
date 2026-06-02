@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks verification coverage and minimality for finalized plugin plans (cached)
-model: sewer-axonhub/GLM-5.1 # HIGH
+model: sewer-axonhub/deepseek-v4-pro # HIGH
 permission:
   "*": deny
   read:
