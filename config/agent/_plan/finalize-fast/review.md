@@ -2,7 +2,7 @@
 mode: primary
 hidden: true
 description: Runs cached-only finalize review against step artifacts
-model: sewer-axonhub/GLM-5.1 # HIGH
+model: sewer-axonhub/deepseek-v4-flash # MED
 permission:
   "*": deny
   read:
