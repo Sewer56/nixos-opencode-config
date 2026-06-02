@@ -21,6 +21,7 @@ permission:
   external_directory: allow
   task:
     "*": "deny"
+    "general": "allow"
     "_implement/plan/reviewer": "allow"
 ---
 
