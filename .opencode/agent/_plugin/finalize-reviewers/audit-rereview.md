@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Re-verifies plugin audit fixes against cache and checks changed steps for new audit issues
-model: sewer-axonhub/deepseek-v4-pro # HIGH
+model: sewer-axonhub/GLM-5.1 # HIGH
 permission:
   "*": deny
   read:

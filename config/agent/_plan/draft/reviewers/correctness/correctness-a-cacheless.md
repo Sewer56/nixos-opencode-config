@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Independent correctness reviewer A (cacheless) for plan draft adjudication
-model: sewer-axonhub/deepseek-v4-pro # HIGH
+model: sewer-axonhub/GLM-5.1 # HIGH
 temperature: 1.0  # reviewer A
 variant: medium
 permission:

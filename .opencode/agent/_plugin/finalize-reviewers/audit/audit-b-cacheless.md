@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Independent plugin finalize audit reviewer B (cacheless)
-model: sewer-axonhub/deepseek-v4-pro # HIGH
+model: sewer-axonhub/GLM-5.1 # HIGH
 temperature: 0.7  # reviewer B
 variant: medium
 permission:

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Independent plugin draft correctness reviewer A (cacheless)
-model: sewer-axonhub/deepseek-v4-pro # HIGH
+model: sewer-axonhub/GLM-5.1 # HIGH
 temperature: 1.0  # reviewer A
 variant: medium
 permission:
