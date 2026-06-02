@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -41,7 +42,7 @@ func runCLI(env Env, args []string) error {
 	case "set":
 		return cmdSet(env, os.Stdout, args[1:])
 	case "help", "-h", "--help":
-		printHelp(os.Stdout)
+		printHelp(os.Stdout, env)
 		return nil
 	default:
 		return fmt.Errorf("unknown command: %s", args[0])
@@ -77,8 +78,17 @@ func parseConfigureArgs(args []string) (string, error) {
 	return *profileFlag, nil
 }
 
-func printHelp(w io.Writer) {
-	fmt.Fprint(w, `opencode-model-tiers
+func printHelp(w io.Writer, env Env) {
+	// Build profiles and tiers dynamically from config.
+	profiles := "normal, work"
+	tiers := "LOW, MED, HIGH"
+	if loaded, err := loadConfig(env); err == nil {
+		profileList := profileNames(loaded.Profiles)
+		sort.Strings(profileList)
+		profiles = strings.Join(profileList, ", ")
+		tiers = strings.Join(loaded.TierOrder, ", ")
+	}
+	fmt.Fprintf(w, `opencode-model-tiers
 
 Usage:
   opencode-model-tiers                         open TUI
@@ -90,8 +100,8 @@ Usage:
   opencode-model-tiers work [--dry-run]        shortcut for apply work
   opencode-model-tiers set <profile> <tier> <model> [--no-validate]
 
-Profiles: normal, work
-Tiers: LOW, MED, HIGH
+Profiles: %s
+Tiers: %s
 
 TUI keys:
   h/l or ←/→   switch profile
@@ -101,28 +111,33 @@ TUI keys:
   s             save tier config
   a             apply selected profile to agent files
   q             quit
-`)
+`, profiles, tiers)
 }
 
 func cmdStatus(env Env, w io.Writer) error {
-	cfg, err := loadConfig(env)
+	loaded, err := loadConfig(env)
 	if err != nil {
 		return err
 	}
 	fmt.Fprintf(w, "tier file: %s\n", rel(env, env.TierFile))
-	for _, profile := range sortedProfiles(cfg) {
+	for _, profile := range sortedProfiles(loaded.Profiles) {
 		fmt.Fprintf(w, "\n[%s]\n", profile)
-		for _, tier := range tierOrder {
-			fmt.Fprintf(w, "%-4s %s\n", tier, cfg[profile][tier])
+		for _, tier := range loaded.TierOrder {
+			if model := loaded.Profiles[profile][tier]; model != "" {
+				fmt.Fprintf(w, "%-4s %s\n", tier, model)
+			}
 		}
 	}
 
-	counts, err := currentCounts(env)
+	re := buildModelLineRE(loaded.TierOrder)
+	counts, err := currentCounts(env, loaded.TierOrder, re)
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(w, "\ncurrent marked agent models: %s\n", rel(env, env.AgentDir))
-	for _, tier := range tierOrder {
+	for _, dir := range env.AgentDirs {
+		fmt.Fprintf(w, "\ncurrent marked agent models: %s\n", rel(env, dir))
+	}
+	for _, tier := range loaded.TierOrder {
 		total := 0
 		for _, count := range counts[tier] {
 			total += count
@@ -168,21 +183,22 @@ func cmdApply(env Env, w io.Writer, args []string) error {
 	}
 
 	profile := positional[0]
-	cfg, err := loadConfig(env)
+	loaded, err := loadConfig(env)
 	if err != nil {
 		return err
 	}
-	values, ok := cfg[profile]
+	values, ok := loaded.Profiles[profile]
 	if !ok {
 		return fmt.Errorf("unknown profile: %s", profile)
 	}
 	if profile == "work" {
-		if err := validateWork(values); err != nil {
+		if err := validateWork(values, loaded.TierOrder); err != nil {
 			return err
 		}
 	}
 
-	result, err := applyProfile(env, values, dryRun)
+	re := buildModelLineRE(loaded.TierOrder)
+	result, err := applyProfile(env, values, dryRun, loaded.TierOrder, re)
 	if err != nil {
 		return err
 	}
@@ -194,7 +210,7 @@ func cmdApply(env Env, w io.Writer, args []string) error {
 		action = "would update"
 	}
 	fmt.Fprintf(w, "%s: %d line(s), %d file(s)\n", action, result.Lines, len(result.Files))
-	for _, tier := range tierOrder {
+	for _, tier := range loaded.TierOrder {
 		if result.Tiers[tier] > 0 {
 			fmt.Fprintf(w, "  %s: %d -> %s\n", tier, result.Tiers[tier], values[tier])
 		}
@@ -214,15 +230,16 @@ func cmdSet(env Env, w io.Writer, args []string) error {
 	profile := positional[0]
 	tier := strings.ToUpper(positional[1])
 	model := positional[2]
-	if !contains(tierOrder, tier) {
-		return fmt.Errorf("unknown tier: %s", tier)
-	}
 
-	cfg, err := loadConfig(env)
+	loaded, err := loadConfig(env)
 	if err != nil {
 		return err
 	}
-	values, ok := cfg[profile]
+	if !contains(loaded.TierOrder, tier) {
+		return fmt.Errorf("unknown tier: %s", tier)
+	}
+
+	values, ok := loaded.Profiles[profile]
 	if !ok {
 		return fmt.Errorf("unknown profile: %s", profile)
 	}
@@ -232,20 +249,20 @@ func cmdSet(env Env, w io.Writer, args []string) error {
 		}
 	}
 
-	nextValues := cloneTierSet(values)
+	nextValues := cloneTierSet(values, loaded.TierOrder)
 	nextValues[tier] = model
 	if profile == "work" {
-		if err := validateWork(nextValues); err != nil {
+		if err := validateWork(nextValues, loaded.TierOrder); err != nil {
 			return err
 		}
 	}
-	cfg[profile] = nextValues
-	if err := saveConfig(env, cfg); err != nil {
+	loaded.Profiles[profile] = nextValues
+	if err := saveConfig(env, loaded); err != nil {
 		return err
 	}
 
 	fmt.Fprintf(w, "updated: %s\n", rel(env, env.TierFile))
-	for _, t := range tierOrder {
+	for _, t := range loaded.TierOrder {
 		fmt.Fprintf(w, "%-4s %s\n", t, nextValues[t])
 	}
 	return nil

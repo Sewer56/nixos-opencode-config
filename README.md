@@ -305,15 +305,29 @@ model (used for titles) is Step 3.7 Flash.
 
 ### Model tiers
 
-Agent model tiers live in `scripts/model-tiers.json`, beside the wrapper that
-runs the Go TUI/CLI. Agent files opt in with frontmatter markers:
+Tier presets are discovered from `scripts/model-tiers.json` at runtime.
+A `$tierOrder` key declares the canonical tier list and display order:
+
+```json
+{
+  "$tierOrder": {"0": "LOW", "1": "MED", "2": "HIGH"},
+  "normal": { ... },
+  "work":   { ... }
+}
+```
+
+If `$tierOrder` is absent, tiers are collected from all profiles and sorted
+alphabetically — so adding a new tier to the JSON is sufficient; no code change
+or recompilation is needed.
+
+Agent files opt in with frontmatter markers:
 
 ```yaml
 model: sewer-axonhub/MiniMax-M3 # MED
 ```
 
-The tool rewrites only the model token and preserves `# LOW`, `# MED`, or
-`# HIGH` comments. Unmarked `model:` lines are left untouched.
+The tool rewrites only the model token and preserves the tier marker comment
+(e.g. `# LOW`, `# MED`, `# HIGH`). Unmarked `model:` lines are left untouched.
 
 ```bash
 scripts/opencode-model-tiers              # TUI
@@ -326,7 +340,8 @@ scripts/opencode-model-tiers set normal MED sewer-axonhub/MiniMax-M3
 ```
 
 The TUI reads choices from `opencode models`, supports typed filtering, previews
-file changes, saves `scripts/model-tiers.json`, and can apply the selected profile.
+file changes, saves `scripts/model-tiers.json` (including the `$tierOrder` key),
+and can apply the selected profile.
 Work mode is guarded to only use `sewer-axonhub-work/*` models.
 
 Extra CLI helpers:

@@ -19,15 +19,30 @@ scripts/opencode-model-tiers configure work
 
 Tier data lives beside the wrapper in `scripts/model-tiers.json`.
 
-`model-tiers.json` intentionally has no comments because it is strict JSON.
-Schema by convention:
+The tool reads a `$tierOrder` key to discover the canonical tier list:
 
 ```json
 {
-  "normal": { "LOW": "provider/model", "MED": "provider/model", "HIGH": "provider/model" },
-  "work": { "LOW": "sewer-axonhub-work/model", "MED": "sewer-axonhub-work/model", "HIGH": "sewer-axonhub-work/model" }
+  "$tierOrder": {"0": "LOW", "1": "MED", "2": "HIGH"},
+  "normal": { "LOW": "...", "MED": "...", "HIGH": "..." },
+  "work":   { "LOW": "...", "MED": "...", "HIGH": "..." }
 }
 ```
+
+Keys in `$tierOrder` are numeric strings (`"0"`, `"1"`, …) that define the
+display and iteration order. Every profile must contain each key from the
+order.
+
+If `$tierOrder` is absent, the tool collects every tier key across all
+profiles and sorts them alphabetically — useful for ad-hoc or evolving configs.
+
+To add a new tier variant (e.g. `HIGH-FAST`):
+
+1. Add the tier key to `$tierOrder`, e.g. `"3": "HIGH-FAST"`.
+2. Add the tier value to each profile: `"HIGH-FAST": "provider/model"`.
+3. Agent files can now use `# HIGH-FAST` markers.
+
+No recompilation needed — the tool adapts at next startup.
 
 ## `opencode-work-mode`
 

@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -26,6 +27,8 @@ const (
 type appModel struct {
 	env        Env
 	cfg        Config
+	re         *regexp.Regexp
+	tierOrder  []string
 	profiles   []string
 	models     []string
 	counts     map[string]map[string]int
@@ -56,7 +59,7 @@ func runTUI(env Env, initialProfile string) error {
 }
 
 func newAppModel(env Env, initialProfile string) (appModel, error) {
-	cfg, err := loadConfig(env)
+	loaded, err := loadConfig(env)
 	if err != nil {
 		return appModel{}, err
 	}
@@ -64,11 +67,12 @@ func newAppModel(env Env, initialProfile string) (appModel, error) {
 	if err != nil {
 		return appModel{}, err
 	}
-	counts, err := currentCounts(env)
+	re := buildModelLineRE(loaded.TierOrder)
+	counts, err := currentCounts(env, loaded.TierOrder, re)
 	if err != nil {
 		return appModel{}, err
 	}
-	profiles := sortedProfiles(cfg)
+	profiles := sortedProfiles(loaded.Profiles)
 	if len(profiles) == 0 {
 		return appModel{}, errors.New("no profiles configured")
 	}
@@ -95,7 +99,9 @@ func newAppModel(env Env, initialProfile string) (appModel, error) {
 
 	return appModel{
 		env:        env,
-		cfg:        cfg,
+		cfg:        loaded.Profiles,
+		re:         re,
+		tierOrder:  loaded.TierOrder,
 		profiles:   profiles,
 		models:     models,
 		counts:     counts,
@@ -130,9 +136,9 @@ func (m appModel) updateMain(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "l", "right":
 		m.profileIdx = (m.profileIdx + 1) % len(m.profiles)
 	case "k", "up":
-		m.tierIdx = (m.tierIdx - 1 + len(tierOrder)) % len(tierOrder)
+		m.tierIdx = (m.tierIdx - 1 + len(m.tierOrder)) % len(m.tierOrder)
 	case "j", "down":
-		m.tierIdx = (m.tierIdx + 1) % len(tierOrder)
+		m.tierIdx = (m.tierIdx + 1) % len(m.tierOrder)
 	case "enter", " ":
 		m.mode = modePicker
 		m.pickIdx = 0
@@ -227,8 +233,12 @@ func (m appModel) viewMain() string {
 	b.WriteString("\n\n")
 
 	profile := m.profile()
-	for i, tier := range tierOrder {
-		line := fmt.Sprintf("%-4s %s", tier, m.cfg[profile][tier])
+	for i, tier := range m.tierOrder {
+		model := m.cfg[profile][tier]
+		if model == "" {
+			model = "<unmapped>"
+		}
+		line := fmt.Sprintf("%-4s %s", tier, model)
 		if i == m.tierIdx {
 			line = activeStyle.Render("> " + line)
 		} else {
@@ -238,22 +248,22 @@ func (m appModel) viewMain() string {
 		b.WriteString("\n")
 	}
 
-	result, err := applyProfile(m.env, m.cfg[profile], true)
+	result, err := applyProfile(m.env, m.cfg[profile], true, m.tierOrder, m.re)
 	b.WriteString("\n")
 	if err != nil {
 		b.WriteString(errorStyle.Render("preview failed: " + err.Error()))
 		b.WriteString("\n")
 	} else {
 		b.WriteString(fmt.Sprintf("preview: %d line(s), %d file(s) would change\n", result.Lines, len(result.Files)))
-		for _, tier := range tierOrder {
-			if result.Tiers[tier] > 0 {
+		for _, tier := range m.tierOrder {
+			if result.Tiers[tier] > 0 && m.cfg[profile][tier] != "" {
 				b.WriteString(fmt.Sprintf("  %s: %d -> %s\n", tier, result.Tiers[tier], m.cfg[profile][tier]))
 			}
 		}
 	}
 
 	b.WriteString("\ncurrent marked assignments:\n")
-	for _, tier := range tierOrder {
+	for _, tier := range m.tierOrder {
 		total := 0
 		for _, count := range m.counts[tier] {
 			total += count
@@ -316,7 +326,7 @@ func (m appModel) viewPicker() string {
 }
 
 func (m appModel) profile() string { return m.profiles[m.profileIdx] }
-func (m appModel) tier() string    { return tierOrder[m.tierIdx] }
+func (m appModel) tier() string    { return m.tierOrder[m.tierIdx] }
 
 func (m appModel) filteredModels() []string {
 	return filterModels(m.profile(), m.models, m.input.Value())
@@ -324,25 +334,25 @@ func (m appModel) filteredModels() []string {
 
 func (m appModel) save() error {
 	if values, ok := m.cfg["work"]; ok {
-		if err := validateWork(values); err != nil {
+		if err := validateWork(values, m.tierOrder); err != nil {
 			return err
 		}
 	}
-	return saveConfig(m.env, m.cfg)
+	return saveConfig(m.env, &LoadedConfig{TierOrder: m.tierOrder, Profiles: m.cfg})
 }
 
 func (m *appModel) apply() error {
 	profile := m.profile()
 	if profile == "work" {
-		if err := validateWork(m.cfg[profile]); err != nil {
+		if err := validateWork(m.cfg[profile], m.tierOrder); err != nil {
 			return err
 		}
 	}
-	result, err := applyProfile(m.env, m.cfg[profile], false)
+	result, err := applyProfile(m.env, m.cfg[profile], false, m.tierOrder, m.re)
 	if err != nil {
 		return err
 	}
-	m.counts, err = currentCounts(m.env)
+	m.counts, err = currentCounts(m.env, m.tierOrder, m.re)
 	if err != nil {
 		return err
 	}

@@ -18,9 +18,17 @@ func findEnv() (Env, error) {
 		env := Env{
 			Root:     dir,
 			TierFile: filepath.Join(dir, "scripts", "model-tiers.json"),
-			AgentDir: filepath.Join(dir, "config", "agent"),
 		}
-		if fileExists(env.TierFile) && dirExists(env.AgentDir) {
+		// Collect all agent directories that exist.
+		for _, candidate := range []string{
+			filepath.Join(dir, "config", "agent"),
+			filepath.Join(dir, ".opencode", "agent"),
+		} {
+			if dirExists(candidate) {
+				env.AgentDirs = append(env.AgentDirs, candidate)
+			}
+		}
+		if fileExists(env.TierFile) && len(env.AgentDirs) > 0 {
 			return env, nil
 		}
 		if parent := filepath.Dir(dir); parent == dir {
