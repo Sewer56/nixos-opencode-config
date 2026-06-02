@@ -39,7 +39,7 @@
       }
     },
     "general": {
-      "model": "sewer-axonhub/GLM-5.1",
+      "model": "sewer-axonhub/deepseek-v4-flash",
       "permission": {
         "task": {
           "*": "deny",
