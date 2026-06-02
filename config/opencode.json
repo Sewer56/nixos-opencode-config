@@ -485,6 +485,54 @@
               "text"
             ]
           }
+        },
+        "neuralwatt/zai-org/GLM-5.1-FP8": {
+          "name": "GLM-5.1 (NeuralWatt)",
+          "family": "glm",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 1.1,
+            "output": 3.6
+          },
+          "limit": {
+            "context": 202736,
+            "output": 131072
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "qwen3.6-35b-a3b": {
+          "name": "Qwen3.6-35B-A3B",
+          "family": "qwen",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "cost": {
+            "input": 0.29,
+            "output": 1.15
+          },
+          "limit": {
+            "context": 131056,
+            "output": 65536
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
         }
       }
     },
