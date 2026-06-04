@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Cached performance reviewer for finalize-fast step artifacts
-model: sewer-axonhub/GLM-5.1 # HIGH
+model: sewer-axonhub/glm-5.1 # HIGH
 permission:
   "*": deny
   read:
