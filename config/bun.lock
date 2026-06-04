@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "opencode-config",
+      "dependencies": {
+        "opencode-models-discovery": "^0.9.0",
+      },
       "devDependencies": {
         "@opencode-ai/plugin": "^1.14.41",
         "@types/bun": "^1.3.13",
@@ -60,6 +63,8 @@
     "multipasta": ["multipasta@0.2.7", "", {}, "sha512-KPA58d68KgGil15oDqXjkUBEBYc00XvbPj5/X+dyzeo/lWm9Nc25pQRlf1D+gv4OpK7NM0J1odrbu9JNNGvynA=="],
 
     "node-gyp-build-optional-packages": ["node-gyp-build-optional-packages@5.2.2", "", { "dependencies": { "detect-libc": "^2.0.1" }, "bin": { "node-gyp-build-optional-packages": "bin.js", "node-gyp-build-optional-packages-optional": "optional.js", "node-gyp-build-optional-packages-test": "build-test.js" } }, "sha512-s+w+rBWnpTMwSFbaE0UXsRlg7hU4FjekKU4eyAih5T8nJuNZT1nNsskXpxmeqSK9UzkBl6UgRlnKc8hz8IEqOw=="],
+
+    "opencode-models-discovery": ["opencode-models-discovery@0.9.0", "", { "dependencies": { "@opencode-ai/plugin": "^1.0.166" } }, "sha512-D8o8d4V/7bqjyxZ+g1uUnkAu/OrTj1J+m0gsrd6XmMQhnFU1kJGhWs2eOp9hRkt19zByEa36iTlBXr2d1VElrw=="],
 
     "path-key": ["path-key@3.1.1", "", {}, "sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q=="],
 
