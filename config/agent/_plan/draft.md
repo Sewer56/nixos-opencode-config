@@ -23,8 +23,7 @@ permission:
     "*": "deny",
     "mcp-search": "allow",
     "_plan/draft/explorer": "allow",
-    "_plan/draft/reviewers/correctness-adjudicator-cached": "allow",
-    "_plan/draft/reviewers/correctness-adjudicator-cacheless": "allow",
+    "_plan/draft/reviewers/correctness": "allow",
     "_plan/draft/reviewers/docs-and-wording": "allow"
   }
   # webfetch: deny
@@ -93,14 +92,12 @@ Follow the ordered steps below.
 - Recompute `## Delta` after every material revision to `plan_path`.
 
 2. Stage 1 — Correctness (fidelity + structure)
-- Run `_plan/draft/reviewers/correctness-adjudicator-cached` first.
-- Pass only `context_path: plan_path`, `draft_handoff_path`, and `cache_path: artifact/<artifact_base>.draft.review-correctness.md`.
-- Treat correctness as a single reviewer contract.
+- Run `_plan/draft/reviewers/correctness` first.
+- Pass only `context_path: plan_path` and `draft_handoff_path`.
 - Validate `# REVIEW`, `Decision:`, `Domains: COR`, and conditional `IDs:`.
-- Read `actions_path` for current findings and fixes.
-- Treat malformed or missing actions file as a protocol failure; retry or rerun correctness instead of mining the cache for fixes.
-- The cache is reviewer-owned state; the caller does not read it.
-- Apply only findings listed in the actions file.
+- Parse inline `## Findings` for current findings and fixes.
+- Treat missing, malformed, or truncated inline output as a protocol failure; retry correctness.
+- Apply findings directly from the inline output block.
 - Recompute `## Delta` after fixes.
 - If correctness returns BLOCKING: fix and re-run correctness before stage 2.
 - If correctness returns PASS or ADVISORY-only: proceed to stage 2.
@@ -111,9 +108,9 @@ Follow the ordered steps below.
 - Validate, apply fixes, recompute Delta.
 
 4. Validate each reviewer response
-- Correctness: `# REVIEW`, `Decision:`, `Domains: COR`, and `IDs:` when Decision is BLOCKING or ADVISORY.
+- Correctness: `# REVIEW`, `Decision:`, `Domains: COR`, `IDs:`, `## Findings`, `## Notes`.
 - Docs-and-wording reviewer: `# REVIEW`, `Decision:`, `## Findings`, `## Verified`.
-- Both domains are diff-mandated; details may live in cache.
+- Both domains are diff-mandated.
 - Treat malformed output as BLOCKING after retries.
 
 5. Record decisions and apply domain ownership
@@ -129,7 +126,6 @@ Follow the ordered steps below.
 - ADVISORY-only findings → DEFERRED. Do not re-run for advisory-only.
 - On re-review: dispatch only reviewers with prior BLOCKING decision. PASS/ADVISORY reviewers skip unless their domain is touched by BLOCKING fixes.
 - Rerun every touched domain after a fix: correctness fixes that change `[P#]` items, structure, paths, diff headers, requirement mapping, or required sections require correctness re-review; docs fixes that change user-facing scope require docs-and-wording re-review; wording fixes that remove specificity require docs-and-wording and may require correctness when structure or requirement mapping changes.
-- Use the delta adjudicator during normal iterations. Switch to the audit adjudicator after structural, path, diff-header, requirement-mapping, or output-contract changes, or after multiple fix rounds.
 - At cap: proceed with risks noted.
 
 ## 5. Clarify only when needed
@@ -139,7 +135,7 @@ Follow the ordered steps below.
 ## 6. Confirmation boundary
 - If the latest user message explicitly confirms the draft is ready for finalize, run one final correctness audit before returning READY.
 - Final correctness audit:
-  - Call `_plan/draft/reviewers/correctness-adjudicator-cacheless` with `context_path: plan_path` and `draft_handoff_path`.
+  - Call `_plan/draft/reviewers/correctness` with `context_path: plan_path` and `draft_handoff_path`.
   - Parse current BLOCKING and ADVISORY findings from its inline `# REVIEW` block.
   - If BLOCKING: fix, recompute `## Delta`, rerun touched reviewers, then repeat final correctness audit.
 - Run final docs-and-wording audit with the audit reviewer only after late user-facing doc changes or prior wording BLOCKING findings.
