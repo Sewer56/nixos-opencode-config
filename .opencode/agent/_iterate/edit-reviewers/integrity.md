@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks direct OpenCode agent/command prompt edits for schema, permissions, wiring, scope, rendered integrity, and self-iteration safety
-model: sewer-axonhub/gpt-5.5 # HIGH-FAST
+model: sewer-axonhub/deepseek-v4-pro # HIGH-DOC
 variant: medium
 permission:
   "*": deny

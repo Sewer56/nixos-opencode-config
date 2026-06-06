@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks generated OpenCode prompt edits against selected workflow patterns
-model: sewer-axonhub/gpt-5.5 # HIGH-FAST
+model: sewer-axonhub/deepseek-v4-pro # HIGH-DOC
 variant: medium
 permission:
   "*": deny
