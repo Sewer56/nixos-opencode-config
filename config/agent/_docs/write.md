@@ -128,3 +128,9 @@ Summary: <one-line summary>
 
 - Wrap prose at 80–100 characters per line. Code blocks and URLs are exempt.
 - Insert a blank line before the first bullet item when a list follows prose, and between adjacent bullet items whenever either wraps past one line; tight single-line lists (flags, enums) need no inter-item spacing.
+
+# Rules
+
+Apply these rules:
+
+{{ file="./rules/groups/style/target-wording.md" }}

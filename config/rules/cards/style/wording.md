@@ -1,3 +1,12 @@
+### Writer guidance (lite-caveman)
+
+Professional but tight. Every sentence carries weight.
+
+- Technical terms exact: use the project's defined name for every concept. Code identifiers, commands, paths, and URLs stay verbatim.
+- Short synonyms: use not utilize, show not demonstrate, help not facilitate, to not in order to.
+- Active voice, one idea per sentence (≤20 words).
+- No filler, hedging, or pleasantries: no `please note`, `simply`, `just`, `of course`, `certainly`, `basically`.
+
 ### Sentence flow
 Flag: choppy, run-on, or awkward sentence construction.
 Severity: ADVISORY.
@@ -28,6 +37,13 @@ Flag: different terms for the same concept within the reviewed artifact or artif
 Severity: BLOCKING when ambiguous; ADVISORY for harmless stylistic variation.
 Bad: same feature called `settings`, `configuration`, and `preferences` with no distinction.
 Good: choose one term or define the distinction.
+
+### Short synonym
+Flag: verbose word choice when a shorter synonym preserves meaning.
+Allow: required technical terms, code identifiers, API/CLI names, safety wording, precise technical jargon.
+Severity: ADVISORY.
+Bad: `utilize`, `demonstrate`, `facilitate`, `in order to`, `as a means of`
+Good: `use`, `show`, `help`, `to`, `to`
 
 ### Paragraph length
 Flag: paragraphs over 4 sentences or 4 rendered lines.
