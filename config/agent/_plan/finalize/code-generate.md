@@ -57,6 +57,7 @@ Write `handoff_path` and a step body file for every I#/T# in the Step Index. Do 
   - Action: UPDATE | INSERT | ADD | REMOVE
   - Anchor symbol or section (or `None`)
   - Purpose in one line
+- Append new assertions to an existing test function when they share its setup and entry point. Create a separate function only when behavioral claim, setup, or runtime requirements differ.
 - Prefer existing test files over creating new test files.
 
 ## 5. Write step body files

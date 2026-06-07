@@ -10,6 +10,7 @@ Good: test covers success, failure, and relevant edge case.
 
 ### Redundancy
 Avoid duplicate coverage and setup; do not restate what an existing test already proves.
+When new assertions share an existing test's setup and entry point, append them there rather than creating a separate function.
 Do not flag: intentionally repeated coverage across different public entry points.
 
 ### Test helpers
