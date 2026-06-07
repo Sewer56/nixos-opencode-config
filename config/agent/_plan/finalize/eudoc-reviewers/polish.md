@@ -63,7 +63,7 @@ Do NOT read the correctness reviewer cache (`artifact/<artifact_base>.review-eud
   agent="_plan/finalize/eudoc-reviewers/polish"
   prefix=EPOL
   categories="CLARITY | WORDING | ENGAGEMENT | POLISH"
-  detail="E_JARGON | E_AMBIGUOUS | E_COMPOUND | E_OPAQUE_REF | E_ACRONYM | E_PASSIVE | E_FILLER | E_WORDY | E_TERM_INCONSIST | E_PARA_LEN | E_HOOK | E_SHOW | E_SCAN | E_PROG_COMPLEX | E_FLUFF | E_QUICK_START | E_PEER_BULLET | E_BULLET_SPACE | E_TERM_DRIFT | E_DUPLICATION | E_ORPHANED"
+  detail="E_REDUNDANCY | E_JARGON | E_AMBIGUOUS | E_COMPOUND | E_OPAQUE_REF | E_ACRONYM | E_PASSIVE | E_FILLER | E_WORDY | E_TERM_INCONSIST | E_PARA_LEN | E_HOOK | E_SHOW | E_SCAN | E_PROG_COMPLEX | E_FLUFF | E_QUICK_START | E_PEER_BULLET | E_BULLET_SPACE | E_TERM_DRIFT | E_DUPLICATION | E_ORPHANED"
   evidence="<D# step, `path:line`, or pattern>"
   problem="<what is wrong>"
   fix="<smallest concrete correction>"

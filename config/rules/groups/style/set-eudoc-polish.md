@@ -9,4 +9,6 @@ Do not judge: implementation correctness, test coverage, code docs, or performan
 
 {{ file="./rules/cards/style/engagement.md" }}
 
+{{ file="./rules/cards/style/redundancy.md" }}
+
 {{ file="./rules/cards/style/consistency.md" }}
