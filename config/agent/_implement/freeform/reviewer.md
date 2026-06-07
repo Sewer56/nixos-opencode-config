@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews an implementation against request intent from conversation context
-model: sewer-axonhub/glm-5.1 # HIGH
+model: sewer-axonhub/kimi-k2.6 # HIGH
 permission:
   "*": deny
   read:

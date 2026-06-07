@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Cached audit reviewer for finalize-fast step artifacts
-model: sewer-axonhub/glm-5.1 # HIGH
+model: sewer-axonhub/kimi-k2.6 # HIGH
 permission:
   "*": deny
   read:

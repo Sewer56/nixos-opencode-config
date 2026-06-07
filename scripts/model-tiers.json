@@ -1,9 +1,9 @@
 {
-  "$tierOrder": {"0": "LOW", "1": "MED", "2": "HIGH"},
+  "$tierOrder": {"0": "LOW","1": "MED","2": "HIGH"},
   "normal": {
-    "LOW": "sewer-axonhub/step-3.7-flash",
-    "MED": "sewer-axonhub/minimax-m3",
-    "HIGH": "sewer-axonhub/glm-5.1"
+    "LOW": "sewer-axonhub/deepseek-v4-flash",
+    "MED": "sewer-axonhub/deepseek-v4-flash",
+    "HIGH": "sewer-axonhub/kimi-k2.6"
   },
   "work": {
     "LOW": "sewer-axonhub-work/gpt-5.4-mini",

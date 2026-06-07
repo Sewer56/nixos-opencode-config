@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks plan draft artifacts for correctness (fidelity, structure, paths, snippets)
-model: sewer-axonhub/glm-5.1 # HIGH
+model: sewer-axonhub/kimi-k2.6 # HIGH
 variant: medium
 permission:
   "*": deny
