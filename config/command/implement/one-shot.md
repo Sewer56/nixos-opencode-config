@@ -1,5 +1,5 @@
 ---
-description: "One-shot implementation: plan, review, implement, review, and run a full cleanup review phase"
+description: "One-shot implementation via finalize-fast and finalized-plan runner"
 agent: _implement/one-shot
 ---
 

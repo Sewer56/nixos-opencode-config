@@ -1,5 +1,5 @@
 ---
-description: "Implement a finalized plan with automated review loop"
+description: "Implement a finalized plan with validation and cleanup review loops"
 agent: _implement/plan
 ---
 
