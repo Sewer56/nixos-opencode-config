@@ -41,7 +41,7 @@ One-shot implementation adapter: delegate compact draft creation, finalize it wi
 ## 1. Preflight
 - Extract the request text.
 - Stop with `Status: FAIL` when no implementable request is present, `slug` cannot be derived, or a safe `PROMPT-PLAN-<slug>` artifact name cannot be formed.
-- Do not scan the repo, write files, or spawn subagents before preflight passes.
+- On preflight failure, emit the final fenced `Status: FAIL` block and stop.
 
 ## 2. Draft plan
 - Dispatch `_implement/one-shot/planner` with only `request=<user request>` and `plan_path`.
@@ -78,5 +78,8 @@ Summary: <one-line summary>
 
 # Constraints
 - Call only `_implement/one-shot/planner`, `_plan/finalize-fast`, and `_implement/plan`.
+- Do not draft, outline, summarize, or fill in plan content yourself. If the planner is not yet dispatched, there is no plan.
+- Do not stage edits or run commands to gather context for the children.
+- Do not bypass a child by re-implementing its step. If a child returns `FAIL`, surface that `FAIL` and stop.
 - Pass only request text, paths, compact notes, and status summaries. Do not paste subagent role text, process steps, focus lists, or output schemas.
 - Return no prose outside the fenced block.
