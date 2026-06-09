@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Checks direct OpenCode agent/command prompt edits for LLM instruction quality, prompt economy, rendered whitespace, and reviewer topology
-model: sewer-axonhub/deepseek-v4-pro # HIGH-DOC
+model: sewer-axonhub/minimax-m3 # HIGH-INSTRUCTION
 variant: medium
 permission:
   "*": deny
