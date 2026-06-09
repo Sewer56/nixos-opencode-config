@@ -17,11 +17,9 @@ permission:
     "*": deny
     "_plan/finalize/code-generate": allow
     "_plan/finalize-fast/review": allow
-    "_plan/finalize-fast/code-docs": allow
-    "_plan/finalize-fast/user-docs": allow
 ---
 
-Run the plan-finalize pipeline with cached-only review phases: validate draft, generate code/test steps, review steps, finalize code-adjacent docs, and finalize end-user docs.
+Run the plan-finalize pipeline with cached-only review phases: validate draft, generate code/test steps, and review steps.
 
 # Inputs
 - The latest user message may name an exact `PROMPT-PLAN-*.draft.md` path, a slug, or finalize-time notes.
@@ -48,17 +46,7 @@ Run the plan-finalize pipeline with cached-only review phases: validate draft, g
 - Stop if it returns `Status: FAIL`.
 - Use `handoff_path` and `step_pattern` as shared context for later stages.
 
-## 4. Finalize code-adjacent docs
-- Dispatch `_plan/finalize-fast/code-docs` with `plan_path`, `handoff_path`, `step_pattern`, compact notes, and `fix_first: true`.
-- Stop if it returns `Status: FAIL`.
-- Keep code-doc findings and caches owned by that child workflow.
-
-## 5. Finalize user docs
-- Dispatch `_plan/finalize-fast/user-docs` with `plan_path`, `handoff_path`, `step_pattern`, compact notes, and `fix_first: true`.
-- If the child determines no user-facing documentation work applies, accept its `Status: SUCCESS` and keep the shared handoff as the ledger.
-- Stop if it returns `Status: FAIL`.
-
-## 6. Finish
+## 4. Finish
 - Read only returned status blocks and, when needed, the shared `handoff_path` Step Index to confirm current step files.
 
 # Output
@@ -69,8 +57,8 @@ Status: SUCCESS | INCOMPLETE | FAIL
 Plan Path: <absolute path to `<artifact_base>.draft.md` | N/A>
 Handoff Path: <absolute path to `<artifact_base>.handoff.md` | N/A>
 Step Pattern: <absolute glob | N/A>
-Review Iterations: <n>
-Summary: <one-line summary>
+  Review Iterations: <n>
+  Summary: <one-line summary>
 ```
 
 # Constraints
@@ -78,6 +66,6 @@ Summary: <one-line summary>
 - Use cached finalize-fast review agents only for success gates.
 - Keep detailed context in handoff, step files, and child-owned reviewer artifacts. Do not pass source excerpts or reviewer finding detail from the parent.
 - Child workflows use draft `## Relevant Files`, step files, and targeted local reads for named gaps.
-- Call only these four children: `_plan/finalize/code-generate`, `_plan/finalize-fast/review`, `_plan/finalize-fast/code-docs`, `_plan/finalize-fast/user-docs`.
+- Call only these two children: `_plan/finalize/code-generate`, `_plan/finalize-fast/review`.
 - Preserve child cache/action ownership. Use the handoff as the shared ledger.
 - Leave product code and git history unchanged.

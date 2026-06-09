@@ -22,11 +22,11 @@ permission:
     "_implement/plan/implementer": allow
     "_implement/plan/implementer-reviewer": allow
     "_implement/plan/validator-fixer": allow
+    "_implement/cleanup/doc-discovery": allow
     "_implement/reviewers/code-docs": allow
     "_implement/reviewers/errors": allow
     "_implement/reviewers/placement": allow
-    "_implement/reviewers/user-docs": allow
-    "_implement/reviewers/polish": allow
+    "_implement/reviewers/user-docs-polish": allow
 ---
 
 Implement a finalized handoff with subagent edits, diff review, validation, and cleanup/documentation reviewers.
@@ -98,15 +98,11 @@ You are the primary orchestrator. Subagents implement, review diffs, run validat
 - Run `git diff --name-only` and derive `changed_paths` from the current diff.
 - Derive `changed_source_files`: changed code-like files, including tests and examples; exclude docs, plan artifacts, generated assets, and binary files.
 - Derive `changed_doc_files`: changed user-facing documentation files (`*.md`, `docs/**`, and `README*`); exclude plan artifacts and executable agent/command prompts.
-- If both derived lists are empty, skip cleanup and finish.
-- On the first cleanup pass, dispatch in parallel for non-empty lists only:
-  - Source reviewers:
-    - `_implement/reviewers/code-docs` with `changed_paths=changed_source_files` and short notes.
-    - `_implement/reviewers/errors` with `changed_paths=changed_source_files` and short notes.
-    - `_implement/reviewers/placement` with `changed_paths=changed_source_files` and short notes.
-  - Documentation reviewers:
-    - `_implement/reviewers/user-docs` with `changed_paths=changed_doc_files` and short notes.
-    - `_implement/reviewers/polish` with `changed_paths=changed_doc_files` and short notes.
+- Run `_implement/cleanup/doc-discovery` with `changed_source_paths=changed_source_files`, `handoff_path`, and short notes. Parse its fenced output for `User-Facing Change`, `Discovered Doc Targets`, and `New Doc Needed`.
+- Derive `discovered_doc_targets` from the discovery output. De-duplicate against `changed_doc_files` and exclude plan artifacts, executable agent/command prompts, and step files.
+- Derive `effective_doc_paths = changed_doc_files ∪ discovered_doc_targets`.
+- If `changed_source_files` and `effective_doc_paths` are both empty, skip cleanup and finish.
+- Dispatch `_implement/reviewers/code-docs`, `_implement/reviewers/errors`, `_implement/reviewers/placement`, and `_implement/reviewers/user-docs-polish` in parallel when their domain is non-empty.
 - On cleanup reruns after a cleanup fix, run only:
   - Reviewers with prior BLOCKING findings.
   - Reviewers whose owned paths changed.

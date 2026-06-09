@@ -19,10 +19,10 @@ permission:
   task:
     "*": "deny"
     "_implement/freeform/reviewer": "allow"
+    "_implement/cleanup/doc-discovery": "allow"
     "_implement/reviewers/code-docs": "allow"
     "_implement/reviewers/errors": "allow"
-    "_implement/reviewers/user-docs": "allow"
-    "_implement/reviewers/polish": "allow"
+    "_implement/reviewers/user-docs-polish": "allow"
     "_implement/reviewers/placement": "allow"
 ---
 
@@ -69,13 +69,11 @@ Implement a plan from conversation context with an automated review loop and cod
 ## 6. Cleanup review phase
 - Derive `changed_source_files`: filter `changed_paths` to source code files (exclude docs, config, assets).
 - Derive `changed_doc_files`: filter `changed_paths` to user-facing documentation files (`*.md`, `docs/**`, `README*`).
-- Spawn in parallel:
-  - `_implement/reviewers/code-docs` with `changed_paths=changed_source_files` and short notes.
-  - `_implement/reviewers/errors` with `changed_paths=changed_source_files` and short notes.
-  - `_implement/reviewers/placement` with `changed_paths=changed_source_files` and short notes.
-- If `changed_doc_files` is non-empty, also spawn in parallel:
-  - `_implement/reviewers/user-docs` with `changed_paths=changed_doc_files` and short notes.
-  - `_implement/reviewers/polish` with `changed_paths=changed_doc_files` and short notes.
+- Run `_implement/cleanup/doc-discovery` with `changed_source_paths=changed_source_files`, optional `plan_path`, and short notes. Parse its fenced output for `User-Facing Change`, `Discovered Doc Targets`, and `New Doc Needed`.
+- Derive `discovered_doc_targets` from the discovery output. De-duplicate against `changed_doc_files` and exclude plan artifacts, executable agent/command prompts, and step files.
+- Derive `effective_doc_paths = changed_doc_files ∪ discovered_doc_targets`.
+- If `changed_source_files` and `effective_doc_paths` are both empty, skip cleanup and finish.
+- Dispatch `_implement/reviewers/code-docs`, `_implement/reviewers/errors`, `_implement/reviewers/placement`, and `_implement/reviewers/user-docs-polish` in parallel when their domain is non-empty.
 - Pass only `changed_paths` and short `notes` to each reviewer. Do not duplicate role text, process steps, or output schema.
 - Parse `Decision:` and `## Findings` from each inline `# REVIEW` block.
 - If any response is missing or malformed, retry that reviewer.

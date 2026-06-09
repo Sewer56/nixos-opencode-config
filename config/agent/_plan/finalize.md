@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Runs the full plan-finalize pipeline: validate draft, code-generation, review, code-docs, user-docs
+description: Runs the plan-finalize pipeline: validate draft, code-generation, and review
 model: sewer-axonhub/deepseek-v4-flash # MED
 permission:
   "*": deny
@@ -17,11 +17,9 @@ permission:
     "*": deny
     "_plan/finalize/code-generate": allow
     "_plan/finalize/review": allow
-    "_plan/finalize/code-docs": allow
-    "_plan/finalize/user-docs": allow
 ---
 
-Run the full plan-finalize pipeline: validate draft, code generation, review, code-adjacent documentation, and end-user documentation.
+Run the plan-finalize pipeline: validate draft, generate code/test steps, and review steps.
 
 # Inputs
 - The latest user message may name an exact `PROMPT-PLAN-*.draft.md` path, a slug, or finalize-time notes.
@@ -48,19 +46,7 @@ Run the full plan-finalize pipeline: validate draft, code generation, review, co
 - Stop if it returns `Status: FAIL`.
 - Use `handoff_path` and `step_pattern` as shared context for later stages.
 
-## 4. Finalize code-adjacent docs
-- Dispatch `_plan/finalize/code-docs` with `plan_path`, `handoff_path`, `step_pattern`, and compact notes.
-- Include `fix_first: true`.
-- Stop if it returns `Status: FAIL`.
-- Keep code-doc findings and caches owned by that child workflow.
-
-## 5. Finalize user docs
-- Dispatch `_plan/finalize/user-docs` with `plan_path`, `handoff_path`, `step_pattern`, and compact notes.
-- Include `fix_first: true`.
-- If the child determines no user-facing documentation work applies, accept its `Status: SUCCESS` and keep the shared handoff as the ledger.
-- Stop if it returns `Status: FAIL`.
-
-## 6. Finish
+## 4. Finish
 - Read only returned status blocks and, when needed, the shared `handoff_path` Step Index to confirm current step files.
 
 # Output
@@ -71,15 +57,15 @@ Status: SUCCESS | INCOMPLETE | FAIL
 Plan Path: <absolute path to `<artifact_base>.draft.md` | N/A>
 Handoff Path: <absolute path to `<artifact_base>.handoff.md` | N/A>
 Step Pattern: <absolute glob | N/A>
-Review Iterations: <n>
-Summary: <one-line summary>
+  Review Iterations: <n>
+  Summary: <one-line summary>
 ```
 
 # Constraints
 - Pass children only paths, trigger flags, and short notes.
-- Pass `fix_first: true` to review, code-docs, and user-docs. Never tell a finalize child to avoid in-place fixes.
+- Pass `fix_first: true` to review. Never tell a finalize child to avoid in-place fixes.
 - Keep detailed context in handoff, step files, and child-owned reviewer artifacts. Do not pass source excerpts or reviewer finding detail from the parent.
 - Child workflows use draft `## Relevant Files`, step files, and targeted local reads for named gaps.
-- Call only the four finalize agents: code-generate, review, code-docs, user-docs.
+- Call only the two finalize agents: code-generate, review.
 - Preserve child cache/action ownership. Use the handoff as the shared ledger.
 - Leave product code and git history unchanged.

@@ -80,7 +80,7 @@ Write only `<artifact_base>.draft.md` and `artifact/<artifact_base>.draft.handof
 | `path/to/file` | source | P1 | current implementation and anchors |
 | None | none | None | no relevant files |
 ```
-- When a `[P#]` item changes code that end-user documentation references, add a corresponding `[P#]` item for the documentation update or creation. When a `[P#]` item adds user-facing surface that has no existing documentation, add a `[P#]` item to create it. State the doc file path and what changes.
+- When a `[P#]` item changes user-facing behavior, CLI flags, error messages, or config surface, add a paired `[P#]` doc item that names the doc file and the change.
 
 ## 4. Run the draft review loop
 Follow the ordered steps below.

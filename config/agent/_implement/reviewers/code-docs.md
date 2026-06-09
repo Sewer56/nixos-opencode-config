@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews changed source files for code-adjacent documentation coverage, fidelity, inline comments, and readability
+description: Reviews changed source files for code-adjacent documentation coverage, placement, fidelity, inline comments, readability, and wording (cacheless)
 model: sewer-axonhub/deepseek-v4-flash # MED
 variant: high
 permission:
@@ -18,15 +18,17 @@ permission:
   external_directory: allow
 ---
 
-Review changed source files for code-adjacent documentation quality: coverage, placement, fidelity, inline comments, and readability.
+Review changed source files for code-adjacent documentation coverage, placement, fidelity, inline comments, readability, and wording. Domain owner for CODEDOC findings.
 
 # Inputs
-- `changed_paths`: comma-separated list of changed source file paths.
+- `changed_paths`: comma-separated repo-relative paths of changed source files.
 - `notes`: short caller notes or `None`.
+- Optional `handoff_path` and `plan_path` (path strings) for context. Pass `None` when absent.
 
 # Scope
-Do not check: user-facing docs.
-Out-of-scope concerns get at most one short Advisory note in `## Notes`; never a BLOCKING finding.
+- Check only changed source files in `changed_paths`. Skip binary and non-text files.
+- Do not check: user-facing documentation, error documentation, placement, polish, plan artifacts, or step files.
+- Out-of-scope concerns get at most one short pointer in `## Notes`; never a BLOCKING finding.
 
 # Focus
 
@@ -40,23 +42,27 @@ Out-of-scope concerns get at most one short Advisory note in `## Notes`; never a
 
 {{
   file="./agent/_templates/review-process/cacheless.txt"
-  read_context="Read every changed source file listed in `changed_paths`. Skip binary and non-text files. Apply Focus checks to each changed file."
+  read_context="Read every changed source file listed in `changed_paths`. Apply Focus checks to each changed file. Use `handoff_path` only when a finding needs handoff context."
 }}
 
 {{
   file="./agent/_templates/review-footer/cacheless.txt"
   agent="_implement/reviewers/code-docs"
-  prefix=CDOC
-  categories="COVERAGE | PLACEMENT | FIDELITY | INLINE_COMMENT | READABILITY"
+  prefix=CODEDOC
+  categories="COVERAGE | PLACEMENT | FIDELITY | INLINE_COMMENT | READABILITY | WORDING"
+  detail="MISSING_DOC | OUTDATED_DOC | MISPLACED_DOC | MISSING_INLINE | JARGON | AMBIGUOUS | COMPOUND | OPAQUE_REF | ACRONYM | PASSIVE | FILLER | WORDY | TERM_INCONSIST"
   evidence="<section, `path:line`, or missing element>"
-  problem="<one-line description of what is wrong>"
+  problem="<what is wrong>"
   fix="<smallest concrete correction>"
-  file_ref="<path>"
-  bad="-old content"
-  good="+new content"
+  file_ref="<path/to/source/file>"
+  bad="-old or missing docs"
+  good="+new docs"
   with_file=1
   with_lines=1
   with_evidence=1
   with_detail=1
-  detail="MISSING_DOC | OUTDATED_DOC | MISPLACED_DOC | MISSING_INLINE | JARGON | AMBIGUOUS | COMPOUND | OPAQUE_REF | ACRONYM | PASSIVE | FILLER | WORDY | TERM_INCONSIST"
+  with_verified=1
+  verified_ref="<path>: <section — unchanged items that remain verified>"
 }}
+- Target diffs to the affected source file and hunk.
+- Verified observations MUST include unchanged items that remain verified.
