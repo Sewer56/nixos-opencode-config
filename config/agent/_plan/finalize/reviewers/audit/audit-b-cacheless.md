@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Independent audit reviewer B (cacheless) for finalize adjudication
-model: sewer-axonhub/kimi-k2.6 # HIGH
+model: sewer-axonhub/deepseek-v4-pro # HIGH
 temperature: 0.7  # reviewer B
 permission:
   "*": deny

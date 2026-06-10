@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews a plan against the user request for fidelity, completeness, and risk
-model: sewer-axonhub/kimi-k2.6 # HIGH
+model: sewer-axonhub/deepseek-v4-pro # HIGH
 permission:
   "*": deny
   read:

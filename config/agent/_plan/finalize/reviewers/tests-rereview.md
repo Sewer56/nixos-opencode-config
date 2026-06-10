@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Re-verifies test fixes against cache, checks changed steps for new test gaps
-model: sewer-axonhub/kimi-k2.6 # HIGH
+model: sewer-axonhub/deepseek-v4-pro # HIGH
 permission:
   "*": deny
   read:

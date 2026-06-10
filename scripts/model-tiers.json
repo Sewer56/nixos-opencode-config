@@ -3,7 +3,7 @@
   "normal": {
     "LOW": "sewer-axonhub/deepseek-v4-flash",
     "MED": "sewer-axonhub/deepseek-v4-flash",
-    "HIGH": "sewer-axonhub/kimi-k2.6"
+    "HIGH": "sewer-axonhub/deepseek-v4-pro"
   },
   "work": {
     "LOW": "sewer-axonhub-work/gpt-5.4-mini",
