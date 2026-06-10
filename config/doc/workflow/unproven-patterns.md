@@ -8,7 +8,7 @@ Use this file only for genuinely unproven reusable ideas. Proven creation/refine
 
 - Use `IDEA-###` ids. Next id = highest existing id + 1. Never reuse numbers.
 - Record only ideas needing more evidence before they become shared guidance.
-- Keep target-specific one-off wins in the experiment log instead of this file.
+- Keep target-specific one-off wins in experiment log instead of this file.
 
 ## Entry Template
 

@@ -1,10 +1,10 @@
 # Workflow Optimize Patterns
 
-Approved `/workflow/optimize` tactics for existing workflow prompts/tools. Use after export/digest evidence. Do not use this file as a creation catalog.
+Approved `/workflow/optimize` tactics for existing workflow prompts/tools. Use after export/digest evidence. Do not use as creation catalog.
 
 Refs:
-- `WOPT-###` — proven tactic for optimizing an existing workflow.
-- `OPT-###` — approved design pattern from `config/doc/workflow/design-patterns.md`; cite when the target design pattern itself is the edit.
+- `WOPT-###` — proven tactic for optimizing existing workflow.
+- `OPT-###` — approved design pattern from `config/doc/workflow/design-patterns.md`; cite when target design pattern itself is edit.
 - `LOCAL:<name>` — one-run hypothesis not yet worth shared docs.
 
 ## How to Use
@@ -12,10 +12,10 @@ Refs:
 1. Start from observed focus signals and counterevidence, not tactic names.
 2. Seed `/workflow/optimize` Strategy Matrix from `## Focus Signal Map`.
 3. Prefer `WOPT-###` for refactor/analysis tactics on existing workflows.
-4. Use `OPT-###` when the design catalog directly describes the desired steady-state prompt shape.
+4. Use `OPT-###` when design catalog directly describes desired steady-state prompt shape.
 5. Use `LOCAL:<name>` only when no WOPT/OPT fits tightly.
 6. Convert selected `Refactor Move` and `Quality Guard` bullets into direct edit instructions. Do not paste whole catalog text into generated artifacts.
-7. Treat code blocks as generic concrete refactor shapes. Copy the structure, not placeholder names. Keep MUST/WHEN/Do-not wording unambiguous.
+7. Treat code blocks as generic concrete refactor shapes. Copy structure, not placeholder names. Keep MUST/WHEN/Do-not wording unambiguous.
 
 ## Focus Signal Map
 
@@ -43,15 +43,13 @@ Refs:
 - Refactor Move:
   - Split first-review and re-review data flow.
   - First review MUST receive full needed context and write grounded cache.
-  - Re-review MUST receive `cache_path` plus the smallest reliable invalidation input: changed ids/paths, source revision/fingerprint, decisions, or trigger flags.
+  - Re-review MUST receive `cache_path` plus smallest reliable invalidation input: changed ids/paths, source revision/fingerprint, decisions, or trigger flags.
   - Caller MUST withhold unchanged artifacts from re-review in any form — bodies, paths, references — when cache can safely cover them.
   - Reviewer MUST use cache for unchanged verified records and reread only invalidated material.
 - Quality Guard:
   - Reread changed domains, unresolved/open blocking findings, cache-stale records, and decision/trigger-referenced artifacts.
-  - If cache is missing or malformed, fall back to full reviewer or full needed read.
+  - If cache missing or malformed, fall back to full reviewer or full needed read.
   - Do not apply withholding when stable ids/paths do not exist or invalidation cannot be determined safely.
-- Related Design Patterns: OPT-003, OPT-006.
-- Expected Gain: makes broad unchanged rereads impossible instead of merely discouraging them.
 
 ```text
 Re-review call:
@@ -72,16 +70,14 @@ Reviewer preserves cached PASS unless changed_ids/decisions touch its domain.
   - Map reviewer dependencies before changing loop order.
   - Run high-risk correctness/security/data-loss reviewers before presentation/style/polish reviewers.
   - Apply blocking fixes from earlier phases before launching downstream presentation reviewers.
-  - After a fix, rerun only reviewer domains touched by that fix.
+  - After fix, rerun only reviewer domains touched by that fix.
   - Preserve PASS for unchanged domains when cache/invalidation rules make reuse safe.
   - Record or defer advisory-only findings unless workflow explicitly requires advisory cleanup before completion.
 - Quality Guard:
   - Never skip required blocking coverage.
-  - Always rerun any domain touched by a blocking fix.
-  - If a fix changes scope, paths, risk flags, or step count, recompute reviewer set before continuing.
+  - Always rerun any domain touched by blocking fix.
+  - If fix changes scope, paths, risk flags, or step count, recompute reviewer set before continuing.
   - Final gate MUST require zero unresolved blocking findings.
-- Related Design Patterns: OPT-003, OPT-009, OPT-011, OPT-012.
-- Expected Gain: fewer invalidated reviewer passes and fewer full-loop reruns.
 
 Before:
 
@@ -104,17 +100,15 @@ advisory-only: log/defer, no full-loop rerun
 - Trigger Signals: topology mismatch, duplicate reads, duplicate reasoning, generated hotspot, scope leakage.
 - Refactor Move:
   - Inspect actual reviewer inputs, file reads, findings, and generated-token hotspots before changing topology.
-  - Merge reviewers when they read the same artifacts and emit overlapping findings or reasoning.
-  - Split an overloaded reviewer only when it has clean independent subdomains and each child can receive smaller scoped input.
+  - Merge reviewers when they read same artifacts and emit overlapping findings or reasoning.
+  - Split overloaded reviewer only when it has clean independent subdomains and each child can receive smaller scoped input.
   - After merge/split, update caller routing, reviewer prompts, output parsing, and review ledger/cache ownership.
   - Keep explicit domain boundaries in each reviewer prompt.
 - Quality Guard:
   - Reject splits where each child still rereads full context.
   - Reject merges that blur correctness, security, data-loss, or other high-risk ownership.
   - Preserve all required coverage and blocking criteria.
-  - Verify the new topology reduces duplicate reads/reasoning or generated hotspot cost.
-- Related Design Patterns: OPT-011, OPT-012, OPT-014.
-- Expected Gain: lower child spread, less duplicate reasoning, and clearer reviewer ownership.
+  - Verify new topology reduces duplicate reads/reasoning or generated hotspot cost.
 
 Merge when:
 
@@ -140,16 +134,14 @@ Do not split if both children reread full plan.
 - Refactor Move:
   - Assign model tier by reviewer domain risk, judgment load, and failure cost.
   - Keep correctness, security, data-loss, migration, and high-risk semantic reviewers on strong models.
-  - Move narrow mechanical reviewers to lower/default models only when evidence shows the task is low-risk and rule-bound.
-  - Record downgrade criteria in the workflow or optimization notes.
+  - Move narrow mechanical reviewers to lower/default models only when evidence shows task is low-risk and rule-bound.
+  - Record downgrade criteria in workflow or optimization notes.
   - Keep escalation path back to stronger model when risk flags appear.
 - Quality Guard:
   - Never downgrade from token cost alone.
-  - Require domain/risk evidence and 3 representative PASS samples showing no lost required findings unless the target workflow defines a different threshold.
+  - Require domain/risk evidence and 3 representative PASS samples showing no lost required findings unless target workflow defines different threshold.
   - Do not downgrade reviewers that must judge ambiguous semantics, safety, security, data loss, or user intent.
   - Revert downgrade if later evidence shows missed findings or unstable protocol output.
-- Related Design Patterns: OPT-011, OPT-012.
-- Expected Gain: lower generated/reasoning tokens on mechanical reviewers without weakening critical review.
 
 ```text
 High tier:
@@ -172,25 +164,23 @@ Downgrade only after 3-sample PASS shows no lost required findings.
 - Trigger Signals: output bloat, cache/delta failure, duplicate reasoning.
 - Refactor Move:
   - Cached reviewer/adjudicator final response MUST be pointer-only: decision, `Actions:`, `Cache:`, and current finding IDs.
-  - Cached actions path MUST be the stable current `<cache_path without .md>.actions.md`; A/B leg actions use `<base>.a.actions.md` and `<base>.b.actions.md`.
+  - Cached actions path MUST be stable current `<cache_path without .md>.actions.md`; A/B leg actions use `<base>.a.actions.md` and `<base>.b.actions.md`.
   - Actions file MUST contain only current actionable OPEN findings needed for this loop.
-  - Actions file MUST be updated each pass. Cache history is the durable audit trail; numbered action files are debug-only and not the runtime contract.
-  - Cache file MUST contain full finding text, status, evidence, prior decisions, verified observations, resolved/deferred items, expected fix conditions, and a pointer to latest actions.
-  - Cacheless reviewers MUST NOT read or write cache or actions files. Findings MUST be returned inline in the output block with `## Findings` and `## Notes` sections.
+  - Actions file MUST be updated each pass. Cache history is durable audit trail; numbered action files are debug-only and not runtime contract.
+  - Cache file MUST contain full finding text, status, evidence, prior decisions, verified observations, resolved/deferred items, expected fix conditions, and pointer to latest actions.
+  - Cacheless reviewers MUST NOT read or write cache or actions files. Findings MUST be returned inline in output block with `## Findings` and `## Notes` sections.
   - Cacheless adjudicators MUST parse A/B findings from each leg's inline `## Findings` section. They MUST NOT read sidecar files or emit `Actions:`/`Cache:` pointers.
   - Runner MUST use final response for routing and read `Actions:` for fix application (cached) or inline `## Findings` (cacheless).
-  - Runner MUST treat missing, malformed, truncated, ambiguous, or insufficient `Actions:` (cached) or inline findings (cacheless) as a protocol failure to retry/rerun.
+  - Runner MUST treat missing, malformed, truncated, ambiguous, or insufficient `Actions:` (cached) or inline findings (cacheless) as protocol failure to retry/rerun.
   - Runner MUST treat `Cache:` as reviewer-owned state for re-review/adjudication and ledger references, not current fix input.
   - Re-review MUST receive `cache_path` and use cache for detailed evidence.
-  - Do not duplicate full history, verified observations, resolved findings, or merge notes in the response or actions file.
+  - Do not duplicate full history, verified observations, resolved findings, or merge notes in response or actions file.
 - Quality Guard:
   - Response schema MUST stay stable and parseable.
   - Every ID in cached response MUST exist in actions and cache when IDs are used.
-  - Actions evidence MUST be actionable without rereading unchanged inputs; cache ledger MUST point to the action files that hold evidence.
+  - Actions evidence MUST be actionable without rereading unchanged inputs; cache ledger MUST point to action files that hold evidence.
   - Cacheless output MUST include all findings inline — no sidecar file references, no `Cache:` or `Actions:` pointers.
-  - Do not split response/cache if downstream consumer cannot read the cache file.
-- Related Design Patterns: OPT-004, OPT-005, OPT-006, OPT-016.
-- Expected Gain: smaller runner context and less duplicated cache/history prose.
+  - Do not split response/cache if downstream consumer cannot read cache file.
 
 ```text
 CACHED reviewer response:
@@ -233,20 +223,18 @@ Runner fixes from actions (cached) or inline findings (cacheless); adjudicator/r
 
 ### WOPT-006 — Coupled-Loop Header Pairing
 
-- Applies To: primary orchestrators that contain two phases sharing a re-dispatch loop.
-- Trigger Signals: loop churn where the runner re-runs the full pipeline after a fix in one phase because the coupling between phases is implicit; cross-references in the prompt that point to "step 3" or "the loop" without naming the boundary.
+- Applies To: primary orchestrators containing two phases that share re-dispatch loop.
+- Trigger Signals: loop churn where runner re-runs full pipeline after fix in one phase because coupling between phases is implicit; cross-references in prompt point to "step 3" or "the loop" without naming boundary.
 - Refactor Move:
-  - Replace two top-level `## N.` and `## N+1.` headers with one `## N.` header plus `### Na.` and `### Nb.` substeps when one phase re-dispatches the other.
-  - Add a one- or two-line preamble to the `## N.` header naming the loop direction and trigger (e.g. "BLOCKING re-dispatches Na and repeats Nb").
-  - Update all cross-references in the prompt to the `Nb` form so re-entry points are unambiguous.
-  - When a third phase enters the loop, add it as `Nc` and rewrite the preamble, do not promote it to a new top-level step.
+  - Replace two top-level `## N.` and `## N+1.` headers with one `## N.` header plus `### Na.` and `### Nb.` substeps when one phase re-dispatches other.
+  - Add one- or two-line preamble to `## N.` header naming loop direction and trigger (e.g. "BLOCKING re-dispatches Na and repeats Nb").
+  - Update all cross-references in prompt to `Nb` form so re-entry points are unambiguous.
+  - When third phase enters loop, add it as `Nc` and rewrite preamble; do not promote to new top-level step.
   - Re-dispatch caps and counters stay per-loop, not per-substep.
 - Quality Guard:
-  - The preamble MUST mention both the trigger condition and the re-dispatch direction; a header that just numbers substeps does not satisfy this.
-  - Do not pair two phases that do not share a re-dispatch — keep them as separate top-level steps.
-  - Do not pair when one phase re-dispatches the other conditionally based on a sub-criterion (e.g. "only when file class X"); pair only when the re-dispatch is structural.
-- Related Design Patterns: OPT-019.
-- Expected Gain: shorter prompts, fewer missed re-dispatches, no accidental full-pipeline restarts when a single phase needs a retry.
+  - Preamble MUST mention both trigger condition and re-dispatch direction; header that just numbers substeps does not satisfy this.
+  - Do not pair two phases that do not share re-dispatch — keep them as separate top-level steps.
+  - Do not pair when one phase re-dispatches other conditionally based on sub-criterion (e.g. "only when file class X"); pair only when re-dispatch is structural.
 
 ```text
 Before (implicit loop):
@@ -274,4 +262,4 @@ Implementer writes code; reviewer validates. BLOCKING re-dispatches 2a and repea
 - ...
 ```
 
-Bad: `## 2. Implement` and `## 3. Review` as siblings — the reader has to infer the loop from the cross-reference.
+Bad: `## 2. Implement` and `## 3. Review` as siblings — reader has to infer loop from cross-reference.

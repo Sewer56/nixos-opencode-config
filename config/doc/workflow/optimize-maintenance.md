@@ -1,14 +1,14 @@
 # Workflow Optimize Maintenance
 
-Context for future edits to `optimize.md`, `export-analyzer.md`, and workflow-optimization docs. This file is documentation only; keep docs outside `agent/` and `command/` trees so markdown is not parsed as agents or commands.
+Context for future edits to `optimize.md`, `export-analyzer.md`, and workflow-optimization docs. Documentation only; keep docs outside `agent/` and `command/` trees so markdown is not parsed as agents or commands.
 
 ## Architecture
 
-- `optimize.md` is the experiment runner: setup, 3-sample batches, export/digest, quality gate, compare, keep/revert, doc memory updates.
-- `optimize-setup.md` normalizes the user request and resolves command/agent/reviewer files plus workflow shape.
-- `export-analyzer.md` profiles one exported session at a time. It should find observable waste signals, not decide the winning optimization.
-- `run_batch.py` creates fresh isolated workspaces and runs exactly 3 samples.
-- `export_digest.py` gives the primary comparison evidence: tree output+reasoning tokens across root + children.
+- `optimize.md` — experiment runner: setup, 3-sample batches, export/digest, quality gate, compare, keep/revert, doc memory updates.
+- `optimize-setup.md` — normalizes user request, resolves command/agent/reviewer files plus workflow shape.
+- `export-analyzer.md` — profiles one exported session at time. Find observable waste signals, not decide winning optimization.
+- `run_batch.py` — creates fresh isolated workspaces, runs exactly 3 samples.
+- `export_digest.py` — gives primary comparison evidence: tree output+reasoning tokens across root + children.
 
 ## Core Goal
 
@@ -49,7 +49,7 @@ Focus signals:
 
 ## Strategy Sources
 
-`optimize.md` should not carry embedded strategy definitions. It builds its Strategy Matrix from:
+`optimize.md` should not carry embedded strategy definitions. It builds Strategy Matrix from:
 
 - `config/doc/workflow/optimize-patterns.md` — approved existing-workflow `WOPT-###` tactics and Focus Signal Map
 - `config/doc/workflow/design-patterns.md` — approved reusable design `OPT-###` patterns
@@ -76,12 +76,12 @@ Canonical docs live under `config/doc/workflow/`:
 - `template-library.md` — catalog of reusable prompt fragments and rule templates
 - `unproven-patterns.md` — empty intake for genuinely unproven reusable ideas
 
-If an experiment teaches reusable behavior:
+If experiment teaches reusable behavior:
 
 - add or update `OPT-###` only for proven creation/refinement design guidance
 - add or update `WOPT-###` only for proven existing-workflow optimization tactics
-- add `IDEA-###` only when the idea is genuinely unproven but likely reusable
-- keep local-only wording or one-off cleanup in the experiment log
+- add `IDEA-###` only when idea is genuinely unproven but likely reusable
+- keep local-only wording or one-off cleanup in experiment log
 - update Trait Matrix or Focus Signal Map when adding approved refs
 
 Do not paste whole docs into target prompts. Carry only selected behavior into target workflow files.

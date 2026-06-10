@@ -4,19 +4,19 @@ Canonical catalog of reusable fragments, `.txt` includes, and inline schema shap
 
 ## How to Use
 
-1. Include a fragment with `{{ file="./path/to/fragment.txt" key="value" }}`. The consumer defines runtime arguments; the fragment defines shape.
-2. Fragments are not standalone prompts. Always pair with caller context (domain, input paths, validation rules) that is NOT in the fragment.
-3. Fragments are grouped by **purpose**, not by file tree. Each group lists where the fragments live and which agents/commands consume them.
+1. Include fragment with `{{ file="./path/to/fragment.txt" key="value" }}`. Consumer defines runtime arguments; fragment defines shape.
+2. Fragments are not standalone prompts. Always pair with caller context (domain, input paths, validation rules) that is NOT in fragment.
+3. Fragments grouped by **purpose**, not by file tree. Each group lists where fragments live and which agents/commands consume them.
 4. Keep fragments generic. Domain specifics (language, rule, artifact) are caller arguments.
 5. Do not paste full fragment text into target prompts. Include with `{{ file=... }}`.
 
 ## Relationship to Rules
 
-Rules in `config/rules/` also use `{{ file="..." }}` inclusion and share the same compositional pattern:
+Rules in `config/rules/` also use `{{ file="..." }}` inclusion and share same compositional pattern:
 - `rules/groups/*/*.md` assemble related cards or targets into rule groups
 - `rules/cards/*/*.md` define individual rule cards
 - Both include each other via `{{ file="..." }}`
-- Both are included from agents via `{{ file="./rules/..." }}`
+- Both included from agents via `{{ file="./rules/..." }}`
 
 Treat `config/rules/` templates as rule-fragment equivalents to prompt templates.
 
@@ -28,8 +28,8 @@ Shared across finalize, finalize-fast, implement, plan, docs, refactor, audit, a
 
 ### 1.1 Review Mission
 - **File:** `agent/_templates/review-mission.txt`
-- **Shape:** One-line “Mission: Determine whether the `<artifact_type>` is free of blocking `<domain>` issues.”
-- **Used by:** Every reviewer that owns a distinct domain.
+- **Shape:** One-line "Mission: Determine whether `<artifact_type>` is free of blocking `<domain>` issues."
+- **Used by:** Every reviewer owning distinct domain.
 - **Args:** `artifact_type`, `domain`
 
 ### 1.2 Review Process Scripts
@@ -54,9 +54,9 @@ Shared across finalize, finalize-fast, implement, plan, docs, refactor, audit, a
 
 ### 1.4 Read Strategy
 - **File:** `agent/_templates/review-read-strategy/source-access.txt`
-- **Shape:** Declares trust surface (“Do not attempt to read source file paths”).
+- **Shape:** Declares trust surface ("Do not attempt to read source file paths").
 - **Args:** `grounding_refs`
-- **Used by:** finalize reviewers where source is not in the worktree.
+- **Used by:** finalize reviewers where source is not in worktree.
 
 ### 1.5 Finding Format
 - **File:** `agent/_templates/review-finding.txt`
@@ -74,7 +74,7 @@ Shared across finalize, finalize-fast, implement, plan, docs, refactor, audit, a
 - **File:** `agent/_templates/review-output/output.txt`
 - **Shape:** Full `# REVIEW` block with `Cache/Actions/Agent/Decision/Domains/IDs`, `## Findings` (1–2 finding blocks), `## Verified`, `## Notes`.
 - **Args:** all finding args + `mode`, `agent`, `domains`, `with_domains`, `with_verified`, `verified_ref`, `return_rule_extra`
-- **Used by:** cacheless reviewers and some cached reviewers that emit inline findings.
+- **Used by:** cacheless reviewers and some cached reviewers emitting inline findings.
 
 - **File:** `agent/_templates/review-output/pointer.txt`
 - **Shape:** Compact pointer `# REVIEW` block with `Cache/Actions/Agent/Decision/Domains/IDs`. No `## Findings` inline.
@@ -82,7 +82,7 @@ Shared across finalize, finalize-fast, implement, plan, docs, refactor, audit, a
 - **Used by:** cached adjudicators and re-reviewers.
 
 - **File:** `agent/_templates/review-output/compact-output.txt`
-- **Shape:** Minimal `# REVIEW` with `## Findings` as a bullet list (one-line per finding) + `## Verified` + `## Notes`.
+- **Shape:** Minimal `# REVIEW` with `## Findings` as bullet list (one-line per finding) + `## Verified` + `## Notes`.
 - **Args:** `agent`, `prefix`, `finding_detail`, `verified_ref`
 - **Used by:** rereview or lightweight review variants.
 
@@ -90,12 +90,12 @@ Shared across finalize, finalize-fast, implement, plan, docs, refactor, audit, a
 - **File:** `agent/_templates/review-footer/cached.txt`
 - **Shape:** Optionally includes cache-table template + actions file format + pointer output block with return instructions.
 - **Args:** all cache-table args + all pointer args + `skip_cache_format`, `has_actions_path`, `output_extra`, `agent`, `domains`, `prefix`
-- **Used by:** every cached reviewer as the bottom of its prompt.
+- **Used by:** every cached reviewer as bottom of its prompt.
 
 - **File:** `agent/_templates/review-footer/cacheless.txt`
 - **Shape:** Includes `review-output/output.txt` with return instructions.
 - **Args:** all output.txt args
-- **Used by:** every cacheless reviewer as the bottom of its prompt.
+- **Used by:** every cacheless reviewer as bottom of its prompt.
 
 ---
 
@@ -115,7 +115,7 @@ Shared across OPT-016 adjudicated reviews for correctness and audit.
 
 ### 2.3 Cache Contract Header
 - **File:** `agent/_templates/adjudicator/cache-contract.txt`
-- **Shape:** One-line contract reminder to preserve pointer/actions/cache contract for the domain.
+- **Shape:** One-line contract reminder to preserve pointer/actions/cache contract for domain.
 - **Args:** `domain`
 
 ---
@@ -131,7 +131,7 @@ Used by codebase-explorer, draft explorer, and plan agents.
 
 ### 3.2 Explorer Constraints
 - **File:** `agent/_templates/explorer/constraints.txt`
-- **Shape:** One-liner “Read each file once. Output ≤80 lines.”
+- **Shape:** One-liner "Read each file once. Output ≤80 lines."
 - **Args:** `constraint_extra`, `density_rule`
 
 ---
@@ -143,7 +143,7 @@ Nested under `{workflow}/reviewers/_templates/`.
 ### 4.1 Correctness
 - **Location:** `agent/_plan/draft/reviewers/correctness/_templates/`
 - **Files:** `body.txt`, `cache-format.txt`
-- **Shape:** `body.txt` is a parameterized review body for correctness A/B legs. `cache-format.txt` defines the COR cache schema.
+- **Shape:** `body.txt` is parameterized review body for correctness A/B legs. `cache-format.txt` defines COR cache schema.
 
 ### 4.2 Performance
 - **Location:** `agent/_plan/finalize/reviewers/_templates/performance-shared-focus.txt`
@@ -181,7 +181,7 @@ Under `agent/_audit/_templates/` and `agent/_refactor/_templates/lang-*`.
 ### 5.1 Public API Audit
 - **Location:** `agent/_audit/_templates/`
 - **Files:** `analysis-report.txt`, `lang-go.txt`, `lang-java.txt`, `lang-kotlin.txt`, `lang-python.txt`, `lang-rust.txt`, `lang-typescript.txt`
-- **Shape:** `analysis-report.txt` defines the report schema for PROMPT-API-AUDIT.md. Language files define language-specific visibility and usage patterns.
+- **Shape:** `analysis-report.txt` defines report schema for PROMPT-API-AUDIT.md. Language files define language-specific visibility and usage patterns.
 
 ### 5.2 Refactor Error Languages
 - **Location:** `agent/_refactor/_templates/`
@@ -210,7 +210,7 @@ Some agents define domain-specific schemas inline in their `.md` prompt files.
 
 ## 7. Rule Fragments (`config/rules/`)
 
-Rules use the same `{{ file="..." }}` inclusion system as agents.
+Rules use same `{{ file="..." }}` inclusion system as agents.
 
 - `rules/groups/*/*.md` — Assembled rule groups that include cards or other groups
 - `rules/cards/*/*.md` — Single-card rules included by groups

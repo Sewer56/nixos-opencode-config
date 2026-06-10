@@ -1,6 +1,6 @@
 # Workflow Design Patterns
 
-Approved catalog for reusable workflow and prompt design patterns used when creating or refining commands, agents, and reviewers.
+Approved catalog of reusable workflow/prompt design patterns for creating or refining commands, agents, reviewers.
 
 Related files:
 - Design patterns: `config/doc/workflow/design-patterns.md` (this file)
@@ -14,9 +14,9 @@ Related files:
 1. Classify target design traits first: command delegation, primary runner + review subagents, review loop, subagent coordination, repeated subagent/task calls, machine-readable output, diff-based machine artifacts, failure-path validation, or pattern selection.
 2. Select only matching approved patterns.
 3. Convert selected `Carry-In` bullets into direct instructions in target prompts or reviewers. Do not paste whole catalog text into generated files.
-4. Keep scope honest. A pattern may be approved for `cross-workflow`, `iterate-family`, or `finalize-family`.
+4. Keep scope honest. Pattern may be approved for `cross-workflow`, `iterate-family`, or `finalize-family`.
 5. Existing-command optimization tactics belong in `config/doc/workflow/optimize-patterns.md`, not here.
-6. Treat code blocks as generic normative shapes. Copy the structure, not placeholder names. Keep MUST/WHEN/Do-not wording unambiguous.
+6. Treat code blocks as generic normative shapes. Copy structure, not placeholder names. Keep MUST/WHEN/Do-not wording unambiguous.
 
 ## Trait Matrix
 
@@ -41,15 +41,13 @@ Related files:
 
 ### OPT-001 — Thin Command Templates
 
-- Scope: cross-workflow
 - Apply When: command mainly passes user input to one agent.
 - Skip When: command must validate inputs, transform arguments, choose between agents, or assemble non-trivial fixed context.
 - Carry-In:
   - Command file MUST contain only frontmatter, minimal routing, and `$ARGUMENTS` when possible.
   - Agent prompt MUST own process steps, role, output format, examples, and detailed constraints.
   - Do not duplicate agent-owned instructions in command body.
-  - If command needs one or two variables, define them inline near `$ARGUMENTS`; do not add a long process section.
-- Expected Gain: fewer conflicting instructions and lower prompt token load.
+  - If command needs one or two variables, define them inline near `$ARGUMENTS`; do not add long process section.
 
 Good:
 
@@ -65,15 +63,13 @@ Bad: command repeats # Process already owned by agent.
 
 ### OPT-002 — Tight Subagent Inputs
 
-- Scope: cross-workflow
 - Apply When: target spawns subagents or reviewers.
 - Skip When: callee cannot access required files or lacks required permanent instructions in its own prompt.
 - Carry-In:
   - Caller MUST pass only data needed for this run: artifact paths, scoped changed ids/paths, trigger flags, user notes, and changed decisions.
   - Caller MUST NOT paste callee-owned role text, focus list, process steps, output schema, examples, model notes, or generic read order.
-  - If every call repeats the same instruction, move that instruction into the callee prompt instead.
-  - If callee lacks required context, pass a path or id first. Paste content only when the callee cannot read it.
-- Expected Gain: lower token use and less off-scope work.
+  - If every call repeats same instruction, move that instruction into callee prompt instead.
+  - If callee lacks required context, pass path or id first. Paste content only when callee cannot read it.
 
 Good:
 
@@ -89,21 +85,18 @@ Bad: paste reviewer focus list, output schema, role text, examples, model notes,
 
 ### OPT-003 — Repeated Subagent Cache
 
-- Scope: cross-workflow
-- Apply When: same subagent/task can run more than once for the same artifact or input set.
-- Skip When: flow is single-pass; caller cannot provide a stable `cache_path`; inputs cannot be identified; or full reread is cheaper/safer than cache reuse.
+- Apply When: same subagent/task can run more than once for same artifact or input set.
+- Skip When: flow is single-pass; caller cannot provide stable `cache_path`; inputs cannot be identified; or full reread is cheaper/safer than cache reuse.
 - Carry-In:
   - Caller MUST pass `cache_path`.
-  - Caller MUST pass the smallest reliable primary invalidation input: source path + revision/fingerprint, changed paths, changed item ids, or `## Delta`.
+  - Caller MUST pass smallest reliable primary invalidation input: source path + revision/fingerprint, changed paths, changed item ids, or `## Delta`.
   - Caller MUST also pass decisions or trigger flags when they can invalidate cached conclusions.
   - Callee owns cache contents. Target prompt may define exact schema.
-  - Callee MUST read existing cache first when the cache file exists.
-  - If cache is missing or malformed, callee MUST do a full needed read and write a fresh cache.
+  - Callee MUST read existing cache first when cache file exists.
+  - If cache is missing or malformed, callee MUST do full needed read and write fresh cache.
   - Callee MUST reread material when cache is missing/stale, path or item is Changed/New, finding is open/unresolved, or decision/trigger touches its domain.
   - Callee MUST preserve unchanged verified cache records byte-for-byte.
   - Callee MUST update cache before final response.
-- Expected Gain: fewer repeated reads, cheaper re-invocation, less duplicate reasoning.
-- Template refs: `review-cache-table.txt`, `review-finding.txt`, `cached.txt`
 
 Choose invalidation input by workflow shape:
 
@@ -112,7 +105,7 @@ Choose invalidation input by workflow shape:
 - Item-level: stable item ids exist. Caller passes `## Delta`, `changed_ids`, or equivalent item statuses. Callee reopens Changed/New items only.
 - Decision-level: decisions or trigger flags can invalidate cached conclusions. Caller passes decisions/trigger flags. Callee reopens only records whose domain is touched.
 
-If no item ids exist, use `<source-path>` or `<source-path>#whole` as the cache record id.
+If no item ids exist, use `<source-path>` or `<source-path>#whole` as cache record id.
 
 Cache record rules:
 
@@ -166,7 +159,6 @@ reopen STEP-002 only if decision/domain touches it
 
 ### OPT-004 — Fixed Structured Output Blocks
 
-- Scope: cross-workflow
 - Apply When: machine-readable final answers or reviewer outputs matter.
 - Skip When: output is intentionally free-form human prose.
 - Carry-In:
@@ -174,10 +166,8 @@ reopen STEP-002 only if decision/domain touches it
   - For plain structured output, use fenced `text` block.
   - Output MUST keep heading names, field names, order, and allowed values stable.
   - Output MUST include required empty sections when schema expects them.
-  - Output MUST NOT include greetings, summaries, or prose outside the block.
-  - Use JSON only when the consumer explicitly requires JSON.
-- Expected Gain: better parser reliability and less format drift.
-- Template refs: `review-output/output.txt`, `review-output/pointer.txt`, `review-output/compact-output.txt`
+  - Output MUST NOT include greetings, summaries, or prose outside block.
+  - Use JSON only when consumer explicitly requires JSON.
 
 Good:
 
@@ -195,16 +185,14 @@ Bad: greeting, JSON, or prose outside fenced block.
 
 ### OPT-005 — Reference Instead of Requote
 
-- Scope: cross-workflow
 - Apply When: multiple artifacts share context or requirements.
 - Skip When: target artifact must stand alone and pointer-only wording would make it unusable.
 - Carry-In:
   - Reference existing content by file path, section heading, item id, or finding id.
-  - Quote only the smallest required snippet when exact wording matters.
+  - Quote only smallest required snippet when exact wording matters.
   - Do not duplicate full requirements, full deltas, full rules, full reviewer outputs, or full design catalogs into multiple artifacts.
-  - If target must stand alone, include a short summary plus canonical source pointer, not a full copy.
-  - Do not reference prior chat as durable source; write durable context to a file first.
-- Expected Gain: lower prompt size, less divergence between copies.
+  - If target must stand alone, include short summary plus canonical source pointer, not full copy.
+  - Do not reference prior chat as durable source; write durable context to file first.
 
 Good:
 
@@ -217,18 +205,16 @@ Bad: paste full Delta table plus full design catalog into every reviewer prompt.
 
 ### OPT-006 — Shared Context File
 
-- Scope: cross-workflow
 - Apply When: workflow spawns ≥2 subagents and any information must be shared between them.
 - Skip When: single subagent, or subagents fully independent — no shared input, decisions, or results needed.
 - Carry-In:
   - Caller MUST create or name one shared context file path.
   - Shared context file MUST hold any information that >1 subagent needs: input summaries, decisions, changed ids/paths, step indices, reviewer findings, arbitration notes, or result pointers.
-  - Put only shared information in the context file. Domain-specific evidence stays in domain cache files (OPT-003) or subagent outputs.
+  - Put only shared information in context file. Domain-specific evidence stays in domain cache files (OPT-003) or subagent outputs.
   - Each writer MUST own only its domain sections. Caller or caller-agent owns cross-domain decisions and structure.
   - Each reader MUST read only sections it needs for its domain.
   - Do not scatter durable shared information across chat messages or unrelated subagent outputs.
   - When OPT-003 applies, context file stores summaries and pointers; domain caches store detailed evidence.
-- Expected Gain: cleaner handoffs, less rediscovery, no scattered shared state.
 
 ```text
 <artifact>.handoff.md
@@ -240,17 +226,15 @@ Bad: paste full Delta table plus full design catalog into every reviewer prompt.
 
 ### OPT-007 — Diff Line Locators
 
-- Scope: iterate-family
 - Apply When: machine artifacts tell implementers or reviewers where to edit.
 - Skip When: artifact uses create-only full-file outputs.
 - Carry-In:
   - Each edit step MUST list approximate target ranges as `Lines: ~start-end`.
-  - If one step has multiple hunks, list each range in the step header.
-  - Each hunk MUST have a matching per-hunk label, e.g. `**Lines: ~40-55**`.
+  - If one step has multiple hunks, list each range in step header.
+  - Each hunk MUST have matching per-hunk label, e.g. `**Lines: ~40-55**`.
   - Each diff hunk MUST include at least 2 unchanged context lines before and after changed lines when available.
   - Context text is authoritative. Line numbers are hints only.
   - Do not use full-file ranges for localized edits.
-- Expected Gain: faster targeted reads and fewer locator ambiguities.
 
 ```text
 STEP-001 | Lines: ~40-55, ~80-92
@@ -266,14 +250,12 @@ STEP-001 | Lines: ~40-55, ~80-92
 
 ### OPT-008 — Nested Code Fence Safety
 
-- Scope: cross-workflow
 - Apply When: generated docs or prompts nest fenced code blocks.
 - Skip When: no nested fences exist.
 - Carry-In:
   - Outer fence MUST use backticks (```). Inner fence MUST use tildes (~~~).
-  - Do not nest backticks inside backticks at the same count.
-  - Do not nest tildes inside tildes at the same count.
-- Expected Gain: prevents malformed markdown and accidental fence closure.
+  - Do not nest backticks inside backticks at same count.
+  - Do not nest tildes inside tildes at same count.
 
 Good:
 
@@ -291,17 +273,14 @@ inner fence = ```diff
 
 ### OPT-009 — Reviewer Inline Diffs When Exact
 
-- Scope: finalize-family
 - Apply When: reviewer can specify concrete fix text.
 - Skip When: finding is conceptual and exact patch is not reliable.
 - Carry-In:
-  - Reviewer MUST include an inline unified diff after `Fix:` only when exact replacement text, target path, and surrounding context are known.
-  - Diff MUST target the artifact the implementer should edit.
+  - Reviewer MUST include inline unified diff after `Fix:` only when exact replacement text, target path, and surrounding context are known.
+  - Diff MUST target artifact implementer should edit.
   - Diff MUST include enough unchanged context for safe application.
-  - If exact text or context is uncertain, reviewer MUST write prose fix only and MUST NOT invent a diff.
+  - If exact text or context is uncertain, reviewer MUST write prose fix only and MUST NOT invent diff.
   - Conceptual findings MUST stay conceptual; do not fake precision.
-- Expected Gain: easier mechanical application of reviewer feedback.
-- Template ref: `review-finding.txt`
 
 Exact:
 
@@ -320,14 +299,12 @@ Conceptual: prose only, no fake diff.
 
 ### OPT-010 — Inline Path Variables
 
-- Scope: iterate-family
-- Apply When: a section body contains only `name=<path>` assignments with no accompanying prose.
+- Apply When: section body contains only `name=<path>` assignments with no accompanying prose.
 - Skip When: any assignment needs explanation, ownership notes, environment precedence, or cross-file context.
 - Carry-In:
-  - Remove the standalone section and move its assignments to the start of the nearest `## Process`, `## Workflow`, or equivalent execution section.
+  - Remove standalone section and move its assignments to start of nearest `## Process`, `## Workflow`, or equivalent execution section.
   - Keep each assignment on its own line as `name=<path>`.
   - Do not inline when any assignment cannot stand without surrounding context.
-- Expected Gain: shorter prompts and flatter document shape.
 
 Good:
 
@@ -342,7 +319,6 @@ Bad: separate ## Path Variables section containing only those `name=<path>` line
 
 ### OPT-011 — Triggered Reviewer Sets
 
-- Scope: finalize-family
 - Apply When: reviewer cost varies by complexity/risk or trivial plans can safely skip high-cost reviewers.
 - Skip When: every reviewer is always required for correctness.
 - Carry-In:
@@ -351,8 +327,7 @@ Bad: separate ## Path Variables section containing only those `name=<path>` line
   - Orchestrator MUST include every reviewer required for correctness, security, data-loss, or touched high-risk domains.
   - Orchestrator MAY skip high-cost reviewers only when their domain is untouched and skip is safe by explicit criteria.
   - Advisory-only findings MUST be recorded/deferred unless workflow explicitly requires advisory cleanup before completion.
-  - If risk is unclear, include the safer reviewer.
-- Expected Gain: less reviewer fan-out and better elapsed/token profile.
+  - If risk is unclear, include safer reviewer.
 
 ```text
 docs-only change -> wording + docs reviewers
@@ -362,7 +337,6 @@ advisory-only finding -> record/defer, no full rerun
 ```
 ### OPT-012 — Explicit Reviewer Scope Boundaries
 
-- Scope: cross-workflow
 - Apply When: multiple reviewers own different domains.
 - Skip When: single reviewer owns full judgment.
 - Carry-In:
@@ -372,7 +346,6 @@ advisory-only finding -> record/defer, no full rerun
   - If reviewer notices out-of-scope concern, it may add one short pointer in `## Notes` or equivalent.
   - Reviewer MUST NOT create blocking findings for another reviewer's domain unless prompt explicitly allows it.
   - Optimization/evaluation MUST check for scope leakage and duplicate findings across reviewers.
-- Expected Gain: less overlap, less token waste, clearer ownership.
 
 ```text
 Tests reviewer focus: test coverage only
@@ -385,16 +358,14 @@ Do not investigate security; security/correctness reviewer owns it.
 
 ### OPT-013 — Fast-Fail Preconditions
 
-- Scope: cross-workflow
 - Apply When: missing prerequisite should stop work immediately.
 - Skip When: target can recover cheaply from missing inputs.
 - Carry-In:
-  - Workflow MUST run the exact minimal prerequisite check before broad reads, discovery, subagent calls, or writes.
+  - Workflow MUST run exact minimal prerequisite check before broad reads, discovery, subagent calls, or writes.
   - Check MUST have one clear pass condition.
-  - If check fails, workflow MUST emit the final failure template immediately.
+  - If check fails, workflow MUST emit final failure template immediately.
   - After failure, workflow MUST stop. Do not continue discovery, reviewer calls, artifact writes, or best-effort recovery.
-  - Do not read rules or scan repository files before a failing precondition unless the check itself needs that read.
-- Expected Gain: lower failure-path cost and better correctness.
+  - Do not read rules or scan repository files before failing precondition unless check itself needs that read.
 
 ```text
 Step 1:
@@ -409,17 +380,15 @@ Do not read rules, scan repo files, spawn reviewers, or write artifacts.
 
 ### OPT-014 — Per-File Step Scoping Reduces Reviewer Context
 
-- Scope: cross-workflow
-- Apply When: subagents review subsets of a machine plan and the plan has multiple steps.
-- Skip When: plan is trivial (1–2 steps) or there is only one reviewer that reads everything.
+- Apply When: subagents review subsets of machine plan and plan has multiple steps.
+- Skip When: plan is trivial (1–2 steps) or only one reviewer reads everything.
 - Carry-In:
   - Keep each implementation/test/reviewable step in its own file with stable step id.
-  - Keep a step index in the handoff or main plan so callers can map ids to files.
+  - Keep step index in handoff or main plan so callers can map ids to files.
   - Caller MUST pass reviewers only relevant step paths or changed step ids/paths when possible.
-  - Use `## Delta` only when the workflow already has item-level Delta; otherwise use changed step paths or ids.
+  - Use `## Delta` only when workflow already has item-level Delta; otherwise use changed step paths or ids.
   - Reviewer MUST open only in-scope step files unless its prompt requires full-plan review.
   - Do not merge step files into one monolithic plan only to reduce tool calls.
-- Expected Gain: smaller reviewer context windows, less scope leakage, lower total token cost despite more tool calls.
 
 ```text
 Files:
@@ -438,8 +407,7 @@ Do not merge into one machine.md just to reduce tool calls.
 
 ### OPT-015 — Central Pattern Selector
 
-- Scope: cross-workflow
-- Apply When: a creation/refinement workflow needs shared design guidance without embedding the full catalog in the main agent.
+- Apply When: creation/refinement workflow needs shared design guidance without embedding full catalog in main agent.
 - Skip When: only one small pattern ever applies or selector overhead outweighs saved prompt text.
 - Carry-In:
   - Caller MUST call at most one selector for pattern selection.
@@ -448,7 +416,6 @@ Do not merge into one machine.md just to reduce tool calls.
   - Selector MUST NOT return full catalog text.
   - Caller MUST apply only returned matched patterns unless later evidence changes traits.
   - Caller MUST NOT paste this full catalog into generated artifacts or downstream prompts.
-- Expected Gain: less prompt duplication, lower rule drift, and smaller main-agent context.
 
 ```text
 Selector input:
@@ -465,8 +432,7 @@ Main agent applies only returned carry-ins.
 
 ### OPT-016 — Adjudicated High-Risk Review
 
-- Scope: cross-workflow
-- Apply When: a missed issue in the review domain could make the artifact invalid, unsafe, misleading, or structurally malformed (correctness, security, data-loss, API/CLI contracts, schema/diff/path validity, release gates).
+- Apply When: missed issue in review domain could make artifact invalid, unsafe, misleading, or structurally malformed (correctness, security, data-loss, API/CLI contracts, schema/diff/path validity, release gates).
 - Skip When: low-risk polish, style, formatting, token density, non-blocking docs.
 - Carry-In:
   - Per high-risk domain: `<domain>-adjudicator`
@@ -474,7 +440,7 @@ Main agent applies only returned carry-ins.
     - Legs import shared reviewer text from sidecar `.txt` via `{file:...}`
     - One adjudicator per domain, never shared
   - Adjudicator duties:
-    - Use the same domain scope as A/B, but do not run as reviewer C
+    - Use same domain scope as A/B, but do not run as reviewer C
     - Validate terse A/B outputs
     - Merge duplicates by root cause
     - Keep single-leg findings when evidence is concrete and in scope
@@ -515,21 +481,19 @@ Topology (<domain> = correctness, audit, plan-reviewer, freeform-reviewer):
 
 ### OPT-017 — Pipeline Decomposition
 
-- Scope: cross-workflow
-- Apply When: a monolithic prompt contains phases that do not need the full context of later phases — such as repo search, precondition validation, path resolution, external lookups, discovery, or slug derivation — and those phases can run with limited inputs to produce a compact output file.
-- Skip When: the workflow is already lean (≤80 lines of process) or every phase requires full global context and splitting would duplicate more context than it saves.
+- Apply When: monolithic prompt contains phases that do not need full context of later phases — such as repo search, precondition validation, path resolution, external lookups, discovery, or slug derivation — and those phases can run with limited inputs to produce compact output file.
+- Skip When: workflow is already lean (≤80 lines of process) or every phase requires full global context and splitting would duplicate more context than it saves.
 - Carry-In:
-  - Identify phases that can run independently with narrow inputs and produce a compact output file.
-  - Split each such phase into its own pipeline stage: a prep agent that writes a state file, followed by a downstream agent that reads it.
+  - Identify phases that can run independently with narrow inputs and produce compact output file.
+  - Split each such phase into its own pipeline stage: prep agent that writes state file, followed by downstream agent that reads it.
   - Prep agent MUST own only its phase — precondition checks, discovery, path derivation, external lookups, etc.
-  - Prep agent MUST write a compact pipeline state file with all resolved outputs, validation results, and pointers.
-  - Prep agent MUST be a separate user-facing command when its output is a prerequisite gate for later stages.
-  - Downstream agent MUST read the pipeline state file first and fast-fail if it is missing.
-  - Downstream agent MUST NOT dispatch the prep agent internally.
-  - Pipeline state file MUST be the single handoff artifact between stages.
+  - Prep agent MUST write compact pipeline state file with all resolved outputs, validation results, and pointers.
+  - Prep agent MUST be separate user-facing command when its output is prerequisite gate for later stages.
+  - Downstream agent MUST read pipeline state file first and fast-fail if it is missing.
+  - Downstream agent MUST NOT dispatch prep agent internally.
+  - Pipeline state file MUST be single handoff artifact between stages.
   - Each stage's prompt MUST contain only its owned phase instructions.
   - Callers that chain multiple pipeline workflows MUST call prep stages first, then pass state-derived paths to downstream phases.
-- Expected Gain: smaller per-agent prompts, clearer phase ownership, less monolithic context, reusable prep for different downstream agents, user-visible pipeline stages.
 
 ```text
 Before (monolithic):
@@ -555,13 +519,13 @@ After (pipelined):
 ### OPT-018 — Prompt Fragment Inclusion
 
  - Scope: cross-workflow
- - Apply When: a prompt needs reusable normative shape without pasting the full shape into every consumer.
- - Skip When: the fragment is only used once, or the shape is so domain-specific that parameterization overhead exceeds duplication savings.
+ - Apply When: prompt needs reusable normative shape without pasting full shape into every consumer.
+ - Skip When: fragment is used only once, or shape is so domain-specific that parameterization overhead exceeds duplication savings.
  - Carry-In:
-   - Define fragment in a `.txt` file with parameterized placeholders `{{arg:key}}` and conditional blocks `{{ if=... }}`.
+   - Define fragment in `.txt` file with parameterized placeholders `{{arg:key}}` and conditional blocks `{{ if=... }}`.
    - Consumer includes fragment via `{{ file="./path/to/fragment.txt" key="value" }}`.
    - Fragment MUST be self-contained in shape and MUST NOT contain domain-specific content that changes per consumer.
-   - Consumer MUST pass all required args; do not rely on defaults inside the fragment.
+   - Consumer MUST pass all required args; do not rely on defaults inside fragment.
    - Fragments for different modes (cached vs cacheless, correctness vs audit) SHOULD be separate files, not one file with heavy branching.
    - Keep fragment surface narrow: one mission, one process script, one output block, or one finding format per file.
  - Related: `config/doc/workflow/template-library.md`
@@ -584,23 +548,20 @@ After (pipelined):
 
 ### OPT-019 — Paired Substep Loop Grouping
 
-- Scope: cross-workflow
-- Apply When: a primary has two phases that share a loop — e.g. an implementer and its reviewer, or a fixer and its certifier — and one phase re-dispatches the other on a BLOCKING finding.
-- Skip When: the two phases are truly independent (no re-dispatch), or the loop is short and the cross-reference fits in one step header.
+- Apply When: primary has two phases that share loop — e.g. implementer and its reviewer, or fixer and its certifier — and one phase re-dispatches other on BLOCKING finding.
+- Skip When: two phases are truly independent (no re-dispatch), or loop is short and cross-reference fits in one step header.
 - Carry-In:
-  - Group the two phases under a single numbered top-level step: `## N. <Phase>`, with substeps `### Na. <Substep A>` and `### Nb. <Substep B>`.
-  - The `## N.` section preamble MUST state the loop relationship in one or two lines: which substep re-dispatches which, and the trigger condition.
-  - The earlier substep (`Na`) owns the initial dispatch; the later substep (`Nb`) owns the validation pass and the re-dispatch rule.
-  - Cross-references in other sections MUST use the `Nb` form (e.g. `return to step 2b`) so the loop entry point is unambiguous.
-  - Do not split a paired loop across two `## N.` headers. The pairing is the point.
-  - If a third phase enters the loop, add it as `Nc` and update the preamble, do not promote it to a new top-level step.
-- Related: WOPT-002, WOPT-006.
-- Expected Gain: the loop is visible at a glance, re-dispatch boundaries are explicit, and future steps do not accidentally re-host a substep.
+  - Group two phases under single numbered top-level step: `## N. <Phase>`, with substeps `### Na. <Substep A>` and `### Nb. <Substep B>`.
+  - `## N.` section preamble MUST state loop relationship in one or two lines: which substep re-dispatches which, and trigger condition.
+  - Earlier substep (`Na`) owns initial dispatch; later substep (`Nb`) owns validation pass and re-dispatch rule.
+  - Cross-references in other sections MUST use `Nb` form (e.g. `return to step 2b`) so loop entry point is unambiguous.
+  - Do not split paired loop across two `## N.` headers. Pairing is the point.
+  - If third phase enters loop, add it as `Nc` and update preamble; do not promote it to new top-level step.
 
 ```text
 ## 2. Implement and diff review
 
-The implementer writes product code; the implementer-reviewer validates that code against the handoff. The two steps share a loop: a BLOCKING diff-review finding re-dispatches the implementer and re-runs the reviewer.
+Implementer writes product code; implementer-reviewer validates that code against handoff. Two steps share loop: BLOCKING diff-review finding re-dispatches implementer and re-runs reviewer.
 
 ### 2a. Implement once
 - Dispatch `_implement/plan/implementer` with `handoff_path`.
@@ -612,7 +573,7 @@ The implementer writes product code; the implementer-reviewer validates that cod
 ```text
 ## 3. Validate and certify
 
-The validator-fixer runs validation and applies fixes; final certification re-runs validation with no edits to confirm. The two steps share a loop: a successful fix re-enters step 2b, and a final-cert failure can re-enter step 3a.
+Validator-fixer runs validation and applies fixes; final certification re-runs validation with no edits to confirm. Two steps share loop: successful fix re-enters step 2b, final-cert failure can re-enter step 3a.
 
 ### 3a. Validator-fixer (edit mode)
 - Dispatch validator-fixer in edit mode.
@@ -621,5 +582,5 @@ The validator-fixer runs validation and applies fixes; final certification re-ru
 - Dispatch validator-fixer in final mode.
 ```
 
-Bad: two top-level steps `## 2. Implement` and `## 3. Diff review` with no shared header, requiring the reader to scan cross-references to discover the loop.
-Good: a single `## 2. Implement and diff review` header with `### 2a. Implement once` and `### 2b. Diff review loop` substeps, plus a one-line preamble naming which substep re-dispatches which.
+Bad: two top-level steps `## 2. Implement` and `## 3. Diff review` with no shared header, requiring reader to scan cross-references to discover loop.
+Good: single `## 2. Implement and diff review` header with `### 2a. Implement once` and `### 2b. Diff review loop` substeps, plus one-line preamble naming which substep re-dispatches which.
