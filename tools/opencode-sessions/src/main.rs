@@ -34,10 +34,24 @@ fn main() -> Result<()> {
             let db_path = resolve_db_path(cli.db.as_deref())?;
             let conn = open_db(&db_path)?;
             let index = load_overview(&conn)?;
-            let session_id = resolve_target_session_id(&index, &args)?;
-            let export_root = export_bundle(&conn, &index, &session_id, args.out)?;
-            println!("{}", export_root.display());
-            Ok(())
+
+            if args.all {
+                let roots = index.roots.clone();
+                eprintln!("Exporting {} root sessions...", roots.len());
+                for (i, root_id) in roots.iter().enumerate() {
+                    eprintln!("[{}/{}] {}", i + 1, roots.len(), root_id);
+                    match export_bundle(&conn, &index, root_id, args.out.clone()) {
+                        Ok(export_root) => println!("{}", export_root.display()),
+                        Err(e) => eprintln!("  ERROR: {e:#}"),
+                    }
+                }
+                Ok(())
+            } else {
+                let session_id = resolve_target_session_id(&index, &args)?;
+                let export_root = export_bundle(&conn, &index, &session_id, args.out)?;
+                println!("{}", export_root.display());
+                Ok(())
+            }
         }
         Some(Command::Tui(args)) => {
             let db_path = resolve_db_path(cli.db.as_deref())?;

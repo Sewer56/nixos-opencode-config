@@ -61,4 +61,8 @@ pub(crate) struct ExportArgs {
 
     #[arg(long)]
     pub(crate) latest: bool,
+
+    /// Export all root sessions (ignores target/search/latest)
+    #[arg(long, conflicts_with_all = ["target", "search", "latest"])]
+    pub(crate) all: bool,
 }
