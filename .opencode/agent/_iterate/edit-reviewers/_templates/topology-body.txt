@@ -1,0 +1,88 @@
+{{
+  file="../config/agent/_templates/review-mission.txt"
+  artifact_type="prompt"
+  domain="topology"
+}}
+{{
+  file="../config/agent/_templates/review-process/cached.txt"
+  if=mode==cached
+  delta_source=log_path
+  step2_extra="- Do not read workflow pattern catalogs or pattern contracts.\n- If `static_check_path` is provided, read it for changed_paths and mechanical-gate status only.\n- Inspect only changed prompt files and directly referenced files needed to judge topology or template use.\n- Do not rerun render checks; static script owns render failures and rendered whitespace."
+  preserve_byte_exact=1
+}}
+{{
+  file="../config/agent/_templates/review-process/cacheless.txt"
+  if=mode==cacheless
+  read_context="Read `log_path` and directly referenced files from scratch. Do not read prior caches."
+  reads_review_ledger=1
+}}
+{{
+  file="../config/agent/_templates/review-cache-table.txt"
+  if=mode==cached
+  domain=topology
+  ref_type=path
+  prefix=TOP
+}}
+{{
+  file="../config/agent/_templates/review-footer/cached.txt"
+  if=mode==cached
+  agent="_iterate/edit-reviewers/topology"
+  prefix=TOP
+  domain=topology
+  ref_type=path
+  has_actions_path=1
+  skip_cache_format=1
+  categories="REVIEWER_TOPOLOGY | PIPELINE_DECOMPOSITION | TEMPLATE"
+  evidence="<section, rule, or rendered artifact>"
+  problem="<one-line problem>"
+  fix="<exact correction>"
+  file_ref="<repo-relative path>"
+  bad="-<wrong line>"
+  good="+<correct line>"
+  with_file=1
+  with_lines=1
+  with_evidence=1
+  with_detail=0
+  with_step_file=0
+  detail=""
+  step=""
+  with_verified=1
+  verified_ref="<path>: <one-line verified condition>"
+  output_extra="- Every ID in the response MUST exist in both `actions_path` and `cache_path`."
+  return_rule_extra="- Only include the diff when exact replacement text and surrounding context are known. Otherwise write prose fix only and note 'diff not applicable' in the diff block."
+}}
+{{
+  file="../config/agent/_templates/review-footer/cacheless.txt"
+  if=mode==cacheless
+  agent="_iterate/edit-reviewers/topology"
+  prefix=TOP
+  with_domains=0
+  categories="REVIEWER_TOPOLOGY | PIPELINE_DECOMPOSITION | TEMPLATE"
+  evidence="<section, rule, or rendered artifact>"
+  problem="<one-line problem>"
+  fix="<exact correction>"
+  file_ref="<repo-relative path>"
+  bad="-<wrong line>"
+  good="+<correct line>"
+  with_file=1
+  with_lines=1
+  with_evidence=1
+  with_detail=0
+  with_step_file=0
+  detail=""
+  step=""
+  with_verified=1
+  verified_ref="<path>: <one-line verified condition>"
+  output_extra="- Final-gate uncached pass: ignore prior caches, return only current findings inline."
+}}
+
+# Constraints
+- BLOCKING:
+  - reviewer split where total prompt size does not shrink AND concerns-per-unit does not drop (see `.opencode/agent/_iterate/rules/split-decision-rule.txt`)
+  - reviewer split where one reviewer needs `changed_paths` only and another needs wider reads (callers, error collection, repo scan); different file scopes, different reviewers
+  - pipeline phase kept as a subagent when it has no LLM judgement
+  - high-risk ownership lost in a reviewer merge
+  - numbered action-file runtime contracts or cacheless/inline reviewers that create/read action sidecars
+  - copied boilerplate where a renderer import would do
+- ADVISORY: minor template-style drift, missing block-form import for multi-arg includes, or repo-relative path convention drift.
+- Keep response compact; detailed evidence belongs in cache (cached mode only).

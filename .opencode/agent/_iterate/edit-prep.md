@@ -39,7 +39,11 @@ Prepare a direct `/iterate/edit` run. Resolve only request shape, target paths, 
 - Set `log_path = <cwd>/<artifact_base>.md`.
 - Set `pattern_contract_path = <cwd>/<artifact_base>.patterns.md`.
 - Set `static_check_path = <cwd>/<artifact_base>.static-check.md`.
-- Set reviewer cache paths under `<cwd>/`, never a review subdirectory.
+  - Set reviewer cache paths under `<cwd>/`, never a review subdirectory:
+    - `integrity_cache_path = <cwd>/<artifact_base>.review-integrity.md`
+    - `pattern_compliance_cache_path = <cwd>/<artifact_base>.review-pattern-compliance.md`
+    - `prompt_quality_cache_path = <cwd>/<artifact_base>.review-prompt-quality.md`
+    - `topology_cache_path = <cwd>/<artifact_base>.review-topology.md`
 - If target paths or intended behavior are materially ambiguous, write state with `Decision: NEEDS_INPUT`, one `Question:`, and stop.
 
 ## 2. Resolve paths
@@ -83,7 +87,8 @@ Question: <one concise question | None>
 - static_check_path: <absolute path>
 - integrity_cache_path: <absolute path>
 - pattern_compliance_cache_path: <absolute path>
-- instruction_quality_cache_path: <absolute path>
+- prompt_quality_cache_path: <absolute path>
+- topology_cache_path: <absolute path>
 
 ## Targets
 - <repo-relative path> — <why likely touched>

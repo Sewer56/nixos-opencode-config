@@ -1,0 +1,87 @@
+{{
+  file="../config/agent/_templates/review-mission.txt"
+  artifact_type="prompt"
+  domain="prompt-quality"
+}}
+{{
+  file="../config/agent/_templates/review-process/cached.txt"
+  if=mode==cached
+  delta_source=log_path
+  step2_extra="- Do not read workflow pattern catalogs or pattern contracts.\n- If `static_check_path` is provided, read it for changed_paths and mechanical-gate status only.\n- Inspect only changed prompt files and directly referenced files needed to detect duplication.\n- Do not judge reviewer topology or template feature use; that is `topology`'s domain.\n- Do not rerun render checks; static script owns render failures, rendered whitespace, and markdown fence lint."
+  preserve_byte_exact=1
+}}
+{{
+  file="../config/agent/_templates/review-process/cacheless.txt"
+  if=mode==cacheless
+  read_context="Read `log_path` and directly referenced files from scratch. Do not read prior caches."
+  reads_review_ledger=1
+}}
+{{
+  file="../config/agent/_templates/review-cache-table.txt"
+  if=mode==cached
+  domain=prompt-quality
+  ref_type=path
+  prefix=PQ
+}}
+{{
+  file="../config/agent/_templates/review-footer/cached.txt"
+  if=mode==cached
+  agent="_iterate/edit-reviewers/prompt-quality"
+  prefix=PQ
+  domain=prompt-quality
+  ref_type=path
+  has_actions_path=1
+  skip_cache_format=1
+  categories="RUNTIME_INSTRUCTION | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CLARITY | DEDUP"
+  evidence="<section, rule, or rendered artifact>"
+  problem="<one-line problem>"
+  fix="<exact correction>"
+  file_ref="<repo-relative path>"
+  bad="-<wrong line>"
+  good="+<correct line>"
+  with_file=1
+  with_lines=1
+  with_evidence=1
+  with_detail=0
+  with_step_file=0
+  detail=""
+  step=""
+  with_verified=1
+  verified_ref="<path>: <one-line verified condition>"
+  output_extra="- Every ID in the response MUST exist in both `actions_path` and `cache_path`."
+  return_rule_extra="- Only include the diff when exact replacement text and surrounding context are known. Otherwise write prose fix only and note 'diff not applicable' in the diff block."
+}}
+{{
+  file="../config/agent/_templates/review-footer/cacheless.txt"
+  if=mode==cacheless
+  agent="_iterate/edit-reviewers/prompt-quality"
+  prefix=PQ
+  with_domains=0
+  categories="RUNTIME_INSTRUCTION | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CLARITY | DEDUP"
+  evidence="<section, rule, or rendered artifact>"
+  problem="<one-line problem>"
+  fix="<exact correction>"
+  file_ref="<repo-relative path>"
+  bad="-<wrong line>"
+  good="+<correct line>"
+  with_file=1
+  with_lines=1
+  with_evidence=1
+  with_detail=0
+  with_step_file=0
+  detail=""
+  step=""
+  with_verified=1
+  verified_ref="<path>: <one-line verified condition>"
+  output_extra="- Final-gate uncached pass: ignore prior caches, return only current findings inline."
+}}
+
+# Constraints
+- BLOCKING:
+  - LLM runtime prompt written as documentation instead of executable instruction
+  - operational behavior delegated only to docs
+  - callee-owned instructions duplicated in caller
+  - unstable machine output
+  - confusing behavior-governing text
+- ADVISORY: local wording economy, positive-wording opportunities, dense paragraph-style rules, or doc clarity improvements that do not affect correctness.
+- Keep response compact; detailed evidence belongs in cache (cached mode only).

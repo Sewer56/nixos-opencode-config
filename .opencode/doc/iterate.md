@@ -10,14 +10,13 @@ Reference for direct OpenCode agent/command/reviewer prompt edits. Shared patter
 
 ## Pipeline
 
-1. `/iterate/edit` routes to `_iterate/edit`, the primary edit/review orchestrator.
+1. `/iterate/edit` routes to `_iterate/edit`, the primary edit orchestrator.
 2. Prep: `_iterate/edit-prep` resolves targets, artifacts, classification, risks, and required reads; it writes `PROMPT-ITERATE-EDIT-<slug>.prep.md`.
 3. Pattern selector: `_iterate/edit-pattern-selector` writes `PROMPT-ITERATE-EDIT-<slug>.patterns.md`.
-4. Static checker: `_iterate/edit-static-checker` runs deterministic changed-path, import/ref, render, and whitespace checks; it writes `PROMPT-ITERATE-EDIT-<slug>.static-check.md`.
-5. Semantic reviewers live in `_iterate/edit-reviewers/`:
-    - `integrity` — OpenCode schema, permissions, wiring, scope, self-iteration, optimizer architecture.
-    - `pattern-compliance` — generated-edit compliance with selected carry-ins, quality guards, apply-to paths, and validation bullets.
-    - `instruction-quality` — LLM runtime instruction clarity, dedup, tight inputs, output schemas, topology economy.
+4. Static check: the primary runs `bash scripts/iterate-static-check.sh <artifact_base>`, which writes `PROMPT-ITERATE-EDIT-<slug>.static-check.md` and the `# STATIC CHECK` verdict.
+5. Cached review loop: per-domain cached reviewers (integrity, pattern-compliance, prompt-quality, topology) emit pointer review blocks with canonical cache + actions sidecars. The primary applies actions and re-runs touched domains until zero BLOCKING findings or 5 iterations.
+6. Final gate (cacheless): per-domain cacheless auditors (integrity-cacheless, pattern-compliance-cacheless, prompt-quality-cacheless, topology-cacheless) ignore prior caches, read the full artifact, and return current findings inline. If any cacheless auditor returns BLOCKING, the runner re-enters the cached loop and repeats the gate.
+7. Semantic reviewer bodies live in `_iterate/edit-reviewers/_templates/<domain>-body.txt`. Each cached reviewer and its cacheless counterpart share the same body, parameterized as `mode=cached` or `mode=cacheless`.
 
 No user-confirmed draft/finalize commands by default. Prep/static state files are machine handoffs, not user approval artifacts. Add a draft/finalize boundary only through dedicated future commands when prompt edits need collaborative design before any target edit.
 
@@ -33,6 +32,56 @@ No user-confirmed draft/finalize commands by default. Prep/static state files ar
 - Use `WOPT-###` only when refactoring an existing workflow and focus signals match.
 - Carry compact rule fragments into changed prompts. Do not paste whole catalogs.
 - Target prompts must contain model-facing operational rules directly. Docs cannot be the only source for behavior.
+
+## Split vs. Don't-Split Rule
+
+Adherence drops with prompt length. Narrow units or scripts beat one fat agent. Apply on every add/split/merge/remove of a subagent, reviewer, script, or pipeline phase.
+
+### Split when
+
+- Runner past 150 lines, or holds 3+ heterogeneous domains.
+- Reviewer emits findings across unrelated concerns.
+- Pipeline phase has no LLM judgement and outputs `PASS | BLOCKING`.
+- Caller duplicates callee scope, role, or schema. Move it.
+- **Reviewers need different file scopes.** Split: one needs `changed_paths` only, another reads more (callers, error collection, repo scan). Don't drag one into the other's reads.
+
+### Do not split when
+
+- Child is comparable size to parent *and* parent is already narrow (<3 domains). Redistribution, not win.
+- Both units read same artifacts and emit overlapping findings. Merge.
+- Handoff contract is longer than the work saved.
+- Phase is one or two sentences; parent runs it cheaply.
+
+### Two metrics
+
+1. Total prompt size (parent + children).
+2. Concerns per unit (heterogeneous domains a model holds at once).
+
+A split that grows total but drops concerns-per-unit 9→2 is a real win. A split that holds total steady and keeps concerns-per-unit is a net loss. Measure concerns-per-unit, not file length.
+
+### Script over subagent
+
+No LLM judgement + deterministic verdict + invoked once per run = use `scripts/<name>.sh`.
+
+The current static check is `scripts/iterate-static-check.sh` for exactly this reason. A subagent that only relays `bash` exit codes is wasted model context.
+
+### Split-cost guard
+
+Each new unit adds: a permission grant, a file to sync, a handoff contract, a set of edits. If the one-line cost is longer than the work removed, do not split.
+
+### Caveman rule
+
+Write rules in caveman. Shortest rule that keeps behavior. Fewer tokens == better adherence. Apply to every rule card, reviewer body, runner prompt, and inline instruction.
+
+### Validation
+
+After every split, merge, or script-replacement:
+
+- Update the runner's `task:` allowlist or `bash:` grant in lockstep.
+- Update this iterate doc and any affected reviewer's `cache_path` / artifact names.
+- Verify the parent prompt got *shorter* and the new unit is *narrower*. If neither shrank, revert the split.
+
+The `topology` reviewer enforces this rule during review. New reviewer-spread proposals that violate it will be flagged BLOCKING.
 
 ## Iterate-Only Conventions
 
@@ -55,33 +104,41 @@ No user-confirmed draft/finalize commands by default. Prep/static state files ar
 - reviewer caches:
    - `<artifact_base>.review-integrity.md`
    - `<artifact_base>.review-pattern-compliance.md`
-   - `<artifact_base>.review-instruction-quality.md`
+   - `<artifact_base>.review-prompt-quality.md`
+   - `<artifact_base>.review-topology.md`
 - no draft context, finalize handoff, or STEP files in the direct workflow
 
-### Reviewer Merge
+### Reviewer Topology
 
-The old wording/style/clarity/dedup/performance/correctness/diff/meta reviewer spread is collapsed into a static mechanical gate plus three semantic domains:
+The old wording/style/clarity/dedup/performance/correctness/diff/meta reviewer spread is collapsed into a static script plus four semantic domains, each with a cached and a cacheless reviewer:
 
-- `edit-static-checker` owns deterministic changed-path, import/ref, render, and whitespace checks before semantic review.
-- `integrity` keeps high-risk checks separate: command/agent schema, permissions, task refs, self-iteration enforcement, optimize architecture, source boundary, and scope.
-- `pattern-compliance` independently checks generated prompt edits against selected OPT/WOPT carry-ins and guards.
-- `instruction-quality` owns overlapping prompt-economy checks: wording, style, clarity, dedup, tight inputs, output schemas, markdown fences, and reviewer topology.
+- `scripts/iterate-static-check.sh` owns deterministic changed-path, import/ref, render, whitespace, and markdown-fence checks before semantic review.
+- `integrity` and `integrity-cacheless` keep high-risk checks separate: command/agent schema, permissions, task refs, self-iteration enforcement, optimize architecture, source boundary, and scope.
+- `pattern-compliance` and `pattern-compliance-cacheless` independently check generated prompt edits against selected OPT/WOPT carry-ins and guards.
+- `prompt-quality` and `prompt-quality-cacheless` own prompt-text concerns: LLM runtime writing, tight inputs, output schemas, wording, clarity, dedup.
+- `topology` and `topology-cacheless` own workflow-shape concerns: reviewer topology economy, pipeline decomposition, template feature use.
 
-Split only when the child has an independent domain and smaller scoped input. Keep high-risk correctness/security/data-loss checks separate from wording/polish checks. Merge reviewers when they read the same artifacts and emit overlapping findings.
+Per-domain cached reviewers run during the review loop. Each reads its own cache + actions sidecar, emits a pointer review block, and lets the runner carry state across iterations. Per-domain cacheless reviewers run only at the final gate, ignore prior caches, read the full artifact, and emit current findings inline. The two phases share a body template, parameterized as `mode=cached` or `mode=cacheless`. See `.opencode/agent/_iterate/edit-reviewers/_templates/<domain>-body.txt`.
+
+Split only when the child has an independent domain and a smaller scoped input. Keep high-risk correctness/security/data-loss checks separate from wording/polish checks. Merge reviewers that read the same artifacts and emit overlapping findings.
 
 ### Pipeline Decomposition
 
 When a monolithic agent prompt bundles phases that don't require the full global context — such as repo search, precondition validation, path resolution, slug derivation, external lookups, or deterministic validation — split those phases into standalone pipeline stages:
 
 1. Identify phases that can run with narrow inputs and produce a compact output file.
-2. Create a prep agent for each such phase that writes a pipeline state file.
-3. Update the downstream agent to read the state file first and fast-fail if missing.
-4. Make the prep agent a separate user-facing command when it is a prerequisite gate.
+2. Decide subagent vs. script using the split-decision rule: subagent when LLM judgement is needed, `scripts/<name>.sh` when the phase is deterministic.
+3. Create the unit that writes a pipeline state file or verdict file.
+4. Update the downstream agent to read the state file first and fast-fail if missing.
 5. Pipeline state file is the single handoff between stages — each stage's prompt contains only its phase.
 
-Example: `_iterate/edit-prep` owns repo search, slug derivation, and precondition validation before the main agent edits. `_iterate/edit-static-checker` owns deterministic validation after edits and before semantic reviewers.
+Examples in this iterate:
 
-See OPT-017 for full carry-in rules and quality guards.
+- `_iterate/edit-prep` owns repo search, slug derivation, and precondition validation before the main agent edits.
+- `scripts/iterate-static-check.sh` owns deterministic validation after edits and before semantic reviewers.
+- `_iterate/edit-pattern-selector` owns OPT/WOPT selection when the runner should not read the full pattern catalogs.
+
+See OPT-017 for full carry-in rules and quality guards. See `.opencode/agent/_iterate/rules/split-decision-rule.txt` for the operational rule that gates new splits.
 
 ## Direct Edit Loop
 
@@ -90,15 +147,15 @@ See OPT-017 for full carry-in rules and quality guards.
 - pattern contract file: `PROMPT-ITERATE-EDIT-<slug>.patterns.md`
 - static check result file: `PROMPT-ITERATE-EDIT-<slug>.static-check.md`
 - reviewer caches hold detailed findings; final responses stay compact
-- static checker runs before semantic reviewers and after any blocking-fix edit
-- integrity runs first when frontmatter, permissions, wiring, self-iteration, optimizer workflow, or command/agent files change
-- pattern-compliance runs every run after integrity and is the only reviewer that receives the pattern contract
-- instruction-quality runs for prompts, command bodies, output schemas, subagent calls, and reviewer topology changes
+- static check runs before semantic reviewers and after any blocking-fix edit
+- cached loop runs first; integrity runs first when frontmatter, permissions, wiring, self-iteration, optimizer workflow, or command/agent files change; pattern-compliance runs every run after integrity and is the only reviewer that receives the pattern contract; prompt-quality runs for prompts, command bodies, output schemas, and subagent calls; topology runs for runner changes, reviewer topology changes, the static-check script, and pipeline decomposition
+- cacheless final gate runs after the cached loop converges with zero BLOCKING findings; cacheless auditors run in parallel and ignore prior caches
 - rerun only reviewer domains touched by fixes
+- if the cacheless final gate returns BLOCKING, apply fixes, re-enter the cached loop, then repeat the final gate
 
 ## When to Read What
 
-- Read this file for iterate-specific artifact and self-iteration rules.
+- Read this file for iterate-specific artifact, self-iteration, and split-vs-don't-split rules.
 - Read `config/doc/workflow/design-patterns.md` for shared creation/refinement prompt design patterns.
 - Read `config/doc/workflow/optimize-patterns.md` for existing-workflow prompt optimization tactics.
 - Read `config/doc/workflow/optimize-maintenance.md` only when editing `_workflow/optimize*` or `export-analyzer.md`.

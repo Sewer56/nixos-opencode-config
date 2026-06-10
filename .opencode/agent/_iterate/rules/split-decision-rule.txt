@@ -1,0 +1,50 @@
+# Split vs. Don't-Split
+
+Apply on every add/split/merge/remove of a subagent, reviewer, or pipeline phase.
+
+## Why
+
+Adherence drops with prompt length. Narrow units or scripts beat one fat agent.
+
+## Split when
+
+- Runner past 150 lines, or holds 3+ heterogeneous domains.
+- Reviewer emits findings across unrelated concerns.
+- Pipeline phase has no LLM judgement and outputs `PASS | BLOCKING`.
+- Caller duplicates callee scope, role, or schema. Move it.
+- **Reviewers need different file scopes.** Split: one needs `changed_paths` only, another reads more (callers, error collection, repo scan). Don't drag one into the other's reads.
+
+## Don't split when
+
+- Child is comparable size to parent *and* parent is already narrow (<3 domains). Redistribution, not win.
+- Both units read same artifacts and emit overlapping findings. Merge.
+- Handoff contract is longer than the work saved.
+- Phase is one or two sentences; parent runs it cheaply.
+
+## Two metrics
+
+1. Total prompt size (parent + children).
+2. Concerns per unit (heterogeneous domains a model holds at once).
+
+A split that grows total but drops concerns-per-unit 9→2 is a real win. A split that holds total steady and keeps concerns-per-unit is a net loss. Measure concerns-per-unit, not file length.
+
+## Script over subagent
+
+No LLM judgement + deterministic verdict + invoked once per run = use `scripts/<name>.sh`.
+
+## Cost guard
+
+Each new unit adds: a permission grant, a file to sync, a handoff contract, a set of edits. If the one-line cost is longer than the work removed, do not split.
+
+## Anti-patterns
+
+- Prep subagent as long as the parent's would-have-been. Phase too small.
+- Reviewer split into two same-size prompts with same concerns. No gain.
+- Subagent that reads `bash` and returns `PASS | BLOCKING`. Replace with script.
+- Caller re-lists callee `Scope:` or schema. Move to callee, drop caller copy.
+
+## After
+
+- Update runner `task:` allowlist or `bash:` grant.
+- Update iterate doc and reviewer `cache_path` / artifact names.
+- Verify parent got shorter, child got narrower. If not, revert.

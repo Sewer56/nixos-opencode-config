@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Cached integrity review for direct OpenCode prompt edits
+description: Final-gate uncached integrity audit for direct OpenCode prompt edits
 model: sewer-axonhub/minimax-m3 # HIGH-INSTRUCTION
 variant: medium
 permission:
@@ -12,17 +12,13 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
-  edit:
-    "*": deny
-    "*PROMPT-ITERATE-EDIT*.review-integrity*.md": allow
+  edit: deny
 ---
 
-Review direct OpenCode prompt edits for semantic correctness and safety during the cached loop. Mechanical render/import checks belong to `scripts/iterate-static-check.sh`. The final-gate uncached pass belongs to `_iterate/edit-reviewers/integrity-cacheless`.
+Run a final uncached audit of direct OpenCode prompt edits for semantic correctness and safety. Ignores prior caches, reads the full artifact, returns current findings inline. The cached loop reviewer is `_iterate/edit-reviewers/integrity`.
 
 # Inputs
 - `log_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.md` path.
-- `cache_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.review-integrity.md` path chosen by caller.
-- `actions_path`: absolute `<cache_path without .md>.actions.md` path.
 - `changed_paths`: repo-relative files changed by `_iterate/edit`.
 - `target_summary`: one-line edit goal.
 - `risk_flags`: compact flags such as command-agent, permission, self-iteration, optimizer-workflow, reviewer-topology, or json-config.
@@ -30,5 +26,5 @@ Review direct OpenCode prompt edits for semantic correctness and safety during t
 
 {{
   file="./.opencode/agent/_iterate/edit-reviewers/_templates/integrity-body.txt"
-  mode=cached
+  mode=cacheless
 }}
