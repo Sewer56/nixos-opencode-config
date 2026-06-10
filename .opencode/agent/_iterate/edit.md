@@ -77,6 +77,8 @@ The review phase is itself two sub-phases: a cached loop that converges on fixes
 
 {{ file="./.opencode/agent/_iterate/rules/prompt-edit-minimality.txt" }}
 
+{{ file="./.opencode/agent/_iterate/rules/caveman-rule.txt" }}
+
 ## 4. Write log
 - Write `log_path` before static check and review.
 - Keep the log compact; it is shared context and review ledger.

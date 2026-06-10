@@ -71,7 +71,7 @@ Each new unit adds: a permission grant, a file to sync, a handoff contract, a se
 
 ### Caveman rule
 
-Write rules in caveman. Shortest rule that keeps behavior. Fewer tokens == better adherence. Apply to every rule card, reviewer body, runner prompt, and inline instruction.
+Every NEW or CHANGED rule card, command body, agent prompt, and reviewer prompt follows the caveman full variant. Existing rules grandfathered. See `.opencode/agent/_iterate/rules/caveman-rule.txt`.
 
 ### Validation
 
@@ -152,10 +152,11 @@ See OPT-017 for full carry-in rules and quality guards. See `.opencode/agent/_it
 - cacheless final gate runs after the cached loop converges with zero BLOCKING findings; cacheless auditors run in parallel and ignore prior caches
 - rerun only reviewer domains touched by fixes
 - if the cacheless final gate returns BLOCKING, apply fixes, re-enter the cached loop, then repeat the final gate
+- every NEW or CHANGED rule card, command body, agent prompt, and reviewer prompt must follow the caveman rule (full variant) at `.opencode/agent/_iterate/rules/caveman-rule.txt`; existing rules grandfathered
 
 ## When to Read What
 
-- Read this file for iterate-specific artifact, self-iteration, and split-vs-don't-split rules.
+- Read this file for iterate-specific artifact, self-iteration, split-vs-don't-split, and caveman rules.
 - Read `config/doc/workflow/design-patterns.md` for shared creation/refinement prompt design patterns.
 - Read `config/doc/workflow/optimize-patterns.md` for existing-workflow prompt optimization tactics.
 - Read `config/doc/workflow/optimize-maintenance.md` only when editing `_workflow/optimize*` or `export-analyzer.md`.

@@ -32,7 +32,7 @@
   ref_type=path
   has_actions_path=1
   skip_cache_format=1
-  categories="RUNTIME_INSTRUCTION | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CLARITY | DEDUP"
+  categories="RUNTIME_INSTRUCTION | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CAVEMAN | CLARITY | DEDUP"
   evidence="<section, rule, or rendered artifact>"
   problem="<one-line problem>"
   fix="<exact correction>"
@@ -48,7 +48,7 @@
   step=""
   with_verified=1
   verified_ref="<path>: <one-line verified condition>"
-  output_extra="- Every ID in the response MUST exist in both `actions_path` and `cache_path`."
+  output_extra="- Every ID in the response MUST exist in both `actions_path` and `cache_path`.\n- For CAVEMAN findings: cite violated rule (drop article, drop filler, drop hedge, drop preamble), show bad line, and give caveman rewrite."
   return_rule_extra="- Only include the diff when exact replacement text and surrounding context are known. Otherwise write prose fix only and note 'diff not applicable' in the diff block."
 }}
 {{
@@ -57,7 +57,7 @@
   agent="_iterate/edit-reviewers/prompt-quality"
   prefix=PQ
   with_domains=0
-  categories="RUNTIME_INSTRUCTION | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CLARITY | DEDUP"
+  categories="RUNTIME_INSTRUCTION | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CAVEMAN | CLARITY | DEDUP"
   evidence="<section, rule, or rendered artifact>"
   problem="<one-line problem>"
   fix="<exact correction>"
@@ -73,7 +73,7 @@
   step=""
   with_verified=1
   verified_ref="<path>: <one-line verified condition>"
-  output_extra="- Final-gate uncached pass: ignore prior caches, return only current findings inline."
+  output_extra="- Final-gate uncached pass: ignore prior caches, return only current findings inline.\n- For CAVEMAN findings on existing grandfathered rule cards, do not flag; only flag NEW or CHANGED rule cards and prompts."
 }}
 
 # Constraints
@@ -83,5 +83,6 @@
   - callee-owned instructions duplicated in caller
   - unstable machine output
   - confusing behavior-governing text
+  - NEW or CHANGED rule card, command body, agent prompt, or reviewer prompt violates caveman-rule.txt
 - ADVISORY: local wording economy, positive-wording opportunities, dense paragraph-style rules, or doc clarity improvements that do not affect correctness.
 - Keep response compact; detailed evidence belongs in cache (cached mode only).

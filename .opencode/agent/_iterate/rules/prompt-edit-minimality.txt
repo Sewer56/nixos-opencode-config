@@ -1,4 +1,4 @@
-- Write rules in caveman. Shortest rule that keeps behavior. Fewer tokens == better adherence. Apply to every rule card, reviewer body, runner prompt, and inline instruction.
+- Apply caveman rule at `.opencode/agent/_iterate/rules/caveman-rule.txt` to every NEW or CHANGED rule card, command body, agent prompt, and reviewer prompt.
 - Match frontmatter permissions to tools the body exercises.
 - Drop instructions for unavailable tools.
 - Drop tool permissions the prompt body does not exercise.
