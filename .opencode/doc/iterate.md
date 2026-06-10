@@ -14,7 +14,7 @@ Reference for direct OpenCode LLM-instruction edits. Shared pattern memory:
 2. `_iterate/edit-prep` resolves targets, artifacts, classification, risks, required reads; writes `PROMPT-ITERATE-EDIT-<slug>.prep.md`.
 3. `_iterate/edit-pattern-selector` writes `PROMPT-ITERATE-EDIT-<slug>.patterns.md`.
 4. Primary edits target prompts/docs.
-5. `scripts/iterate-static-check.sh <artifact_base>` writes `.static-check.md` and `# STATIC CHECK` verdict.
+5. `{{path:./scripts/iterate-static-check.py}} <artifact_base>` writes `.static-check.md` and `# STATIC CHECK` verdict.
 6. Cached reviewers write cache + actions sidecars; primary applies actions and reruns touched domains until zero BLOCKING or 5 iterations.
 7. Cacheless reviewers ignore prior caches, audit full artifact, return inline findings. BLOCKING re-enters cached loop.
 
@@ -67,7 +67,7 @@ Split wins when concerns drop, even if total grows. Split loses when concerns st
 
 ### Script over subagent
 
-No LLM judgment + deterministic verdict + once per run = script. Current static check is `scripts/iterate-static-check.sh` for this reason.
+No LLM judgment + deterministic verdict + once per run = script. Current static check is `scripts/iterate-static-check.py` for this reason.
 
 ### Validation
 

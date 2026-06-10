@@ -1,6 +1,9 @@
 # Prompt files
 PROMPT-*.md
 
+# Python cache
+__pycache__/
+
 tools/workflow-optimize/__pycache__/
 
 # Nix build symlink

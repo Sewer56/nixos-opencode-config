@@ -87,7 +87,7 @@ Direct-edit OpenCode prompts that write LLM instructions. Keep primary on orches
 - Use exact shape from rule file at `.opencode/agent/_iterate/rules/edit-log-shape.txt`.
 
 ## 5. Static check
-- Run `bash scripts/iterate-static-check.sh <artifact_base>`. Script owns its own scope.
+- Run `python3 {{path:./scripts/iterate-static-check.py}} <artifact_base>`. Script owns its own scope.
 - Read `<artifact_base>.static-check.md`; validate stdout `# STATIC CHECK` block.
 - If BLOCKING, fix listed issues, update `## Delta`, rerun script.
 - Use PASS `Changed Paths` as reviewer `changed_paths`.
@@ -135,6 +135,6 @@ Summary: <one-line summary>
 # Constraints
 - Direct-edit target files. Emit no draft/finalize/STEP artifacts.
 - Ask at most one question, only when ambiguity blocks safe edits.
-- Static check is `scripts/iterate-static-check.sh`, not subagent.
+- Static check is `{{path:./scripts/iterate-static-check.py}}`, not subagent.
 - Preserve quality gates before token savings.
 - Keep user response brief, factual.

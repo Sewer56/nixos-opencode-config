@@ -23,64 +23,53 @@ permission:
     "_audit/public-api/collector": "allow"
 ---
 
-Audit items that are public/exported but should not be. Produce report with exact diffs.
+Find public items that should be private. Produce report with exact diffs.
 
 # Inputs
 
 - `$ARGUMENTS`: (optional) file or directory paths. Empty → audit entire repo.
-- `repo_root`: determined from working directory.
+- `repo_root`: from working directory.
 
-# Orchestration
+# Workflow
 
 ## 1. Resolve targets
 
-**If `$ARGUMENTS` has paths:**
+**Paths given:**
+- For each path: if dir, discover source files under it; if file, use directly. Detect language by extension.
+- No valid source files → stop, tell user.
 
-For each path:
-- If directory: discover source files under it
-- If file: use directly
-- Detect language from file extension
-
-If no valid source files found, stop and tell user.
-
-**If `$ARGUMENTS` is empty:**
-
-Ask user: "Audit entire repo? (y/n)". If no, stop.
-
-Spawn `codebase-explorer` to discover all source files in repo. Skip files matching test patterns from language files (`agent/_audit/_templates/lang-*.txt`) and files with `Code generated` or `DO NOT EDIT` in first 5 lines.
+**No paths:**
+- Ask user: "Audit entire repo? (y/n)". No → stop.
+- Spawn `codebase-explorer` to discover all source files. Skip test patterns from `agent/_audit/_templates/lang-*.txt` and files with `Code generated` or `DO NOT EDIT` in first 5 lines.
 
 ## 2. Collect
 
-Group targets by detected language. For each language, pipe file list through:
+Group targets by language. For each language, pipe file list through:
 
 ```
 python {{path:./scripts/chunk-files-by-tokens.py}}
 ```
 
-Spawn one `_audit/public-api/collector` per chunk in single parallel call. Each chunk is <64k estimated tokens.
+Default 32k tokens/chunk. Override with `-s`.
 
-Per collector:
+Parse output: `chunk N: TOTAL` lines begin groups; `TOKENS FILE_PATH` lines list files. Blank lines separate chunks.
+
+Spawn one `_audit/public-api/collector` per chunk, all in parallel. Each gets:
 - `language`: detected language
-- `repo_root`: absolute path to repo root
-- `specific_paths`: comma-separated list of absolute file paths in chunk
+- `repo_root`: absolute repo root
+- `specific_paths`: absolute file paths in chunk
 
-## 3. Gate
+Wait for ALL collectors. Collector output is final — do not re-query or resume.
 
-Wait for ALL collectors to return. Collector output is final — per-item blocks for candidates/review, then summary. Do not re-query or resume.
+## 3. Filter
 
-# Analysis
+**Paths given:** discard items whose `File` is not under a user-provided path. Cross-reference usage counts from full repo are preserved.
 
-## 4. Filter
+**No paths:** keep all items.
 
-If `$ARGUMENTS` had paths: discard collector items whose `File` is not within a user-provided target path. Only user-requested files enter classification. Usage counts from full repo cross-reference preserved.
+## 4. Classify
 
-If `$ARGUMENTS` was empty: keep all items (no filter).
-
-## 5. Classify
-
-Scope: `targeted: <paths>` if paths given, otherwise `whole repo`. Scope line: `N paths (languages)` or `N files (languages)`.
-
-### Rules
+Scope: `targeted: <paths>` or `whole repo`. Scope line: `N paths (languages)` or `N files (languages)`.
 
 {{ file="./config/rules/groups/audit/search-public-api-analysis.md" }}
 
