@@ -9,7 +9,7 @@ mod tui;
 mod tree;
 mod export;
 
-use anyhow::Result;
+use anyhow::{Result, bail};
 use clap::Parser;
 use cli::{Cli, Command, TuiArgs, TreeArgs};
 use db::discover::{resolve_db_path, open_db, print_discovered_dbs};
@@ -18,6 +18,7 @@ use tree::display::run_tree_command;
 use export::bundle::export_bundle;
 use tui::input::run_tui;
 use std::io::{self, IsTerminal};
+use chrono::{Utc, TimeZone, NaiveDate, NaiveDateTime};
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -40,6 +41,28 @@ fn main() -> Result<()> {
                 eprintln!("Exporting {} root sessions...", roots.len());
                 for (i, root_id) in roots.iter().enumerate() {
                     eprintln!("[{}/{}] {}", i + 1, roots.len(), root_id);
+                    match export_bundle(&conn, &index, root_id, args.out.clone()) {
+                        Ok(export_root) => println!("{}", export_root.display()),
+                        Err(e) => eprintln!("  ERROR: {e:#}"),
+                    }
+                }
+                Ok(())
+            } else if let Some(since) = &args.since {
+                let since_ms = parse_since_timestamp(since)?;
+                let matched: Vec<_> = index
+                    .roots
+                    .iter()
+                    .filter(|root_id| {
+                        index.sessions.get(*root_id).is_some_and(|s| s.time_updated >= since_ms)
+                    })
+                    .cloned()
+                    .collect();
+                if matched.is_empty() {
+                    bail!("no root sessions updated since {}", since);
+                }
+                eprintln!("Exporting {} root sessions updated >= {}...", matched.len(), since);
+                for (i, root_id) in matched.iter().enumerate() {
+                    eprintln!("[{}/{}] {}", i + 1, matched.len(), root_id);
                     match export_bundle(&conn, &index, root_id, args.out.clone()) {
                         Ok(export_root) => println!("{}", export_root.display()),
                         Err(e) => eprintln!("  ERROR: {e:#}"),
@@ -79,4 +102,28 @@ fn main() -> Result<()> {
             }
         }
     }
+}
+
+fn parse_since_timestamp(raw: &str) -> Result<i64> {
+    let trimmed = raw.trim();
+
+    // Try ISO8601 / RFC3339 with timezone
+    if let Ok(dt) = chrono::DateTime::parse_from_rfc3339(trimmed) {
+        return Ok(dt.timestamp_millis());
+    }
+
+    // Try "YYYY-MM-DD HH:MM:SS" (naive → UTC)
+    if let Ok(naive) = NaiveDateTime::parse_from_str(trimmed, "%Y-%m-%d %H:%M:%S") {
+        return Ok(Utc.from_utc_datetime(&naive).timestamp_millis());
+    }
+
+    // Try "YYYY-MM-DD" (naive date → UTC)
+    if let Ok(naive) = NaiveDate::parse_from_str(trimmed, "%Y-%m-%d") {
+        let dt = naive.and_hms_opt(0, 0, 0).unwrap();
+        return Ok(Utc.from_utc_datetime(&dt).timestamp_millis());
+    }
+
+    bail!(
+        "cannot parse --since value {raw:?}. Expected ISO8601, \"YYYY-MM-DD\", or \"YYYY-MM-DD HH:MM:SS\" (UTC)"
+    )
 }

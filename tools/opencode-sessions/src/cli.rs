@@ -63,6 +63,11 @@ pub(crate) struct ExportArgs {
     pub(crate) latest: bool,
 
     /// Export all root sessions (ignores target/search/latest)
-    #[arg(long, conflicts_with_all = ["target", "search", "latest"])]
+    #[arg(long, conflicts_with_all = ["target", "search", "latest", "since"])]
     pub(crate) all: bool,
+
+    /// Export root sessions updated since this timestamp (ignores target/search/latest)
+    /// Accepts ISO8601, "YYYY-MM-DD", or "YYYY-MM-DD HH:MM:SS" (UTC)
+    #[arg(long, conflicts_with_all = ["target", "search", "latest", "all"])]
+    pub(crate) since: Option<String>,
 }
