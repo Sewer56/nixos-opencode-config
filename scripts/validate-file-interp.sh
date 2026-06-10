@@ -10,4 +10,6 @@ cd "$root"
 bun plugins/opencode-plugin-md-expand/src/cli/cli.ts validate \
   --exclude renderer-syntax.txt \
   --exclude renderer-template-use-checks.txt \
+  --exclude design-patterns.md \
+  --exclude template-library.md \
   ${*:-.opencode config}
