@@ -18,6 +18,7 @@ permission:
   websearch: allow
   task:
     "*": deny
+    "general": allow
     "_iterate/edit-prep": allow
     "_iterate/edit-pattern-selector": allow
     "_iterate/edit-reviewers/integrity": allow
