@@ -80,6 +80,9 @@ Intent: write executable instructions for large language models. Use proven prom
 - Agent markdown body becomes the system prompt.
 - Local subagents are called as `@agent/name`; callers also need matching `permission.task` allows.
 - Prefer deny-all permissions with narrow allows. Keep `*.env` and `*.env.*` denied; allow `*.env.example` only as safe sample input.
+- Match the frontmatter `permission` block to what the prompt body actually exercises. The only default-allow workflow tools are `todowrite` and `external_directory` — every other tool (`read`, `grep`, `glob`, `list`, `bash`, `edit`, plus niche tools like `webfetch`, `plan`, `task`, etc.) MUST be justified by the body. Do not strip `todowrite` or `external_directory` just because the body does not name them — `todowrite` is encouraged on any long-running task and `external_directory` is the norm for cross-repo work. For all other tools, if a tool is allowed but unused, drop it from the frontmatter; adding it "just in case" makes it observable to the model and invites drift.
+- Drop tools the body never references; do not write compensating rules like "do not run git" in a body that has no `bash: allow`.
+- Do not restate callee-owned scope in a caller that dispatches a subagent. The subagent owns its `Scope:` / `Out of scope:`, its mission, its process, and its output schema. A primary that re-lists them creates duplication and a drift surface (caller still lists the old scope after the subagent changes). Pass only paths, ids, notes, decisions, and trigger flags; let the subagent speak for itself.
 - Keep documentation outside `agent/` and `command/` unless the markdown file is an executable agent or command.
 - Use local command/agent conventions and workflow docs for prompt edits.
 - Use `bash` only for git metadata/diff/status, `git diff --check`, and requested validation commands. Prefer `read`, `grep`, and `glob` for file inspection.
@@ -135,6 +138,9 @@ Intent: write executable instructions for large language models. Use proven prom
 - Write command bodies as user messages and agent/reviewer bodies as system prompts.
 - Before saving each changed prompt, run this minimality gate:
   - Remove instructions for tools unavailable in frontmatter.
+  - Remove tools from the frontmatter that the prompt body never references. The only exempt tools are `todowrite` and `external_directory`; every other tool must be justified by the body.
+  - Remove denials of tools or subagents that the `task` allowlist, `bash`/deny list, or other permission entries already block. The prompt cannot observe what it cannot call; writing "do not invoke X" when X is not in the allowlist is unreachable and dead text.
+  - Remove restated callee scope: a caller that dispatches a subagent and then re-lists the subagent's `Scope:` / `Out of scope:` lines, its mission, its review process, or its output schema. The subagent owns that information; restating it in the caller is duplication and a drift surface. Let the subagent speak for itself.
   - Remove direct-vs-child wording unless the prompt can observe and branch on it.
   - Replace prohibition-led rules with the positive action when equivalent.
   - Collapse repeated path derivations into one variable definition.

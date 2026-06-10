@@ -230,3 +230,48 @@ Fix: <smallest concrete correction>
 
 Runner fixes from actions (cached) or inline findings (cacheless); adjudicator/re-review reads actions first, cache only as needed.
 ```
+
+### WOPT-006 — Coupled-Loop Header Pairing
+
+- Applies To: primary orchestrators that contain two phases sharing a re-dispatch loop.
+- Trigger Signals: loop churn where the runner re-runs the full pipeline after a fix in one phase because the coupling between phases is implicit; cross-references in the prompt that point to "step 3" or "the loop" without naming the boundary.
+- Refactor Move:
+  - Replace two top-level `## N.` and `## N+1.` headers with one `## N.` header plus `### Na.` and `### Nb.` substeps when one phase re-dispatches the other.
+  - Add a one- or two-line preamble to the `## N.` header naming the loop direction and trigger (e.g. "BLOCKING re-dispatches Na and repeats Nb").
+  - Update all cross-references in the prompt to the `Nb` form so re-entry points are unambiguous.
+  - When a third phase enters the loop, add it as `Nc` and rewrite the preamble, do not promote it to a new top-level step.
+  - Re-dispatch caps and counters stay per-loop, not per-substep.
+- Quality Guard:
+  - The preamble MUST mention both the trigger condition and the re-dispatch direction; a header that just numbers substeps does not satisfy this.
+  - Do not pair two phases that do not share a re-dispatch — keep them as separate top-level steps.
+  - Do not pair when one phase re-dispatches the other conditionally based on a sub-criterion (e.g. "only when file class X"); pair only when the re-dispatch is structural.
+- Related Design Patterns: OPT-019.
+- Expected Gain: shorter prompts, fewer missed re-dispatches, no accidental full-pipeline restarts when a single phase needs a retry.
+
+```text
+Before (implicit loop):
+## 2. Implement once
+- Dispatch implementer.
+
+## 3. Diff review loop
+- Dispatch reviewer. On BLOCKING: re-dispatch step 2.
+
+## 4. Validator-fixer
+- ...
+
+After (paired loop):
+## 2. Implement and diff review
+
+Implementer writes code; reviewer validates. BLOCKING re-dispatches 2a and repeats 2b.
+
+### 2a. Implement once
+- Dispatch implementer.
+
+### 2b. Diff review loop
+- Dispatch reviewer. On BLOCKING: re-dispatch 2a.
+
+## 3. Validate and certify
+- ...
+```
+
+Bad: `## 2. Implement` and `## 3. Review` as siblings — the reader has to infer the loop from the cross-reference.

@@ -5,6 +5,7 @@ Approved catalog for reusable workflow and prompt design patterns used when crea
 Related files:
 - Design patterns: `config/doc/workflow/design-patterns.md` (this file)
 - Existing-workflow optimization tactics: `config/doc/workflow/optimize-patterns.md`
+- Template catalog: `config/doc/workflow/template-library.md`
 - Unproven intake: `config/doc/workflow/unproven-patterns.md`
 - Experiment evidence: `PROMPT-WORKFLOW-OPTIMIZE-*.md`
 
@@ -19,14 +20,14 @@ Related files:
 
 ## Trait Matrix
 
-| Trait | Usually Apply |
-| --- | --- |
+| trait | Usually Apply |
+|---|---|
 | command delegates to agent | OPT-001 |
 | primary runner + review subagents | OPT-002, OPT-003, OPT-004, OPT-006, OPT-011, OPT-012, OPT-014 |
-| review loop | OPT-003, OPT-004, OPT-005, OPT-009, OPT-011, OPT-012 |
+| review loop | OPT-003, OPT-004, OPT-005, OPT-009, OPT-011, OPT-012, OPT-018 |
 | subagent coordination | OPT-002, OPT-006, OPT-012 |
 | repeated subagent/task calls | OPT-003 |
-| machine-readable final output | OPT-004, OPT-005, OPT-008 |
+| machine-readable final output | OPT-004, OPT-005, OPT-008, OPT-018 |
 | diff-based machine artifacts | OPT-007, OPT-008, OPT-009 |
 | path-only helper sections | OPT-010 |
 | failure-path validation | OPT-013 |
@@ -34,6 +35,7 @@ Related files:
 | shared pattern selection | OPT-015 |
 | adjudicated high-risk review | OPT-016 |
 | pipeline decomposition | OPT-017 |
+| prompt fragment inclusion | OPT-018 |
 
 ## Approved Patterns
 
@@ -101,6 +103,7 @@ Bad: paste reviewer focus list, output schema, role text, examples, model notes,
   - Callee MUST preserve unchanged verified cache records byte-for-byte.
   - Callee MUST update cache before final response.
 - Expected Gain: fewer repeated reads, cheaper re-invocation, less duplicate reasoning.
+- Template refs: `review-cache-table.txt`, `review-finding.txt`, `cached.txt`
 
 Choose invalidation input by workflow shape:
 
@@ -174,6 +177,7 @@ reopen STEP-002 only if decision/domain touches it
   - Output MUST NOT include greetings, summaries, or prose outside the block.
   - Use JSON only when the consumer explicitly requires JSON.
 - Expected Gain: better parser reliability and less format drift.
+- Template refs: `review-output/output.txt`, `review-output/pointer.txt`, `review-output/compact-output.txt`
 
 Good:
 
@@ -297,6 +301,7 @@ inner fence = ```diff
   - If exact text or context is uncertain, reviewer MUST write prose fix only and MUST NOT invent a diff.
   - Conceptual findings MUST stay conceptual; do not fake precision.
 - Expected Gain: easier mechanical application of reviewer feedback.
+- Template ref: `review-finding.txt`
 
 Exact:
 
@@ -488,8 +493,9 @@ Main agent applies only returned carry-ins.
   - Risk tiers:
     - High-risk → adjudicated double-check + final audit
     - Low-risk → single reviewer + single-reviewer final audit
-  - After fix: rerun touched domains only
-- Expected Gain: fewer missed high-risk issues, reliable release gates, cost scaled by risk.
+    - After fix: rerun touched domains only
+ - Related: `config/doc/workflow/template-library.md`
+ - Expected Gain: fewer missed high-risk issues, reliable release gates, cost scaled by risk.
 
 ```text
 Topology (<domain> = correctness, audit, plan-reviewer, freeform-reviewer):
@@ -540,8 +546,80 @@ After (pipelined):
     ├── repo search / discovery
     └── writes pipeline state file
 
-  agent.md (250 lines) — reads state file
-    ├── reads pipeline state file
-    ├── core generation work
-    └── review loop
+   agent.md (250 lines) — reads state file
+     ├── reads pipeline state file
+     ├── core generation work
+     └── review loop
+ ```
+
+### OPT-018 — Prompt Fragment Inclusion
+
+ - Scope: cross-workflow
+ - Apply When: a prompt needs reusable normative shape without pasting the full shape into every consumer.
+ - Skip When: the fragment is only used once, or the shape is so domain-specific that parameterization overhead exceeds duplication savings.
+ - Carry-In:
+   - Define fragment in a `.txt` file with parameterized placeholders `{{arg:key}}` and conditional blocks `{{ if=... }}`.
+   - Consumer includes fragment via `{{ file="./path/to/fragment.txt" key="value" }}`.
+   - Fragment MUST be self-contained in shape and MUST NOT contain domain-specific content that changes per consumer.
+   - Consumer MUST pass all required args; do not rely on defaults inside the fragment.
+   - Fragments for different modes (cached vs cacheless, correctness vs audit) SHOULD be separate files, not one file with heavy branching.
+   - Keep fragment surface narrow: one mission, one process script, one output block, or one finding format per file.
+ - Related: `config/doc/workflow/template-library.md`
+ - Expected Gain: less copy-paste drift, smaller prompts, consistent output schemas across reviewers.
+
+ ```text
+ Fragment: `review-finding.txt`
+   [{{arg:prefix}}-NNN]
+   Severity: BLOCKING | ADVISORY
+   Problem: {{arg:problem}}
+   Fix: {{arg:fix}}
+   ~~~diff
+   {{arg:bad}}
+   {{arg:good}}
+   ~~~
+
+ Consumer:
+   {{ file="./agent/_templates/review-finding.txt" prefix="COR" problem="..." ... }}
+ ```
+
+### OPT-019 — Paired Substep Loop Grouping
+
+- Scope: cross-workflow
+- Apply When: a primary has two phases that share a loop — e.g. an implementer and its reviewer, or a fixer and its certifier — and one phase re-dispatches the other on a BLOCKING finding.
+- Skip When: the two phases are truly independent (no re-dispatch), or the loop is short and the cross-reference fits in one step header.
+- Carry-In:
+  - Group the two phases under a single numbered top-level step: `## N. <Phase>`, with substeps `### Na. <Substep A>` and `### Nb. <Substep B>`.
+  - The `## N.` section preamble MUST state the loop relationship in one or two lines: which substep re-dispatches which, and the trigger condition.
+  - The earlier substep (`Na`) owns the initial dispatch; the later substep (`Nb`) owns the validation pass and the re-dispatch rule.
+  - Cross-references in other sections MUST use the `Nb` form (e.g. `return to step 2b`) so the loop entry point is unambiguous.
+  - Do not split a paired loop across two `## N.` headers. The pairing is the point.
+  - If a third phase enters the loop, add it as `Nc` and update the preamble, do not promote it to a new top-level step.
+- Related: WOPT-002, WOPT-006.
+- Expected Gain: the loop is visible at a glance, re-dispatch boundaries are explicit, and future steps do not accidentally re-host a substep.
+
+```text
+## 2. Implement and diff review
+
+The implementer writes product code; the implementer-reviewer validates that code against the handoff. The two steps share a loop: a BLOCKING diff-review finding re-dispatches the implementer and re-runs the reviewer.
+
+### 2a. Implement once
+- Dispatch `_implement/plan/implementer` with `handoff_path`.
+
+### 2b. Diff review loop
+- Dispatch `_implement/plan/implementer-reviewer`. On BLOCKING: re-dispatch 2a and repeat.
 ```
+
+```text
+## 3. Validate and certify
+
+The validator-fixer runs validation and applies fixes; final certification re-runs validation with no edits to confirm. The two steps share a loop: a successful fix re-enters step 2b, and a final-cert failure can re-enter step 3a.
+
+### 3a. Validator-fixer (edit mode)
+- Dispatch validator-fixer in edit mode.
+
+### 3b. Final certification (no-edit)
+- Dispatch validator-fixer in final mode.
+```
+
+Bad: two top-level steps `## 2. Implement` and `## 3. Diff review` with no shared header, requiring the reader to scan cross-references to discover the loop.
+Good: a single `## 2. Implement and diff review` header with `### 2a. Implement once` and `### 2b. Diff review loop` substeps, plus a one-line preamble naming which substep re-dispatches which.

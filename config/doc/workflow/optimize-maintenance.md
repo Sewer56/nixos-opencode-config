@@ -73,6 +73,7 @@ Canonical docs live under `config/doc/workflow/`:
 
 - `design-patterns.md` — approved creation/refinement patterns
 - `optimize-patterns.md` — approved existing-workflow optimization tactics
+- `template-library.md` — catalog of reusable prompt fragments and rule templates
 - `unproven-patterns.md` — empty intake for genuinely unproven reusable ideas
 
 If an experiment teaches reusable behavior:
