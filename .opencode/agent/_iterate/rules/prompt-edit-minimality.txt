@@ -1,0 +1,13 @@
+- Match frontmatter permissions to tools the body exercises.
+- Drop instructions for unavailable tools.
+- Drop tool permissions the prompt body does not exercise.
+- Drop unreachable denials already enforced by permissions.
+- Pass subagents only run-specific paths, ids, flags, notes, decisions, and cache/action paths.
+- Let callees own their role, scope, process, examples, and output schema.
+- Replace prohibition-led wording with the equivalent positive action.
+- Define derived paths once and reuse the variable.
+- Remove filler, duplicate rules, trailing spaces, whitespace-only lines, and repeated blank lines.
+- Keep only selected OPT/WOPT carry-ins that change the target prompt.
+- Use imperative concrete verbs.
+- Number sequential workflow phases only.
+- Prefer bullets/checklists for runtime rules.

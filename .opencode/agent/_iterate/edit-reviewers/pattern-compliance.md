@@ -15,15 +15,6 @@ permission:
   edit:
     "*": deny
     "*PROMPT-ITERATE-EDIT*.review-pattern-compliance*.md": allow
-  glob:
-    "*": allow
-    "opencode-source/**": deny
-  grep:
-    "*": allow
-    "opencode-source/**": deny
-  bash: allow
-  list: allow
-  external_directory: allow
 ---
 
 Check changed prompt files against selected workflow patterns.
@@ -35,14 +26,18 @@ Check changed prompt files against selected workflow patterns.
 - `changed_paths`: repo-relative files changed by `_iterate/edit`.
 - `target_summary`: one-line edit goal.
 - `risk_flags`: compact flags.
+- `static_check_path`: optional static-check result path.
+
+# Focus
+- Own: selected pattern Carry-Ins, Quality Guards, Apply To paths, and Validation bullets.
+- Non-domain: prompt wording quality, semantic permission safety, and mechanical render checks.
 
 # Process
 
 {{
   file="../config/agent/_templates/review-process/cached.txt"
   delta_source=log_path
-  render_expanded=1
-  step2_extra="- Read `pattern_contract_path`.\n- Read selected source sections named by the contract, such as `config/doc/workflow/design-patterns.md#OPT-###` or `config/doc/workflow/optimize-patterns.md#WOPT-###`.\n- Read changed files and any `Apply To` files from the contract.\n- Check each selected Carry-In, Quality Guard, Apply To path, and Validation bullet against the generated prompt text.\n- When selected patterns affect templates or output schemas, inspect rendered output for whitespace artifacts that weaken the selected validation.\n- Findings are about generated files not matching selected patterns."
+  step2_extra="- Read `pattern_contract_path`.\n- Read selected source sections named by the contract, such as `config/doc/workflow/design-patterns.md#OPT-###` or `config/doc/workflow/optimize-patterns.md#WOPT-###`.\n- Read changed files and any `Apply To` files from the contract.\n- If `static_check_path` is provided, read it only when a selected Validation bullet depends on static/render status.\n- Check each selected Carry-In, Quality Guard, Apply To path, and Validation bullet against the generated prompt text.\n- Findings are about generated files not matching selected patterns."
   preserve_byte_exact=1
 }}
 

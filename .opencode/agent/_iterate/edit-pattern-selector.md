@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Selects compact design and workflow-optimization rules for direct OpenCode agent/command prompt edits
+description: Writes compact OPT/WOPT pattern contracts for direct OpenCode prompt edits
 permission:
   "*": deny
   read:
@@ -13,17 +13,18 @@ permission:
   edit:
     "*": deny
     "*PROMPT-ITERATE-EDIT*.patterns*.md": allow
-  external_directory: allow
 ---
 
-Select compact pattern guidance for a direct OpenCode agent or command prompt edit.
+Select compact pattern guidance for a direct OpenCode command, agent, reviewer, or workflow-doc prompt edit.
 
 # Inputs
 - `target_summary`: short description of requested edit.
 - `target_paths`: repo-relative paths expected to change.
-- `behavior_traits`: compact traits such as command delegation, primary runner + review subagents, review loop, subagent coordination, repeated subagent/task calls, machine-readable output, diff-based artifacts, failure-path validation, path-only helper sections, shared pattern selection, optimizer workflow, or reviewer topology.
-- `focus_signals`: observed waste/risk signals such as prompt/context bloat, duplicate reads, duplicate reasoning, tight input violation, output bloat, topology mismatch, model/risk mismatch, scope leakage, cache/delta failure, review-loop churn, or rendered whitespace artifacts.
-- `risk_flags`: compact flags such as command-agent, permission, self-iteration, optimizer-workflow, reviewer-topology, structured-output, or json-config.
+- `behavior_traits`: compact traits from the shared iterate-edit vocabulary.
+- `focus_signals`: observed waste/risk signals from the shared iterate-edit vocabulary.
+- `risk_flags`: compact flags from the shared iterate-edit vocabulary.
+
+{{ file="./.opencode/agent/_iterate/rules/iterate-edit-vocabulary.txt" }}
 - `pattern_contract_path`: `PROMPT-ITERATE-EDIT-<slug>.patterns.md` path to write.
 
 # Process
