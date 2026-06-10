@@ -1,37 +1,37 @@
 ### Public API classification
-Before evaluating the decision table, gather evidence per item for each override condition. For each item, check all that apply:
+Gather evidence per item for each override condition. Check all that apply:
 
-- **Re-exports** (rule 1): grep for re-exports (`pub use`, `export.*from`, `__init__.py` re-imports, `public fun` delegating). Only count matches where the re-export site is in a **different module** than the defining module. Same-module re-exports are internal organization, not external demand.
-- **Doc contract** (rule 2): read the item's doc comments for API guarantees or `# API` sections.
-- **Derive macros** (rule 3): check if the item is a field on a struct/enum with derive attributes that access fields or generate public methods.
-- **Trait impl** (rule 4): check if the item appears in `impl Trait for Type` where the type is not fully private.
-- **Binary/FFI** (rule 5): grep binary targets, examples, and FFI bindings for the item.
-- **Reflection/DI** (rule 6): grep for `getattr`, `Class.forName`, `getMethod`, Spring wiring by string name.
+- **Re-exports** (rule 1): grep for re-exports (`pub use`, `export.*from`, `__init__.py` re-imports, `public fun` delegating). Count only cross-module re-exports. Same-module = internal organization, not external demand.
+- **Doc contract** (rule 2): read doc comments for API guarantees or `# API` sections.
+- **Derive macros** (rule 3): check if item is field on struct/enum with derive attributes that access fields or generate public methods.
+- **Trait impl** (rule 4): check if item appears in `impl Trait for Type` where type is not fully private.
+- **Binary/FFI** (rule 5): grep binary targets, examples, FFI bindings for the item.
+- **Reflection/DI** (rule 6): grep for string-name lookups (e.g. `getattr`); see language file for full per-runtime list.
 
-Rules are evaluated top-to-bottom; first match wins.
+Rules evaluated top-to-bottom; first match wins.
 
 | # | Condition | Decision |
 |---|-----------|----------|
 | 1 | Re-exported by another module's public API | **KEEP PUBLIC** |
-| 2 | Documented as public API contract (doc comments indicating external use, `# API` sections) | **KEEP PUBLIC** |
-| 3 | Required by a derive macro on a non-fully-private type — any derive that accesses fields or generates public accessor methods requires field visibility ≥ type visibility (including but not limited to: `Serialize`, `Deserialize`, any `serde` derive, `JsonSchema`, `TypeJson`, `FromPyObject`, `IntoPyObject`, `pyclass`, `pymethods`, any `pyo3` derive, `QueryFragment`, `derive_builder`, `typed_builder`, `strum`, `prost`, `tonic`, `diesel`, `sqlx`) | **KEEP PUBLIC** |
-| 4 | Part of a trait implementation on a non-fully-private type (visibility must satisfy the trait contract) | **KEEP PUBLIC** |
-| 5 | Referenced in a binary, example, or FFI binding outside the module | **KEEP PUBLIC** |
-| 6 | Accessed via reflection/string reference or DI container wiring (real runtime usage invisible to grep — e.g. `getattr(obj, "name")`, `Class.forName("Name")`, `obj.getClass().getMethod("name")`, Spring XML/annotations resolving by string name) | **KEEP PUBLIC** |
-| 7 | Collector's Visibility field contains `doc(hidden)` — author has flagged as intentionally hidden from documentation | **MANUAL REVIEW** |
-| 8 | Collector says `candidate-medium` AND used only in code-generated files (look for `Code generated`, `@generated`, `DO NOT EDIT` headers) | **CANDIDATE LOW** |
-| 9 | Collector says `candidate-high` | **CANDIDATE HIGH** |
-| 10 | Collector says `candidate-medium` | **CANDIDATE MEDIUM** |
-| 11 | Collector says `review` | **MANUAL REVIEW** |
+| 2 | Documented as public API contract (doc comments, `# API` sections) | **KEEP PUBLIC** |
+| 3 | Required by derive macro on non-fully-private type — any derive accessing fields or generating public methods forces field visibility ≥ type visibility (see language file; e.g. `serde`, `pyo3` families) | **KEEP PUBLIC** |
+| 4 | Part of trait impl on non-fully-private type (visibility must satisfy trait contract) | **KEEP PUBLIC** |
+| 5 | Referenced in binary, example, or FFI binding outside module | **KEEP PUBLIC** |
+| 6 | Accessed via reflection/string reference or DI wiring (invisible to grep; see language file; e.g. `getattr`) | **KEEP PUBLIC** |
+| 7 | Visibility contains `doc(hidden)` — author flagged intentionally hidden | **MANUAL REVIEW** |
+| 8 | `candidate-medium` AND used only in code-generated files (`Code generated`, `DO NOT EDIT` headers) | **CANDIDATE LOW** |
+| 9 | `candidate-high` | **CANDIDATE HIGH** |
+| 10 | `candidate-medium` | **CANDIDATE MEDIUM** |
+| 11 | `review` | **MANUAL REVIEW** |
 
-The decision table is the sole authority for initial classification. Rules 1–6 promote an item to KEEP PUBLIC; rule 7 marks doc-hidden items for review; rule 8 demotes from MEDIUM to LOW. After the decision table produces an initial classification, apply the restriction hint override: if restriction hint is `none` AND the table outcome is not **KEEP PUBLIC**, reclassify the item as **MANUAL REVIEW** (no specific visibility change can be recommended). KEEP PUBLIC items are correctly public regardless of restriction hint.
+Decision table = sole authority for initial classification. Rules 1–6 → KEEP PUBLIC. Rule 7 → MANUAL REVIEW (doc-hidden). Rule 8 → demote MEDIUM to LOW. Restriction hint override: if hint is `none` AND table outcome ≠ KEEP PUBLIC → reclassify as MANUAL REVIEW (no specific visibility change can be recommended). KEEP PUBLIC items are correctly public regardless of hint.
 
 ### Restriction hint mapping
-For every candidate, use the collector's Restriction Hint to determine the target visibility in the diff:
+For every candidate, map Restriction Hint to target visibility in diff:
 
-- `can-be-private` → remove visibility keyword entirely (Rust: remove `pub`/`pub(crate)`; TS: remove `export`; Python: add `_` prefix or remove from `__all__`; Go: lowercase first letter; Java: change to `private`; Kotlin: change to `private`)
-- `can-be-package-private` → remove `public`/`protected` keyword, leaving default access (Java only)
+- `can-be-private` → remove visibility keyword entirely (Rust: drop `pub`/`pub(crate)`; TS: drop `export`; Python: `_` prefix or remove from `__all__`; Go: lowercase first letter; Java: `private`; Kotlin: `private`)
+- `can-be-package-private` → remove `public`/`protected`, leaving default access (Java only)
 - `can-be-internal` → add `internal` modifier (Kotlin only)
 - `can-be-pub-super` → `pub(super)` (Rust only)
-- `can-be-pub-in(<path>)` → `pub(in <path>)` using the path from the collector's hint (Rust only)
-- `none` → item needs its current scope but is still over-exposed compared to external demand; the restriction hint override above reclassifies these as MANUAL REVIEW
+- `can-be-pub-in(<path>)` → `pub(in <path>)` using path from collector hint (Rust only)
+- `none` → needs current scope but over-exposed vs external demand; restriction hint override above reclassifies as MANUAL REVIEW

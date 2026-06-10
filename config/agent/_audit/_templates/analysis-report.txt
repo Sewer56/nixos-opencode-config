@@ -1,9 +1,9 @@
 # Report
-Write `PROMPT-API-AUDIT.md` to repo root with these sections in order:
+Write `PROMPT-API-AUDIT.md` to repo root. Sections in order:
 
-**Summary** — scope, languages, modules, total public items, candidates by confidence (high/medium/low), correctly public (including collector-preclassified keep-public), needs review.
+**Summary** — scope, languages, modules, total public items, candidates by confidence, correctly public (incl. collector-preclassified keep-public), needs review.
 
-**Privatization Candidates** — one subsection per item. Number sequentially from `API-001`, ordered by confidence (High before Medium before Low):
+**Privatization Candidates** — one subsection per item, numbered `API-001`+, High→Medium→Low:
 
 ```
 ### [API-NNN] `item_name` - <confidence>
@@ -18,7 +18,7 @@ Diff:
 (unified diff - approximate source lines with 2+ context before and after visibility change)
 ```
 
-**Correctly Public Items** — items promoted to KEEP PUBLIC by rules 1–6: `` `item_name` - reason (path:line) ``. Then one count line: `N items preclassified keep-public by collector (not individually listed)`.
+**Correctly Public Items** — items promoted to KEEP PUBLIC by rules 1–6: `` `item_name` - reason (path:line) ``. Then: `N items preclassified keep-public by collector (not individually listed)`.
 
 **Needs Manual Review** — bullet list: `` `item_name` - why ambiguous (path:line) ``
 
