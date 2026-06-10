@@ -13,6 +13,7 @@ permission:
   edit: allow
   question: allow
   todowrite: allow
+  external_directory: allow
   task:
     "*": deny
     "_iterate/edit-prep": allow
