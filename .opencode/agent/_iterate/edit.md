@@ -14,6 +14,8 @@ permission:
   question: allow
   todowrite: allow
   external_directory: allow
+  webfetch: allow
+  websearch: allow
   task:
     "*": deny
     "_iterate/edit-prep": allow
