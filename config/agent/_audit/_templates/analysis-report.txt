@@ -1,10 +1,9 @@
 # Report
+Write `PROMPT-API-AUDIT.md` to repo root with these sections in order:
 
-Write `PROMPT-API-AUDIT.md` to the repository root with these sections in order:
+**Summary** — scope, languages, modules, total public items, candidates by confidence (high/medium/low), correctly public (including collector-preclassified keep-public), needs review.
 
-**Summary** - scope, languages, modules, total public items, candidates by confidence (high/medium/low), correctly public (including collector-preclassified keep-public), needs review.
-
-**Privatization Candidates** - one subsection per item. Number sequentially starting from `API-001`, ordered by confidence (High before Medium before Low):
+**Privatization Candidates** — one subsection per item. Number sequentially from `API-001`, ordered by confidence (High before Medium before Low):
 
 ```
 ### [API-NNN] `item_name` - <confidence>
@@ -16,19 +15,18 @@ Write `PROMPT-API-AUDIT.md` to the repository root with these sections in order:
 - Reason: one sentence
 
 Diff:
-(unified diff - approximate source lines with 2+ context before and after the visibility change)
+(unified diff - approximate source lines with 2+ context before and after visibility change)
 ```
 
-**Correctly Public Items** - items promoted to KEEP PUBLIC by rules 1–6: `` `item_name` - reason (path:line) ``. Then one count line: `N items preclassified keep-public by collector (not individually listed)`.
+**Correctly Public Items** — items promoted to KEEP PUBLIC by rules 1–6: `` `item_name` - reason (path:line) ``. Then one count line: `N items preclassified keep-public by collector (not individually listed)`.
 
-**Needs Manual Review** - bullet list: `` `item_name` - why ambiguous (path:line) ``
+**Needs Manual Review** — bullet list: `` `item_name` - why ambiguous (path:line) ``
 
-**Module Breakdown** - table: Module | Language | Public Items | Candidates | High Confidence
+**Module Breakdown** — table: Module | Language | Public Items | Candidates | High Confidence
 
-Before printing the CLI summary, GATE: `PROMPT-API-AUDIT.md` MUST exist on disk and contain all required sections above. If missing or incomplete, write or repair it before output.
+GATE: verify `PROMPT-API-AUDIT.md` exists on disk with all required sections; write/repair if missing.
 
 # CLI Summary
-
 Print after writing:
 
 ```

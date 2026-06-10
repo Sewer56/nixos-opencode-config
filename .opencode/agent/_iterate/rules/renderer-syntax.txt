@@ -40,6 +40,12 @@ Good parameterized import:
 - Runtime environment value: `{{env:VAR}}`
 - Do not use env tokens for local prompt/rule paths; use file imports.
 
+## Path Resolution
+
+- Resolve relative path to absolute: `{{path:./scripts/tool.py}}`
+- Resolve relative to git root: `{{gitpath:./scripts/tool.py}}`
+- Use for script/binary paths that need absolute resolution at render time, regardless of working directory.
+
 ## Boolean Args
 
 - Pass `1` for true.

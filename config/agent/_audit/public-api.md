@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Audits an entire repository for unnecessarily public APIs with privatization diffs
+description: Audits unnecessarily public APIs with privatization diffs — targeted files or entire repo
 permission:
   "*": deny
   read:
@@ -23,60 +23,75 @@ permission:
     "_audit/public-api/collector": "allow"
 ---
 
-Audit every library module in the repository for items that are public/exported but should not be. Produce a report with exact diffs.
+Audit items that are public/exported but should not be. Produce report with exact diffs.
 
 # Inputs
 
-- `repo_root`: determined from the working directory.
+- `$ARGUMENTS`: (optional) file or directory paths. Empty → audit entire repo.
+- `repo_root`: determined from working directory.
 
-# ORCHESTRATION
+# Orchestration
 
-## 1. Discover structure
+## 1. Resolve targets
 
-Spawn `codebase-explorer` to map the repository:
+**If `$ARGUMENTS` has paths:**
 
-- Every language present
-- Every module/crate boundary: Cargo.toml (Rust workspace members), package.json (Node), pyproject.toml / setup.py (Python), build.gradle / build.gradle.kts (JVM). For Go: each directory containing `.go` files is a separate module (not one module per go.mod — Go packages are the cross-reference boundary per lang-go.txt).
-- Which modules are **libraries** vs **applications**. A module is a library if other modules list it as a dependency (check Cargo.toml `[dependencies]`, package.json `dependencies`, go.mod `require`, build.gradle `implementation`). A module is an application if it has a main entry point (`fn main`, `src/main.rs`, `index.ts` with server startup, `main.py`, `build.gradle` with `application` plugin) and no dependents within the repo.
+For each path:
+- If directory: discover source files under it
+- If file: use directly
+- Detect language from file extension
 
-Only library modules are audited. Skip binaries, applications, and test-only fixtures.
+If no valid source files found, stop and tell user.
+
+**If `$ARGUMENTS` is empty:**
+
+Ask user: "Audit entire repo? (y/n)". If no, stop.
+
+Spawn `codebase-explorer` to discover all source files in repo. Skip files matching test patterns from language files (`agent/_audit/_templates/lang-*.txt`) and files with `Code generated` or `DO NOT EDIT` in first 5 lines.
 
 ## 2. Collect
 
-Spawn one `_audit/public-api/collector` per (library module, language) pair in a single parallel call. When a module directory contains markers for multiple languages (e.g. a Python package with Rust extensions), spawn one collector per language with the same `target_path` but different `language` values. For Go, each package directory is a separate collector invocation. Skip Go packages under `internal/` directories (compiler-enforced private; no items to audit).
+Group targets by detected language. For each language, pipe file list through:
 
-Per collector, pass:
+```
+python {{path:./scripts/chunk-files-by-tokens.py}}
+```
 
-- `target_path`: absolute path to the module root
+Spawn one `_audit/public-api/collector` per chunk in single parallel call. Each chunk is <64k estimated tokens.
+
+Per collector:
 - `language`: detected language
-- `repo_root`: absolute path to the repository root
+- `repo_root`: absolute path to repo root
+- `specific_paths`: comma-separated list of absolute file paths in chunk
 
 ## 3. Gate
 
-Wait for ALL collectors to return before proceeding. Do not begin any analysis until every collector has reported.
+Wait for ALL collectors to return. Collector output is final — per-item blocks for candidates/review, then summary. Do not re-query or resume.
 
-Collector output is final — per-item blocks for candidates/review, then summary. Do not re-query or resume.
+# Analysis
 
-# ANALYSIS
+## 4. Filter
 
-## 4. Classify
+If `$ARGUMENTS` had paths: discard collector items whose `File` is not within a user-provided target path. Only user-requested files enter classification. Usage counts from full repo cross-reference preserved.
 
-Use `whole repo` as the scope value and `N modules (languages)` as the scope line.
+If `$ARGUMENTS` was empty: keep all items (no filter).
+
+## 5. Classify
+
+Scope: `targeted: <paths>` if paths given, otherwise `whole repo`. Scope line: `N paths (languages)` or `N files (languages)`.
 
 ### Rules
 
-{{ file="./rules/groups/audit/search-public-api-analysis.md" }}
+{{ file="./config/rules/groups/audit/search-public-api-analysis.md" }}
 
-{{ file="./agent/_audit/_templates/analysis-report.txt" }}
+{{ file="./config/agent/_audit/_templates/analysis-report.txt" }}
 
 # Output
-
-Return exactly:
 
 ```text
 Status: SUCCESS | FAIL
 Report Path: <absolute path to PROMPT-API-AUDIT.md>
-Modules Audited: <n>
+Files Audited: <n>
 Candidates: <n>
 Summary: <one-line summary>
 ```

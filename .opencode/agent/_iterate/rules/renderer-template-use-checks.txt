@@ -12,7 +12,7 @@ Check:
 - Do not use env tokens for local prompt/rule paths.
 - Do not pass false-flag args (`=0`); omit the arg entirely for false, and keep true numeric flags as `1`.
 - Do not pass args that the target template does not consume.
-- Use `.opencode/agent/_iterate/rules/renderer-syntax.txt` as the exact usage guide; it contains live renderer tokens and stays excluded from broad interpolation validation.
+- Use `{{path:./...}}` for script/binary paths that need absolute resolution at render time; prefer over hardcoded absolute paths.
 
 Bad:
 ```text

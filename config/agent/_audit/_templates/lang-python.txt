@@ -1,27 +1,6 @@
-Python-specific enumeration and visibility rules.
-
-# What to Enumerate
-
-| Enumerate | Skip |
-|-----------|------|
-| In `__all__` OR non-`_`-prefixed at module scope | `_`-prefixed |
-
-# Module Boundary
-
-Directory containing `__init__.py`.
-
-# Re-export Detection
-
-`__init__.py` re-imports: `from .module import Name` — Name is re-exported to package consumers.
-
-# Qualified Path Matching
-
-`from module import item`, `module.Item`, `module.function_name`
-
-# Test Patterns
-
-`test_*.py`, `tests/`
-
-# Special Case
-
-References in `__init__.py` that re-export an item from a submodule within the same package (via `from .module import Name`) are **Internal non-test** — they are the package's own API surface, not external demand. Real external consumers importing the item from other packages will still appear as External usages from their own files.
+Enumerate: In `__all__` OR non-`_`-prefixed at module scope. Skip: `_`-prefixed.
+Module Boundary: directory containing `__init__.py`.
+Re-export: `__init__.py` re-imports `from .module import Name` → Name re-exported to package consumers.
+Qualified Path: `from module import item`, `module.Item`, `module.function_name`.
+Test Patterns: `test_*.py`, `tests/`.
+Special Case: references in `__init__.py` re-exporting item from submodule within same package (`from .module import Name`) → **Internal non-test** (package's own API surface, not external demand). Real external consumers importing item from other packages still appear as External usages.
