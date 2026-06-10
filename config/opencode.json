@@ -42,7 +42,6 @@
       }
     },
     "general": {
-      "model": "sewer-axonhub/deepseek-v4-flash",
       "permission": {
         "task": {
           "*": "deny",
