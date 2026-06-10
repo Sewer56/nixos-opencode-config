@@ -1,14 +1,14 @@
-- Apply caveman rule at `.opencode/agent/_iterate/rules/caveman-rule.txt` to every NEW or CHANGED rule card, command body, agent prompt, and reviewer prompt.
-- Match frontmatter permissions to tools the body exercises.
-- Drop instructions for unavailable tools.
-- Drop tool permissions the prompt body does not exercise.
-- Drop unreachable denials already enforced by permissions.
-- Pass subagents only run-specific paths, ids, flags, notes, decisions, and cache/action paths.
-- Let callees own their role, scope, process, examples, and output schema.
-- Replace prohibition-led wording with the equivalent positive action.
-- Define derived paths once and reuse the variable.
-- Remove filler, duplicate rules, trailing spaces, whitespace-only lines, and repeated blank lines.
-- Keep only selected OPT/WOPT carry-ins that change the target prompt.
+- Apply caveman rule at `.opencode/agent/_iterate/rules/caveman-rule.txt` to every NEW or CHANGED rule card, command body, agent prompt, reviewer prompt.
+- Match frontmatter permissions to tools prompt body uses.
+- Remove unavailable-tool instructions.
+- Remove unused tool permissions.
+- Remove denials already enforced by frontmatter.
+- Pass subagents only run paths, ids, flags, notes, decisions, cache/action paths.
+- Let callee own role, scope, process, examples, output schema.
+- Use positive action wording.
+- Define derived path once; reuse variable.
+- Remove filler, duplicate rules, trailing spaces, whitespace-only lines, repeated blank lines.
+- Keep selected OPT/WOPT carry-ins only when they change target prompt.
 - Use imperative concrete verbs.
 - Number sequential workflow phases only.
 - Prefer bullets/checklists for runtime rules.

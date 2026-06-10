@@ -1,6 +1,6 @@
 # Caveman Rule
 
-Apply to every NEW or CHANGED rule card, command body, agent prompt, and reviewer prompt. Existing rules grandfathered.
+Apply to every NEW or CHANGED rule card, command body, agent prompt, reviewer prompt. Existing rules stay.
 
 ## Mode
 
@@ -17,7 +17,7 @@ Terse like smart caveman. Substance stay. Fluff die.
 ## Keep
 
 - Fragments OK.
-- Short synonyms: `big` not `extensive`, `fix` not `implement a solution for`, `check` not `verify the validity of`.
+- Short words: `big` not `extensive`; `fix` not `implement a solution for`; `check` not `verify validity of`.
 - Technical terms exact. Acronyms. File paths. Code identifiers.
 - Code blocks unchanged. Fenced examples unchanged.
 - Errors quoted exact.
@@ -36,15 +36,15 @@ Not:
 
 ## Auto-clarity
 
-Drop caveman for:
+Suspend caveman for:
 
 - Security warnings.
 - Irreversible action confirmations.
 - Multi-step sequences where fragment order risks misread.
-- User asks to clarify.
+- User asks clarification.
 
 Resume after.
 
 ## Machine output
 
-Machine output schemas and fenced log blocks stay normal English. Rule applies to prompt-text and rule-card-text only.
+Machine output schemas and fenced log blocks stay normal English. Rule applies to prompt text and rule-card text only.

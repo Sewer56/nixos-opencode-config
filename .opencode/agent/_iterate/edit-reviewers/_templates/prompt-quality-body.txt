@@ -7,13 +7,13 @@
   file="../config/agent/_templates/review-process/cached.txt"
   if=mode==cached
   delta_source=log_path
-  step2_extra="- Do not read workflow pattern catalogs or pattern contracts.\n- If `static_check_path` is provided, read it for changed_paths and mechanical-gate status only.\n- Inspect only changed prompt files and directly referenced files needed to detect duplication.\n- Do not judge reviewer topology or template feature use; that is `topology`'s domain.\n- Do not rerun render checks; static script owns render failures, rendered whitespace, and markdown fence lint."
+  step2_extra="- Skip workflow pattern catalogs and pattern contracts.\n- If `static_check_path` is provided, read it for changed_paths and mechanical-gate status only.\n- Inspect changed prompt files and directly referenced files needed to detect duplication only.\n- Leave reviewer topology and template feature use to `topology`.\n- Leave render checks, rendered whitespace, markdown fence lint to static script."
   preserve_byte_exact=1
 }}
 {{
   file="../config/agent/_templates/review-process/cacheless.txt"
   if=mode==cacheless
-  read_context="Read `log_path` and directly referenced files from scratch. Do not read prior caches."
+  read_context="Read `log_path` and directly referenced files from scratch. Ignore prior caches."
   reads_review_ledger=1
 }}
 {{
@@ -24,14 +24,11 @@
   prefix=PQ
 }}
 {{
-  file="../config/agent/_templates/review-footer/cached.txt"
+  file="./agent/_iterate/edit-reviewers/_templates/cached-footer.txt"
   if=mode==cached
   agent="_iterate/edit-reviewers/prompt-quality"
   prefix=PQ
   domain=prompt-quality
-  ref_type=path
-  has_actions_path=1
-  skip_cache_format=1
   categories="RUNTIME_INSTRUCTION | TIGHT_INPUTS | OUTPUT_SCHEMA | WORDING | CAVEMAN | CLARITY | DEDUP"
   evidence="<section, rule, or rendered artifact>"
   problem="<one-line problem>"
@@ -46,10 +43,7 @@
   with_step_file=0
   detail=""
   step=""
-  with_verified=1
-  verified_ref="<path>: <one-line verified condition>"
-  output_extra="- Every ID in the response MUST exist in both `actions_path` and `cache_path`.\n- For CAVEMAN findings: cite violated rule (drop article, drop filler, drop hedge, drop preamble), show bad line, and give caveman rewrite."
-  return_rule_extra="- Only include the diff when exact replacement text and surrounding context are known. Otherwise write prose fix only and note 'diff not applicable' in the diff block."
+  output_extra="- For CAVEMAN finding: cite violated rule, show bad line, give caveman rewrite."
 }}
 {{
   file="../config/agent/_templates/review-footer/cacheless.txt"
@@ -73,16 +67,16 @@
   step=""
   with_verified=1
   verified_ref="<path>: <one-line verified condition>"
-  output_extra="- Final-gate uncached pass: ignore prior caches, return only current findings inline.\n- For CAVEMAN findings on existing grandfathered rule cards, do not flag; only flag NEW or CHANGED rule cards and prompts."
+  output_extra="- Final-gate cacheless pass: ignore prior caches, return current findings inline only.\n- For CAVEMAN findings on existing grandfathered rule cards, skip; flag NEW or CHANGED rule cards and prompts only."
 }}
 
 # Constraints
 - BLOCKING:
-  - LLM runtime prompt written as documentation instead of executable instruction
-  - operational behavior delegated only to docs
+  - LLM runtime prompt written as docs instead of executable instruction
+  - operational behavior lives only in docs
   - callee-owned instructions duplicated in caller
   - unstable machine output
   - confusing behavior-governing text
   - NEW or CHANGED rule card, command body, agent prompt, or reviewer prompt violates caveman-rule.txt
-- ADVISORY: local wording economy, positive-wording opportunities, dense paragraph-style rules, or doc clarity improvements that do not affect correctness.
+- ADVISORY: local wording economy, positive wording, dense paragraph rules, doc clarity improvement with no correctness effect.
 - Keep response compact; detailed evidence belongs in cache (cached mode only).

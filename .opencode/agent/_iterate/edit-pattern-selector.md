@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Writes compact OPT/WOPT pattern contracts for direct OpenCode prompt edits
+description: Writes compact OPT/WOPT contracts for direct prompt edits
 permission:
   "*": deny
   read:
@@ -15,14 +15,14 @@ permission:
     "*PROMPT-ITERATE-EDIT*.patterns*.md": allow
 ---
 
-Select compact pattern guidance for a direct OpenCode command, agent, reviewer, or workflow-doc prompt edit.
+Select compact pattern guidance for direct OpenCode command, agent, reviewer, or workflow-doc prompt edit.
 
 # Inputs
-- `target_summary`: short description of requested edit.
+- `target_summary`: short edit goal.
 - `target_paths`: repo-relative paths expected to change.
-- `behavior_traits`: compact traits from the shared iterate-edit vocabulary.
-- `focus_signals`: observed waste/risk signals from the shared iterate-edit vocabulary.
-- `risk_flags`: compact flags from the shared iterate-edit vocabulary.
+- `behavior_traits`: compact traits from iterate-edit vocabulary.
+- `focus_signals`: observed waste/risk signals from iterate-edit vocabulary.
+- `risk_flags`: compact flags from iterate-edit vocabulary.
 
 {{ file="./.opencode/agent/_iterate/rules/iterate-edit-vocabulary.txt" }}
 - `pattern_contract_path`: `PROMPT-ITERATE-EDIT-<slug>.patterns.md` path to write.
@@ -31,19 +31,19 @@ Select compact pattern guidance for a direct OpenCode command, agent, reviewer, 
 1. Read `config/doc/workflow/design-patterns.md`.
 2. Read `config/doc/workflow/optimize-patterns.md`.
 3. Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or `target_paths` match `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/optimize/export-analyzer.md`.
-4. Read `config/doc/workflow/unproven-patterns.md` only when the request is about `IDEA-###`, unproven pattern intake, or pattern promotion.
-5. Select the fewest patterns that change the target prompt.
+4. Read `config/doc/workflow/unproven-patterns.md` only for `IDEA-###`, unproven pattern intake, or pattern promotion.
+5. Select fewest patterns that change target prompt.
 6. Prefer `- None` over weak matches.
 7. Merge overlapping carry-ins into one direct rule.
-8. Select `OPT-###` patterns when they describe the desired prompt/workflow shape.
-9. Select `WOPT-###` tactics only for existing workflow refactors with matching focus signals.
+8. Select `OPT-###` when pattern describes desired prompt/workflow shape.
+9. Select `WOPT-###` only for existing workflow refactor with matching focus signals.
 10. Write `pattern_contract_path` before final response using `# Pattern Contract` shape below.
-11. Return compact carry-in rules. Do not paste full catalog text.
-12. Do not invent pattern ids.
+11. Return compact carry-in rules. Keep full catalog text out.
+12. Use source pattern ids only.
 
 # Pattern Contract
 
-Write this markdown shape. Under each selected section, write one or more entries or a single `- None` line.
+Write this markdown shape. Under each selected section, write entries or one `- None` line.
 
 ```markdown
 # Iterate Edit Pattern Contract
@@ -101,7 +101,7 @@ Validation:
 - None
 ```
 
-Use selected entries or `- None` under each selected section, not both.
+Use selected entries or `- None` under each section, not both.
 
 # Output
 

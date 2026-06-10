@@ -1,5 +1,5 @@
 ---
-description: "Directly edit OpenCode prompts with prep, pattern, static, and reviewer checks"
+description: "Write OpenCode LLM instructions with prep, pattern, static, review gates"
 agent: _iterate/edit
 ---
 

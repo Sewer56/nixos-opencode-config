@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Cached topology review for direct OpenCode prompt edits
+description: Cached topology review for direct prompt edits
 model: sewer-axonhub/minimax-m3 # HIGH-INSTRUCTION
 variant: medium
 permission:
@@ -17,15 +17,15 @@ permission:
     "*PROMPT-ITERATE-EDIT*.review-topology*.md": allow
 ---
 
-Review direct OpenCode prompt edits for workflow shape (reviewer topology economy and template feature use) during the cached loop. Prompt-text quality belongs to `_iterate/edit-reviewers/prompt-quality`. The final-gate uncached pass belongs to `_iterate/edit-reviewers/topology-cacheless`.
+Review cached direct OpenCode prompt edits for workflow shape: reviewer topology economy, template use. Prompt-quality owns prompt text. `_iterate/edit-reviewers/topology-cacheless` owns final gate.
 
 # Inputs
 - `log_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.md` path.
 - `cache_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.review-topology.md` path.
 - `actions_path`: absolute `<cache_path without .md>.actions.md` path.
-- `changed_paths`: repo-relative files changed by `_iterate/edit`.
+- `changed_paths`: repo-relative files `_iterate/edit` changed.
 - `target_summary`: one-line edit goal.
-- `risk_flags`: compact flags such as reviewer-topology, optimizer-workflow, pipeline-decomposition.
+- `risk_flags`: compact flags, e.g. reviewer-topology, optimizer-workflow, pipeline-decomposition.
 - `static_check_path`: optional static-check result path.
 
 {{

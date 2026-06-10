@@ -1,0 +1,57 @@
+# Actions file format
+
+```markdown
+# Review Actions: {{arg:domain}}
+Source Cache: <cache_path>
+
+## Findings
+{{
+  file="../config/agent/_templates/review-finding.txt"
+  prefix={{arg:prefix}}
+  categories="{{arg:categories}}"
+  evidence="{{arg:evidence}}"
+  problem="{{arg:problem}}"
+  fix="{{arg:fix}}"
+  file_ref="{{arg:file_ref}}"
+  bad="{{arg:bad}}"
+  good="{{arg:good}}"
+  with_file={{arg:with_file}}
+  with_lines={{arg:with_lines}}
+  with_evidence={{arg:with_evidence}}
+  with_detail={{arg:with_detail}}
+  detail="{{arg:detail}}"
+  with_step_file={{arg:with_step_file}}
+  step="{{arg:step}}"
+}}
+```
+
+# Output
+
+Return ONLY fenced block below.
+
+```text
+# REVIEW
+Cache: <cache_path>
+Actions: <actions_path>
+Agent: {{arg:agent}}
+Decision: PASS | ADVISORY | BLOCKING
+IDs: {{arg:prefix}}-001, {{arg:prefix}}-002, ...
+
+## Findings
+- See `actions_path` for current OPEN findings.
+- Use `- None` when no current findings.
+
+## Verified
+- See `cache_path` for verified observations.
+- Use `- None` when no verified observations.
+
+## Notes
+- <optional short notes>
+```
+
+- PASS omits `IDs`.
+- Every response ID MUST exist in `actions_path` and `cache_path`.
+- Keep response pointer-only; put detailed findings in `actions_path` and evidence in `cache_path`.
+{{ if=output_extra }}
+{{arg:output_extra}}
+{{ endif }}

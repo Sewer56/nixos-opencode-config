@@ -87,7 +87,7 @@ done
 for path in ${all_paths}; do
   [ -f "${path}" ] || continue
   case "${path}" in
-    .opencode/agent/*|.opencode/command/*|config/agent/*|config/command/*)
+    .opencode/agent/*.md|.opencode/command/*.md|config/agent/*.md|config/command/*.md)
       rendered="${path}.rendered"
       if bun plugins/opencode-plugin-md-expand/src/cli/cli.ts render "${path}" >"${rendered}" 2>"${rendered}.err"; then
         # Whitespace and empty-line lint on the rendered output.
@@ -101,17 +101,26 @@ for path in ${all_paths}; do
             "rendered output has consecutive blank lines" \
             "collapse repeated blank lines in the source prompt"
         fi
-        # Markdown safety: a code-fence line inside an already-open code block
-        # would close the outer fence prematurely. Detect nested ``` inside ```.
-        nested_fence_line="$(awk '
-          BEGIN { depth = 0 }
-          /^```/ { if (depth > 0) { print NR; exit } depth = 1; next }
-          /^~~~/ { depth = 1; next }
+        # Markdown fence safety: allow separate fences and ~~~ inside ``` schema blocks;
+        # block only unclosed fences after render.
+        unclosed_fence_line="$(awk '
+          BEGIN { fence = ""; opened = "" }
+          /^```/ {
+            if (fence == "") { fence = "```"; opened = NR; next }
+            if (fence == "```") { fence = ""; opened = ""; next }
+            next
+          }
+          /^~~~/ {
+            if (fence == "") { fence = "~~~"; opened = NR; next }
+            if (fence == "~~~") { fence = ""; opened = ""; next }
+            next
+          }
+          END { if (fence != "") print opened }
         ' "${rendered}" | head -n1)"
-        if [ -n "${nested_fence_line}" ]; then
+        if [ -n "${unclosed_fence_line}" ]; then
           add_finding "STAT-$(date +%s%N | tail -c 6)" "BLOCKING" "${path}" \
-            "rendered output has a nested backtick fence at line ${nested_fence_line}" \
-            "use ~~~ for the inner fence, or close the outer fence first"
+            "rendered output has an unclosed markdown fence starting at line ${unclosed_fence_line}" \
+            "close the fence or switch inner examples to the other fence marker"
         fi
         rm -f "${rendered}" "${rendered}.err"
       else
@@ -143,7 +152,8 @@ if [ -z "${findings}" ]; then
   decision="PASS"
   finding_table="${finding_table}| None | none | None | no findings | None |
 "
-  changed_block="- None"
+  changed_block="$(printf "%s\n" "${all_paths}" | sed '/^$/d' | sed 's/^/- /' | head -n 50)"
+  [ -z "${changed_block}" ] && changed_block="- None"
   verified_block="- None"
   ids_out="None"
   summary="static check passed"
@@ -163,7 +173,7 @@ fi
   printf "## Changed Paths\n"
   printf "%s\n\n" "${changed_block}"
   printf "## Findings\n"
-  printf "%s\n" "${finding_table}"
+  printf "%s%s\n" "${finding_table}" "${findings}"
   printf "## Verified\n"
   printf "%s\n" "${verified_block}"
 } >"${result_path}"

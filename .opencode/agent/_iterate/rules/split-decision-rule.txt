@@ -1,50 +1,50 @@
-# Split vs. Don't-Split
+# Split Rule
 
-Apply on every add/split/merge/remove of a subagent, reviewer, or pipeline phase.
+Apply on add/split/merge/remove of subagent, reviewer, pipeline phase.
 
 ## Why
 
-Adherence drops with prompt length. Narrow units or scripts beat one fat agent.
+Long prompt lowers adherence. Narrow unit or script beats fat agent.
 
 ## Split when
 
-- Runner past 150 lines, or holds 3+ heterogeneous domains.
+- Runner exceeds 150 lines or holds 3+ heterogeneous domains.
 - Reviewer emits findings across unrelated concerns.
-- Pipeline phase has no LLM judgement and outputs `PASS | BLOCKING`.
-- Caller duplicates callee scope, role, or schema. Move it.
-- **Reviewers need different file scopes.** Split: one needs `changed_paths` only, another reads more (callers, error collection, repo scan). Don't drag one into the other's reads.
+- Phase has no LLM judgment and returns `PASS | BLOCKING`.
+- Caller repeats callee scope, role, or schema. Move it to callee.
+- Reviewers need different file scopes: one needs `changed_paths`; another needs callers, errors, or repo scan.
 
-## Don't split when
+## Keep when
 
-- Child is comparable size to parent *and* parent is already narrow (<3 domains). Redistribution, not win.
-- Both units read same artifacts and emit overlapping findings. Merge.
-- Handoff contract is longer than the work saved.
-- Phase is one or two sentences; parent runs it cheaply.
+- Child size matches parent and parent already narrow (<3 domains). Redistribution, no win.
+- Units read same artifacts and emit overlapping findings. Merge.
+- Handoff contract longer than work saved.
+- Phase is one or two sentences. Parent runs it cheaply.
 
-## Two metrics
+## Metrics
 
-1. Total prompt size (parent + children).
-2. Concerns per unit (heterogeneous domains a model holds at once).
+1. Total prompt size: parent + children.
+2. Concerns per unit: heterogeneous domains model holds at once.
 
-A split that grows total but drops concerns-per-unit 9→2 is a real win. A split that holds total steady and keeps concerns-per-unit is a net loss. Measure concerns-per-unit, not file length.
+Split wins when total grows but concerns drop, e.g. 9→2. Split loses when total holds and concerns stay. Measure concerns, not file length.
 
 ## Script over subagent
 
-No LLM judgement + deterministic verdict + invoked once per run = use `scripts/<name>.sh`.
+No LLM judgment + deterministic verdict + once per run = `scripts/<name>.sh`.
 
 ## Cost guard
 
-Each new unit adds: a permission grant, a file to sync, a handoff contract, a set of edits. If the one-line cost is longer than the work removed, do not split.
+New unit adds permission grant, sync file, handoff contract, edit set. If cost line exceeds removed work, keep parent.
 
 ## Anti-patterns
 
-- Prep subagent as long as the parent's would-have-been. Phase too small.
-- Reviewer split into two same-size prompts with same concerns. No gain.
-- Subagent that reads `bash` and returns `PASS | BLOCKING`. Replace with script.
-- Caller re-lists callee `Scope:` or schema. Move to callee, drop caller copy.
+- Prep subagent as long as parent would be. Phase too small.
+- Reviewer split into same-size prompts with same concerns. No gain.
+- Subagent reads `bash` and returns `PASS | BLOCKING`. Use script.
+- Caller re-lists callee `Scope:` or schema. Move to callee; drop caller copy.
 
 ## After
 
 - Update runner `task:` allowlist or `bash:` grant.
 - Update iterate doc and reviewer `cache_path` / artifact names.
-- Verify parent got shorter, child got narrower. If not, revert.
+- Verify parent shorter, child narrower. Else revert.

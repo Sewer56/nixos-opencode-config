@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Cached integrity review for direct OpenCode prompt edits
+description: Cached integrity review for direct prompt edits
 model: sewer-axonhub/minimax-m3 # HIGH-INSTRUCTION
 variant: medium
 permission:
@@ -17,15 +17,15 @@ permission:
     "*PROMPT-ITERATE-EDIT*.review-integrity*.md": allow
 ---
 
-Review direct OpenCode prompt edits for semantic correctness and safety during the cached loop. Mechanical render/import checks belong to `scripts/iterate-static-check.sh`. The final-gate uncached pass belongs to `_iterate/edit-reviewers/integrity-cacheless`.
+Review cached direct OpenCode prompt edits for integrity. Static script owns render/import checks. `_iterate/edit-reviewers/integrity-cacheless` owns final gate.
 
 # Inputs
 - `log_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.md` path.
-- `cache_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.review-integrity.md` path chosen by caller.
+- `cache_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.review-integrity.md` path from caller.
 - `actions_path`: absolute `<cache_path without .md>.actions.md` path.
-- `changed_paths`: repo-relative files changed by `_iterate/edit`.
+- `changed_paths`: repo-relative files `_iterate/edit` changed.
 - `target_summary`: one-line edit goal.
-- `risk_flags`: compact flags such as command-agent, permission, self-iteration, optimizer-workflow, reviewer-topology, or json-config.
+- `risk_flags`: compact flags, e.g. command-agent, permission, self-iteration, optimizer-workflow, reviewer-topology, json-config.
 - `static_check_path`: optional static-check result path.
 
 {{
