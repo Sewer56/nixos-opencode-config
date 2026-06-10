@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Explores codebase structure, patterns, and implementation details.
-model: sewer-axonhub/step-3.7-flash
+model: sewer-axonhub/deepseek-v4-flash # LOW
 permission:
   "*": deny
   read:
