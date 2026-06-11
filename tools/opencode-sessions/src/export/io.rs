@@ -28,13 +28,15 @@ pub(crate) fn build_deliverable_snapshot(
         return Ok(None);
     }
 
-    let text = fs::read_to_string(&source_path).with_context(|| format!("read {}", source_path.display()))?;
+    let text = fs::read_to_string(&source_path)
+        .with_context(|| format!("read {}", source_path.display()))?;
     let snapshot_rel = relative_session_dir.join("deliverables").join(path);
     let snapshot_path = session_dir.join("deliverables").join(path);
     if let Some(parent) = snapshot_path.parent() {
         fs::create_dir_all(parent).with_context(|| format!("create {}", parent.display()))?;
     }
-    fs::write(&snapshot_path, &text).with_context(|| format!("write {}", snapshot_path.display()))?;
+    fs::write(&snapshot_path, &text)
+        .with_context(|| format!("write {}", snapshot_path.display()))?;
 
     Ok(Some(DeliverableSnapshot {
         snapshot_file: path_string(&snapshot_rel),
@@ -52,7 +54,10 @@ pub(crate) fn resolve_workspace_deliverable_path(path: &str) -> Option<PathBuf> 
     if relative.is_absolute() {
         return None;
     }
-    if relative.components().any(|component| matches!(component, std::path::Component::ParentDir)) {
+    if relative
+        .components()
+        .any(|component| matches!(component, std::path::Component::ParentDir))
+    {
         return None;
     }
     Some(repo_root_dir().join(relative))
@@ -158,10 +163,15 @@ pub(crate) fn write_artifacts_manifest(
             entries: entries.clone(),
         },
     )?;
-    Ok((Some(path_string(&artifacts_rel_dir.join("index.json"))), entries))
+    Ok((
+        Some(path_string(&artifacts_rel_dir.join("index.json"))),
+        entries,
+    ))
 }
 
-pub(crate) fn classify_artifact_manifest_entry(name: &str) -> (String, Option<usize>, Option<usize>) {
+pub(crate) fn classify_artifact_manifest_entry(
+    name: &str,
+) -> (String, Option<usize>, Option<usize>) {
     if let Some(rest) = name.strip_prefix("message-") {
         let (message_index, suffix) = rest.split_once('-').unwrap_or((rest, ""));
         let message_index = message_index.parse::<usize>().ok();
@@ -204,7 +214,8 @@ pub(crate) fn classify_artifact_manifest_entry(name: &str) -> (String, Option<us
 pub(crate) fn write_json_pretty(path: PathBuf, value: &impl Serialize) -> Result<()> {
     let file = File::create(&path).with_context(|| format!("create {}", path.display()))?;
     let writer = BufWriter::new(file);
-    serde_json::to_writer_pretty(writer, value).with_context(|| format!("write {}", path.display()))?;
+    serde_json::to_writer_pretty(writer, value)
+        .with_context(|| format!("write {}", path.display()))?;
     Ok(())
 }
 
@@ -217,7 +228,8 @@ pub(crate) fn write_jsonl(path: PathBuf, lines: &[Value]) -> Result<()> {
     let file = File::create(&path).with_context(|| format!("create {}", path.display()))?;
     let mut writer = BufWriter::new(file);
     for line in lines {
-        serde_json::to_writer(&mut writer, line).with_context(|| format!("write line to {}", path.display()))?;
+        serde_json::to_writer(&mut writer, line)
+            .with_context(|| format!("write line to {}", path.display()))?;
         writer.write_all(b"\n")?;
     }
     writer.flush()?;
@@ -247,7 +259,9 @@ pub(crate) fn session_folder_name(
     session_id: &str,
 ) -> String {
     let prefix = if is_root { "root" } else { "subagent" };
-    let agent = agent.map(sanitize_filename).unwrap_or_else(|| String::from("unknown"));
+    let agent = agent
+        .map(sanitize_filename)
+        .unwrap_or_else(|| String::from("unknown"));
     format!(
         "{}__{}__{}__{}",
         session_path.replace('.', "-"),

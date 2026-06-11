@@ -1,7 +1,9 @@
 use anyhow::{Context, Result};
 use crossterm::ExecutableCommand;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
-use crossterm::terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode};
+use crossterm::terminal::{
+    EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
+};
 use ratatui::Terminal;
 use ratatui::backend::CrosstermBackend;
 use std::fs::{self};
@@ -10,26 +12,31 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use crate::cli::*;
-use crate::models::*;
 use crate::db::*;
 use crate::export::*;
+use crate::models::*;
 use crate::tui::app::*;
 use crate::tui::render::*;
 
 pub(crate) fn run_tui(db_path: PathBuf, index: OverviewIndex, args: TuiArgs) -> Result<()> {
     let export_base = default_export_base_dir();
-    fs::create_dir_all(&export_base).with_context(|| format!("create {}", export_base.display()))?;
+    fs::create_dir_all(&export_base)
+        .with_context(|| format!("create {}", export_base.display()))?;
 
     enable_raw_mode().context("enable raw mode")?;
     let mut stdout = io::stdout();
-    stdout.execute(EnterAlternateScreen).context("enter alt screen")?;
+    stdout
+        .execute(EnterAlternateScreen)
+        .context("enter alt screen")?;
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend).context("create terminal")?;
     let mut app = TuiApp::new(db_path.clone(), export_base, index, args);
 
     let result = (|| -> Result<()> {
         loop {
-            terminal.draw(|frame| draw_tui(frame, &mut app)).context("draw tui")?;
+            terminal
+                .draw(|frame| draw_tui(frame, &mut app))
+                .context("draw tui")?;
 
             if !event::poll(Duration::from_millis(250)).context("poll terminal events")? {
                 continue;
@@ -96,19 +103,23 @@ pub(crate) fn handle_tui_key(app: &mut TuiApp, key: KeyEvent) -> Result<bool> {
         }
         KeyCode::Char('a') => app.expand_all(),
         KeyCode::Char('z') => app.collapse_all(),
-        KeyCode::Esc
-            if !app.search.is_empty() => {
-                app.search.clear();
-                app.refresh_rows();
-                app.status = String::from("search cleared");
-            }
+        KeyCode::Esc if !app.search.is_empty() => {
+            app.search.clear();
+            app.refresh_rows();
+            app.status = String::from("search cleared");
+        }
         KeyCode::Char('e') => {
             let Some(session_id) = app.selected_session_id().map(str::to_owned) else {
                 app.status = String::from("nothing selected");
                 return Ok(false);
             };
             let conn = open_db(&app.db_path)?;
-            let export_root = export_bundle(&conn, &app.index, &session_id, Some(app.export_base.clone()))?;
+            let export_root = export_bundle(
+                &conn,
+                &app.index,
+                &session_id,
+                Some(app.export_base.clone()),
+            )?;
             app.last_export = Some(export_root.clone());
             app.status = format!("exported selected -> {}", export_root.display());
         }
@@ -119,7 +130,8 @@ pub(crate) fn handle_tui_key(app: &mut TuiApp, key: KeyEvent) -> Result<bool> {
             };
             let root_id = app.index.root_id(&session_id)?;
             let conn = open_db(&app.db_path)?;
-            let export_root = export_bundle(&conn, &app.index, &root_id, Some(app.export_base.clone()))?;
+            let export_root =
+                export_bundle(&conn, &app.index, &root_id, Some(app.export_base.clone()))?;
             app.last_export = Some(export_root.clone());
             app.status = format!("exported root -> {}", export_root.display());
         }

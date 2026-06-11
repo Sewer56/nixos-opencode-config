@@ -1,5 +1,0 @@
-go 1.26
-
-// Workspace for root-level `go test ./tools/model-tiers` and the
-// scripts/opencode-model-tiers source wrapper.
-use ./tools/model-tiers

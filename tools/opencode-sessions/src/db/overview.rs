@@ -61,7 +61,10 @@ pub(crate) fn load_overview(conn: &Connection) -> Result<OverviewIndex> {
             .get(session_id)
             .with_context(|| format!("missing session after load: {session_id}"))?;
         if let Some(parent_id) = &session.parent_id {
-            children.entry(parent_id.clone()).or_default().push(session.id.clone());
+            children
+                .entry(parent_id.clone())
+                .or_default()
+                .push(session.id.clone());
         } else {
             roots.push(session.id.clone());
         }
@@ -75,7 +78,10 @@ pub(crate) fn load_overview(conn: &Connection) -> Result<OverviewIndex> {
     })
 }
 
-pub(crate) fn resolve_target_session_id(index: &OverviewIndex, args: &ExportArgs) -> Result<String> {
+pub(crate) fn resolve_target_session_id(
+    index: &OverviewIndex,
+    args: &ExportArgs,
+) -> Result<String> {
     if let Some(target) = &args.target {
         if index.sessions.contains_key(target) {
             return Ok(target.clone());

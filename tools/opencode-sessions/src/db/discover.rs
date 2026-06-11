@@ -11,12 +11,20 @@ pub(crate) fn print_discovered_dbs(explicit: Option<&Path>) -> Result<()> {
     let default = resolve_db_path(explicit).ok();
 
     if discovered.is_empty() {
-        bail!("no OpenCode sqlite files found under {}", opencode_data_dir()?.display());
+        bail!(
+            "no OpenCode sqlite files found under {}",
+            opencode_data_dir()?.display()
+        );
     }
 
     for path in discovered {
-        let metadata = fs::metadata(&path).with_context(|| format!("read metadata for {}", path.display()))?;
-        let modified = metadata.modified().ok().map(format_system_time).unwrap_or_else(|| "unknown".into());
+        let metadata =
+            fs::metadata(&path).with_context(|| format!("read metadata for {}", path.display()))?;
+        let modified = metadata
+            .modified()
+            .ok()
+            .map(format_system_time)
+            .unwrap_or_else(|| "unknown".into());
         let mark = if default.as_deref() == Some(path.as_path()) {
             "*"
         } else {
@@ -89,7 +97,11 @@ pub(crate) fn resolve_db_path(explicit: Option<&Path>) -> Result<PathBuf> {
     if let Some(env_db) = std::env::var_os("OPENCODE_DB") {
         let raw = PathBuf::from(env_db);
         if raw.as_os_str() != ":memory:" {
-            let resolved = if raw.is_absolute() { raw } else { opencode_data_dir()?.join(raw) };
+            let resolved = if raw.is_absolute() {
+                raw
+            } else {
+                opencode_data_dir()?.join(raw)
+            };
             if resolved.is_file() {
                 return Ok(resolved);
             }

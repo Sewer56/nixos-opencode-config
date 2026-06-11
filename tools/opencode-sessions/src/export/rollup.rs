@@ -3,30 +3,34 @@ use std::collections::{BTreeSet, HashMap};
 use std::path::Path;
 
 use crate::constants::*;
+use crate::export::io::*;
+use crate::export::turn::*;
 use crate::format::*;
 use crate::models::*;
-use crate::export::turn::*;
-use crate::export::io::*;
 
 pub(crate) fn rollup_tools(tools: &[ToolCallDigest]) -> Vec<ToolAggregate> {
     let mut map: HashMap<String, ToolAggregate> = HashMap::new();
     for tool in tools {
-        let entry = map.entry(tool.tool.clone()).or_insert_with(|| ToolAggregate {
-            tool: tool.tool.clone(),
-            calls: 0,
-            error_calls: 0,
-            total_duration_ms: 0,
-            max_duration_ms: 0,
-            total_output_chars: 0,
-            total_input_tokens_proxy: 0,
-            avg_input_tokens_proxy: None,
-        });
+        let entry = map
+            .entry(tool.tool.clone())
+            .or_insert_with(|| ToolAggregate {
+                tool: tool.tool.clone(),
+                calls: 0,
+                error_calls: 0,
+                total_duration_ms: 0,
+                max_duration_ms: 0,
+                total_output_chars: 0,
+                total_input_tokens_proxy: 0,
+                avg_input_tokens_proxy: None,
+            });
         entry.calls += 1;
         if tool.status == "error" {
             entry.error_calls += 1;
         }
         entry.total_duration_ms += tool.duration_ms.unwrap_or_default();
-        entry.max_duration_ms = entry.max_duration_ms.max(tool.duration_ms.unwrap_or_default());
+        entry.max_duration_ms = entry
+            .max_duration_ms
+            .max(tool.duration_ms.unwrap_or_default());
         entry.total_output_chars += tool.output_chars.unwrap_or_default();
         entry.total_input_tokens_proxy += tool.input_tokens_proxy;
     }
@@ -37,36 +41,47 @@ pub(crate) fn rollup_tools(tools: &[ToolCallDigest]) -> Vec<ToolAggregate> {
     items
 }
 
-pub(crate) fn build_file_access_rollup(turns: &[TurnDigest], tools: &[ToolCallDigest]) -> Vec<FileAccessRollupEntry> {
+pub(crate) fn build_file_access_rollup(
+    turns: &[TurnDigest],
+    tools: &[ToolCallDigest],
+) -> Vec<FileAccessRollupEntry> {
     let turn_by_message = build_message_turn_index(turns);
     let mut map: HashMap<String, FileAccessRollupEntry> = HashMap::new();
 
     for tool in tools {
         let turn_index = turn_by_message.get(&tool.message_index).copied();
         for path in &tool.read_paths {
-            let entry = map.entry(path.clone()).or_insert_with(|| FileAccessRollupEntry {
-                path: path.clone(),
-                read_count: 0,
-                modified_count: 0,
-                total_output_chars: 0,
-                turn_indexes: Vec::new(),
-            });
+            let entry = map
+                .entry(path.clone())
+                .or_insert_with(|| FileAccessRollupEntry {
+                    path: path.clone(),
+                    read_count: 0,
+                    modified_count: 0,
+                    total_output_chars: 0,
+                    turn_indexes: Vec::new(),
+                });
             entry.read_count += 1;
             entry.total_output_chars += tool.output_chars.unwrap_or_default();
-            if let Some(turn_index) = turn_index && !entry.turn_indexes.contains(&turn_index) {
+            if let Some(turn_index) = turn_index
+                && !entry.turn_indexes.contains(&turn_index)
+            {
                 entry.turn_indexes.push(turn_index);
             }
         }
         for path in &tool.modified_paths {
-            let entry = map.entry(path.clone()).or_insert_with(|| FileAccessRollupEntry {
-                path: path.clone(),
-                read_count: 0,
-                modified_count: 0,
-                total_output_chars: 0,
-                turn_indexes: Vec::new(),
-            });
+            let entry = map
+                .entry(path.clone())
+                .or_insert_with(|| FileAccessRollupEntry {
+                    path: path.clone(),
+                    read_count: 0,
+                    modified_count: 0,
+                    total_output_chars: 0,
+                    turn_indexes: Vec::new(),
+                });
             entry.modified_count += 1;
-            if let Some(turn_index) = turn_index && !entry.turn_indexes.contains(&turn_index) {
+            if let Some(turn_index) = turn_index
+                && !entry.turn_indexes.contains(&turn_index)
+            {
                 entry.turn_indexes.push(turn_index);
             }
         }
@@ -89,12 +104,18 @@ pub(crate) fn build_file_access_rollup(turns: &[TurnDigest], tools: &[ToolCallDi
     items
 }
 
-pub(crate) fn build_error_patterns(turns: &[TurnDigest], tools: &[ToolCallDigest]) -> Vec<ErrorPatternEntry> {
+pub(crate) fn build_error_patterns(
+    turns: &[TurnDigest],
+    tools: &[ToolCallDigest],
+) -> Vec<ErrorPatternEntry> {
     let turn_by_message = build_message_turn_index(turns);
     let mut map: HashMap<(String, String), ErrorPatternEntry> = HashMap::new();
 
     for tool in tools.iter().filter(|tool| tool.status == "error") {
-        let error_type = tool.error_type.clone().unwrap_or_else(|| String::from("tool-error"));
+        let error_type = tool
+            .error_type
+            .clone()
+            .unwrap_or_else(|| String::from("tool-error"));
         let entry = map
             .entry((tool.tool.clone(), error_type.clone()))
             .or_insert_with(|| ErrorPatternEntry {
@@ -125,14 +146,23 @@ pub(crate) fn build_error_patterns(turns: &[TurnDigest], tools: &[ToolCallDigest
     items
 }
 
-pub(crate) fn build_retry_chains(turns: &[TurnDigest], tools: &[ToolCallDigest]) -> Vec<RetryChainEntry> {
+pub(crate) fn build_retry_chains(
+    turns: &[TurnDigest],
+    tools: &[ToolCallDigest],
+) -> Vec<RetryChainEntry> {
     let turn_by_message = build_message_turn_index(turns);
     let mut chains = Vec::new();
     let mut current: Option<RetryChainEntry> = None;
 
     for tool in tools.iter().filter(|tool| tool.status == "error") {
-        let turn_index = turn_by_message.get(&tool.message_index).copied().unwrap_or_default();
-        let error_type = tool.error_type.clone().unwrap_or_else(|| String::from("tool-error"));
+        let turn_index = turn_by_message
+            .get(&tool.message_index)
+            .copied()
+            .unwrap_or_default();
+        let error_type = tool
+            .error_type
+            .clone()
+            .unwrap_or_else(|| String::from("tool-error"));
         match &mut current {
             Some(chain)
                 if chain.turn_index == turn_index
@@ -178,7 +208,11 @@ pub(crate) fn build_retry_chains(turns: &[TurnDigest], tools: &[ToolCallDigest])
         chain.recovery_strategy = tools
             .iter()
             .find(|tool| {
-                turn_by_message.get(&tool.message_index).copied().unwrap_or_default() == chain.turn_index
+                turn_by_message
+                    .get(&tool.message_index)
+                    .copied()
+                    .unwrap_or_default()
+                    == chain.turn_index
                     && tool.message_index > chain.end_message_index
             })
             .map(|tool| match tool.tool.as_str() {
@@ -193,7 +227,11 @@ pub(crate) fn build_retry_chains(turns: &[TurnDigest], tools: &[ToolCallDigest])
     chains
 }
 
-pub(crate) fn build_file_transition_rollup(turns: &[TurnDigest], tools: &[ToolCallDigest], session_status: &str) -> Vec<FileTransitionEntry> {
+pub(crate) fn build_file_transition_rollup(
+    turns: &[TurnDigest],
+    tools: &[ToolCallDigest],
+    session_status: &str,
+) -> Vec<FileTransitionEntry> {
     let mut writes_by_path: HashMap<String, Vec<usize>> = HashMap::new();
     let mut reads_by_path: HashMap<String, BTreeSet<usize>> = HashMap::new();
     let mut final_presence_by_path: HashMap<String, bool> = HashMap::new();
@@ -234,10 +272,7 @@ pub(crate) fn build_file_transition_rollup(turns: &[TurnDigest], tools: &[ToolCa
                 })
                 .collect::<Vec<_>>();
             let survives_to_end = rewritten_in_turns.is_empty()
-                && final_presence_by_path
-                    .get(&path)
-                    .copied()
-                    .unwrap_or(true);
+                && final_presence_by_path.get(&path).copied().unwrap_or(true);
             let reread_in_turns = reads_by_path
                 .get(&path)
                 .map(|turn_indexes| {
@@ -266,7 +301,12 @@ pub(crate) fn build_file_transition_rollup(turns: &[TurnDigest], tools: &[ToolCa
             .write_count
             .cmp(&left.write_count)
             .then_with(|| right.reread_in_turns.len().cmp(&left.reread_in_turns.len()))
-            .then_with(|| right.rewritten_in_turns.len().cmp(&left.rewritten_in_turns.len()))
+            .then_with(|| {
+                right
+                    .rewritten_in_turns
+                    .len()
+                    .cmp(&left.rewritten_in_turns.len())
+            })
             .then_with(|| right.write_turns.last().cmp(&left.write_turns.last()))
             .then_with(|| left.path.cmp(&right.path))
     });
@@ -337,7 +377,9 @@ pub(crate) fn build_session_deliverables(
     Ok(items)
 }
 
-pub(crate) fn build_turn_dependency_edges(transitions: &[FileTransitionEntry]) -> Vec<TurnDependencyEdge> {
+pub(crate) fn build_turn_dependency_edges(
+    transitions: &[FileTransitionEntry],
+) -> Vec<TurnDependencyEdge> {
     let mut by_turn_pair: HashMap<(usize, usize), Vec<String>> = HashMap::new();
     for transition in transitions {
         for edge in &transition.supersession_chain {

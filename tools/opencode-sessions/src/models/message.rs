@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::models::overview::*;
 use crate::models::export::*;
+use crate::models::overview::*;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub(crate) struct MessageTime {
@@ -91,7 +91,9 @@ impl MessageInfo {
     }
 
     pub(crate) fn model_name(&self) -> Option<String> {
-        if let Some(model_id) = &self.model_id && !model_id.is_empty() {
+        if let Some(model_id) = &self.model_id
+            && !model_id.is_empty()
+        {
             return Some(model_id.clone());
         }
         self.model
@@ -101,7 +103,9 @@ impl MessageInfo {
     }
 
     pub(crate) fn provider_name(&self) -> Option<String> {
-        if let Some(provider_id) = &self.provider_id && !provider_id.is_empty() {
+        if let Some(provider_id) = &self.provider_id
+            && !provider_id.is_empty()
+        {
             return Some(provider_id.clone());
         }
         self.model
@@ -133,17 +137,24 @@ pub(crate) struct LoadedSession {
 
 impl LoadedSession {
     pub(crate) fn agent(&self) -> Option<String> {
-        self.meta
-            .agent_hint()
-            .or_else(|| self.messages.iter().find_map(|message| message.info.agent.clone()))
+        self.meta.agent_hint().or_else(|| {
+            self.messages
+                .iter()
+                .find_map(|message| message.info.agent.clone())
+        })
     }
 }
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(tag = "type")]
 pub(crate) enum CompactPart {
-    Text { text: String, synthetic: bool },
-    Reasoning { text: String },
+    Text {
+        text: String,
+        synthetic: bool,
+    },
+    Reasoning {
+        text: String,
+    },
     Tool {
         tool: String,
         status: String,
@@ -154,16 +165,27 @@ pub(crate) enum CompactPart {
         output_chars: Option<usize>,
         error: Option<String>,
     },
-    Agent { name: String },
+    Agent {
+        name: String,
+    },
     Subtask {
         agent: String,
         description: String,
         prompt: String,
         command: Option<String>,
     },
-    File { filename: Option<String>, mime: Option<String> },
-    Patch { file_count: usize, files: Vec<String> },
-    Retry { attempt: Option<i64>, error: Option<String> },
+    File {
+        filename: Option<String>,
+        mime: Option<String>,
+    },
+    Patch {
+        file_count: usize,
+        files: Vec<String>,
+    },
+    Retry {
+        attempt: Option<i64>,
+        error: Option<String>,
+    },
 }
 
 #[derive(Debug, Clone, Serialize)]

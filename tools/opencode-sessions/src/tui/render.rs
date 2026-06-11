@@ -43,7 +43,11 @@ pub(crate) fn draw_tui(frame: &mut ratatui::Frame<'_>, app: &mut TuiApp) {
     .block(Block::default().borders(Borders::ALL));
     frame.render_widget(header, areas[0]);
 
-    let search_title = if app.search_mode { "Search (typing)" } else { "Search (/ to edit)" };
+    let search_title = if app.search_mode {
+        "Search (typing)"
+    } else {
+        "Search (/ to edit)"
+    };
     let search = Paragraph::new(app.search.as_str())
         .block(Block::default().borders(Borders::ALL).title(search_title))
         .wrap(Wrap { trim: false });
@@ -59,7 +63,11 @@ pub(crate) fn draw_tui(frame: &mut ratatui::Frame<'_>, app: &mut TuiApp) {
     };
 
     let list = List::new(items)
-        .block(Block::default().borders(Borders::ALL).title("Recent conversations"))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title("Recent conversations"),
+        )
         .highlight_style(Style::default().bg(Color::Rgb(30, 30, 70)).fg(Color::White))
         .highlight_symbol("▶ ");
 
@@ -98,7 +106,9 @@ pub(crate) fn format_row(app: &TuiApp, row: &VisibleRow) -> String {
     let kind = if row.depth == 0 {
         String::from("root")
     } else {
-        session.agent_hint().unwrap_or_else(|| String::from("subagent"))
+        session
+            .agent_hint()
+            .unwrap_or_else(|| String::from("subagent"))
     };
 
     format!(
@@ -123,7 +133,9 @@ pub(crate) fn selected_summary(app: &TuiApp) -> String {
     };
 
     let kind = if session.parent_id.is_some() {
-        session.agent_hint().unwrap_or_else(|| String::from("subagent"))
+        session
+            .agent_hint()
+            .unwrap_or_else(|| String::from("subagent"))
     } else {
         String::from("root")
     };

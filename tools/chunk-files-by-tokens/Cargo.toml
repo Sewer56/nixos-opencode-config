@@ -1,0 +1,13 @@
+[package]
+name = "chunk-files-by-tokens"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "chunk-files-by-tokens"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true

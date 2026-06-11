@@ -761,9 +761,13 @@ pub(crate) fn render_export_readme(index: &ExportIndexFile) -> String {
     out.push_str("- `message_index_end` on compact turns gives direct turn span end without opening full turns file.\n");
     out.push_str("- `turns.jsonl` = full user turn digest with response cost, tools, delegations, and next-user outcome signal.\n");
     out.push_str("- `messages.compact.jsonl` = compact chronological message scan with timing, token, activity, and reasoning hints only.\n");
-    out.push_str("- `user_message_index`..`message_index_end` spans full message range for each turn.\n");
+    out.push_str(
+        "- `user_message_index`..`message_index_end` spans full message range for each turn.\n",
+    );
     out.push_str("- `user_intent_confidence` = 0..1 heuristic confidence for `user_intent`; `alternative_user_intents` gives fallback labels when confidence is low.\n");
-    out.push_str("- `user_tags` values are documented in `classification_policy.user_tag_values`.\n");
+    out.push_str(
+        "- `user_tags` values are documented in `classification_policy.user_tag_values`.\n",
+    );
     out.push_str("- `message_kind` tells whether message is user, assistant-text, tool-only, mixed, or reasoning-only.\n");
     out.push_str("- `duration_ms` = elapsed model/tool duration when present.\n");
     out.push_str("- `runtime.models` / `runtime.providers` = session-level runtime set; per-message `model` / `provider` appear only when session mixes runtimes.\n");
@@ -772,13 +776,19 @@ pub(crate) fn render_export_readme(index: &ExportIndexFile) -> String {
     out.push_str("- `agent_strategy` on turns = heuristic phase label (`explore`, `implement`, `debug`, `refactor`, `validate`, `delegate`).\n");
     out.push_str("- `turn_cost_tier` separates cost (`light` | `medium` | `heavy` | `extreme`) from value labels; `recommended_attention` is coarse skip/read guidance.\n");
     out.push_str("- `turn_effectiveness` / `effectiveness_signals` estimate whether turn produced durable value versus churn.\n");
-    out.push_str("- `text_preview` / `reasoning_preview` / `output_preview` are truncated previews.\n");
-    out.push_str("- `activity_summary` = compact summary for tool-only or sparse assistant messages.\n");
+    out.push_str(
+        "- `text_preview` / `reasoning_preview` / `output_preview` are truncated previews.\n",
+    );
+    out.push_str(
+        "- `activity_summary` = compact summary for tool-only or sparse assistant messages.\n",
+    );
     out.push_str("- `reasoning_summary` = compact middle layer before opening full reasoning sidecar; `reasoning_themes` give cheap topic hints.\n");
     out.push_str("- `read_files` / `modified_files` on turns are unique path samples; counts show full scope.\n");
     out.push_str("- `change_stats` on turns aggregates patch counts and line churn across tool calls in that turn; `change_intents` summarizes semantic edit classes seen in that turn.\n");
     out.push_str("- `call_purpose_rollup` on turns summarizes why tools were used (`modify`, `search`, `context-gather`, ...).\n");
-    out.push_str("- `key_diff_preview` on turns is compact patch summary for strongest edit in that turn.\n");
+    out.push_str(
+        "- `key_diff_preview` on turns is compact patch summary for strongest edit in that turn.\n",
+    );
     out.push_str("- `file_transition_rollup` in `summary.json` is aggregated per file; `write_turns` show rewrite history, `supersession_chain` links which turn overwrote which, and `survives_to_end` is omitted while session is still running.\n");
     out.push_str("- `session_deliverables` in `summary.json` highlights final modified files with last-write turn, coarse patch intent, and optional final snapshot metadata.\n");
     out.push_str("- `turn_dependency_edges` in `summary.json` aggregates cross-turn rewrite edges, so analyzers can jump from overwritten turn to overwriting turn.\n");
@@ -786,10 +796,14 @@ pub(crate) fn render_export_readme(index: &ExportIndexFile) -> String {
     out.push_str("- `last_activity_ms` / `staleness_ms` in summaries and root index help distinguish active `running` sessions from stale ones.\n");
     out.push_str("- `hot_messages` may collapse consecutive same-signal messages into spans via `start_message_index` / `end_message_index`.\n");
     out.push_str("- `file_access_rollup` / `error_patterns` in `summary.json` surface repeated file churn and failures.\n");
-    out.push_str("- `retry_chains` in `summary.json` groups repeated same-tool failures inside turns.\n");
+    out.push_str(
+        "- `retry_chains` in `summary.json` groups repeated same-tool failures inside turns.\n",
+    );
     out.push_str("- `token_efficiency` gives normalized per-turn/per-tool token ratios.\n");
     out.push_str("- `tool_rollup.total_input_tokens_proxy` / `avg_input_tokens_proxy` are per-tool token approximations split evenly across tool parts inside same hosting message.\n");
-    out.push_str("- `iteration_meta` in `index.json` links sibling benchmark exports in same series.\n");
+    out.push_str(
+        "- `iteration_meta` in `index.json` links sibling benchmark exports in same series.\n",
+    );
     out.push_str("- `delta_from_previous` summarizes high-level index changes plus turn/tool/totals deltas versus prior sibling export when present.\n");
     out.push_str("- `children[]` may include `delegation_result_preview` / `child_outcome` for subagent result triage from parent summary.\n");
     out.push_str("- `children[].delegation_export_reference_status` warns when child prompt references stale export paths; `current_export_path_hint` points at current bundle series root, `resolved_current_export_paths` rewrites stale bundle paths onto current export root when possible, and `delegation_prompt_preview_resolved` gives compact rewritten prompt preview when stale root was detected.\n");
@@ -803,25 +817,48 @@ pub(crate) fn render_export_readme(index: &ExportIndexFile) -> String {
     out.push_str("- `largest_artifacts` in `summary.json` surfaces biggest sidecars first so analyzers can target expensive files without scanning whole manifest.\n");
     out.push_str("- `snapshot_file` / `content_sha256` / `line_count` on `session_deliverables` describe current workspace snapshot when source file is still available locally.\n");
     out.push_str("- `*_file` pointers contain full text/json sidecars when preview omitted or insufficient.\n");
-    out.push_str("- `artifact_policy` in `index.json` tells which thresholds decide sidecar emission.\n");
+    out.push_str(
+        "- `artifact_policy` in `index.json` tells which thresholds decide sidecar emission.\n",
+    );
     out.push_str("- Missing field means absent or intentionally omitted as redundant.\n");
     out.push_str("\n## Root summary\n\n");
     out.push_str(&format!("- schema_version: `{}`\n", index.schema_version));
     out.push_str(&format!("- schema_file: `{}`\n", index.schema_file));
     out.push_str(&format!("- fields_file: `{}`\n", index.fields_file));
     out.push_str(&format!("- export_id: `{}`\n", index.export_id));
-    out.push_str(&format!("- export_timestamp_ms: `{}`\n", index.export_timestamp_ms));
+    out.push_str(&format!(
+        "- export_timestamp_ms: `{}`\n",
+        index.export_timestamp_ms
+    ));
     out.push_str(&format!("- root_session_id: `{}`\n", index.root_session_id));
     out.push_str(&format!("- root_title: `{}`\n", index.root_title));
-    out.push_str(&format!("- root_session_status: `{}`\n", index.root_session_status));
-    out.push_str(&format!("- root_snapshot_completeness: `{}`\n", index.root_snapshot_completeness));
-    out.push_str(&format!("- root_last_activity_ms: `{}`\n", index.root_last_activity_ms));
+    out.push_str(&format!(
+        "- root_session_status: `{}`\n",
+        index.root_session_status
+    ));
+    out.push_str(&format!(
+        "- root_snapshot_completeness: `{}`\n",
+        index.root_snapshot_completeness
+    ));
+    out.push_str(&format!(
+        "- root_last_activity_ms: `{}`\n",
+        index.root_last_activity_ms
+    ));
     if index.root_staleness_ms > 0 {
-        out.push_str(&format!("- root_staleness_ms: `{}`\n", index.root_staleness_ms));
+        out.push_str(&format!(
+            "- root_staleness_ms: `{}`\n",
+            index.root_staleness_ms
+        ));
     }
-    out.push_str(&format!("- session_count: {}\n", index.totals.session_count));
+    out.push_str(&format!(
+        "- session_count: {}\n",
+        index.totals.session_count
+    ));
     out.push_str(&format!("- turn_count: {}\n", index.totals.turn_count));
-    out.push_str(&format!("- message_count: {}\n", index.totals.message_count));
+    out.push_str(&format!(
+        "- message_count: {}\n",
+        index.totals.message_count
+    ));
     out.push_str(&format!("- tool_calls: {}\n", index.totals.tool_calls));
     if let Some(path) = &index.root_task_file {
         out.push_str(&format!("- root_task_file: `{path}`\n"));

@@ -1,9 +1,9 @@
 {
   description = "OpenCode config utilities";
   # ── Inputs ──────────────────────────────────────────────────────────────
-  # nixpkgs        – package set
-  # rust-overlay   – latest stable Rust toolchain (rustc, cargo, clippy, …)
-  # llm-agents     – provides coderabbit-cli (auto-review tool)
+  # nixpkgs      – package set
+  # rust-overlay – latest stable Rust toolchain (rustc, cargo, clippy, …)
+  # llm-agents   – provides coderabbit-cli (auto-review tool)
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -39,25 +39,15 @@
       nixpkgs.lib.genAttrs systems (system: fn system (mkPkgs system));
 
     # ── Tool derivations (shared by packages / apps / devShells) ──────────
-    # Go:   opencode-model-tiers  - TUI/CLI for model tier assignments
-    #       opencode-work-mode    - Switches to 'work' mode.
-    # Rust: opencode-sessions     - browse/export OpenCode SQLite sessions
+    # Rust tools workspace.
     mkTools = pkgs: rec {
-      opencode-model-tiers = pkgs.buildGoModule {
+      opencode-model-tiers = pkgs.rustPlatform.buildRustPackage {
         pname = "opencode-model-tiers";
         version = "0.1.0";
 
-        src = ./tools/model-tiers;
-        vendorHash = "sha256-i7iMej6SH9OCeO5SXt/DcfDBH+VVFbw+HD0S6XwXABY=";
-
-        env.CGO_ENABLED = "0";
-        ldflags = ["-s" "-w"];
-
-        checkPhase = ''
-          runHook preCheck
-          go test ./...
-          runHook postCheck
-        '';
+        src = ./tools;
+        cargoLock.lockFile = ./tools/Cargo.lock;
+        cargoBuildFlags = ["--package" "opencode-model-tiers"];
 
         meta = {
           description = "TUI/CLI for opencode # LOW/# MED/# HIGH model tier assignments";
@@ -65,28 +55,59 @@
         };
       };
 
-      opencode-work-mode = pkgs.writeShellApplication {
-        name = "opencode-work-mode";
-        runtimeInputs = [opencode-model-tiers];
-        text = ''
-          exec opencode-model-tiers work "$@"
-        '';
-        meta = {
-          description = "Shortcut that applies opencode work-mode model tiers";
-          mainProgram = "opencode-work-mode";
-        };
-      };
-
       opencode-sessions = pkgs.rustPlatform.buildRustPackage {
         pname = "opencode-sessions";
         version = "0.1.0";
 
-        src = ./tools/opencode-sessions;
-        cargoLock.lockFile = ./tools/opencode-sessions/Cargo.lock;
+        src = ./tools;
+        cargoLock.lockFile = ./tools/Cargo.lock;
+        cargoBuildFlags = ["--package" "opencode-sessions"];
 
         meta = {
           description = "Browse and export OpenCode conversations from local SQLite";
           mainProgram = "opencode-sessions";
+        };
+      };
+
+      chunk-files-by-tokens = pkgs.rustPlatform.buildRustPackage {
+        pname = "chunk-files-by-tokens";
+        version = "0.1.0";
+
+        src = ./tools;
+        cargoLock.lockFile = ./tools/Cargo.lock;
+        cargoBuildFlags = ["--package" "chunk-files-by-tokens"];
+
+        meta = {
+          description = "Chunk files by estimated token count";
+          mainProgram = "chunk-files-by-tokens";
+        };
+      };
+
+      token-count-after-expand = pkgs.rustPlatform.buildRustPackage {
+        pname = "token-count-after-expand";
+        version = "0.1.0";
+
+        src = ./tools;
+        cargoLock.lockFile = ./tools/Cargo.lock;
+        cargoBuildFlags = ["--package" "token-count-after-expand"];
+
+        meta = {
+          description = "Estimate prompt token counts after md-expand rendering";
+          mainProgram = "token-count-after-expand";
+        };
+      };
+
+      iterate-static-check = pkgs.rustPlatform.buildRustPackage {
+        pname = "iterate-static-check";
+        version = "0.1.0";
+
+        src = ./tools;
+        cargoLock.lockFile = ./tools/Cargo.lock;
+        cargoBuildFlags = ["--package" "iterate-static-check"];
+
+        meta = {
+          description = "Static checks for iterate/edit artifacts";
+          mainProgram = "iterate-static-check";
         };
       };
 
@@ -97,9 +118,9 @@
     # Exported as homeManagerModules.default so the root NixOS flake can
     # import it directly.  Adds:
     #   • opencode & opencode-build wrapper scripts
-    #   • the three CLI tools above
+    #   • CLI tools above
     #   • coderabbit-cli
-    #   • MCP runtime deps (node, yarn, docker, ts, bun, go)
+    #   • MCP/runtime deps (node, yarn, docker, bun)
     #   • ~/.config/opencode → editable config symlink
     #   • ~/opencode           → convenience symlink to this repo
     homeModule = {
@@ -114,7 +135,7 @@
       opencodeSource = "${opencodeRepo}/opencode-source";
       opencodeBin = "${opencodeSource}/packages/opencode/dist/opencode-linux-x64/bin/opencode";
 
-      # Thin wrapper: default to CWD, forwards args.
+      # Thin wrapper: default to CWD, forwards args. Runs with Exa search enabled.
       opencodeScript = pkgs.writeShellScriptBin "opencode" ''
         export OPENCODE_ENABLE_EXA=1
         if [ "$#" -eq 0 ]; then
@@ -125,6 +146,7 @@
       '';
 
       # Rebuild the opencode‑source submodule (bun build).
+      # I often iterate, so separate build via `opencode-build` command will do.
       opencodeBuildScript = pkgs.writeShellScriptBin "opencode-build" ''
         set -euo pipefail
         pushd ${opencodeSource}/packages/opencode > /dev/null
@@ -140,8 +162,10 @@
 
         # Built CLI tools - land on PATH after activation.
         tools.opencode-model-tiers
-        tools.opencode-work-mode
         tools.opencode-sessions
+        tools.chunk-files-by-tokens
+        tools.token-count-after-expand
+        tools.iterate-static-check
 
         llm-agents.packages.${system}.coderabbit-cli
 
@@ -149,9 +173,7 @@
         pkgs.nodejs
         pkgs.yarn
         pkgs.docker
-        pkgs.typescript
         pkgs.bun
-        pkgs.go
       ];
 
       # Editable config → ~/.config/opencode.
@@ -169,10 +191,13 @@
     # nix build .#opencode-model-tiers   etc.
     packages = eachSystem (_system: pkgs: mkTools pkgs);
 
-    # nix flake check  (builds + runs Go tests)
+    # nix flake check
     checks = eachSystem (system: _pkgs: {
       opencode-model-tiers = self.packages.${system}.opencode-model-tiers;
       opencode-sessions = self.packages.${system}.opencode-sessions;
+      chunk-files-by-tokens = self.packages.${system}.chunk-files-by-tokens;
+      token-count-after-expand = self.packages.${system}.token-count-after-expand;
+      iterate-static-check = self.packages.${system}.iterate-static-check;
     });
 
     # nix run .#opencode-sessions -- tui
@@ -183,22 +208,34 @@
         meta.description = "Open opencode model tier TUI/CLI";
       };
 
-      opencode-work-mode = {
-        type = "app";
-        program = "${self.packages.${system}.opencode-work-mode}/bin/opencode-work-mode";
-        meta.description = "Apply opencode work-mode model tiers";
-      };
-
       opencode-sessions = {
         type = "app";
         program = "${self.packages.${system}.opencode-sessions}/bin/opencode-sessions";
         meta.description = "Browse and export OpenCode sessions";
       };
 
+      chunk-files-by-tokens = {
+        type = "app";
+        program = "${self.packages.${system}.chunk-files-by-tokens}/bin/chunk-files-by-tokens";
+        meta.description = "Chunk files by estimated token count";
+      };
+
+      token-count-after-expand = {
+        type = "app";
+        program = "${self.packages.${system}.token-count-after-expand}/bin/token-count-after-expand";
+        meta.description = "Estimate prompt token counts after md-expand rendering";
+      };
+
+      iterate-static-check = {
+        type = "app";
+        program = "${self.packages.${system}.iterate-static-check}/bin/iterate-static-check";
+        meta.description = "Static checks for iterate/edit artifacts";
+      };
+
       default = opencode-model-tiers;
     });
 
-    # nix develop  →  Go + Rust toolchains + built CLI tools on PATH.
+    # nix develop  →  Rust toolchain + built CLI tools on PATH.
     devShells = eachSystem (system: pkgs: let
       tools = self.packages.${system};
       rustToolchain = pkgs.rust-bin.stable.latest.default.override {
@@ -207,11 +244,6 @@
     in {
       default = pkgs.mkShell {
         packages = [
-          # Go.
-          pkgs.go
-          pkgs.gopls
-          pkgs.gotools
-
           # Rust (rust‑overlay gives rustc/cargo/rustfmt/clippy;
           # standalone rust-analyzer is fresher than the bundled preview).
           rustToolchain
@@ -221,11 +253,11 @@
 
           # Built CLI tools - ready to run inside the shell.
           tools.opencode-model-tiers
-          tools.opencode-work-mode
           tools.opencode-sessions
+          tools.chunk-files-by-tokens
+          tools.token-count-after-expand
+          tools.iterate-static-check
         ];
-
-        CGO_ENABLED = "0";
       };
     });
 

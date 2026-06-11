@@ -4,10 +4,10 @@ use std::collections::{BTreeSet, HashMap};
 use std::path::Path;
 
 use crate::constants::*;
+use crate::export::classify::*;
+use crate::export::turn::*;
 use crate::format::*;
 use crate::models::*;
-use crate::export::turn::*;
-use crate::export::classify::*;
 
 pub(crate) struct SessionOutput {
     pub(crate) turn_digests: Vec<TurnDigest>,
@@ -80,7 +80,10 @@ pub(crate) fn build_session_machine_output(
     };
     let mut prompt_preview = None;
     let mut prompt_file = None;
-    let child_links_by_id: HashMap<&str, &ChildLink> = child_links.iter().map(|item| (item.session_id.as_str(), item)).collect();
+    let child_links_by_id: HashMap<&str, &ChildLink> = child_links
+        .iter()
+        .map(|item| (item.session_id.as_str(), item))
+        .collect();
     let mut message_digests = Vec::new();
     let mut tool_digests = Vec::new();
     let runtime = SessionRuntime {
@@ -100,7 +103,9 @@ pub(crate) fn build_session_machine_output(
     let emit_message_model = runtime.models.len() > 1;
     let emit_message_provider = runtime.providers.len() > 1;
 
-    for (message_index, (message, compact)) in session.messages.iter().zip(compact_messages).enumerate() {
+    for (message_index, (message, compact)) in
+        session.messages.iter().zip(compact_messages).enumerate()
+    {
         let text_blocks = compact
             .parts
             .iter()
@@ -121,21 +126,34 @@ pub(crate) fn build_session_machine_output(
         let reasoning = join_blocks(&reasoning_blocks);
         let text_chars = text.chars().count();
         let reasoning_chars = reasoning.chars().count();
-        let text_preview = (!text.is_empty()).then(|| truncate_text(&text, INLINE_TEXT_PREVIEW_LIMIT));
-        let user_classification = (compact.role == "user").then(|| classify_user_intent(text_preview.as_deref()));
-        let user_intent = user_classification.as_ref().map(|(intent, _)| intent.clone());
-        let user_intent_confidence = user_classification.as_ref().map(|(_, confidence)| *confidence);
+        let text_preview =
+            (!text.is_empty()).then(|| truncate_text(&text, INLINE_TEXT_PREVIEW_LIMIT));
+        let user_classification =
+            (compact.role == "user").then(|| classify_user_intent(text_preview.as_deref()));
+        let user_intent = user_classification
+            .as_ref()
+            .map(|(intent, _)| intent.clone());
+        let user_intent_confidence = user_classification
+            .as_ref()
+            .map(|(_, confidence)| *confidence);
         let alternative_user_intents = user_classification
             .as_ref()
-            .map(|(intent, confidence)| classify_alternative_user_intents(text_preview.as_deref(), intent, *confidence))
+            .map(|(intent, confidence)| {
+                classify_alternative_user_intents(text_preview.as_deref(), intent, *confidence)
+            })
             .unwrap_or_default();
-        let user_tags = if compact.role == "user" { classify_user_tags(text_preview.as_deref()) } else { Default::default() };
+        let user_tags = if compact.role == "user" {
+            classify_user_tags(text_preview.as_deref())
+        } else {
+            Default::default()
+        };
         let mut message_activity_items = Vec::new();
         let reasoning_themes = extract_reasoning_themes(&reasoning);
         let reasoning_summary = (reasoning_chars > REASONING_PREVIEW_LIMIT)
             .then(|| summarize_reasoning(&reasoning, &reasoning_themes))
             .flatten();
-        let reasoning_preview = (!reasoning.is_empty()).then(|| truncate_text(&reasoning, REASONING_PREVIEW_LIMIT));
+        let reasoning_preview =
+            (!reasoning.is_empty()).then(|| truncate_text(&reasoning, REASONING_PREVIEW_LIMIT));
 
         let mut text_file = if text_chars > MESSAGES_EMBEDDED_TEXT_LIMIT
             || (compact.role == "assistant" && text_chars > ASSISTANT_TEXT_ARTIFACT_CHARS_THRESHOLD)
@@ -230,7 +248,9 @@ pub(crate) fn build_session_machine_output(
             .filter(|part| matches!(part, CompactPart::Tool { status, .. } if status == "error"))
             .count();
 
-        let next_message_time = compact_messages.get(message_index + 1).map(|next| next.created_ms);
+        let next_message_time = compact_messages
+            .get(message_index + 1)
+            .map(|next| next.created_ms);
         let wall_gap_ms = next_message_time.map(|next| next.saturating_sub(compact.created_ms));
 
         let tool_parts_count = message
@@ -262,8 +282,7 @@ pub(crate) fn build_session_machine_output(
                 .unwrap_or("unknown")
                 .to_string();
             let input_value = state.get("input");
-            let input_text = input_value
-                .and_then(|value| serde_json::to_string(value).ok());
+            let input_text = input_value.and_then(|value| serde_json::to_string(value).ok());
             let input_preview = input_value
                 .map(|value| {
                     shrink_json(
@@ -330,9 +349,22 @@ pub(crate) fn build_session_machine_output(
             } else {
                 HashMap::new()
             };
-            let effective_read_paths = if status != "error" { read_paths.clone() } else { Vec::new() };
-            let effective_modified_paths = if status != "error" { modified_paths.clone() } else { Vec::new() };
-            let call_purpose = classify_tool_call_purpose(tool, task_description.as_deref(), &effective_read_paths, &effective_modified_paths);
+            let effective_read_paths = if status != "error" {
+                read_paths.clone()
+            } else {
+                Vec::new()
+            };
+            let effective_modified_paths = if status != "error" {
+                modified_paths.clone()
+            } else {
+                Vec::new()
+            };
+            let call_purpose = classify_tool_call_purpose(
+                tool,
+                task_description.as_deref(),
+                &effective_read_paths,
+                &effective_modified_paths,
+            );
             let patch_intent = patch_summary
                 .as_ref()
                 .and_then(|summary| classify_patch_intent(&modified_paths, summary));
@@ -361,7 +393,8 @@ pub(crate) fn build_session_machine_output(
                 .flatten();
 
             let output_chars = (!output_text.is_empty()).then_some(output_text.chars().count());
-            let output_preview = (!output_text.is_empty()).then(|| truncate_text(output_text, TOOL_TEXT_PREVIEW_LIMIT));
+            let output_preview = (!output_text.is_empty())
+                .then(|| truncate_text(output_text, TOOL_TEXT_PREVIEW_LIMIT));
             let output_file = if output_chars.unwrap_or_default() > TOOL_CALLS_EMBEDDED_IO_LIMIT {
                 write_text_artifact(
                     &mut aw,
@@ -375,7 +408,8 @@ pub(crate) fn build_session_machine_output(
             };
 
             let error_text = state.get("error").and_then(Value::as_str).unwrap_or("");
-            let error_preview = (!error_text.is_empty()).then(|| truncate_text(error_text, TOOL_TEXT_PREVIEW_LIMIT));
+            let error_preview = (!error_text.is_empty())
+                .then(|| truncate_text(error_text, TOOL_TEXT_PREVIEW_LIMIT));
             let error_type = classify_tool_error(tool, &status, error_text);
             let error_file = if error_text.chars().count() > TOOL_CALLS_EMBEDDED_IO_LIMIT {
                 write_text_artifact(
@@ -443,7 +477,9 @@ pub(crate) fn build_session_machine_output(
             ),
             time_ms: compact.created_ms,
             model: emit_message_model.then(|| compact.model.clone()).flatten(),
-            provider: emit_message_provider.then(|| compact.provider.clone()).flatten(),
+            provider: emit_message_provider
+                .then(|| compact.provider.clone())
+                .flatten(),
             wall_gap_ms,
             duration_ms: compact.duration_ms,
             tokens: compact.tokens.clone().filter(|tokens| !tokens.is_empty()),
@@ -470,16 +506,14 @@ pub(crate) fn build_session_machine_output(
         });
     }
 
-    let turn_digests = build_turn_digests(
-        session_path,
-        &message_digests,
-        &tool_digests,
-        child_links,
-    );
+    let turn_digests =
+        build_turn_digests(session_path, &message_digests, &tool_digests, child_links);
 
     for tool in &mut tool_digests {
         tool.turn_index = turn_digests.iter().find_map(|turn| {
-            (tool.message_index >= turn.user_message_index && tool.message_index <= turn.message_index_end).then_some(turn.turn_index)
+            (tool.message_index >= turn.user_message_index
+                && tool.message_index <= turn.message_index_end)
+                .then_some(turn.turn_index)
         });
     }
 
@@ -490,7 +524,9 @@ pub(crate) fn build_session_machine_output(
             }
             turn.assistant_message_start
                 .zip(turn.assistant_message_end)
-                .filter(|(start, end)| message.message_index >= *start && message.message_index <= *end)
+                .filter(|(start, end)| {
+                    message.message_index >= *start && message.message_index <= *end
+                })
                 .map(|_| turn.turn_index)
         });
     }
@@ -534,7 +570,9 @@ pub(crate) fn build_turn_compact_entries(turns: &[TurnDigest]) -> Vec<TurnCompac
         .collect()
 }
 
-pub(crate) fn build_message_compact_entries(messages: &[MessageDigest]) -> Vec<MessageCompactEntry> {
+pub(crate) fn build_message_compact_entries(
+    messages: &[MessageDigest],
+) -> Vec<MessageCompactEntry> {
     messages
         .iter()
         .map(|message| MessageCompactEntry {
@@ -569,7 +607,12 @@ pub(crate) fn infer_session_status(
     };
     let last_compact = compact_messages.last();
 
-    if last_loaded.info.error.is_some() || matches!(last_compact.and_then(|message| message.finish.as_deref()), Some("error")) {
+    if last_loaded.info.error.is_some()
+        || matches!(
+            last_compact.and_then(|message| message.finish.as_deref()),
+            Some("error")
+        )
+    {
         return String::from("error");
     }
     if last_loaded.info.role == "assistant" {
@@ -600,7 +643,11 @@ pub(crate) fn compact_part(part: &LoadedPart) -> Option<CompactPart> {
             }
             Some(CompactPart::Text {
                 text,
-                synthetic: part.raw.get("synthetic").and_then(Value::as_bool).unwrap_or(false),
+                synthetic: part
+                    .raw
+                    .get("synthetic")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false),
             })
         }
         "reasoning" => Some(CompactPart::Reasoning {
@@ -610,24 +657,19 @@ pub(crate) fn compact_part(part: &LoadedPart) -> Option<CompactPart> {
             let tool = part.raw.get("tool")?.as_str()?.to_string();
             let state = part.raw.get("state")?;
             let status = state.get("status")?.as_str()?.to_string();
-            let input = state
-                .get("input")
-                .map(|value| {
-                    shrink_json(
-                        value,
-                        TOOL_INPUT_STRING_LIMIT,
-                        TOOL_INPUT_ITEMS_LIMIT,
-                        TOOL_INPUT_DEPTH_LIMIT + 1,
-                    )
-                });
+            let input = state.get("input").map(|value| {
+                shrink_json(
+                    value,
+                    TOOL_INPUT_STRING_LIMIT,
+                    TOOL_INPUT_ITEMS_LIMIT,
+                    TOOL_INPUT_DEPTH_LIMIT + 1,
+                )
+            });
             let output_preview = state
                 .get("output")
                 .and_then(Value::as_str)
                 .map(|value| truncate_text(value.trim(), TOOL_PART_PREVIEW_LIMIT));
-            let output_chars = state
-                .get("output")
-                .and_then(Value::as_str)
-                .map(str::len);
+            let output_chars = state.get("output").and_then(Value::as_str).map(str::len);
             let error = state
                 .get("error")
                 .and_then(Value::as_str)
@@ -662,8 +704,14 @@ pub(crate) fn compact_part(part: &LoadedPart) -> Option<CompactPart> {
         }),
         "subtask" => Some(CompactPart::Subtask {
             agent: part.raw.get("agent")?.as_str()?.to_string(),
-            description: truncate_text(part.raw.get("description")?.as_str()?.trim(), SUBTASK_PREVIEW_LIMIT),
-            prompt: truncate_text(part.raw.get("prompt")?.as_str()?.trim(), SUBTASK_PREVIEW_LIMIT),
+            description: truncate_text(
+                part.raw.get("description")?.as_str()?.trim(),
+                SUBTASK_PREVIEW_LIMIT,
+            ),
+            prompt: truncate_text(
+                part.raw.get("prompt")?.as_str()?.trim(),
+                SUBTASK_PREVIEW_LIMIT,
+            ),
             command: part
                 .raw
                 .get("command")
@@ -676,7 +724,11 @@ pub(crate) fn compact_part(part: &LoadedPart) -> Option<CompactPart> {
                 .get("filename")
                 .and_then(Value::as_str)
                 .map(str::to_string),
-            mime: part.raw.get("mime").and_then(Value::as_str).map(str::to_string),
+            mime: part
+                .raw
+                .get("mime")
+                .and_then(Value::as_str)
+                .map(str::to_string),
         }),
         "patch" => {
             let files = part
@@ -794,5 +846,7 @@ pub(crate) fn session_totals(stats: &SessionStats) -> SessionTotals {
 }
 
 pub(crate) fn parent_session_path(session_path: &str) -> Option<String> {
-    session_path.rsplit_once('.').map(|(parent, _)| parent.to_string())
+    session_path
+        .rsplit_once('.')
+        .map(|(parent, _)| parent.to_string())
 }

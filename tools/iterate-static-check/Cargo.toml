@@ -1,0 +1,13 @@
+[package]
+name = "iterate-static-check"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "iterate-static-check"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+regex.workspace = true

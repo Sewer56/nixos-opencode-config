@@ -8,7 +8,11 @@ use std::path::Path;
 use crate::constants::*;
 use crate::models::*;
 
-pub(crate) fn build_iteration_meta(base_dir: &Path, root_name: &str, export_root: &Path) -> Result<IterationMeta> {
+pub(crate) fn build_iteration_meta(
+    base_dir: &Path,
+    root_name: &str,
+    export_root: &Path,
+) -> Result<IterationMeta> {
     let mut group = fs::read_dir(base_dir)
         .with_context(|| format!("read {}", base_dir.display()))?
         .filter_map(|entry| entry.ok())
@@ -23,7 +27,11 @@ pub(crate) fn build_iteration_meta(base_dir: &Path, root_name: &str, export_root
         .and_then(|value| value.to_str())
         .unwrap_or(root_name)
         .to_string();
-    let iteration_number = group.iter().position(|name| name == &current_name).map(|idx| idx + 1).unwrap_or(group.len().max(1));
+    let iteration_number = group
+        .iter()
+        .position(|name| name == &current_name)
+        .map(|idx| idx + 1)
+        .unwrap_or(group.len().max(1));
     let previous_export_path = group
         .iter()
         .position(|name| name == &current_name)
@@ -54,7 +62,11 @@ pub(crate) fn export_group_sort_key(root_name: &str, name: &str) -> (usize, usiz
 
 pub(crate) fn json_number_i64(value: Option<&Value>) -> i64 {
     value
-        .and_then(|value| value.as_i64().or_else(|| value.as_u64().and_then(|num| i64::try_from(num).ok())))
+        .and_then(|value| {
+            value
+                .as_i64()
+                .or_else(|| value.as_u64().and_then(|num| i64::try_from(num).ok()))
+        })
         .unwrap_or_default()
 }
 
@@ -62,23 +74,35 @@ pub(crate) fn json_number_f64(value: Option<&Value>) -> f64 {
     value.and_then(Value::as_f64).unwrap_or_default()
 }
 
-pub(crate) fn build_totals_delta(previous_obj: &Map<String, Value>, current: &ExportIndexFile) -> Option<TotalsDelta> {
+pub(crate) fn build_totals_delta(
+    previous_obj: &Map<String, Value>,
+    current: &ExportIndexFile,
+) -> Option<TotalsDelta> {
     let previous = previous_obj.get("totals").and_then(Value::as_object)?;
     let delta = TotalsDelta {
-        session_count: current.totals.session_count as i64 - json_number_i64(previous.get("session_count")),
+        session_count: current.totals.session_count as i64
+            - json_number_i64(previous.get("session_count")),
         turn_count: current.totals.turn_count as i64 - json_number_i64(previous.get("turn_count")),
-        message_count: current.totals.message_count as i64 - json_number_i64(previous.get("message_count")),
-        user_message_count: current.totals.user_message_count as i64 - json_number_i64(previous.get("user_message_count")),
+        message_count: current.totals.message_count as i64
+            - json_number_i64(previous.get("message_count")),
+        user_message_count: current.totals.user_message_count as i64
+            - json_number_i64(previous.get("user_message_count")),
         assistant_message_count: current.totals.assistant_message_count as i64
             - json_number_i64(previous.get("assistant_message_count")),
         text_chars: current.totals.text_chars as i64 - json_number_i64(previous.get("text_chars")),
-        reasoning_chars: current.totals.reasoning_chars as i64 - json_number_i64(previous.get("reasoning_chars")),
+        reasoning_chars: current.totals.reasoning_chars as i64
+            - json_number_i64(previous.get("reasoning_chars")),
         tool_calls: current.totals.tool_calls as i64 - json_number_i64(previous.get("tool_calls")),
-        input_tokens: current.totals.input_tokens as i64 - json_number_i64(previous.get("input_tokens")),
-        output_tokens: current.totals.output_tokens as i64 - json_number_i64(previous.get("output_tokens")),
-        reasoning_tokens: current.totals.reasoning_tokens as i64 - json_number_i64(previous.get("reasoning_tokens")),
-        cache_read_tokens: current.totals.cache_read_tokens as i64 - json_number_i64(previous.get("cache_read_tokens")),
-        cache_write_tokens: current.totals.cache_write_tokens as i64 - json_number_i64(previous.get("cache_write_tokens")),
+        input_tokens: current.totals.input_tokens as i64
+            - json_number_i64(previous.get("input_tokens")),
+        output_tokens: current.totals.output_tokens as i64
+            - json_number_i64(previous.get("output_tokens")),
+        reasoning_tokens: current.totals.reasoning_tokens as i64
+            - json_number_i64(previous.get("reasoning_tokens")),
+        cache_read_tokens: current.totals.cache_read_tokens as i64
+            - json_number_i64(previous.get("cache_read_tokens")),
+        cache_write_tokens: current.totals.cache_write_tokens as i64
+            - json_number_i64(previous.get("cache_write_tokens")),
         cost: current.totals.cost - json_number_f64(previous.get("cost")),
     };
     let has_non_zero = delta.session_count != 0
@@ -98,7 +122,10 @@ pub(crate) fn build_totals_delta(previous_obj: &Map<String, Value>, current: &Ex
     has_non_zero.then_some(delta)
 }
 
-pub(crate) fn build_tool_rollup_deltas(previous_obj: &Map<String, Value>, current: &ExportIndexFile) -> Vec<ToolRollupDelta> {
+pub(crate) fn build_tool_rollup_deltas(
+    previous_obj: &Map<String, Value>,
+    current: &ExportIndexFile,
+) -> Vec<ToolRollupDelta> {
     let mut previous_by_tool = HashMap::new();
     if let Some(items) = previous_obj.get("tool_rollup").and_then(Value::as_array) {
         for item in items {
@@ -119,7 +146,8 @@ pub(crate) fn build_tool_rollup_deltas(previous_obj: &Map<String, Value>, curren
         .tool_rollup
         .iter()
         .filter_map(|item| {
-            let (previous_calls, previous_errors) = previous_by_tool.remove(&item.tool).unwrap_or_default();
+            let (previous_calls, previous_errors) =
+                previous_by_tool.remove(&item.tool).unwrap_or_default();
             let delta = ToolRollupDelta {
                 tool: item.tool.clone(),
                 calls_delta: item.calls as i64 - previous_calls,
@@ -129,21 +157,30 @@ pub(crate) fn build_tool_rollup_deltas(previous_obj: &Map<String, Value>, curren
         })
         .collect::<Vec<_>>();
 
-    deltas.extend(previous_by_tool.into_iter().filter_map(|(tool, (calls, errors))| {
-        let delta = ToolRollupDelta {
-            tool,
-            calls_delta: -calls,
-            error_calls_delta: -errors,
-        };
-        (delta.calls_delta != 0 || delta.error_calls_delta != 0).then_some(delta)
-    }));
+    deltas.extend(
+        previous_by_tool
+            .into_iter()
+            .filter_map(|(tool, (calls, errors))| {
+                let delta = ToolRollupDelta {
+                    tool,
+                    calls_delta: -calls,
+                    error_calls_delta: -errors,
+                };
+                (delta.calls_delta != 0 || delta.error_calls_delta != 0).then_some(delta)
+            }),
+    );
 
     deltas.sort_by(|left, right| {
         right
             .calls_delta
             .abs()
             .cmp(&left.calls_delta.abs())
-            .then_with(|| right.error_calls_delta.abs().cmp(&left.error_calls_delta.abs()))
+            .then_with(|| {
+                right
+                    .error_calls_delta
+                    .abs()
+                    .cmp(&left.error_calls_delta.abs())
+            })
             .then_with(|| left.tool.cmp(&right.tool))
     });
     deltas.truncate(TOOL_ROLLUP_DELTA_LIMIT);
@@ -159,21 +196,39 @@ pub(crate) fn read_jsonl_typed<T: DeserializeOwned>(path: &Path) -> Result<Vec<T
 }
 
 pub(crate) fn total_tokens_from_turn_delta(turn: &TurnDeltaDigest) -> u64 {
-    turn.input_tokens + turn.output_tokens + turn.reasoning_tokens + turn.cache_read_tokens + turn.cache_write_tokens
+    turn.input_tokens
+        + turn.output_tokens
+        + turn.reasoning_tokens
+        + turn.cache_read_tokens
+        + turn.cache_write_tokens
 }
 
-pub(crate) fn build_turn_deltas(base_dir: &Path, export_root: &Path, previous_obj: &Map<String, Value>, current: &ExportIndexFile) -> Result<Vec<TurnDeltaEntry>> {
+pub(crate) fn build_turn_deltas(
+    base_dir: &Path,
+    export_root: &Path,
+    previous_obj: &Map<String, Value>,
+    current: &ExportIndexFile,
+) -> Result<Vec<TurnDeltaEntry>> {
     let Some(previous_export_path) = &current.iteration_meta.previous_export_path else {
         return Ok(Vec::new());
     };
     let Some(previous_turns_rel) = previous_obj
         .get("recommended_read_order")
         .and_then(Value::as_array)
-        .and_then(|items| items.iter().filter_map(Value::as_str).find(|path| path.ends_with("turns.jsonl")))
+        .and_then(|items| {
+            items
+                .iter()
+                .filter_map(Value::as_str)
+                .find(|path| path.ends_with("turns.jsonl"))
+        })
     else {
         return Ok(Vec::new());
     };
-    let Some(current_turns_rel) = current.recommended_read_order.iter().find(|path| path.ends_with("turns.jsonl")) else {
+    let Some(current_turns_rel) = current
+        .recommended_read_order
+        .iter()
+        .find(|path| path.ends_with("turns.jsonl"))
+    else {
         return Ok(Vec::new());
     };
 
@@ -196,35 +251,49 @@ pub(crate) fn build_turn_deltas(base_dir: &Path, export_root: &Path, previous_ob
             let previous_turn = previous_by_turn.get(&current_turn.turn_index);
             let current_total_tokens = total_tokens_from_turn_delta(&current_turn);
             let mut changed_fields = Vec::new();
-            if previous_turn.and_then(|turn| turn.agent_strategy.as_deref()) != current_turn.agent_strategy.as_deref() {
+            if previous_turn.and_then(|turn| turn.agent_strategy.as_deref())
+                != current_turn.agent_strategy.as_deref()
+            {
                 changed_fields.push(String::from("agent_strategy"));
             }
-            if previous_turn.and_then(|turn| turn.turn_cost_tier.as_deref()) != current_turn.turn_cost_tier.as_deref() {
+            if previous_turn.and_then(|turn| turn.turn_cost_tier.as_deref())
+                != current_turn.turn_cost_tier.as_deref()
+            {
                 changed_fields.push(String::from("turn_cost_tier"));
             }
-            if previous_turn.and_then(|turn| turn.turn_effectiveness.as_deref()) != current_turn.turn_effectiveness.as_deref() {
+            if previous_turn.and_then(|turn| turn.turn_effectiveness.as_deref())
+                != current_turn.turn_effectiveness.as_deref()
+            {
                 changed_fields.push(String::from("turn_effectiveness"));
             }
             if previous_turn.map(total_tokens_from_turn_delta) != Some(current_total_tokens) {
                 changed_fields.push(String::from("total_tokens"));
             }
-            if previous_turn.map(|turn| turn.tool_call_count) != Some(current_turn.tool_call_count) {
+            if previous_turn.map(|turn| turn.tool_call_count) != Some(current_turn.tool_call_count)
+            {
                 changed_fields.push(String::from("tool_call_count"));
             }
             if previous_turn.map(|turn| turn.error_count) != Some(current_turn.error_count) {
                 changed_fields.push(String::from("error_count"));
             }
-            if previous_turn.map(|turn| turn.modified_file_count) != Some(current_turn.modified_file_count) {
+            if previous_turn.map(|turn| turn.modified_file_count)
+                != Some(current_turn.modified_file_count)
+            {
                 changed_fields.push(String::from("modified_file_count"));
             }
             (!changed_fields.is_empty()).then(|| TurnDeltaEntry {
                 turn_index: current_turn.turn_index,
                 changed_fields,
                 previous_agent_strategy: previous_turn.and_then(|turn| turn.agent_strategy.clone()),
-                current_agent_strategy: current_turn.agent_strategy.unwrap_or_else(|| String::from("unknown")),
+                current_agent_strategy: current_turn
+                    .agent_strategy
+                    .unwrap_or_else(|| String::from("unknown")),
                 previous_turn_cost_tier: previous_turn.and_then(|turn| turn.turn_cost_tier.clone()),
-                current_turn_cost_tier: current_turn.turn_cost_tier.unwrap_or_else(|| String::from("unknown")),
-                previous_turn_effectiveness: previous_turn.and_then(|turn| turn.turn_effectiveness.clone()),
+                current_turn_cost_tier: current_turn
+                    .turn_cost_tier
+                    .unwrap_or_else(|| String::from("unknown")),
+                previous_turn_effectiveness: previous_turn
+                    .and_then(|turn| turn.turn_effectiveness.clone()),
                 current_turn_effectiveness: current_turn
                     .turn_effectiveness
                     .unwrap_or_else(|| String::from("unknown")),
@@ -244,14 +313,22 @@ pub(crate) fn build_turn_deltas(base_dir: &Path, export_root: &Path, previous_ob
         right
             .current_total_tokens
             .abs_diff(right.previous_total_tokens.unwrap_or_default())
-            .cmp(&left.current_total_tokens.abs_diff(left.previous_total_tokens.unwrap_or_default()))
+            .cmp(
+                &left
+                    .current_total_tokens
+                    .abs_diff(left.previous_total_tokens.unwrap_or_default()),
+            )
             .then_with(|| left.turn_index.cmp(&right.turn_index))
     });
     deltas.truncate(TURN_DELTA_LIMIT);
     Ok(deltas)
 }
 
-pub(crate) fn build_delta_from_previous(base_dir: &Path, export_root: &Path, current: &ExportIndexFile) -> Result<Option<DeltaFromPrevious>> {
+pub(crate) fn build_delta_from_previous(
+    base_dir: &Path,
+    export_root: &Path,
+    current: &ExportIndexFile,
+) -> Result<Option<DeltaFromPrevious>> {
     let Some(previous_export_path) = &current.iteration_meta.previous_export_path else {
         return Ok(None);
     };
@@ -260,11 +337,13 @@ pub(crate) fn build_delta_from_previous(base_dir: &Path, export_root: &Path, cur
         return Ok(None);
     }
     let previous_value: Value = serde_json::from_str(
-        &fs::read_to_string(&previous_index_path).with_context(|| format!("read {}", previous_index_path.display()))?,
+        &fs::read_to_string(&previous_index_path)
+            .with_context(|| format!("read {}", previous_index_path.display()))?,
     )
     .with_context(|| format!("parse {}", previous_index_path.display()))?;
     let previous_obj = previous_value.as_object().cloned().unwrap_or_default();
-    let current_value = serde_json::to_value(current).map_err(|err| anyhow::anyhow!(err.to_string()))?;
+    let current_value =
+        serde_json::to_value(current).map_err(|err| anyhow::anyhow!(err.to_string()))?;
     let current_obj = current_value.as_object().cloned().unwrap_or_default();
     let current_fields = [
         "schema_version",

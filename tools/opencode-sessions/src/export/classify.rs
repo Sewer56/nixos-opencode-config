@@ -2,9 +2,9 @@ use serde_json::Value;
 use std::collections::{BTreeSet, HashSet};
 
 use crate::constants::*;
+use crate::export::turn::*;
 use crate::format::*;
 use crate::models::*;
-use crate::export::turn::*;
 
 pub(crate) fn build_session_narrative(
     title: &str,
@@ -18,7 +18,10 @@ pub(crate) fn build_session_narrative(
     if turns.is_empty() {
         return None;
     }
-    let high_value = turns.iter().filter(|turn| turn.turn_effectiveness == "high-value").count();
+    let high_value = turns
+        .iter()
+        .filter(|turn| turn.turn_effectiveness == "high-value")
+        .count();
     let waste = turns
         .iter()
         .filter(|turn| matches!(turn.turn_effectiveness.as_str(), "waste" | "low-value"))
@@ -29,15 +32,27 @@ pub(crate) fn build_session_narrative(
         .map(|item| item.path.clone())
         .collect::<Vec<_>>();
 
-    let mut parts = vec![format!("Session `{title}` status={session_status} across {} turns.", turns.len())];
+    let mut parts = vec![format!(
+        "Session `{title}` status={session_status} across {} turns.",
+        turns.len()
+    )];
     parts.push(format!(
         "Snapshot: {}.",
         infer_snapshot_completeness(session_status, staleness_ms)
     ));
     if !pivotal_turns.is_empty() {
-        parts.push(format!("Pivotal turns: {}.", pivotal_turns.iter().map(|idx| idx.to_string()).collect::<Vec<_>>().join(", ")));
+        parts.push(format!(
+            "Pivotal turns: {}.",
+            pivotal_turns
+                .iter()
+                .map(|idx| idx.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        ));
     }
-    parts.push(format!("High-value turns: {high_value}; low-value/waste turns: {waste}."));
+    parts.push(format!(
+        "High-value turns: {high_value}; low-value/waste turns: {waste}."
+    ));
     if !top_files.is_empty() {
         parts.push(format!("Main deliverables: {}.", top_files.join(", ")));
     }
@@ -84,9 +99,11 @@ pub(crate) fn classify_user_intent(text: Option<&str>) -> (String, f64) {
     {
         return (String::from("followup-request"), 0.88);
     }
-    if ["what ", "why ", "how ", "when ", "where ", "did ", "does ", "is ", "are "]
-        .iter()
-        .any(|prefix| trimmed.starts_with(prefix))
+    if [
+        "what ", "why ", "how ", "when ", "where ", "did ", "does ", "is ", "are ",
+    ]
+    .iter()
+    .any(|prefix| trimmed.starts_with(prefix))
         || trimmed.ends_with('?')
     {
         return (String::from("followup-request"), 0.82);
@@ -110,7 +127,11 @@ pub(crate) fn classify_user_intent(text: Option<&str>) -> (String, f64) {
     (String::from("task"), 0.82)
 }
 
-pub(crate) fn classify_alternative_user_intents(text: Option<&str>, primary: &str, confidence: f64) -> Vec<String> {
+pub(crate) fn classify_alternative_user_intents(
+    text: Option<&str>,
+    primary: &str,
+    confidence: f64,
+) -> Vec<String> {
     let text = text.unwrap_or("").to_lowercase();
     let mut out = Vec::new();
     let mut push = |label: &str| {
@@ -140,10 +161,18 @@ pub(crate) fn classify_alternative_user_intents(text: Option<&str>, primary: &st
     if text.contains("continue") || text.contains("keep going") || text.contains("again") {
         push("continuation");
     }
-    if text.contains('?') || text.starts_with("what ") || text.starts_with("how ") || text.starts_with("why ") {
+    if text.contains('?')
+        || text.starts_with("what ")
+        || text.starts_with("how ")
+        || text.starts_with("why ")
+    {
         push("followup-request");
     }
-    if text.contains("please") || text.contains("do ") || text.contains("add ") || text.contains("fix ") {
+    if text.contains("please")
+        || text.contains("do ")
+        || text.contains("add ")
+        || text.contains("fix ")
+    {
         push("task");
     }
     out.truncate(2);
@@ -186,7 +215,10 @@ pub(crate) fn infer_turn_outcome(
     if tool_call_count > 0 {
         return String::from("executed");
     }
-    if next_user_tags.iter().any(|tag| tag == "metrics" || tag == "tui") {
+    if next_user_tags
+        .iter()
+        .any(|tag| tag == "metrics" || tag == "tui")
+    {
         return String::from("followup-needed");
     }
     String::from("answered")
@@ -204,7 +236,9 @@ pub(crate) fn is_analysis_only_turn_shape(
     modified_file_count == 0
         && final_assistant_text_present
         && !tool_rollup.is_empty()
-        && tool_rollup.iter().all(|entry| is_analysis_tool(&entry.tool))
+        && tool_rollup
+            .iter()
+            .all(|entry| is_analysis_tool(&entry.tool))
 }
 
 pub(crate) fn infer_turn_success(
@@ -218,8 +252,11 @@ pub(crate) fn infer_turn_success(
     if outcome == "redirected" {
         return false;
     }
-    if is_analysis_only_turn_shape(modified_file_count, tool_rollup, final_assistant_text_present)
-        && matches!(outcome, "answered" | "executed")
+    if is_analysis_only_turn_shape(
+        modified_file_count,
+        tool_rollup,
+        final_assistant_text_present,
+    ) && matches!(outcome, "answered" | "executed")
     {
         return true;
     }
@@ -271,32 +308,55 @@ pub(crate) fn infer_agent_strategy(
     String::from("explore")
 }
 
-pub(crate) fn classify_turn_cost_tier(total_tokens: u64, tool_call_count: usize, response_elapsed_ms: Option<i64>) -> String {
-    if total_tokens >= 500_000 || tool_call_count >= 50 || response_elapsed_ms.unwrap_or_default() >= 600_000 {
+pub(crate) fn classify_turn_cost_tier(
+    total_tokens: u64,
+    tool_call_count: usize,
+    response_elapsed_ms: Option<i64>,
+) -> String {
+    if total_tokens >= 500_000
+        || tool_call_count >= 50
+        || response_elapsed_ms.unwrap_or_default() >= 600_000
+    {
         return String::from("extreme");
     }
-    if total_tokens >= 150_000 || tool_call_count >= 20 || response_elapsed_ms.unwrap_or_default() >= 180_000 {
+    if total_tokens >= 150_000
+        || tool_call_count >= 20
+        || response_elapsed_ms.unwrap_or_default() >= 180_000
+    {
         return String::from("heavy");
     }
-    if total_tokens >= 40_000 || tool_call_count >= 5 || response_elapsed_ms.unwrap_or_default() >= 60_000 {
+    if total_tokens >= 40_000
+        || tool_call_count >= 5
+        || response_elapsed_ms.unwrap_or_default() >= 60_000
+    {
         return String::from("medium");
     }
     String::from("light")
 }
 
-pub(crate) fn classify_turn_effectiveness(turn: &TurnDigest, files_survived_to_end: usize) -> String {
+pub(crate) fn classify_turn_effectiveness(
+    turn: &TurnDigest,
+    files_survived_to_end: usize,
+) -> String {
     let retry_ratio = turn.effectiveness_signals.retry_ratio.unwrap_or_default();
-    let redundant_read_ratio = turn.effectiveness_signals.redundant_read_ratio.unwrap_or_default();
+    let redundant_read_ratio = turn
+        .effectiveness_signals
+        .redundant_read_ratio
+        .unwrap_or_default();
     if !turn.success && files_survived_to_end == 0 && turn.modified_file_count == 0 {
         return String::from("waste");
     }
     if files_survived_to_end > 0 || (turn.outcome == "delegated" && turn.success) {
         return String::from("high-value");
     }
-    if turn.success && turn.modified_file_count > 0
-        && (matches!(turn.turn_cost_tier.as_str(), "heavy" | "extreme") || retry_ratio >= 0.5 || redundant_read_ratio >= 0.7) {
-            return String::from("moderate");
-        }
+    if turn.success
+        && turn.modified_file_count > 0
+        && (matches!(turn.turn_cost_tier.as_str(), "heavy" | "extreme")
+            || retry_ratio >= 0.5
+            || redundant_read_ratio >= 0.7)
+    {
+        return String::from("moderate");
+    }
     if retry_ratio >= 0.5 || redundant_read_ratio >= 0.7 {
         return String::from("low-value");
     }
@@ -310,7 +370,10 @@ pub(crate) fn classify_turn_effectiveness(turn: &TurnDigest, files_survived_to_e
 }
 
 pub(crate) fn recommend_turn_attention(turn: &TurnDigest) -> String {
-    match (turn.turn_effectiveness.as_str(), turn.turn_cost_tier.as_str()) {
+    match (
+        turn.turn_effectiveness.as_str(),
+        turn.turn_cost_tier.as_str(),
+    ) {
         ("waste", _) => String::from("skip"),
         ("low-value", "heavy" | "extreme") => String::from("skim"),
         ("high-value", "heavy" | "extreme") => String::from("inspect-artifacts"),
@@ -319,25 +382,36 @@ pub(crate) fn recommend_turn_attention(turn: &TurnDigest) -> String {
     }
 }
 
-pub(crate) fn build_failure_narrative(turn: &TurnDigest, files_survived_to_end: usize) -> Option<String> {
+pub(crate) fn build_failure_narrative(
+    turn: &TurnDigest,
+    files_survived_to_end: usize,
+) -> Option<String> {
     if !matches!(turn.turn_effectiveness.as_str(), "waste" | "low-value") {
         return None;
     }
     if turn.tool_call_count == 0 {
-        return Some(String::from("No tool work or durable file change landed in this turn."));
+        return Some(String::from(
+            "No tool work or durable file change landed in this turn.",
+        ));
     }
-    if turn.effectiveness_signals.redundant_read_ratio.unwrap_or_default() >= 0.6 {
+    if turn
+        .effectiveness_signals
+        .redundant_read_ratio
+        .unwrap_or_default()
+        >= 0.6
+    {
         return Some(format!(
             "Heavy repeated reads with limited durable change; redundant_read_ratio={:.2} across {} tool calls.",
-            turn.effectiveness_signals.redundant_read_ratio.unwrap_or_default(),
+            turn.effectiveness_signals
+                .redundant_read_ratio
+                .unwrap_or_default(),
             turn.tool_call_count
         ));
     }
     if turn.error_count > 0 && files_survived_to_end == 0 {
         return Some(format!(
             "Errors interrupted turn and no durable file changes survived; {} tool errors across {} calls.",
-            turn.error_count,
-            turn.tool_call_count
+            turn.error_count, turn.tool_call_count
         ));
     }
     if turn.modified_file_count > 0 && files_survived_to_end == 0 {
@@ -346,18 +420,25 @@ pub(crate) fn build_failure_narrative(turn: &TurnDigest, files_survived_to_end: 
             turn.modified_file_count
         ));
     }
-    Some(String::from("Turn consumed budget without strong durable output signal."))
+    Some(String::from(
+        "Turn consumed budget without strong durable output signal.",
+    ))
 }
 
 pub(crate) fn build_optimization_hints(turn: &TurnDigest) -> Vec<String> {
     let mut hints = Vec::new();
-    if matches!(turn.turn_cost_tier.as_str(), "heavy" | "extreme") && turn.turn_effectiveness != "high-value" {
+    if matches!(turn.turn_cost_tier.as_str(), "heavy" | "extreme")
+        && turn.turn_effectiveness != "high-value"
+    {
         hints.push(format!(
             "High-cost turn ({} tokens, {} tool calls); cut exploration loops sooner.",
             turn.total_tokens, turn.tool_call_count
         ));
     }
-    let redundant_read_ratio = turn.effectiveness_signals.redundant_read_ratio.unwrap_or_default();
+    let redundant_read_ratio = turn
+        .effectiveness_signals
+        .redundant_read_ratio
+        .unwrap_or_default();
     if redundant_read_ratio >= 0.5 {
         hints.push(format!(
             "Repeated reads dominate this turn ({:.0}% redundant); cache file state after first read.",
@@ -395,7 +476,11 @@ pub(crate) fn summarize_turn_change(
         return Some(truncate_text(text, TURN_PREVIEW_LIMIT));
     }
     if modified_file_count > 0 {
-        let first = modified_files.iter().next().cloned().unwrap_or_else(|| String::from("files"));
+        let first = modified_files
+            .iter()
+            .next()
+            .cloned()
+            .unwrap_or_else(|| String::from("files"));
         return Some(if modified_file_count == 1 {
             format!("updated {first}")
         } else {
@@ -515,24 +600,41 @@ pub(crate) fn summarize_reasoning(text: &str, themes: &[String]) -> Option<Strin
 
     let mut parts = Vec::new();
     if !themes.is_empty() {
-        parts.push(format!("themes: {}", themes.iter().take(3).cloned().collect::<Vec<_>>().join(", ")));
+        parts.push(format!(
+            "themes: {}",
+            themes
+                .iter()
+                .take(3)
+                .cloned()
+                .collect::<Vec<_>>()
+                .join(", ")
+        ));
     }
 
     if let Some(first) = lines.first() {
-        let first_theme = themes.first().map(|theme| theme.to_lowercase()).unwrap_or_default();
+        let first_theme = themes
+            .first()
+            .map(|theme| theme.to_lowercase())
+            .unwrap_or_default();
         if first.to_lowercase() != first_theme {
             parts.push(format!("start: {}", truncate_text(first, 120)));
         }
     }
     if lines.len() > 1
-        && let Some(last) = lines.iter().rev().find(|line| line.as_str() != lines[0]) {
-            parts.push(format!("end: {}", truncate_text(last, 120)));
-        }
+        && let Some(last) = lines.iter().rev().find(|line| line.as_str() != lines[0])
+    {
+        parts.push(format!("end: {}", truncate_text(last, 120)));
+    }
 
     Some(truncate_text(&parts.join(" | "), REASONING_SUMMARY_LIMIT))
 }
 
-pub(crate) fn classify_message_kind(role: &str, has_text: bool, has_reasoning: bool, has_activity: bool) -> String {
+pub(crate) fn classify_message_kind(
+    role: &str,
+    has_text: bool,
+    has_reasoning: bool,
+    has_activity: bool,
+) -> String {
     if role == "user" {
         return String::from("user");
     }

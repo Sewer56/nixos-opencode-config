@@ -1,7 +1,6 @@
 use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 
-
 #[derive(Parser)]
 #[command(name = "opencode-sessions")]
 #[command(version)]

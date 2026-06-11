@@ -21,7 +21,12 @@ pub(crate) struct TuiApp {
 }
 
 impl TuiApp {
-    pub(crate) fn new(db_path: PathBuf, export_base: PathBuf, index: OverviewIndex, args: TuiArgs) -> Self {
+    pub(crate) fn new(
+        db_path: PathBuf,
+        export_base: PathBuf,
+        index: OverviewIndex,
+        args: TuiArgs,
+    ) -> Self {
         let mut app = Self {
             db_path,
             export_base,
@@ -47,7 +52,8 @@ impl TuiApp {
     }
 
     pub(crate) fn refresh_rows(&mut self) {
-        self.visible_rows = build_visible_rows(&self.index, self.search.trim(), self.limit, &self.expanded);
+        self.visible_rows =
+            build_visible_rows(&self.index, self.search.trim(), self.limit, &self.expanded);
         if self.visible_rows.is_empty() {
             self.list_state.select(None);
             return;
@@ -65,7 +71,8 @@ impl TuiApp {
         }
 
         let current = self.list_state.selected().unwrap_or(0) as isize;
-        let next = (current + delta).clamp(0, self.visible_rows.len().saturating_sub(1) as isize) as usize;
+        let next =
+            (current + delta).clamp(0, self.visible_rows.len().saturating_sub(1) as isize) as usize;
         self.list_state.select(Some(next));
     }
 

@@ -1,0 +1,19 @@
+[workspace]
+members = [
+  "opencode-sessions",
+  "model-tiers",
+  "chunk-files-by-tokens",
+  "token-count-after-expand",
+  "iterate-static-check",
+]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+version = "0.1.0"
+license = "MIT"
+
+[workspace.dependencies]
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+regex = "1.12"

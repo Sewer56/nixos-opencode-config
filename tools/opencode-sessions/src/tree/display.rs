@@ -7,7 +7,11 @@ use crate::format::*;
 use crate::models::*;
 use crate::tree::browse::*;
 
-pub(crate) fn run_tree_command(db_path: &Path, index: &OverviewIndex, args: TreeArgs) -> Result<()> {
+pub(crate) fn run_tree_command(
+    db_path: &Path,
+    index: &OverviewIndex,
+    args: TreeArgs,
+) -> Result<()> {
     let search = args.search.unwrap_or_default();
 
     if args.json {
@@ -38,14 +42,22 @@ pub(crate) fn run_tree_command(db_path: &Path, index: &OverviewIndex, args: Tree
     Ok(())
 }
 
-pub(crate) fn build_tree_nodes(index: &OverviewIndex, search: &str, limit: Option<usize>) -> Vec<TreeNode> {
+pub(crate) fn build_tree_nodes(
+    index: &OverviewIndex,
+    search: &str,
+    limit: Option<usize>,
+) -> Vec<TreeNode> {
     limit_roots(&index.roots, limit)
         .iter()
         .filter_map(|root_id| build_tree_node(index, root_id, search))
         .collect()
 }
 
-pub(crate) fn build_tree_node(index: &OverviewIndex, session_id: &str, search: &str) -> Option<TreeNode> {
+pub(crate) fn build_tree_node(
+    index: &OverviewIndex,
+    session_id: &str,
+    search: &str,
+) -> Option<TreeNode> {
     let session = index.sessions.get(session_id)?;
     let children: Vec<TreeNode> = index
         .children_of(session_id)
@@ -74,7 +86,11 @@ pub(crate) fn build_tree_node(index: &OverviewIndex, session_id: &str, search: &
     })
 }
 
-pub(crate) fn build_text_tree(index: &OverviewIndex, search: &str, limit: Option<usize>) -> Vec<String> {
+pub(crate) fn build_text_tree(
+    index: &OverviewIndex,
+    search: &str,
+    limit: Option<usize>,
+) -> Vec<String> {
     let mut lines = Vec::new();
     let roots: Vec<&String> = limit_roots(&index.roots, limit)
         .iter()

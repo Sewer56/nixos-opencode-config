@@ -54,8 +54,14 @@ pub(crate) fn normalize_tool_path(path: &str) -> String {
             return format!("external/{}", suffix);
         }
     }
-    let segments = trimmed.split('/').filter(|part| !part.is_empty()).collect::<Vec<_>>();
-    if let Some(index) = segments.iter().position(|segment| segment.contains("__export-")) {
+    let segments = trimmed
+        .split('/')
+        .filter(|part| !part.is_empty())
+        .collect::<Vec<_>>();
+    if let Some(index) = segments
+        .iter()
+        .position(|segment| segment.contains("__export-"))
+    {
         return format!("exports/{}", segments[index..].join("/"));
     }
     if let Some(index) = segments
@@ -108,7 +114,10 @@ pub(crate) fn normalize_tool_input_preview(tool: &str, mut preview: Value) -> Va
     if tool == "bash"
         && let Some(Value::String(description)) = object.get("description")
     {
-        object.insert(String::from("description"), Value::String(truncate_text(description, TOOL_PART_PREVIEW_LIMIT)));
+        object.insert(
+            String::from("description"),
+            Value::String(truncate_text(description, TOOL_PART_PREVIEW_LIMIT)),
+        );
     }
     preview
 }
@@ -123,7 +132,15 @@ pub(crate) fn to_json_values<T: Serialize>(items: &[T]) -> Result<Vec<Value>> {
 
 pub(crate) fn token_total(tokens: Option<&TokenStatsExport>) -> u64 {
     tokens
-        .map(|tokens| tokens.total.unwrap_or(tokens.input + tokens.output + tokens.reasoning + tokens.cache_read + tokens.cache_write))
+        .map(|tokens| {
+            tokens.total.unwrap_or(
+                tokens.input
+                    + tokens.output
+                    + tokens.reasoning
+                    + tokens.cache_read
+                    + tokens.cache_write,
+            )
+        })
         .unwrap_or_default()
 }
 
@@ -165,7 +182,10 @@ pub(crate) fn is_completed_status(value: &str) -> bool {
 }
 
 pub(crate) fn non_empty_owned(value: Option<&str>) -> Option<String> {
-    value.map(str::trim).filter(|value| !value.is_empty()).map(str::to_string)
+    value
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(str::to_string)
 }
 
 pub(crate) fn sanitize_filename(input: &str) -> String {
@@ -173,10 +193,9 @@ pub(crate) fn sanitize_filename(input: &str) -> String {
     for ch in input.chars().flat_map(char::to_lowercase) {
         if ch.is_ascii_alphanumeric() {
             out.push(ch);
-        } else if matches!(ch, ' ' | '-' | '_' | '.')
-            && !out.ends_with('-') {
-                out.push('-');
-            }
+        } else if matches!(ch, ' ' | '-' | '_' | '.') && !out.ends_with('-') {
+            out.push('-');
+        }
     }
     let trimmed = out.trim_matches('-');
     if trimmed.is_empty() {
@@ -208,7 +227,12 @@ pub(crate) fn truncate_text(text: &str, limit: usize) -> String {
     format!("{}…(+{} chars)", prefix, count.saturating_sub(limit))
 }
 
-pub(crate) fn shrink_json(value: &Value, max_string: usize, max_items: usize, depth: usize) -> Value {
+pub(crate) fn shrink_json(
+    value: &Value,
+    max_string: usize,
+    max_items: usize,
+    depth: usize,
+) -> Value {
     if depth == 0 {
         return Value::String(String::from("[truncated-depth]"));
     }

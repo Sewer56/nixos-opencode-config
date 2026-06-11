@@ -2,9 +2,9 @@ use serde_json::Value;
 use std::collections::{BTreeSet, HashMap, HashSet};
 
 use crate::constants::*;
+use crate::export::classify::*;
 use crate::format::*;
 use crate::models::*;
-use crate::export::classify::*;
 
 pub(crate) fn extract_export_reference_paths(text: &str) -> Vec<String> {
     let mut paths = Vec::new();
@@ -14,7 +14,9 @@ pub(crate) fn extract_export_reference_paths(text: &str) -> Vec<String> {
             continue;
         }
         let cleaned = token
-            .trim_matches(|c: char| matches!(c, '`' | '"' | '\'' | ',' | '.' | ')' | '(' | ']' | '['))
+            .trim_matches(|c: char| {
+                matches!(c, '`' | '"' | '\'' | ',' | '.' | ')' | '(' | ']' | '[')
+            })
             .trim();
         if cleaned.is_empty() {
             continue;
@@ -27,11 +29,17 @@ pub(crate) fn extract_export_reference_paths(text: &str) -> Vec<String> {
     paths
 }
 
-pub(crate) fn classify_export_reference_status(paths: &[String], current_export_name: &str) -> Option<String> {
+pub(crate) fn classify_export_reference_status(
+    paths: &[String],
+    current_export_name: &str,
+) -> Option<String> {
     if paths.is_empty() {
         return None;
     }
-    let current_count = paths.iter().filter(|path| path.contains(current_export_name)).count();
+    let current_count = paths
+        .iter()
+        .filter(|path| path.contains(current_export_name))
+        .count();
     if current_count == paths.len() {
         return Some(String::from("current-export"));
     }
@@ -41,7 +49,10 @@ pub(crate) fn classify_export_reference_status(paths: &[String], current_export_
     Some(String::from("stale-export"))
 }
 
-pub(crate) fn resolve_current_export_paths(paths: &[String], current_export_name: &str) -> Vec<String> {
+pub(crate) fn resolve_current_export_paths(
+    paths: &[String],
+    current_export_name: &str,
+) -> Vec<String> {
     let current_root = format!("exports/{current_export_name}");
     let mut out = Vec::new();
     let mut seen = HashSet::new();
@@ -67,7 +78,10 @@ pub(crate) fn resolve_current_export_paths(paths: &[String], current_export_name
     out
 }
 
-pub(crate) fn build_resolved_prompt_preview(paths: &[String], current_export_name: &str) -> Option<String> {
+pub(crate) fn build_resolved_prompt_preview(
+    paths: &[String],
+    current_export_name: &str,
+) -> Option<String> {
     let resolved = resolve_current_export_paths(paths, current_export_name);
     if resolved.is_empty() || resolved == paths {
         return None;
@@ -129,8 +143,10 @@ pub(crate) fn map_child_delegations(
                 .and_then(Value::as_str)
                 .map(extract_export_reference_paths)
                 .unwrap_or_default();
-            let prompt_preview_resolved = build_resolved_prompt_preview(&prompt_export_paths, current_export_name);
-            let export_reference_status = classify_export_reference_status(&prompt_export_paths, current_export_name);
+            let prompt_preview_resolved =
+                build_resolved_prompt_preview(&prompt_export_paths, current_export_name);
+            let export_reference_status =
+                classify_export_reference_status(&prompt_export_paths, current_export_name);
 
             by_id.insert(
                 task_id,
@@ -151,7 +167,10 @@ pub(crate) fn map_child_delegations(
     by_id
 }
 
-pub(crate) fn collect_turn_reasoning_themes(messages: &[MessageDigest], range: Option<&std::ops::RangeInclusive<usize>>) -> Vec<String> {
+pub(crate) fn collect_turn_reasoning_themes(
+    messages: &[MessageDigest],
+    range: Option<&std::ops::RangeInclusive<usize>>,
+) -> Vec<String> {
     let Some(range) = range else {
         return Vec::new();
     };
@@ -191,9 +210,17 @@ pub(crate) fn build_turn_reasoning_summary(
         }
     }
     if !snippets.is_empty() {
-        return Some(truncate_text(&snippets.join(" | "), REASONING_SUMMARY_LIMIT));
+        return Some(truncate_text(
+            &snippets.join(" | "),
+            REASONING_SUMMARY_LIMIT,
+        ));
     }
-    (!themes.is_empty()).then(|| truncate_text(&format!("Themes: {}", themes.join(", ")), REASONING_SUMMARY_LIMIT))
+    (!themes.is_empty()).then(|| {
+        truncate_text(
+            &format!("Themes: {}", themes.join(", ")),
+            REASONING_SUMMARY_LIMIT,
+        )
+    })
 }
 
 pub(crate) fn build_turn_digests(
@@ -221,8 +248,11 @@ pub(crate) fn build_turn_digests(
     for (turn_index, &user_idx) in user_indexes.iter().enumerate() {
         let user = &messages[user_idx];
         let next_user_idx = user_indexes.get(turn_index + 1).copied();
-        let assistant_start = (user_idx + 1..messages.len()).find(|&idx| messages[idx].role != "user");
-        let assistant_end = next_user_idx.map(|idx| idx.saturating_sub(1)).or_else(|| messages.len().checked_sub(1));
+        let assistant_start =
+            (user_idx + 1..messages.len()).find(|&idx| messages[idx].role != "user");
+        let assistant_end = next_user_idx
+            .map(|idx| idx.saturating_sub(1))
+            .or_else(|| messages.len().checked_sub(1));
         let assistant_range = assistant_start
             .zip(assistant_end)
             .filter(|(start, end)| start <= end)
@@ -261,9 +291,18 @@ pub(crate) fn build_turn_digests(
             })
             .collect::<Vec<_>>();
         let tool_call_count = tool_slice.len();
-        let tool_duration_ms = tool_slice.iter().map(|tool| tool.duration_ms.unwrap_or_default()).sum();
-        let error_count = tool_slice.iter().filter(|tool| tool.status == "error").count();
-        let total_read_events = tool_slice.iter().map(|tool| tool.read_paths.len()).sum::<usize>();
+        let tool_duration_ms = tool_slice
+            .iter()
+            .map(|tool| tool.duration_ms.unwrap_or_default())
+            .sum();
+        let error_count = tool_slice
+            .iter()
+            .filter(|tool| tool.status == "error")
+            .count();
+        let total_read_events = tool_slice
+            .iter()
+            .map(|tool| tool.read_paths.len())
+            .sum::<usize>();
         let mut change_stats = TurnChangeStats {
             patch_calls: 0,
             files_added: 0,
@@ -282,11 +321,14 @@ pub(crate) fn build_turn_digests(
         let mut strongest_patch: Option<(&ToolCallDigest, usize)> = None;
 
         for tool in tool_slice {
-            let entry = tool_rollup_map.entry(tool.tool.clone()).or_insert_with(|| TurnToolAggregate {
-                tool: tool.tool.clone(),
-                calls: 0,
-                error_calls: 0,
-            });
+            let entry =
+                tool_rollup_map
+                    .entry(tool.tool.clone())
+                    .or_insert_with(|| TurnToolAggregate {
+                        tool: tool.tool.clone(),
+                        calls: 0,
+                        error_calls: 0,
+                    });
             entry.calls += 1;
             if tool.status == "error" {
                 entry.error_calls += 1;
@@ -305,7 +347,10 @@ pub(crate) fn build_turn_digests(
                 change_stats.lines_added += summary.lines_added;
                 change_stats.lines_deleted += summary.lines_deleted;
                 let churn = summary.lines_added + summary.lines_deleted;
-                let replace = strongest_patch.as_ref().map(|(_, best)| churn > *best).unwrap_or(true);
+                let replace = strongest_patch
+                    .as_ref()
+                    .map(|(_, best)| churn > *best)
+                    .unwrap_or(true);
                 if replace {
                     strongest_patch = Some((tool, churn));
                 }
@@ -326,17 +371,29 @@ pub(crate) fn build_turn_digests(
         }
 
         let mut tool_rollup = tool_rollup_map.into_values().collect::<Vec<_>>();
-        tool_rollup.sort_by(|left, right| right.calls.cmp(&left.calls).then_with(|| left.tool.cmp(&right.tool)));
+        tool_rollup.sort_by(|left, right| {
+            right
+                .calls
+                .cmp(&left.calls)
+                .then_with(|| left.tool.cmp(&right.tool))
+        });
         let mut call_purpose_rollup = call_purpose_map
             .into_iter()
             .map(|(purpose, calls)| TurnPurposeAggregate { purpose, calls })
             .collect::<Vec<_>>();
-        call_purpose_rollup.sort_by(|left, right| right.calls.cmp(&left.calls).then_with(|| left.purpose.cmp(&right.purpose)));
+        call_purpose_rollup.sort_by(|left, right| {
+            right
+                .calls
+                .cmp(&left.calls)
+                .then_with(|| left.purpose.cmp(&right.purpose))
+        });
 
         let response_elapsed_ms = assistant_range
             .as_ref()
             .and_then(|range| messages.get(*range.end()))
-            .map(|last| last.time_ms.saturating_sub(user.time_ms) + last.duration_ms.unwrap_or_default());
+            .map(|last| {
+                last.time_ms.saturating_sub(user.time_ms) + last.duration_ms.unwrap_or_default()
+            });
         let wall_to_next_user_ms = next_user_idx
             .and_then(|idx| messages.get(idx))
             .map(|next| next.time_ms.saturating_sub(user.time_ms))
@@ -344,26 +401,37 @@ pub(crate) fn build_turn_digests(
         let final_assistant = assistant_range
             .as_ref()
             .and_then(|range| messages.get(*range.end()));
-        let total_tokens = input_tokens + output_tokens + reasoning_tokens + cache_read_tokens + cache_write_tokens;
+        let total_tokens = input_tokens
+            + output_tokens
+            + reasoning_tokens
+            + cache_read_tokens
+            + cache_write_tokens;
         let cache_hit_ratio = (total_tokens > 0)
             .then_some(cache_read_tokens as f64 / total_tokens as f64)
             .filter(|ratio| ratio.is_finite());
-        let tokens_per_tool_call = average_u64(total_tokens, tool_call_count).filter(|value| value.is_finite());
+        let tokens_per_tool_call =
+            average_u64(total_tokens, tool_call_count).filter(|value| value.is_finite());
         let read_file_count = read_files.len();
         let modified_file_count = modified_files.len();
         let read_files_all = read_files.iter().cloned().collect::<Vec<_>>();
         let modified_files_all = modified_files.iter().cloned().collect::<Vec<_>>();
         let retry_ratio = average_usize(error_count, tool_call_count);
-        let redundant_read_ratio = (total_read_events > 0)
-            .then_some(total_read_events.saturating_sub(read_file_count) as f64 / total_read_events as f64);
+        let redundant_read_ratio = (total_read_events > 0).then_some(
+            total_read_events.saturating_sub(read_file_count) as f64 / total_read_events as f64,
+        );
         let read_file_sample_limit = if redundant_read_ratio.unwrap_or_default() >= 0.3 {
             3
         } else {
             TURN_FILE_SAMPLE_LIMIT
         };
-        let modified_file_sample_limit = if modified_file_count > 1 { 3 } else { TURN_FILE_SAMPLE_LIMIT };
+        let modified_file_sample_limit = if modified_file_count > 1 {
+            3
+        } else {
+            TURN_FILE_SAMPLE_LIMIT
+        };
 
-        let (user_intent, user_intent_confidence) = classify_user_intent(user.text_preview.as_deref());
+        let (user_intent, user_intent_confidence) =
+            classify_user_intent(user.text_preview.as_deref());
         let alternative_user_intents = classify_alternative_user_intents(
             user.text_preview.as_deref(),
             &user_intent,
@@ -374,8 +442,11 @@ pub(crate) fn build_turn_digests(
             .and_then(|idx| messages.get(idx))
             .filter(|next| next.role == "user")
             .map(|next| classify_user_intent(next.text_preview.as_deref()));
-        let next_user_intent = next_user_classification.as_ref().map(|(intent, _)| intent.clone());
-        let next_user_intent_confidence = next_user_classification.map(|(_, confidence)| confidence);
+        let next_user_intent = next_user_classification
+            .as_ref()
+            .map(|(intent, _)| intent.clone());
+        let next_user_intent_confidence =
+            next_user_classification.map(|(_, confidence)| confidence);
         let next_user_tags = next_user_idx
             .and_then(|idx| messages.get(idx))
             .filter(|next| next.role == "user")
@@ -394,7 +465,12 @@ pub(crate) fn build_turn_digests(
         let final_assistant_kind = classify_assistant_text_kind(
             final_assistant.and_then(|message| message.text_preview.as_deref()),
         );
-        let agent_strategy = infer_agent_strategy(&tool_rollup, error_count, &delegation_previews, modified_file_count);
+        let agent_strategy = infer_agent_strategy(
+            &tool_rollup,
+            error_count,
+            &delegation_previews,
+            modified_file_count,
+        );
         let success = infer_turn_success(
             error_count,
             &outcome,
@@ -403,17 +479,24 @@ pub(crate) fn build_turn_digests(
             modified_file_count,
             &tool_rollup,
         );
-        let turn_cost_tier = classify_turn_cost_tier(total_tokens, tool_call_count, response_elapsed_ms);
+        let turn_cost_tier =
+            classify_turn_cost_tier(total_tokens, tool_call_count, response_elapsed_ms);
         let turn_change_summary = summarize_turn_change(
             modified_file_count,
             &modified_files,
             final_assistant_text_preview.as_deref(),
             outcome.as_str(),
         );
-        let turn_reasoning_themes = collect_turn_reasoning_themes(messages, assistant_range.as_ref());
-        let turn_reasoning_summary = build_turn_reasoning_summary(messages, assistant_range.as_ref(), &turn_reasoning_themes);
-        let key_diff_preview = strongest_patch
-            .and_then(|(tool, _)| build_key_diff_preview(tool.patch_summary.as_ref(), tool.patch_intent.as_deref()));
+        let turn_reasoning_themes =
+            collect_turn_reasoning_themes(messages, assistant_range.as_ref());
+        let turn_reasoning_summary = build_turn_reasoning_summary(
+            messages,
+            assistant_range.as_ref(),
+            &turn_reasoning_themes,
+        );
+        let key_diff_preview = strongest_patch.and_then(|(tool, _)| {
+            build_key_diff_preview(tool.patch_summary.as_ref(), tool.patch_intent.as_deref())
+        });
 
         turns.push(TurnDigest {
             session_path: session_path.to_string(),
@@ -429,8 +512,12 @@ pub(crate) fn build_turn_digests(
             alternative_user_intents,
             user_text_preview: user.text_preview.clone(),
             user_text_file: user.text_file.clone(),
-            assistant_message_start: assistant_range.as_ref().map(|range| messages[*range.start()].message_index),
-            assistant_message_end: assistant_range.as_ref().map(|range| messages[*range.end()].message_index),
+            assistant_message_start: assistant_range
+                .as_ref()
+                .map(|range| messages[*range.start()].message_index),
+            assistant_message_end: assistant_range
+                .as_ref()
+                .map(|range| messages[*range.end()].message_index),
             assistant_message_count,
             response_elapsed_ms,
             wall_to_next_user_ms,
@@ -448,16 +535,23 @@ pub(crate) fn build_turn_digests(
             total_tokens,
             tokens_per_tool_call,
             read_file_count,
-            read_files: sample_strings(read_files.clone().into_iter().collect(), read_file_sample_limit),
+            read_files: sample_strings(
+                read_files.clone().into_iter().collect(),
+                read_file_sample_limit,
+            ),
             modified_file_count,
-            modified_files: sample_strings(modified_files.clone().into_iter().collect(), modified_file_sample_limit),
+            modified_files: sample_strings(
+                modified_files.clone().into_iter().collect(),
+                modified_file_sample_limit,
+            ),
             tool_rollup,
             call_purpose_rollup,
             delegations: delegation_previews,
             delegations_file: None,
             final_assistant_message_index: final_assistant.map(|message| message.message_index),
             final_assistant_text_preview,
-            final_assistant_text_file: final_assistant.and_then(|message| message.text_file.clone()),
+            final_assistant_text_file: final_assistant
+                .and_then(|message| message.text_file.clone()),
             final_assistant_kind,
             agent_strategy,
             outcome,
@@ -505,7 +599,10 @@ pub(crate) fn finalize_turn_effectiveness(turns: &mut [TurnDigest]) {
         let files_survived_to_end = turn
             .modified_files_all
             .iter()
-            .filter(|path| last_modified_turn.get(&(turn.session_path.clone(), (*path).clone())) == Some(&turn.turn_index))
+            .filter(|path| {
+                last_modified_turn.get(&(turn.session_path.clone(), (*path).clone()))
+                    == Some(&turn.turn_index)
+            })
             .count();
         turn.effectiveness_signals.files_survived_to_end = files_survived_to_end;
         turn.turn_effectiveness = classify_turn_effectiveness(turn, files_survived_to_end);
@@ -587,7 +684,10 @@ pub(crate) fn render_patch_summary(summary: &PatchSummary) -> String {
         parts.push(format!("hunks {}", summary.hunks));
     }
     if summary.lines_added > 0 || summary.lines_deleted > 0 {
-        parts.push(format!("lines +{}/-{}", summary.lines_added, summary.lines_deleted));
+        parts.push(format!(
+            "lines +{}/-{}",
+            summary.lines_added, summary.lines_deleted
+        ));
     }
     if parts.is_empty() {
         return String::from("patch");
@@ -595,7 +695,10 @@ pub(crate) fn render_patch_summary(summary: &PatchSummary) -> String {
     parts.join(", ")
 }
 
-pub(crate) fn build_key_diff_preview(summary: Option<&PatchSummary>, intent: Option<&str>) -> Option<String> {
+pub(crate) fn build_key_diff_preview(
+    summary: Option<&PatchSummary>,
+    intent: Option<&str>,
+) -> Option<String> {
     let summary = summary?;
     let mut parts = Vec::new();
     if let Some(intent) = intent {
@@ -603,13 +706,24 @@ pub(crate) fn build_key_diff_preview(summary: Option<&PatchSummary>, intent: Opt
     }
     parts.push(render_patch_summary(summary));
     if !summary.sample_paths.is_empty() {
-        parts.push(summary.sample_paths.iter().take(3).cloned().collect::<Vec<_>>().join(", "));
+        parts.push(
+            summary
+                .sample_paths
+                .iter()
+                .take(3)
+                .cloned()
+                .collect::<Vec<_>>()
+                .join(", "),
+        );
     }
     Some(truncate_text(&parts.join(" | "), TURN_PREVIEW_LIMIT))
 }
 
 pub(crate) fn classify_patch_intent(paths: &[String], summary: &PatchSummary) -> Option<String> {
-    let lower_paths = paths.iter().map(|path| path.to_lowercase()).collect::<Vec<_>>();
+    let lower_paths = paths
+        .iter()
+        .map(|path| path.to_lowercase())
+        .collect::<Vec<_>>();
     let has_code = lower_paths.iter().any(|path| {
         path.ends_with(".rs")
             || path.ends_with(".ts")
@@ -620,13 +734,20 @@ pub(crate) fn classify_patch_intent(paths: &[String], summary: &PatchSummary) ->
             || path.ends_with(".go")
     });
     let all_docs = !lower_paths.is_empty()
-        && lower_paths.iter().all(|path| path.ends_with(".md") || path.contains("/docs/") || path.contains("readme"));
+        && lower_paths.iter().all(|path| {
+            path.ends_with(".md") || path.contains("/docs/") || path.contains("readme")
+        });
     let all_tests = !lower_paths.is_empty()
-        && lower_paths.iter().all(|path| path.contains("test") || path.ends_with("_test.rs") || path.ends_with(".spec.ts"));
+        && lower_paths.iter().all(|path| {
+            path.contains("test") || path.ends_with("_test.rs") || path.ends_with(".spec.ts")
+        });
     let all_config = !lower_paths.is_empty()
-        && lower_paths
-            .iter()
-            .all(|path| path.ends_with(".json") || path.ends_with(".toml") || path.ends_with(".nix") || path.contains("gitignore"));
+        && lower_paths.iter().all(|path| {
+            path.ends_with(".json")
+                || path.ends_with(".toml")
+                || path.ends_with(".nix")
+                || path.contains("gitignore")
+        });
     if has_code && summary.lines_added >= 100 && summary.files_added > 0 {
         return Some(String::from("feature"));
     }

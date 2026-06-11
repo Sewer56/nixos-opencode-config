@@ -1,0 +1,13 @@
+[package]
+name = "token-count-after-expand"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "token-count-after-expand"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+wait-timeout = "0.2"

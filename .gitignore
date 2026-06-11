@@ -6,15 +6,18 @@ __pycache__/
 
 tools/workflow-optimize/__pycache__/
 
+# Rust build output
+/target/
+/tools/target/
+**/*.rs.bk
+*.pdb
+
 # Nix build symlink
 result
 result-*
 
 # direnv cache
 .direnv/
-
-# Local Go build output
-tools/model-tiers/opencode-model-tiers
 
 # Review logs
 *.review-implementation.md

@@ -1,24 +1,24 @@
 #![recursion_limit = "512"]
 
-mod constants;
 mod cli;
+mod constants;
+mod db;
+mod export;
 mod format;
 mod models;
-mod db;
-mod tui;
 mod tree;
-mod export;
+mod tui;
 
 use anyhow::{Result, bail};
+use chrono::{NaiveDate, NaiveDateTime, TimeZone, Utc};
 use clap::Parser;
-use cli::{Cli, Command, TuiArgs, TreeArgs};
-use db::discover::{resolve_db_path, open_db, print_discovered_dbs};
+use cli::{Cli, Command, TreeArgs, TuiArgs};
+use db::discover::{open_db, print_discovered_dbs, resolve_db_path};
 use db::overview::{load_overview, resolve_target_session_id};
-use tree::display::run_tree_command;
 use export::bundle::export_bundle;
-use tui::input::run_tui;
 use std::io::{self, IsTerminal};
-use chrono::{Utc, TimeZone, NaiveDate, NaiveDateTime};
+use tree::display::run_tree_command;
+use tui::input::run_tui;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -53,14 +53,21 @@ fn main() -> Result<()> {
                     .roots
                     .iter()
                     .filter(|root_id| {
-                        index.sessions.get(*root_id).is_some_and(|s| s.time_updated >= since_ms)
+                        index
+                            .sessions
+                            .get(*root_id)
+                            .is_some_and(|s| s.time_updated >= since_ms)
                     })
                     .cloned()
                     .collect();
                 if matched.is_empty() {
                     bail!("no root sessions updated since {}", since);
                 }
-                eprintln!("Exporting {} root sessions updated >= {}...", matched.len(), since);
+                eprintln!(
+                    "Exporting {} root sessions updated >= {}...",
+                    matched.len(),
+                    since
+                );
                 for (i, root_id) in matched.iter().enumerate() {
                     eprintln!("[{}/{}] {}", i + 1, matched.len(), root_id);
                     match export_bundle(&conn, &index, root_id, args.out.clone()) {
@@ -88,7 +95,14 @@ fn main() -> Result<()> {
             let index = load_overview(&conn)?;
 
             if io::stdout().is_terminal() {
-                run_tui(db_path, index, TuiArgs { search: None, limit: None })
+                run_tui(
+                    db_path,
+                    index,
+                    TuiArgs {
+                        search: None,
+                        limit: None,
+                    },
+                )
             } else {
                 run_tree_command(
                     &db_path,

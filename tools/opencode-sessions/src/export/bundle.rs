@@ -9,16 +9,16 @@ use std::path::{Path, PathBuf};
 use uuid::Uuid;
 
 use crate::constants::*;
-use crate::format::*;
-use crate::models::*;
+use crate::export::classify::*;
+use crate::export::delta::*;
+use crate::export::hotspot::*;
+use crate::export::io::*;
+use crate::export::rollup::*;
+use crate::export::schema::*;
 use crate::export::session_output::*;
 use crate::export::turn::*;
-use crate::export::classify::*;
-use crate::export::hotspot::*;
-use crate::export::rollup::*;
-use crate::export::io::*;
-use crate::export::delta::*;
-use crate::export::schema::*;
+use crate::format::*;
+use crate::models::*;
 
 pub(crate) fn export_bundle(
     conn: &Connection,
@@ -62,10 +62,20 @@ pub(crate) fn export_bundle(
             .then_with(|| left.tool.cmp(&right.tool))
     });
 
-    acc.session_index.sort_by(|left, right| left.depth.cmp(&right.depth).then_with(|| left.session_path.cmp(&right.session_path)));
-    acc.session_hotspots.sort_by_key(|entry| Reverse(entry.duration_ms));
+    acc.session_index.sort_by(|left, right| {
+        left.depth
+            .cmp(&right.depth)
+            .then_with(|| left.session_path.cmp(&right.session_path))
+    });
+    acc.session_hotspots
+        .sort_by_key(|entry| Reverse(entry.duration_ms));
 
-    let hotspots = build_hotspots(&acc.session_hotspots, &acc.turns, &acc.message_digests, &acc.tool_calls);
+    let hotspots = build_hotspots(
+        &acc.session_hotspots,
+        &acc.turns,
+        &acc.message_digests,
+        &acc.tool_calls,
+    );
     let root_entry = acc
         .session_index
         .iter()
@@ -124,15 +134,43 @@ pub(crate) fn export_bundle(
                 "approval",
             ],
             user_tag_values: vec!["subagents", "tui", "cli", "machine-optimization", "metrics"],
-            message_kind_values: vec!["user", "assistant-text", "assistant-tool-only", "assistant-mixed", "assistant-reasoning-only"],
-            outcome_values: vec!["answered", "executed", "delegated", "redirected", "followup-needed"],
+            message_kind_values: vec![
+                "user",
+                "assistant-text",
+                "assistant-tool-only",
+                "assistant-mixed",
+                "assistant-reasoning-only",
+            ],
+            outcome_values: vec![
+                "answered",
+                "executed",
+                "delegated",
+                "redirected",
+                "followup-needed",
+            ],
             assistant_kind_values: vec!["deliverable", "scratchpad", "mixed"],
             session_status_values: vec!["completed", "running", "abandoned", "error"],
-            agent_strategy_values: vec!["explore", "implement", "debug", "refactor", "validate", "delegate"],
+            agent_strategy_values: vec![
+                "explore",
+                "implement",
+                "debug",
+                "refactor",
+                "validate",
+                "delegate",
+            ],
             turn_cost_tier_values: vec!["light", "medium", "heavy", "extreme"],
             turn_effectiveness_values: vec!["high-value", "moderate", "low-value", "waste"],
-            recommended_attention_values: vec!["skip", "skim", "read-carefully", "inspect-artifacts"],
-            child_export_reference_status_values: vec!["current-export", "mixed-export", "stale-export"],
+            recommended_attention_values: vec![
+                "skip",
+                "skim",
+                "read-carefully",
+                "inspect-artifacts",
+            ],
+            child_export_reference_status_values: vec![
+                "current-export",
+                "mixed-export",
+                "stale-export",
+            ],
             patch_intent_values: vec!["feature", "fix", "refactor", "config", "test", "docs"],
             tool_call_purpose_values: vec![
                 "context-gather",
@@ -144,7 +182,13 @@ pub(crate) fn export_bundle(
                 "modify",
                 "delegate",
             ],
-            retry_recovery_values: vec!["retry", "re-read-and-retry", "verify-or-build", "change-approach", "abandon"],
+            retry_recovery_values: vec![
+                "retry",
+                "re-read-and-retry",
+                "verify-or-build",
+                "change-approach",
+                "abandon",
+            ],
             intent_confidence_range: "0..1 heuristic confidence",
             confidence_thresholds: ConfidenceThresholds {
                 reliable_above: 0.75,
@@ -158,14 +202,24 @@ pub(crate) fn export_bundle(
                     String::from("schema.json"),
                     String::from("fields.json"),
                     root.summary_file.clone(),
-                    root.turns_compact_file.clone().unwrap_or_else(|| root.turns_file.clone()),
+                    root.turns_compact_file
+                        .clone()
+                        .unwrap_or_else(|| root.turns_file.clone()),
                     root.turns_file.clone(),
-                    root.messages_compact_file.clone().unwrap_or_else(|| root.messages_file.clone()),
+                    root.messages_compact_file
+                        .clone()
+                        .unwrap_or_else(|| root.messages_file.clone()),
                     root.messages_file.clone(),
                     root.tool_calls_file.clone(),
                 ]
             })
-            .unwrap_or_else(|| vec![String::from("index.json"), String::from("schema.json"), String::from("fields.json")]),
+            .unwrap_or_else(|| {
+                vec![
+                    String::from("index.json"),
+                    String::from("schema.json"),
+                    String::from("fields.json"),
+                ]
+            }),
         totals,
         token_efficiency,
         tree,
@@ -173,11 +227,15 @@ pub(crate) fn export_bundle(
         tool_rollup,
         hotspots,
     };
-    index_file.delta_from_previous = build_delta_from_previous(&base_dir, &export_root, &index_file)?;
+    index_file.delta_from_previous =
+        build_delta_from_previous(&base_dir, &export_root, &index_file)?;
 
     write_json_pretty(export_root.join("index.json"), &index_file)?;
     write_json_pretty(export_root.join("schema.json"), &build_export_schema())?;
-    write_json_pretty(export_root.join("fields.json"), &build_export_fields_catalog())?;
+    write_json_pretty(
+        export_root.join("fields.json"),
+        &build_export_fields_catalog(),
+    )?;
     write_text(
         export_root.join("README.md"),
         &render_export_readme(&index_file),
@@ -186,7 +244,11 @@ pub(crate) fn export_bundle(
     Ok(export_root)
 }
 
-pub(crate) fn load_session_tree(conn: &Connection, index: &OverviewIndex, session_id: &str) -> Result<LoadedSession> {
+pub(crate) fn load_session_tree(
+    conn: &Connection,
+    index: &OverviewIndex,
+    session_id: &str,
+) -> Result<LoadedSession> {
     let meta = index.get(session_id)?.clone();
     let messages = load_messages(conn, session_id)?;
     let children = index
@@ -195,7 +257,11 @@ pub(crate) fn load_session_tree(conn: &Connection, index: &OverviewIndex, sessio
         .map(|child_id| load_session_tree(conn, index, child_id))
         .collect::<Result<Vec<_>>>()?;
 
-    Ok(LoadedSession { meta, messages, children })
+    Ok(LoadedSession {
+        meta,
+        messages,
+        children,
+    })
 }
 
 pub(crate) fn load_messages(conn: &Connection, session_id: &str) -> Result<Vec<LoadedMessage>> {
@@ -262,16 +328,25 @@ pub(crate) fn write_session_bundle(
     acc: &mut ExportAccumulator,
 ) -> Result<ExportTreeNode> {
     let agent = session.agent();
-    let folder_name = session_folder_name(is_root, session_path, agent.as_deref(), &session.meta.title, &session.meta.id);
+    let folder_name = session_folder_name(
+        is_root,
+        session_path,
+        agent.as_deref(),
+        &session.meta.title,
+        &session.meta.id,
+    );
     let relative_session_dir = relative_parent_dir.join(&folder_name);
     let session_dir = bundle_root.join(&relative_session_dir);
-    fs::create_dir_all(&session_dir).with_context(|| format!("create {}", session_dir.display()))?;
+    fs::create_dir_all(&session_dir)
+        .with_context(|| format!("create {}", session_dir.display()))?;
 
     let compact_messages = session
         .messages
         .iter()
         .enumerate()
-        .map(|(message_index, message)| compact_message(message, session_path, depth, message_index))
+        .map(|(message_index, message)| {
+            compact_message(message, session_path, depth, message_index)
+        })
         .collect::<Result<Vec<_>>>()?;
 
     let mut child_links = Vec::new();
@@ -301,7 +376,10 @@ pub(crate) fn write_session_bundle(
             acc,
         )?;
         let delegation = child_delegations.get(&child.meta.id);
-        let child_stats = acc.session_stats.iter().find(|stats| stats.session_id == child.meta.id);
+        let child_stats = acc
+            .session_stats
+            .iter()
+            .find(|stats| stats.session_id == child.meta.id);
         let child_turn = acc
             .turns
             .iter()
@@ -314,33 +392,52 @@ pub(crate) fn write_session_bundle(
             agent: child.agent(),
             summary_file: child_tree.summary_file.clone(),
             duration_ms: child.meta.duration_ms(),
-            turn_count: child_stats.map(|stats| stats.turn_count).unwrap_or_default(),
-            message_count: child_stats.map(|stats| stats.message_count).unwrap_or(child.meta.message_count),
-            tool_call_count: child_stats.map(|stats| stats.tool_calls).unwrap_or_default(),
-            input_tokens: child_stats.map(|stats| stats.input_tokens).unwrap_or_default(),
-            output_tokens: child_stats.map(|stats| stats.output_tokens).unwrap_or_default(),
-            reasoning_tokens: child_stats.map(|stats| stats.reasoning_tokens).unwrap_or_default(),
+            turn_count: child_stats
+                .map(|stats| stats.turn_count)
+                .unwrap_or_default(),
+            message_count: child_stats
+                .map(|stats| stats.message_count)
+                .unwrap_or(child.meta.message_count),
+            tool_call_count: child_stats
+                .map(|stats| stats.tool_calls)
+                .unwrap_or_default(),
+            input_tokens: child_stats
+                .map(|stats| stats.input_tokens)
+                .unwrap_or_default(),
+            output_tokens: child_stats
+                .map(|stats| stats.output_tokens)
+                .unwrap_or_default(),
+            reasoning_tokens: child_stats
+                .map(|stats| stats.reasoning_tokens)
+                .unwrap_or_default(),
             parent_message_index: delegation.map(|item| item.message_index),
             parent_tool_index: delegation.map(|item| item.tool_index),
             delegation_description: delegation.and_then(|item| item.description.clone()),
             delegation_prompt_preview: delegation.and_then(|item| item.prompt_preview.clone()),
-            delegation_prompt_preview_resolved: delegation.and_then(|item| item.prompt_preview_resolved.clone()),
+            delegation_prompt_preview_resolved: delegation
+                .and_then(|item| item.prompt_preview_resolved.clone()),
             delegation_prompt_export_paths: delegation
                 .map(|item| item.prompt_export_paths.clone())
                 .unwrap_or_default(),
             resolved_current_export_paths: delegation
-                .map(|item| resolve_current_export_paths(&item.prompt_export_paths, current_export_name))
+                .map(|item| {
+                    resolve_current_export_paths(&item.prompt_export_paths, current_export_name)
+                })
                 .unwrap_or_default(),
-            delegation_export_reference_status: delegation.and_then(|item| item.export_reference_status.clone()),
+            delegation_export_reference_status: delegation
+                .and_then(|item| item.export_reference_status.clone()),
             current_export_path_hint: delegation
                 .and_then(|item| item.export_reference_status.as_deref())
                 .filter(|status| matches!(*status, "stale-export" | "mixed-export"))
                 .map(|_| format!("exports/{current_export_name}")),
             delegation_input_file: delegation.and_then(|item| item.input_file.clone()),
-            delegation_result_preview: child_turn.and_then(|turn| turn.final_assistant_text_preview.clone()),
-            delegation_result_file: child_turn.and_then(|turn| turn.final_assistant_text_file.clone()),
+            delegation_result_preview: child_turn
+                .and_then(|turn| turn.final_assistant_text_preview.clone()),
+            delegation_result_file: child_turn
+                .and_then(|turn| turn.final_assistant_text_file.clone()),
             child_outcome: child_turn.map(|turn| turn.outcome.clone()),
-            child_final_assistant_kind: child_turn.and_then(|turn| turn.final_assistant_kind.clone()),
+            child_final_assistant_kind: child_turn
+                .and_then(|turn| turn.final_assistant_kind.clone()),
         });
         child_tree_nodes.push(child_tree);
     }
@@ -355,7 +452,13 @@ pub(crate) fn write_session_bundle(
         duration_ms: session.meta.duration_ms(),
     };
 
-    let session_stats = compute_session_stats(session, &compact_messages, session_path, depth, agent.clone());
+    let session_stats = compute_session_stats(
+        session,
+        &compact_messages,
+        session_path,
+        depth,
+        agent.clone(),
+    );
 
     let turns_file = path_string(&relative_session_dir.join("turns.jsonl"));
     let turns_compact_file = path_string(&relative_session_dir.join("turns.compact.jsonl"));
@@ -371,10 +474,33 @@ pub(crate) fn write_session_bundle(
         &relative_session_dir,
         session_path,
     )?;
-    let (turn_digests, message_digests, tool_digests, runtime, prompt_preview, prompt_file, artifacts_dir, artifact_count) =
-        (out.turn_digests, out.message_digests, out.tool_digests, out.runtime, out.prompt_preview, out.prompt_file, out.artifacts_dir, out.artifact_count);
-    let (artifacts_manifest_file, mut artifact_entries) = write_artifacts_manifest(&session_dir, &relative_session_dir)?;
-    artifact_entries.sort_by(|left, right| right.size_bytes.cmp(&left.size_bytes).then_with(|| left.path.cmp(&right.path)));
+    let (
+        turn_digests,
+        message_digests,
+        tool_digests,
+        runtime,
+        prompt_preview,
+        prompt_file,
+        artifacts_dir,
+        artifact_count,
+    ) = (
+        out.turn_digests,
+        out.message_digests,
+        out.tool_digests,
+        out.runtime,
+        out.prompt_preview,
+        out.prompt_file,
+        out.artifacts_dir,
+        out.artifact_count,
+    );
+    let (artifacts_manifest_file, mut artifact_entries) =
+        write_artifacts_manifest(&session_dir, &relative_session_dir)?;
+    artifact_entries.sort_by(|left, right| {
+        right
+            .size_bytes
+            .cmp(&left.size_bytes)
+            .then_with(|| left.path.cmp(&right.path))
+    });
     let largest_artifacts = artifact_entries.into_iter().take(10).collect::<Vec<_>>();
     let session_status = infer_session_status(session, &compact_messages, &tool_digests);
 
@@ -393,8 +519,14 @@ pub(crate) fn write_session_bundle(
     let file_access_rollup = build_file_access_rollup(&turn_digests, &tool_digests);
     let error_patterns = build_error_patterns(&turn_digests, &tool_digests);
     let retry_chains = build_retry_chains(&turn_digests, &tool_digests);
-    let file_transition_rollup = build_file_transition_rollup(&turn_digests, &tool_digests, &session_status);
-    let session_deliverables = build_session_deliverables(&turn_digests, &tool_digests, &session_dir, &relative_session_dir)?;
+    let file_transition_rollup =
+        build_file_transition_rollup(&turn_digests, &tool_digests, &session_status);
+    let session_deliverables = build_session_deliverables(
+        &turn_digests,
+        &tool_digests,
+        &session_dir,
+        &relative_session_dir,
+    )?;
     let turn_dependency_edges = build_turn_dependency_edges(&file_transition_rollup);
     let session_narrative = build_session_narrative(
         &session.meta.title,
@@ -457,15 +589,16 @@ pub(crate) fn write_session_bundle(
     acc.turns.extend(turn_digests.clone());
     acc.message_digests.extend(message_digests.clone());
     acc.tool_calls.extend(tool_digests.clone());
-    acc.session_hotspots.push(trim_session_hotspot(SessionHotspot {
-        session_path: session_path.to_string(),
-        duration_ms: session.meta.duration_ms(),
-        message_count: message_digests.len(),
-        tool_call_count: tool_digests.len(),
-        input_tokens: session_stats.input_tokens,
-        output_tokens: session_stats.output_tokens,
-        reasoning_tokens: session_stats.reasoning_tokens,
-    }));
+    acc.session_hotspots
+        .push(trim_session_hotspot(SessionHotspot {
+            session_path: session_path.to_string(),
+            duration_ms: session.meta.duration_ms(),
+            message_count: message_digests.len(),
+            tool_call_count: tool_digests.len(),
+            input_tokens: session_stats.input_tokens,
+            output_tokens: session_stats.output_tokens,
+            reasoning_tokens: session_stats.reasoning_tokens,
+        }));
     acc.session_index.push(SessionIndexEntry {
         session_path: session_path.to_string(),
         depth,
@@ -501,9 +634,18 @@ pub(crate) fn write_session_bundle(
         session_dir.join("messages.compact.jsonl"),
         &to_json_values(&build_message_compact_entries(&message_digests))?,
     )?;
-    write_jsonl(session_dir.join("turns.jsonl"), &to_json_values(&turn_digests)?)?;
-    write_jsonl(session_dir.join("messages.jsonl"), &to_json_values(&message_digests)?)?;
-    write_jsonl(session_dir.join("tool_calls.jsonl"), &to_json_values(&tool_digests)?)?;
+    write_jsonl(
+        session_dir.join("turns.jsonl"),
+        &to_json_values(&turn_digests)?,
+    )?;
+    write_jsonl(
+        session_dir.join("messages.jsonl"),
+        &to_json_values(&message_digests)?,
+    )?;
+    write_jsonl(
+        session_dir.join("tool_calls.jsonl"),
+        &to_json_values(&tool_digests)?,
+    )?;
 
     Ok(ExportTreeNode {
         session_path: session_path.to_string(),

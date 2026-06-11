@@ -1,5 +1,3 @@
-
-
 pub(crate) const TEXT_PREVIEW_LIMIT: usize = 160;
 
 pub(crate) const INLINE_TEXT_PREVIEW_LIMIT: usize = 400;
