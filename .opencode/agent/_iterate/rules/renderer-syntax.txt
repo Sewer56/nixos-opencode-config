@@ -1,19 +1,17 @@
 # Renderer Template Syntax
+Reference for OpenCode prompt imports, args, conditionals, env tokens. Contains live renderer tokens; exclude from broad interpolation validation.
 
-Usage guide for OpenCode prompt template imports, arguments, conditionals, and env tokens. This file intentionally contains live renderer tokens and is excluded from broad interpolation validation.
-
-## File Imports
-
-- Import a file: `{{file="./path/to/file.md"}}`
-- Import with arguments: `{{file="./path/to/file.txt" arg1="value1" arg2="value2"}}`
-- Use block imports for readability when passing multiple arguments.
+## Imports
+- File: `{{file="./path/to/file.md"}}`
+- With args: `{{file="./template.txt" arg="value"}}`
+- Prefer block import for multi-arg calls.
 
 Good:
 ```markdown
 {{ file="./rules/groups/tests/target-test-strategy.md" }}
 ```
 
-Good parameterized import:
+Good parameterized:
 ```markdown
 {{
   file="../config/agent/_templates/review-mission.txt"
@@ -22,36 +20,24 @@ Good parameterized import:
 }}
 ```
 
-## Template Placeholders
-
-- Use only inside reusable template files: `{{arg:name}}`
-- Args apply to one file include.
-- Nested includes receive args only when forwarded as `key=value` pairs.
+## Template placeholders and args
+- Reusable-template placeholder: `{{arg:name}}`.
+- Human-readable placeholder inside examples/schemas: `[[name]]`; do not use angle placeholders.
+- Args apply to one include. Forward args explicitly to nested includes.
+- Boolean true: `1`. False: omit arg; do not pass `=0`.
 
 ## Conditionals
-
-- Truthy arg: `{{if=name}} ... {{endif}}`
+- Truthy: `{{if=name}} ... {{endif}}`
 - Equality: `{{if=name==value}} ... {{endif}}`
 - Inequality: `{{if=name!=value}} ... {{endif}}`
-- Env condition: `{{if=env:CI}} ... {{else}} ... {{endif}}`
+- Env: `{{if=env:CI}} ... {{else}} ... {{endif}}`
 
-## Env Tokens
-
-- Runtime environment value: `{{env:VAR}}`
-- Do not use env tokens for local prompt/rule paths; use file imports.
-
-## Path Resolution
-
-- Resolve relative path to absolute: `{{path:./scripts/tool.py}}`
-- Resolve relative to git root: `{{gitpath:./scripts/tool.py}}`
-- Use for script/binary paths that need absolute resolution at render time, regardless of working directory.
-
-## Boolean Args
-
-- Pass `1` for true.
-- Omit false flags entirely; do not pass `=0`.
+## Env and paths
+- Runtime env value: `{{env:VAR}}`
+- Script/binary absolute path: `{{path:./scripts/tool.py}}`
+- Git-root absolute path: `{{gitpath:./scripts/tool.py}}`
+- Do not use env tokens for local prompt/rule paths; use imports.
 
 ## Validation
-
-- Do not pass args the target template does not consume.
-- Validate changed agent and command prompts with `bash scripts/render-file.sh <repo-relative-path>` when imports, args, env tokens, or conditionals change.
+- Do not pass unused args.
+- Validate changed command/agent prompts with `bash {{path:./scripts/render-file.sh}} [[repo_relative_path]]` when imports, args, env tokens, or conditionals change.

@@ -1,265 +1,73 @@
 # Workflow Optimize Patterns
 
-Approved `/workflow/optimize` tactics for existing workflow prompts/tools. Use after export/digest evidence. Do not use as creation catalog.
+Approved tactics for reducing existing workflow token cost without losing quality. Use after observing focus signals from export/digest/logs; do not force-fit tactics.
 
-Refs:
-- `WOPT-###` — proven tactic for optimizing existing workflow.
-- `OPT-###` — approved design pattern from `config/doc/workflow/design-patterns.md`; cite when target design pattern itself is edit.
-- `LOCAL:<name>` — one-run hypothesis not yet worth shared docs.
+Refs: `WOPT-###` for existing-workflow optimization, `OPT-###` for design shape, `LOCAL:[[name]]` for one-run hypotheses.
 
-## How to Use
+## Use
 
-1. Start from observed focus signals and counterevidence, not tactic names.
-2. Seed `/workflow/optimize` Strategy Matrix from `## Focus Signal Map`.
-3. Prefer `WOPT-###` for refactor/analysis tactics on existing workflows.
-4. Use `OPT-###` when design catalog directly describes desired steady-state prompt shape.
-5. Use `LOCAL:<name>` only when no WOPT/OPT fits tightly.
-6. Convert selected `Refactor Move` and `Quality Guard` bullets into direct edit instructions. Do not paste whole catalog text into generated artifacts.
-7. Treat code blocks as generic concrete refactor shapes. Copy structure, not placeholder names. Keep MUST/WHEN/Do-not wording unambiguous.
+1. Start from observed signals and counterevidence.
+2. Select the fewest WOPT/OPT refs that explain the waste.
+3. Convert refactor moves into direct edits; do not paste this catalog into prompts.
+4. Keep quality guards and rerun representative checks.
 
-## Focus Signal Map
+## Signal Map
 
-| Focus Signal | Usually Apply |
+| Signal | Usually Apply |
 | --- | --- |
 | generated hotspot | WOPT-003, WOPT-004, WOPT-005 |
-| tight input violation | OPT-002, OPT-001 |
-| overbroad handoff | OPT-002, OPT-005, OPT-012 |
-| duplicate reads | WOPT-003, OPT-012, OPT-014 |
-| duplicate reasoning | WOPT-001, WOPT-003, OPT-003, OPT-006 |
-| scope leakage | WOPT-003, OPT-002, OPT-012, OPT-014 |
-| review-loop churn | WOPT-001, WOPT-002, OPT-003, OPT-011 |
-| cache/delta failure | WOPT-001, WOPT-005, OPT-003, OPT-006 |
-| output bloat | WOPT-005, OPT-004, OPT-005, OPT-009 |
-| topology mismatch | WOPT-003, OPT-011, OPT-012 |
+| overbroad handoff | WOPT-001, WOPT-003, OPT-002 |
+| duplicate reads/reasoning | WOPT-001, WOPT-003, OPT-003 |
+| review-loop churn | WOPT-001, WOPT-002, WOPT-006 |
+| cache/delta failure | WOPT-001, WOPT-005 |
+| output bloat | WOPT-005, OPT-004, OPT-005 |
 | model/risk mismatch | WOPT-004 |
-| prompt/context bloat | OPT-001, OPT-005, OPT-010 |
+| prompt/context bloat | WOPT-001, WOPT-003, OPT-018 |
 
-## Approved Tactics
+## WOPT-001 - Structural Withholding
 
-### WOPT-001 — Structural Withholding
+Problem: runner gives every child full context/rules, causing duplicate reasoning.
 
-- Applies To: existing review loops with stable artifacts and partial revisions.
-- Trigger Signals: review-loop churn, duplicate reads, duplicate reasoning, cache/delta failure.
-- Refactor Move:
-  - Split first-review and re-review data flow.
-  - First review MUST receive full needed context and write grounded cache.
-  - Re-review MUST receive `cache_path` plus smallest reliable invalidation input: changed ids/paths, source revision/fingerprint, decisions, or trigger flags.
-  - Caller MUST withhold unchanged artifacts from re-review in any form — bodies, paths, references — when cache can safely cover them.
-  - Reviewer MUST use cache for unchanged verified records and reread only invalidated material.
-- Quality Guard:
-  - Reread changed domains, unresolved/open blocking findings, cache-stale records, and decision/trigger-referenced artifacts.
-  - If cache missing or malformed, fall back to full reviewer or full needed read.
-  - Do not apply withholding when stable ids/paths do not exist or invalidation cannot be determined safely.
+Refactor: parent keeps orchestration; child prompt owns role/process/schema; handoff carries paths, ids, flags, decisions, cache/action paths, and success criteria only. Move repeated child instructions into child prompt or shared multi-consumer include.
 
-```text
-Re-review call:
-cache_path=<path>
-changed_ids=[STEP-003]
-decisions=[DEC-002]
-artifact_paths=[handoff, STEP pattern]
+Guard: child still has enough access to verify its domain. Do not withhold required source paths or safety constraints.
 
-Do not mention STEP-001 or STEP-002 in any form — no bodies, paths, or references.
-Reviewer preserves cached PASS unless changed_ids/decisions touch its domain.
-```
+## WOPT-002 - Review Loop Restructuring
 
-### WOPT-002 — Review Loop Restructuring
+Problem: every fix reruns every reviewer.
 
-- Applies To: multi-reviewer workflows with ordered dependencies between correctness, presentation, and advisory checks.
-- Trigger Signals: review-loop churn, output bloat, topology mismatch.
-- Refactor Move:
-  - Map reviewer dependencies before changing loop order.
-  - Run high-risk correctness/security/data-loss reviewers before presentation/style/polish reviewers.
-  - Apply blocking fixes from earlier phases before launching downstream presentation reviewers.
-  - After fix, rerun only reviewer domains touched by that fix.
-  - Preserve PASS for unchanged domains when cache/invalidation rules make reuse safe.
-  - Record or defer advisory-only findings unless workflow explicitly requires advisory cleanup before completion.
-- Quality Guard:
-  - Never skip required blocking coverage.
-  - Always rerun any domain touched by blocking fix.
-  - If fix changes scope, paths, risk flags, or step count, recompute reviewer set before continuing.
-  - Final gate MUST require zero unresolved blocking findings.
+Refactor: order high-risk blocking domains before presentation/style domains. After a fix, rerun only touched domains; recompute set when paths, risk flags, or scope changes. Advisory-only findings do not force full-loop reruns unless target workflow requires them.
 
-Before:
+Guard: final gate requires zero unresolved blocking findings.
 
-```text
-correctness + security + wording + style + docs rerun after any fix
-```
+## WOPT-003 - Reviewer Topology Shaping
 
-After:
+Problem: reviewers overlap, reread same artifacts, or split without context savings.
 
-```text
-phase 1: correctness + security
-phase 2: wording + style + docs only after blocking correctness passes
-wording-only fix: rerun phase 2 only
-advisory-only: log/defer, no full-loop rerun
-```
+Refactor: merge reviewers with same read scope and overlapping findings. Split overloaded reviewer only when subdomains are independent and each child receives smaller scoped input. Update caller routing, cache ownership, output parsing, docs, and review ledger.
 
-### WOPT-003 — Reviewer Topology Shaping
+Guard: do not merge away correctness/security/data-loss ownership. Reject splits where children still read full context.
 
-- Applies To: existing command→subagent workflows with multiple reviewers or overloaded reviewers.
-- Trigger Signals: topology mismatch, duplicate reads, duplicate reasoning, generated hotspot, scope leakage.
-- Refactor Move:
-  - Inspect actual reviewer inputs, file reads, findings, and generated-token hotspots before changing topology.
-  - Merge reviewers when they read same artifacts and emit overlapping findings or reasoning.
-  - Split overloaded reviewer only when it has clean independent subdomains and each child can receive smaller scoped input.
-  - After merge/split, update caller routing, reviewer prompts, output parsing, and review ledger/cache ownership.
-  - Keep explicit domain boundaries in each reviewer prompt.
-- Quality Guard:
-  - Reject splits where each child still rereads full context.
-  - Reject merges that blur correctness, security, data-loss, or other high-risk ownership.
-  - Preserve all required coverage and blocking criteria.
-  - Verify new topology reduces duplicate reads/reasoning or generated hotspot cost.
+## WOPT-004 - Risk-Based Reviewer Tiering
 
-Merge when:
+Problem: low-risk mechanical checks use high-cost models or high-risk checks use weak ones.
 
-```text
-wording reviewer and style reviewer read same artifacts
-both emit overlapping prose edits
-```
+Refactor: assign model tier by domain risk, judgment load, and failure cost. Keep correctness, security, data-loss, migration, and ambiguous semantic review on strong models. Move narrow mechanical checks down only with evidence.
 
-Split when:
+Guard: never downgrade from token cost alone. Keep escalation path when risk flags appear.
 
-```text
-overloaded correctness reviewer has independent API and test domains
-api-correctness receives API paths only
-test-correctness receives test paths only
+## WOPT-005 - Reviewer Action/Cache Split
 
-Do not split if both children reread full plan.
-```
+Problem: reviewer responses carry full evidence/history every loop.
 
-### WOPT-004 — Risk-Based Reviewer Model Tiering
+Refactor: cached reviewer response is pointer-only: `Decision`, `Actions`, `Cache`, current IDs. Actions file contains current OPEN fixes. Cache contains durable evidence, statuses, resolved/deferred history, and verified observations. Cacheless reviewers return findings inline and do not use sidecars.
 
-- Applies To: reviewer sets mixing high-risk semantic checks with low-risk mechanical checks.
-- Trigger Signals: model/risk mismatch, generated hotspot, output bloat.
-- Refactor Move:
-  - Assign model tier by reviewer domain risk, judgment load, and failure cost.
-  - Keep correctness, security, data-loss, migration, and high-risk semantic reviewers on strong models.
-  - Move narrow mechanical reviewers to lower/default models only when evidence shows task is low-risk and rule-bound.
-  - Record downgrade criteria in workflow or optimization notes.
-  - Keep escalation path back to stronger model when risk flags appear.
-- Quality Guard:
-  - Never downgrade from token cost alone.
-  - Require domain/risk evidence and 3 representative PASS samples showing no lost required findings unless target workflow defines different threshold.
-  - Do not downgrade reviewers that must judge ambiguous semantics, safety, security, data loss, or user intent.
-  - Revert downgrade if later evidence shows missed findings or unstable protocol output.
+Guard: every current ID exists in response, actions, and cache. Missing/malformed sidecar = protocol failure.
 
-```text
-High tier:
-- correctness
-- security
-- data-loss
+## WOPT-006 - Coupled-Loop Header Pairing
 
-Low/default tier:
-- formatting
-- naming
-- protocol-shape
-- dead-link
+Problem: two phases implicitly re-dispatch each other and cross-references are unclear.
 
-Downgrade only after 3-sample PASS shows no lost required findings.
-```
+Refactor: group them under one top-level step with named substeps and a preamble stating trigger and re-entry direction. Keep loop caps at the grouped level.
 
-### WOPT-005 — Reviewer Action / Cache Split
-
-- Applies To: review loops where runner needs current fixes while re-review/adjudication needs detailed evidence and history.
-- Trigger Signals: output bloat, cache/delta failure, duplicate reasoning.
-- Refactor Move:
-  - Cached reviewer/adjudicator final response MUST be pointer-only: decision, `Actions:`, `Cache:`, and current finding IDs.
-  - Cached actions path MUST be stable current `<cache_path without .md>.actions.md`; A/B leg actions use `<base>.a.actions.md` and `<base>.b.actions.md`.
-  - Actions file MUST contain only current actionable OPEN findings needed for this loop.
-  - Actions file MUST be updated each pass. Cache history is durable audit trail; numbered action files are debug-only and not runtime contract.
-  - Cache file MUST contain full finding text, status, evidence, prior decisions, verified observations, resolved/deferred items, expected fix conditions, and pointer to latest actions.
-  - Cacheless reviewers MUST NOT read or write cache or actions files. Findings MUST be returned inline in output block with `## Findings` and `## Notes` sections.
-  - Cacheless adjudicators MUST parse A/B findings from each leg's inline `## Findings` section. They MUST NOT read sidecar files or emit `Actions:`/`Cache:` pointers.
-  - Runner MUST use final response for routing and read `Actions:` for fix application (cached) or inline `## Findings` (cacheless).
-  - Runner MUST treat missing, malformed, truncated, ambiguous, or insufficient `Actions:` (cached) or inline findings (cacheless) as protocol failure to retry/rerun.
-  - Runner MUST treat `Cache:` as reviewer-owned state for re-review/adjudication and ledger references, not current fix input.
-  - Re-review MUST receive `cache_path` and use cache for detailed evidence.
-  - Do not duplicate full history, verified observations, resolved findings, or merge notes in response or actions file.
-- Quality Guard:
-  - Response schema MUST stay stable and parseable.
-  - Every ID in cached response MUST exist in actions and cache when IDs are used.
-  - Actions evidence MUST be actionable without rereading unchanged inputs; cache ledger MUST point to action files that hold evidence.
-  - Cacheless output MUST include all findings inline — no sidecar file references, no `Cache:` or `Actions:` pointers.
-  - Do not split response/cache if downstream consumer cannot read cache file.
-
-```text
-CACHED reviewer response:
-Decision: BLOCKING
-Actions: <cache-base>.actions.md
-Cache: <path>
-
-Actions file:
-F1 current problem + smallest fix
-
-Cache file:
-Latest Actions: <cache-base>.actions.md
-F1 full evidence, expected fix condition, prior decision, verified observations, resolved history
-
-CACHELESS reviewer response:
-Decision: BLOCKING
-IDs: COR-001, COR-002, ...
-
-## Findings
-### [COR-001]
-Category: FIDELITY
-Severity: BLOCKING
-Evidence: <section, [P#], path:line>
-Problem: <one line>
-Fix: <smallest concrete correction>
-~~~
---- a/<path>
-+++ b/<path>
- unchanged context
--old
-+new
- unchanged context
-~~~
-
-## Notes
-- <optional>
-
-Runner fixes from actions (cached) or inline findings (cacheless); adjudicator/re-review reads actions first, cache only as needed.
-```
-
-### WOPT-006 — Coupled-Loop Header Pairing
-
-- Applies To: primary orchestrators containing two phases that share re-dispatch loop.
-- Trigger Signals: loop churn where runner re-runs full pipeline after fix in one phase because coupling between phases is implicit; cross-references in prompt point to "step 3" or "the loop" without naming boundary.
-- Refactor Move:
-  - Replace two top-level `## N.` and `## N+1.` headers with one `## N.` header plus `### Na.` and `### Nb.` substeps when one phase re-dispatches other.
-  - Add one- or two-line preamble to `## N.` header naming loop direction and trigger (e.g. "BLOCKING re-dispatches Na and repeats Nb").
-  - Update all cross-references in prompt to `Nb` form so re-entry points are unambiguous.
-  - When third phase enters loop, add it as `Nc` and rewrite preamble; do not promote to new top-level step.
-  - Re-dispatch caps and counters stay per-loop, not per-substep.
-- Quality Guard:
-  - Preamble MUST mention both trigger condition and re-dispatch direction; header that just numbers substeps does not satisfy this.
-  - Do not pair two phases that do not share re-dispatch — keep them as separate top-level steps.
-  - Do not pair when one phase re-dispatches other conditionally based on sub-criterion (e.g. "only when file class X"); pair only when re-dispatch is structural.
-
-```text
-Before (implicit loop):
-## 2. Implement once
-- Dispatch implementer.
-
-## 3. Diff review loop
-- Dispatch reviewer. On BLOCKING: re-dispatch step 2.
-
-## 4. Validator-fixer
-- ...
-
-After (paired loop):
-## 2. Implement and diff review
-
-Implementer writes code; reviewer validates. BLOCKING re-dispatches 2a and repeats 2b.
-
-### 2a. Implement once
-- Dispatch implementer.
-
-### 2b. Diff review loop
-- Dispatch reviewer. On BLOCKING: re-dispatch 2a.
-
-## 3. Validate and certify
-- ...
-```
-
-Bad: `## 2. Implement` and `## 3. Review` as siblings — reader has to infer loop from cross-reference.
+Guard: pair only phases with structural re-dispatch. Independent phases remain separate.

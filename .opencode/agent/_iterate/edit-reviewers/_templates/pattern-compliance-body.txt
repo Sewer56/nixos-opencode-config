@@ -7,7 +7,7 @@
   file="../config/agent/_templates/review-process/cached.txt"
   if=mode==cached
   delta_source=log_path
-  step2_extra="- Read `pattern_contract_path`.\n- Read selected source sections named by contract, such as `config/doc/workflow/design-patterns.md#OPT-###` or `config/doc/workflow/optimize-patterns.md#WOPT-###`.\n- Read changed files and any `Apply To` files from contract.\n- If `static_check_path` is provided, read it only when selected Validation bullet depends on static/render status.\n- Check each selected Carry-In, Quality Guard, Apply To path, Validation bullet against generated prompt text.\n- Findings target generated files that miss selected patterns."
+  step2_extra="- Read `pattern_contract_path`; inspect selected PE/OPT/WOPT source sections only.\n- Read changed files plus contract Apply To files.\n- Check carry-ins, guards, and validation against generated prompt text.\n- Flag copied catalog prose, absent PE baseline, or stale model hacks."
   preserve_byte_exact=1
 }}
 {{
@@ -29,13 +29,13 @@
   agent="_iterate/edit-reviewers/pattern-compliance"
   prefix=PAT
   domain=pattern-compliance
-  categories="CARRY_IN | QUALITY_GUARD | APPLY_TO | VALIDATION"
-  evidence="<pattern id or missing element>"
-  problem="<one-line problem>"
-  fix="<exact correction>"
-  file_ref="<repo-relative path>"
-  bad="-<wrong line>"
-  good="+<correct line>"
+  categories="PE_BASELINE | CARRY_IN | QUALITY_GUARD | APPLY_TO | VALIDATION | TOKEN_DENSITY"
+  evidence="[[pattern_id_or_missing_element]]"
+  problem="[[one_line_problem]]"
+  fix="[[exact_correction]]"
+  file_ref="[[repo_relative_path]]"
+  bad="-[[wrong_line]]"
+  good="+[[correct_line]]"
   with_file=1
   with_lines=1
   with_evidence=1
@@ -44,7 +44,7 @@
   detail=""
   step=""
   with_verified=1
-  verified_ref="<pattern id or path>: <one-line verification>"
+  verified_ref="[[pattern_id_or_path]]: [[verification]]"
 }}
 {{
   file="../config/agent/_templates/review-footer/cacheless.txt"
@@ -52,13 +52,13 @@
   agent="_iterate/edit-reviewers/pattern-compliance"
   prefix=PAT
   with_domains=0
-  categories="CARRY_IN | QUALITY_GUARD | APPLY_TO | VALIDATION"
-  evidence="<pattern id or missing element>"
-  problem="<one-line problem>"
-  fix="<exact correction>"
-  file_ref="<repo-relative path>"
-  bad="-<wrong line>"
-  good="+<correct line>"
+  categories="PE_BASELINE | CARRY_IN | QUALITY_GUARD | APPLY_TO | VALIDATION | TOKEN_DENSITY"
+  evidence="[[pattern_id_or_missing_element]]"
+  problem="[[one_line_problem]]"
+  fix="[[exact_correction]]"
+  file_ref="[[repo_relative_path]]"
+  bad="-[[wrong_line]]"
+  good="+[[correct_line]]"
   with_file=1
   with_lines=1
   with_evidence=1
@@ -67,11 +67,10 @@
   detail=""
   step=""
   with_verified=1
-  verified_ref="<pattern id or path>: <one-line verification>"
-  output_extra="- Final-gate cacheless pass: ignore prior caches, return current findings inline only."
+  verified_ref="[[pattern_id_or_path]]: [[verification]]"
+  output_extra="- Cacheless final gate: ignore caches; return current findings inline only."
 }}
 
-# Constraints
-- BLOCKING: selected Carry-In, Quality Guard, or Validation bullet missing or contradicted in generated prompt text.
-- ADVISORY: selected behavior present but weak or indirect.
-- Keep `opencode-source/` unread and unused.
+<review_scope>
+BLOCKING: selected PE/OPT/WOPT rule missing or contradicted; validation uncheckable; catalog copied; token savings remove required boundary/schema/check. ADVISORY: selected behavior present but weak.
+</review_scope>

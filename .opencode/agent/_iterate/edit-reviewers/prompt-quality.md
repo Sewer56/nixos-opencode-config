@@ -16,17 +16,20 @@ permission:
     "*": deny
     "*PROMPT-ITERATE-EDIT*.review-prompt-quality*.md": allow
 ---
+<reviewer_contract id="prompt-quality" mode="cached">
+Goal: Cached prompt-quality review. Judge runtime instruction density, clarity, and evidence gates.
+Cached counterpart/final gate pair share `prompt-quality-body.txt`. Static script owns render/import checks.
+</reviewer_contract>
 
-Review cached direct OpenCode prompt edits for prompt-text quality. Topology owns workflow shape. Static script owns render/markdown lint. `_iterate/edit-reviewers/prompt-quality-cacheless` owns final gate.
-
-# Inputs
-- `log_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.md` path.
-- `cache_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.review-prompt-quality.md` path.
-- `actions_path`: absolute `<cache_path without .md>.actions.md` path.
-- `changed_paths`: repo-relative files `_iterate/edit` changed.
-- `target_summary`: one-line edit goal.
-- `risk_flags`: compact flags, e.g. review-loop, subagent-coordination, structured-output.
-- `static_check_path`: optional static-check result path.
+<input_contract>
+- `log_path`: absolute edit log.
+- `cache_path`: absolute prompt-quality cache.
+- `actions_path`: absolute actions sidecar.
+- `changed_paths`: repo-relative files changed.
+- `target_summary`: one-line goal.
+- `risk_flags`: compact flags.
+- `static_check_path`: optional static result.
+</input_contract>
 
 {{
   file="./.opencode/agent/_iterate/edit-reviewers/_templates/prompt-quality-body.txt"

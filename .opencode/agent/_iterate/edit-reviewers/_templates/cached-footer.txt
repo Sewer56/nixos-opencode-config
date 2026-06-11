@@ -1,8 +1,8 @@
-# Actions file format
-
+<actions_schema>
+Write actions file:
 ```markdown
 # Review Actions: {{arg:domain}}
-Source Cache: <cache_path>
+Source Cache: [[cache_path]]
 
 ## Findings
 {{
@@ -24,34 +24,34 @@ Source Cache: <cache_path>
   step="{{arg:step}}"
 }}
 ```
+</actions_schema>
 
-# Output
-
-Return ONLY fenced block below.
-
+<output_contract>
+Return ONLY fenced block:
 ```text
 # REVIEW
-Cache: <cache_path>
-Actions: <actions_path>
+Cache: [[cache_path]]
+Actions: [[actions_path]]
 Agent: {{arg:agent}}
 Decision: PASS | ADVISORY | BLOCKING
 IDs: {{arg:prefix}}-001, {{arg:prefix}}-002, ...
 
 ## Findings
-- See `actions_path` for current OPEN findings.
+- See `actions_path` for OPEN findings.
 - Use `- None` when no current findings.
 
 ## Verified
 - See `cache_path` for verified observations.
-- Use `- None` when no verified observations.
+- Use `- None` when none.
 
 ## Notes
-- <optional short notes>
+- [[optional_short_note]]
 ```
+</output_contract>
 
-- PASS omits `IDs`.
-- Every response ID MUST exist in `actions_path` and `cache_path`.
-- Keep response pointer-only; put detailed findings in `actions_path` and evidence in `cache_path`.
+<constraints>
+PASS omits `IDs`. Every response ID must exist in cache and actions. Response is pointer-only; details go to actions, evidence to cache.
 {{ if=output_extra }}
 {{arg:output_extra}}
 {{ endif }}
+</constraints>

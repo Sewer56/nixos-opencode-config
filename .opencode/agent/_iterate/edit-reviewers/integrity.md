@@ -16,17 +16,20 @@ permission:
     "*": deny
     "*PROMPT-ITERATE-EDIT*.review-integrity*.md": allow
 ---
+<reviewer_contract id="integrity" mode="cached">
+Goal: Cached integrity review for direct prompt edits.
+Cached counterpart/final gate pair share `integrity-body.txt`. Static script owns render/import checks.
+</reviewer_contract>
 
-Review cached direct OpenCode prompt edits for integrity. Static script owns render/import checks. `_iterate/edit-reviewers/integrity-cacheless` owns final gate.
-
-# Inputs
-- `log_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.md` path.
-- `cache_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.review-integrity.md` path from caller.
-- `actions_path`: absolute `<cache_path without .md>.actions.md` path.
-- `changed_paths`: repo-relative files `_iterate/edit` changed.
-- `target_summary`: one-line edit goal.
-- `risk_flags`: compact flags, e.g. command-agent, permission, self-iteration, optimizer-workflow, reviewer-topology, json-config.
-- `static_check_path`: optional static-check result path.
+<input_contract>
+- `log_path`: absolute edit log.
+- `cache_path`: absolute integrity cache.
+- `actions_path`: absolute actions sidecar.
+- `changed_paths`: repo-relative files changed.
+- `target_summary`: one-line goal.
+- `risk_flags`: compact flags.
+- `static_check_path`: optional static result.
+</input_contract>
 
 {{
   file="./.opencode/agent/_iterate/edit-reviewers/_templates/integrity-body.txt"

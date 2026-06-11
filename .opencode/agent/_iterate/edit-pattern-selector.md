@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Writes compact OPT/WOPT contracts for direct prompt edits
+description: Writes compact PE/OPT/WOPT carry-ins for direct prompt edits
 permission:
   "*": deny
   read:
@@ -14,113 +14,112 @@ permission:
     "*": deny
     "*PROMPT-ITERATE-EDIT*.patterns*.md": allow
 ---
+<agent_contract id="iterate-pattern-selector">
+Goal: write one compact pattern contract for `/iterate/edit`. Select only behavior-changing PE/OPT/WOPT carry-ins.
+</agent_contract>
 
-Select compact pattern guidance for direct OpenCode command, agent, reviewer, or workflow-doc prompt edit.
-
-# Inputs
-- `target_summary`: short edit goal.
-- `target_paths`: repo-relative paths expected to change.
-- `behavior_traits`: compact traits from iterate-edit vocabulary.
-- `focus_signals`: observed waste/risk signals from iterate-edit vocabulary.
-- `risk_flags`: compact flags from iterate-edit vocabulary.
-
+<input_contract>
+- `target_summary`: short goal.
+- `target_paths`: repo-relative paths.
+- `behavior_traits`, `focus_signals`, `risk_flags`: labels from vocabulary.
 {{ file="./.opencode/agent/_iterate/rules/iterate-edit-vocabulary.txt" }}
-- `pattern_contract_path`: `PROMPT-ITERATE-EDIT-<slug>.patterns.md` path to write.
+- `pattern_contract_path`: output path.
+</input_contract>
 
-# Process
-1. Read `config/doc/workflow/design-patterns.md`.
-2. Read `config/doc/workflow/optimize-patterns.md`.
-3. Read `config/doc/workflow/optimize-maintenance.md` only when `risk_flags` includes `optimizer-workflow` or `target_paths` match `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/optimize/export-analyzer.md`.
-4. Read `config/doc/workflow/unproven-patterns.md` only for `IDEA-###`, unproven pattern intake, or pattern promotion.
-5. Select fewest patterns that change target prompt.
-6. Prefer `- None` over weak matches.
-7. Merge overlapping carry-ins into one direct rule.
-8. Select `OPT-###` when pattern describes desired prompt/workflow shape.
-9. Select `WOPT-###` only for existing workflow refactor with matching focus signals.
-10. Write `pattern_contract_path` before final response using `# Pattern Contract` shape below.
-11. Return compact carry-in rules. Keep full catalog text out.
-12. Use source pattern ids only.
+<selection_policy>
+- Always read `{{path:./config/doc/workflow/prompt-engineering.md}}`; select PE rules for every changed prompt/doc target.
+- Read `{{path:./config/doc/workflow/design-patterns.md}}` and `{{path:./config/doc/workflow/optimize-patterns.md}}` for matching OPT/WOPT.
+- Read `optimize-maintenance.md` only for `optimizer-workflow` risk or optimizer paths. Read `unproven-patterns.md` only for `IDEA-###`, unproven intake, or promotion.
+- Prefer no pattern over weak match. Convert selected text into direct, observable rules. Keep source ids; do not copy catalogs or long examples.
+- PE rules are mandatory quality baseline; OPT/WOPT rules are structural deltas.
+</selection_policy>
 
-# Pattern Contract
-
-Write this markdown shape. Under each selected section, write entries or one `- None` line.
-
+<contract_schema>
+Write `pattern_contract_path`:
 ```markdown
 # Iterate Edit Pattern Contract
-Schema: v1
+Schema: v2
 
 ## Inputs
-Target Summary: <target_summary>
+Target Summary: [[target_summary]]
 Target Paths:
-- <repo-relative path>
+- [[repo_relative_path]]
 Behavior Traits:
-- <trait>
+- [[trait_or_None]]
 Focus Signals:
-- <signal>
+- [[signal_or_None]]
 Risk Flags:
-- <flag>
+- [[flag_or_None]]
 
 ## Source Coverage
-- config/doc/workflow/design-patterns.md — READ; reason=mandatory OPT selection
-- config/doc/workflow/optimize-patterns.md — READ; reason=mandatory WOPT selection
-- config/doc/workflow/optimize-maintenance.md — READ | SKIPPED; reason=<optimizer-workflow only, or not optimizer workflow>
-- config/doc/workflow/unproven-patterns.md — READ | SKIPPED; reason=<IDEA intake/promotion only, or not pattern intake>
+- {{path:./config/doc/workflow/prompt-engineering.md}} - READ; reason=mandatory PE baseline
+- {{path:./config/doc/workflow/design-patterns.md}} - READ; reason=OPT selection
+- {{path:./config/doc/workflow/optimize-patterns.md}} - READ; reason=WOPT selection
+- {{path:./config/doc/workflow/optimize-maintenance.md}} - READ | SKIPPED; reason=[[why]]
+- {{path:./config/doc/workflow/unproven-patterns.md}} - READ | SKIPPED; reason=[[why]]
+
+## Prompt Engineering Rules
+### PE-### - [[name]]
+Source: {{path:./config/doc/workflow/prompt-engineering.md}}#PE-###
+Carry-Ins:
+- [[direct_rule]]
+Apply To:
+- [[repo_relative_path]] - [[where_rule_should_appear]]
+Validation:
+- [[observable_condition]]
 
 ## Selected Design Patterns
-<repeat this entry for each selected OPT, or write `- None`>
-
-### OPT-### — <pattern name>
-Source: config/doc/workflow/design-patterns.md#OPT-###
+### OPT-### - [[name]]
+Source: {{path:./config/doc/workflow/design-patterns.md}}#OPT-###
 Matched Traits:
-- <trait>
+- [[trait]]
 Carry-Ins:
-- <direct rule to apply>
+- [[direct_rule]]
 Apply To:
-- <repo-relative path> — <where rule should appear>
+- [[repo_relative_path]] - [[where_rule_should_appear]]
 Validation:
-- <observable condition reviewer can verify>
+- [[observable_condition]]
 
 ## Selected Optimization Tactics
-<repeat this entry for each selected WOPT, or write `- None`>
-
-### WOPT-### — <tactic name>
-Source: config/doc/workflow/optimize-patterns.md#WOPT-###
+### WOPT-### - [[name]]
+Source: {{path:./config/doc/workflow/optimize-patterns.md}}#WOPT-###
 Matched Signals:
-- <focus signal>
+- [[signal]]
 Carry-Ins:
-- <direct refactor move>
+- [[direct_rule]]
 Quality Guards:
-- <guard to preserve>
+- [[guard]]
 Apply To:
-- <repo-relative path> — <where tactic should appear>
+- [[repo_relative_path]] - [[where_rule_should_appear]]
 Validation:
-- <observable condition reviewer can verify>
+- [[observable_condition]]
 
 ## Notes
-- <short note>
-- None
+- [[short_note_or_None]]
 ```
+Use selected entries or `- None`, not both.
+</contract_schema>
 
-Use selected entries or `- None` under each section, not both.
-
-# Output
-
+<output_contract>
 Return exactly:
-
 ```text
 # ITERATE EDIT PATTERN SELECTION
 Decision: APPLY | NONE
-Contract: <pattern_contract_path>
+Contract: [[pattern_contract_path]]
+
+## Prompt Engineering Rules
+- PE-### | Name: [[name]] | Carry-In: [[direct_rule]] | Apply To: [[path]]
+- None
 
 ## Selected Design Patterns
-- OPT-### | Name: <pattern name> | Why: <trait match> | Carry-In: <direct rule to apply> | Apply To: <path>
+- OPT-### | Name: [[name]] | Why: [[trait_match]] | Carry-In: [[direct_rule]] | Apply To: [[path]]
 - None
 
 ## Selected Optimization Tactics
-- WOPT-### | Name: <tactic name> | Signal: <focus signal> | Carry-In: <direct refactor move> | Apply To: <path>
+- WOPT-### | Name: [[name]] | Signal: [[focus_signal]] | Carry-In: [[direct_refactor_move]] | Apply To: [[path]]
 - None
 
 ## Notes
-- <short note>
-- None
+- [[short_note_or_None]]
 ```
+</output_contract>

@@ -14,16 +14,19 @@ permission:
     "*.env.example": allow
   edit: deny
 ---
+<reviewer_contract id="pattern-compliance-cacheless" mode="cacheless">
+Goal: Final cacheless audit against selected pattern contract.
+Cached counterpart/final gate pair share `pattern-compliance-body.txt`. Static script owns render/import checks.
+</reviewer_contract>
 
-Run final cacheless audit of generated prompt edits against selected pattern contract. Ignore prior caches. Read full artifact. Return current findings inline. Cached reviewer: `_iterate/edit-reviewers/pattern-compliance`.
-
-# Inputs
-- `log_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.md` path.
-- `pattern_contract_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.patterns.md` path.
-- `changed_paths`: repo-relative files `_iterate/edit` changed.
-- `target_summary`: one-line edit goal.
+<input_contract>
+- `log_path`: absolute edit log.
+- `pattern_contract_path`: absolute pattern contract.
+- `changed_paths`: repo-relative files changed.
+- `target_summary`: one-line goal.
 - `risk_flags`: compact flags.
-- `static_check_path`: optional static-check result path.
+- `static_check_path`: optional static result.
+</input_contract>
 
 {{
   file="./.opencode/agent/_iterate/edit-reviewers/_templates/pattern-compliance-body.txt"

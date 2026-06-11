@@ -1,39 +1,47 @@
 # Iterate Edit Vocabulary
-
-Shared `behavior_traits`, `focus_signals`, and `risk_flags` vocabulary for `/iterate/edit` prep and pattern selection.
+Use exact labels for prep, pattern selection, review.
 
 ## Behavior Traits
 - command delegation
 - primary runner + review subagents
 - review loop
 - subagent coordination
-- repeated subagent/task calls
+- parallel review
 - machine-readable output
 - diff-based artifacts
-- failure-path validation
-- path-only helper sections
+- verification loop
+- path-only handoff
 - shared pattern selection
 - optimizer workflow
 - reviewer topology
 - action/cache split
 - pipeline decomposition
+- XML sectioning
+- placeholder hygiene
+- context-budget control
+- prompt-harness boundary
+- token-density optimization
 
 ## Focus Signals
 - prompt/context bloat
-- missing prompt-writing contract
+- missing executable contract
+- weak XML boundaries
+- placeholder/XML ambiguity
 - tight input violation
 - overbroad handoff
 - duplicate reads
 - duplicate reasoning
-- scope leakage
+- source-boundary leak
+- prompt-harness mixing
 - review-loop churn
 - cache/delta failure
 - action/cache confusion
 - output bloat
 - topology mismatch
-- model/risk mismatch
+- stale model hack
 - monolithic prompt
 - rendered whitespace
+- missing verification
 
 ## Risk Flags
 - command-agent
@@ -43,3 +51,6 @@ Shared `behavior_traits`, `focus_signals`, and `risk_flags` vocabulary for `/ite
 - reviewer-topology
 - structured-output
 - json-config
+- source-injection
+- irreversible-action
+- harness-boundary

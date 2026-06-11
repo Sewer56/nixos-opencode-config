@@ -1,56 +1,56 @@
-# Edit Log Shape
-
+<edit_log_shape>
 Use exact markdown shape:
-
 ```markdown
 # Iterate Edit Log
 ## Raw Request
-<verbatim user request>
+[[verbatim_user_request]]
 ## Targets
-- <repo-relative path> — <why touched>
+- [[repo_relative_path]] - [[why_touched]]
 ## Pattern Contract
-- Path: <pattern_contract_path>
+- Path: [[pattern_contract_path]]
 - Status: WRITTEN | FALLBACK_WRITTEN | MISSING
 ## Classification
-- Prompt Kind: <command | agent | reviewer | docs | mixed>
-- Consumer: <LLM-runtime | human-doc | machine-output | mixed>
-- Behavior Traits: <comma-separated>
-- Focus Signals: <comma-separated>
-- Risk Flags: <comma-separated>
+- Prompt Kind: [[command|agent|reviewer|docs|mixed]]
+- Consumer: [[LLM-runtime|human-doc|machine-output|mixed]]
+- Behavior Traits: [[comma_list]]
+- Focus Signals: [[comma_list]]
+- Risk Flags: [[comma_list]]
 ## Selected Patterns
-- OPT-### | <carry-in>
-- WOPT-### | <carry-in>
+- PE-### | [[carry-in]]
+- OPT-### | [[carry-in]]
+- WOPT-### | [[carry-in]]
 - None
 ## Delta
-- <path> — Status: New | Changed | Unchanged; Why: <smallest reason>
+- [[path]] - Status: New | Changed | Unchanged; Why: [[smallest_reason]]
 ## Review Ledger
 ### Static Check
-- Decision: <PASS | BLOCKING | NOT_RUN>
-- Result: <path | None>
+- Decision: PASS | BLOCKING | NOT_RUN
+- Result: [[path_or_None]]
 ### Cached Loop
-- Iterations: <n>
+- Iterations: [[n]]
 #### Integrity
-- Decision: <PASS | ADVISORY | BLOCKING | NOT_RUN>
-- Cache: <path | None>
+- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
+- Cache: [[path_or_None]]
 #### Pattern Compliance
-- Decision: <PASS | ADVISORY | BLOCKING | NOT_RUN>
-- Cache: <path | None>
+- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
+- Cache: [[path_or_None]]
 #### Prompt Quality
-- Decision: <PASS | ADVISORY | BLOCKING | NOT_RUN>
-- Cache: <path | None>
+- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
+- Cache: [[path_or_None]]
 #### Topology
-- Decision: <PASS | ADVISORY | BLOCKING | NOT_RUN>
-- Cache: <path | None>
+- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
+- Cache: [[path_or_None]]
 ### Final Gate (Cacheless)
-- Iterations: <n>
+- Iterations: [[n]]
 #### Integrity
-- Decision: <PASS | ADVISORY | BLOCKING | NOT_RUN>
+- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
 #### Pattern Compliance
-- Decision: <PASS | ADVISORY | BLOCKING | NOT_RUN>
+- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
 #### Prompt Quality
-- Decision: <PASS | ADVISORY | BLOCKING | NOT_RUN>
+- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
 #### Topology
-- Decision: <PASS | ADVISORY | BLOCKING | NOT_RUN>
+- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
 ## Decisions
-- [DEC-001] <cross-domain decision or None>
+- [DEC-001] [[safe_assumption_or_skipped_check_or_evidence_or_cross_domain_decision_or_None]]
 ```
+</edit_log_shape>

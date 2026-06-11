@@ -2,22 +2,23 @@
 
 No active entries.
 
-Use this file only for genuinely unproven reusable ideas. Proven creation/refinement design patterns belong in `config/doc/workflow/design-patterns.md`; proven existing-workflow optimization tactics belong in `config/doc/workflow/optimize-patterns.md`.
+Use only for reusable ideas needing evidence before promotion. Proven creation/refinement patterns belong in `design-patterns.md`; proven existing-workflow optimization tactics belong in `optimize-patterns.md`; prompt-quality rules belong in `prompt-engineering.md`.
 
 ## Rules
 
-- Use `IDEA-###` ids. Next id = highest existing id + 1. Never reuse numbers.
-- Record only ideas needing more evidence before they become shared guidance.
-- Keep target-specific one-off wins in experiment log instead of this file.
+- Use `IDEA-###`; next id = highest existing id + 1.
+- Record only ideas that may generalize.
+- Keep target-specific one-off wins in the experiment log.
+- Use `[[placeholder]]` syntax in examples.
 
 ## Entry Template
 
-### IDEA-### — <name>
-- Scope Guess: <cross-workflow | iterate-family | finalize-family | workflow-optimize / ... | unknown>
-- First Seen In: <experiment log path or ref>
-- Problem: <waste or failure pattern>
-- Proposed Change: <unproven reusable change>
-- Why It Might Generalize: <reason>
-- Evidence Needed: <what would prove shared vs local>
-- Promotion Target: `OPT-###` in `design-patterns.md` | `WOPT-###` in `optimize-patterns.md` | keep local
-- Notes: <short note>
+### IDEA-### - [[name]]
+- Scope Guess: [[cross-workflow|iterate-family|finalize-family|workflow-optimize|unknown]]
+- First Seen In: [[experiment_log_path_or_ref]]
+- Problem: [[waste_or_failure_pattern]]
+- Proposed Change: [[unproven_reusable_change]]
+- Why It Might Generalize: [[reason]]
+- Evidence Needed: [[proof_needed]]
+- Promotion Target: `OPT-###` | `WOPT-###` | `PE-###` | keep local
+- Notes: [[short_note]]

@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Prepares direct prompt edits by resolving targets, artifacts, risks, reads
+description: Resolves targets, artifacts, classification, reads, and blockers for one direct prompt edit
 permission:
   "*": deny
   read:
@@ -23,108 +23,91 @@ permission:
     "*": deny
     "codebase-explorer": allow
 ---
+<agent_contract id="iterate-edit-prep">
+Goal: resolve one `/iterate/edit` request. Write prep state only; edit no targets.
+Inputs: `request` verbatim; cwd = repo root.
+</agent_contract>
 
-Prepare direct `/iterate/edit` run. Resolve request shape, prompt targets, artifacts, classification, required reads. Write one prep state file. Edit no targets.
-
-# Inputs
-- `request`: verbatim user request.
-- Current working directory: repo root.
-
-# Process
-
-## 1. Parse request
-- Derive `slug`: 2–3 word identifier.
-- Set `artifact_base = PROMPT-ITERATE-EDIT-<slug>`.
-- Set `state_path = <cwd>/<artifact_base>.prep.md`.
-- Set `log_path = <cwd>/<artifact_base>.md`.
-- Set `pattern_contract_path = <cwd>/<artifact_base>.patterns.md`.
-- Set `static_check_path = <cwd>/<artifact_base>.static-check.md`.
-- Set reviewer cache paths under `<cwd>/`, never review subdir:
-  - `integrity_cache_path = <cwd>/<artifact_base>.review-integrity.md`
-  - `pattern_compliance_cache_path = <cwd>/<artifact_base>.review-pattern-compliance.md`
-  - `prompt_quality_cache_path = <cwd>/<artifact_base>.review-prompt-quality.md`
-  - `topology_cache_path = <cwd>/<artifact_base>.review-topology.md`
-- If target paths or intended behavior block safe edit, write `Decision: NEEDS_INPUT` with one `Question:` and stop.
-
-## 2. Resolve paths
-- Normalize absolute paths inside repo to repo-relative paths.
-- When request names target paths, read them and direct callers/reviewers first.
-- Use `glob` and `grep` only for command/agent wiring, local docs, reviewer topology, related prompt paths.
-- Use `@codebase-explorer` only when direct reads cannot resolve targets, wiring, permission conventions, docs, topology. Tell it: skip `opencode-source/`.
-- Keep `opencode-source/` out of targets and required reads.
-
-## 3. Classify
 {{ file="./.opencode/agent/_iterate/rules/iterate-edit-vocabulary.txt" }}
-- Set `prompt_kind`: command, agent, reviewer, docs, or mixed.
-- Set `consumer`: LLM-runtime, human-doc, machine-output, or mixed.
-- Select observed `behavior_traits`, `focus_signals`, `risk_flags` from vocabulary only.
-- Set `self-iteration` when paths include `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`.
-- Set `optimizer-workflow` when paths include `config/agent/_workflow/optimize*.md` or `config/agent/_workflow/optimize/export-analyzer.md`.
-- Add `.opencode/doc/iterate.md` to required reads for self-iteration rule changes.
-- Add `config/doc/workflow/optimize-maintenance.md` to required reads only for `optimizer-workflow`.
 
-## 4. Write state
-- Write `state_path` before final response.
-- Use exact state shape:
+<process>
+1. Parse request
+- Slug = 2-3 word id. `artifact_base = PROMPT-ITERATE-EDIT-[[slug]]`.
+- Derive `state_path`, `log_path`, `pattern_contract_path`, `static_check_path`, and reviewer cache paths from `artifact_base` under cwd.
+- Return `NEEDS_INPUT` only when target, intended behavior, safety, or irreversible action blocks a correct edit. Otherwise record safe assumptions.
 
+2. Resolve targets
+- Normalize repo-internal absolute paths to repo-relative paths.
+- If request names paths, read them plus direct callers/importers/reviewers first.
+- Search only enough to resolve wiring, local docs, reviewer topology, and related prompts. Do not read `opencode-source/`.
+- Use `codebase-explorer` only when direct reads/search cannot identify target/wiring/docs; request candidate paths and rationale only.
+
+3. Classify
+- `prompt_kind`: command | agent | reviewer | docs | mixed.
+- `consumer`: LLM-runtime | human-doc | machine-output | mixed.
+- Pick smallest accurate `behavior_traits`, `focus_signals`, `risk_flags` from vocabulary.
+- Add `self-iteration` for `.opencode/agent/_iterate/**` or `.opencode/command/iterate/**`; require `.opencode/doc/iterate.md`.
+- Add `optimizer-workflow` for `config/agent/_workflow/optimize*.md`, `config/agent/_workflow/optimize/export-analyzer.md`, or workflow optimization docs; require `{{path:./config/doc/workflow/optimize-maintenance.md}}`.
+</process>
+
+<state_schema>
+Write `state_path`:
 ```markdown
 # Iterate Edit Prep State
-Schema: v1
+Schema: v2
 Decision: READY | NEEDS_INPUT | FAIL
-Question: <one concise question | None>
+Question: [[one_question_or_None]]
 
 ## Request
-<verbatim request>
+[[verbatim_request]]
 
 ## Target Summary
-<one line>
+[[one_line]]
 
 ## Artifacts
-- artifact_base: <artifact_base>
-- state_path: <absolute path>
-- log_path: <absolute path>
-- pattern_contract_path: <absolute path>
-- static_check_path: <absolute path>
-- integrity_cache_path: <absolute path>
-- pattern_compliance_cache_path: <absolute path>
-- prompt_quality_cache_path: <absolute path>
-- topology_cache_path: <absolute path>
+- artifact_base: [[artifact_base]]
+- state_path: [[absolute_path]]
+- log_path: [[absolute_path]]
+- pattern_contract_path: [[absolute_path]]
+- static_check_path: [[absolute_path]]
+- integrity_cache_path: [[absolute_path]]
+- pattern_compliance_cache_path: [[absolute_path]]
+- prompt_quality_cache_path: [[absolute_path]]
+- topology_cache_path: [[absolute_path]]
 
 ## Targets
-- <repo-relative path> — <why likely touched>
+- [[repo_relative_path]] - [[why_likely_touched]]
 
 ## Classification
-- Prompt Kind: <command | agent | reviewer | docs | mixed>
-- Consumer: <LLM-runtime | human-doc | machine-output | mixed>
-- Behavior Traits: <comma-separated | None>
-- Focus Signals: <comma-separated | None>
-- Risk Flags: <comma-separated | None>
+- Prompt Kind: [[command|agent|reviewer|docs|mixed]]
+- Consumer: [[LLM-runtime|human-doc|machine-output|mixed]]
+- Behavior Traits: [[comma_list_or_None]]
+- Focus Signals: [[comma_list_or_None]]
+- Risk Flags: [[comma_list_or_None]]
 
 ## Required Reads
-- <repo-relative path> — <why>
+- [[repo_relative_path]] - [[why]]
 - None
 
 ## Notes
-- <short note>
-- None
+- [[assumption_or_skip_reason_or_None]]
 ```
+</state_schema>
 
-# Output
-
-Return exactly one fenced `text` block:
-
+<output_contract>
+Return one fenced `text` block:
 ```text
 # PREP
 Decision: READY | NEEDS_INPUT | FAIL
-State Path: <absolute state_path | N/A>
-Artifact Base: <artifact_base | N/A>
-Question: <question | None>
-Target Paths: <comma-separated repo-relative paths | None>
-Risk Flags: <comma-separated | None>
-Summary: <one-line summary>
+State Path: [[absolute_state_path_or_N/A]]
+Artifact Base: [[artifact_base_or_N/A]]
+Question: [[question_or_None]]
+Target Paths: [[comma-separated_repo_paths_or_None]]
+Risk Flags: [[comma-separated_or_None]]
+Summary: [[one-line_summary]]
 ```
+</output_contract>
 
-# Constraints
-- Edit no target files.
-- Write no pattern contract, edit log, static-check result, reviewer caches.
-- Ask no user-facing question directly; return `Decision: NEEDS_INPUT` with one question.
+<constraints>
+Write no pattern contract, edit log, static-check result, reviewer cache, or target edit. Return the question; do not ask user directly.
+</constraints>

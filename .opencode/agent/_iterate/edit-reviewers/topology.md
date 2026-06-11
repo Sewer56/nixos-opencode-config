@@ -16,17 +16,20 @@ permission:
     "*": deny
     "*PROMPT-ITERATE-EDIT*.review-topology*.md": allow
 ---
+<reviewer_contract id="topology" mode="cached">
+Goal: Cached topology review. Judge split/merge/script/template choices only.
+Cached counterpart/final gate pair share `topology-body.txt`. Static script owns render/import checks.
+</reviewer_contract>
 
-Review cached direct OpenCode prompt edits for workflow shape: reviewer topology economy, template use. Prompt-quality owns prompt text. `_iterate/edit-reviewers/topology-cacheless` owns final gate.
-
-# Inputs
-- `log_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.md` path.
-- `cache_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.review-topology.md` path.
-- `actions_path`: absolute `<cache_path without .md>.actions.md` path.
-- `changed_paths`: repo-relative files `_iterate/edit` changed.
-- `target_summary`: one-line edit goal.
-- `risk_flags`: compact flags, e.g. reviewer-topology, optimizer-workflow, pipeline-decomposition.
-- `static_check_path`: optional static-check result path.
+<input_contract>
+- `log_path`: absolute edit log.
+- `cache_path`: absolute topology cache.
+- `actions_path`: absolute actions sidecar.
+- `changed_paths`: repo-relative files changed.
+- `target_summary`: one-line goal.
+- `risk_flags`: compact flags.
+- `static_check_path`: optional static result.
+</input_contract>
 
 {{
   file="./.opencode/agent/_iterate/edit-reviewers/_templates/topology-body.txt"

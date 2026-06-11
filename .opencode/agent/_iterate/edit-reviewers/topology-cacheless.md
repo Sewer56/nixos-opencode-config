@@ -14,15 +14,18 @@ permission:
     "*.env.example": allow
   edit: deny
 ---
+<reviewer_contract id="topology-cacheless" mode="cacheless">
+Goal: Final cacheless topology audit. Ignore caches; return current findings inline.
+Cached counterpart/final gate pair share `topology-body.txt`. Static script owns render/import checks.
+</reviewer_contract>
 
-Run final cacheless topology audit for direct OpenCode prompt edits. Check reviewer topology economy and template use. Ignore prior caches. Read full artifact. Return current findings inline. Cached reviewer: `_iterate/edit-reviewers/topology`.
-
-# Inputs
-- `log_path`: absolute `PROMPT-ITERATE-EDIT-<slug>.md` path.
-- `changed_paths`: repo-relative files `_iterate/edit` changed.
-- `target_summary`: one-line edit goal.
-- `risk_flags`: compact flags, e.g. reviewer-topology, optimizer-workflow, pipeline-decomposition.
-- `static_check_path`: optional static-check result path.
+<input_contract>
+- `log_path`: absolute edit log.
+- `changed_paths`: repo-relative files changed.
+- `target_summary`: one-line goal.
+- `risk_flags`: compact flags.
+- `static_check_path`: optional static result.
+</input_contract>
 
 {{
   file="./.opencode/agent/_iterate/edit-reviewers/_templates/topology-body.txt"
