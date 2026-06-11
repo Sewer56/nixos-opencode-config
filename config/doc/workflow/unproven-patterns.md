@@ -1,24 +1,15 @@
-# Unproven Workflow Pattern Intake
+# Unproven Prompt Workflow Ideas
 
-No active entries.
+Use this file as a parking lot. Do not import these into runtime prompts until validated.
 
-Use only for reusable ideas needing evidence before promotion. Proven creation/refinement patterns belong in `design-patterns.md`; proven existing-workflow optimization tactics belong in `optimize-patterns.md`; prompt-quality rules belong in `prompt-engineering.md`.
+## IDEA-001 - Automatic Render Baselines
 
-## Rules
+Store before/after rendered prompts for every changed runtime file and compare semantic section deltas.
 
-- Use `IDEA-###`; next id = highest existing id + 1.
-- Record only ideas that may generalize.
-- Keep target-specific one-off wins in the experiment log.
-- Use `[[placeholder]]` syntax in examples.
+## IDEA-002 - Prompt Diff Classifier
 
-## Entry Template
+Classify prompt changes as schema, boundary, behavior, wording, examples, or docs to choose checks more precisely.
 
-### IDEA-### - [[name]]
-- Scope Guess: [[cross-workflow|iterate-family|finalize-family|workflow-optimize|unknown]]
-- First Seen In: [[experiment_log_path_or_ref]]
-- Problem: [[waste_or_failure_pattern]]
-- Proposed Change: [[unproven_reusable_change]]
-- Why It Might Generalize: [[reason]]
-- Evidence Needed: [[proof_needed]]
-- Promotion Target: `OPT-###` | `WOPT-###` | `PE-###` | keep local
-- Notes: [[short_note]]
+## IDEA-003 - Golden Prompt Eval Pack
+
+Run a small YAML fixture suite against old and new prompts before accepting structural prompt changes.

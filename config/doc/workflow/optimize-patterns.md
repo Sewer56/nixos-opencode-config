@@ -1,73 +1,35 @@
-# Workflow Optimize Patterns
+# Prompt Workflow Optimization Tactics
 
-Approved tactics for reducing existing workflow token cost without losing quality. Use after observing focus signals from export/digest/logs; do not force-fit tactics.
+Use these tactics when `/iterate/edit` is asked to reduce or modernize command/agent/reviewer workflows.
 
-Refs: `WOPT-###` for existing-workflow optimization, `OPT-###` for design shape, `LOCAL:[[name]]` for one-run hypotheses.
+## WOPT-001 - Remove Standing Committee
 
-## Use
+Replace always-on reviewer swarms with profile-gated reviewers. Keep full fanout for self-iteration and high-risk changes.
 
-1. Start from observed signals and counterevidence.
-2. Select the fewest WOPT/OPT refs that explain the waste.
-3. Convert refactor moves into direct edits; do not paste this catalog into prompts.
-4. Keep quality guards and rerun representative checks.
+## WOPT-002 - Scriptable Selector
 
-## Signal Map
+Replace LLM pattern-selection subagents with deterministic contract compilers when inputs are path/profile/rule based. Keep LLM fallback only for ambiguous semantic routing.
 
-| Signal | Usually Apply |
-| --- | --- |
-| generated hotspot | WOPT-003, WOPT-004, WOPT-005 |
-| overbroad handoff | WOPT-001, WOPT-003, OPT-002 |
-| duplicate reads/reasoning | WOPT-001, WOPT-003, OPT-003 |
-| review-loop churn | WOPT-001, WOPT-002, WOPT-006 |
-| cache/delta failure | WOPT-001, WOPT-005 |
-| output bloat | WOPT-005, OPT-004, OPT-005 |
-| model/risk mismatch | WOPT-004 |
-| prompt/context bloat | WOPT-001, WOPT-003, OPT-018 |
+## WOPT-003 - Prompt/Harness Scrub
 
-## WOPT-001 - Structural Withholding
+Move model names, effort parameters, tool schemas, provider reasoning replay, permission tables, sandboxing, egress, and prompt-cache internals out of runtime prompt bodies unless the prompt is specifically editing harness/config docs.
 
-Problem: runner gives every child full context/rules, causing duplicate reasoning.
+## WOPT-004 - Sparse XML
 
-Refactor: parent keeps orchestration; child prompt owns role/process/schema; handoff carries paths, ids, flags, decisions, cache/action paths, and success criteria only. Move repeated child instructions into child prompt or shared multi-consumer include.
+Use XML tags for major mixed-content boundaries: `agent_contract`, `inputs`, `workflow`, `constraints`, `output_contract`, `verification`, `documents`, `examples`. Do not XML-wrap every bullet.
 
-Guard: child still has enough access to verify its domain. Do not withhold required source paths or safety constraints.
+## WOPT-005 - Token Report
 
-## WOPT-002 - Review Loop Restructuring
+Generate a token/word/char report for changed prompts. Use it to spot prompt bloat, not as the only quality metric.
 
-Problem: every fix reruns every reviewer.
+## WOPT-006 - Self-Iteration Guard
 
-Refactor: order high-risk blocking domains before presentation/style domains. After a fix, rerun only touched domains; recompute set when paths, risk flags, or scope changes. Advisory-only findings do not force full-loop reruns unless target workflow requires them.
+When editing `/iterate/edit`, update runner, editor, reviewers, scripts, docs, and tests if behavior crosses those layers. Preserve future application of the same optimization rules.
 
-Guard: final gate requires zero unresolved blocking findings.
+## WOPT-007 - Handoff Compression
 
-## WOPT-003 - Reviewer Topology Shaping
+Pass subagents paths, ids, flags, criteria, and artifact paths. Do not paste complete parent workflows, long catalogs, or examples unless they are necessary input data.
 
-Problem: reviewers overlap, reread same artifacts, or split without context savings.
+## WOPT-008 - Validation Substitution
 
-Refactor: merge reviewers with same read scope and overlapping findings. Split overloaded reviewer only when subdomains are independent and each child receives smaller scoped input. Update caller routing, cache ownership, output parsing, docs, and review ledger.
-
-Guard: do not merge away correctness/security/data-loss ownership. Reject splits where children still read full context.
-
-## WOPT-004 - Risk-Based Reviewer Tiering
-
-Problem: low-risk mechanical checks use high-cost models or high-risk checks use weak ones.
-
-Refactor: assign model tier by domain risk, judgment load, and failure cost. Keep correctness, security, data-loss, migration, and ambiguous semantic review on strong models. Move narrow mechanical checks down only with evidence.
-
-Guard: never downgrade from token cost alone. Keep escalation path when risk flags appear.
-
-## WOPT-005 - Reviewer Action/Cache Split
-
-Problem: reviewer responses carry full evidence/history every loop.
-
-Refactor: cached reviewer response is pointer-only: `Decision`, `Actions`, `Cache`, current IDs. Actions file contains current OPEN fixes. Cache contains durable evidence, statuses, resolved/deferred history, and verified observations. Cacheless reviewers return findings inline and do not use sidecars.
-
-Guard: every current ID exists in response, actions, and cache. Missing/malformed sidecar = protocol failure.
-
-## WOPT-006 - Coupled-Loop Header Pairing
-
-Problem: two phases implicitly re-dispatch each other and cross-references are unclear.
-
-Refactor: group them under one top-level step with named substeps and a preamble stating trigger and re-entry direction. Keep loop caps at the grouped level.
-
-Guard: pair only phases with structural re-dispatch. Independent phases remain separate.
+If the ideal render/test/check cannot run, require the next-best inspectable substitute and record why it is weaker.

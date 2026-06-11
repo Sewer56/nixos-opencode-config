@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Direct-edits OpenCode model-facing instructions with prep, pattern contract, static check, reviewer gates
+description: Edits OpenCode prompt files through contract compiler, editor, deterministic checks, and risk-tiered review
 permission:
   "*": deny
   read:
@@ -19,76 +19,80 @@ permission:
   task:
     "*": deny
     "general": allow
-    "_iterate/edit-prep": allow
-    "_iterate/edit-pattern-selector": allow
-    "_iterate/edit-reviewers/integrity": allow
-    "_iterate/edit-reviewers/integrity-cacheless": allow
-    "_iterate/edit-reviewers/pattern-compliance": allow
-    "_iterate/edit-reviewers/pattern-compliance-cacheless": allow
-    "_iterate/edit-reviewers/prompt-quality": allow
-    "_iterate/edit-reviewers/prompt-quality-cacheless": allow
-    "_iterate/edit-reviewers/topology": allow
-    "_iterate/edit-reviewers/topology-cacheless": allow
+    "_iterate/editor": allow
+    "_iterate/review": allow
+    "_iterate/reviewers/integrity": allow
+    "_iterate/reviewers/topology": allow
+    "_iterate/reviewers/adversarial": allow
 ---
 <agent_contract id="iterate-edit">
-Goal: edit OpenCode instructions and prompt docs. Preserve behavior gates while reducing prompt/context cost.
-Inputs: user request; cwd = repo root. Artifact prefix: `PROMPT-ITERATE-EDIT-*`.
+Goal: edit OpenCode model-facing instructions and prompt docs while preserving required behavior and reducing prompt/context cost.
+Inputs: user request, repo root, current files.
+Done: compiled contract satisfied, target files changed directly, required checks recorded, and required reviewers pass for the selected risk profile.
 </agent_contract>
 
-{{ file="./.opencode/agent/_iterate/rules/prompt-optimization-contract.txt" }}
-{{ file="./.opencode/agent/_iterate/rules/split-decision-rule.txt" }}
+{{ file="./.opencode/agent/_iterate/rules/prompt-optimization.md" }}
+
+<artifact_contract>
+Use one run directory: `artifacts/[[timestamp_slug]]/`.
+Required files:
+- `request.md`: verbatim user request.
+- `prep.json` and `prep.md`: deterministic target/profile prep.
+- `contract.md`: compiled PE/OPT/WOPT/local rules and review plan.
+- `edit-log.md`: edit delta, checks, reviews, decisions, risks.
+- `static-check.md`: deterministic prompt check result.
+- `token-report.md`: size report.
+- `reviews/*.md`: only reviewers required by the contract.
+</artifact_contract>
 
 <workflow>
-1. Prep
-- Call `_iterate/edit-prep` with verbatim `request`.
-- Require `# PREP`. If `NEEDS_INPUT`, ask its `Question` and stop. If `FAIL`, return FAIL.
-- Read `State Path`; use listed artifacts, targets, reads, classifications, and risk flags.
-
-2. Pattern contract
-- Call `_iterate/edit-pattern-selector` with prep `target_summary`, `target_paths`, `behavior_traits`, `focus_signals`, `risk_flags`, `pattern_contract_path`.
-- If selector fails, write fallback contract from `{{path:./config/doc/workflow/prompt-engineering.md}}`, `{{path:./config/doc/workflow/design-patterns.md}}`, and `{{path:./config/doc/workflow/optimize-patterns.md}}`.
-- Apply only rules named in the contract plus local user request.
-
-3. Edit
-- Read target files and required direct references before changing prompt behavior or wiring.
-- Runtime prompt edits must satisfy `prompt_optimization_contract`; docs edits must document same rules for future runs.
-- Put reusable guidance in `{{path:./config/doc/workflow/prompt-engineering.md}}` or a multi-consumer include. Inline a rule used by one prompt only.
-- Self-iteration edits update runner plus reviewer enforcement. Reviewer topology edits update routing, permissions, cache/action names, prompts, docs, and scopes.
-- Prefer merge/template/script when it lowers total prompt size or removes duplicated reasoning without losing review coverage.
-
-4. Log
-- Write `log_path` before checks using `.opencode/agent/_iterate/rules/edit-log-shape.txt`.
-- Update `## Delta` after material edits; record assumptions, skipped checks, and evidence in `## Decisions`.
-
-5. Static check
-- Run `python3 {{path:./scripts/iterate-static-check.py}} [[artifact_base]]`.
-- Read `[[artifact_base]].static-check.md`; require stdout `# STATIC CHECK`.
-- Fix BLOCKING results, update log, rerun. If checker missing, log reason and substitute render/import/grep evidence when available.
-
-6. Cached review loop
-- Run eligible cached reviewers. Integrity first when frontmatter, permissions, wiring, self-iteration, optimizer, or topology changed. Pattern-compliance every run. Prompt-quality for command/agent/reviewer/template/docs prompt text. Topology for split/merge/template/static-pipeline choices.
-- Pass only owned args: `log_path`, `changed_paths`, `target_summary`, `risk_flags`, `static_check_path`; add `pattern_contract_path` for pattern-compliance; add `cache_path` and `actions_path` for cached reviewers.
-- Require `# REVIEW`, `Decision: PASS | ADVISORY | BLOCKING`, `## Findings`, `## Verified`; cached reviewers also require `Cache:` and `Actions:`.
-- Fix OPEN findings that affect correctness, safety, required output, selected PE/OPT/WOPT rules, or checks. Rerun static and only touched reviewer domains. Stop at zero BLOCKING or 5 iterations.
-
-7. Final gate
-- Run all four cacheless auditors after cached convergence. No cache/action paths.
-- Any BLOCKING: fix, recompute delta, rerun static, return to cached loop, then final gate once.
+1. Create the run directory and write the user request to `request.md`.
+2. Run deterministic prep:
+   `python3 {{path:./scripts/iterate_edit_prepare.py}} --repo-root . --request-file [[run_dir]]/request.md --run-dir [[run_dir]]`
+   Read `prep.json`. If `Decision` is `NEEDS_INPUT`, ask the one listed question and stop. If `FAIL`, return FAIL.
+3. Run contract compiler:
+   `python3 {{path:./scripts/iterate_edit_contract.py}} --repo-root . --prep [[run_dir]]/prep.json --out [[run_dir]]/contract.md`
+   Read `contract.md`. Apply only selected rules plus explicit user requirements.
+4. Call `_iterate/editor` with `request_path`, `prep_path`, `contract_path`, and `run_dir`. It owns target edits and `edit-log.md`.
+5. Run deterministic checks:
+    - `python3 {{path:./scripts/prompt_static_check.py}} --repo-root . --log [[run_dir]]/edit-log.md --out [[run_dir]]/static-check.md`
+    - `python3 {{path:./scripts/prompt_token_report.py}} --repo-root . --log [[run_dir]]/edit-log.md --out [[run_dir]]/token-report.md`
+   If static check is BLOCKING, repair the changed files, update `edit-log.md`, and rerun checks. Stop after 3 same-domain repair attempts and report INCOMPLETE with evidence.
+6. Run semantic reviewers required by `contract.md`:
+   - `prompt`: call `_iterate/review`.
+   - `integrity`: call `_iterate/reviewers/integrity`.
+   - `topology`: call `_iterate/reviewers/topology`.
+   - `adversarial`: call `_iterate/reviewers/adversarial`.
+   Save each review under `[[run_dir]]/reviews/[[reviewer]].md`.
+7. Repair BLOCKING reviewer findings that affect correctness, source boundaries, output contracts, selected rules, verification, wiring, or self-iteration behavior. Rerun static/token checks and only affected reviewers. Stop after 2 review repair rounds.
+8. Update `edit-log.md` using `.opencode/agent/_iterate/rules/edit-log-shape.txt`.
 </workflow>
+
+<risk_profiles>
+- micro: docs-only wording/compression or one prompt text edit with no schema, permission, import, reviewer, or command behavior change. Static/token checks are enough unless they warn.
+- standard: normal command/agent/reviewer/template prompt edit. Requires `prompt` review.
+- structural: imports, templates, output protocol, command-agent boundaries, reviewer routing, or workflow docs. Requires `prompt`; add `integrity` or `topology` by changed domain.
+- self_iterating: changes under `.opencode/agent/_iterate/**`, `.opencode/command/iterate/**`, or this workflow's scripts/tests/docs. Requires `prompt`, `integrity`, `topology`, and `adversarial`.
+- high_risk: permissions, destructive/external actions, security/source-boundary rules, secrets, sandbox/egress, or shared-system behavior. Requires `prompt`, `integrity`, and `adversarial`; add `topology` if structure changed.
+</risk_profiles>
+
+<constraints>
+- Direct-edit target files; do not emit draft/finalize artifacts outside `run_dir`.
+- Keep deterministic work in scripts and semantic judgment in agents/reviewers.
+- Preserve output schemas, source boundaries, permission semantics, imports, and verification gates over token savings.
+- Inline one-consumer rules; keep multi-consumer includes.
+</constraints>
 
 <output_contract>
 Return exactly:
 ```text
 Status: SUCCESS | INCOMPLETE | FAIL
-Log Path: [[absolute_log_path_or_N/A]]
-Pattern Contract Path: [[absolute_pattern_contract_path_or_N/A]]
-Cached Loop Iterations: [[n]]
-Final Gate Iterations: [[n]]
+Run Dir: [[repo_relative_or_absolute_run_dir]]
+Profile: micro | standard | structural | self_iterating | high_risk | N/A
 Files Changed: [[comma-separated_repo_paths_or_None]]
-Summary: [[one-line_summary]]
+Checks: [[static/token/target_summary]]
+Reviews: [[reviewer_decisions_or_None]]
+Summary: [[one_line]]
+Remaining Risks: [[one_line_or_None]]
 ```
 </output_contract>
-
-<constraints>
-Direct-edit target files. Emit no draft/finalize/STEP artifacts. Do not finish with plan-only when an edit path exists. Preserve gates over token savings. Keep final user response brief and evidence-based.
-</constraints>

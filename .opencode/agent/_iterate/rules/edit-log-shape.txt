@@ -1,56 +1,47 @@
-<edit_log_shape>
-Use exact markdown shape:
+# Iterate Edit Log Shape v4
+
+Use this shape for [[run_dir]]/edit-log.md.
+
 ```markdown
 # Iterate Edit Log
-## Raw Request
+Schema: v4
+
+## Request
 [[verbatim_user_request]]
+
+## Run
+- Profile: micro | standard | structural | self_iterating | high_risk
+- Run Dir: {{path:[[absolute_or_repo_relative_run_dir]]}}
+- Prep: {{path:[[prep_path]]}}
+- Contract: {{path:[[contract_path]]}}
+
 ## Targets
-- [[repo_relative_path]] - [[why_touched]]
-## Pattern Contract
-- Path: [[pattern_contract_path]]
-- Status: WRITTEN | FALLBACK_WRITTEN | MISSING
-## Classification
-- Prompt Kind: [[command|agent|reviewer|docs|mixed]]
-- Consumer: [[LLM-runtime|human-doc|machine-output|mixed]]
-- Behavior Traits: [[comma_list]]
-- Focus Signals: [[comma_list]]
-- Risk Flags: [[comma_list]]
-## Selected Patterns
-- PE-### | [[carry-in]]
-- OPT-### | [[carry-in]]
-- WOPT-### | [[carry-in]]
+- {{gitpath:[[repo_relative_path]]}} - [[why_touched]]
 - None
+
+## Contract Summary
+- Required Rules: [[PE-ids_and_local_rules_or_None]]
+- Conditional Rules: [[OPT/WOPT_ids_or_None]]
+- Required Checks: [[checks_or_None]]
+- Required Reviewers: [[prompt|integrity|topology|adversarial|None]]
+
 ## Delta
-- [[path]] - Status: New | Changed | Unchanged; Why: [[smallest_reason]]
-## Review Ledger
-### Static Check
-- Decision: PASS | BLOCKING | NOT_RUN
-- Result: [[path_or_None]]
-### Cached Loop
-- Iterations: [[n]]
-#### Integrity
-- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
-- Cache: [[path_or_None]]
-#### Pattern Compliance
-- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
-- Cache: [[path_or_None]]
-#### Prompt Quality
-- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
-- Cache: [[path_or_None]]
-#### Topology
-- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
-- Cache: [[path_or_None]]
-### Final Gate (Cacheless)
-- Iterations: [[n]]
-#### Integrity
-- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
-#### Pattern Compliance
-- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
-#### Prompt Quality
-- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
-#### Topology
-- Decision: PASS | ADVISORY | BLOCKING | NOT_RUN
+- {{path:[[path]]}} - Added | Changed | Removed | Unchanged; [[short_reason]]
+
+## Checks
+- Static: PASS | BLOCKING | NOT_RUN - {{path:[[path_or_reason]]}}
+- Token Report: PASS | NOT_RUN - {{path:[[path_or_reason]]}}
+- Target Checks: [[command/result_or_reason_or_None]]
+
+## Reviews
+- Prompt: PASS | ADVISORY | BLOCKING | NOT_RUN - [[summary]]
+- Integrity: PASS | ADVISORY | BLOCKING | NOT_RUN - [[summary]]
+- Topology: PASS | ADVISORY | BLOCKING | NOT_RUN - [[summary]]
+- Adversarial: PASS | ADVISORY | BLOCKING | NOT_RUN - [[summary]]
+
 ## Decisions
-- [DEC-001] [[safe_assumption_or_skipped_check_or_evidence_or_cross_domain_decision_or_None]]
+- [DEC-001] [[decision_or_assumption_or_None]]
+
+## Remaining Risks
+- [[risk_or_None]]
 ```
-</edit_log_shape>
