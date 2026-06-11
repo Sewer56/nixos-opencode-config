@@ -39,9 +39,9 @@
       nixpkgs.lib.genAttrs systems (system: fn system (mkPkgs system));
 
     # ── Tool derivations (shared by packages / apps / devShells) ──────────
-    # Go:   opencode-model-tiers  — TUI/CLI for model tier assignments
-    #        opencode-work-mode    — thin "work" shortcut over model-tiers
-    # Rust: opencode-sessions     — browse/export OpenCode SQLite sessions
+    # Go:   opencode-model-tiers  - TUI/CLI for model tier assignments
+    #       opencode-work-mode    - Switches to 'work' mode.
+    # Rust: opencode-sessions     - browse/export OpenCode SQLite sessions
     mkTools = pkgs: rec {
       opencode-model-tiers = pkgs.buildGoModule {
         pname = "opencode-model-tiers";
@@ -138,7 +138,7 @@
         opencodeScript
         opencodeBuildScript
 
-        # Built CLI tools — land on PATH after activation.
+        # Built CLI tools - land on PATH after activation.
         tools.opencode-model-tiers
         tools.opencode-work-mode
         tools.opencode-sessions
@@ -202,7 +202,7 @@
     devShells = eachSystem (system: pkgs: let
       tools = self.packages.${system};
       rustToolchain = pkgs.rust-bin.stable.latest.default.override {
-        extensions = ["rust-src"];   # needed for rust-analyzer type info
+        extensions = ["rust-src"]; # needed for rust-analyzer type info
       };
     in {
       default = pkgs.mkShell {
@@ -219,7 +219,7 @@
           pkgs.pkg-config
           pkgs.stdenv.cc
 
-          # Built CLI tools — ready to run inside the shell.
+          # Built CLI tools - ready to run inside the shell.
           tools.opencode-model-tiers
           tools.opencode-work-mode
           tools.opencode-sessions
