@@ -5,7 +5,7 @@ Prefer the existing file/module. Create new modules or files only when module bo
 Split catch-all files into focused, domain-named modules. Do not collapse modular code into monoliths unless the user asks.
 
 ### Entrypoint and models
-Keep orchestration in the entrypoint file/module. Keep data-holder models in dedicated `models` modules/directories where the repo supports it. Keep `models` barrel/index files for wiring and re-exports, not concrete definitions.
+Keep orchestration in the entrypoint file/module. Put data-holder models in dedicated `models` modules/directories when the repo supports it. Keep `models` barrel/index files for wiring and re-exports, not concrete definitions.
 
 ### Type and conversion ownership
 Keep enums, newtypes, and value objects with the parent type when only that parent uses them. Keep non-public helper types local. Keep conversions next to the type; avoid global `conversions` buckets.

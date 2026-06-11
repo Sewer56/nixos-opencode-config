@@ -1,14 +1,14 @@
 ### Public API classification
-Gather evidence per item for each override condition. Check all that apply:
+For each item, gather only evidence needed by the override table:
 
-- **Re-exports** (rule 1): grep for re-exports (`pub use`, `export.*from`, `__init__.py` re-imports, `public fun` delegating). Count only cross-module re-exports. Same-module = internal organization, not external demand.
-- **Doc contract** (rule 2): read doc comments for API guarantees or `# API` sections.
-- **Derive macros** (rule 3): check if item is field on struct/enum with derive attributes that access fields or generate public methods.
-- **Trait impl** (rule 4): check if item appears in `impl Trait for Type` where type is not fully private.
-- **Binary/FFI** (rule 5): grep binary targets, examples, FFI bindings for the item.
-- **Reflection/DI** (rule 6): grep for string-name lookups (e.g. `getattr`); see language file for full per-runtime list.
+- **Re-exports:** grep cross-module re-exports (`pub use`, `export.*from`, `__init__.py` re-imports, `public fun` delegating). Same-module re-exports are internal organization.
+- **Doc contract:** read doc comments and `# API` sections for public guarantees.
+- **Derive macros:** check fields on structs/enums with derives that access fields or generate public methods.
+- **Trait impl:** check `impl Trait for Type` where the type is not fully private.
+- **Binary/FFI:** grep binaries, examples, and FFI bindings.
+- **Reflection/DI:** grep string-name lookups such as `getattr`; use language rules for runtime-specific cases.
 
-Rules evaluated top-to-bottom; first match wins.
+Evaluate top-to-bottom; first match wins.
 
 | # | Condition | Decision |
 |---|-----------|----------|
@@ -33,5 +33,5 @@ For every candidate, map Restriction Hint to target visibility in diff:
 - `can-be-package-private` → remove `public`/`protected`, leaving default access (Java only)
 - `can-be-internal` → add `internal` modifier (Kotlin only)
 - `can-be-pub-super` → `pub(super)` (Rust only)
-- `can-be-pub-in(<path>)` → `pub(in <path>)` using path from collector hint (Rust only)
+- `can-be-pub-in([[path]])` → `pub(in [[path]])` using path from collector hint (Rust only)
 - `none` → needs current scope but over-exposed vs external demand; restriction hint override above reclassifies as MANUAL REVIEW

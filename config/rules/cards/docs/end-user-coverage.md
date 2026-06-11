@@ -1,17 +1,14 @@
 ### Referenced-doc coverage
 Each planned code change that end-user docs reference needs a matching docs item to update or create docs.
-Bad: changes CLI flag behavior with no README or guide update item.
-Good: code item plus docs item naming the affected file and section.
+Block public behavior changes with no named README/guide/reference update when docs mention that surface.
 
 ### New-surface docs coverage
 Each planned item adding user-facing surface without existing docs needs a docs creation item.
-Bad: adds public command but no docs plan.
-Good: adds command and creates or updates the user guide.
+Block new public commands, flags, APIs, or UI flows without docs creation or update.
 
 ### Docs specificity
 Generic `update docs` blocks. Specify file, scope level, affected sections, and what changes.
-Bad: `Update docs.`
-Good: `Update README Usage section to document --watch behavior and example command.`
+Required shape: file, section/scope, and concrete behavior to document.
 
 ### End-user docs boundary
 Focus on end-user documentation: READMEs, wiki, guides, changelogs, reference pages, and migration docs.

@@ -1,13 +1,13 @@
 ### Minimum visibility
 Apply only to declarations introduced by the reviewed change or existing declarations whose visibility/export changed. Pre-existing unchanged declarations are out of scope.
 
-For each changed visible declaration, gather evidence before deciding:
-- Identify the declaration name, file, current visibility, defining scope, and change source.
-- Search the repository for direct usages, imports, re-exports, and barrel exports for that name.
-- Ignore the declaration itself, same-file references when checking cross-file demand, test-only references when production visibility is not required, and generated/vendor/build outputs unless the reviewed change edits them.
-- Check override evidence: re-export by another module's public API, documented API contract, derive or macro visibility requirement, trait-impl requirement, binary/example/FFI usage, or reflection/string/DI usage.
+For each changed visible declaration, gather before deciding:
+- Name, file, current visibility, defining scope, and change source.
+- Targeted repo search for direct uses, imports, re-exports, and barrel exports.
+- Ignore self references, same-file references for cross-file demand, test-only references unless production visibility is required, and generated/vendor/build outputs unless changed.
+- Override evidence: public re-export, documented API contract, derive/macro visibility requirement, trait-impl requirement, binary/example/FFI use, or reflection/string/DI use.
 
-Rules are evaluated top-to-bottom; first match wins.
+Evaluate top-to-bottom; first match wins.
 
 | # | Condition | Decision |
 |---|-----------|----------|

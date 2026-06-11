@@ -1,12 +1,9 @@
 ### Acceptance lens
 Tests must prove behavior the implementation could get wrong. Never write tests that only assert what the compiler or type system already guarantees (e.g., field access after assignment, enum variant identity, trivial delegation).
-Bad: field-access test (`assert_eq!(ctx.field, "val")`), enum-variant-existence test (`assert_eq!(Variant::A, Variant::A)`), asserting private helper call order.
-Good: test asserts observable behavior tied to an acceptance criterion.
+Prefer observable behavior tied to an acceptance criterion over private helper call order.
 
 ### Changed behavior coverage
 Cover critical new or changed behavior, including success, failure, and relevant edge cases. Cover all new code when the task requires tests.
-Bad: new error path has no test.
-Good: test covers success, failure, and relevant edge case.
 
 ### Redundancy
 Avoid duplicate coverage and setup; do not restate what an existing test already proves.

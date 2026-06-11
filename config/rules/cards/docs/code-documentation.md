@@ -10,18 +10,16 @@ Package docs cover import/usage shape; in-code docs cover exported symbols. Upda
 
 ### Documentation fidelity
 Docs must not contradict implementation. When documented surfaces are moved, renamed, or replaced, preserve or update affected docs.
-Bad: docs use an old option name after code renames it.
-Good: docs and code use the same option name and behavior.
+Block stale names, options, defaults, links, examples, or behavior.
 
 ### Inline readability comments
 Non-trivial function bodies need short inline comments at logical steps when names and control flow do not explain intent.
 Skip: trivial assignments, getters, direct delegation, and code already explained by names.
-Bad: a multi-step parser normalizes aliases before validation with no comment explaining why order matters.
-Good: `// Normalize aliases before validation so deprecated names share one error path.`
+Example: `// Normalize aliases before validation so deprecated names share one error path.`
 
 ### Documentation style
 Lead with a one-sentence purpose in plain language. Prefer goal-oriented phrasing. Use language-native doc-link syntax for types/variants when supported. Prefer short in-text doc links plus reference definitions over long inline link targets. Always include language tags on fenced code blocks; never use bare `ignore` fences.
-Bad: `[Name](long.target.path)` repeated inline. Good: `[Name]` in text and `[Name]: long.target.path` after the section.
+Prefer `[Name]` in text plus one reference definition over repeated long inline targets.
 
 ### No legacy docs backfill
 Do not backfill untouched legacy files solely for docs.
