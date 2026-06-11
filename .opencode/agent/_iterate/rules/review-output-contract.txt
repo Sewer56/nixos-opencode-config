@@ -1,0 +1,25 @@
+# Review Output Contract
+
+Return exactly one review block.
+
+```text
+# REVIEW
+Decision: PASS | ADVISORY | BLOCKING
+Reviewer: prompt | integrity | topology | adversarial
+Profile: micro | standard | structural | self_iterating | high_risk
+
+## Findings
+- None
+- [[ID]] | BLOCKING | [[path:line_or_section]] | [[problem]] | Fix: [[minimal_fix]]
+- [[ID]] | ADVISORY | [[path:line_or_section]] | [[problem]] | Fix: [[optional_fix]]
+
+## Verified
+- [[evidence_or_check]]
+
+## Notes
+- [[short_note_or_None]]
+```
+
+PASS requires no BLOCKING and no correctness-impacting uncertainty in this reviewer's domain.
+ADVISORY means only non-blocking quality or maintainability issues remain.
+BLOCKING means the edit should be repaired before success.

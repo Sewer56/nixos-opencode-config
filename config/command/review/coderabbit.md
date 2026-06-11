@@ -1,6 +1,6 @@
 ---
 description: "Run CodeRabbit CLI review and auto-apply fixes"
-agent: coderabbit
+agent: _review/coderabbit
 ---
 
 Run CodeRabbit review on current changes and automatically apply all findings.

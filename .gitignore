@@ -25,3 +25,6 @@ tools/model-tiers/opencode-model-tiers
 *.review-*.b.md
 *.review-*.a.actions.*.md
 *.review-*.b.actions.*.md
+
+# LLM Artifacts
+artifacts/*
