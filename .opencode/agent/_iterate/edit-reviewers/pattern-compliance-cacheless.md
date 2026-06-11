@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Final-gate cacheless pattern-compliance audit for direct prompt edits
-model: sewer-axonhub/minimax-m3 # HIGH-INSTRUCTION
+model: sewer-axonhub/deepseek-v4-pro # HIGH-INSTRUCTION
 variant: medium
 permission:
   "*": deny

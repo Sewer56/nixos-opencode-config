@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Cached pattern-compliance review for direct prompt edits
-model: sewer-axonhub/minimax-m3 # HIGH-INSTRUCTION
+model: sewer-axonhub/deepseek-v4-pro # HIGH-INSTRUCTION
 variant: medium
 permission:
   "*": deny
