@@ -1,6 +1,6 @@
 # OpenCode Config
 
-Self-hosted [OpenCode](https://opencode.ai) with a Home Manager module for
+Personal [OpenCode] setup with a Home Manager module for
 repeatable NixOS setup, pinned source, and multi-provider LLM routing.
 
 > [!WARNING]
@@ -400,3 +400,5 @@ OpenCode needs at runtime:
 
 - `~/.config/opencode` → this repo's `config/` directory
 - `~/opencode` → this repo's root (convenient access)
+
+[OpenCode]: https://opencode.ai
