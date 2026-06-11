@@ -27,7 +27,7 @@ Review an implementation against request intent from conversation context.
 
 # Scope
 - Own: request fidelity, plan-step application, severe regressions, unintended scope creep, critical error handling.
-- Do not judge: error-doc completeness or branding.
+- Do not judge: error-doc completeness.
 - Out-of-scope concerns get at most one short Advisory note; never a BLOCKING finding.
 
 {{ file="./rules/groups/implementation/target-implementation-review.md" }}

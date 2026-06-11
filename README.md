@@ -78,7 +78,6 @@ Clean up after an implementation with `/implement/cleanup-diff`.
 
 **Other**
 
-- `/branding/draft` — draft project names and brand direction for a given folder path (local)
 - `/workflow/optimize` — optimize workflow patterns
 
 ### Review Topology
@@ -196,7 +195,7 @@ setup is GLM + DeepSeek — model diversity beats temperature diversity.
 
 #### Single review (low-risk)
 
-Tests, performance, docs, branding, and placement domains use one reviewer
+Tests, performance, docs, and placement domains use one reviewer
 with `-cached` and `-cacheless` variants. No adjudicator.
 
 - **Cached**: writes history to `cache_path` and overwrites
