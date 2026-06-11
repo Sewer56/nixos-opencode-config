@@ -28,7 +28,8 @@
           "general": "allow",
           "mcp-search": "allow",
           "codebase-explorer": "allow"
-        }
+        },
+        "skill": "deny"
       }
     },
     "build": {
@@ -38,7 +39,8 @@
           "general": "allow",
           "mcp-search": "allow",
           "codebase-explorer": "allow"
-        }
+        },
+        "skill": "deny"
       }
     },
     "general": {
