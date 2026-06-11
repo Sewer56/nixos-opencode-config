@@ -3,7 +3,7 @@
 Human reference for writing model-facing instructions.
 
 Companion LLM-facing rules:
-`{{path:./config/doc/workflow/prompt-engineering.md}}`
+`{{path:./.opencode/agent/_iterate/docs/prompt-engineering.md}}`
 
 Scope: prompt text. Harness/config advice is only included to say “do not put this in prompt.”
 

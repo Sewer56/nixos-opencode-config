@@ -78,8 +78,6 @@ Clean up after an implementation with `/implement/cleanup-diff`.
 
 **Other**
 
-- `/workflow/optimize` — optimize workflow patterns
-
 ### Review Topology
 
 #### Cache/action contract

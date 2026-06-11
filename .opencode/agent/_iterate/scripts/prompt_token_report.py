@@ -20,7 +20,7 @@ Input
 
   # Direct paths:
   ./prompt_token_report.py \\
-    --paths .opencode/agent/_iterate/edit.md config/doc/workflow/prompt-engineering.md \\
+    --paths .opencode/agent/_iterate/edit.md .opencode/agent/_iterate/docs/prompt-engineering.md \\
     --out artifacts/20250611-120000/token-report.md
 
   # Fallback via contract + log:
@@ -38,7 +38,7 @@ token-report.md (example):
   | File | Words | Chars | Est Tokens |
   | --- | ---: | ---: | ---: |
   | `.opencode/agent/_iterate/edit.md` | 1203 | 8734 | 2184 |
-  | `config/doc/workflow/prompt-engineering.md` | 24510 | 187200 | 46800 |
+  | `.opencode/agent/_iterate/docs/prompt-engineering.md` | 24510 | 187200 | 46800 |
   | `.opencode/agent/_iterate/editor.md` | 3421 | 23891 | 5973 |
 
   Total words: 29134
@@ -108,7 +108,7 @@ def main() -> int:
         ),
         epilog=(
             "Examples:\n"
-            "  %(prog)s --paths .opencode/agent/_iterate/edit.md config/doc/workflow/prompt-engineering.md --out report.md\n"
+            "  %(prog)s --paths .opencode/agent/_iterate/edit.md .opencode/agent/_iterate/docs/prompt-engineering.md --out report.md\n"
             "  %(prog)s --contract artifacts/run/contract.md --log artifacts/run/edit-log.md --out artifacts/run/token-report.md\n\n"
             "At least one of --paths, --contract, or --log should be provided."
         ),

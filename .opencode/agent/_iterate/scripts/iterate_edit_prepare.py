@@ -191,11 +191,11 @@ def extract_path_hints(repo: Path, request: str) -> list[str]:
                 paths.append(rel)
     if "workflow" in lower or "prompt-engineering" in lower or "prompt engineering" in lower:
         for rel in [
-            "config/doc/workflow/prompt-engineering.md",
+            ".opencode/agent/_iterate/docs/prompt-engineering.md",
             "workflow/prompt-engineering.md",
-            "config/doc/workflow/design-patterns.md",
+            ".opencode/agent/_iterate/docs/design-patterns.md",
             "workflow/design-patterns.md",
-            "config/doc/workflow/optimize-patterns.md",
+            ".opencode/agent/_iterate/docs/optimize-patterns.md",
             "workflow/optimize-patterns.md",
         ]:
             if path_exists(repo, rel) and rel not in seen:

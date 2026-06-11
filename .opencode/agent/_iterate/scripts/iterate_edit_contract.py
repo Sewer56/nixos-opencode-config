@@ -48,7 +48,7 @@ contract.md (human-readable):
 
   ## Required Reads
   - .opencode/agent/_iterate/editor.md
-  - config/doc/workflow/prompt-engineering.md
+  - .opencode/agent/_iterate/docs/prompt-engineering.md
 
   ## Required Prompt Rules
   - PE-001: Outcome contract: start with deliverable, scope, done criteria …
@@ -73,9 +73,9 @@ contract.md (human-readable):
   - prompt
 
   ## Source Docs
-  - prompt_engineering: config/doc/workflow/prompt-engineering.md
-  - design_patterns: config/doc/workflow/design-patterns.md
-  - optimize_patterns: config/doc/workflow/optimize-patterns.md
+  - prompt_engineering: .opencode/agent/_iterate/docs/prompt-engineering.md
+  - design_patterns: .opencode/agent/_iterate/docs/design-patterns.md
+  - optimize_patterns: .opencode/agent/_iterate/docs/optimize-patterns.md
 
   ## Local Constraints
   - Apply explicit user requirements before optional compression.
@@ -97,9 +97,9 @@ contract.json (machine-readable):
     "checks": ["prompt_static_check.py", "prompt_token_report.py"],
     "reviewers": ["prompt"],
     "source_docs": {
-      "prompt_engineering": "config/doc/workflow/prompt-engineering.md",
-      "design_patterns": "config/doc/workflow/design-patterns.md",
-      "optimize_patterns": "config/doc/workflow/optimize-patterns.md"
+      "prompt_engineering": ".opencode/agent/_iterate/docs/prompt-engineering.md",
+      "design_patterns": ".opencode/agent/_iterate/docs/design-patterns.md",
+      "optimize_patterns": ".opencode/agent/_iterate/docs/optimize-patterns.md"
     }
   }
 """
@@ -305,9 +305,9 @@ def main() -> int:
         "checks": checks,
         "reviewers": reviewers,
         "source_docs": {
-            "prompt_engineering": existing_doc(repo, ["config/doc/workflow/prompt-engineering.md", "workflow/prompt-engineering.md"]),
-            "design_patterns": existing_doc(repo, ["config/doc/workflow/design-patterns.md", "workflow/design-patterns.md"]),
-            "optimize_patterns": existing_doc(repo, ["config/doc/workflow/optimize-patterns.md", "workflow/optimize-patterns.md"]),
+            "prompt_engineering": existing_doc(repo, [".opencode/agent/_iterate/docs/prompt-engineering.md", "workflow/prompt-engineering.md"]),
+            "design_patterns": existing_doc(repo, [".opencode/agent/_iterate/docs/design-patterns.md", "workflow/design-patterns.md"]),
+            "optimize_patterns": existing_doc(repo, [".opencode/agent/_iterate/docs/optimize-patterns.md", "workflow/optimize-patterns.md"]),
         },
     }
 
