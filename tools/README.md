@@ -12,8 +12,8 @@ Rust workspace for local OpenCode utilities.
 
 ## Shell helpers
 
-- `tools/scripts/render-file.sh <path>` — render one md-expand prompt file.
-- `tools/scripts/validate-file-interp.sh [paths...]` — validate md-expand references.
+- `tools/render-file.sh <path>` — render one md-expand prompt file.
+- `tools/validate-file-interp.sh [paths...]` — validate md-expand references.
 
 ## Examples
 

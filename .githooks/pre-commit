@@ -2,6 +2,5 @@
 set -eu
 
 repo_root="$(git rev-parse --show-toplevel)"
-cd "$repo_root/config"
-
-bun run check
+cd "$repo_root"
+exec tools/validate-file-interp.sh
