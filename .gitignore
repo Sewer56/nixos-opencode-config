@@ -19,6 +19,9 @@ result-*
 # direnv cache
 .direnv/
 
+# VSCode local reviews
+.vscode/local-reviews/
+
 # Review logs
 *.review-implementation.md
 *.review-implementation.actions.*.md
