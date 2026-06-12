@@ -16,7 +16,8 @@ pub fn load_config(env: &Env) -> anyhow::Result<LoadedConfig> {
     })
 }
 
-/// Derive canonical tier order from: $tierOrder in config → profile keys → file scan.
+/// Derive canonical tier order from: `$tierOrder` in config, then profile tier keys,
+/// then tier names discovered in agent markdown files.
 pub fn derive_tier_order(env: &Env, cfg: &Config) -> Vec<String> {
     let mut seen = std::collections::HashSet::new();
     let mut result = Vec::new();
@@ -25,10 +26,10 @@ pub fn derive_tier_order(env: &Env, cfg: &Config) -> Vec<String> {
     if let Some(order) = cfg.get("$tierOrder") {
         let mut indexed: Vec<(usize, String)> = Vec::new();
         for (k, v) in order {
-            if let Ok(idx) = k.parse::<usize>() {
-                if !v.is_empty() {
-                    indexed.push((idx, v.clone()));
-                }
+            if let Ok(idx) = k.parse::<usize>()
+                && !v.is_empty()
+            {
+                indexed.push((idx, v.clone()));
             }
         }
         indexed.sort_by_key(|(i, _)| *i);
@@ -98,15 +99,17 @@ pub fn validate_config(cfg: &Config, _tier_order: &[String]) -> anyhow::Result<(
             continue;
         }
         let keys: std::collections::HashSet<String> = values.keys().cloned().collect();
-        if first_keys.is_none() {
+        if let Some(ref first) = first_keys {
+            if keys != *first {
+                bail!(
+                    "profile {:?} tier keys differ from {:?}",
+                    profile,
+                    first_profile
+                );
+            }
+        } else {
             first_keys = Some(keys);
             first_profile = profile;
-        } else if keys != *first_keys.as_ref().unwrap() {
-            bail!(
-                "profile {:?} tier keys differ from {:?}",
-                profile,
-                first_profile
-            );
         }
         for (tier, model) in values {
             if model.trim().is_empty() {
@@ -121,10 +124,10 @@ pub fn validate_config(cfg: &Config, _tier_order: &[String]) -> anyhow::Result<(
 pub fn validate_work(values: &TierSet, tier_order: &[String]) -> anyhow::Result<()> {
     let mut bad = Vec::new();
     for tier in tier_order {
-        if let Some(model) = values.get(tier) {
-            if !model.starts_with(WORK_PROVIDER) {
-                bad.push(format!("{}={}", tier, model));
-            }
+        if let Some(model) = values.get(tier)
+            && !model.starts_with(WORK_PROVIDER)
+        {
+            bad.push(format!("{}={}", tier, model));
         }
     }
     if !bad.is_empty() {
@@ -140,7 +143,7 @@ pub fn validate_work(values: &TierSet, tier_order: &[String]) -> anyhow::Result<
 /// Save config atomically: write to .tmp, then rename.
 pub fn save_config(env: &Env, loaded: &LoadedConfig) -> anyhow::Result<()> {
     validate_config(&loaded.profiles, &loaded.tier_order)?;
-    let data = marshal_config(&loaded.profiles, &loaded.tier_order)?;
+    let data = marshal_config(&loaded.profiles, &loaded.tier_order);
     let tmp = format!("{}.tmp", env.tier_file);
     std::fs::write(&tmp, &data).context("write tier file tmp")?;
     std::fs::rename(&tmp, &env.tier_file).context("rename tier file")?;
@@ -148,7 +151,7 @@ pub fn save_config(env: &Env, loaded: &LoadedConfig) -> anyhow::Result<()> {
 }
 
 /// Marshal config to JSON preserving tier order (LOW/MED/HIGH) and profile order.
-pub fn marshal_config(cfg: &Config, tier_order: &[String]) -> anyhow::Result<String> {
+pub fn marshal_config(cfg: &Config, tier_order: &[String]) -> String {
     let mut out = String::from("{\n");
 
     // $tierOrder as first key
@@ -187,13 +190,10 @@ pub fn marshal_config(cfg: &Config, tier_order: &[String]) -> anyhow::Result<Str
         out.push('\n');
     }
     out.push_str("}\n");
-    Ok(out)
+    out
 }
 
-fn profile_names(cfg: &Config) -> Vec<&String> {
-    cfg.keys().filter(|k| !k.starts_with('$')).collect()
-}
-
+/// Return profile names (non-`$`-prefixed keys) from the config, sorted alphabetically.
 pub fn sorted_profiles(cfg: &Config) -> Vec<String> {
     let mut names: Vec<String> = cfg
         .keys()
@@ -204,12 +204,8 @@ pub fn sorted_profiles(cfg: &Config) -> Vec<String> {
     names
 }
 
-pub fn clone_tier_set(values: &TierSet, tier_order: &[String]) -> TierSet {
-    let mut copy = TierSet::new();
-    for tier in tier_order {
-        if let Some(v) = values.get(tier) {
-            copy.insert(tier.clone(), v.clone());
-        }
-    }
-    copy
+fn profile_names(cfg: &Config) -> Vec<&String> {
+    cfg.keys().filter(|k| !k.starts_with('$')).collect()
 }
+
+

@@ -35,10 +35,3 @@ pub struct ApplyResult {
     pub lines: usize,
 }
 
-/// Sorted model → count pair used in display helpers.
-#[allow(dead_code)]
-#[derive(Debug, Clone)]
-pub struct CountItem {
-    pub model: String,
-    pub count: usize,
-}

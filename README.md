@@ -15,7 +15,7 @@ update it often enough that tracking OS/system changes becomes hard.
 
 ```
 .
-├── default.nix            # Home Manager module (packages, symlinks)
+├── flake.nix              # Flake with Home Manager module (packages, symlinks)
 ├── opencode-source/       # Pinned OpenCode source (submodule)
 ├── config/                # Active OpenCode configuration (symlinked)
 │   ├── opencode.json      # Provider, agent, MCP, and permission config
@@ -26,13 +26,12 @@ update it often enough that tracking OS/system changes becomes hard.
 │   ├── rules/             # Coding and documentation rules (cards + groups)
 │   └── plugins/           # TypeScript plugins
 ├── plugins/               # Local plugin source packages
-├── scripts/               # Utility scripts
-├── tools/                 # Workflow tools (Python and Go)
-└── AGENTS.md              # Repo-level agent instructions
+├── tools/                 # Workflow tools (Rust workspace)
+└── OPTIMIZATIONS.md       # Optimization notes
 ```
 
 `config/` is symlinked to `~/.config/opencode` at build time (see
-[default.nix](default.nix)).
+[flake.nix](flake.nix)).
 
 ## Configuration
 
@@ -301,7 +300,7 @@ model (used for titles) is Step 3.7 Flash.
 
 ### Model tiers
 
-Tier presets are discovered from `scripts/model-tiers.json` at runtime.
+Tier presets are discovered from `config/model-tiers.json` at runtime.
 A `$tierOrder` key declares the canonical tier list and display order:
 
 ```json
@@ -326,36 +325,26 @@ The tool rewrites only the model token and preserves the tier marker comment
 (e.g. `# LOW`, `# MED`, `# HIGH`). Unmarked `model:` lines are left untouched.
 
 ```bash
-scripts/opencode-model-tiers              # TUI
-scripts/opencode-model-tiers status
-scripts/opencode-model-tiers apply normal --dry-run
-scripts/opencode-model-tiers apply normal
-scripts/opencode-work-mode --dry-run
-scripts/opencode-work-mode
-scripts/opencode-model-tiers set normal MED sewer-axonhub/MiniMax-M3
+opencode-model-tiers              # Launch TUI (default profile)
+opencode-model-tiers normal       # Launch TUI with "normal" profile
+opencode-model-tiers bogus        # Error: "unknown profile: bogus" + lists available profiles
+opencode-model-tiers a b          # Error: "usage: opencode-model-tiers [profile]"
 ```
 
-The TUI reads choices from `opencode models`, supports typed filtering, previews
-file changes, saves `scripts/model-tiers.json` (including the `$tierOrder` key),
+The TUI reads choices from the config, supports typed filtering, previews
+file changes, saves tier assignments (including the `$tierOrder` key),
 and can apply the selected profile.
-Work mode is guarded to only use `sewer-axonhub-work/*` models.
 
-Extra CLI helpers:
-
-```bash
-scripts/opencode-model-tiers models
-scripts/opencode-model-tiers models --work
-scripts/opencode-model-tiers configure work
-```
-
-The Go app can also be run through the root flake:
+The binary can also be run through the root flake:
 
 ```bash
-nix run .#opencode-model-tiers -- status
 nix run .#opencode-model-tiers
-nix run .#opencode-work-mode -- --dry-run
+nix run .#opencode-model-tiers -- normal
 ```
 
+The binary accepts an optional profile name. With no arguments it opens the TUI
+with the first profile. Invalid profiles produce `"unknown profile: <name>"` and
+list available profiles. More than one argument prints a usage message.
 Root `direnv` support is enabled through `.envrc` / `flake.nix`; run
 `direnv allow` after cloning or changing the dev shell.
 
@@ -383,7 +372,7 @@ opencode /path/to/project
 
 ## Nix Module
 
-`default.nix` provides two shell wrappers and installs the dependencies
+`flake.nix` provides two shell wrappers and installs the dependencies
 OpenCode needs at runtime:
 
 | Package                   | Purpose                                                                                         |

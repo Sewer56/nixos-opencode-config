@@ -4,7 +4,7 @@ Rust workspace for local OpenCode utilities.
 
 ## Binaries
 
-- `opencode-model-tiers` — TUI/CLI for `# LOW` / `# MED` / `# HIGH` model tiers. Config: `config/model-tiers.json`.
+- `opencode-model-tiers` — TUI for `# LOW` / `# MED` / `# HIGH` model tiers. Config: `config/model-tiers.json`.
 - `opencode-sessions` — browse/export OpenCode SQLite sessions.
 - `chunk-files-by-tokens` — split files/directories into token-sized chunks.
 - `token-count-after-expand` — render md-expand prompt files and estimate tokens.
@@ -18,9 +18,8 @@ Rust workspace for local OpenCode utilities.
 ## Examples
 
 ```bash
-cargo run -p opencode-model-tiers -- status
-cargo run -p opencode-model-tiers -- apply normal --dry-run
-cargo run -p opencode-model-tiers -- work
+cargo run -p opencode-model-tiers              # Launch TUI (default profile)
+cargo run -p opencode-model-tiers -- normal    # Launch TUI with "normal" profile
 cargo run -p chunk-files-by-tokens -- -s 32000 config/agent
 cargo run -p token-count-after-expand -- config/agent/mcp-search.md
 cargo run -p iterate-static-check -- PROMPT-EXAMPLE

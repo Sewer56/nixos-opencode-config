@@ -36,18 +36,6 @@ pub fn parse_models_output(output: &str) -> anyhow::Result<Vec<String>> {
     Ok(models)
 }
 
-/// Validate that all given models are known to opencode.
-pub fn validate_known(env: &Env, models: &[String]) -> anyhow::Result<()> {
-    let known = available_models(env)?;
-    let known_set: std::collections::HashSet<&String> = known.iter().collect();
-    let unknown: Vec<&String> = models.iter().filter(|m| !known_set.contains(m)).collect();
-    if !unknown.is_empty() {
-        let names: Vec<&str> = unknown.iter().map(|s| s.as_str()).collect();
-        bail!("unknown model(s): {}", names.join(", "));
-    }
-    Ok(())
-}
-
 /// Filter models by case-insensitive space-separated token query.
 /// Work profile additionally requires `sewer-axonhub-work/` prefix.
 pub fn filter_models(profile: &str, models: &[String], query: &str) -> Vec<String> {

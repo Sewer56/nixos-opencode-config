@@ -39,7 +39,7 @@ fn test_marshal_config_keeps_tier_order() {
     let mut cfg = Config::new();
     cfg.insert("work".into(), work);
 
-    let data = config::marshal_config(&cfg, &tier_order).unwrap();
+    let data = config::marshal_config(&cfg, &tier_order);
     let want = "{\n  \"$tierOrder\": {\"0\": \"LOW\",\"1\": \"MED\",\"2\": \"HIGH\"},\n  \"work\": {\n    \
                 \"LOW\": \"sewer-axonhub-work/low\",\n    \"MED\": \"sewer-axonhub-work/med\",\n    \
                 \"HIGH\": \"sewer-axonhub-work/high\"\n  }\n}\n";
@@ -89,21 +89,6 @@ fn test_validate_config_rejects_empty_model_values() {
     let err = config::validate_config(&cfg, &tier_order).unwrap_err();
     assert!(err.to_string().contains("empty model"));
 }
-
-#[test]
-fn test_clone_tier_set_preserves_only_ordered_tiers() {
-    let tier_order = vec!["LOW".to_string(), "MED".to_string()];
-    let mut values = TierSet::new();
-    values.insert("LOW".into(), "low".into());
-    values.insert("MED".into(), "med".into());
-    values.insert("EXTRA".into(), "extra".into());
-    let cloned = config::clone_tier_set(&values, &tier_order);
-    assert_eq!(cloned.len(), 2);
-    assert_eq!(cloned.get("LOW"), Some(&"low".to_string()));
-    assert_eq!(cloned.get("MED"), Some(&"med".to_string()));
-    assert!(!cloned.contains_key("EXTRA"));
-}
-
 #[test]
 fn test_load_config_reads_tier_file() {
     let json = r#"{

@@ -1041,7 +1041,6 @@ name = "opencode-model-tiers"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "clap",
  "crossterm",
  "ratatui",
  "regex",
