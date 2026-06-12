@@ -39,76 +39,57 @@
       nixpkgs.lib.genAttrs systems (system: fn system (mkPkgs system));
 
     # ── Tool derivations (shared by packages / apps / devShells) ──────────
-    # Rust tools workspace.
-    mkTools = pkgs: rec {
-      opencode-model-switcher = pkgs.rustPlatform.buildRustPackage {
+    # Build entire Rust workspace *once* – all crates share the same
+    # dependency tree so compiling 5× was pure waste.  Each per‑tool
+    # derivation below just plucks its binary from this shared build.
+    mkTools = pkgs: let
+      workspaceDrv = pkgs.rustPlatform.buildRustPackage {
+        pname = "opencode-tools";
+        version = "0.1.0";
+
+        src = ./tools;
+        cargoLock.lockFile = ./tools/Cargo.lock;
+
+        # Build every workspace member together → one compilation unit.
+        # Default cargoInstallHook copies *all* built binaries to $out/bin.
+        cargoBuildFlags = ["--workspace"];
+      };
+
+      # Derive a single‑binary package from the shared workspace build.
+      mkTool = { pname, description, binary ? pname }:
+        pkgs.runCommand pname {
+          meta = {
+            inherit description;
+            mainProgram = binary;
+          };
+        } ''
+          mkdir -p $out/bin
+          cp ${workspaceDrv}/bin/${binary} $out/bin/
+        '';
+    in rec {
+      opencode-model-switcher = mkTool {
         pname = "opencode-model-switcher";
-        version = "0.1.0";
-
-        src = ./tools;
-        cargoLock.lockFile = ./tools/Cargo.lock;
-        cargoBuildFlags = ["--package" "opencode-model-switcher"];
-
-        meta = {
-          description = "TUI/CLI for opencode # LOW/# MED/# HIGH model tier assignments";
-          mainProgram = "opencode-model-switcher";
-        };
+        description = "TUI/CLI for opencode # LOW/# MED/# HIGH model tier assignments";
       };
 
-      opencode-sessions = pkgs.rustPlatform.buildRustPackage {
+      opencode-sessions = mkTool {
         pname = "opencode-sessions";
-        version = "0.1.0";
-
-        src = ./tools;
-        cargoLock.lockFile = ./tools/Cargo.lock;
-        cargoBuildFlags = ["--package" "opencode-sessions"];
-
-        meta = {
-          description = "Browse and export OpenCode conversations from local SQLite";
-          mainProgram = "opencode-sessions";
-        };
+        description = "Browse and export OpenCode conversations from local SQLite";
       };
 
-      chunk-files-by-tokens = pkgs.rustPlatform.buildRustPackage {
+      chunk-files-by-tokens = mkTool {
         pname = "chunk-files-by-tokens";
-        version = "0.1.0";
-
-        src = ./tools;
-        cargoLock.lockFile = ./tools/Cargo.lock;
-        cargoBuildFlags = ["--package" "chunk-files-by-tokens"];
-
-        meta = {
-          description = "Chunk files by estimated token count";
-          mainProgram = "chunk-files-by-tokens";
-        };
+        description = "Chunk files by estimated token count";
       };
 
-      token-count-after-expand = pkgs.rustPlatform.buildRustPackage {
+      token-count-after-expand = mkTool {
         pname = "token-count-after-expand";
-        version = "0.1.0";
-
-        src = ./tools;
-        cargoLock.lockFile = ./tools/Cargo.lock;
-        cargoBuildFlags = ["--package" "token-count-after-expand"];
-
-        meta = {
-          description = "Estimate prompt token counts after md-expand rendering";
-          mainProgram = "token-count-after-expand";
-        };
+        description = "Estimate prompt token counts after md-expand rendering";
       };
 
-      iterate-static-check = pkgs.rustPlatform.buildRustPackage {
+      iterate-static-check = mkTool {
         pname = "iterate-static-check";
-        version = "0.1.0";
-
-        src = ./tools;
-        cargoLock.lockFile = ./tools/Cargo.lock;
-        cargoBuildFlags = ["--package" "iterate-static-check"];
-
-        meta = {
-          description = "Static checks for iterate/edit artifacts";
-          mainProgram = "iterate-static-check";
-        };
+        description = "Static checks for iterate/edit artifacts";
       };
 
       default = opencode-model-switcher;
