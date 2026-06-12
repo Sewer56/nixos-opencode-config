@@ -282,7 +282,6 @@ Only enabled for specific agents (see `opencode.json` permissions).
 | GitHub   | Local (Docker) | GitHub API (token from `~/.secrets/github-token`) |
 | Context7 | Local (NPX)    | Library documentation lookup                      |
 | DeepWiki | Remote (SSE)   | Repository documentation analysis                 |
-| Discord  | Local (Docker) | Discord API — **disabled**                        |
 
 ### TUI
 
@@ -393,7 +392,7 @@ OpenCode needs at runtime:
 | `opencode-build`          | Builds the forked OpenCode from source (`bun install` + `bun run build --single`)               |
 | `coderabbit-cli`          | CodeRabbit review tool (from `llm-agents` flake input)                                          |
 | `nodejs` / `yarn` / `bun` | Runtime for MCP servers and plugin development                                                  |
-| `docker`                  | Container runtime for GitHub and Discord MCP servers                                            |
+| `docker`                  | Container runtime for GitHub MCP server                                            |
 | `typescript` / `go`       | Language toolchains for local development                                                       |
 
 ### Symlinks
