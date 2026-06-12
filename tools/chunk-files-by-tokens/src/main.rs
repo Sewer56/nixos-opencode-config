@@ -1,11 +1,11 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use clap::Parser;
+use ignore::WalkBuilder;
 use std::collections::BTreeSet;
 use std::env;
 use std::fs;
 use std::io::{self, BufRead};
 use std::path::{Path, PathBuf};
-use std::process::Command;
 
 #[derive(Parser, Debug)]
 #[command(about = "Chunk files by estimated token count")]
@@ -22,67 +22,7 @@ fn bytes_per_token() -> f64 {
     env::var("BYTES_PER_TOKEN")
         .ok()
         .and_then(|v| v.parse().ok())
-        .unwrap_or(3.0)
-}
-
-fn git_root(dir: &Path) -> Option<PathBuf> {
-    let out = Command::new("git")
-        .arg("-C")
-        .arg(dir)
-        .args(["rev-parse", "--show-toplevel"])
-        .output()
-        .ok()?;
-    if !out.status.success() {
-        return None;
-    }
-    let root = String::from_utf8(out.stdout).ok()?;
-    Some(PathBuf::from(root.trim()))
-}
-
-fn git_list_files(dir: &Path) -> Option<Vec<PathBuf>> {
-    let root = git_root(dir)?;
-    let rel = dir.strip_prefix(&root).unwrap_or(dir);
-    let mut cmd = Command::new("git");
-    cmd.arg("-C").arg(&root).args([
-        "ls-files",
-        "--cached",
-        "--others",
-        "--exclude-standard",
-        "--",
-    ]);
-    if !rel.as_os_str().is_empty() {
-        cmd.arg(rel);
-    }
-    let out = cmd.output().ok()?;
-    if !out.status.success() {
-        return None;
-    }
-    let stdout = String::from_utf8(out.stdout).ok()?;
-    let mut paths = Vec::new();
-    for line in stdout.lines().filter(|line| !line.is_empty()) {
-        let path = root.join(line);
-        if path.is_file() {
-            paths.push(path);
-        }
-    }
-    Some(paths)
-}
-
-fn walk_files(dir: &Path, out: &mut Vec<PathBuf>) -> Result<()> {
-    let mut entries = fs::read_dir(dir)
-        .with_context(|| format!("read directory {}", dir.display()))?
-        .collect::<std::result::Result<Vec<_>, _>>()?;
-    entries.sort_by_key(|entry| entry.path());
-    for entry in entries {
-        let path = entry.path();
-        let file_type = entry.file_type()?;
-        if file_type.is_dir() {
-            walk_files(&path, out)?;
-        } else if file_type.is_file() {
-            out.push(path);
-        }
-    }
-    Ok(())
+        .unwrap_or(4.0)
 }
 
 fn expand(path: &Path) -> Result<Vec<PathBuf>> {
@@ -90,11 +30,21 @@ fn expand(path: &Path) -> Result<Vec<PathBuf>> {
         return Ok(vec![path.to_path_buf()]);
     }
     if path.is_dir() {
-        if let Some(paths) = git_list_files(path) {
-            return Ok(paths);
-        }
         let mut paths = Vec::new();
-        walk_files(path, &mut paths)?;
+        let walker = WalkBuilder::new(path)
+            .git_ignore(true)
+            .git_global(true)
+            .git_exclude(true)
+            .require_git(false)
+            .sort_by_file_name(|a, b| a.cmp(b))
+            .filter_entry(|entry| entry.file_name() != ".git")
+            .build();
+        for entry in walker {
+            let entry = entry?;
+            if entry.file_type().map_or(false, |ft| ft.is_file()) {
+                paths.push(entry.into_path());
+            }
+        }
         return Ok(paths);
     }
     Ok(Vec::new())
