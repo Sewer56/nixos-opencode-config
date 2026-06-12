@@ -130,7 +130,7 @@ impl<'a> AppModelRender for AppModel<'a> {
 
         // Help
         f.render_widget(
-            Paragraph::new("h/l profile • j/k tier • enter choose • s save • a apply • q quit")
+            Paragraph::new("←/→ profile • ↑/↓ tier • enter choose • s save • a apply • q quit")
                 .fg(Color::DarkGray),
             chunks[9],
         );
@@ -180,7 +180,7 @@ impl<'a> AppModelRender for AppModel<'a> {
         }
         lines.push(Line::from(""));
         lines.push(
-            Line::from("type filter • ↑/↓ move • enter select • esc back").fg(Color::DarkGray),
+            Line::from("type to filter • ↑/↓ move • enter select • esc back").fg(Color::DarkGray),
         );
 
         let block = Block::default()

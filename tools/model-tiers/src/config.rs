@@ -144,6 +144,9 @@ pub fn validate_work(values: &TierSet, tier_order: &[String]) -> anyhow::Result<
 pub fn save_config(env: &Env, loaded: &LoadedConfig) -> anyhow::Result<()> {
     validate_config(&loaded.profiles, &loaded.tier_order)?;
     let data = marshal_config(&loaded.profiles, &loaded.tier_order);
+    if let Some(parent) = std::path::Path::new(&env.tier_file).parent() {
+        std::fs::create_dir_all(parent).context("create config dir")?;
+    }
     let tmp = format!("{}.tmp", env.tier_file);
     std::fs::write(&tmp, &data).context("write tier file tmp")?;
     std::fs::rename(&tmp, &env.tier_file).context("rename tier file")?;

@@ -24,19 +24,19 @@ impl<'a> AppModelHandler for AppModel<'a> {
     fn handle_main_key(&mut self, code: KeyCode) {
         match code {
             KeyCode::Char('q') | KeyCode::Esc => self.should_quit = true,
-            KeyCode::Char('h') | KeyCode::Left => {
+            KeyCode::Left => {
                 self.profile_idx =
                     (self.profile_idx + self.profiles.len() - 1) % self.profiles.len();
                 self.update_preview();
             }
-            KeyCode::Char('l') | KeyCode::Right => {
+            KeyCode::Right => {
                 self.profile_idx = (self.profile_idx + 1) % self.profiles.len();
                 self.update_preview();
             }
-            KeyCode::Char('k') | KeyCode::Up => {
+            KeyCode::Up => {
                 self.tier_idx = (self.tier_idx + self.tier_order.len() - 1) % self.tier_order.len();
             }
-            KeyCode::Char('j') | KeyCode::Down => {
+            KeyCode::Down => {
                 self.tier_idx = (self.tier_idx + 1) % self.tier_order.len();
             }
             KeyCode::Enter | KeyCode::Char(' ') => {
@@ -122,12 +122,12 @@ impl<'a> AppModelHandler for AppModel<'a> {
                 }
                 self.mode = Mode::Main;
             }
-            KeyCode::Up | KeyCode::Char('k') => {
+            KeyCode::Up => {
                 if !filtered.is_empty() {
                     self.pick_idx = (self.pick_idx + filtered.len() - 1) % filtered.len();
                 }
             }
-            KeyCode::Down | KeyCode::Char('j') => {
+            KeyCode::Down => {
                 if !filtered.is_empty() {
                     self.pick_idx = (self.pick_idx + 1) % filtered.len();
                 }

@@ -1,16 +1,27 @@
 use crate::types::Env;
-use anyhow::{Context, bail};
-use std::path::Path;
+use anyhow::Context;
 
-/// Walk upward from CWD until we find a directory containing both
-/// `config/model-tiers.json` and at least one agent directory
-/// (`config/agent` or `.opencode/agent`).
+/// OpenCode config directory. Matches the TypeScript core which uses `xdg-basedir`
+/// (always resolves to `$XDG_CONFIG_HOME/opencode` or `~/.config/opencode` on all platforms).
+pub fn opencode_config_dir() -> String {
+    if let Ok(d) = std::env::var("XDG_CONFIG_HOME") {
+        if !d.is_empty() {
+            return format!("{d}/opencode");
+        }
+    }
+    let home = std::env::var("HOME").unwrap_or_default();
+    format!("{home}/.config/opencode")
+}
+
+/// Walk upward from CWD to find agent directories (`config/agent` or
+/// `.opencode/agent`). The tier config file lives in the OpenCode config
+/// directory returned by [`opencode_config_dir`].
 pub fn find_env() -> anyhow::Result<Env> {
     let cwd = std::env::current_dir().context("get current directory")?;
+    let tier_file = format!("{}/model-tiers.json", opencode_config_dir());
     let mut dir = cwd.as_path();
 
     loop {
-        let tier_file = dir.join("config").join("model-tiers.json");
         let mut agent_dirs = Vec::new();
 
         for candidate in &[
@@ -22,10 +33,10 @@ pub fn find_env() -> anyhow::Result<Env> {
             }
         }
 
-        if tier_file.is_file() && !agent_dirs.is_empty() {
+        if !agent_dirs.is_empty() {
             return Ok(Env {
                 root: dir.to_string_lossy().into_owned(),
-                tier_file: tier_file.to_string_lossy().into_owned(),
+                tier_file,
                 agent_dirs,
             });
         }
@@ -36,15 +47,17 @@ pub fn find_env() -> anyhow::Result<Env> {
         }
     }
 
-    bail!(
-        "could not find repo root from {} (need config/model-tiers.json and config/agent or .opencode/agent)",
-        cwd.display()
-    )
+    // No agent dirs found - still usable for config editing.
+    Ok(Env {
+        root: cwd.to_string_lossy().into_owned(),
+        tier_file,
+        agent_dirs: Vec::new(),
+    })
 }
 
 /// Return path relative to env.root, falling back to the full path on error.
 pub fn rel(env: &Env, path: &str) -> String {
-    Path::new(path)
+    std::path::Path::new(path)
         .strip_prefix(&env.root)
         .map(|p| p.to_string_lossy().into_owned())
         .unwrap_or_else(|_| path.to_string())
