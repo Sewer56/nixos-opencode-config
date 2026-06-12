@@ -110,7 +110,6 @@
       ...
     }: let
       system = pkgs.stdenv.hostPlatform.system;
-      tools = self.packages.${system};
 
       opencodeRepo = "${config.home.homeDirectory}/nixos/users/sewer/home-manager/programs/opencode";
       opencodeSource = "${opencodeRepo}/opencode-source";
@@ -136,17 +135,29 @@
         popd > /dev/null
         chmod -R +x ${opencodeSource}/packages/opencode/dist/opencode-linux-x64/bin
       '';
+
+      # ── Cargo‑backed tool wrappers ──────────────────────────────────────
+      # Delegate to `cargo run` at runtime instead of baking Nix‑built
+      # binaries.  This avoids a full workspace‑wide Rust rebuild inside
+      # `home‑manager switch` whenever a single .rs file changes.
+      # Cargo handles incremental compilation; second run is near‑instant.
+      mkCargoTool = { name, package ? name }:
+        pkgs.writeShellScriptBin name ''
+          set -euo pipefail
+          cd "$HOME/opencode/tools"
+          exec cargo run --release --package ${package} -- "$@"
+        '';
     in {
       home.packages = [
         opencodeScript
         opencodeBuildScript
 
-        # Built CLI tools - land on PATH after activation.
-        tools.opencode-model-switcher
-        tools.opencode-sessions
-        tools.chunk-files-by-tokens
-        tools.token-count-after-expand
-        tools.iterate-static-check
+        # CLI tools — cargo‑backed so editing tools/ costs zero Nix rebuild.
+        (mkCargoTool { name = "opencode-model-switcher"; })
+        (mkCargoTool { name = "opencode-sessions"; })
+        (mkCargoTool { name = "chunk-files-by-tokens"; })
+        (mkCargoTool { name = "token-count-after-expand"; })
+        (mkCargoTool { name = "iterate-static-check"; })
 
         llm-agents.packages.${system}.coderabbit-cli
 
