@@ -41,17 +41,17 @@
     # ── Tool derivations (shared by packages / apps / devShells) ──────────
     # Rust tools workspace.
     mkTools = pkgs: rec {
-      opencode-model-tiers = pkgs.rustPlatform.buildRustPackage {
-        pname = "opencode-model-tiers";
+      opencode-model-switcher = pkgs.rustPlatform.buildRustPackage {
+        pname = "opencode-model-switcher";
         version = "0.1.0";
 
         src = ./tools;
         cargoLock.lockFile = ./tools/Cargo.lock;
-        cargoBuildFlags = ["--package" "opencode-model-tiers"];
+        cargoBuildFlags = ["--package" "opencode-model-switcher"];
 
         meta = {
           description = "TUI/CLI for opencode # LOW/# MED/# HIGH model tier assignments";
-          mainProgram = "opencode-model-tiers";
+          mainProgram = "opencode-model-switcher";
         };
       };
 
@@ -111,7 +111,7 @@
         };
       };
 
-      default = opencode-model-tiers;
+      default = opencode-model-switcher;
     };
 
     # ── Home‑Manager module ──────────────────────────────────────────────
@@ -161,7 +161,7 @@
         opencodeBuildScript
 
         # Built CLI tools - land on PATH after activation.
-        tools.opencode-model-tiers
+        tools.opencode-model-switcher
         tools.opencode-sessions
         tools.chunk-files-by-tokens
         tools.token-count-after-expand
@@ -188,12 +188,12 @@
     # ── Flake outputs ─────────────────────────────────────────────────────
     # nix build / nix run / nix develop all work from this repo directly.
 
-    # nix build .#opencode-model-tiers   etc.
+    # nix build .#opencode-model-switcher   etc.
     packages = eachSystem (_system: pkgs: mkTools pkgs);
 
     # nix flake check
     checks = eachSystem (system: _pkgs: {
-      opencode-model-tiers = self.packages.${system}.opencode-model-tiers;
+      opencode-model-switcher = self.packages.${system}.opencode-model-switcher;
       opencode-sessions = self.packages.${system}.opencode-sessions;
       chunk-files-by-tokens = self.packages.${system}.chunk-files-by-tokens;
       token-count-after-expand = self.packages.${system}.token-count-after-expand;
@@ -202,9 +202,9 @@
 
     # nix run .#opencode-sessions -- tui
     apps = eachSystem (system: _pkgs: rec {
-      opencode-model-tiers = {
+      opencode-model-switcher = {
         type = "app";
-        program = "${self.packages.${system}.opencode-model-tiers}/bin/opencode-model-tiers";
+        program = "${self.packages.${system}.opencode-model-switcher}/bin/opencode-model-switcher";
         meta.description = "Open opencode model tier TUI/CLI";
       };
 
@@ -232,7 +232,7 @@
         meta.description = "Static checks for iterate/edit artifacts";
       };
 
-      default = opencode-model-tiers;
+      default = opencode-model-switcher;
     });
 
     # nix develop  →  Rust toolchain + built CLI tools on PATH.
@@ -252,7 +252,7 @@
           pkgs.stdenv.cc
 
           # Built CLI tools - ready to run inside the shell.
-          tools.opencode-model-tiers
+          tools.opencode-model-switcher
           tools.opencode-sessions
           tools.chunk-files-by-tokens
           tools.token-count-after-expand

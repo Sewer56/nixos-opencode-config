@@ -1,11 +1,11 @@
-use opencode_model_tiers::rewrite;
-use opencode_model_tiers::types::{Env, TierSet};
+use opencode_model_switcher::rewrite;
+use opencode_model_switcher::types::{Env, TierSet};
 
 fn test_env() -> anyhow::Result<(tempfile::TempDir, Env)> {
     let dir = tempfile::tempdir()?;
     let agent_dir = dir.path().join("config").join("agent");
     std::fs::create_dir_all(&agent_dir)?;
-    let tier_file = dir.path().join("config").join("model-tiers.json");
+    let tier_file = dir.path().join("config").join("model-switcher.json");
     std::fs::write(
         &tier_file,
         r#"{

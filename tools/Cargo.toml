@@ -1,7 +1,7 @@
 [workspace]
 members = [
   "opencode-sessions",
-  "model-tiers",
+  "model-switcher",
   "chunk-files-by-tokens",
   "token-count-after-expand",
   "iterate-static-check",

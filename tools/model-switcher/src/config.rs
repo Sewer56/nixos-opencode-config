@@ -3,7 +3,7 @@ use crate::rewrite::agent_files;
 use crate::types::{Config, Env, LoadedConfig, TierSet, WORK_PROVIDER};
 use anyhow::{Context, bail};
 
-/// Load and validate model-tiers.json from env.tier_file.
+/// Load and validate model-switcher.json from env.tier_file.
 pub fn load_config(env: &Env) -> anyhow::Result<LoadedConfig> {
     let data = std::fs::read_to_string(&env.tier_file)
         .with_context(|| format!("read tier file: {}", rel(env, &env.tier_file)))?;

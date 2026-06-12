@@ -300,7 +300,7 @@ model (used for titles) is Step 3.7 Flash.
 
 ### Model tiers
 
-Tier presets are discovered from `config/model-tiers.json` at runtime.
+Tier presets are discovered from `config/model-switcher.json` at runtime.
 A `$tierOrder` key declares the canonical tier list and display order:
 
 ```json
@@ -325,10 +325,10 @@ The tool rewrites only the model token and preserves the tier marker comment
 (e.g. `# LOW`, `# MED`, `# HIGH`). Unmarked `model:` lines are left untouched.
 
 ```bash
-opencode-model-tiers              # Launch TUI (default profile)
-opencode-model-tiers normal       # Launch TUI with "normal" profile
-opencode-model-tiers bogus        # Error: "unknown profile: bogus" + lists available profiles
-opencode-model-tiers a b          # Error: "usage: opencode-model-tiers [profile]"
+opencode-model-switcher              # Launch TUI (default profile)
+opencode-model-switcher normal       # Launch TUI with "normal" profile
+opencode-model-switcher bogus        # Error: "unknown profile: bogus" + lists available profiles
+opencode-model-switcher a b          # Error: "usage: opencode-model-switcher [profile]"
 ```
 
 The TUI reads choices from the config, supports typed filtering, previews
@@ -338,8 +338,8 @@ and can apply the selected profile.
 The binary can also be run through the root flake:
 
 ```bash
-nix run .#opencode-model-tiers
-nix run .#opencode-model-tiers -- normal
+nix run .#opencode-model-switcher
+nix run .#opencode-model-switcher -- normal
 ```
 
 The binary accepts an optional profile name. With no arguments it opens the TUI

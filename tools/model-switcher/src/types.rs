@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 pub const WORK_PROVIDER: &str = "sewer-axonhub-work/";
 
 /// Maps profile names to their tier→model assignments.
-/// Mirrors the structure of model-tiers.json.
+/// Mirrors the structure of model-switcher.json.
 pub type Config = BTreeMap<String, TierSet>;
 
 /// A single profile's tier→model map.

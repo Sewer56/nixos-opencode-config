@@ -31,7 +31,7 @@ impl<'a> AppModelRender for AppModel<'a> {
             .split(f.area());
 
         // Title
-        let title = Line::from("opencode model tiers".bold().fg(Color::Cyan));
+        let title = Line::from("opencode model switcher".bold().fg(Color::Cyan));
         f.render_widget(Paragraph::new(title), chunks[0]);
 
         // Profiles

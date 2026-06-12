@@ -1,4 +1,4 @@
-use opencode_model_tiers::models;
+use opencode_model_switcher::models;
 
 #[test]
 fn test_parse_models_output_dedupes_and_ignores_noise() {

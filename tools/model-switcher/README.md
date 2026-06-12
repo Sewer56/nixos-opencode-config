@@ -1,11 +1,11 @@
-# opencode-model-tiers
+# opencode-model-switcher
 
 TUI for managing model tier assignments across OpenCode agent profiles.
 
 ## Commands
 
 ```
-opencode-model-tiers [profile]
+opencode-model-switcher [profile]
 ```
 
 Launch interactive editor. Optionally pre-select a profile name.
@@ -25,7 +25,7 @@ In picker: type to filter, `Enter` select, `Esc` cancel.
 
 ## Config file
 
-Stored at `~/.config/opencode/model-tiers.json` (or `$XDG_CONFIG_HOME/opencode/model-tiers.json`).
+Stored at `~/.config/opencode/model-switcher.json` (or `$XDG_CONFIG_HOME/opencode/model-switcher.json`).
 
 ```jsonc
 {
@@ -60,10 +60,10 @@ model: other/other-model   # MED keep comment
 
 ## Adding a new profile
 
-Edit `model-tiers.json` - add a new key with the same tier set as existing profiles.
+Edit `model-switcher.json` - add a new key with the same tier set as existing profiles.
 
 ## Adding a new tier
 
-1. Add tier key to all profiles in `model-tiers.json`.
+1. Add tier key to all profiles in `model-switcher.json`.
 2. Optionally update `$tierOrder` to control display order.
 3. Tag model lines in agent `.md` files with `# NEWTIER`.

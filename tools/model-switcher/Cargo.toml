@@ -1,11 +1,11 @@
 [package]
-name = "opencode-model-tiers"
+name = "opencode-model-switcher"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [[bin]]
-name = "opencode-model-tiers"
+name = "opencode-model-switcher"
 path = "src/main.rs"
 
 [dependencies]

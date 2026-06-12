@@ -18,7 +18,7 @@ pub fn opencode_config_dir() -> String {
 /// directory returned by [`opencode_config_dir`].
 pub fn find_env() -> anyhow::Result<Env> {
     let cwd = std::env::current_dir().context("get current directory")?;
-    let tier_file = format!("{}/model-tiers.json", opencode_config_dir());
+    let tier_file = format!("{}/model-switcher.json", opencode_config_dir());
     let mut dir = cwd.as_path();
 
     loop {

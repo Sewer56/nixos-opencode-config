@@ -23,7 +23,7 @@ fn main() -> Result<()> {
 /// available profiles on a second line for display in the terminal.
 fn parse_profile(env: &types::Env, args: &[String]) -> anyhow::Result<String> {
     if args.len() > 1 {
-        bail!("usage: opencode-model-tiers [profile]");
+        bail!("usage: opencode-model-switcher [profile]");
     }
     let name = args.first().map(|s| s.as_str()).unwrap_or("");
     if name.is_empty() {
