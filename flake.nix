@@ -92,6 +92,9 @@
         description = "Static checks for iterate/edit artifacts";
       };
 
+      # rust-auto-reorder lives in a git submodule with its own workspace.
+      # Pure flakes cannot track submodule files, so it is built at runtime
+      # via the cargo-backed wrapper in the Home-Manager module.
       default = opencode-model-switcher;
     };
 
@@ -141,10 +144,10 @@
       # binaries.  This avoids a full workspace‑wide Rust rebuild inside
       # `home‑manager switch` whenever a single .rs file changes.
       # Cargo handles incremental compilation; second run is near‑instant.
-      mkCargoTool = { name, package ? name }:
+      mkCargoTool = { name, package ? name, dir ? "$HOME/opencode/tools" }:
         pkgs.writeShellScriptBin name ''
           set -euo pipefail
-          cd "$HOME/opencode/tools"
+          cd "${dir}"
           exec cargo run --release --package ${package} -- "$@"
         '';
     in {
@@ -158,6 +161,11 @@
         (mkCargoTool { name = "chunk-files-by-tokens"; })
         (mkCargoTool { name = "token-count-after-expand"; })
         (mkCargoTool { name = "iterate-static-check"; })
+        (mkCargoTool {
+          name = "rust-auto-reorder";
+          package = "rust-auto-reorder-cli";
+          dir = "$HOME/opencode/tools/rust-auto-reorder/src";
+        })
 
         llm-agents.packages.${system}.coderabbit-cli
 

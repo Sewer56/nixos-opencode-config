@@ -9,6 +9,7 @@ Rust workspace for local OpenCode utilities.
 - `chunk-files-by-tokens` — split files/directories into token-sized chunks.
 - `token-count-after-expand` — render md-expand prompt files and estimate tokens.
 - `iterate-static-check` — deterministic static checks for iterate/edit artifacts.
+- `rust-auto-reorder` — reorder Rust functions by call-dependency order.
 
 ## Shell helpers
 
@@ -23,4 +24,5 @@ cargo run -p opencode-model-switcher -- normal    # Launch TUI with "normal" pro
 cargo run -p chunk-files-by-tokens -- -s 32000 config/agent
 cargo run -p token-count-after-expand -- config/agent/mcp-search.md
 cargo run -p iterate-static-check -- PROMPT-EXAMPLE
+cargo run -p rust-auto-reorder -- --dry-run src/main.rs
 ```

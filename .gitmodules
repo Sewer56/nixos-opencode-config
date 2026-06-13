@@ -9,3 +9,6 @@
 	path = plugins/opencode-models-discovery
 	url = https://github.com/Sewer56/opencode-models-discovery.git
 	branch = main
+[submodule "tools/rust-auto-reorder"]
+	path = tools/rust-auto-reorder
+	url = ./tools/rust-auto-reorder
