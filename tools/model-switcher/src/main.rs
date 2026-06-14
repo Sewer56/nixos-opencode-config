@@ -6,7 +6,7 @@ mod rewrite;
 mod tui;
 mod types;
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 
 fn main() -> Result<()> {
     let env = env::find_env()?;
@@ -32,7 +32,11 @@ fn parse_profile(env: &types::Env, args: &[String]) -> anyhow::Result<String> {
     let loaded = config::load_config(env)?;
     let profiles = config::sorted_profiles(&loaded.profiles);
     if !profiles.contains(&name.to_string()) {
-        bail!("unknown profile: {}\navailable: {}", name, profiles.join(", "));
+        bail!(
+            "unknown profile: {}\navailable: {}",
+            name,
+            profiles.join(", ")
+        );
     }
     Ok(name.to_string())
 }

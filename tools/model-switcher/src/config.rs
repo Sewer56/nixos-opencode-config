@@ -210,5 +210,3 @@ pub fn sorted_profiles(cfg: &Config) -> Vec<String> {
 fn profile_names(cfg: &Config) -> Vec<&String> {
     cfg.keys().filter(|k| !k.starts_with('$')).collect()
 }
-
-
