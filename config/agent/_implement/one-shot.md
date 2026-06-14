@@ -15,7 +15,7 @@ permission:
   task:
     "*": deny
     "_implement/one-shot/planner": allow
-    "_plan/finalize-fast": allow
+    "_plan/finalize": allow
     "_implement/plan": allow
 ---
 
@@ -32,7 +32,7 @@ One-shot implementation adapter: delegate compact draft creation, finalize it wi
 
 # Ownership
 - `_implement/one-shot/planner` maps relevant repo files and writes `plan_path`.
-- `_plan/finalize-fast` owns handoff and step artifacts.
+- `_plan/finalize` owns handoff and step artifacts.
 - `_implement/plan` owns product edits, validation, and cleanup/documentation review.
 - You only preflight, dispatch children, validate outputs, and return status.
 
@@ -50,7 +50,7 @@ One-shot implementation adapter: delegate compact draft creation, finalize it wi
 - Stop unless `Status: SUCCESS` and `Plan Path` equals `plan_path`.
 
 ## 3. Finalize draft
-- Dispatch `_plan/finalize-fast` with only `plan_path`, `handoff_path`, `step_pattern`, and compact notes.
+- Dispatch `_plan/finalize` with only `plan_path`, `handoff_path`, `step_pattern`, and compact notes.
 - Validate its fenced output fields: `Status`, `Plan Path`, `Handoff Path`, `Step Pattern`, `Review Iterations`, and `Summary`.
 - If output is malformed, retry once. If still malformed, return `Status: FAIL`.
 - Stop unless `Status: SUCCESS` and `Handoff Path` equals `handoff_path`.

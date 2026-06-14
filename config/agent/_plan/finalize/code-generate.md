@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Code generation agent — produces the plan handoff and step body files from a draft
-model: sewer-axonhub/deepseek-v4-pro # HIGH
+model: sewer-axonhub/glm-5.2 # HIGH
 permission:
   "*": deny
   read:

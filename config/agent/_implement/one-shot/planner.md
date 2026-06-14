@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Writes a compact PROMPT-PLAN draft for one-shot implementation
-model: sewer-axonhub/deepseek-v4-pro # HIGH
+model: sewer-axonhub/glm-5.2 # HIGH
 permission:
   "*": deny
   read:

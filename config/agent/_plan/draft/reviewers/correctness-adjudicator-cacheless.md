@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Adjudicates two independent plan-draft correctness reviews (cacheless)
-model: sewer-axonhub/deepseek-v4-pro # HIGH
+model: sewer-axonhub/glm-5.2 # HIGH
 variant: medium
 permission:
   "*": deny

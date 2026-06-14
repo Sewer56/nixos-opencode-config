@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Adjudicates two independent finalize audit reviews (cacheless)
-model: sewer-axonhub/deepseek-v4-pro # HIGH
+model: sewer-axonhub/glm-5.2 # HIGH
 permission:
   "*": deny
   read:

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Cached test-strategy reviewer for finalize-fast step artifacts
-model: sewer-axonhub/deepseek-v4-pro # HIGH
+model: sewer-axonhub/glm-5.2 # HIGH
 permission:
   "*": deny
   read:
