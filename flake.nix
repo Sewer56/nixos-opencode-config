@@ -56,7 +56,11 @@
       };
 
       # Derive a single‑binary package from the shared workspace build.
-      mkTool = { pname, description, binary ? pname }:
+      mkTool = {
+        pname,
+        description,
+        binary ? pname,
+      }:
         pkgs.runCommand pname {
           meta = {
             inherit description;
@@ -144,7 +148,11 @@
       # binaries.  This avoids a full workspace‑wide Rust rebuild inside
       # `home‑manager switch` whenever a single .rs file changes.
       # Cargo handles incremental compilation; second run is near‑instant.
-      mkCargoTool = { name, package ? name, dir ? "$HOME/opencode/tools" }:
+      mkCargoTool = {
+        name,
+        package ? name,
+        dir ? "$HOME/opencode/tools",
+      }:
         pkgs.writeShellScriptBin name ''
           set -euo pipefail
           cd "${dir}"
@@ -156,11 +164,11 @@
         opencodeBuildScript
 
         # CLI tools — cargo‑backed so editing tools/ costs zero Nix rebuild.
-        (mkCargoTool { name = "opencode-model-switcher"; })
-        (mkCargoTool { name = "opencode-sessions"; })
-        (mkCargoTool { name = "chunk-files-by-tokens"; })
-        (mkCargoTool { name = "token-count-after-expand"; })
-        (mkCargoTool { name = "iterate-static-check"; })
+        (mkCargoTool {name = "opencode-model-switcher";})
+        (mkCargoTool {name = "opencode-sessions";})
+        (mkCargoTool {name = "chunk-files-by-tokens";})
+        (mkCargoTool {name = "token-count-after-expand";})
+        (mkCargoTool {name = "iterate-static-check";})
         (mkCargoTool {
           name = "rust-auto-reorder";
           package = "rust-auto-reorder-cli";
