@@ -11,4 +11,4 @@
 	branch = main
 [submodule "tools/rust-auto-reorder"]
 	path = tools/rust-auto-reorder
-	url = ./tools/rust-auto-reorder
+	url = https://github.com/Sewer56/rust-llm-tidy.git
