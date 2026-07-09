@@ -67,7 +67,7 @@ Review a working diff for code-quality blockers and apply their fixes in a loop.
 - If `changed_source_files` and `effective_doc_paths` are both empty, return `Status: PASS` with `Iterations: 0/6`, `Files Changed: none`, `Findings Applied: none`.
 
 ## 3. Reviewer fan-out
-- The fixed cleanup reviewer set: `_implement/reviewers/code-docs`, `_implement/reviewers/errors`, `_implement/reviewers/placement`, `_implement/reviewers/user-docs-polish`.
+- The fixed cleanup reviewer set (task tool): `_implement/reviewers/code-docs`, `_implement/reviewers/errors`, `_implement/reviewers/placement`, `_implement/reviewers/user-docs-polish`.
 - Dependency split: blocking-finding reviewers (`_implement/reviewers/errors`, `_implement/reviewers/placement`) run before polish reviewers (`_implement/reviewers/code-docs`, `_implement/reviewers/user-docs-polish`); all in-scope reviewers in a priority group run in parallel within the iter.
 - Run only the reviewers whose domain is non-empty. On iter 2+ run only the rerun domain set (see step 5).
 - Pass each in-scope reviewer: its per-domain path subset, `notes`, and the optional `handoff_path`. Do not paste role text, focus lists, or output schema. Each reviewer owns its own scope; do not restate it here.
