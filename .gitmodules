@@ -2,11 +2,11 @@
 	path = opencode-source
 	url = https://github.com/Sewer56/opencode.git
 [submodule "plugins/opencode-plugin-md-expand"]
-	path = plugins/opencode-plugin-md-expand
+	path = config/plugins/opencode-plugin-md-expand
 	url = https://github.com/Sewer56/opencode-plugin-md-expand.git
 	branch = main
 [submodule "plugins/opencode-models-discovery"]
-	path = plugins/opencode-models-discovery
+	path = config/plugins/opencode-models-discovery
 	url = https://github.com/Sewer56/opencode-models-discovery.git
 	branch = main
 [submodule "tools/rust-auto-reorder"]

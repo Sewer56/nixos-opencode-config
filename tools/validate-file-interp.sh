@@ -7,9 +7,10 @@
 set -eu
 root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$root"
-bun plugins/opencode-plugin-md-expand/src/cli/cli.ts validate \
+bun config/plugins/opencode-plugin-md-expand/src/cli/cli.ts validate \
   --exclude renderer-syntax.txt \
   --exclude renderer-template-use-checks.txt \
   --exclude design-patterns.md \
   --exclude template-library.md \
+  --exclude config/plugins/opencode-plugin-md-expand/README.md \
   ${*:-.opencode config}

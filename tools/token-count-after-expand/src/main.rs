@@ -18,7 +18,7 @@ fn find_repo_root() -> Result<PathBuf> {
     let cwd = env::current_dir().context("get current directory")?;
     for dir in cwd.ancestors() {
         if dir.join("config/opencode.json").is_file()
-            && dir.join("plugins/opencode-plugin-md-expand").is_dir()
+            && dir.join("config/plugins/opencode-plugin-md-expand").is_dir()
         {
             return Ok(dir.to_path_buf());
         }
@@ -43,7 +43,7 @@ fn strip_frontmatter(text: &str) -> String {
 fn render_and_count(root: &Path, path: &str) -> (String, usize, Option<String>) {
     let mut child = match Command::new("bun")
         .args([
-            "plugins/opencode-plugin-md-expand/src/cli/cli.ts",
+            "config/plugins/opencode-plugin-md-expand/src/cli/cli.ts",
             "render",
             path,
         ])

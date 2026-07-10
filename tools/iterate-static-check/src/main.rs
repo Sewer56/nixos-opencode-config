@@ -69,7 +69,7 @@ fn path_exists(path: &str) -> bool {
 fn render(path: &str) -> (bool, String, String) {
     match Command::new("bun")
         .args([
-            "plugins/opencode-plugin-md-expand/src/cli/cli.ts",
+            "config/plugins/opencode-plugin-md-expand/src/cli/cli.ts",
             "render",
             path,
         ])
