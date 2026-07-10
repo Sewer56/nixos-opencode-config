@@ -12,6 +12,9 @@ tools/workflow-optimize/__pycache__/
 **/*.rs.bk
 *.pdb
 
+# Windows setup bin output (built .exe + cache marker)
+/bin/
+
 # Nix build symlink
 result
 result-*

@@ -370,6 +370,25 @@ opencode
 opencode /path/to/project
 ```
 
+## Windows
+
+No Nix on Windows. One script instead of Home-Manager:
+
+```pwsh
+pwsh ./scripts/windows/setup.ps1
+```
+
+Idempotent. Detects `cargo`/`bun`/`git` (missing tool = warn + skip, not fatal).
+
+Creates `~\opencode` and `~\.config\opencode` junctions (no admin rights),
+persists `OPENCODE_ENABLE_EXA=1`, builds all Rust tools + OpenCode, and adds
+`~\opencode\bin` to User `PATH`. All binaries (Rust tools, `rust-llm-tidy`,
+`opencode.exe`) land in `bin\` (gitignored) and are reachable on `PATH`.
+
+OpenCode build is cached by the `opencode-source` git SHA; pass `-ForceRebuild`
+to bypass. Also: `-UseEnvVar`, `-SkipOpenCode`, `-SkipRustTools`,
+`-SkipRustLLMTidy`.
+
 ## Nix Module
 
 `flake.nix` provides two shell wrappers and installs the dependencies
