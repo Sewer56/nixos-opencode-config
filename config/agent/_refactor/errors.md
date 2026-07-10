@@ -41,7 +41,7 @@ Never modify product code while collecting or reviewing. Write only per-collecto
 
 # Workflow
 
-- `LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor/_templates`
+- `LANG_RULES_DIR`: `~/opencode/config/agent/_refactor/_templates`
 
 ## 1. Discover structure
 

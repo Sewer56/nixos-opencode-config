@@ -25,6 +25,6 @@ If `## Delta` is non-empty, verify only source files for Delta items; otherwise 
 
 # Language Rules Directory
 
-`LANG_RULES_DIR`: `/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/agent/_refactor/_templates`
+`LANG_RULES_DIR`: `~/opencode/config/agent/_refactor/_templates`
 
 Read `lang-<language>-errors.txt` once per language, per `# Focus`.

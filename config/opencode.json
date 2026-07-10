@@ -59,9 +59,13 @@
     "github": {
       "type": "local",
       "command": [
-        "bash",
-        "-c",
-        "if [ ! -f \"$HOME/.secrets/github-token\" ]; then echo \"Error: GitHub token secret file not found\" >&2; exit 1; fi; export GITHUB_PERSONAL_ACCESS_TOKEN=\"$(cat \"$HOME/.secrets/github-token\")\"; exec docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN ghcr.io/github/github-mcp-server"
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN={file:~/.secrets/github-token}",
+        "ghcr.io/github/github-mcp-server"
       ],
       "enabled": true
     },
@@ -90,8 +94,8 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "Sewer AxonHub",
       "options": {
-        "baseURL": "{file:/home/sewer/.secrets/axonhub-url}",
-        "apiKey": "{file:/home/sewer/.secrets/axonhub-key}",
+        "baseURL": "{file:~/.secrets/axonhub-url}",
+        "apiKey": "{file:~/.secrets/axonhub-key}",
         "modelsDiscovery": {
           "enabled": true
         }
@@ -101,8 +105,8 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "AxonHub (Work Mode)",
       "options": {
-        "baseURL": "{file:/home/sewer/.secrets/axonhub-url}",
-        "apiKey": "{file:/home/sewer/.secrets/axonhub-work-key}",
+        "baseURL": "{file:~/.secrets/axonhub-url}",
+        "apiKey": "{file:~/.secrets/axonhub-work-key}",
         "modelsDiscovery": {
           "enabled": true
         }
