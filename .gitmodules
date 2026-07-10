@@ -9,6 +9,6 @@
 	path = config/plugins/opencode-models-discovery
 	url = https://github.com/Sewer56/opencode-models-discovery.git
 	branch = main
-[submodule "tools/rust-auto-reorder"]
-	path = tools/rust-auto-reorder
+[submodule "tools/rust-llm-tidy"]
+	path = tools/rust-llm-tidy
 	url = https://github.com/Sewer56/rust-llm-tidy.git

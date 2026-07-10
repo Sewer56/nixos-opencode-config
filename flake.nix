@@ -96,7 +96,7 @@
         description = "Static checks for iterate/edit artifacts";
       };
 
-      # rust-auto-reorder lives in a git submodule with its own workspace.
+      # rust-llm-tidy lives in a git submodule with its own workspace.
       # Pure flakes cannot track submodule files, so it is built at runtime
       # via the cargo-backed wrapper in the Home-Manager module.
       default = opencode-model-switcher;
@@ -170,9 +170,9 @@
         (mkCargoTool {name = "token-count-after-expand";})
         (mkCargoTool {name = "iterate-static-check";})
         (mkCargoTool {
-          name = "rust-auto-reorder";
-          package = "rust-auto-reorder-cli";
-          dir = "$HOME/opencode/tools/rust-auto-reorder/src";
+          name = "rust-llm-tidy";
+          package = "rust-llm-tidy-cli";
+          dir = "$HOME/opencode/tools/rust-llm-tidy/src";
         })
 
         llm-agents.packages.${system}.coderabbit-cli
