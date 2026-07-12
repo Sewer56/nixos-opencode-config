@@ -98,6 +98,35 @@ Do not write "[x] code written", "[x] tested" unless a repo template requires it
 
 Keep the whole body under ~400 words unless the change is genuinely large.
 
+## Paragraph size — one idea per paragraph
+
+Cap paragraphs at 2 sentences, ~50 words. Split whenever a new subject,
+capability, or noun phrase begins ("An optional config...", "Global flags...",
+"Two hooks collapse..."). One paragraph = one claim. Readers skim, they do not
+read walls of text.
+
+Bad (one block, two ideas):
+
+> `rust-llm-tidy` is now one command that runs the full pipeline by default. No
+> more subcommands. An optional `.rust-llm-tidy.yml` config drives excludes,
+> per-path rule disabling, and post-process hooks.
+
+Good (split, breathing room):
+
+> `rust-llm-tidy` is now one command that runs the full pipeline (fix → reorder
+> → vis → lints) by default. The `fix` / `reorder` / `vis` / `check` / `all`
+> subcommands are gone.
+>
+> An optional `.rust-llm-tidy.yml` config drives excludes, per-path rule
+> disabling, and post-process hooks (e.g. `rustfmt`), replacing two bespoke
+> pre-commit hooks.
+
+## Whitespace
+
+Blank line between every paragraph and every section header. Never let a header
+butt against prose. Never let two distinct thoughts share a paragraph. Err on
+the side of more whitespace.
+
 <examples>
 <example label="Small fix — no headers">
 <ideal_output>
@@ -164,7 +193,9 @@ File: `./pr.md` (project folder).
 Title line (H1 or plain) is the PR title — concise, ≤72 chars, verb-first,
 Keep a Changelog prefix allowed (Added/Changed/Fixed/Removed/Deprecated/Security).
 Body sections appear only if they add value for the change size. Use:
-1. Summary — 1–4 sentences, problem/fix or new-capability framed.
+1. Summary — 1–3 short sentences, problem/fix or new-capability framed. Split
+   into separate paragraphs when a second distinct idea appears (see Paragraph
+   size rule).
 2. Usage / Example — code/config/CLI block demonstrating new behavior (when relevant).
 3. Why — user pain or motivation; link issue.
 4. Before / After — table or paired code blocks when shape/behavior shifted.
