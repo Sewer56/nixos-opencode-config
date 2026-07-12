@@ -208,7 +208,8 @@ Omit empty sections.
 </output_contract>
 
 <tool_behavior>
-- Do not commit, push, or open the PR. Only write `pr.md`.
+- Do not commit or push. Do not open the PR unless the user explicitly asks.
+  Only write `pr.md`.
 - Do not modify tracked source files other than `pr.md`.
 </tool_behavior>
 
