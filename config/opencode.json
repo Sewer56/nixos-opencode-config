@@ -6,13 +6,12 @@
     "./plugins/caveman/src/index",
     "./plugins/opencode-plugin-md-expand/src/index"
   ],
-  "small_model": "sewer-axonhub/step-3.7-flash",
+  "small_model": "sewer-axonhub/deepseek-v4-flash",
   "permission": {
     "bash": {
       "*": "allow"
     },
-    "task": {
-    },
+    "task": {},
     "webfetch": "allow",
     "doom_loop": "deny",
     "github_*": "deny",
