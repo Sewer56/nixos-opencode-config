@@ -2,16 +2,17 @@
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": false,
   "plugin": [
-    "./plugins/opencode-models-discovery/src/index",
+    "./plugins/opencode-axonhub/src/index",
     "./plugins/caveman/src/index",
     "./plugins/opencode-plugin-md-expand/src/index"
   ],
-  "small_model": "sewer-axonhub/deepseek-v4-flash",
+  "small_model": "sewer-axonhub/step-3.7-flash",
   "permission": {
     "bash": {
       "*": "allow"
     },
-    "task": {},
+    "task": {
+    },
     "webfetch": "allow",
     "doom_loop": "deny",
     "github_*": "deny",
@@ -98,7 +99,8 @@
         "modelsDiscovery": {
           "enabled": true
         }
-      }
+      },
+      "models": {}
     },
     "sewer-axonhub-work": {
       "npm": "@ai-sdk/openai-compatible",
@@ -109,7 +111,8 @@
         "modelsDiscovery": {
           "enabled": true
         }
-      }
+      },
+      "models": {}
     }
   },
   "experimental": {
