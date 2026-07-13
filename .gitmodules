@@ -7,7 +7,7 @@
 	branch = main
 [submodule "plugins/opencode-models-discovery"]
 	path = config/plugins/opencode-models-discovery
-	url = https://github.com/Sewer56/opencode-models-discovery.git
+	url = https://github.com/yuhp/opencode-models-discovery.git
 	branch = main
 [submodule "tools/rust-llm-tidy"]
 	path = tools/rust-llm-tidy
