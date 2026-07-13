@@ -6,8 +6,8 @@
     "HIGH": "sewer-axonhub/glm-5.2"
   },
   "work": {
-    "LOW": "sewer-axonhub-work/gpt-5.4-mini",
-    "MED": "sewer-axonhub-work/gpt-5.4",
-    "HIGH": "sewer-axonhub-work/gpt-5.5"
+    "LOW": "sewer-axonhub-work/gpt-5.6-luna",
+    "MED": "sewer-axonhub-work/gpt-5.6-terra",
+    "HIGH": "sewer-axonhub-work/gpt-5.6-sol"
   }
 }
