@@ -1,14 +1,20 @@
 ### Requirement fidelity
-Every user requirement, constraint, and question from the original request needs at least one `[P#]` item or an explicit out-of-scope decision.
+Every user requirement and constraint maps to an `[AC-#]`, `[P#]`, `[D#]`, explicit invariant, or explicit out-of-scope decision.
+
+### Observable acceptance
+Acceptance criteria describe externally observable behavior, stable contracts, or executable checks. They do not merely restate files to edit or internal implementation steps.
 
 ### Action appropriateness
-`[P#]` actions must match the stated goal and not contradict user intent. Investigation-only requests should plan discovery or ask open questions, not implementation.
+`[P#]` outcomes must advance the stated goal without contradicting decisions, invariants, or non-goals. Investigation-only requests plan discovery rather than silently becoming implementation work.
 
-### File path validity
-Paths in `**Files:**` lines and diff headers must exist or be plausible new targets within repo structure.
-Block nonexistent paths unless the item gives a plausible creation rationale under the matching module.
+### Dependency integrity
+Dependencies are acyclic. Contract/data/schema producers precede consumers unless tightly coupled work is deliberately kept in one cohort to preserve a valid repository state.
 
-### Illustrative snippets
-Code snippets in draft items are illustrative, not binding implementation instructions.
-Severity: ADVISORY unless exact speculative code blocks reviewer understanding.
-Prefer short signatures or shapes over speculative full function bodies.
+### Target plausibility
+Named paths and symbols must be verified or explicitly described as plausible new targets under an existing module. Bounded discovery areas are allowed when exact placement is an implementation detail rather than a design decision.
+
+### Risk and verification coverage
+Changed behavior needs tests or an explicit reason tests are not applicable. Material security, performance, migration, compatibility, and user-documentation risks must be routed and reflected in acceptance or verification.
+
+### Appropriate detail
+Plans contain approved behavior, contracts, dependencies, and evidence—not speculative patch mechanics. Exact code is advisory at best and blocking when it falsely constrains a valid implementation or quickly becomes stale.

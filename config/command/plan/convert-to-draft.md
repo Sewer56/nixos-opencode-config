@@ -1,7 +1,7 @@
 ---
-description: "Convert conversation context into a draft implementation plan"
+description: "Convert conversation context into the collaborative draft format"
 agent: _plan/draft
 ---
 
-Additional instructions (if any):
+Create or update a draft from the current conversation. Extra instructions:
 $ARGUMENTS

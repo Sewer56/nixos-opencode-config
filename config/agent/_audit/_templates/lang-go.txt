@@ -1,6 +1,0 @@
-Enumerate: First letter capitalized. Skip: lowercase first letter.
-Module Boundary: each directory with `.go` files sharing same `package` clause = one package. Cross-reference boundaries are per-package: files in different package (even under same `go.mod`) are external. Exported item used by another package must remain exported — Go has no narrower scope.
-Re-export: Go has no re-exports. Public items accessible via import.
-Qualified Path: `pkgname.Identifier` or `recv.Method`.
-Test Patterns: `*_test.go`.
-Special Case: items in `internal/` directories are compiler-enforced module-private regardless of capitalization. **Skip all.**

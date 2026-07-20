@@ -4,7 +4,6 @@ members = [
   "model-switcher",
   "chunk-files-by-tokens",
   "token-count-after-expand",
-  "iterate-static-check",
 ]
 resolver = "3"
 

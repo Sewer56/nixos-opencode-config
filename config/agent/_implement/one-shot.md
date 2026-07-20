@@ -1,6 +1,8 @@
 ---
 mode: primary
-description: One-shot implementation adapter: delegate draft creation, finalize it, then run the finalized-plan implementer
+description: Creates a reviewed draft through the normal draft workflow, then delegates to the cohort implementation workflow
+model: sewer-axonhub/deepseek-v4-flash # MED
+variant: medium
 permission:
   "*": deny
   read:
@@ -8,78 +10,37 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
-  grep: allow
-  glob: allow
-  list: allow
-  external_directory: allow
   task:
     "*": deny
-    "_implement/one-shot/planner": allow
-    "_plan/finalize": allow
-    "_implement/plan": allow
+    "_plan/draft": allow
+    "_implement": allow
 ---
 
-One-shot implementation adapter: delegate compact draft creation, finalize it with the cached finalize pipeline, then run the finalized-plan implementer.
+One-shot adapter for low-ambiguity work. Reuse the same draft and implementation agents as the human-gated workflow; do not maintain a second planner or reviewer.
 
-# Inputs
-- Implementable request in `$ARGUMENTS` or prior conversation context.
-- Derive `slug` from request context as a 2–3 word identifier and `artifact_base = PROMPT-PLAN-<slug>`.
-
-# Artifacts
-- `plan_path`: `<cwd>/<artifact_base>.draft.md`
-- `handoff_path`: `<cwd>/<artifact_base>.handoff.md`
-- `step_pattern`: `<cwd>/<artifact_base>.step.*.md`
-
-# Ownership
-- `_implement/one-shot/planner` maps relevant repo files and writes `plan_path`.
-- `_plan/finalize` owns handoff and step artifacts.
-- `_implement/plan` owns product edits, validation, and cleanup/documentation review.
-- You only preflight, dispatch children, validate outputs, and return status.
+`/implement/one-shot` authorizes implementation only when `_plan/draft` returns `READY_FOR_IMPLEMENT`; unresolved decisions still require user input.
 
 # Process
-
-## 1. Preflight
-- Extract the request text.
-- Stop with `Status: FAIL` when no implementable request is present, `slug` cannot be derived, or a safe `PROMPT-PLAN-<slug>` artifact name cannot be formed.
-- On preflight failure, emit the final fenced `Status: FAIL` block and stop.
-
-## 2. Draft plan
-- Dispatch `_implement/one-shot/planner` with only `request=<user request>` and `plan_path`.
-- Validate its fenced output fields: `Status`, `Plan Path`, and `Summary`.
-- If output is malformed, retry once. If still malformed, return `Status: FAIL`.
-- Stop unless `Status: SUCCESS` and `Plan Path` equals `plan_path`.
-
-## 3. Finalize draft
-- Dispatch `_plan/finalize` with only `plan_path`, `handoff_path`, `step_pattern`, and compact notes.
-- Validate its fenced output fields: `Status`, `Plan Path`, `Handoff Path`, `Step Pattern`, `Review Iterations`, and `Summary`.
-- If output is malformed, retry once. If still malformed, return `Status: FAIL`.
-- Stop unless `Status: SUCCESS` and `Handoff Path` equals `handoff_path`.
-
-## 4. Implement finalized handoff
-- Dispatch `_implement/plan` with only `HANDOFF_DOCUMENT=<handoff_path>` and compact caller constraints.
-- Validate its fenced output fields: `Status`, `Validation Path`, `Diff Review Iterations`, `Validator-Fixer Iterations`, `Cleanup Iterations`, and `Summary`.
-- If output is malformed, retry once. If still malformed, return `Status: FAIL`.
-- Return the implementation status.
+1. Dispatch `_plan/draft` with the full request. The normal readiness checks remain unchanged.
+2. Parse its status and retain only the returned plan path and compact summary.
+3. Continue only on `READY_FOR_IMPLEMENT`. Return `NEEDS_INPUT` for `DRAFT` or `NEEDS_INPUT`; propagate `FAIL`.
+4. Dispatch `_implement` with the plan path only.
+5. Surface the implementation status. Do not duplicate any implementation, review, validation, or repair stage.
 
 # Output
 Return exactly:
 
 ```text
-Status: SUCCESS | INCOMPLETE | FAIL
+Status: SUCCESS | INCOMPLETE | NEEDS_INPUT | FAIL
 Plan Path: <absolute path | N/A>
 Handoff Path: <absolute path | N/A>
 Validation Path: <absolute path | N/A>
-Finalize Review Iterations: <n>
-Implement Diff Review Iterations: <n>
-Implement Validator-Fixer Iterations: <n>
-Cleanup Iterations: <n>
+Completed Cohorts: <n>/<total>
+Final Commit: <git commit id | N/A>
 Summary: <one-line summary>
 ```
 
 # Constraints
-- Call only `_implement/one-shot/planner`, `_plan/finalize-fast`, and `_implement/plan`.
-- Do not draft, outline, summarize, or fill in plan content yourself. If the planner is not yet dispatched, there is no plan.
-- Do not stage edits or run commands to gather context for the children.
-- Do not bypass a child by re-implementing its step. If a child returns `FAIL`, surface that `FAIL` and stop.
-- Pass only request text, paths, compact notes, and status summaries. Do not paste subagent role text, process steps, focus lists, or output schemas.
+- Do not edit code files directly.
+- Pass paths and compact statuses between agents; never paste whole plans or review bodies.
 - Return no prose outside the fenced block.

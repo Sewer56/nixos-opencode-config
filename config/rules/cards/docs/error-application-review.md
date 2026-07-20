@@ -1,5 +1,5 @@
 ### Error application fidelity
-Applied source docs must match the proposed/cached error section: functions, paths, lines, variants, and triggers align.
+Applied source docs must match the current traced error facts and implementation: functions, paths, lines, variants, and triggers align.
 Block dropped proposed variants or trigger changes unless code evidence proves the proposal obsolete.
 
 ### Zero-path fallback

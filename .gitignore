@@ -1,10 +1,15 @@
-# Prompt files
-PROMPT-*.md
+# Local LLM workflow artifacts
+/PROMPT-*.md
+/ISSUE-*.md
+/pr.md
+/artifact/
+/artifacts/
 
-# Python cache
+# Python cache and local environments
 __pycache__/
-
-tools/workflow-optimize/__pycache__/
+.venv/
+.cache/
+/tmp/
 
 # Rust build output
 /target/
@@ -12,28 +17,13 @@ tools/workflow-optimize/__pycache__/
 **/*.rs.bk
 *.pdb
 
-# Windows setup bin output (built .exe + cache marker)
+# Windows setup output
 /bin/
 
-# Nix build symlink
-result
-result-*
-
-# direnv cache
+# Nix and direnv output
+/result
+/result-*
 .direnv/
 
-# VSCode local reviews
+# Editor-local reviews
 .vscode/local-reviews/
-
-# Review logs
-*.review-implementation.md
-*.review-implementation.actions.*.md
-
-# Adjudicator leg outputs
-*.review-*.a.md
-*.review-*.b.md
-*.review-*.a.actions.*.md
-*.review-*.b.actions.*.md
-
-# LLM Artifacts
-artifacts/*

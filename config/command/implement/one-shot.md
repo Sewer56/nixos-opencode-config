@@ -1,5 +1,5 @@
 ---
-description: "One-shot implementation via finalize-fast and finalized-plan runner"
+description: "One-shot draft, bounded plan review, and cohort implementation"
 agent: _implement/one-shot
 ---
 

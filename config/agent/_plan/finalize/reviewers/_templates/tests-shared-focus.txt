@@ -1,9 +1,0 @@
-{{ file="./rules/groups/tests/target-test-strategy.md" }}
-
-{{ file="./rules/groups/tests/target-test-parameterization.md" }}
-
-## Trust snapshots
-Trust step file diffs and handoff snapshots. Open repo test files only for specific verification needs.
-
-Bad: reread unrelated repo tests for every item.
-Good: trust step diffs and open repo tests only to resolve a specific coverage question.

@@ -1,14 +1,7 @@
 ---
-description: "Run CodeRabbit CLI review and auto-apply fixes"
+description: "Run CodeRabbit and repair blockers or requested advisories"
 agent: _review/coderabbit
 ---
 
-Run CodeRabbit review on current changes and automatically apply all findings.
-
-# Inputs
-
-- `$ARGUMENTS`: optional base branch and review constraints.
-- Pass `base_branch` to the agent as the first branch-like token in `$ARGUMENTS`; if absent, use `origin/main`.
-
-Additional instructions:
+Optional: base branch; review type (`all`, `committed`, or `uncommitted`); `apply advisories`.
 $ARGUMENTS

@@ -3,7 +3,7 @@
   Build OpenCode (bun install + bun run build --single), git-state cached.
 
 .DESCRIPTION
-  Matches the opencodeBuildScript in flake.nix, with a cache layer:
+  Builds the pinned OpenCode submodule with a git-state cache:
     - Cache key: `git -C opencode-source rev-parse HEAD`
     - Marker:    bin\.cache\opencode.sha
     - Hit when:  SHA matches AND bin\opencode.exe present AND not -ForceRebuild

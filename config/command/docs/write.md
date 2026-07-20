@@ -1,7 +1,8 @@
 ---
-description: "Write or modify end-user-facing documentation with review loop"
-agent: _docs/write
+description: "Write or revise scoped end-user documentation with verified review"
+agent: _docs
 ---
 
-Additional instructions (if any):
+Mode: WRITE
+Request and target scope:
 $ARGUMENTS

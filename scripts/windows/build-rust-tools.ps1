@@ -5,10 +5,9 @@
 .DESCRIPTION
   Two phases:
     - Main workspace: cargo build --release --workspace in tools\
-      (matches flake.nix cargoBuildFlags). Copies 5 .exe to bin\:
+      Copies 4 .exe to bin\:
         opencode-model-switcher, opencode-sessions,
-        chunk-files-by-tokens, token-count-after-expand,
-        iterate-static-check
+        chunk-files-by-tokens, token-count-after-expand
     - rust-llm-tidy submodule (separate workspace at
       tools\rust-llm-tidy\src\Cargo.toml). Auto-runs
       `git submodule update --init` if the submodule is missing.
@@ -21,7 +20,7 @@
 #>
 #Requires -Version 5.1
 
-# Build the main Rust workspace (5 tool binaries).
+# Build the main Rust workspace (4 tool binaries).
 function Build-RustWorkspace {
   param([hashtable]$PreFlight)
 
@@ -60,8 +59,7 @@ function Build-RustWorkspace {
     'opencode-model-switcher',
     'opencode-sessions',
     'chunk-files-by-tokens',
-    'token-count-after-expand',
-    'iterate-static-check'
+    'token-count-after-expand'
   )
 
   $result = 'done'

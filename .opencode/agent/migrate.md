@@ -8,7 +8,11 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
-  edit: allow
+  edit:
+    "*": deny
+    "opencode-source/**": allow
+    "opencode-source/.git": deny
+    "opencode-source/.git/**": deny
   bash: allow
   glob: allow
   grep: allow

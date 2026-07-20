@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Enumerates error-returning functions in one module, traces error paths, and classifies error docs
+description: Exhaustively traces public error-returning APIs in an explicit bounded file chunk
 model: sewer-axonhub/deepseek-v4-flash # LOW
 permission:
   "*": deny
@@ -10,95 +10,78 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
+  edit:
+    "*": deny
+    "artifact/*.facts.md": allow
   grep: allow
   glob: allow
   list: allow
-  bash: allow
-  external_directory: allow
-  edit:
+  bash:
     "*": deny
-    "*PROMPT-ERROR-DOCS*.md": allow
+    "git grep *": allow
 ---
 
-Enumerate all error-returning functions in one module, trace every error path in each function body, and classify the existing error documentation.
+Trace public error-returning APIs in one explicit file chunk. The caller owns file enumeration and chunk completeness; do not broaden scope or use iterative cache discovery.
 
 # Inputs
-
-- `target_path`: absolute path to the module root, crate directory, or source file
-- `language`: language name as reported by `codebase-explorer`
-- `repo_root`: absolute path to the repository root
-- `cache_path`: absolute path to the per-module cache file (e.g. `artifact/PROMPT-ERROR-DOCS.<module_name>.cache.md`). Each collector receives its own file — no concurrent writes to a shared cache.
-
-# Focus
+- `repo_root`: absolute repository root.
+- `language`: detected language.
+- `target_files`: explicit repository-relative source files in this chunk.
+- `facts_path`: unique output artifact.
 
 {{ file="./rules/groups/docs/search-error-collection.md" }}
 
-# Workflow
+# Process
+1. Read every target file completely enough to enumerate public/exported error-returning APIs under the repository's language conventions.
+2. For each API, trace direct error construction, `?`/propagation, thrown/rejected errors, mapped errors, called helper contracts, and conditional branches.
+3. Follow only narrowly necessary local callees. Record an unresolved edge instead of guessing when the callee contract cannot be established.
+4. Compare reachable paths with the existing `# Errors`, `@throws`, or language-equivalent section.
+5. Classify each API as `specific`, `missing`, `vague`, `incorrect`, or `incomplete-evidence`.
+6. Write all facts once. Do not suppress `specific` APIs; the complete inventory is how the caller proves file coverage.
 
-## 1. Enumerate
+# Artifact
+Write `facts_path`:
 
-Read `cache_path` if it exists. Skip functions already present in the cache (matching file path + function name).
+```markdown
+# Error documentation facts
+Language: <language>
+Files: <comma-separated target files>
+Status: COMPLETE | INCOMPLETE
 
-Find every **public** error-returning function in `target_path` using the detection and scope rules from the language file (described in `# Language Rules`). Private and internal helpers are out of scope.
+## APIs
+### `<path:line>` - `<symbol>`
+Visibility: <public/exported form>
+Return/Error Shape: <type or throw/rejection form>
+Documentation: specific | missing | vague | incorrect | incomplete-evidence
+Reachable Paths:
+- `<variant or type>` when <exact trigger> - Evidence: `<path:line or callee>`
+- None
+Documentation Gap: <specific gap or None>
+Unresolved Edges:
+- <callee or dynamic path that could not be established>
+- None
 
-For each function record: name, file path, line number, return type.
-
-## 2. Trace
-
-For each detected function, read the full function body. Using the tracing rules from the language file, enumerate every reachable error path.
-
-For each error path record:
-- Variant: the specific error variant, class, or type
-- Trigger: the exact condition in the function body that produces this error
-
-When a single variant is reachable from multiple conditions, record one entry per condition.
-
-## 3. Classify
-
-For each function, examine the doc comments immediately above the function definition. Apply the classification decision table from the language file.
-
-Do **not** emit per-item blocks for `specific` functions. Omit them entirely; report only their count in the summary.
-
-## 4. Return
-
-Write to `cache_path` using the `## artifact/PROMPT-ERROR-DOCS.cache.md` template from `config/agent/_refactor/errors.md`:
-- Create parent directories for `cache_path` unconditionally before writing (mkdir -p semantics: no overwrite, no existence check).
-- If the file does not exist, write it from the template.
-- If it exists, use targeted edits to insert new items into `## Items` and update the summary counts.
-- Do not modify items already in the cache.
-
-Return the `# Output` review block summarizing found items and counts. Use `Decision: PASS` when the scan is complete and cache is updated. The primary agent re-runs collectors until convergence (step 4), verifying exhaustiveness.
-
-# Output
-
-Return ONLY the fenced `text` block below.
-
-```text
-# REVIEW
-Agent: _refactor/errors/collector
-Decision: PASS
-
-## Findings
-### [ITEM-###]
-Category: NEW_ITEM | UPDATED_ITEM
-Function: <name>
-File: <relative_path:line>
-Classification: missing | vague
-Traced Paths: <count>
-
-## Summary
-- Module: <target_path>
-- Language: <language>
-- New items: <count>
-- Total items in cache: <count>
+## Coverage
+- Files read: <n>/<target_files count>
+- Public error-returning APIs: <n>
+- Specific: <n>
+- Missing/vague/incorrect: <n>
+- Incomplete evidence: <n>
 ```
 
-# Malformed-Output Retry
+# Output
+Return exactly:
 
-If the caller reports that the output does not start with `# REVIEW`, reuse the existing cache state and re-emit a protocol-compliant response. Do not re-read source files that have already been traced — their results are in the cache.
+```text
+Status: COMPLETE | INCOMPLETE | FAIL
+Facts Path: <facts_path>
+Files Read: <n>/<total>
+APIs: <n>
+Gaps: <n>
+Summary: <one-line summary>
+```
 
-# Language Rules
-
-Language file directory: `~/opencode/config/agent/_refactor/_templates/`
-
-Read `lang-<language>-errors.txt` from that directory (e.g. `lang-rust-errors.txt`, `lang-typescript-errors.txt`). If the file does not exist for the given language, return only the summary block with a note: `No language rules for <language> — skipped.`
+# Constraints
+- Write only `facts_path`.
+- Never edit source or use a shared cache.
+- Return no prose outside the fenced block.

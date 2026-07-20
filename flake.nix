@@ -91,11 +91,6 @@
         description = "Estimate prompt token counts after md-expand rendering";
       };
 
-      iterate-static-check = mkTool {
-        pname = "iterate-static-check";
-        description = "Static checks for iterate/edit artifacts";
-      };
-
       # rust-llm-tidy lives in a git submodule with its own workspace.
       # Pure flakes cannot track submodule files, so it is built at runtime
       # via the cargo-backed wrapper in the Home-Manager module.
@@ -168,7 +163,6 @@
         (mkCargoTool {name = "opencode-sessions";})
         (mkCargoTool {name = "chunk-files-by-tokens";})
         (mkCargoTool {name = "token-count-after-expand";})
-        (mkCargoTool {name = "iterate-static-check";})
         (mkCargoTool {
           name = "rust-llm-tidy";
           package = "rust-llm-tidy-cli";
@@ -182,6 +176,10 @@
         pkgs.yarn
         pkgs.docker
         pkgs.bun
+        (pkgs.python3.withPackages (pythonPackages: [
+          pythonPackages.json5
+          pythonPackages.pyyaml
+        ]))
       ];
 
       # Editable config → ~/.config/opencode.
@@ -205,7 +203,6 @@
       opencode-sessions = self.packages.${system}.opencode-sessions;
       chunk-files-by-tokens = self.packages.${system}.chunk-files-by-tokens;
       token-count-after-expand = self.packages.${system}.token-count-after-expand;
-      iterate-static-check = self.packages.${system}.iterate-static-check;
     });
 
     # nix run .#opencode-sessions -- tui
@@ -234,12 +231,6 @@
         meta.description = "Estimate prompt token counts after md-expand rendering";
       };
 
-      iterate-static-check = {
-        type = "app";
-        program = "${self.packages.${system}.iterate-static-check}/bin/iterate-static-check";
-        meta.description = "Static checks for iterate/edit artifacts";
-      };
-
       default = opencode-model-switcher;
     });
 
@@ -258,13 +249,16 @@
           pkgs.rust-analyzer
           pkgs.pkg-config
           pkgs.stdenv.cc
+          (pkgs.python3.withPackages (pythonPackages: [
+            pythonPackages.json5
+            pythonPackages.pyyaml
+          ]))
 
           # Built CLI tools - ready to run inside the shell.
           tools.opencode-model-switcher
           tools.opencode-sessions
           tools.chunk-files-by-tokens
           tools.token-count-after-expand
-          tools.iterate-static-check
         ];
       };
     });

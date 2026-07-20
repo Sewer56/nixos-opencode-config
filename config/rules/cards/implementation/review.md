@@ -1,11 +1,8 @@
 ### Implementation fidelity
-Changes must satisfy the described outcome, files, and anchors. Exact text is not required when behavior is equivalent.
-Block unrelated edits that omit planned anchor behavior.
+Changes must satisfy the approved outcome, acceptance criteria, contracts, and invariants. Exact syntax is not required when behavior is equivalent. Block unrelated edits that omit or contradict required behavior.
 
 ### No severe regression
-Block obvious broken logic, missing critical error handling, and unintended scope creep introduced or exposed by the change.
-Allow minor style differences, harmless refactors, and behavior-equivalent plan drift.
+Block concrete broken logic, missing critical error handling, invalid state transitions, compatibility failures, and unintended scope introduced or exposed by the change. Allow minor style differences, harmless refactors, and behavior-equivalent mechanical drift.
 
-### Functional correctness
-Run the program's build and test suite when available. Capture command, exit code, and key output.
-Block failing builds/tests or observed runtime errors; pass when checks succeed and expected behavior is observable.
+### Functional evidence
+Use the supplied validation ledger and actual tree-to-tree diff. Treat an executed failing build, type check, test, linter, or static analyzer as blocking when it identifies a product defect in scope. Do not rerun deterministic checks from a read-only review agent and do not infer PASS from a missing or unavailable check; report the evidence gap as `INCOMPLETE` when material.

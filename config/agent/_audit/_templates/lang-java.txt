@@ -1,6 +1,0 @@
-Enumerate: `public`, `protected`, or no modifier (package-private). Skip: `private`.
-Module Boundary: source root matching package declaration.
-Re-export: Java has no re-exports. Public items accessible via import.
-Qualified Path: `org.pkg.Class.item` or `import org.pkg.Class.item`.
-Test Patterns: `*Test.java`.
-Special Case: items accessed via `Class.forName("Name")` or `getMethod("name")` may be effectively public even with zero compile-time external usages.

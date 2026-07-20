@@ -20,3 +20,6 @@ Example: select the top slice, then sort only the kept slice.
 
 ### Grounded performance judgment
 Read referenced target code before judging performance risk. Do not infer N+1 or unbounded-work risk from plan wording alone when target code is available.
+
+### Micro-optimizations
+Flag a grounded small reduction in allocations, copies, calls, or repeated work as ADVISORY when it preserves clarity. It is BLOCKING only when measured or bounded evidence shows material impact or an explicit performance requirement is violated.

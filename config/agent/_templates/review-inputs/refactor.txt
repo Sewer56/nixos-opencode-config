@@ -1,1 +1,0 @@
-- `handoff_path` (e.g., `artifact/<artifact_base>.handoff.md`)

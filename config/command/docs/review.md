@@ -1,7 +1,8 @@
 ---
-description: "Review existing end-user-facing documentation and apply fixes"
-agent: _docs/review
+description: "Review and repair scoped end-user documentation with verified findings"
+agent: _docs
 ---
 
-Additional instructions (if any):
+Mode: REVIEW
+Request and target scope:
 $ARGUMENTS

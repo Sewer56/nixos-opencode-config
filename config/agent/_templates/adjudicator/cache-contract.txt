@@ -1,2 +1,0 @@
-## Cache contract
-Preserve the canonical {{arg:domain}} pointer/actions/cache contract.

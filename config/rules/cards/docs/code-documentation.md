@@ -24,5 +24,5 @@ Prefer `[Name]` in text plus one reference definition over repeated long inline 
 ### No legacy docs backfill
 Do not backfill untouched legacy files solely for docs.
 
-### Machine-plan docs specificity
-In machine plans, docs must appear in the relevant snippet or diff; generic `update docs` notes are insufficient.
+### Implementation-plan docs specificity
+In implementation plans, name the affected documentation surface, audience, and behavioral change. Generic `update docs` notes are insufficient; exact prose or patch hunks are not required.

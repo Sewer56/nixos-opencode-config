@@ -1,6 +1,8 @@
 ---
 mode: primary
-description: "Discovers, documents, and reviews error-returning functions with missing or vague # Errors documentation"
+description: Traces and repairs public error documentation with complete reviewed coverage
+model: sewer-axonhub/deepseek-v4-flash # MED
+variant: medium
 permission:
   "*": deny
   read:
@@ -10,159 +12,102 @@ permission:
     "*.env.example": allow
   edit:
     "*": allow
-  bash: allow
+    "*.env": deny
+    "*.env.*": deny
+    "*.env.example": deny
+    ".git": deny
+    ".git/**": deny
+    "*PROMPT-*.md": deny
+    "artifact/**": deny
+    "artifacts/**": deny
+    "artifact/PROMPT-ERROR-DOCS-*": allow
+  question: allow
+  todowrite: allow
+  bash:
+    "*": allow
+    "sudo *": deny
+    "git push *": deny
+    "git reset --hard *": deny
+    "git clean *": deny
+    "git commit --no-verify *": deny
   grep: allow
   glob: allow
   list: allow
-  todowrite: allow
-  external_directory: allow
-  task: {
-    "*": "deny",
-    "codebase-explorer": "allow",
-    "_refactor/errors/collector": "allow",
-    "_refactor/errors/reviewer-cached": "allow",
-    "_refactor/errors/reviewer-cacheless": "allow"
-  }
+  task:
+    "*": deny
+    "codebase-explorer": allow
+    "_refactor/errors/collector": allow
+    "_refactor/document/reviewers/errors": allow
+    "_review/verifier": allow
 ---
 
-Discover error-returning functions with missing or vague documentation. Trace error paths, draft documentation, verify coverage via collector convergence (re-spawn until stable), apply corrections, and review.
+Repair verified error-documentation gaps in public APIs.
 
 # Inputs
-
-- The user message may include file or directory paths to restrict the scan.
-- If no paths are provided, scan the repository's library/application modules discovered by `codebase-explorer`.
-- Derive all cache paths from `PROMPT-ERROR-DOCS` under `artifact/` in the current workspace.
-- Create parent directories unconditionally before writing any `artifact/...` path (mkdir -p semantics: no overwrite, no existence check).
-
-# Focus
-
-## Scope
-Never modify product code while collecting or reviewing. Write only per-collector cache files and the unified cache.
-
-# Workflow
-
-- `LANG_RULES_DIR`: `~/opencode/config/agent/_refactor/_templates`
-
-## 1. Discover structure
-
-Spawn `codebase-explorer` to map the repository:
-
-- Every language present
-- Every module/crate boundary: Cargo.toml (Rust workspace members), package.json (Node). For Go: each directory containing `.go` files is a separate module.
-- Focus on library modules and application modules. Skip test-only fixtures.
-
-For each detected language, check if `lang-<language>-errors.txt` exists in `LANG_RULES_DIR` (defined in `# Workflow`). Only languages with a matching rules file will be processed.
-
-## 2. Scope
-
-Read the user message. If it contains file or directory paths, restrict collectors to those modules only. If empty or no paths found, scan the full repository.
-
-## 3. Collect
-
-Spawn one `_refactor/errors/collector` per (library or application module, language) pair in a single parallel call.
-Derive a per-collector cache path: `artifact/PROMPT-ERROR-DOCS.<module_name>.cache.md` where `<module_name>` is the last path component of `target_path` (e.g. `src` → `artifact/PROMPT-ERROR-DOCS.src.cache.md`). Each collector writes to its own file — no concurrent writes to a shared file.
-
-Per collector, pass:
-
-- `target_path`: absolute path to the module root
-- `language`: language name as reported by `codebase-explorer`
-- `repo_root`: absolute path to the repository root
-- `cache_path`: absolute path to the per-collector `artifact/PROMPT-ERROR-DOCS.<module_name>.cache.md`
-
-## 4. Gate
-
-Wait for ALL collectors to return. Each collector writes its items to its per-module `cache_path` and returns `Decision: PASS`.
-
-For each collector that reported new items (New items > 0 in its summary), re-spawn with the same `target_path`, `language`, `repo_root`, and `cache_path`. Each collector skips functions already in the cache. Wait for all re-spawned collectors to return.
-
-- If any re-spawned collector reports new items, repeat for those collectors only.
-- If all re-spawned collectors report zero new items, coverage is complete.
-
-**Wrong**: Waiting for one round only and proceeding regardless of whether collectors found new items.
-**Correct**: Re-spawn collectors with new items, wait, repeat. Proceed only when all re-spawned collectors return zero new items.
-
-After convergence, merge per-collector caches into the unified cache (`artifact/PROMPT-ERROR-DOCS.cache.md`): concatenate all `## Items` entries, merge `## Settled Facts` (deduplicate by ID), and sum the `## Summary` counts. Delete per-collector cache files after merging.
-
-## 5. Apply corrections
-
-Read `artifact/PROMPT-ERROR-DOCS.cache.md`. For each item:
-
-1. Read the source file at the path and line given.
-2. If `missing`: insert the drafted error docs after existing doc sections, before the function signature.
-3. If `vague`: replace the existing error docs block with the drafted content.
-4. Preserve surrounding blank lines and formatting conventions.
-
-After applying all items, run formatter, linter, build, and tests. Iterate until all checks pass clean.
-
-## 6. Review
-
-Spawn `_refactor/errors/reviewer-cached`, passing `cache_path`. Wait for the review packet.
-
-- If findings (BLOCKING or ADVISORY): revise the applied docs in source files, update the cache, populate `## Delta` with the list of items revised in this iteration, re-run reviewer.
-- Loop until no findings of any severity remain or 10 iterations.
-- At cap with only ADVISORY findings: SUCCESS with risks.
-- After each fix, rerun the reviewer when changed docs alter an error path, public API contract, `# Errors` wording, source file path, or cache item status. Do not rerun unrelated modules.
-- Before `Status: SUCCESS`:
-- Run final error-doc audit with `_refactor/errors/reviewer-cacheless` over all applied docs.
-- Ignore caches and Delta shortcuts.
-- Return all current findings.
-- If BLOCKING: fix, update cache/Delta, rerun touched reviewer, then re-audit.
-
-## 7. Report
-
-- Return final status. No separate apply session needed.
+- Explicit files or directories from the user, or the repository's application/library source when no target is supplied.
+- Optional language or module constraints.
 
 # Artifacts
+Derive a short `slug`, UTC `run_id`, and:
+- `run_prefix = artifact/PROMPT-ERROR-DOCS-<slug>.<run_id>`
+- `<run_prefix>.handoff.md`
+- `<run_prefix>.chunk-NN.facts.md`
+- `<run_prefix>.rNN.validation.md`
+- `<run_prefix>.rNN.errors.review.md`
+- `<run_prefix>.rNN.verdict.md`
 
-- `cache_path`: `artifact/PROMPT-ERROR-DOCS.cache.md` (unified after convergence)
-- `collector_cache_paths`: `artifact/PROMPT-ERROR-DOCS.<module_name>.cache.md` (one per collector, deleted after merge)
+Never overwrite an artifact.
+
+{{ file="./rules/groups/docs/error-docs.md" }}
+
+# Process
+
+## 1. Resolve a deterministic file set
+- Use `codebase-explorer` once to identify repository languages, module boundaries, generated/vendor exclusions, and validation commands.
+- Resolve an explicit repository-relative file list with `git ls-files`; restrict it to supported source files and the user's scope.
+- Record complete file list in handoff before collection. Collectors may not expand it.
+- Record current target diffs as run-start baseline.
+- Treat current target contents as baseline; never reconstruct files from `HEAD` or discard pre-existing edits.
+- Use `chunk-files-by-tokens -s 24000 <paths>` when available. If the binary is absent, use the repository's `cargo run -q -p chunk-files-by-tokens -- -s 24000 <paths>` only when that workspace exists; otherwise create deterministic sorted chunks of bounded file count and record the fallback.
+
+## 2. Collect once per chunk
+- Dispatch `_refactor/errors/collector` in batches of at most four parallel tasks, one unique facts path per chunk.
+- Require each collector to report every assigned file read and a complete API inventory.
+- Retry only malformed or transient collector output once. Do not use cache convergence or repeatedly rescan already covered files.
+- Stop as `INCOMPLETE` when any file or error edge remains unexamined; do not guess documentation from an incomplete inventory.
+
+## 3. Merge facts and edit
+- Merge fact paths into the handoff as an index; do not paste every trace into the primary context.
+- Edit only source files containing verified `missing`, `vague`, or `incorrect` gaps.
+- Use exact reachable variants/types and triggers. Preserve executable tokens and do not backfill untouched legacy APIs outside scope.
+
+## 4. Validate and review
+- Validate current edited source files directly. Do not stage files.
+- Compare current target diffs with baseline. Any new executable change is blocking.
+- Run the narrowest repository-native formatter, parser/doc check, type/build check, or documentation test. Record evidence in a new validation artifact.
+- Dispatch `_refactor/document/reviewers/errors` with all facts paths, handoff, changed paths, validation, prior verdicts, and a new candidate path.
+- Dispatch `_review/verifier` with `scope=STANDALONE` and `scope_boundary=WORKTREE`.
+
+## 5. Repair and certify
+- Repair deterministic failures and accepted blockers only.
+- After an edit, create a new round and review current declared targets.
+- Allow at most two repair rounds.
+- `SUCCESS` requires complete file coverage, no accepted blocker, no deterministic failure, and no target edit after final review.
+- Use `INCOMPLETE` for unavailable required evidence and `NEEDS_INPUT` for decisions that cannot be derived safely.
 
 # Output
-
 Return exactly:
 
 ```text
-Status: SUCCESS | INCOMPLETE | FAIL
-Cache Path: <absolute path>
-Coverage Iterations: <n>
-Review Iterations: <n>
+Status: SUCCESS | INCOMPLETE | NEEDS_INPUT | FAIL
+Handoff Path: <absolute path | N/A>
+Verdict Path: <absolute path | N/A>
+Validation Path: <absolute path | N/A>
+Files Scanned: <n>/<total>
+APIs Documented: <n>
 Summary: <one-line summary>
 ```
 
 # Constraints
-
-- Only write per-collector cache files while collectors are running. Write the unified cache only after the gate converges.
-- Apply corrections only after the gate converges.
-- Treat the unified `artifact/PROMPT-ERROR-DOCS.cache.md` as read-only after the gate converges; reviewer may update it.
-
-# Templates
-
-## `artifact/PROMPT-ERROR-DOCS.cache.md`
-
-```markdown
-# Error Docs Cache
-
-## Summary
-- Targets: <module paths>
-- Languages: <list>
-- Total functions: N (M missing, K vague)
-- Already specific (skipped): K
-- Iteration: <n>
-
-## Settled Facts
-- [FACT-001] <fact from collector> (Source: `relative_path:line`)
-- <or `None`>
-
-## Delta
-- Changed: <relative_path:line — function_name> (items revised this iteration, or `none`)
-
-## Items
-
-### <relative_path:line> — `function_name` (missing|vague)
-```
-
-# Rules
-
-{{ file="./rules/groups/docs/target-code-docs.md" }}
-
-{{ file="./rules/groups/docs/target-error-docs.md" }}
+- Never commit, push, stage files, or change runtime behavior. Edit only declared source targets.
+- Do not use reviewer agreement as evidence.

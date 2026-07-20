@@ -1,6 +1,7 @@
 ---
-description: "Rewrite vague or missing `# Errors` docs with specific variant-level bullets"
+description: "Trace and repair public error documentation with verified coverage"
 agent: _refactor/errors
 ---
-Additional instructions (if any):
+
+Target paths, languages, or module constraints:
 $ARGUMENTS
