@@ -97,7 +97,7 @@
         "apiKey": "{file:~/.secrets/axonhub-key}",
         "modelsDiscovery": {
           "enabled": true,
-          "modelInfoFormat": "models.dev"
+          "modelInfoFormat": "axonhub"
         }
       }
     },
@@ -109,7 +109,7 @@
         "apiKey": "{file:~/.secrets/axonhub-work-key}",
         "modelsDiscovery": {
           "enabled": true,
-          "modelInfoFormat": "models.dev"
+          "modelInfoFormat": "axonhub"
         }
       }
     }
