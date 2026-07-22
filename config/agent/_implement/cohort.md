@@ -96,7 +96,7 @@ Add every other input declared by the selected reviewer to that envelope. Requir
 
 ## 4. Call exact verifier and repair
 
-Send candidates to `_review/verifier`. Repair accepted blockers only; never advisories.
+Send candidates to `_review/verifier`. Repair accepted blockers and advisories.
 
 After repair, restage and rerun all checks, correctness, quality, and affected optional reviews; then verify candidates.
 
@@ -119,4 +119,4 @@ Repair Turns: [[n]]
 Summary: [[one line]]
 ```
 
-Never push, reset, amend, run another code writer, or apply advisories.
+Never push, reset, amend, or run another code writer.
