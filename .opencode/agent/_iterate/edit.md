@@ -22,6 +22,7 @@ permission:
   todowrite: allow
   task:
     "*": deny
+    "general": allow
     "_iterate/editor": allow
     "_iterate/review": allow
     "_iterate/verifier": allow
