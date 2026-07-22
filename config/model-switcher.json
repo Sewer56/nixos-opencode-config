@@ -6,8 +6,8 @@
     "HIGH": "sewer-axonhub/glm-5.2"
   },
   "work": {
-    "LOW": "sewer-axonhub-work/gpt-5.6-luna",
-    "MED": "sewer-axonhub-work/gpt-5.6-terra",
-    "HIGH": "sewer-axonhub-work/gpt-5.6-sol"
+    "LOW": "sewer-axonhub-work/claude-sonnet-5",
+    "MED": "sewer-axonhub-work/claude-sonnet-5",
+    "HIGH": "sewer-axonhub-work/claude-fable-5"
   }
 }
