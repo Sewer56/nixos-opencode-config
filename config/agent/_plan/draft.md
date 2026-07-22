@@ -18,11 +18,6 @@ permission:
   glob: allow
   grep: allow
   list: allow
-  bash:
-    "*": deny
-    "pwd": allow
-    "git rev-parse --show-toplevel": allow
-    "git status --short *": allow
   task:
     "*": deny
     "_plan/draft/explorer": allow
