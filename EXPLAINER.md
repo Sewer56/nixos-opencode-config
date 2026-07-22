@@ -1,83 +1,207 @@
 # Architecture and rationale
 
-Configuration uses selected context, one owner per decision, deterministic evidence, bounded review, and exact commit boundaries. [README][readme] covers commands; [Iterate guide][iterate-guide] covers instruction edits.
+Configuration is built on five principles:
+
+- selected context,
+- one owner per decision,
+- deterministic evidence,
+- bounded review,
+- exact commit boundaries.
+
+[README][readme] covers commands; [Iterate guide][iterate-guide] covers instruction edits.
 
 ## Architecture
 
-```text
-request
-  -> repository-grounded behavioral draft
-  -> independent draft review
-  -> human approval
-  -> dependency-ordered cohorts
-  -> one cohort owner per cohort:
-       code -> checks -> correctness + quality -> optional specialists
-            -> finding verifier -> bounded repair -> exact commit
-  -> full validation + cumulative integration review
+Draft:
+
+```mermaid
+flowchart TD
+    request([request]) --> explorer
+
+    subgraph s1["1. Draft agent"]
+        explorer[explorer: repository impact map] --> draft[behavioral draft]
+        draft --> draftReview[draft reviewer]
+    end
+
+    draftReview --> approval([human approval])
 ```
 
-Approved draft owns behavior. [Implementation orchestrator][implement] creates cohorts and calls [cohort agent][cohort] exactly once per cohort. Cohort agent owns writing, checks, review, repair, and commit, which keeps local failures in one context while reviewers remain read-only and independent.
+Implementation:
 
-## Context selection
+```mermaid
+flowchart TD
+    approval([approved draft]) --> plan
 
-Agents begin from requested behavior and exact targets, map direct producers and consumers, inspect one dependency hop, and expand only when a call, import, schema, manifest, migration, test, trace, or trust-boundary clue can change decision. They pass paths and evidence references instead of copied repositories or transcripts.
+    subgraph sPlan["2. Cohort planner"]
+        plan[dependency-ordered cohorts,<br/>one handoff]
+    end
 
-This aims to improve relevant context density. [Repoformer][repoformer] reports that selective retrieval brought “as much as 70% inference speedup ... without harming the performance” on repository-level completion benchmarks.[^repoformer-scope] [Lost in the Middle][lost-middle] found performance “significantly degrades” when relevant information sits in middle of long contexts. [CodeRabbit path instructions][coderabbit-paths] similarly document that excluding irrelevant files “keeps reviews focused and fast.” These sources support selection, not this repository's exact one-hop rule.
+    plan --> write
 
-[Draft explorer][draft-explorer] builds impact map. [Cohort planner][create-cohorts] groups source, tests, and required documentation by observable outcome and orders groups by repository dependency. Cohort structure is local design choice, not a claimed reproduction of external planning research.
+    subgraph s3["3. Cohort agent — sole code writer, called once per cohort in dependency order"]
+        write[write code] --> stage[stage exact paths]
+        stage --> checkLoop
 
-## Implementation and commits
+        subgraph checkLoop["quick-check loop"]
+            quick[planner-derived quick checks<br/>+ targeted tests] -- deterministic failure --> quickRepair[repair, restage]
+            quickRepair --> quick
+        end
 
-[Cohort loop][cohort] stages only cohort paths in real Git index and runs repository-native quick checks. Correctness and quality always review exact proposed commit. Tests, security, and performance live under [optional review subtree][optional-reviews] and run only when change triggers their domain.
+        checkLoop -- PASS --> review
 
-Candidate findings from internal reviewers go to [shared verifier][review-verifier]. Accepted blockers may enter repair; advisories remain visible and do not trigger edits. Every selected reviewer must complete before commit. [Commit agent][commit-agent] commits only approved staged paths while preserving unrelated staged and unstaged changes.
+        subgraph repairLoop["review-repair loop — ≤ 5 turns/cohort"]
+            review[reviewers: correctness + quality<br/>+ optional specialists] --> verifier[shared finding verifier]
+            verifier -- accepted blocker --> blockerRepair[repair, restage,<br/>rerun checks + reviews]
+            blockerRepair --> review
+        end
 
-Final gate runs full validation and reviews cumulative base-to-final implementation. A final repair has two identities:
+        verifier -- no blocker --> commit[commit agent: exact staged paths]
+    end
+
+    commit -- all cohorts done --> finalLoop
+
+    subgraph s4["4. Final integration gate — orchestrator-owned"]
+        subgraph finalLoop["integration loop — ≤ 2 repair turns"]
+            final[full validation + cumulative<br/>base-to-final integration review]
+            final -- accepted blocker --> finalRepair[integration repair,<br/>revalidate + re-review,<br/>exact commit]
+            finalRepair --> final
+        end
+    end
+
+    finalLoop -- PASS --> done([done])
+```
+
+Ownership is split cleanly:
+
+- Approved draft owns behavior.
+- [Implementation orchestrator][implement] creates cohorts, calls [cohort agent][cohort] exactly once per cohort, and owns the final gate.
+- Cohort agent owns writing, checks, review, repair, and commit.
+
+This keeps local failures in one context while reviewers remain read-only and independent.
+
+## 1. Draft
+
+[Draft explorer][draft-explorer] builds impact map from repository evidence. Like all agents here, it selects context instead of loading everything:
+
+- begin from requested behavior and exact targets;
+- map direct producers and consumers;
+- inspect one dependency hop;
+- expand only when a call, import, schema, manifest, migration, test, trace, or trust-boundary clue can change decision;
+- pass paths and evidence references instead of copied repositories or transcripts.
+
+This aims to improve relevant context density:
+
+- [Repoformer][repoformer] reports that selective retrieval brought “as much as 70% inference speedup ... without harming the performance” on repository-level completion benchmarks.[^repoformer-scope]
+- [Lost in the Middle][lost-middle] found performance “significantly degrades” when relevant information sits in middle of long contexts.
+- [CodeRabbit path instructions][coderabbit-paths] similarly document that excluding irrelevant files “keeps reviews focused and fast.”
+
+These sources motivate selective context in general; the specific one-dependency-hop rule above is this repository's own design choice, not something these sources prescribe.
+
+Draft is independently reviewed and requires human approval before implementation starts.
+
+## 2. Cohort planning
+
+[Cohort planner][create-cohorts] converts approved draft into an implementation handoff:
+
+- groups source, tests, and required documentation by observable outcome;
+- orders groups by repository dependency;
+- routes correctness and quality always; routes tests, security, or performance only for concrete risk;
+- marks cross-cohort risk for the final gate;
+- derives full validation commands from manifests, task runners, CI, and developer docs — never invented.
+
+This mirrors [CodeRabbit's Change Stack][coderabbit-change-stack], which groups related files into "cohorts" by dependency — applied here to planning instead of review.
+
+## 3. Cohort loop
+
+[Cohort agent][cohort] is the sole code writer and loop owner for one cohort. It calls reviewers, the shared verifier, and the commit agent; it never runs another writer.
+
+### Write and stage (cohort agent)
+
+The cohort agent works on exact proposed commit:
+
+- guards against dirty targets — already-changed planned target is ambiguous ownership and returns `NEEDS_INPUT`;
+- implements smallest cohesive diff for the cohort's outcome;
+- stages only cohort paths in real Git index.
+
+### Quick checks: deterministic evidence first (cohort agent)
+
+Before semantic review, the cohort agent runs quick validation commands derived by the planner from manifests, task runners, CI, and developer docs, then applicable targeted tests. Executed product failures are repaired and rerun; unavailable tools, services, credentials, or fixtures produce `INCOMPLETE`.
+
+Execution evidence includes:
+
+- command,
+- working directory,
+- result,
+- exit code,
+- decisive output.
+
+It does not manufacture screenshots or logs. [Greptile's TREX article][greptile-trex] states, “Bad evidence is worse than no evidence,” and backs findings with scripts, logs, traces, and screenshots in disposable sandboxes. This configuration has no disposable sandbox, so it runs only authorized repository-native checks and reports unavailable proof as `INCOMPLETE`.
+
+### Review (read-only reviewer agents)
+
+The cohort agent calls reviewers only after quick checks pass:
+
+- correctness and quality always review exact proposed commit;
+- [tests][optional-reviews], [security][optional-security], and [performance][optional-performance] reviewers run only when routed or matching concrete risk;
+- reviewers inspect staged diff independently and remain read-only.
+
+Reviewers inspect code and repository evidence rather than trusting surrounding prose. Plans define approved intent; PR text, comments, summaries, and tool narration remain claims to check.
+
+[Review-finding rules][review-findings] require, for every internal candidate finding:
+
+- violated contract,
+- exact location,
+- reachable failure path,
+- material impact,
+- falsifiable verification.
+
+Severity, confidence, reviewer count, and repetition are metadata—not proof.
+
+Signal budget also matters. [Greptile reports][greptile-filtering] its own comments were 19% useful, 2% incorrect, and 79% nits; team-feedback filtering raised reported address rate from 19% to 55%+ in two weeks.[^greptile-vendor] Local reviewers cap low-value output and keep micro-optimizations advisory unless material evidence exists.
+
+### Verify and repair (shared verifier + cohort agent)
+
+Reviewer findings are often false positives, so no finding is trusted directly. Every candidate finding goes to a [shared verifier][review-verifier], which tries to refute it against the actual code before it can block anything.
+
+Once a finding survives verification, repair stays with the cohort agent:
+
+- only accepted blockers may enter repair; the cohort has at most five repair turns total, shared between quick-check failures and verified review blockers;
+- advisories remain visible and never trigger edits;
+- after repair, the cohort restages, reruns all quick checks, core reviews, and affected optional reviews, then re-verifies the new findings;
+- every selected reviewer must complete before commit.
+
+This is why verification matters: [Refute-or-Promote][refute-promote], a pipeline built to filter LLM reviewers' persistent false positives, reports killing about 79% of roughly 171 candidate findings before disclosure. In its clearest failure, ten dedicated reviewers unanimously endorsed a nonexistent vulnerability that a single empirical test rejected.[^refute-preprint] Refutation and deterministic evidence beat reviewer agreement — though this remains single-operator 2026 preprint evidence, not controlled proof of this workflow.
+
+### Commit (commit agent)
+
+[Commit agent][commit-agent] commits only approved staged paths while preserving unrelated staged and unstaged changes. Orchestrator then moves to next cohort in dependency order.
+
+## 4. Final integration gate
+
+After all cohorts commit, the [implementation orchestrator][implement] owns the gate: it runs full validation and reviews cumulative base-to-final implementation. A final repair has two identities:
 
 - cumulative base-to-final diff for integration review;
 - staged repair diff for correctness, quality, and commit.
 
-This matters because separately valid changes can compose badly. [MOSAIC-Bench][mosaic-bench] reports 53–86% exploit success across 199 three-ticket chains and about 25% neutral-review evasion on confirmed-vulnerable cumulative diffs; pentester framing reduced evasion to 3.0–17.6% in evaluated subset.[^mosaic-preprint] Local workflow therefore reviews composition and routes cross-cohort security risk explicitly.
+Integration repair is bounded to two turns; each turn revalidates, re-reviews, and commits exact repair paths.
 
-Implementation is only workflow that treats dirty target as ambiguous ownership and commits automatically. Documentation/refactor workflows edit named current contents without staging or committing, so repeated passes on already modified files remain valid.
-
-## Deterministic evidence
-
-Writers run format checks, parsers, type/build checks, and targeted tests before semantic review. Full validation follows cohort commits. Executed product failures enter bounded repair; unavailable tools, services, credentials, or fixtures produce `INCOMPLETE`.
-
-This separates observations from model claims. [Agentless][agentless] describes “a simplistic three-phase process of localization, repair, and patch validation” and reports 32.0% resolution at $0.70 average cost on SWE-bench Lite with its evaluated setup.[^agentless-scope] Local workflow uses same broad ordering, not Agentless patch sampling or benchmark configuration.
-
-Execution evidence includes command, working directory, result, exit code, and decisive output. It does not manufacture screenshots or logs. [Greptile's TREX article][greptile-trex] states, “Bad evidence is worse than no evidence,” and backs findings with scripts, logs, traces, and screenshots in disposable sandboxes. This configuration has no disposable sandbox, so it runs only authorized repository-native checks and reports unavailable proof as `INCOMPLETE`.
-
-## Finding quality
-
-[Review-finding rules][review-findings] require violated contract, exact location, reachable failure path, material impact, and falsifiable verification for internal candidate review. Severity, confidence, reviewer count, and repetition are metadata—not proof.
-
-[Refute-or-Promote][refute-promote] reports killing about 79% of roughly 171 candidates; its clearest failure had ten dedicated reviewers unanimously endorse nonexistent vulnerability that one empirical test rejected.[^refute-preprint] This supports refutation and deterministic evidence over reviewer voting, while remaining single-operator 2026 preprint evidence rather than controlled proof of this workflow.
-
-Signal budget also matters. [Greptile reports][greptile-filtering] its own comments were 19% useful, 2% incorrect, and 79% nits; team-feedback filtering raised reported address rate from 19% to 55%+ in two weeks.[^greptile-vendor] Local reviewers cap low-value output, keep micro-optimizations advisory unless material evidence exists, and never auto-apply advisories.
-
-Reviewers inspect code and repository evidence rather than trusting surrounding prose. [Sevra-Bench][sevra-bench] holds vulnerable diff fixed across 15 social-engineering framings and reports review agents “are susceptible to narrative manipulation” on retained challenge set of 1,062 adversarial PRs.[^sevra-preprint] Plans define approved intent; PR text, comments, summaries, and tool narration remain claims to check.
-
-## CodeRabbit
-
-`/review/coderabbit` invokes official structured CLI mode for `all`, `committed`, or `uncommitted` scope, requires successful terminal completion, stores exact diff identity, repairs blocking findings, validates repairs, and permits one re-review. CodeRabbit is external review authority, so its findings do not pass through local verifier.
-
-[CodeRabbit CLI reference][coderabbit-cli] defines review types and base comparison. [CodeRabbit path instructions][coderabbit-paths] say targeted instructions “work best as a targeted supplement, not a replacement,” matching local path-scoped rule approach.
+This matters because separately valid changes can compose badly, which per-cohort review cannot see; only the cumulative base-to-final diff shows the composition.
 
 ## Git boundaries
 
-Implementation assumes one repository writer:
+Implementation assumes it is the only writer in the repository:
 
-- record base commit and unrelated changed paths;
-- reject dirty planned targets because ownership is ambiguous;
-- stage only workflow-owned paths;
-- review exact cached diff;
-- pass reviewed staged paths to commit agent;
-- commit explicit paths only;
-- verify committed bytes and unchanged unrelated state.
+- if a planned target file is already dirty, it stops — someone else may own those edits;
+- it stages, reviews, and commits only the paths it changed, by explicit path;
+- everything else — your unrelated staged or unstaged work — is left untouched and verified unchanged afterward.
 
-Global `external_directory` policy is `allow`. Agent prompts use deny-by-default tool maps and inherit global policy.
+Only implementation commits automatically. Documentation and refactor workflows just edit files in place, so running them again on already-modified files is fine.
+
+## CodeRabbit
+
+The local review loop is roughly based on CodeRabbit's concepts — scoped diff, repair of blocking findings, revalidation, re-review. [CodeRabbit's path instructions][coderabbit-paths] follow the same philosophy as local rules: targeted instructions “work best as a targeted supplement, not a replacement.”
+
+CodeRabbit itself can also be invoked directly via `/review/coderabbit`, which runs the official [CodeRabbit CLI][coderabbit-cli]. As an external review authority, its findings skip the local verifier.
 
 ## Instruction authoring and iterate
 
@@ -92,7 +216,12 @@ Global `external_directory` policy is `allow`. Agent prompts use deny-by-default
 | Mechanical invariant | Existing script, test, or direct check. |
 | Usage and rationale | Human documentation. |
 
-Runtime prompts state trigger, objective, inputs, authority, decisions, stop conditions, evidence, failure behavior, and exact output. They pass paths rather than pasted context, use `[[placeholder]]`, and request evidence instead of private reasoning transcripts.
+Runtime prompts:
+
+- state trigger, objective, inputs, authority, decisions, stop conditions, evidence, failure behavior, and exact output;
+- pass paths rather than pasted context;
+- use `[[placeholder]]`;
+- request evidence instead of private reasoning transcripts.
 
 `/iterate/edit` uses one compact flow:
 
@@ -115,20 +244,26 @@ contract -> one editor -> exact staging -> validator/tests
 
 ## Validation
 
-[Configuration validator][validator] documents its checks in its module docstring and checks parseability, frontmatter, routes, reachability, task depth, permissions, imports, rule reachability, Markdown structure, local documentation links, Python/shell syntax, and required global options. [Workflow tests][workflow-tests] cover implementation-specific contracts.
+[Configuration validator][validator] documents its checks in its module docstring and checks:
+
+- parseability, frontmatter, routes, reachability;
+- task depth, permissions, imports, rule reachability;
+- Markdown structure, local documentation links;
+- Python/shell syntax, required global options.
+
+[Workflow tests][workflow-tests] cover implementation-specific contracts.
 
 [^repoformer-scope]: Repoformer evaluates repository-level code completion, not issue-resolution workflow.
-[^agentless-scope]: Agentless result comes from its 2024 SWE-bench Lite experiment and does not estimate this configuration's success rate.
 [^refute-preprint]: Refute-or-Promote is arXiv preprint and retrospective field study; authors report no autonomous vulnerability discovery and no component ablation.
 [^greptile-vendor]: Greptile numbers are vendor-reported internal metrics, not independent evaluation.
-[^mosaic-preprint]: MOSAIC-Bench is 2026 arXiv preprint on oracle-backed synthetic chains.
-[^sevra-preprint]: Sevra-Bench is 2026 arXiv preprint built from reversed historical vulnerability fixes.
 
 [readme]: README.md
 [iterate-guide]: .opencode/ITERATE.md
 [implement]: config/agent/_implement.md
 [cohort]: config/agent/_implement/cohort.md
-[optional-reviews]: config/agent/_implement/cohort/review/optional/
+[optional-reviews]: config/agent/_implement/cohort/review/optional/tests.md
+[optional-security]: config/agent/_implement/cohort/review/optional/security.md
+[optional-performance]: config/agent/_implement/cohort/review/optional/performance.md
 [review-verifier]: config/agent/_review/verifier.md
 [commit-agent]: config/agent/commit.md
 [draft-explorer]: config/agent/_plan/draft/explorer.md
@@ -140,11 +275,9 @@ contract -> one editor -> exact staging -> validator/tests
 [workflow-tests]: tests/test_implement_workflow.py
 [repoformer]: https://proceedings.mlr.press/v235/wu24a.html
 [lost-middle]: https://aclanthology.org/2024.tacl-1.9/
-[agentless]: https://arxiv.org/abs/2407.01489
 [refute-promote]: https://arxiv.org/abs/2604.19049
-[mosaic-bench]: https://arxiv.org/abs/2605.03952
-[sevra-bench]: https://arxiv.org/abs/2606.13757
 [greptile-filtering]: https://www.greptile.com/blog/make-llms-shut-up
 [greptile-trex]: https://www.greptile.com/blog/trex-code-execution
 [coderabbit-cli]: https://docs.coderabbit.ai/cli/reference
 [coderabbit-paths]: https://docs.coderabbit.ai/configuration/path-instructions
+[coderabbit-change-stack]: https://docs.coderabbit.ai/pr-reviews/coderabbit-review
