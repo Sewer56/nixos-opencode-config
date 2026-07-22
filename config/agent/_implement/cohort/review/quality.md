@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Reviews every proposed commit for code quality, placement, documentation, readability, and wording
-model: sewer-axonhub/deepseek-v4-flash # MED
-variant: medium
+model: sewer-axonhub/glm-5.2 # HIGH
+variant: high
 permission:
   "*": deny
   read:
