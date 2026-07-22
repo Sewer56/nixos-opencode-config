@@ -17,7 +17,18 @@ ROOT = Path(__file__).resolve().parent.parent
 ORCHESTRATOR = ROOT / "config/agent/_implement.md"
 CREATE_COHORTS = ROOT / "config/agent/_implement/create-cohorts.md"
 COHORT = ROOT / "config/agent/_implement/cohort.md"
+ITERATE_EDIT = ROOT / ".opencode/agent/_iterate/edit.md"
+ITERATE_EDITOR = ROOT / ".opencode/agent/_iterate/editor.md"
 COMMAND = ROOT / "config/command/implement.md"
+REVIEW_FINDINGS = ROOT / "config/rules/groups/implementation/review-findings.md"
+IMPLEMENT_REVIEWERS = (
+    ROOT / "config/agent/_implement/cohort/review/correctness.md",
+    ROOT / "config/agent/_implement/cohort/review/quality.md",
+    ROOT / "config/agent/_implement/cohort/review/optional/tests.md",
+    ROOT / "config/agent/_implement/cohort/review/optional/security.md",
+    ROOT / "config/agent/_implement/cohort/review/optional/performance.md",
+    ROOT / "config/agent/_implement/review/integration.md",
+)
 SHELL_OWNING_AGENTS = (
     ROOT / ".opencode/agent/_iterate/edit.md",
     ROOT / ".opencode/agent/_iterate/verifier.md",
@@ -134,6 +145,71 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertIn("it owns checking that applicable tests ran after staging", body)
         self.assertIn("Always call `_implement/cohort/review/quality` before commit", body)
         self.assertIn("Call optional tests, security, or performance reviewer only when routed or matching concrete risk", body)
+
+    def test_review_calls_supply_and_validate_explicit_envelopes(self) -> None:
+        for path in (COHORT, ORCHESTRATOR):
+            with self.subTest(path=path.relative_to(ROOT)):
+                body = text(path)
+                for marker in (
+                    "<review-inputs>",
+                    "one explicit envelope with every declared input",
+                    "Plan Path:",
+                    "Handoff Path:",
+                    "Base Commit:",
+                    "Changed Paths:",
+                    "Validation Path: [[concrete",
+                    "Review Path: [[concrete review_path]]",
+                    "Prior Verdict Paths:",
+                    "write the requested artifact",
+                    "return only its exact five-line `# Output` envelope",
+                    "newly created readable artifact",
+                    "artifact-consistent decision and count",
+                    "Missing or malformed evidence is `INCOMPLETE`, never PASS",
+                ):
+                    self.assertIn(marker, body)
+        self.assertIn("Cohort Path: [[concrete cohort_path]]", text(COHORT))
+        orchestrator = text(ORCHESTRATOR)
+        self.assertIn("Add `Cohort Path: None` for non-integration reviewers", orchestrator)
+        self.assertIn("Use implementation `base_commit` and final changed paths for integration/security/performance", orchestrator)
+        self.assertIn("For correctness/quality, use the commit at `HEAD` before the staged final repair and its exact staged repair paths", orchestrator)
+
+    def test_iterate_editor_calls_supply_and_validate_absolute_paths(self) -> None:
+        caller = text(ITERATE_EDIT)
+        for marker in (
+            "every `_iterate/editor` call supplies exactly",
+            "Request Path: [[absolute request_path]]",
+            "Contract Path: [[absolute contract_path]]",
+            "Repair Notes:",
+        ):
+            self.assertIn(marker, caller)
+
+        editor = text(ITERATE_EDITOR)
+        for marker in (
+            "Explicit absolute `request_path` and `contract_path`",
+            "Before editing, reject missing, non-absolute, unreadable, or non-file `request_path` or `contract_path`",
+            "read contract first and request second",
+        ):
+            self.assertIn(marker, editor)
+
+    def test_implementation_reviewers_fail_closed_via_shared_rule(self) -> None:
+        rule = text(REVIEW_FINDINGS)
+        for marker in (
+            "- Validate one explicit labeled `<review-inputs>` envelope",
+            "every declared input",
+            "write the requested artifact with `Decision: INCOMPLETE`",
+            "exact `# Output` envelope with `Status: INCOMPLETE`",
+            "- Valid input: write the requested artifact",
+            "return only the declared output envelope",
+        ):
+            self.assertIn(marker, rule)
+        for path in IMPLEMENT_REVIEWERS:
+            with self.subTest(path=path.relative_to(ROOT)):
+                body = text(path)
+                self.assertIn('{{ file="./rules/groups/implementation/review-findings.md" }}', body)
+                self.assertIn("validation_path", body)
+                self.assertIn("review_path", body)
+                self.assertIn("# Artifact", body)
+                self.assertIn("# Output", body)
 
     def test_optional_reviewers_have_distinct_subtree(self) -> None:
         review = ROOT / "config/agent/_implement/cohort/review"

@@ -57,7 +57,15 @@ For iterate control-file changes, run config validation and workflow tests befor
 
 ## 2. Edit
 
-Skip writer for VERIFY-only work. Otherwise call `_iterate/editor`; repair notes contain only failed checks or verified target blockers.
+Skip writer for VERIFY-only work. Otherwise every `_iterate/editor` call supplies exactly:
+
+```text
+<editor-inputs>
+Request Path: [[absolute request_path]]
+Contract Path: [[absolute contract_path]]
+Repair Notes: [[failed checks or verified target blockers, otherwise None]]
+</editor-inputs>
+```
 
 ## 3. Stage exact targets and validate
 

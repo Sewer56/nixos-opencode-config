@@ -74,9 +74,25 @@ Stop on non-success. Before next cohort, require returned commit at `HEAD` and u
 2. Run handoff full validation. Missing environment is `INCOMPLETE`; code failure enters `_implement/integration-repair`.
 3. After repair, reject out-of-scope paths and stage only repair paths. Rerun full validation, including applicable tests, and write fresh ledger before review.
 4. Always call `_implement/review/integration`. For staged repair, also call `_implement/cohort/review/correctness` and `_implement/cohort/review/quality`. Route security/performance only for concrete cross-cohort risk. Every selected reviewer must complete.
-5. Send candidates to `_review/verifier`; send accepted blockers to `_implement/integration-repair`. Never repair advisories.
-6. Allow two final repair turns. Each turn: repair, stage approved paths, validate including tests, then rerun integration, correctness, quality, and affected optional reviews with fresh ledger. Remaining blocker is `FAIL`; missing evidence is `INCOMPLETE`.
-7. Re-read staged repair, call `commit` with exact repair paths, and confirm commit scope plus preserved unrelated changes. Do not create empty commit.
+5. Before every reviewer call, reserve a nonexisting review path and supply one explicit envelope with every declared input and placeholder resolved:
+
+```text
+<review-inputs>
+Plan Path: [[concrete plan_path]]
+Handoff Path: [[concrete handoff_path]]
+Base Commit: [[concrete reviewer baseline]]
+Scope: [[committed base_commit..HEAD or staged repair against base_commit]]
+Changed Paths: [[concrete reviewer changed paths]]
+Validation Path: [[concrete latest full validation_path]]
+Review Path: [[concrete review_path]]
+Prior Verdict Paths: [[concrete paths or None]]
+</review-inputs>
+```
+
+   Use implementation `base_commit` and final changed paths for integration/security/performance. For correctness/quality, use the commit at `HEAD` before the staged final repair and its exact staged repair paths. Add `Cohort Path: None` for non-integration reviewers; omit Scope for correctness/quality, use `Scope: FINAL_COMMITTED | FINAL_STAGED` for security/performance, and add every other input declared by the selected reviewer. Require the reviewer to write the requested artifact and return only its exact five-line `# Output` envelope. Then require a newly created readable artifact conforming to the reviewer's `# Artifact` schema at the exact Review Path, with an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count. Missing or malformed evidence is `INCOMPLETE`, never PASS.
+6. Send candidates to `_review/verifier`; send accepted blockers to `_implement/integration-repair`. Never repair advisories.
+7. Allow two final repair turns. Each turn: repair, stage approved paths, validate including tests, then rerun integration, correctness, quality, and affected optional reviews with fresh ledger. Remaining blocker is `FAIL`; missing evidence is `INCOMPLETE`.
+8. Re-read staged repair, call `commit` with exact repair paths, and confirm commit scope plus preserved unrelated changes. Do not create empty commit.
 
 ## 4. Finish
 

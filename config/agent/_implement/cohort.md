@@ -77,7 +77,22 @@ Review only after quick checks PASS.
 - Always call `_implement/cohort/review/quality` before commit.
 - Call optional tests, security, or performance reviewer only when routed or matching concrete risk.
 
-Give reviewers plan/cohort context, staged paths, validation, output path, and prior verdicts. They inspect staged diff independently. Every selected reviewer must complete.
+Before each call, reserve a nonexisting review path and supply one explicit envelope with every declared input and placeholder resolved; for security or performance add `Scope: COHORT_STAGED`:
+
+```text
+<review-inputs>
+Plan Path: [[concrete plan_path]]
+Handoff Path: [[concrete handoff_path]]
+Cohort Path: [[concrete cohort_path]]
+Base Commit: [[cohort start commit]]
+Changed Paths: [[concrete staged paths]]
+Validation Path: [[concrete latest validation_path]]
+Review Path: [[concrete review_path]]
+Prior Verdict Paths: [[concrete paths or None]]
+</review-inputs>
+```
+
+Add every other input declared by the selected reviewer to that envelope. Require it to inspect staged diff independently, write the requested artifact, and return only its exact five-line `# Output` envelope. Then require a newly created readable artifact conforming to its `# Artifact` schema at the exact Review Path, with an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count. Missing or malformed evidence is `INCOMPLETE`, never PASS. Every selected reviewer must complete.
 
 ## 4. Call exact verifier and repair
 
