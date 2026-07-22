@@ -269,7 +269,7 @@ contract -> one editor -> exact staging -> validator/tests
 [draft-explorer]: config/agent/_plan/draft/explorer.md
 [create-cohorts]: config/agent/_implement/create-cohorts.md
 [review-findings]: config/rules/groups/implementation/review-findings.md
-[instruction-standard]: .opencode/agent/_iterate/rules/instruction-authoring.md
+[instruction-standard]: .opencode/rules/instruction-authoring.md
 [iterate-agent]: .opencode/agent/_iterate/edit.md
 [validator]: scripts/validate-opencode-config.py
 [workflow-tests]: tests/test_implement_workflow.py

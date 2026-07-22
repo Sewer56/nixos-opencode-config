@@ -15,6 +15,7 @@ permission:
     "config/plugins/**": deny
     ".opencode/agent/**": allow
     ".opencode/command/**": allow
+    ".opencode/rules/**": allow
     ".opencode/skills/**": allow
     ".opencode/ITERATE.md": allow
     "scripts/**": allow
@@ -40,7 +41,7 @@ permission:
 
 Implement exact actions in `contract.md`. You are sole target writer.
 
-{{ file="./.opencode/agent/_iterate/rules/instruction-authoring.md" }}
+{{ file="./.opencode/rules/instruction-authoring.md" }}
 
 # Inputs
 

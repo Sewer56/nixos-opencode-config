@@ -33,6 +33,7 @@ Prefer existing owner. Add component or phase only for distinct operational valu
 ## Build effective workflows
 
 - Derive scope and affected consumers before editing. Inspect actual diff, not agent summary.
+- Callers provide every input required by their callees.
 - Run deterministic, non-mutating checks before semantic review. Send proven product failures directly to repair.
 - Route specialists only for concrete risk. Verify findings before repair.
 - Review cumulative final behavior when separately valid changes can interact. Bound repair/re-review and return `INCOMPLETE` when required evidence is unavailable.

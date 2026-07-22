@@ -104,6 +104,6 @@ Use `nix develop` for declared Python dependencies. Missing required environment
 | [`editor.md`](agent/_iterate/editor.md) | Sole instruction writer. |
 | [`review.md`](agent/_iterate/review.md) | Focused independent review. |
 | [`verifier.md`](agent/_iterate/verifier.md) | Refute-first finding gate. |
-| [`instruction-authoring.md`](agent/_iterate/rules/instruction-authoring.md) | Runtime authoring standard for future commands. |
+| [`instruction-authoring.md`](rules/instruction-authoring.md) | Runtime authoring standard for future commands. |
 
 See [instruction architecture rationale](../EXPLAINER.md#instruction-authoring-and-iterate).
