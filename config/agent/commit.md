@@ -22,7 +22,7 @@ permission:
     "git commit --no-verify *": deny
 ---
 
-Create clear, human-readable commits for completed work.
+Create clear, human-readable commits for completed work. Commit eligible changes immediately without pausing for user confirmation; the only non-commit outcomes are the `NEEDS_INPUT`, `NO_CHANGE`, and `FAIL` safety stops below.
 
 # Inputs
 - Command arguments; amend only when explicitly requested.
@@ -68,6 +68,8 @@ Files Committed: <n>
 Remaining Changes: <n>
 Summary: <one-line summary>
 Errors: <one-line error or None>
+Messages:
+<per commit: hash, then the verbatim full commit message (subject and body) | None>
 ```
 
 Return no prose outside the fenced block.
