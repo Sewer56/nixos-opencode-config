@@ -18,6 +18,8 @@ Agent frontmatter and permissions:
 Commands and task graph:
 - Validate command targets, entry points, routes, reachability, cycles, disabled
   agents, and maximum custom task depth of three edges.
+- Write config.subagent_depth as (maximum custom task depth + 2) so nested
+  Task calls never hit the runtime depth limit.
 
 Prompt structure and imports:
 - Check Markdown fences, output contracts, imports, import cycles, rule
@@ -422,6 +424,22 @@ def main() -> int:
         + str(max_depth)
         + (" (" + " -> ".join(max_path) + ")" if max_path else "")
     )
+
+    required_subagent_depth = max_depth + 2
+    if config.get("subagent_depth") != required_subagent_depth:
+        raw = config_path.read_text(encoding="utf-8")
+        match = re.search(r'"subagent_depth"\s*:\s*\d+', raw)
+        if match:
+            updated = raw[: match.start()] + f'"subagent_depth": {required_subagent_depth}' + raw[match.end() :]
+        else:
+            updated = raw.replace(
+                '"autoupdate": false,',
+                f'"autoupdate": false,\n  "subagent_depth": {required_subagent_depth},',
+                1,
+            )
+        config_path.write_text(updated, encoding="utf-8")
+        config["subagent_depth"] = required_subagent_depth
+    details.append(f"config.subagent_depth: {required_subagent_depth}")
 
     all_prompt_files = active_prompt_files(repo)
     imported_targets: set[Path] = set()
