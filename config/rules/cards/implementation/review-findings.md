@@ -22,7 +22,7 @@ Correctness review remains responsible for the complete behavioral change. Speci
 Merge duplicate findings by root cause. Reject findings already handled in the current tree, based on stale line context, contradicted by an existing guard, intentionally deferred to a named dependent cohort without invalidating the current state, or previously refuted without new evidence. Treat pure moves, renames, generated churn, and formatter-only edits as context rather than semantic defects unless they change behavior or hide a contract violation.
 
 ### Repair boundary
-Only accepted BLOCKING findings and deterministic validation failures enter the automatic repair loop. Advisories remain visible but are not automatically implemented.
+In the cohort loop, accepted BLOCKING findings, accepted advisories, and deterministic validation failures enter repair. At the final integration gate, only accepted BLOCKING findings and deterministic validation failures enter repair; advisories remain visible but are not automatically implemented.
 
 ### Signal budget
 Normally emit no more than five findings for one small cohort and one domain, ordered by materiality and evidence strength. Do not fill a quota. If more than five independent material blockers survive, emit every blocker, suppress advisories, and note that the change may be systemic or the cohort may be too broad. Omit speculative low-value observations.

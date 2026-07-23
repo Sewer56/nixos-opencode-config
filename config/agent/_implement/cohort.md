@@ -33,6 +33,7 @@ permission:
     "git reset --hard *": deny
     "git clean *": deny
     "git commit --no-verify *": deny
+    "git commit *": deny
   task:
     "*": deny
     "_implement/cohort/review/correctness": allow
@@ -48,9 +49,11 @@ Process exactly one created cohort. You are sole code writer and loop owner for 
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
+{{ file="./rules/cards/implementation/artifact-paths.md" }}
+
 # Inputs
 
-`plan_path`, `handoff_path`, `cohort_path`, `run_prefix`.
+`plan_path`, `handoff_path`, `cohort_path`, `run_prefix`. `validation_path`, `review_path`, and `verdict_path` are computed from `run_prefix` and the cohort id per the artifact-paths card.
 
 # Loop
 
@@ -67,7 +70,7 @@ Process exactly one created cohort. You are sole code writer and loop owner for 
 2. Inspect staged diff and run `git diff --cached --check`.
 3. Run quick validation, then applicable targeted tests. Record concrete reason when no test applies. Do not install dependencies or update snapshots/generated files.
 4. Record commands, results, decisive output, missing environment, and test evidence in validation artifact.
-5. Repair code failures, restage, and rerun all quick checks. Missing environment is `INCOMPLETE`.
+5. Repair code failures, restage, and rerun all quick checks, overwriting the current round's `validation_path`; `rNN` increments only on post-review repair turns. Missing environment is `INCOMPLETE`.
 
 ## 3. Call exact reviewers
 
@@ -77,28 +80,28 @@ Review only after quick checks PASS.
 - Always call `_implement/cohort/review/quality` before commit.
 - Call optional tests, security, or performance reviewer only when routed or matching concrete risk.
 
-Before each call, reserve a nonexisting review path and supply one explicit envelope with every declared input and placeholder resolved; for security or performance add `Scope: COHORT_STAGED`:
+Before each call, compute `review_path` per the artifact-paths card for the current round; the writer creates or overwrites it. Supply one explicit envelope with every declared input and placeholder resolved; for security or performance add `Scope: COHORT_STAGED`:
 
 ```text
 <review-inputs>
-Plan Path: [[concrete plan_path]]
-Handoff Path: [[concrete handoff_path]]
-Cohort Path: [[concrete cohort_path]]
+Plan Path: [[plan_path]]
+Handoff Path: [[handoff_path]]
+Cohort Path: [[cohort_path]]
 Base Commit: [[cohort start commit]]
 Changed Paths: [[concrete staged paths]]
-Validation Path: [[concrete latest validation_path]]
-Review Path: [[concrete review_path]]
+Validation Path: [[validation_path]]
+Review Path: [[review_path]]
 Prior Verdict Paths: [[concrete paths or None]]
 </review-inputs>
 ```
 
-Add every other input declared by the selected reviewer to that envelope. Require it to inspect staged diff independently, write the requested artifact, and return only its exact five-line `# Output` envelope. Then require a newly created readable artifact conforming to its `# Artifact` schema at the exact Review Path, with an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count. Missing or malformed evidence is `INCOMPLETE`, never PASS. Every selected reviewer must complete.
+Add every other input declared by the selected reviewer to that envelope. Require it to inspect staged diff independently, write the requested artifact, and return only its exact five-line `# Output` envelope. After each reviewer returns, read the artifact at the exact assigned `review_path`; require a readable, schema-conforming artifact at the exact assigned `review_path`, artifact-consistent with the returned envelope, with an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count. Missing or malformed evidence is `INCOMPLETE`, never PASS; an envelope without its on-disk artifact is missing evidence. Every selected reviewer must complete. A failed or cancelled delegation is `FAIL` or `INCOMPLETE`; never perform delegated review, verdict, or commit work yourself; never report SUCCESS without its evidence.
 
 ## 4. Call exact verifier and repair
 
-Send candidates to `_review/verifier`. Repair accepted blockers and advisories.
+Send candidates to `_review/verifier` with an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`. Repair accepted blockers and advisories.
 
-After repair, restage and rerun all checks, correctness, quality, and affected optional reviews; then verify candidates.
+After repair, restage and rerun all checks, correctness, quality, and affected optional reviews; rerun the verifier when re-reviews emit new candidates.
 
 Allow at most five repair turns total across deterministic and verified-review failures. Remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
 

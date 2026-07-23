@@ -13,15 +13,41 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifact/*.verdict.md": allow
+    "artifact/**": allow
   grep: allow
   glob: allow
   list: allow
   bash:
-    "*": deny
-    "git diff *": allow
-    "git show *": allow
-    "git grep *": allow
+    "*": allow
+    "sudo *": deny
+    "git push *": deny
+    "git commit *": deny
+    "git add *": deny
+    "git reset *": deny
+    "git clean *": deny
+    "git rebase *": deny
+    "git merge *": deny
+    "git checkout *": deny
+    "git switch *": deny
+    "git restore *": deny
+    "git stash *": deny
+    "git rm *": deny
+    "git mv *": deny
+    "git apply *": deny
+    "git cherry-pick *": deny
+    "git revert *": deny
+    "rm *": deny
+    "mv *": deny
+    "cp *": deny
+    "touch *": deny
+    "mkdir *": deny
+    "rmdir *": deny
+    "tee *": deny
+    "dd *": deny
+    "ln *": deny
+    "chmod *": deny
+    "chown *": deny
+    "patch *": deny
 ---
 
 Verify candidate findings against the actual scoped code. Candidate reviewers generate hypotheses; this agent is the only review stage allowed to make them repair-eligible.
@@ -46,6 +72,9 @@ Apply imported evidence rules to exact scope. For each candidate, locate cited c
     - `INCOMPLETE`: potentially material but impossible to verify with available evidence or environment.
 
 Rewrite accepted item as smallest self-contained correction and proof step. Never copy speculative patch.
+
+# Writable surface
+Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
 
 # Artifact
 Write `verdict_path`:
@@ -110,5 +139,5 @@ Summary: <one-line summary>
 # Constraints
 - Write only `verdict_path`.
 - Never edit code or candidate artifacts.
-- Only accepted blockers may enter automatic repair.
+- Repair eligibility follows the imported repair boundary.
 - Return no prose outside the fenced block.

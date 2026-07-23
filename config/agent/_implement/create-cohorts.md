@@ -13,16 +13,41 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifact/*PROMPT-PLAN*.implement.handoff.md": allow
-    "artifact/*PROMPT-PLAN*.implement.C??.md": allow
+    "artifact/**": allow
   grep: allow
   glob: allow
   list: allow
   bash:
-    "*": deny
-    "git ls-files *": allow
-    "git grep *": allow
-    "git show *": allow
+    "*": allow
+    "sudo *": deny
+    "git push *": deny
+    "git commit *": deny
+    "git add *": deny
+    "git reset *": deny
+    "git clean *": deny
+    "git rebase *": deny
+    "git merge *": deny
+    "git checkout *": deny
+    "git switch *": deny
+    "git restore *": deny
+    "git stash *": deny
+    "git rm *": deny
+    "git mv *": deny
+    "git apply *": deny
+    "git cherry-pick *": deny
+    "git revert *": deny
+    "rm *": deny
+    "mv *": deny
+    "cp *": deny
+    "touch *": deny
+    "mkdir *": deny
+    "rmdir *": deny
+    "tee *": deny
+    "dd *": deny
+    "ln *": deny
+    "chmod *": deny
+    "chown *": deny
+    "patch *": deny
 ---
 
 Create compact executable cohorts from approved behavior. Reconcile live repository drift without editing code or prescribing patch hunks.
@@ -32,6 +57,8 @@ Create compact executable cohorts from approved behavior. Reconcile live reposit
 `plan_path`, `base_commit`, `run_id`, `run_prefix`, `handoff_path`.
 
 {{ file="./rules/groups/implementation/cohort-planning.md" }}
+
+{{ file="./rules/cards/implementation/artifact-paths.md" }}
 
 # Discovery
 
@@ -80,7 +107,7 @@ Run ID: [[run_id]]
 - [[SECURITY, PERFORMANCE only with cross-cohort reason]]
 ```
 
-Write one `[[run_prefix]].Cnn.md` per cohort:
+Write one cohort artifact at `cohort_path` per cohort:
 
 ```markdown
 # Cnn: [[outcome]]

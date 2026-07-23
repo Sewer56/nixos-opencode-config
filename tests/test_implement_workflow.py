@@ -35,7 +35,6 @@ SHELL_OWNING_AGENTS = (
     ROOT / "config/agent/_audit/public-api.md",
     ROOT / "config/agent/_docs.md",
     ORCHESTRATOR,
-    COHORT,
     ROOT / "config/agent/_implement/integration-repair.md",
     ROOT / "config/agent/_refactor/document.md",
     ROOT / "config/agent/_refactor/errors.md",
@@ -50,6 +49,47 @@ SHARED_BASH_PERMISSION = """  bash:
     "git reset --hard *": deny
     "git clean *": deny
     "git commit --no-verify *": deny
+"""
+COHORT_BASH_PERMISSION = SHARED_BASH_PERMISSION + '    "git commit *": deny\n'
+READ_ONLY_BASH_PERMISSION = """  bash:
+    "*": allow
+    "sudo *": deny
+    "git push *": deny
+    "git commit *": deny
+    "git add *": deny
+    "git reset *": deny
+    "git clean *": deny
+    "git rebase *": deny
+    "git merge *": deny
+    "git checkout *": deny
+    "git switch *": deny
+    "git restore *": deny
+    "git stash *": deny
+    "git rm *": deny
+    "git mv *": deny
+    "git apply *": deny
+    "git cherry-pick *": deny
+    "git revert *": deny
+    "rm *": deny
+    "mv *": deny
+    "cp *": deny
+    "touch *": deny
+    "mkdir *": deny
+    "rmdir *": deny
+    "tee *": deny
+    "dd *": deny
+    "ln *": deny
+    "chmod *": deny
+    "chown *": deny
+    "patch *": deny
+"""
+VERIFIER = ROOT / "config/agent/_review/verifier.md"
+ARTIFACT_PATHS_CARD = ROOT / "config/rules/cards/implementation/artifact-paths.md"
+ARTIFACT_WRITERS = (ORCHESTRATOR, *IMPLEMENT_REVIEWERS, VERIFIER, CREATE_COHORTS)
+READ_ONLY_BASH_AGENTS = (*IMPLEMENT_REVIEWERS, VERIFIER, CREATE_COHORTS)
+WRITABLE_SURFACE_AGENTS = (*IMPLEMENT_REVIEWERS, VERIFIER)
+WRITABLE_SURFACE = """# Writable surface
+Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
 """
 
 
@@ -157,17 +197,18 @@ class ImplementWorkflowTests(unittest.TestCase):
                     "Handoff Path:",
                     "Base Commit:",
                     "Changed Paths:",
-                    "Validation Path: [[concrete",
-                    "Review Path: [[concrete review_path]]",
+                    "Validation Path: [[validation_path]]",
+                    "Review Path: [[review_path]]",
+                    "Verdict Path: [[verdict_path]]",
                     "Prior Verdict Paths:",
                     "write the requested artifact",
                     "return only its exact five-line `# Output` envelope",
-                    "newly created readable artifact",
+                    "readable, schema-conforming artifact at the exact assigned `review_path`, artifact-consistent with the returned envelope",
                     "artifact-consistent decision and count",
                     "Missing or malformed evidence is `INCOMPLETE`, never PASS",
                 ):
                     self.assertIn(marker, body)
-        self.assertIn("Cohort Path: [[concrete cohort_path]]", text(COHORT))
+        self.assertIn("Cohort Path: [[cohort_path]]", text(COHORT))
         orchestrator = text(ORCHESTRATOR)
         self.assertIn("Add `Cohort Path: None` for non-integration reviewers", orchestrator)
         self.assertIn("Use implementation `base_commit` and final changed paths for integration/security/performance", orchestrator)
@@ -250,7 +291,7 @@ class ImplementWorkflowTests(unittest.TestCase):
 
     def test_real_index_staging_is_scoped(self) -> None:
         frontmatter = text(COHORT).split("---", 2)[1]
-        self.assertIn(SHARED_BASH_PERMISSION, frontmatter)
+        self.assertEqual(COHORT_BASH_PERMISSION, bash_permission(frontmatter))
         self.assertIn("stage only paths changed by cohort writer", text(COHORT))
         self.assertIn("git diff --cached", text(COHORT))
 
@@ -266,7 +307,8 @@ class ImplementWorkflowTests(unittest.TestCase):
         frontmatter = body.split("---", 2)[1]
         self.assertIn('edit:\n    "*": deny', frontmatter)
         self.assertNotIn('edit:\n    "*": allow', frontmatter)
-        self.assertIn('"artifact/*PROMPT-PLAN*.final.r??.validation.md": allow', frontmatter)
+        self.assertIn('"artifact/**": allow', frontmatter)
+        self.assertIn("model: sewer-axonhub/glm-5.2 # HIGH", body)
 
     def test_no_agent_overrides_global_external_directory(self) -> None:
         for root in (ROOT / "config/agent", ROOT / ".opencode/agent"):
@@ -296,6 +338,75 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertIn('git commit --amend', body)
         self.assertIn("Never bypass hooks", body)
         self.assertIn("stage with blanket pathspecs", body)
+
+    def test_artifact_writers_can_write_only_artifacts(self) -> None:
+        for path in ARTIFACT_WRITERS:
+            with self.subTest(path=path.relative_to(ROOT)):
+                frontmatter = text(path).split("---", 2)[1]
+                self.assertIn('edit:\n    "*": deny\n    "artifact/**": allow', frontmatter)
+
+    def test_reviewers_and_verifier_use_read_only_bash_blacklist(self) -> None:
+        for path in READ_ONLY_BASH_AGENTS:
+            with self.subTest(path=path.relative_to(ROOT)):
+                frontmatter = text(path).split("---", 2)[1]
+                self.assertEqual(READ_ONLY_BASH_PERMISSION, bash_permission(frontmatter))
+
+    def test_cohort_denies_direct_git_commit(self) -> None:
+        frontmatter = text(COHORT).split("---", 2)[1]
+        self.assertIn('"git commit *": deny', frontmatter)
+        self.assertIn('"artifact/**": deny', frontmatter)
+
+    def test_artifact_paths_card_binds_path_variables(self) -> None:
+        self.assertTrue(ARTIFACT_PATHS_CARD.is_file())
+        card = text(ARTIFACT_PATHS_CARD)
+        for marker in (
+            "never a directory",
+            "`review_path`",
+            "`verdict_path`",
+            "creates or overwrites that exact file",
+            "never write any other path",
+            "stub",
+        ):
+            self.assertIn(marker, card)
+        card_import = '{{ file="./rules/cards/implementation/artifact-paths.md" }}'
+        for path in (ORCHESTRATOR, COHORT, CREATE_COHORTS):
+            with self.subTest(path=path.relative_to(ROOT)):
+                self.assertIn(card_import, text(path))
+
+    def test_reviewers_and_verifier_declare_writable_surface(self) -> None:
+        for path in WRITABLE_SURFACE_AGENTS:
+            with self.subTest(path=path.relative_to(ROOT)):
+                body = text(path)
+                self.assertIn(WRITABLE_SURFACE, body)
+
+    def test_reviewer_gate_fails_closed_without_writes(self) -> None:
+        rule = text(REVIEW_FINDINGS)
+        self.assertIn("not writable, write nothing", rule)
+        self.assertIn("Never probe, relocate, or write any other artifact", rule)
+
+    def test_committed_content_is_self_contained(self) -> None:
+        self.assertIn(
+            "never cite plan- or cohort-only identifiers",
+            text(ROOT / "config/rules/cards/docs/code-documentation.md"),
+        )
+        self.assertIn("plan-internal", text(ROOT / "config/rules/cards/structure/plan-artifacts.md"))
+
+    def test_advisory_repair_split(self) -> None:
+        card = text(ROOT / "config/rules/cards/implementation/review-findings.md")
+        self.assertIn("In the cohort loop, accepted BLOCKING findings, accepted advisories", card)
+        self.assertIn("At the final integration gate, only accepted BLOCKING findings", card)
+        self.assertIn("Repair accepted blockers and advisories", text(COHORT))
+        self.assertIn("Never repair advisories", text(ORCHESTRATOR))
+
+    def test_cohort_delegation_honesty_and_reverify(self) -> None:
+        body = text(COHORT)
+        self.assertIn("never perform delegated review, verdict, or commit work yourself", body)
+        self.assertIn("rerun the verifier when re-reviews emit new candidates", body)
+
+    def test_orchestrator_preflight_and_restart_hygiene(self) -> None:
+        body = text(ORCHESTRATOR)
+        self.assertIn(".git/info/exclude", body)
+        self.assertIn("remove its partial artifacts and stubs", body)
 
     def test_non_implement_writers_accept_current_target_state(self) -> None:
         for relative in (

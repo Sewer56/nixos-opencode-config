@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Orchestrates an approved draft through dependency-ordered cohorts and final integration review
-model: sewer-axonhub/deepseek-v4-flash # MED
+model: sewer-axonhub/glm-5.2 # HIGH
 variant: high
 permission:
   "*": deny
@@ -12,7 +12,7 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifact/*PROMPT-PLAN*.final.r??.validation.md": allow
+    "artifact/**": allow
   grep: allow
   glob: allow
   list: allow
@@ -44,29 +44,25 @@ Implement one authorized `PROMPT-PLAN-*.draft.md` with `Status: READY_FOR_IMPLEM
 
 Reject caller-requested behavior or scope changes; require draft update first.
 
-For `artifact_base = [[draft basename without .draft.md]]` and `run_id = [[UTC timestamp]]`, append numeric suffix only on collision:
+For `artifact_base = [[draft basename without .draft.md]]` and `run_id = [[UTC timestamp]]`, append numeric suffix only on collision. Bind path variables per:
 
-- `run_prefix`: `artifact/[[artifact_base]].[[run_id]].implement`
-- handoff: `[[run_prefix]].handoff.md`
-- cohorts: `[[run_prefix]].Cnn.md`
-- cohort evidence: `[[run_prefix]].Cnn.rNN.quick.validation.md`, `[[run_prefix]].Cnn.rNN.[[domain]].review.md`, and `[[run_prefix]].Cnn.rNN.verdict.md`
-- final evidence: `[[run_prefix]].final.rNN.validation.md`, `[[run_prefix]].final.rNN.[[domain]].review.md`, and `[[run_prefix]].final.rNN.verdict.md`
+{{ file="./rules/cards/implementation/artifact-paths.md" }}
 
-Never overwrite artifacts. Restart interrupted runs with new prefix.
+Each writer creates or overwrites only its exact assigned path; never write any other path. Restart interrupted runs with new prefix. Before rerunning an interrupted cohort: remove its partial artifacts and stubs, unstage its leftover paths, and use fresh round numbers.
 
 # Process
 
 ## 1. Preflight and create cohorts
 
 1. Require in-repository `READY_FOR_IMPLEMENT` draft, no blocking question, and readable `HEAD`. Record and preserve unrelated changes. Return `NEEDS_INPUT` when planned target is already changed.
-2. Record `base_commit=HEAD`; create run prefix.
+2. Record `base_commit=HEAD`; create run prefix. Ensure the target repository excludes `artifact/` (append `artifact/` to `.git/info/exclude` when missing).
 3. Call `_implement/create-cohorts`. Reject incomplete acceptance coverage, invalid ids/dependencies, cycles, or wrong artifact paths.
 
 ## 2. Process cohorts
 
 In dependency order, call `_implement/cohort` exactly once for each cohort. It owns edit, checks, reviews, verification, repair, and commit.
 
-Stop on non-success. Before next cohort, require returned commit at `HEAD` and unrelated changes preserved.
+Stop on non-success. Before next cohort, require returned commit at `HEAD` and new since the prior cohort (or `None` with acceptance evidence), and unrelated changes preserved.
 
 ## 3. Final integration gate
 
@@ -74,23 +70,23 @@ Stop on non-success. Before next cohort, require returned commit at `HEAD` and u
 2. Run handoff full validation. Missing environment is `INCOMPLETE`; code failure enters `_implement/integration-repair`.
 3. After repair, reject out-of-scope paths and stage only repair paths. Rerun full validation, including applicable tests, and write fresh ledger before review.
 4. Always call `_implement/review/integration`. For staged repair, also call `_implement/cohort/review/correctness` and `_implement/cohort/review/quality`. Route security/performance only for concrete cross-cohort risk. Every selected reviewer must complete.
-5. Before every reviewer call, reserve a nonexisting review path and supply one explicit envelope with every declared input and placeholder resolved:
+5. Before every reviewer call, compute `review_path` per the artifact-paths card for the current round; the writer creates or overwrites it. Supply one explicit envelope with every declared input and placeholder resolved:
 
 ```text
 <review-inputs>
-Plan Path: [[concrete plan_path]]
-Handoff Path: [[concrete handoff_path]]
+Plan Path: [[plan_path]]
+Handoff Path: [[handoff_path]]
 Base Commit: [[concrete reviewer baseline]]
 Scope: [[committed base_commit..HEAD or staged repair against base_commit]]
 Changed Paths: [[concrete reviewer changed paths]]
-Validation Path: [[concrete latest full validation_path]]
-Review Path: [[concrete review_path]]
+Validation Path: [[validation_path]]
+Review Path: [[review_path]]
 Prior Verdict Paths: [[concrete paths or None]]
 </review-inputs>
 ```
 
-   Use implementation `base_commit` and final changed paths for integration/security/performance. For correctness/quality, use the commit at `HEAD` before the staged final repair and its exact staged repair paths. Add `Cohort Path: None` for non-integration reviewers; omit Scope for correctness/quality, use `Scope: FINAL_COMMITTED | FINAL_STAGED` for security/performance, and add every other input declared by the selected reviewer. Require the reviewer to write the requested artifact and return only its exact five-line `# Output` envelope. Then require a newly created readable artifact conforming to the reviewer's `# Artifact` schema at the exact Review Path, with an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count. Missing or malformed evidence is `INCOMPLETE`, never PASS.
-6. Send candidates to `_review/verifier`; send accepted blockers to `_implement/integration-repair`. Never repair advisories.
+   Use implementation `base_commit` and final changed paths for integration/security/performance. For correctness/quality, use the commit at `HEAD` before the staged final repair and its exact staged repair paths. Add `Cohort Path: None` for non-integration reviewers; omit Scope for correctness/quality, use `Scope: FINAL_COMMITTED | FINAL_STAGED` for security/performance, and add every other input declared by the selected reviewer. Require the reviewer to write the requested artifact and return only its exact five-line `# Output` envelope. Then require a readable, schema-conforming artifact at the exact assigned `review_path`, artifact-consistent with the returned envelope, with an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count. Missing or malformed evidence is `INCOMPLETE`, never PASS.
+6. Send candidates to `_review/verifier` with an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`; send accepted blockers to `_implement/integration-repair`. Never repair advisories.
 7. Allow two final repair turns. Each turn: repair, stage approved paths, validate including tests, then rerun integration, correctness, quality, and affected optional reviews with fresh ledger. Remaining blocker is `FAIL`; missing evidence is `INCOMPLETE`.
 8. Re-read staged repair, call `commit` with exact repair paths, and confirm commit scope plus preserved unrelated changes. Do not create empty commit.
 
