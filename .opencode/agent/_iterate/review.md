@@ -11,16 +11,43 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifacts/iterate/*/review.md": allow
+    "artifacts/iterate/**": allow
   glob:
     "*": allow
   grep:
     "*": allow
   list: allow
   bash:
-    "*": deny
-    "git diff --cached*": allow
-    "git show*": allow
+    "*": allow
+    "sudo *": deny
+    "git push *": deny
+    "git commit *": deny
+    "git add *": deny
+    "git reset *": deny
+    "git clean *": deny
+    "git rebase *": deny
+    "git merge *": deny
+    "git checkout *": deny
+    "git switch *": deny
+    "git restore *": deny
+    "git stash *": deny
+    "git rm *": deny
+    "git mv *": deny
+    "git apply *": deny
+    "git cherry-pick *": deny
+    "git revert *": deny
+    "rm *": deny
+    "mv *": deny
+    "cp *": deny
+    "touch *": deny
+    "mkdir *": deny
+    "rmdir *": deny
+    "tee *": deny
+    "dd *": deny
+    "ln *": deny
+    "chmod *": deny
+    "chown *": deny
+    "patch *": deny
 ---
 
 Review exact staged instruction change. Generate hypotheses; verifier owns repair eligibility.
@@ -42,6 +69,9 @@ Review exact staged instruction change. Generate hypotheses; verifier owns repai
 5. Deduplicate root causes. Emit no quota and no rewrite.
 
 Write concise `review_path` with decision `PASS | CANDIDATES | INCOMPLETE`, findings, important verified behavior, and missing evidence.
+
+# Writable surface
+Create or overwrite files only under `artifacts/iterate/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
 
 # Output
 

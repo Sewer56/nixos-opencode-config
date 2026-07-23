@@ -62,7 +62,7 @@ Derive a short `slug`, UTC `run_id`, and:
 - `<run_prefix>.rNN.errors.review.md` when error docs are in scope
 - `<run_prefix>.rNN.verdict.md`
 
-Never overwrite an attempt artifact.
+Create or overwrite each exact assigned path. Never create placeholder or stub files.
 
 {{ file="./rules/groups/docs/code-docs.md" }}
 

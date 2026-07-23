@@ -13,15 +13,41 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifact/*.review.md": allow
+    "artifact/**": allow
   grep: allow
   glob: allow
   list: allow
   bash:
-    "*": deny
-    "git diff *": allow
-    "git show *": allow
-    "git grep *": allow
+    "*": allow
+    "sudo *": deny
+    "git push *": deny
+    "git commit *": deny
+    "git add *": deny
+    "git reset *": deny
+    "git clean *": deny
+    "git rebase *": deny
+    "git merge *": deny
+    "git checkout *": deny
+    "git switch *": deny
+    "git restore *": deny
+    "git stash *": deny
+    "git rm *": deny
+    "git mv *": deny
+    "git apply *": deny
+    "git cherry-pick *": deny
+    "git revert *": deny
+    "rm *": deny
+    "mv *": deny
+    "cp *": deny
+    "touch *": deny
+    "mkdir *": deny
+    "rmdir *": deny
+    "tee *": deny
+    "dd *": deny
+    "ln *": deny
+    "chmod *": deny
+    "chown *": deny
+    "patch *": deny
 ---
 
 Review error documentation for the scoped source files. Trace reachable errors from code before raising a candidate. Do not edit source.
@@ -40,6 +66,9 @@ Review error documentation for the scoped source files. Trace reachable errors f
 - Variant/type names, links, ordering, and source locations match current code.
 - A delegated error is attributed only when the public API can actually expose it.
 - Prior refuted findings are not repeated without new evidence.
+
+# Writable surface
+Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
 
 # Artifact
 Write `candidate_path`:

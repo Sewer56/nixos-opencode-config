@@ -56,7 +56,7 @@ Derive a short `slug`, UTC `run_id`, and:
 - `<run_prefix>.rNN.errors.review.md`
 - `<run_prefix>.rNN.verdict.md`
 
-Never overwrite an artifact.
+Create or overwrite each exact assigned path. Never create placeholder or stub files.
 
 {{ file="./rules/groups/docs/error-docs.md" }}
 

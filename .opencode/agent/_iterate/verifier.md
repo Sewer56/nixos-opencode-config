@@ -11,7 +11,7 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifacts/iterate/*/verdict.md": allow
+    "artifacts/iterate/**": allow
   glob:
     "*": allow
   grep:
@@ -21,9 +21,33 @@ permission:
     "*": allow
     "sudo *": deny
     "git push *": deny
-    "git reset --hard *": deny
+    "git commit *": deny
+    "git add *": deny
+    "git reset *": deny
     "git clean *": deny
-    "git commit --no-verify *": deny
+    "git rebase *": deny
+    "git merge *": deny
+    "git checkout *": deny
+    "git switch *": deny
+    "git restore *": deny
+    "git stash *": deny
+    "git rm *": deny
+    "git mv *": deny
+    "git apply *": deny
+    "git cherry-pick *": deny
+    "git revert *": deny
+    "rm *": deny
+    "mv *": deny
+    "cp *": deny
+    "touch *": deny
+    "mkdir *": deny
+    "rmdir *": deny
+    "tee *": deny
+    "dd *": deny
+    "ln *": deny
+    "chmod *": deny
+    "chown *": deny
+    "patch *": deny
 ---
 
 Verify candidates against contract, staged diff, consumers, and deterministic evidence. Missing evidence is not evidence of defect.
@@ -43,6 +67,9 @@ For each candidate:
 5. Give blockers repair scope `TARGET`, `CONTRACT`, or `EVIDENCE`. Only `TARGET` may reach writer. Rewrite it as smallest correction plus proof step.
 
 Write `verdict_path` with decision and compact candidate classifications, refutations, evidence, correction, and verification.
+
+# Writable surface
+Create or overwrite files only under `artifacts/iterate/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
 
 # Output
 

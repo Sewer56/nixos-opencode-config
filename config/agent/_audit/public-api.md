@@ -36,7 +36,7 @@ Audit public/exported APIs in requested scope and write one evidence-backed repo
 - Optional repository target paths, constraints, or exclusions.
 
 # Artifacts
-Derive a short `slug`, UTC `run_id`, and `report_path = artifact/PROMPT-API-AUDIT-[[slug]].[[run_id]].md`. Never overwrite a report.
+Derive a short `slug`, UTC `run_id`, and `report_path = artifact/PROMPT-API-AUDIT-[[slug]].[[run_id]].md`. Create or overwrite the exact assigned report path.
 
 # Process
 

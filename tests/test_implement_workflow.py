@@ -31,7 +31,6 @@ IMPLEMENT_REVIEWERS = (
 )
 SHELL_OWNING_AGENTS = (
     ROOT / ".opencode/agent/_iterate/edit.md",
-    ROOT / ".opencode/agent/_iterate/verifier.md",
     ROOT / "config/agent/_audit/public-api.md",
     ROOT / "config/agent/_docs.md",
     ORCHESTRATOR,
@@ -91,6 +90,39 @@ WRITABLE_SURFACE_AGENTS = (*IMPLEMENT_REVIEWERS, VERIFIER)
 WRITABLE_SURFACE = """# Writable surface
 Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
 """
+WRITABLE_SURFACE_ITERATE = """# Writable surface
+Create or overwrite files only under `artifacts/iterate/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
+"""
+CROSS_WORKFLOW_READ_ONLY_BASH = (
+    ROOT / ".opencode/agent/_iterate/review.md",
+    ROOT / ".opencode/agent/_iterate/verifier.md",
+    ROOT / "config/agent/_plan/draft/explorer.md",
+    ROOT / "config/agent/_plan/draft/reviewer.md",
+    ROOT / "config/agent/_docs/reviewers/accuracy.md",
+    ROOT / "config/agent/_docs/reviewers/usability.md",
+    ROOT / "config/agent/_refactor/document/reviewers/documentation.md",
+    ROOT / "config/agent/_refactor/document/reviewers/errors.md",
+    ROOT / "config/agent/_refactor/errors/collector.md",
+    ROOT / "config/agent/_audit/public-api/collector.md",
+    ROOT / "config/agent/_write/pr.md",
+)
+WRITABLE_SURFACE_CROSS_ARTIFACT = (
+    ROOT / "config/agent/_docs/reviewers/accuracy.md",
+    ROOT / "config/agent/_docs/reviewers/usability.md",
+    ROOT / "config/agent/_refactor/document/reviewers/documentation.md",
+    ROOT / "config/agent/_refactor/document/reviewers/errors.md",
+    ROOT / "config/agent/_refactor/errors/collector.md",
+)
+WRITABLE_SURFACE_CROSS_ITERATE = (
+    ROOT / ".opencode/agent/_iterate/review.md",
+    ROOT / ".opencode/agent/_iterate/verifier.md",
+)
+OVERWRITE_WORDING_AGENTS = (
+    ROOT / "config/agent/_docs.md",
+    ROOT / "config/agent/_refactor/document.md",
+    ROOT / "config/agent/_refactor/errors.md",
+    ROOT / "config/agent/_audit/public-api.md",
+)
 
 
 def text(path: Path) -> str:
@@ -418,6 +450,39 @@ class ImplementWorkflowTests(unittest.TestCase):
             frontmatter = body.split("---", 2)[1]
             self.assertNotIn('"git add*": allow', frontmatter)
             self.assertIn("Do not stage files", body)
+
+    def test_cross_workflow_read_only_agents_use_bash_blacklist(self) -> None:
+        for path in CROSS_WORKFLOW_READ_ONLY_BASH:
+            with self.subTest(path=path.relative_to(ROOT)):
+                frontmatter = text(path).split("---", 2)[1]
+                self.assertEqual(READ_ONLY_BASH_PERMISSION, bash_permission(frontmatter))
+
+    def test_cross_workflow_writers_declare_writable_surface(self) -> None:
+        for path in WRITABLE_SURFACE_CROSS_ARTIFACT:
+            with self.subTest(path=path.relative_to(ROOT)):
+                body = text(path)
+                self.assertIn(WRITABLE_SURFACE, body)
+        for path in WRITABLE_SURFACE_CROSS_ITERATE:
+            with self.subTest(path=path.relative_to(ROOT)):
+                body = text(path)
+                self.assertIn(WRITABLE_SURFACE_ITERATE, body)
+
+    def test_cross_workflow_writers_use_broad_artifact_glob(self) -> None:
+        for path in WRITABLE_SURFACE_CROSS_ARTIFACT:
+            with self.subTest(path=path.relative_to(ROOT)):
+                frontmatter = text(path).split("---", 2)[1]
+                self.assertIn('"artifact/**": allow', frontmatter)
+        for path in WRITABLE_SURFACE_CROSS_ITERATE:
+            with self.subTest(path=path.relative_to(ROOT)):
+                frontmatter = text(path).split("---", 2)[1]
+                self.assertIn('"artifacts/iterate/**": allow', frontmatter)
+
+    def test_orchestrators_use_create_or_overwrite_wording(self) -> None:
+        for path in OVERWRITE_WORDING_AGENTS:
+            with self.subTest(path=path.relative_to(ROOT)):
+                body = text(path)
+                self.assertNotIn("Never overwrite", body)
+                self.assertIn("Create or overwrite", body)
 
 
 if __name__ == "__main__":

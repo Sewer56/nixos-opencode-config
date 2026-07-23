@@ -15,10 +15,36 @@ permission:
   glob: allow
   list: allow
   bash:
-    "*": deny
-    "git status --short *": allow
-    "git ls-files *": allow
-    "git grep *": allow
+    "*": allow
+    "sudo *": deny
+    "git push *": deny
+    "git commit *": deny
+    "git add *": deny
+    "git reset *": deny
+    "git clean *": deny
+    "git rebase *": deny
+    "git merge *": deny
+    "git checkout *": deny
+    "git switch *": deny
+    "git restore *": deny
+    "git stash *": deny
+    "git rm *": deny
+    "git mv *": deny
+    "git apply *": deny
+    "git cherry-pick *": deny
+    "git revert *": deny
+    "rm *": deny
+    "mv *": deny
+    "cp *": deny
+    "touch *": deny
+    "mkdir *": deny
+    "rmdir *": deny
+    "tee *": deny
+    "dd *": deny
+    "ln *": deny
+    "chmod *": deny
+    "chown *": deny
+    "patch *": deny
 ---
 
 Build a compact repository manifest for planning. Report facts and uncertainty; do not recommend exact code and do not write files.

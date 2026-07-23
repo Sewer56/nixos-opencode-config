@@ -14,10 +14,36 @@ permission:
   glob: allow
   list: allow
   bash:
-    "*": deny
-    "git grep *": allow
-    "git ls-files *": allow
-    "rg *": allow
+    "*": allow
+    "sudo *": deny
+    "git push *": deny
+    "git commit *": deny
+    "git add *": deny
+    "git reset *": deny
+    "git clean *": deny
+    "git rebase *": deny
+    "git merge *": deny
+    "git checkout *": deny
+    "git switch *": deny
+    "git restore *": deny
+    "git stash *": deny
+    "git rm *": deny
+    "git mv *": deny
+    "git apply *": deny
+    "git cherry-pick *": deny
+    "git revert *": deny
+    "rm *": deny
+    "mv *": deny
+    "cp *": deny
+    "touch *": deny
+    "mkdir *": deny
+    "rmdir *": deny
+    "tee *": deny
+    "dd *": deny
+    "ln *": deny
+    "chmod *": deny
+    "chown *": deny
+    "patch *": deny
 ---
 
 Enumerate public/exported items defined in the explicit file chunk and classify repository-wide usages. Return evidence, not recommendations based on name counts alone.
