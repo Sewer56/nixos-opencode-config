@@ -162,7 +162,8 @@
   },
   "compaction": {
     "auto": true,
-    "prune": true,
+    /* Remove contents of old tool calls. */
+    "prune": false,
     "reserved": 12000
   },
   // Ignore certain locations in file watcher in OpenCode.
