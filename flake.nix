@@ -176,10 +176,6 @@
         pkgs.yarn
         pkgs.docker
         pkgs.bun
-        (pkgs.python3.withPackages (pythonPackages: [
-          pythonPackages.json5
-          pythonPackages.pyyaml
-        ]))
       ];
 
       # Editable config → ~/.config/opencode.
