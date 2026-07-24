@@ -76,6 +76,11 @@ function Build-OpenCode {
   }
 
   Push-Location $ocPkgDir
+  # OPENCODE_CHANNEL=local marks the build as a local installation
+  # (InstallationLocal=true), so opencode installs @opencode-ai/plugin@latest
+  # into config dirs instead of pinning a nonexistent 0.0.0-<timestamp> version.
+  $prevChannel = $env:OPENCODE_CHANNEL
+  $env:OPENCODE_CHANNEL = 'local'
   try {
     Write-Host '  bun install ...'
     & $PreFlight.Bun install 2>&1 | ForEach-Object { Write-Host "  $_" }
@@ -92,6 +97,7 @@ function Build-OpenCode {
     }
   }
   finally {
+    $env:OPENCODE_CHANNEL = $prevChannel
     Pop-Location
   }
 
