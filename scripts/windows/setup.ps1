@@ -84,6 +84,7 @@ $scriptsDir = Join-Path $RepoRoot 'scripts\windows'
 . (Join-Path $scriptsDir 'common.ps1')
 . (Join-Path $scriptsDir 'prerequisites.ps1')
 . (Join-Path $scriptsDir 'setup-filesystem.ps1')
+. (Join-Path $scriptsDir 'install-plugin-deps.ps1')
 . (Join-Path $scriptsDir 'build-rust-tools.ps1')
 . (Join-Path $scriptsDir 'build-opencode.ps1')
 
@@ -95,6 +96,8 @@ $results['Pre-flight'] = 'done'
 
 Invoke-FilesystemSetup
 $results['Filesystem'] = 'done'
+
+$results['Plugin deps'] = Invoke-PluginDeps $pre
 
 if (-not $SkipRustTools) {
   $results['Rust workspace'] = Build-RustWorkspace $pre

@@ -127,10 +127,48 @@
         fi
       '';
 
+      # Install runtime deps for local plugins. Plugins with runtime deps
+      # (e.g. xdg-basedir) fail their dynamic import inside OpenCode silently
+      # when node_modules is missing, so this must run on fresh checkouts.
+      pluginDepsScript = pkgs.writeShellScriptBin "opencode-plugin-deps" ''
+        set -uo pipefail
+        failed=0
+        for dir in ${opencodeRepo}/config/plugins/*/; do
+          if [ ! -f "$dir/package.json" ]; then
+            # Empty dir = uninitialized submodule (clone without --recurse-submodules).
+            if [ -z "$(ls -A "$dir" 2>/dev/null)" ]; then
+              echo "error: $dir is empty - uninitialized submodule? run: git submodule update --init" >&2
+              failed=1
+            fi
+            continue
+          fi
+          # Only install when the plugin declares runtime dependencies.
+          # jq parse failure (malformed package.json) must be surfaced, not skipped.
+          if ! deps=$(${pkgs.jq}/bin/jq '.dependencies | length' "$dir/package.json" 2>&1); then
+            echo "error: invalid package.json in $dir: $deps" >&2
+            failed=1
+            continue
+          fi
+          [ "$deps" -gt 0 ] 2>/dev/null || continue
+          echo "installing plugin deps: $dir"
+          # Frozen lockfile when committed (submodules) so installs never
+          # rewrite bun.lock and dirty the tree; caveman has no lockfile.
+          if [ -f "$dir/bun.lock" ] || [ -f "$dir/bun.lockb" ]; then
+            (cd "$dir" && ${pkgs.bun}/bin/bun install --production --frozen-lockfile) || failed=1
+          else
+            (cd "$dir" && ${pkgs.bun}/bin/bun install --production) || failed=1
+          fi
+        done
+        exit $failed
+      '';
+
       # Rebuild the opencode‑source submodule (bun build).
       # I often iterate, so separate build via `opencode-build` command will do.
       opencodeBuildScript = pkgs.writeShellScriptBin "opencode-build" ''
         set -euo pipefail
+        # Plugin deps failing (e.g. offline) shouldn't block the binary build.
+        ${pluginDepsScript}/bin/opencode-plugin-deps || \
+          echo "warning: plugin deps install failed; run opencode-plugin-deps manually"
         pushd ${opencodeSource}/packages/opencode > /dev/null
         bun install
         bun run build --single
@@ -157,6 +195,7 @@
       home.packages = [
         opencodeScript
         opencodeBuildScript
+        pluginDepsScript
 
         # CLI tools — cargo‑backed so editing tools/ costs zero Nix rebuild.
         (mkCargoTool {name = "opencode-model-switcher";})
@@ -181,6 +220,16 @@
       # Editable config → ~/.config/opencode.
       home.file.".config/opencode".source =
         config.lib.file.mkOutOfStoreSymlink "${opencodeRepo}/config";
+
+      # Plugin runtime deps on every switch (bun install is a fast no-op when
+      # node_modules is already in sync). Guarded so a missing repo checkout
+      # doesn't break activation on a partially bootstrapped machine.
+      home.activation.opencodePluginDeps = config.lib.dag.entryAfter ["writeBoundary"] ''
+        if [ -d "${opencodeRepo}/config/plugins" ]; then
+          run ${pluginDepsScript}/bin/opencode-plugin-deps || \
+            echo "warning: opencode plugin deps install failed; run opencode-plugin-deps manually"
+        fi
+      '';
 
       # Repo shortcut → ~/opencode.
       home.file."opencode".source =
