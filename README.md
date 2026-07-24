@@ -135,6 +135,10 @@ Windows:
 pwsh ./scripts/windows/setup.ps1
 ```
 
+Pre-flight offers to install missing prerequisites (cargo, bun, git, Node.js LTS, Yarn, Docker Desktop) via `winget`, with a y/N prompt per tool and a direct-installer fallback for cargo/bun/yarn. Installs are never fatal; declines fall back to the old detect-and-warn behaviour. Pass `-NoInstallPrereqs` to force detect-only.
+
+CodeRabbit CLI is intentionally not installed on Windows: upstream ships Linux/macOS binaries only (WSL-only on Windows). The `/review/coderabbit` command returns `INCOMPLETE` when `cr`/`coderabbit` is absent. To use it, install under WSL: `wsl -c 'curl -fsSL https://cli.coderabbit.ai/install.sh | sh'`.
+
 ## Validation
 
 From repository root:

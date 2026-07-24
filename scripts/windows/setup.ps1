@@ -7,16 +7,22 @@
   build (git-state cached). Dot-sources phase modules from scripts/windows/.
 
   Phases:
-    1. Pre-flight        - detect cargo / bun / git (warn, never fatal)
+    1. Pre-flight        - detect cargo / bun / git / node / yarn / docker.
+                          Missing tools are offered for install via winget
+                          (interactive shells, y/N consent, direct-installer
+                          fallback for cargo/bun/yarn). Installs never fatal.
+                          CodeRabbit CLI is NOT installed (upstream is
+                          WSL-only on Windows).
     2. Filesystem        - junctions, secrets dir, OPENCODE_ENABLE_EXA, bin/.cache
     3. Build rust tools   - cargo build --release --workspace + rust-llm-tidy submodule
     4. Build OpenCode    - bun install + bun run build --single (cached by git SHA)
     5. PATH              - append ~\opencode\bin to User PATH if missing
     6. Summary           - phase results table
 
-  Missing cargo/bun -> affected phases SKIPPED with WARN (not fatal).
-  Missing git       -> OpenCode cache disabled (always rebuilds).
+  Missing cargo/bun -> offered for install, else affected phases SKIPPED with WARN.
+  Missing git       -> offered for install, else OpenCode cache disabled (always rebuilds).
   Missing the rust-llm-tidy submodule -> auto `git submodule update --init`.
+  Pass -NoInstallPrereqs to force detect-only (no installs, no consent prompts).
 
   Built binaries land in <repo>\bin\ (gitignored), reachable as
   ~\opencode\bin via the repo junction.
@@ -34,11 +40,15 @@
 .PARAMETER SkipRustLLMTidy
 .PARAMETER SkipOpenCode
   Skip individual build phases.
+.PARAMETER NoInstallPrereqs
+  Force detect-only pre-flight: never prompt to install missing tools, even
+  in an interactive shell. Useful when you manage prerequisites yourself.
 
 .EXAMPLE
   pwsh ./scripts/windows/setup.ps1
   pwsh ./scripts/windows/setup.ps1 -ForceRebuild
   pwsh ./scripts/windows/setup.ps1 -UseEnvVar -SkipOpenCode
+  pwsh ./scripts/windows/setup.ps1 -NoInstallPrereqs
 #>
 #Requires -Version 5.1
 [CmdletBinding()]
@@ -48,7 +58,8 @@ param(
   [switch]$ForceRebuild,
   [switch]$SkipRustTools,
   [switch]$SkipRustLLMTidy,
-  [switch]$SkipOpenCode
+  [switch]$SkipOpenCode,
+  [switch]$NoInstallPrereqs
 )
 
 $ErrorActionPreference = 'Stop'
@@ -60,9 +71,10 @@ if (-not $RepoRoot) {
 
 # Shared state consumed by dot-sourced modules ($script: scope). Functions in
 # the modules read these at *call* time, so they resolve to this script scope.
-$script:RepoRoot     = $RepoRoot
-$script:UseEnvVar    = [bool]$UseEnvVar
-$script:ForceRebuild = [bool]$ForceRebuild
+$script:RepoRoot        = $RepoRoot
+$script:UseEnvVar       = [bool]$UseEnvVar
+$script:ForceRebuild    = [bool]$ForceRebuild
+$script:NoInstallPrereqs = [bool]$NoInstallPrereqs
 
 $scriptsDir = Join-Path $RepoRoot 'scripts\windows'
 
