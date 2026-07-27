@@ -8,6 +8,6 @@
   "work": {
     "LOW": "sewer-axonhub-work/claude-sonnet-5",
     "MED": "sewer-axonhub-work/claude-sonnet-5",
-    "HIGH": "sewer-axonhub-work/claude-fable-5"
+    "HIGH": "sewer-axonhub-work/claude-opus-5"
   }
 }
