@@ -1,51 +1,59 @@
 use crate::env::rel;
 use crate::rewrite::agent_files;
-use crate::types::{Config, Env, LoadedConfig, TierSet, WORK_PROVIDER};
+use crate::types::{Config, Env, LoadedConfig, TierSet, VARIANTS, WORK_PROVIDER};
 use anyhow::{Context, bail};
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+struct ConfigFile {
+    #[serde(rename = "$tierOrder", default)]
+    tier_order: std::collections::BTreeMap<String, String>,
+    #[serde(flatten)]
+    profiles: Config,
+}
 
 /// Load and validate model-switcher.json from env.tier_file.
 pub fn load_config(env: &Env) -> anyhow::Result<LoadedConfig> {
     let data = std::fs::read_to_string(&env.tier_file)
         .with_context(|| format!("read tier file: {}", rel(env, &env.tier_file)))?;
-    let cfg: Config = serde_json::from_str(&data).with_context(|| "parse tier config")?;
-    let tier_order = derive_tier_order(env, &cfg);
-    validate_config(&cfg, &tier_order)?;
+    let file: ConfigFile = serde_json::from_str(&data).with_context(|| "parse tier config")?;
+    let tier_order = derive_tier_order(env, &file.profiles, &file.tier_order);
+    validate_config(&file.profiles, &tier_order)?;
     Ok(LoadedConfig {
         tier_order,
-        profiles: cfg,
+        profiles: file.profiles,
     })
 }
 
 /// Derive canonical tier order from: `$tierOrder` in config, then profile tier keys,
 /// then tier names discovered in agent markdown files.
-pub fn derive_tier_order(env: &Env, cfg: &Config) -> Vec<String> {
+pub fn derive_tier_order(
+    env: &Env,
+    cfg: &Config,
+    configured: &std::collections::BTreeMap<String, String>,
+) -> Vec<String> {
     let mut seen = std::collections::HashSet::new();
     let mut result = Vec::new();
 
     // 1. Parse numeric $tierOrder keys
-    if let Some(order) = cfg.get("$tierOrder") {
-        let mut indexed: Vec<(usize, String)> = Vec::new();
-        for (k, v) in order {
-            if let Ok(idx) = k.parse::<usize>()
-                && !v.is_empty()
-            {
-                indexed.push((idx, v.clone()));
-            }
+    let mut indexed: Vec<(usize, String)> = Vec::new();
+    for (k, v) in configured {
+        if let Ok(idx) = k.parse::<usize>()
+            && !v.is_empty()
+        {
+            indexed.push((idx, v.clone()));
         }
-        indexed.sort_by_key(|(i, _)| *i);
-        for (_, tier) in indexed {
-            if !tier.is_empty() && seen.insert(tier.clone()) {
-                result.push(tier);
-            }
+    }
+    indexed.sort_by_key(|(i, _)| *i);
+    for (_, tier) in indexed {
+        if seen.insert(tier.clone()) {
+            result.push(tier);
         }
     }
 
     // 2. Collect tier keys from all non-$ profiles
     let mut profile_tiers: Vec<String> = Vec::new();
-    for (profile, values) in cfg {
-        if profile.starts_with('$') {
-            continue;
-        }
+    for values in cfg.values() {
         for tier in values.keys() {
             if !seen.contains(tier) {
                 profile_tiers.push(tier.clone());
@@ -95,9 +103,6 @@ pub fn validate_config(cfg: &Config, _tier_order: &[String]) -> anyhow::Result<(
     let mut first_profile = "";
 
     for (profile, values) in cfg {
-        if profile.starts_with('$') {
-            continue;
-        }
         let keys: std::collections::HashSet<String> = values.keys().cloned().collect();
         if let Some(ref first) = first_keys {
             if keys != *first {
@@ -111,9 +116,17 @@ pub fn validate_config(cfg: &Config, _tier_order: &[String]) -> anyhow::Result<(
             first_keys = Some(keys);
             first_profile = profile;
         }
-        for (tier, model) in values {
-            if model.trim().is_empty() {
+        for (tier, assignment) in values {
+            if assignment.model.trim().is_empty() {
                 bail!("profile {:?} has empty model for {}", profile, tier);
+            }
+            if !VARIANTS.contains(&assignment.variant.as_str()) {
+                bail!(
+                    "profile {:?} has invalid variant {:?} for {}",
+                    profile,
+                    assignment.variant,
+                    tier
+                );
             }
         }
     }
@@ -124,10 +137,10 @@ pub fn validate_config(cfg: &Config, _tier_order: &[String]) -> anyhow::Result<(
 pub fn validate_work(values: &TierSet, tier_order: &[String]) -> anyhow::Result<()> {
     let mut bad = Vec::new();
     for tier in tier_order {
-        if let Some(model) = values.get(tier)
-            && !model.starts_with(WORK_PROVIDER)
+        if let Some(assignment) = values.get(tier)
+            && !assignment.model.starts_with(WORK_PROVIDER)
         {
-            bad.push(format!("{}={}", tier, model));
+            bad.push(format!("{}={}", tier, assignment.model));
         }
     }
     if !bad.is_empty() {
@@ -153,7 +166,7 @@ pub fn save_config(env: &Env, loaded: &LoadedConfig) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Marshal config to JSON preserving tier order (LOW/MED/HIGH) and profile order.
+/// Marshal config to JSON preserving tier and profile order.
 pub fn marshal_config(cfg: &Config, tier_order: &[String]) -> String {
     let mut out = String::from("{\n");
 
@@ -177,9 +190,9 @@ pub fn marshal_config(cfg: &Config, tier_order: &[String]) -> String {
         out.push_str(&format!("  {}: {{\n", profile_json));
         if let Some(values) = cfg.get(profile) {
             for (ti, tier) in tier_order.iter().enumerate() {
-                let model = values.get(tier).map(|s| s.as_str()).unwrap_or("");
-                let model_json = serde_json::to_string(model).unwrap();
-                out.push_str(&format!("    \"{}\": {}", tier, model_json));
+                let assignment = values.get(tier).expect("validated tier assignment");
+                let assignment_json = serde_json::to_string(assignment).unwrap();
+                out.push_str(&format!("    \"{}\": {}", tier, assignment_json));
                 if ti != tier_order.len() - 1 {
                     out.push(',');
                 }
@@ -198,15 +211,11 @@ pub fn marshal_config(cfg: &Config, tier_order: &[String]) -> String {
 
 /// Return profile names (non-`$`-prefixed keys) from the config, sorted alphabetically.
 pub fn sorted_profiles(cfg: &Config) -> Vec<String> {
-    let mut names: Vec<String> = cfg
-        .keys()
-        .filter(|k| !k.starts_with('$'))
-        .cloned()
-        .collect();
+    let mut names: Vec<String> = cfg.keys().cloned().collect();
     names.sort();
     names
 }
 
 fn profile_names(cfg: &Config) -> Vec<&String> {
-    cfg.keys().filter(|k| !k.starts_with('$')).collect()
+    cfg.keys().collect()
 }

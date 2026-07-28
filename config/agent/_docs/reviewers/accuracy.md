@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces evidence-backed documentation accuracy and coverage candidates
-model: sewer-axonhub/gpt-5.6-sol # HIGH
+model: sewer-axonhub/gpt-5.6-sol # HARD
 variant: high
 permission:
   "*": deny

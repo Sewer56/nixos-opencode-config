@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces focused documentation usability, clarity, and information-design candidates
-model: sewer-axonhub/gpt-5.6-terra # MED
+model: sewer-axonhub/gpt-5.6-terra # MEDIUM
 variant: medium
 permission:
   "*": deny

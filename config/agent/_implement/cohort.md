@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Processes one cohort through code changes, quick checks, focused review, verified repair, and commit
-model: sewer-axonhub/gpt-5.6-sol # HIGH
+model: sewer-axonhub/gpt-5.6-sol # HARD
 variant: high
 permission:
   "*": deny

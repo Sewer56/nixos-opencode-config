@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Creates Keep a Changelog-style commits without pushing
-model: sewer-axonhub/gpt-5.6-terra # MED
+model: sewer-axonhub/gpt-5.6-terra # MEDIUM
 variant: medium
 permission:
   "*": deny

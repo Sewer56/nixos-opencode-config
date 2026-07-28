@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews a collaborative draft for fidelity, completeness, dependency order, and implementation readiness
-model: sewer-axonhub/gpt-5.6-sol # HIGH
+model: sewer-axonhub/gpt-5.6-sol # HARD
 variant: high
 permission:
   "*": deny

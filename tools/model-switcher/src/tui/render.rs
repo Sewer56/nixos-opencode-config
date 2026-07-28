@@ -10,6 +10,7 @@ use ratatui::{
 pub(crate) trait AppModelRender {
     fn render(&mut self, f: &mut Frame);
     fn render_picker(&self, f: &mut Frame);
+    fn render_variant_picker(&self, f: &mut Frame);
 }
 
 impl<'a> AppModelRender for AppModel<'a> {
@@ -59,19 +60,25 @@ impl<'a> AppModelRender for AppModel<'a> {
             .iter()
             .enumerate()
             .map(|(i, tier)| {
-                let model = self
+                let assignment = self
                     .cfg
                     .get(self.profile())
                     .and_then(|v| v.get(tier))
                     .cloned()
-                    .unwrap_or_else(|| "<unmapped>".into());
+                    .expect("validated tier assignment");
                 let marker = if i == self.tier_idx { "> " } else { "  " };
                 if i == self.tier_idx {
-                    Line::from(format!("{}{:<4} {}", marker, tier, model))
-                        .fg(Color::Green)
-                        .bold()
+                    Line::from(format!(
+                        "{}{:<7} {} [{}]",
+                        marker, tier, assignment.model, assignment.variant
+                    ))
+                    .fg(Color::Green)
+                    .bold()
                 } else {
-                    Line::from(format!("{}{:<4} {}", marker, tier, model))
+                    Line::from(format!(
+                        "{}{:<7} {} [{}]",
+                        marker, tier, assignment.model, assignment.variant
+                    ))
                 }
             })
             .collect::<Vec<_>>();
@@ -92,9 +99,12 @@ impl<'a> AppModelRender for AppModel<'a> {
             for tier in &self.tier_order {
                 if let Some(&count) = result.tiers.get(tier)
                     && count > 0
-                    && let Some(model) = self.cfg.get(self.profile()).and_then(|v| v.get(tier))
+                    && let Some(assignment) = self.cfg.get(self.profile()).and_then(|v| v.get(tier))
                 {
-                    lines.push(format!("  {}: {} -> {}", tier, count, model));
+                    lines.push(format!(
+                        "  {}: {} -> {} [{}]",
+                        tier, count, assignment.model, assignment.variant
+                    ));
                 }
             }
             f.render_widget(Paragraph::new(lines.join("\n")), chunks[5]);
@@ -130,14 +140,19 @@ impl<'a> AppModelRender for AppModel<'a> {
 
         // Help
         f.render_widget(
-            Paragraph::new("←/→ profile • ↑/↓ tier • enter choose • s save • a apply • q quit")
-                .fg(Color::DarkGray),
+            Paragraph::new(
+                "←/→ profile • ↑/↓ tier • enter model • v variant • s save • a apply • q quit",
+            )
+            .fg(Color::DarkGray),
             chunks[9],
         );
 
         // Picker overlay
-        if matches!(self.mode, Mode::Picker) {
+        if matches!(self.mode, Mode::ModelPicker) {
             self.render_picker(f);
+        }
+        if matches!(self.mode, Mode::VariantPicker) {
+            self.render_variant_picker(f);
         }
     }
 
@@ -186,6 +201,32 @@ impl<'a> AppModelRender for AppModel<'a> {
         let block = Block::default()
             .borders(Borders::ALL)
             .style(Style::default());
+        let inner = block.inner(area);
+        f.render_widget(block, area);
+        f.render_widget(Paragraph::new(lines), inner);
+    }
+
+    fn render_variant_picker(&self, f: &mut Frame) {
+        let area = center_rect(f.area(), 40, 12);
+        let mut lines = vec![
+            Line::from(format!("choose {} {} variant", self.profile(), self.tier()))
+                .bold()
+                .fg(Color::Cyan),
+            Line::from(""),
+        ];
+        for (i, variant) in crate::types::VARIANTS.iter().enumerate() {
+            if i == self.pick_idx {
+                lines.push(
+                    Line::from(format!(" {} ", variant))
+                        .style(Style::default().bg(Color::Cyan).fg(Color::Black)),
+                );
+            } else {
+                lines.push(Line::from(format!(" {}", variant)));
+            }
+        }
+        lines.push(Line::from(""));
+        lines.push(Line::from("↑/↓ move • enter select • esc back").fg(Color::DarkGray));
+        let block = Block::default().borders(Borders::ALL);
         let inner = block.inner(area);
         f.render_widget(block, area);
         f.render_widget(Paragraph::new(lines), inner);

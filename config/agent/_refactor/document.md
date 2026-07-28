@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Adds or repairs scoped source documentation without changing runtime behavior
-model: sewer-axonhub/gpt-5.6-terra # MED
+model: sewer-axonhub/gpt-5.6-terra # MEDIUM
 variant: medium
 permission:
   "*": deny

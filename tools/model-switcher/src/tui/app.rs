@@ -12,7 +12,8 @@ use super::render::AppModelRender;
 
 pub(crate) enum Mode {
     Main,
-    Picker,
+    ModelPicker,
+    VariantPicker,
 }
 
 /// Interactive TUI state for reviewing and editing tier-model assignments.
@@ -126,7 +127,7 @@ fn run_app(terminal: &mut DefaultTerminal, env: &Env, initial_profile: &str) -> 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::types::{Config, Env, TierSet};
+    use crate::types::{Assignment, Config, Env, TierSet};
     use std::collections::BTreeMap;
 
     fn test_env_empty() -> Env {
@@ -144,16 +145,34 @@ mod tests {
         // all rows would show the selected tier's model.
         let mut cfg: Config = Config::new();
         let mut normal: TierSet = TierSet::new();
-        normal.insert("LOW".into(), "model-low".into());
-        normal.insert("MED".into(), "model-med".into());
-        normal.insert("HIGH".into(), "model-high".into());
+        normal.insert(
+            "EASY".into(),
+            Assignment {
+                model: "model-low".into(),
+                variant: "low".into(),
+            },
+        );
+        normal.insert(
+            "MEDIUM".into(),
+            Assignment {
+                model: "model-med".into(),
+                variant: "medium".into(),
+            },
+        );
+        normal.insert(
+            "HARD".into(),
+            Assignment {
+                model: "model-high".into(),
+                variant: "high".into(),
+            },
+        );
         cfg.insert("normal".into(), normal);
 
-        let tier_order = vec!["LOW".to_string(), "MED".to_string(), "HIGH".to_string()];
+        let tier_order = vec!["EASY".to_string(), "MEDIUM".to_string(), "HARD".to_string()];
         let profiles = vec!["normal".to_string()];
         let env = test_env_empty();
 
-        // tier_idx = 1 (MED selected) — old bug would show "model-med" for all rows
+        // tier_idx = 1 (MEDIUM selected) — old bug would show "model-med" for all rows
         let app = AppModel {
             env: &env,
             cfg,
@@ -180,7 +199,7 @@ mod tests {
                 app.cfg
                     .get(app.profile())
                     .and_then(|v| v.get(tier))
-                    .cloned()
+                    .map(|assignment| assignment.model.clone())
                     .unwrap_or_else(|| "<unmapped>".into())
             })
             .collect();

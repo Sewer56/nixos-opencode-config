@@ -4,7 +4,7 @@ Rust workspace for local OpenCode utilities.
 
 ## Binaries
 
-- `opencode-model-switcher` — TUI for `# LOW` / `# MED` / `# HIGH` model tiers. Config: `config/model-switcher.json`.
+- `opencode-model-switcher` — TUI for `# EASY` / `# MEDIUM` / `# HARD` model tiers and variants. Config: `config/model-switcher.json`.
 - `opencode-sessions` — browse/export OpenCode SQLite sessions.
 - `chunk-files-by-tokens` — split files/directories into token-sized chunks.
 - `token-count-after-expand` — render md-expand prompt files and estimate tokens.

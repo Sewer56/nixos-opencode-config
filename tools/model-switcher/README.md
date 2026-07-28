@@ -17,6 +17,7 @@ Launch interactive editor. Optionally pre-select a profile name.
 | `←`/`→`           | Switch profile                             |
 | `↑`/`↓`           | Navigate tiers                             |
 | `Enter` / `Space` | Open model picker (fuzzy search)           |
+| `v`               | Open variant picker                        |
 | `s`               | Save config to disk                        |
 | `a`               | Apply current profile to agent `.md` files |
 | `q` / `Esc`       | Quit                                       |
@@ -29,34 +30,35 @@ Stored at `~/.config/opencode/model-switcher.json` (or `$XDG_CONFIG_HOME/opencod
 
 ```jsonc
 {
-  "$tierOrder": {"0": "LOW", "1": "MED", "2": "HIGH"},   // optional; auto-discovered
+  "$tierOrder": {"0": "EASY", "1": "MEDIUM", "2": "HARD"},
   "normal": {
-    "LOW": "provider/cheap-model",
-    "MED": "provider/default-model",
-    "HIGH": "provider/expensive-model"
+    "EASY": {"model": "provider/cheap-model", "variant": "low"},
+    "MEDIUM": {"model": "provider/default-model", "variant": "medium"},
+    "HARD": {"model": "provider/expensive-model", "variant": "high"}
   },
   "work": {
-    "LOW": "sewer-axonhub-work/cheap",
-    "MED": "sewer-axonhub-work/default",
-    "HIGH": "sewer-axonhub-work/expensive"
+    "EASY": {"model": "sewer-axonhub-work/cheap", "variant": "low"},
+    "MEDIUM": {"model": "sewer-axonhub-work/default", "variant": "medium"},
+    "HARD": {"model": "sewer-axonhub-work/expensive", "variant": "high"}
   }
 }
 ```
 
 - All profiles must have identical tier keys.
 - `work` profile requires `sewer-axonhub-work/` provider prefix.
-- `$tierOrder` is optional. Missing tiers are discovered from profile keys + `# LOW` / `# MED` / `# HIGH` tags in agent files.
+- Variants are `low`, `medium`, `high`, `xhigh`, or `max`.
+- `$tierOrder` is optional. Missing tiers are discovered from profile keys and tagged model lines in agent files.
 
 ## Agent files
 
 Tool scans `config/agent/` and `.opencode/agent/` for `.md` files containing tagged model lines:
 
 ```
-model: provider/model-name # LOW
-model: other/other-model   # MED keep comment
+model: provider/model-name # EASY
+variant: low
 ```
 
-**`a` (apply)** rewrites these lines to match the current profile's tier assignments.
+**`a` (apply)** rewrites each tagged model and its following variant line to match the current profile.
 
 ## Adding a new profile
 

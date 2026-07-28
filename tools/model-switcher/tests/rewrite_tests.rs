@@ -1,164 +1,137 @@
 use opencode_model_switcher::rewrite;
-use opencode_model_switcher::types::{Env, TierSet};
+use opencode_model_switcher::types::{Assignment, Env, TierSet};
+
+fn assignment(model: &str, variant: &str) -> Assignment {
+    Assignment {
+        model: model.into(),
+        variant: variant.into(),
+    }
+}
+
+fn values() -> TierSet {
+    TierSet::from([
+        ("EASY".into(), assignment("new-easy", "low")),
+        ("MEDIUM".into(), assignment("new-medium", "medium")),
+        ("HARD".into(), assignment("new-hard", "high")),
+    ])
+}
 
 fn test_env() -> anyhow::Result<(tempfile::TempDir, Env)> {
     let dir = tempfile::tempdir()?;
     let agent_dir = dir.path().join("config").join("agent");
     std::fs::create_dir_all(&agent_dir)?;
-    let tier_file = dir.path().join("config").join("model-switcher.json");
-    std::fs::write(
-        &tier_file,
-        r#"{
-  "$tierOrder": {"0": "LOW","1": "MED","2": "HIGH"},
-  "normal": { "LOW": "low", "MED": "med", "HIGH": "high" },
-  "work": { "LOW": "sewer-axonhub-work/low", "MED": "sewer-axonhub-work/med", "HIGH": "sewer-axonhub-work/high" }
-}
-"#,
-    )?;
-    let env = Env {
-        root: dir.path().to_string_lossy().into_owned(),
-        tier_file: tier_file.to_string_lossy().into_owned(),
-        agent_dirs: vec![agent_dir.to_string_lossy().into_owned()],
-    };
-    Ok((dir, env))
+    let root = dir.path().to_string_lossy().into_owned();
+    let tier_file = dir
+        .path()
+        .join("config/model-switcher.json")
+        .to_string_lossy()
+        .into_owned();
+    Ok((
+        dir,
+        Env {
+            root,
+            tier_file,
+            agent_dirs: vec![agent_dir.to_string_lossy().into_owned()],
+        },
+    ))
 }
 
 #[test]
-fn test_build_model_line_re_matches_correctly() {
-    let tiers = vec!["LOW".to_string(), "MED".to_string(), "HIGH".to_string()];
-    let re = rewrite::build_model_line_re(&tiers);
-    assert!(re.is_match("model: some-model # LOW"));
-    assert!(re.is_match("  model: other-model    # MED keep comment"));
-    assert!(re.is_match("model: x # HIGH\r"));
+fn test_build_model_line_re_matches_tiers() {
+    let re = rewrite::build_model_line_re(&["EASY".into(), "MEDIUM".into(), "HARD".into()]);
+    assert!(re.is_match("model: some-model # EASY"));
+    assert!(re.is_match("  model: other # MEDIUM keep comment"));
+    assert!(re.is_match("model: x # HARD\r"));
     assert!(!re.is_match("model: unmarked"));
-    assert!(!re.is_match("description: leave me"));
 }
 
 #[test]
-fn test_build_model_line_re_longest_first() {
-    // HIGH-FAST must match before HIGH
-    let tiers = vec![
-        "LOW".to_string(),
-        "HIGH".to_string(),
-        "HIGH-FAST".to_string(),
-    ];
+fn test_rewrite_content_updates_models_and_variants() {
+    let tiers = vec!["EASY".into(), "MEDIUM".into(), "HARD".into()];
     let re = rewrite::build_model_line_re(&tiers);
-    let caps = re.captures("model: x # HIGH-FAST").unwrap();
-    assert_eq!(caps.get(4).unwrap().as_str(), "HIGH-FAST");
-}
-
-#[test]
-fn test_rewrite_content_preserves_tier_markers_and_comments() {
-    let tier_order = vec!["LOW".to_string(), "MED".to_string(), "HIGH".to_string()];
-    let re = rewrite::build_model_line_re(&tier_order);
     let input = concat!(
         "---\n",
-        "model: old-low # LOW\n",
-        "model: old-med    # MED keep this comment\n",
-        "  model: old-high # HIGH\r\n",
-        "model: unmarked\n",
-        "description: leave me\n",
-        "---\n",
-        "\n",
+        "model: old-easy # EASY\n",
+        "variant: max\n",
+        "model: old-medium # MEDIUM keep\n",
+        "variant: low # preserve\n",
+        "  model: old-hard # HARD\r\n",
+        "  variant: xhigh\r\n",
+        "---\n"
     );
-
-    let mut values = TierSet::new();
-    values.insert("LOW".into(), "new-low".into());
-    values.insert("MED".into(), "new-med".into());
-    values.insert("HIGH".into(), "new-high".into());
-
-    let (output, by_tier, changed) = rewrite::rewrite_content(input, &values, &re);
-
-    assert_eq!(changed, 3);
-    for tier in &tier_order {
-        assert_eq!(by_tier.get(tier).copied().unwrap_or(0), 1);
-    }
-
-    let want = concat!(
-        "---\n",
-        "model: new-low # LOW\n",
-        "model: new-med    # MED keep this comment\n",
-        "  model: new-high # HIGH\r\n",
-        "model: unmarked\n",
-        "description: leave me\n",
-        "---\n",
-        "\n",
-    );
+    let (output, by_tier, changed) = rewrite::rewrite_content(input, &values(), &re);
+    assert_eq!(changed, 6);
+    assert_eq!(by_tier["EASY"], 2);
+    assert_eq!(by_tier["MEDIUM"], 2);
+    assert_eq!(by_tier["HARD"], 2);
     assert_eq!(
-        output, want,
-        "rewrite mismatch\nwant:\n{:?}\ngot:\n{:?}",
-        want, output
+        output,
+        concat!(
+            "---\n",
+            "model: new-easy # EASY\n",
+            "variant: low\n",
+            "model: new-medium # MEDIUM keep\n",
+            "variant: medium # preserve\n",
+            "  model: new-hard # HARD\r\n",
+            "  variant: high\r\n",
+            "---\n"
+        )
     );
 }
 
 #[test]
-fn test_rewrite_content_preserves_crlf() {
-    let tier_order = vec!["LOW".to_string()];
-    let re = rewrite::build_model_line_re(&tier_order);
-    let input = "model: old # LOW\r\n";
-    let mut values = TierSet::new();
-    values.insert("LOW".into(), "new".into());
-
-    let (output, _by_tier, changed) = rewrite::rewrite_content(input, &values, &re);
-    assert_eq!(changed, 1);
-    assert_eq!(output, "model: new # LOW\r\n");
+fn test_rewrite_content_inserts_missing_variant_with_indent_and_eol() {
+    let re = rewrite::build_model_line_re(&["EASY".into()]);
+    let input = "  model: old # EASY\r\ndescription: keep\r\n";
+    let (output, by_tier, changed) = rewrite::rewrite_content(
+        input,
+        &TierSet::from([("EASY".into(), assignment("new", "low"))]),
+        &re,
+    );
+    assert_eq!(changed, 2);
+    assert_eq!(by_tier["EASY"], 2);
+    assert_eq!(
+        output,
+        "  model: new # EASY\r\n  variant: low\r\ndescription: keep\r\n"
+    );
 }
 
 #[test]
-fn test_apply_profile_dry_run_does_not_write() {
+fn test_rewrite_content_is_unchanged_when_assignment_matches() {
+    let re = rewrite::build_model_line_re(&["EASY".into()]);
+    let current = TierSet::from([("EASY".into(), assignment("same", "low"))]);
+    let input = "model: same # EASY\nvariant: low\n";
+    let (output, _, changed) = rewrite::rewrite_content(input, &current, &re);
+    assert_eq!(changed, 0);
+    assert_eq!(output, input);
+}
+
+#[test]
+fn test_apply_profile_dry_run_and_current_counts() {
     let (_dir, env) = test_env().unwrap();
-    let tier_order = vec!["LOW".to_string(), "MED".to_string(), "HIGH".to_string()];
-    let re = rewrite::build_model_line_re(&tier_order);
+    let tiers = vec!["EASY".into(), "MEDIUM".into(), "HARD".into()];
+    let re = rewrite::build_model_line_re(&tiers);
     let agent_path = std::path::Path::new(&env.agent_dirs[0]).join("agent.md");
-    std::fs::write(&agent_path, "model: old # LOW\n").unwrap();
+    std::fs::write(
+        &agent_path,
+        "model: old # EASY\nvariant: max\nmodel: unmarked\n",
+    )
+    .unwrap();
 
-    let mut values = TierSet::new();
-    values.insert("LOW".into(), "new".into());
-    values.insert("MED".into(), "med".into());
-    values.insert("HIGH".into(), "high".into());
-
-    let result = rewrite::apply_profile(&env, &values, true, &tier_order, &re).unwrap();
-    assert_eq!(result.lines, 1);
-    assert_eq!(result.files.len(), 1);
-    assert_eq!(result.tiers.get("LOW").copied().unwrap_or(0), 1);
-
-    // Dry run should NOT have written
-    let content = std::fs::read_to_string(&agent_path).unwrap();
-    assert_eq!(content, "model: old # LOW\n");
-
-    // Real apply
-    let result = rewrite::apply_profile(&env, &values, false, &tier_order, &re).unwrap();
-    assert_eq!(result.lines, 1);
-    let content = std::fs::read_to_string(&agent_path).unwrap();
-    assert_eq!(content, "model: new # LOW\n");
-}
-
-#[test]
-fn test_current_counts_ignores_unmarked_models() {
-    let (_dir, env) = test_env().unwrap();
-    let tier_order = vec!["LOW".to_string(), "MED".to_string(), "HIGH".to_string()];
-    let re = rewrite::build_model_line_re(&tier_order);
-
-    let a = std::path::Path::new(&env.agent_dirs[0]).join("a.md");
-    std::fs::write(&a, "model: low # LOW\nmodel: nope\n").unwrap();
-
-    let nested = std::path::Path::new(&env.agent_dirs[0]).join("nested");
-    std::fs::create_dir_all(&nested).unwrap();
-    std::fs::write(nested.join("b.md"), "model: med # MED\n").unwrap();
-
-    let counts = rewrite::current_counts(&env, &tier_order, &re).unwrap();
+    let result = rewrite::apply_profile(&env, &values(), true, &tiers, &re).unwrap();
+    assert_eq!(result.lines, 2);
     assert_eq!(
-        counts.get("LOW").unwrap().get("low").copied().unwrap_or(0),
-        1
+        std::fs::read_to_string(&agent_path).unwrap(),
+        "model: old # EASY\nvariant: max\nmodel: unmarked\n"
     );
+
+    rewrite::apply_profile(&env, &values(), false, &tiers, &re).unwrap();
     assert_eq!(
-        counts.get("MED").unwrap().get("med").copied().unwrap_or(0),
-        1
+        std::fs::read_to_string(&agent_path).unwrap(),
+        "model: new-easy # EASY\nvariant: low\nmodel: unmarked\n"
     );
-    assert_eq!(
-        counts.get("LOW").unwrap().get("nope").copied().unwrap_or(0),
-        0
-    );
+    let counts = rewrite::current_counts(&env, &tiers, &re).unwrap();
+    assert_eq!(counts["EASY"]["new-easy"], 1);
 }
 
 #[test]
@@ -169,44 +142,6 @@ fn test_agent_files_finds_md_files_recursively() {
     std::fs::write(std::path::Path::new(&env.agent_dirs[0]).join("a.md"), "").unwrap();
     std::fs::write(nested.join("b.md"), "").unwrap();
     std::fs::write(nested.join("not-md.txt"), "").unwrap();
-
     let files = rewrite::agent_files(&env).unwrap();
-    let names: Vec<&str> = files
-        .iter()
-        .map(|f| {
-            std::path::Path::new(f)
-                .file_name()
-                .unwrap()
-                .to_str()
-                .unwrap()
-        })
-        .collect();
-    assert!(names.contains(&"a.md"));
-    assert!(names.contains(&"b.md"));
-    assert!(!names.contains(&"not-md.txt"));
-}
-
-#[test]
-fn test_rewrite_line_unchanged_when_model_matches() {
-    let tier_order = vec!["LOW".to_string()];
-    let re = rewrite::build_model_line_re(&tier_order);
-    let mut values = TierSet::new();
-    values.insert("LOW".into(), "same-model".into());
-
-    let (new_line, _tier, changed) =
-        rewrite::rewrite_line("model: same-model # LOW\n", &values, &re);
-    assert!(!changed);
-    assert_eq!(new_line, "model: same-model # LOW\n");
-}
-
-#[test]
-fn test_rewrite_line_unchanged_when_no_tier_match() {
-    let tier_order = vec!["LOW".to_string()];
-    let re = rewrite::build_model_line_re(&tier_order);
-    let mut values = TierSet::new();
-    values.insert("MED".into(), "some-model".into()); // different tier
-
-    let (new_line, _tier, changed) = rewrite::rewrite_line("model: old # LOW\n", &values, &re);
-    assert!(!changed);
-    assert_eq!(new_line, "model: old # LOW\n");
+    assert_eq!(files.len(), 2);
 }

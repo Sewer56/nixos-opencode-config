@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Collaboratively creates or refines a human-readable implementation draft
-model: sewer-axonhub/gpt-5.6-sol # HIGH
+model: sewer-axonhub/gpt-5.6-sol # HARD
 variant: high
 permission:
   "*": deny

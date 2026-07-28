@@ -8,8 +8,11 @@ use std::sync::LazyLock;
 pub static MODEL_LINE_DISCOVERY_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"^\s*model:\s*\S+\s*#\s*(\S+)\b.*$"#).unwrap());
 
+static VARIANT_LINE_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"^(\s*variant:\s*)(\S+)(.*)$"#).unwrap());
+
 /// Build a regex that matches tagged frontmatter model lines with given tier names.
-/// Tiers are sorted longest-first so e.g. "HIGH-FAST" matches before "HIGH".
+/// Tiers are sorted longest-first so overlapping names match correctly.
 pub fn build_model_line_re(tiers: &[String]) -> Regex {
     let mut sorted = tiers.to_vec();
     sorted.sort_by_key(|b| std::cmp::Reverse(b.len()));
@@ -85,15 +88,62 @@ pub fn rewrite_content(
     let mut by_tier: BTreeMap<String, usize> = BTreeMap::new();
     let mut changed = 0;
 
-    for line in input.split_inclusive('\n') {
+    let lines: Vec<&str> = input.split_inclusive('\n').collect();
+    let mut i = 0;
+    while i < lines.len() {
+        let line = lines[i];
         let (new_line, tier, did_change) = rewrite_line(line, values, re);
         out.push_str(&new_line);
         if did_change {
-            if let Some(t) = tier {
-                *by_tier.entry(t).or_insert(0) += 1;
+            if let Some(ref t) = tier {
+                *by_tier.entry(t.clone()).or_insert(0) += 1;
             }
             changed += 1;
         }
+
+        let Some(tier) = tier else {
+            i += 1;
+            continue;
+        };
+        let Some(assignment) = values.get(&tier) else {
+            i += 1;
+            continue;
+        };
+
+        if let Some(next) = lines.get(i + 1)
+            && let Some(caps) = VARIANT_LINE_RE.captures(split_eol(next).0)
+        {
+            let old_variant = caps.get(2).unwrap().as_str();
+            if old_variant == assignment.variant {
+                out.push_str(next);
+            } else {
+                let eol = split_eol(next).1;
+                out.push_str(&format!(
+                    "{}{}{}{}",
+                    caps.get(1).unwrap().as_str(),
+                    assignment.variant,
+                    caps.get(3).unwrap().as_str(),
+                    eol
+                ));
+                *by_tier.entry(tier).or_insert(0) += 1;
+                changed += 1;
+            }
+            i += 2;
+            continue;
+        }
+
+        let (body, eol) = split_eol(line);
+        let indent = body.len() - body.trim_start().len();
+        let eol = if eol.is_empty() { "\n" } else { eol };
+        out.push_str(&format!(
+            "{}variant: {}{}",
+            &body[..indent],
+            assignment.variant,
+            eol
+        ));
+        *by_tier.entry(tier).or_insert(0) += 1;
+        changed += 1;
+        i += 1;
     }
 
     (out, by_tier, changed)
@@ -120,7 +170,7 @@ pub fn rewrite_line(line: &str, values: &TierSet, re: &Regex) -> (String, Option
     let old_model = caps.get(2).unwrap().as_str();
     let tier = caps.get(4).unwrap().as_str().to_string();
     let new_model = match values.get(&tier) {
-        Some(m) if !m.is_empty() => m,
+        Some(assignment) if !assignment.model.is_empty() => &assignment.model,
         _ => return (line.to_string(), Some(tier), false),
     };
     if old_model == new_model {

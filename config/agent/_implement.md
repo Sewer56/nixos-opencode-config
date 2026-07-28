@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Orchestrates an approved draft through dependency-ordered cohorts and final integration review
-model: sewer-axonhub/gpt-5.6-sol # HIGH
+model: sewer-axonhub/gpt-5.6-sol # HARD
 variant: high
 permission:
   "*": deny

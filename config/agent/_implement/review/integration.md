@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews the complete implementation for cross-cohort correctness, acceptance coverage, and integration drift
-model: sewer-axonhub/gpt-5.6-sol # HIGH
+model: sewer-axonhub/gpt-5.6-sol # HARD
 variant: high
 permission:
   "*": deny

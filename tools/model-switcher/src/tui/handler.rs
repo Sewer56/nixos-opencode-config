@@ -9,6 +9,7 @@ pub(crate) trait AppModelHandler {
     fn handle_key(&mut self, code: KeyCode);
     fn handle_main_key(&mut self, code: KeyCode);
     fn handle_picker_key(&mut self, code: KeyCode);
+    fn handle_variant_picker_key(&mut self, code: KeyCode);
     fn filtered_models(&self) -> Vec<String>;
     fn update_preview(&mut self);
 }
@@ -17,7 +18,8 @@ impl<'a> AppModelHandler for AppModel<'a> {
     fn handle_key(&mut self, code: KeyCode) {
         match self.mode {
             Mode::Main => self.handle_main_key(code),
-            Mode::Picker => self.handle_picker_key(code),
+            Mode::ModelPicker => self.handle_picker_key(code),
+            Mode::VariantPicker => self.handle_variant_picker_key(code),
         }
     }
 
@@ -40,9 +42,23 @@ impl<'a> AppModelHandler for AppModel<'a> {
                 self.tier_idx = (self.tier_idx + 1) % self.tier_order.len();
             }
             KeyCode::Enter | KeyCode::Char(' ') => {
-                self.mode = Mode::Picker;
+                self.mode = Mode::ModelPicker;
                 self.pick_idx = 0;
                 self.input.clear();
+                self.message.clear();
+            }
+            KeyCode::Char('v') => {
+                self.mode = Mode::VariantPicker;
+                self.pick_idx = self
+                    .cfg
+                    .get(self.profile())
+                    .and_then(|values| values.get(self.tier()))
+                    .and_then(|assignment| {
+                        crate::types::VARIANTS
+                            .iter()
+                            .position(|variant| *variant == assignment.variant)
+                    })
+                    .unwrap_or(0);
                 self.message.clear();
             }
             KeyCode::Char('s') => {
@@ -115,9 +131,11 @@ impl<'a> AppModelHandler for AppModel<'a> {
                     let profile = self.profile().to_string();
                     let tier = self.tier().to_string();
                     self.cfg
-                        .entry(profile)
-                        .or_default()
-                        .insert(tier, model.clone());
+                        .get_mut(&profile)
+                        .expect("validated profile")
+                        .get_mut(&tier)
+                        .expect("validated tier assignment")
+                        .model = model.clone();
                     self.update_preview();
                 }
                 self.mode = Mode::Main;
@@ -146,6 +164,33 @@ impl<'a> AppModelHandler for AppModel<'a> {
         let filtered = self.filtered_models();
         if self.pick_idx >= filtered.len() {
             self.pick_idx = filtered.len().saturating_sub(1);
+        }
+    }
+
+    fn handle_variant_picker_key(&mut self, code: KeyCode) {
+        match code {
+            KeyCode::Esc => self.mode = Mode::Main,
+            KeyCode::Enter => {
+                let variant = crate::types::VARIANTS[self.pick_idx].to_string();
+                let profile = self.profile().to_string();
+                let tier = self.tier().to_string();
+                self.cfg
+                    .get_mut(&profile)
+                    .expect("validated profile")
+                    .get_mut(&tier)
+                    .expect("validated tier assignment")
+                    .variant = variant;
+                self.update_preview();
+                self.mode = Mode::Main;
+            }
+            KeyCode::Up => {
+                self.pick_idx = (self.pick_idx + crate::types::VARIANTS.len() - 1)
+                    % crate::types::VARIANTS.len();
+            }
+            KeyCode::Down => {
+                self.pick_idx = (self.pick_idx + 1) % crate::types::VARIANTS.len();
+            }
+            _ => {}
         }
     }
 

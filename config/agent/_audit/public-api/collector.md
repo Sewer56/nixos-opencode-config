@@ -2,7 +2,8 @@
 mode: subagent
 hidden: true
 description: Enumerates public items in explicit files and verifies repository-wide usage with language-aware matching
-model: sewer-axonhub/gpt-5.6-luna # LOW
+model: sewer-axonhub/gpt-5.6-luna # EASY
+variant: low
 permission:
   "*": deny
   read:
