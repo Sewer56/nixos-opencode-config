@@ -1,16 +1,21 @@
 use crate::types::Env;
 use anyhow::Context;
+use std::path::PathBuf;
 
 /// OpenCode config directory. Matches the TypeScript core which uses `xdg-basedir`
 /// (always resolves to `$XDG_CONFIG_HOME/opencode` or `~/.config/opencode` on all platforms).
+/// `xdg-basedir` uses `os.homedir()` (Node), which on Windows returns `USERPROFILE`, not `$HOME`.
 pub fn opencode_config_dir() -> String {
-    if let Ok(d) = std::env::var("XDG_CONFIG_HOME") {
-        if !d.is_empty() {
-            return format!("{d}/opencode");
-        }
+    if let Ok(d) = std::env::var("XDG_CONFIG_HOME")
+        && !d.is_empty()
+    {
+        return PathBuf::from(d).join("opencode").to_string_lossy().into_owned();
     }
-    let home = std::env::var("HOME").unwrap_or_default();
-    format!("{home}/.config/opencode")
+    let home = dirs::home_dir().unwrap_or_else(|| PathBuf::from("."));
+    home.join(".config")
+        .join("opencode")
+        .to_string_lossy()
+        .into_owned()
 }
 
 /// Walk upward from CWD to find agent directories (`config/agent` or
@@ -18,7 +23,10 @@ pub fn opencode_config_dir() -> String {
 /// directory returned by [`opencode_config_dir`].
 pub fn find_env() -> anyhow::Result<Env> {
     let cwd = std::env::current_dir().context("get current directory")?;
-    let tier_file = format!("{}/model-switcher.json", opencode_config_dir());
+    let tier_file = PathBuf::from(opencode_config_dir())
+        .join("model-switcher.json")
+        .to_string_lossy()
+        .into_owned();
     let mut dir = cwd.as_path();
 
     loop {
