@@ -117,46 +117,61 @@
         "claude-sonnet-5": {
           "name": "Claude Sonnet 5",
           "reasoning": true,
-          "limit": { "context": 200000, "output": 64000 },
           "variants": {
-            "xhigh": { "reasoningEffort": "xhigh" },
-            "max": { "reasoningEffort": "max" }
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
           }
         },
         "claude-opus-4-8": {
           "name": "Claude Opus 4.8",
           "reasoning": true,
-          "limit": { "context": 200000, "output": 64000 },
           "variants": {
-            "xhigh": { "reasoningEffort": "xhigh" },
-            "max": { "reasoningEffort": "max" }
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
           }
         },
         "claude-opus-4-7": {
           "name": "Claude Opus 4.7",
           "reasoning": true,
-          "limit": { "context": 200000, "output": 64000 },
           "variants": {
-            "xhigh": { "reasoningEffort": "xhigh" },
-            "max": { "reasoningEffort": "max" }
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
           }
         },
         "claude-opus-5": {
           "name": "Claude Opus 5",
           "reasoning": true,
-          "limit": { "context": 200000, "output": 64000 },
           "variants": {
-            "xhigh": { "reasoningEffort": "xhigh" },
-            "max": { "reasoningEffort": "max" }
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
           }
         },
         "claude-fable-5": {
           "name": "Claude Fable 5",
           "reasoning": true,
-          "limit": { "context": 200000, "output": 64000 },
           "variants": {
-            "xhigh": { "reasoningEffort": "xhigh" },
-            "max": { "reasoningEffort": "max" }
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
           }
         }
       }
