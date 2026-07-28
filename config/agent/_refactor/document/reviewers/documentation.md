@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces evidence-backed source documentation and readability candidates
-model: sewer-axonhub/deepseek-v4-flash # MED
+model: sewer-axonhub/gpt-5.6-terra # MED
 variant: medium
 permission:
   "*": deny

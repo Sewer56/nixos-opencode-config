@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Builds a compact, request-specific repository manifest for a draft plan
-model: sewer-axonhub/deepseek-v4-flash # LOW
+model: sewer-axonhub/gpt-5.6-luna # LOW
 variant: medium
 permission:
   "*": deny

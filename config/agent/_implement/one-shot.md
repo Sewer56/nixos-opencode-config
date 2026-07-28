@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Creates a reviewed draft through the normal draft workflow, then delegates to the cohort implementation workflow
-model: sewer-axonhub/deepseek-v4-flash # MED
+model: sewer-axonhub/gpt-5.6-terra # MED
 variant: medium
 permission:
   "*": deny

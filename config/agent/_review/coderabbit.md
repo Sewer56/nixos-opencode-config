@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Runs structured CodeRabbit review with bounded repair and one re-review
-model: sewer-axonhub/glm-5.2 # HIGH
+model: sewer-axonhub/gpt-5.6-sol # HIGH
 variant: high
 permission:
   "*": deny

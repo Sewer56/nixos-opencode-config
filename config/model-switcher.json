@@ -1,9 +1,9 @@
 {
   "$tierOrder": {"0": "LOW","1": "MED","2": "HIGH"},
   "normal": {
-    "LOW": "sewer-axonhub/deepseek-v4-flash",
-    "MED": "sewer-axonhub/deepseek-v4-flash",
-    "HIGH": "sewer-axonhub/glm-5.2"
+    "LOW": "sewer-axonhub/gpt-5.6-luna",
+    "MED": "sewer-axonhub/gpt-5.6-terra",
+    "HIGH": "sewer-axonhub/gpt-5.6-sol"
   },
   "work": {
     "LOW": "sewer-axonhub-work/claude-sonnet-5",

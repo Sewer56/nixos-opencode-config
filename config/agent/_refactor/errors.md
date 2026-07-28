@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Traces and repairs public error documentation with complete reviewed coverage
-model: sewer-axonhub/deepseek-v4-flash # MED
+model: sewer-axonhub/gpt-5.6-terra # MED
 variant: medium
 permission:
   "*": deny

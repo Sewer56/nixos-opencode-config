@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Repairs final integration failures across approved plan scope
-model: sewer-axonhub/glm-5.2 # HIGH
+model: sewer-axonhub/gpt-5.6-sol # HIGH
 variant: high
 permission:
   "*": deny

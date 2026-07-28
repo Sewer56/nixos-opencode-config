@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Finds the smallest repository context needed to answer a concrete implementation question
-model: sewer-axonhub/deepseek-v4-flash # LOW
+model: sewer-axonhub/gpt-5.6-luna # LOW
 permission:
   "*": deny
   read:

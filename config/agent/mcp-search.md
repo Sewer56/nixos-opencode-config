@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Researches version-sensitive third-party APIs and repository documentation through configured MCP sources
-model: sewer-axonhub/deepseek-v4-flash # MED
+model: sewer-axonhub/gpt-5.6-terra # MED
 variant: medium
 permission:
   "*": deny

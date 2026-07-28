@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Optionally produces evidence-backed performance candidates for realistic changed workloads
-model: sewer-axonhub/glm-5.2 # HIGH
+model: sewer-axonhub/gpt-5.6-sol # HIGH
 variant: high
 permission:
   "*": deny
