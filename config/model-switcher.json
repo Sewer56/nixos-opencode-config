@@ -3,7 +3,7 @@
   "normal": {
     "EASY": {"model":"sewer-axonhub/gpt-5.6-luna","variant":"low"},
     "MEDIUM": {"model":"sewer-axonhub/gpt-5.6-terra","variant":"medium"},
-    "HARD": {"model":"sewer-axonhub/gpt-5.6-sol","variant":"high"}
+    "HARD": {"model":"sewer-axonhub/gpt-5.6-sol","variant":"medium"}
   },
   "work": {
     "EASY": {"model":"sewer-axonhub-work/claude-sonnet-5","variant":"low"},

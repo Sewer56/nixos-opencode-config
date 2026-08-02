@@ -2,7 +2,7 @@
 mode: all
 description: Runs structured CodeRabbit review with bounded repair and one re-review
 model: sewer-axonhub/gpt-5.6-sol # HARD
-variant: high
+variant: medium
 permission:
   "*": deny
   read:

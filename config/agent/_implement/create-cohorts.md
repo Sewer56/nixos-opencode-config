@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Reconciles an approved draft with live code and creates dependency-ordered behavioral cohorts
 model: sewer-axonhub/gpt-5.6-sol # HARD
-variant: high
+variant: medium
 permission:
   "*": deny
   read:
