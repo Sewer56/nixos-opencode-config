@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Traces changed public error paths and produces evidence-backed error-documentation candidates
-model: sewer-axonhub/gpt-5.6-sol # HARD
-variant: medium
+model: sewer-axonhub/deepseek-v4-flash-fast # HARD
+variant: high
 permission:
   "*": deny
   read:

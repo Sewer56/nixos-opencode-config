@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Processes one cohort through code changes, quick checks, focused review, verified repair, and commit
-model: sewer-axonhub/gpt-5.6-sol # HARD
-variant: medium
+model: sewer-axonhub/deepseek-v4-flash-fast # HARD
+variant: high
 permission:
   "*": deny
   read:

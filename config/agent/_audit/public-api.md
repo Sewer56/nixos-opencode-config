@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Audits scoped or repository-wide public APIs for evidence-backed visibility reductions
-model: sewer-axonhub/gpt-5.6-terra # MEDIUM
+model: sewer-axonhub/deepseek-v4-flash-fast # MEDIUM
 variant: medium
 permission:
   "*": deny

@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Writes a repository-grounded issue using the local template and a concise problem statement
-model: sewer-axonhub/gpt-5.6-terra # MEDIUM
+model: sewer-axonhub/deepseek-v4-flash-fast # MEDIUM
 variant: medium
 permission:
   "*": deny

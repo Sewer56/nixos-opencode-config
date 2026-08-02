@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Adds or repairs scoped source documentation without changing runtime behavior
-model: sewer-axonhub/gpt-5.6-terra # MEDIUM
+model: sewer-axonhub/deepseek-v4-flash-fast # MEDIUM
 variant: medium
 permission:
   "*": deny
