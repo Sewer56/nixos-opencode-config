@@ -6,8 +6,8 @@ optional path supplied with ``--report``.
 
 Configuration documents:
 - Parse active JSON/JSONC configuration and local Caveman plugin package data.
-- Require positive tool output limits, compaction pruning, and globally allowed
-  external-directory access.
+- Require positive tool output limits and globally allowed external-directory
+  access. Compaction pruning is optional.
 
 Agent frontmatter and permissions:
 - Validate IDs, YAML, modes, descriptions, provider-qualified models, permission
@@ -367,15 +367,18 @@ def main() -> int:
             description = fm.get("description")
             if not isinstance(description, str) or not description.strip():
                 errors.append(f"{path.relative_to(repo)} has no command description")
+            # Agent-less commands run in-context under the current agent/model
+            # (e.g. /commit/current) and contribute no task-graph root.
             target = fm.get("agent")
-            if not isinstance(target, str) or not target:
-                errors.append(f"{path.relative_to(repo)} has no agent target")
-            elif target not in agent_files and target not in BUILTIN_AGENTS:
-                errors.append(f"{path.relative_to(repo)} targets missing agent {target}")
-            elif target in agent_files:
-                if agent_frontmatter[target].get("mode") == "subagent":
-                    errors.append(f"{path.relative_to(repo)} targets subagent-only agent {target}")
-                command_roots.add(target)
+            if target is not None and not isinstance(target, str):
+                errors.append(f"{path.relative_to(repo)} agent target must be a string")
+            elif isinstance(target, str) and target:
+                if target not in agent_files and target not in BUILTIN_AGENTS:
+                    errors.append(f"{path.relative_to(repo)} targets missing agent {target}")
+                elif target in agent_files:
+                    if agent_frontmatter[target].get("mode") == "subagent":
+                        errors.append(f"{path.relative_to(repo)} targets subagent-only agent {target}")
+                    command_roots.add(target)
 
     graph: dict[str, set[str]] = {ident: set() for ident in agent_files}
     for ident, fm in agent_frontmatter.items():
@@ -537,9 +540,8 @@ def main() -> int:
             errors.append("config.tool_output.max_lines must be a positive integer")
         if not isinstance(tool_output.get("max_bytes"), int) or tool_output["max_bytes"] <= 0:
             errors.append("config.tool_output.max_bytes must be a positive integer")
-    compaction = config.get("compaction")
-    if not isinstance(compaction, dict) or compaction.get("prune") is not True:
-        errors.append("config.compaction.prune must be true")
+    # Compaction pruning is optional by policy; prune:false preserves old
+    # tool-call contents in context, so it is not mandated here.
     permission = config.get("permission")
     if not isinstance(permission, dict) or permission.get("external_directory") != "allow":
         errors.append("config.permission.external_directory must be allow")
