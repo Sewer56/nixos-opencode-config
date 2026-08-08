@@ -2,6 +2,13 @@
 Read: approved plan, compiled cohort or final failures, changed/referenced files, direct consumers, and applicable path instructions. Repo search: evidence-triggered only.
 Owns: minimal code changes, repository conventions, naming, tests, comments/docs/errors, placement, performance, security, and unrelated-change avoidance.
 
+### Lint gate
+
+Before reviewer or parent validation handoff, run from `PATH`:
+`rust-llm-tidy`
+
+Auto mode checks repository-wide tracked staged and unstaged `.rs`/`.md` changes. It may include unrelated tracked changes; untracked files are excluded until staged. No eligible tracked changes is a successful skip. Non-zero blocks handoff; repair and rerun within the caller's bounded writer loop, returning its failure status on exhaustion.
+
 {{ file="./rules/groups/quality/general.md" }}
 
 {{ file="./rules/groups/tests/test-strategy.md" }}

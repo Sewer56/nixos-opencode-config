@@ -185,11 +185,16 @@
         name,
         package ? name,
         dir ? "$HOME/opencode/tools",
+        manifestPath ? null,
       }:
         pkgs.writeShellScriptBin name ''
           set -euo pipefail
-          cd "${dir}"
-          exec cargo run --release --package ${package} -- "$@"
+          ${
+            if manifestPath == null
+            then ''cd "${dir}"
+          exec cargo run --release --package ${package} -- "$@"''
+            else ''exec cargo run --release --manifest-path "${manifestPath}" --package ${package} -- "$@"''
+          }
         '';
     in {
       home.packages = [
@@ -206,6 +211,7 @@
           name = "rust-llm-tidy";
           package = "rust-llm-tidy-cli";
           dir = "$HOME/opencode/tools/rust-llm-tidy/src";
+          manifestPath = "$HOME/opencode/tools/rust-llm-tidy/src/Cargo.toml";
         })
 
         llm-agents.packages.${system}.coderabbit-cli

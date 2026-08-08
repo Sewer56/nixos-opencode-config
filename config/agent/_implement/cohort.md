@@ -66,11 +66,12 @@ Process exactly one created cohort. You are sole code writer and loop owner for 
 
 ## 2. Stage and run quick checks
 
-1. Reject unexpected paths; stage only paths changed by cohort writer (`EDIT` paths plus required compatibility edits).
-2. Inspect staged diff and run `git diff --cached --check`.
-3. Run quick validation, then applicable targeted tests. Record concrete reason when no test applies. Do not install dependencies or update snapshots/generated files.
-4. Record commands, results, decisive output, missing environment, and test evidence in validation artifact.
-5. Repair code failures, restage, and rerun all quick checks, overwriting the current round's `validation_path`; `rNN` increments only on post-review repair turns. Missing environment is `INCOMPLETE`.
+1. Run the shared code-writing lint gate on current writer changes. It must pass before staging or quick validation.
+2. Reject unexpected paths; stage only paths changed by cohort writer (`EDIT` paths plus required compatibility edits).
+3. Inspect staged diff and run `git diff --cached --check`.
+4. Run quick validation, then applicable targeted tests. Record concrete reason when no test applies. Do not install dependencies or update snapshots/generated files.
+5. Record commands, results, decisive output, missing environment, and test evidence in validation artifact.
+6. Repair code or lint failures, then rerun this all-checks loop from the lint gate before restaging and rerunning every quick check, overwriting the current round's `validation_path`; `rNN` increments only on post-review repair turns. Missing environment is `INCOMPLETE`.
 
 ## 3. Call exact reviewers
 
@@ -101,7 +102,7 @@ Add every other input declared by the selected reviewer to that envelope. Requir
 
 Send candidates to `_review/verifier` with an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`. Repair accepted blockers and advisories.
 
-After repair, restage and rerun all checks, correctness, quality, and affected optional reviews; rerun the verifier when re-reviews emit new candidates.
+After repair, rerun the Section 2 all-checks loop from the lint gate before restaging, then rerun correctness, quality, and affected optional reviews; rerun the verifier when re-reviews emit new candidates.
 
 Allow at most five repair turns total across deterministic and verified-review failures. Remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
 

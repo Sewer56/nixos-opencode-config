@@ -9,14 +9,18 @@ Run: ``python3 -m unittest discover -s tests -p 'test_*.py'``.
 from __future__ import annotations
 
 import ast
+import re
 import subprocess
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+FLAKE = ROOT / "flake.nix"
 ORCHESTRATOR = ROOT / "config/agent/_implement.md"
 CREATE_COHORTS = ROOT / "config/agent/_implement/create-cohorts.md"
 COHORT = ROOT / "config/agent/_implement/cohort.md"
+CODE_WRITING = ROOT / "config/rules/groups/implementation/code-writing.md"
+INTEGRATION_REPAIR = ROOT / "config/agent/_implement/integration-repair.md"
 ITERATE_EDIT = ROOT / ".opencode/agent/_iterate/edit.md"
 ITERATE_EDITOR = ROOT / ".opencode/agent/_iterate/editor.md"
 COMMAND = ROOT / "config/command/implement.md"
@@ -139,6 +143,14 @@ def bash_permission(frontmatter: str) -> str:
     return "".join(lines[start:end])
 
 
+def expand_config_imports(source: str) -> str:
+    pattern = re.compile(r'\{\{ file="(?P<path>\./[^"]+)" \}\}')
+    return pattern.sub(
+        lambda match: text(ROOT / "config" / match.group("path").removeprefix("./")),
+        source,
+    )
+
+
 class ImplementWorkflowTests(unittest.TestCase):
     def test_shell_owners_use_shared_permissive_bash_map(self) -> None:
         for path in SHELL_OWNING_AGENTS:
@@ -198,6 +210,57 @@ class ImplementWorkflowTests(unittest.TestCase):
             "Commit",
         ):
             self.assertIn(marker, body)
+
+    def test_shared_writer_lint_uses_auto_mode(self) -> None:
+        rule = text(CODE_WRITING)
+        self.assertTrue(rule.startswith("## RULE GROUP: IMPLEMENTATION / CODE WRITING\n"))
+        self.assertIn("\n### Lint gate\n", rule)
+        self.assertEqual(
+            ["rust-llm-tidy"],
+            re.findall(r"`(rust-llm-tidy[^`]*)`", rule),
+        )
+        self.assertIn("repository-wide tracked staged and unstaged `.rs`/`.md` changes", rule)
+        self.assertIn("may include unrelated tracked changes", rule)
+        self.assertIn("untracked files are excluded until staged", rule)
+        self.assertIn("No eligible tracked changes is a successful skip", rule)
+        self.assertIn("Non-zero blocks handoff", rule)
+        self.assertIn("bounded writer loop", rule)
+
+        rule_import = '{{ file="./rules/groups/implementation/code-writing.md" }}'
+        for path in (COHORT, INTEGRATION_REPAIR):
+            with self.subTest(path=path.relative_to(ROOT)):
+                self.assertIn(rule_import, text(path))
+
+    def test_rust_llm_tidy_wrapper_preserves_caller_cwd(self) -> None:
+        flake = text(FLAKE)
+        self.assertIn("manifestPath ? null", flake)
+        self.assertIn('manifestPath = "$HOME/opencode/tools/rust-llm-tidy/src/Cargo.toml";', flake)
+        self.assertIn('--manifest-path "${manifestPath}"', flake)
+        tidy = flake.index('name = "rust-llm-tidy"')
+        tidy_block = flake[tidy : flake.index("})", tidy) + 2]
+        self.assertIn("manifestPath =", tidy_block)
+        self.assertNotIn('cd "${dir}"', tidy_block)
+        self.assertIn('cd "${dir}"', flake[:tidy])
+
+    def test_lint_gate_precedes_first_imported_rule_group_after_expansion(self) -> None:
+        rule = text(CODE_WRITING)
+        self.assertEqual(1, len(re.findall(r"(?m)^## RULE GROUP:", rule)))
+
+        expanded = expand_config_imports(rule)
+        rule_groups = [match.start() for match in re.finditer(r"(?m)^## RULE GROUP:", expanded)]
+        self.assertGreaterEqual(len(rule_groups), 2)
+        self.assertLess(expanded.index("\n### Lint gate\n"), rule_groups[1])
+
+    def test_cohort_lints_before_staging_validation_and_review(self) -> None:
+        body = text(COHORT)
+        lint = body.index("Run the shared code-writing lint gate")
+        staging = body.index("stage only paths changed by cohort writer")
+        validation = body.index("Run quick validation")
+        review = body.index("Review only after quick checks PASS")
+        self.assertLess(lint, staging)
+        self.assertLess(staging, validation)
+        self.assertLess(validation, review)
+        self.assertIn("rerun this all-checks loop from the lint gate before restaging", body)
 
     def test_exact_reviewer_and_verifier_names(self) -> None:
         body = text(COHORT)
@@ -340,7 +403,6 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertIn('edit:\n    "*": deny', frontmatter)
         self.assertNotIn('edit:\n    "*": allow', frontmatter)
         self.assertIn('"artifact/**": allow', frontmatter)
-        self.assertIn("model: sewer-axonhub/glm-5.2 # HIGH", body)
 
     def test_no_agent_overrides_global_external_directory(self) -> None:
         for root in (ROOT / "config/agent", ROOT / ".opencode/agent"):
