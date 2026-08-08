@@ -1,226 +1,40 @@
-use serde_json::Value;
-use std::collections::{BTreeSet, HashMap, HashSet};
-
 use crate::constants::*;
 use crate::export::classify::*;
 use crate::format::*;
 use crate::models::*;
+use serde_json::Value;
+use std::collections::{BTreeSet, HashMap, HashSet};
 
-pub(crate) fn extract_export_reference_paths(text: &str) -> Vec<String> {
-    let mut paths = Vec::new();
-    let mut seen = HashSet::new();
-    for token in text.split_whitespace() {
-        if !token.contains("__export-") {
-            continue;
-        }
-        let cleaned = token
-            .trim_matches(|c: char| {
-                matches!(c, '`' | '"' | '\'' | ',' | '.' | ')' | '(' | ']' | '[')
-            })
-            .trim();
-        if cleaned.is_empty() {
-            continue;
-        }
-        let normalized = normalize_tool_path(cleaned);
-        if seen.insert(normalized.clone()) {
-            paths.push(normalized);
-        }
-    }
-    paths
-}
-
-pub(crate) fn classify_export_reference_status(
-    paths: &[String],
-    current_export_name: &str,
-) -> Option<String> {
-    if paths.is_empty() {
-        return None;
-    }
-    let current_count = paths
-        .iter()
-        .filter(|path| path.contains(current_export_name))
-        .count();
-    if current_count == paths.len() {
-        return Some(String::from("current-export"));
-    }
-    if current_count > 0 {
-        return Some(String::from("mixed-export"));
-    }
-    Some(String::from("stale-export"))
-}
-
-pub(crate) fn resolve_current_export_paths(
-    paths: &[String],
-    current_export_name: &str,
-) -> Vec<String> {
-    let current_root = format!("exports/{current_export_name}");
-    let mut out = Vec::new();
-    let mut seen = HashSet::new();
-    for path in paths {
-        let resolved = path
-            .find("exports/")
-            .map(|index| &path[index + "exports/".len()..])
-            .map(|suffix| {
-                let mut parts = suffix.splitn(2, '/');
-                let _old_root = parts.next().unwrap_or_default();
-                let rest = parts.next().unwrap_or_default();
-                if rest.is_empty() {
-                    current_root.clone()
-                } else {
-                    format!("{current_root}/{rest}")
-                }
-            })
-            .unwrap_or_else(|| current_root.clone());
-        if seen.insert(resolved.clone()) {
-            out.push(resolved);
-        }
-    }
-    out
-}
-
-pub(crate) fn build_resolved_prompt_preview(
-    paths: &[String],
-    current_export_name: &str,
-) -> Option<String> {
-    let resolved = resolve_current_export_paths(paths, current_export_name);
-    if resolved.is_empty() || resolved == paths {
-        return None;
-    }
-    Some(truncate_text(
-        &format!("Resolved export refs: {}", resolved.join(", ")),
-        SUBTASK_PREVIEW_LIMIT,
-    ))
-}
-
-pub(crate) fn infer_snapshot_completeness(session_status: &str, staleness_ms: i64) -> String {
-    if session_status == "completed" {
-        return String::from("final");
-    }
-    if session_status == "running" {
-        if staleness_ms >= 43_200_000 {
-            return String::from("stale-running-snapshot");
-        }
-        return String::from("live-running-snapshot");
-    }
-    String::from("partial")
-}
-
-pub(crate) fn map_child_delegations(
-    session: &LoadedSession,
-    _compact_messages: &[CompactMessage],
-    current_export_name: &str,
-) -> HashMap<String, ChildDelegationInfo> {
-    let mut by_id = HashMap::new();
-
-    for (message_index, loaded) in session.messages.iter().enumerate() {
-        for (tool_index, part) in loaded
-            .parts
-            .iter()
-            .filter(|part| part.raw.get("type").and_then(Value::as_str) == Some("tool"))
-            .enumerate()
-        {
-            if part.raw.get("tool").and_then(Value::as_str) != Some("task") {
-                continue;
-            }
-            let Some(state) = part.raw.get("state") else {
-                continue;
-            };
-            let output = state.get("output").and_then(Value::as_str).unwrap_or("");
-            let Some(task_id) = extract_task_id(output) else {
-                continue;
-            };
-            let input = state.get("input");
-            let description = input
-                .and_then(|value| value.get("description"))
-                .and_then(Value::as_str)
-                .map(|value| truncate_text(value.trim(), TOOL_PART_PREVIEW_LIMIT));
-            let prompt_preview = input
-                .and_then(|value| value.get("prompt"))
-                .and_then(Value::as_str)
-                .map(|value| truncate_text(value.trim(), SUBTASK_PREVIEW_LIMIT));
-            let prompt_export_paths = input
-                .and_then(|value| value.get("prompt"))
-                .and_then(Value::as_str)
-                .map(extract_export_reference_paths)
-                .unwrap_or_default();
-            let prompt_preview_resolved =
-                build_resolved_prompt_preview(&prompt_export_paths, current_export_name);
-            let export_reference_status =
-                classify_export_reference_status(&prompt_export_paths, current_export_name);
-
-            by_id.insert(
-                task_id,
-                ChildDelegationInfo {
-                    message_index,
-                    tool_index,
-                    description,
-                    prompt_preview,
-                    prompt_preview_resolved,
-                    prompt_export_paths,
-                    export_reference_status,
-                    input_file: None,
-                },
-            );
-        }
-    }
-
-    by_id
-}
-
-pub(crate) fn collect_turn_reasoning_themes(
-    messages: &[MessageDigest],
-    range: Option<&std::ops::RangeInclusive<usize>>,
-) -> Vec<String> {
-    let Some(range) = range else {
-        return Vec::new();
-    };
-    let mut seen = HashSet::new();
-    let mut themes = Vec::new();
-    for idx in range.clone() {
-        for theme in &messages[idx].reasoning_themes {
-            if seen.insert(theme.clone()) {
-                themes.push(theme.clone());
-            }
-            if themes.len() >= 5 {
-                return themes;
+pub(crate) fn build_message_turn_index(turns: &[TurnDigest]) -> HashMap<usize, usize> {
+    let mut map = HashMap::new();
+    for turn in turns {
+        map.insert(turn.user_message_index, turn.turn_index);
+        if let Some((start, end)) = turn.assistant_message_start.zip(turn.assistant_message_end) {
+            for message_index in start..=end {
+                map.insert(message_index, turn.turn_index);
             }
         }
     }
-    themes
+    map
 }
 
-pub(crate) fn build_turn_reasoning_summary(
-    messages: &[MessageDigest],
-    range: Option<&std::ops::RangeInclusive<usize>>,
-    themes: &[String],
-) -> Option<String> {
-    let range = range?;
-    let mut snippets = Vec::new();
-    let mut seen = HashSet::new();
-    for idx in range.clone() {
-        let Some(summary) = messages[idx].reasoning_summary.as_ref() else {
-            continue;
-        };
-        let summary = truncate_text(summary, 120);
-        if seen.insert(summary.clone()) {
-            snippets.push(summary);
-        }
-        if snippets.len() >= 2 {
-            break;
-        }
+pub(crate) fn build_token_efficiency(
+    turn_count: usize,
+    tool_calls: usize,
+    input_tokens: u64,
+    output_tokens: u64,
+    reasoning_tokens: u64,
+    cache_read_tokens: u64,
+) -> TokenEfficiency {
+    let total = input_tokens + output_tokens + reasoning_tokens + cache_read_tokens;
+    TokenEfficiency {
+        cache_hit_ratio: (total > 0).then_some(cache_read_tokens as f64 / total as f64),
+        avg_input_tokens_per_turn: average_u64(input_tokens, turn_count),
+        avg_output_tokens_per_turn: average_u64(output_tokens, turn_count),
+        avg_reasoning_tokens_per_turn: average_u64(reasoning_tokens, turn_count),
+        avg_tool_calls_per_turn: average_usize(tool_calls, turn_count),
+        avg_input_tokens_per_tool_call: average_u64(input_tokens, tool_calls),
     }
-    if !snippets.is_empty() {
-        return Some(truncate_text(
-            &snippets.join(" | "),
-            REASONING_SUMMARY_LIMIT,
-        ));
-    }
-    (!themes.is_empty()).then(|| {
-        truncate_text(
-            &format!("Themes: {}", themes.join(", ")),
-            REASONING_SUMMARY_LIMIT,
-        )
-    })
 }
 
 pub(crate) fn build_turn_digests(
@@ -587,138 +401,6 @@ pub(crate) fn build_turn_digests(
     turns
 }
 
-pub(crate) fn finalize_turn_effectiveness(turns: &mut [TurnDigest]) {
-    let mut last_modified_turn: HashMap<(String, String), usize> = HashMap::new();
-    for turn in turns.iter() {
-        for path in &turn.modified_files_all {
-            last_modified_turn.insert((turn.session_path.clone(), path.clone()), turn.turn_index);
-        }
-    }
-
-    for turn in turns.iter_mut() {
-        let files_survived_to_end = turn
-            .modified_files_all
-            .iter()
-            .filter(|path| {
-                last_modified_turn.get(&(turn.session_path.clone(), (*path).clone()))
-                    == Some(&turn.turn_index)
-            })
-            .count();
-        turn.effectiveness_signals.files_survived_to_end = files_survived_to_end;
-        turn.turn_effectiveness = classify_turn_effectiveness(turn, files_survived_to_end);
-        turn.recommended_attention = recommend_turn_attention(turn);
-        turn.failure_narrative = build_failure_narrative(turn, files_survived_to_end);
-        turn.optimization_hints = build_optimization_hints(turn);
-    }
-}
-
-pub(crate) fn extract_task_id(output: &str) -> Option<String> {
-    let prefix = "task_id:";
-    output
-        .lines()
-        .find_map(|line| line.trim().strip_prefix(prefix).map(str::trim))
-        .and_then(|value| value.split_whitespace().next())
-        .map(str::to_string)
-        .filter(|value| !value.is_empty())
-}
-
-pub(crate) fn summarize_patch_text(text: &str) -> Option<PatchSummary> {
-    if text.trim().is_empty() {
-        return None;
-    }
-
-    let mut added = 0usize;
-    let mut updated = 0usize;
-    let mut deleted = 0usize;
-    let mut moved = 0usize;
-    let mut hunk_count = 0usize;
-    let mut added_lines = 0usize;
-    let mut removed_lines = 0usize;
-    let sample_paths = sample_strings(patch_paths_from_text(text), PATCH_FILE_SAMPLE_LIMIT);
-
-    for line in text.lines() {
-        if line.starts_with("*** Add File:") {
-            added += 1;
-        } else if line.starts_with("*** Update File:") {
-            updated += 1;
-        } else if line.starts_with("*** Delete File:") {
-            deleted += 1;
-        } else if line.starts_with("*** Move to:") {
-            moved += 1;
-        } else if line.starts_with("@@") {
-            hunk_count += 1;
-        } else if line.starts_with('+') && !line.starts_with("+++") {
-            added_lines += 1;
-        } else if line.starts_with('-') && !line.starts_with("---") {
-            removed_lines += 1;
-        }
-    }
-
-    Some(PatchSummary {
-        files_added: added,
-        files_updated: updated,
-        files_deleted: deleted,
-        files_moved: moved,
-        hunks: hunk_count,
-        lines_added: added_lines,
-        lines_deleted: removed_lines,
-        sample_paths,
-    })
-}
-
-pub(crate) fn render_patch_summary(summary: &PatchSummary) -> String {
-    let mut parts = Vec::new();
-    if summary.files_added > 0 {
-        parts.push(format!("add {}", summary.files_added));
-    }
-    if summary.files_updated > 0 {
-        parts.push(format!("update {}", summary.files_updated));
-    }
-    if summary.files_deleted > 0 {
-        parts.push(format!("delete {}", summary.files_deleted));
-    }
-    if summary.files_moved > 0 {
-        parts.push(format!("move {}", summary.files_moved));
-    }
-    if summary.hunks > 0 {
-        parts.push(format!("hunks {}", summary.hunks));
-    }
-    if summary.lines_added > 0 || summary.lines_deleted > 0 {
-        parts.push(format!(
-            "lines +{}/-{}",
-            summary.lines_added, summary.lines_deleted
-        ));
-    }
-    if parts.is_empty() {
-        return String::from("patch");
-    }
-    parts.join(", ")
-}
-
-pub(crate) fn build_key_diff_preview(
-    summary: Option<&PatchSummary>,
-    intent: Option<&str>,
-) -> Option<String> {
-    let summary = summary?;
-    let mut parts = Vec::new();
-    if let Some(intent) = intent {
-        parts.push(intent.to_string());
-    }
-    parts.push(render_patch_summary(summary));
-    if !summary.sample_paths.is_empty() {
-        parts.push(
-            summary
-                .sample_paths
-                .iter()
-                .take(3)
-                .cloned()
-                .collect::<Vec<_>>()
-                .join(", "),
-        );
-    }
-    Some(truncate_text(&parts.join(" | "), TURN_PREVIEW_LIMIT))
-}
-
 pub(crate) fn classify_patch_intent(paths: &[String], summary: &PatchSummary) -> Option<String> {
     let lower_paths = paths
         .iter()
@@ -775,36 +457,143 @@ pub(crate) fn classify_patch_intent(paths: &[String], summary: &PatchSummary) ->
     (!paths.is_empty()).then_some(String::from("feature"))
 }
 
-pub(crate) fn build_token_efficiency(
-    turn_count: usize,
-    tool_calls: usize,
-    input_tokens: u64,
-    output_tokens: u64,
-    reasoning_tokens: u64,
-    cache_read_tokens: u64,
-) -> TokenEfficiency {
-    let total = input_tokens + output_tokens + reasoning_tokens + cache_read_tokens;
-    TokenEfficiency {
-        cache_hit_ratio: (total > 0).then_some(cache_read_tokens as f64 / total as f64),
-        avg_input_tokens_per_turn: average_u64(input_tokens, turn_count),
-        avg_output_tokens_per_turn: average_u64(output_tokens, turn_count),
-        avg_reasoning_tokens_per_turn: average_u64(reasoning_tokens, turn_count),
-        avg_tool_calls_per_turn: average_usize(tool_calls, turn_count),
-        avg_input_tokens_per_tool_call: average_u64(input_tokens, tool_calls),
+pub(crate) fn infer_snapshot_completeness(session_status: &str, staleness_ms: i64) -> String {
+    if session_status == "completed" {
+        return String::from("final");
     }
+    if session_status == "running" {
+        if staleness_ms >= 43_200_000 {
+            return String::from("stale-running-snapshot");
+        }
+        return String::from("live-running-snapshot");
+    }
+    String::from("partial")
 }
 
-pub(crate) fn build_message_turn_index(turns: &[TurnDigest]) -> HashMap<usize, usize> {
-    let mut map = HashMap::new();
-    for turn in turns {
-        map.insert(turn.user_message_index, turn.turn_index);
-        if let Some((start, end)) = turn.assistant_message_start.zip(turn.assistant_message_end) {
-            for message_index in start..=end {
-                map.insert(message_index, turn.turn_index);
+pub(crate) fn map_child_delegations(
+    session: &LoadedSession,
+    _compact_messages: &[CompactMessage],
+    current_export_name: &str,
+) -> HashMap<String, ChildDelegationInfo> {
+    let mut by_id = HashMap::new();
+
+    for (message_index, loaded) in session.messages.iter().enumerate() {
+        for (tool_index, part) in loaded
+            .parts
+            .iter()
+            .filter(|part| part.raw.get("type").and_then(Value::as_str) == Some("tool"))
+            .enumerate()
+        {
+            if part.raw.get("tool").and_then(Value::as_str) != Some("task") {
+                continue;
             }
+            let Some(state) = part.raw.get("state") else {
+                continue;
+            };
+            let output = state.get("output").and_then(Value::as_str).unwrap_or("");
+            let Some(task_id) = extract_task_id(output) else {
+                continue;
+            };
+            let input = state.get("input");
+            let description = input
+                .and_then(|value| value.get("description"))
+                .and_then(Value::as_str)
+                .map(|value| truncate_text(value.trim(), TOOL_PART_PREVIEW_LIMIT));
+            let prompt_preview = input
+                .and_then(|value| value.get("prompt"))
+                .and_then(Value::as_str)
+                .map(|value| truncate_text(value.trim(), SUBTASK_PREVIEW_LIMIT));
+            let prompt_export_paths = input
+                .and_then(|value| value.get("prompt"))
+                .and_then(Value::as_str)
+                .map(extract_export_reference_paths)
+                .unwrap_or_default();
+            let prompt_preview_resolved =
+                build_resolved_prompt_preview(&prompt_export_paths, current_export_name);
+            let export_reference_status =
+                classify_export_reference_status(&prompt_export_paths, current_export_name);
+
+            by_id.insert(
+                task_id,
+                ChildDelegationInfo {
+                    message_index,
+                    tool_index,
+                    description,
+                    prompt_preview,
+                    prompt_preview_resolved,
+                    prompt_export_paths,
+                    export_reference_status,
+                    input_file: None,
+                },
+            );
         }
     }
-    map
+
+    by_id
+}
+
+pub(crate) fn patch_path_presence_from_text(text: &str) -> HashMap<String, bool> {
+    let mut out = HashMap::new();
+    for line in text.lines() {
+        let added_or_updated = line
+            .strip_prefix("*** Add File:")
+            .or_else(|| line.strip_prefix("*** Update File:"))
+            .or_else(|| line.strip_prefix("*** Move to:"))
+            .map(str::trim);
+        if let Some(path) = added_or_updated {
+            out.insert(normalize_tool_path(path), true);
+            continue;
+        }
+        let deleted = line.strip_prefix("*** Delete File:").map(str::trim);
+        if let Some(path) = deleted {
+            out.insert(normalize_tool_path(path), false);
+        }
+    }
+    out
+}
+
+pub(crate) fn summarize_patch_text(text: &str) -> Option<PatchSummary> {
+    if text.trim().is_empty() {
+        return None;
+    }
+
+    let mut added = 0usize;
+    let mut updated = 0usize;
+    let mut deleted = 0usize;
+    let mut moved = 0usize;
+    let mut hunk_count = 0usize;
+    let mut added_lines = 0usize;
+    let mut removed_lines = 0usize;
+    let sample_paths = sample_strings(patch_paths_from_text(text), PATCH_FILE_SAMPLE_LIMIT);
+
+    for line in text.lines() {
+        if line.starts_with("*** Add File:") {
+            added += 1;
+        } else if line.starts_with("*** Update File:") {
+            updated += 1;
+        } else if line.starts_with("*** Delete File:") {
+            deleted += 1;
+        } else if line.starts_with("*** Move to:") {
+            moved += 1;
+        } else if line.starts_with("@@") {
+            hunk_count += 1;
+        } else if line.starts_with('+') && !line.starts_with("+++") {
+            added_lines += 1;
+        } else if line.starts_with('-') && !line.starts_with("---") {
+            removed_lines += 1;
+        }
+    }
+
+    Some(PatchSummary {
+        files_added: added,
+        files_updated: updated,
+        files_deleted: deleted,
+        files_moved: moved,
+        hunks: hunk_count,
+        lines_added: added_lines,
+        lines_deleted: removed_lines,
+        sample_paths,
+    })
 }
 
 pub(crate) fn tool_read_paths(tool: &str, input_value: Option<&Value>) -> Vec<String> {
@@ -816,6 +605,178 @@ pub(crate) fn tool_read_paths(tool: &str, input_value: Option<&Value>) -> Vec<St
         .and_then(Value::as_str)
         .map(|path| vec![normalize_tool_path(path)])
         .unwrap_or_default()
+}
+
+pub(crate) fn build_key_diff_preview(
+    summary: Option<&PatchSummary>,
+    intent: Option<&str>,
+) -> Option<String> {
+    let summary = summary?;
+    let mut parts = Vec::new();
+    if let Some(intent) = intent {
+        parts.push(intent.to_string());
+    }
+    parts.push(render_patch_summary(summary));
+    if !summary.sample_paths.is_empty() {
+        parts.push(
+            summary
+                .sample_paths
+                .iter()
+                .take(3)
+                .cloned()
+                .collect::<Vec<_>>()
+                .join(", "),
+        );
+    }
+    Some(truncate_text(&parts.join(" | "), TURN_PREVIEW_LIMIT))
+}
+
+pub(crate) fn build_resolved_prompt_preview(
+    paths: &[String],
+    current_export_name: &str,
+) -> Option<String> {
+    let resolved = resolve_current_export_paths(paths, current_export_name);
+    if resolved.is_empty() || resolved == paths {
+        return None;
+    }
+    Some(truncate_text(
+        &format!("Resolved export refs: {}", resolved.join(", ")),
+        SUBTASK_PREVIEW_LIMIT,
+    ))
+}
+
+pub(crate) fn build_turn_reasoning_summary(
+    messages: &[MessageDigest],
+    range: Option<&std::ops::RangeInclusive<usize>>,
+    themes: &[String],
+) -> Option<String> {
+    let range = range?;
+    let mut snippets = Vec::new();
+    let mut seen = HashSet::new();
+    for idx in range.clone() {
+        let Some(summary) = messages[idx].reasoning_summary.as_ref() else {
+            continue;
+        };
+        let summary = truncate_text(summary, 120);
+        if seen.insert(summary.clone()) {
+            snippets.push(summary);
+        }
+        if snippets.len() >= 2 {
+            break;
+        }
+    }
+    if !snippets.is_empty() {
+        return Some(truncate_text(
+            &snippets.join(" | "),
+            REASONING_SUMMARY_LIMIT,
+        ));
+    }
+    (!themes.is_empty()).then(|| {
+        truncate_text(
+            &format!("Themes: {}", themes.join(", ")),
+            REASONING_SUMMARY_LIMIT,
+        )
+    })
+}
+
+pub(crate) fn classify_export_reference_status(
+    paths: &[String],
+    current_export_name: &str,
+) -> Option<String> {
+    if paths.is_empty() {
+        return None;
+    }
+    let current_count = paths
+        .iter()
+        .filter(|path| path.contains(current_export_name))
+        .count();
+    if current_count == paths.len() {
+        return Some(String::from("current-export"));
+    }
+    if current_count > 0 {
+        return Some(String::from("mixed-export"));
+    }
+    Some(String::from("stale-export"))
+}
+
+pub(crate) fn collect_turn_reasoning_themes(
+    messages: &[MessageDigest],
+    range: Option<&std::ops::RangeInclusive<usize>>,
+) -> Vec<String> {
+    let Some(range) = range else {
+        return Vec::new();
+    };
+    let mut seen = HashSet::new();
+    let mut themes = Vec::new();
+    for idx in range.clone() {
+        for theme in &messages[idx].reasoning_themes {
+            if seen.insert(theme.clone()) {
+                themes.push(theme.clone());
+            }
+            if themes.len() >= 5 {
+                return themes;
+            }
+        }
+    }
+    themes
+}
+
+pub(crate) fn extract_export_reference_paths(text: &str) -> Vec<String> {
+    let mut paths = Vec::new();
+    let mut seen = HashSet::new();
+    for token in text.split_whitespace() {
+        if !token.contains("__export-") {
+            continue;
+        }
+        let cleaned = token
+            .trim_matches(|c: char| {
+                matches!(c, '`' | '"' | '\'' | ',' | '.' | ')' | '(' | ']' | '[')
+            })
+            .trim();
+        if cleaned.is_empty() {
+            continue;
+        }
+        let normalized = normalize_tool_path(cleaned);
+        if seen.insert(normalized.clone()) {
+            paths.push(normalized);
+        }
+    }
+    paths
+}
+
+pub(crate) fn extract_task_id(output: &str) -> Option<String> {
+    let prefix = "task_id:";
+    output
+        .lines()
+        .find_map(|line| line.trim().strip_prefix(prefix).map(str::trim))
+        .and_then(|value| value.split_whitespace().next())
+        .map(str::to_string)
+        .filter(|value| !value.is_empty())
+}
+
+pub(crate) fn finalize_turn_effectiveness(turns: &mut [TurnDigest]) {
+    let mut last_modified_turn: HashMap<(String, String), usize> = HashMap::new();
+    for turn in turns.iter() {
+        for path in &turn.modified_files_all {
+            last_modified_turn.insert((turn.session_path.clone(), path.clone()), turn.turn_index);
+        }
+    }
+
+    for turn in turns.iter_mut() {
+        let files_survived_to_end = turn
+            .modified_files_all
+            .iter()
+            .filter(|path| {
+                last_modified_turn.get(&(turn.session_path.clone(), (*path).clone()))
+                    == Some(&turn.turn_index)
+            })
+            .count();
+        turn.effectiveness_signals.files_survived_to_end = files_survived_to_end;
+        turn.turn_effectiveness = classify_turn_effectiveness(turn, files_survived_to_end);
+        turn.recommended_attention = recommend_turn_attention(turn);
+        turn.failure_narrative = build_failure_narrative(turn, files_survived_to_end);
+        turn.optimization_hints = build_optimization_hints(turn);
+    }
 }
 
 pub(crate) fn patch_paths_from_text(text: &str) -> Vec<String> {
@@ -839,21 +800,59 @@ pub(crate) fn patch_paths_from_text(text: &str) -> Vec<String> {
     items
 }
 
-pub(crate) fn patch_path_presence_from_text(text: &str) -> HashMap<String, bool> {
-    let mut out = HashMap::new();
-    for line in text.lines() {
-        let added_or_updated = line
-            .strip_prefix("*** Add File:")
-            .or_else(|| line.strip_prefix("*** Update File:"))
-            .or_else(|| line.strip_prefix("*** Move to:"))
-            .map(str::trim);
-        if let Some(path) = added_or_updated {
-            out.insert(normalize_tool_path(path), true);
-            continue;
-        }
-        let deleted = line.strip_prefix("*** Delete File:").map(str::trim);
-        if let Some(path) = deleted {
-            out.insert(normalize_tool_path(path), false);
+pub(crate) fn render_patch_summary(summary: &PatchSummary) -> String {
+    let mut parts = Vec::new();
+    if summary.files_added > 0 {
+        parts.push(format!("add {}", summary.files_added));
+    }
+    if summary.files_updated > 0 {
+        parts.push(format!("update {}", summary.files_updated));
+    }
+    if summary.files_deleted > 0 {
+        parts.push(format!("delete {}", summary.files_deleted));
+    }
+    if summary.files_moved > 0 {
+        parts.push(format!("move {}", summary.files_moved));
+    }
+    if summary.hunks > 0 {
+        parts.push(format!("hunks {}", summary.hunks));
+    }
+    if summary.lines_added > 0 || summary.lines_deleted > 0 {
+        parts.push(format!(
+            "lines +{}/-{}",
+            summary.lines_added, summary.lines_deleted
+        ));
+    }
+    if parts.is_empty() {
+        return String::from("patch");
+    }
+    parts.join(", ")
+}
+
+pub(crate) fn resolve_current_export_paths(
+    paths: &[String],
+    current_export_name: &str,
+) -> Vec<String> {
+    let current_root = format!("exports/{current_export_name}");
+    let mut out = Vec::new();
+    let mut seen = HashSet::new();
+    for path in paths {
+        let resolved = path
+            .find("exports/")
+            .map(|index| &path[index + "exports/".len()..])
+            .map(|suffix| {
+                let mut parts = suffix.splitn(2, '/');
+                let _old_root = parts.next().unwrap_or_default();
+                let rest = parts.next().unwrap_or_default();
+                if rest.is_empty() {
+                    current_root.clone()
+                } else {
+                    format!("{current_root}/{rest}")
+                }
+            })
+            .unwrap_or_else(|| current_root.clone());
+        if seen.insert(resolved.clone()) {
+            out.push(resolved);
         }
     }
     out

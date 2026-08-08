@@ -1,10 +1,9 @@
-use ratatui::widgets::ListState;
-use std::collections::HashSet;
-use std::path::PathBuf;
-
 use crate::cli::*;
 use crate::models::*;
 use crate::tree::*;
+use ratatui::widgets::ListState;
+use std::collections::HashSet;
+use std::path::PathBuf;
 
 pub(crate) struct TuiApp {
     pub(crate) db_path: PathBuf,

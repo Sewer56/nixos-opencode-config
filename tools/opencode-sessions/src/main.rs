@@ -1,14 +1,5 @@
 #![recursion_limit = "512"]
 
-mod cli;
-mod constants;
-mod db;
-mod export;
-mod format;
-mod models;
-mod tree;
-mod tui;
-
 use anyhow::{Result, bail};
 use chrono::{NaiveDate, NaiveDateTime, TimeZone, Utc};
 use clap::Parser;
@@ -19,6 +10,15 @@ use export::bundle::export_bundle;
 use std::io::{self, IsTerminal};
 use tree::display::run_tree_command;
 use tui::input::run_tui;
+
+mod cli;
+mod constants;
+mod db;
+mod export;
+mod format;
+mod models;
+mod tree;
+mod tui;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();

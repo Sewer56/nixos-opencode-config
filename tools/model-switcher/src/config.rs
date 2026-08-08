@@ -25,6 +25,39 @@ pub fn load_config(env: &Env) -> anyhow::Result<LoadedConfig> {
     })
 }
 
+/// Save config atomically: write to .tmp, then rename.
+pub fn save_config(env: &Env, loaded: &LoadedConfig) -> anyhow::Result<()> {
+    validate_config(&loaded.profiles, &loaded.tier_order)?;
+    let data = marshal_config(&loaded.profiles, &loaded.tier_order);
+    if let Some(parent) = std::path::Path::new(&env.tier_file).parent() {
+        std::fs::create_dir_all(parent).context("create config dir")?;
+    }
+    let tmp = format!("{}.tmp", env.tier_file);
+    std::fs::write(&tmp, &data).context("write tier file tmp")?;
+    std::fs::rename(&tmp, &env.tier_file).context("rename tier file")?;
+    Ok(())
+}
+
+/// Work profile must only use work-provider models.
+pub fn validate_work(values: &TierSet, tier_order: &[String]) -> anyhow::Result<()> {
+    let mut bad = Vec::new();
+    for tier in tier_order {
+        if let Some(assignment) = values.get(tier)
+            && !assignment.model.starts_with(WORK_PROVIDER)
+        {
+            bad.push(format!("{}={}", tier, assignment.model));
+        }
+    }
+    if !bad.is_empty() {
+        bail!(
+            "work profile must use {} models: {}",
+            WORK_PROVIDER,
+            bad.join(", ")
+        );
+    }
+    Ok(())
+}
+
 /// Derive canonical tier order from: `$tierOrder` in config, then profile tier keys,
 /// then tier names discovered in agent markdown files.
 pub fn derive_tier_order(
@@ -76,96 +109,6 @@ pub fn derive_tier_order(
     result
 }
 
-/// Scan agent markdown files for `# <TIER>` tags.
-fn discover_tiers_from_files(env: &Env) -> anyhow::Result<Vec<String>> {
-    let files = agent_files(env)?;
-    let mut seen = std::collections::HashSet::new();
-    for file in &files {
-        let data = std::fs::read_to_string(file)?;
-        for line in data.lines() {
-            if let Some(caps) = crate::rewrite::MODEL_LINE_DISCOVERY_RE.captures(line) {
-                seen.insert(caps.get(1).unwrap().as_str().to_string());
-            }
-        }
-    }
-    let mut result: Vec<String> = seen.into_iter().collect();
-    result.sort();
-    Ok(result)
-}
-
-/// Validate that all profiles have identical tier key sets and non-empty values.
-pub fn validate_config(cfg: &Config, _tier_order: &[String]) -> anyhow::Result<()> {
-    if profile_names(cfg).is_empty() {
-        bail!("tier config must contain at least one profile");
-    }
-
-    let mut first_keys: Option<std::collections::HashSet<String>> = None;
-    let mut first_profile = "";
-
-    for (profile, values) in cfg {
-        let keys: std::collections::HashSet<String> = values.keys().cloned().collect();
-        if let Some(ref first) = first_keys {
-            if keys != *first {
-                bail!(
-                    "profile {:?} tier keys differ from {:?}",
-                    profile,
-                    first_profile
-                );
-            }
-        } else {
-            first_keys = Some(keys);
-            first_profile = profile;
-        }
-        for (tier, assignment) in values {
-            if assignment.model.trim().is_empty() {
-                bail!("profile {:?} has empty model for {}", profile, tier);
-            }
-            if !VARIANTS.contains(&assignment.variant.as_str()) {
-                bail!(
-                    "profile {:?} has invalid variant {:?} for {}",
-                    profile,
-                    assignment.variant,
-                    tier
-                );
-            }
-        }
-    }
-    Ok(())
-}
-
-/// Work profile must only use work-provider models.
-pub fn validate_work(values: &TierSet, tier_order: &[String]) -> anyhow::Result<()> {
-    let mut bad = Vec::new();
-    for tier in tier_order {
-        if let Some(assignment) = values.get(tier)
-            && !assignment.model.starts_with(WORK_PROVIDER)
-        {
-            bad.push(format!("{}={}", tier, assignment.model));
-        }
-    }
-    if !bad.is_empty() {
-        bail!(
-            "work profile must use {} models: {}",
-            WORK_PROVIDER,
-            bad.join(", ")
-        );
-    }
-    Ok(())
-}
-
-/// Save config atomically: write to .tmp, then rename.
-pub fn save_config(env: &Env, loaded: &LoadedConfig) -> anyhow::Result<()> {
-    validate_config(&loaded.profiles, &loaded.tier_order)?;
-    let data = marshal_config(&loaded.profiles, &loaded.tier_order);
-    if let Some(parent) = std::path::Path::new(&env.tier_file).parent() {
-        std::fs::create_dir_all(parent).context("create config dir")?;
-    }
-    let tmp = format!("{}.tmp", env.tier_file);
-    std::fs::write(&tmp, &data).context("write tier file tmp")?;
-    std::fs::rename(&tmp, &env.tier_file).context("rename tier file")?;
-    Ok(())
-}
-
 /// Marshal config to JSON preserving tier and profile order.
 pub fn marshal_config(cfg: &Config, tier_order: &[String]) -> String {
     let mut out = String::from("{\n");
@@ -209,11 +152,68 @@ pub fn marshal_config(cfg: &Config, tier_order: &[String]) -> String {
     out
 }
 
+/// Validate that all profiles have identical tier key sets and non-empty values.
+pub fn validate_config(cfg: &Config, _tier_order: &[String]) -> anyhow::Result<()> {
+    if profile_names(cfg).is_empty() {
+        bail!("tier config must contain at least one profile");
+    }
+
+    let mut first_keys: Option<std::collections::HashSet<String>> = None;
+    let mut first_profile = "";
+
+    for (profile, values) in cfg {
+        let keys: std::collections::HashSet<String> = values.keys().cloned().collect();
+        if let Some(ref first) = first_keys {
+            if keys != *first {
+                bail!(
+                    "profile {:?} tier keys differ from {:?}",
+                    profile,
+                    first_profile
+                );
+            }
+        } else {
+            first_keys = Some(keys);
+            first_profile = profile;
+        }
+        for (tier, assignment) in values {
+            if assignment.model.trim().is_empty() {
+                bail!("profile {:?} has empty model for {}", profile, tier);
+            }
+            if !VARIANTS.contains(&assignment.variant.as_str()) {
+                bail!(
+                    "profile {:?} has invalid variant {:?} for {}",
+                    profile,
+                    assignment.variant,
+                    tier
+                );
+            }
+        }
+    }
+    Ok(())
+}
+
 /// Return profile names (non-`$`-prefixed keys) from the config, sorted alphabetically.
 pub fn sorted_profiles(cfg: &Config) -> Vec<String> {
     let mut names: Vec<String> = cfg.keys().cloned().collect();
     names.sort();
     names
+}
+
+/// Scan agent markdown files for `# <TIER>` tags.
+fn discover_tiers_from_files(env: &Env) -> anyhow::Result<Vec<String>> {
+    let files = agent_files(env)?;
+    let mut seen = std::collections::HashSet::new();
+    for file in &files {
+        let data = std::fs::read_to_string(file)?;
+        for line in data.lines() {
+            if let Some(caps) = crate::rewrite::MODEL_LINE_DISCOVERY_RE.captures(line) {
+                seen.insert(caps.get(1).unwrap().as_str().to_string());
+            }
+        }
+    }
+    let mut result: Vec<String> = seen.into_iter().collect();
+    result.sort();
+    Ok(result)
 }
 
 fn profile_names(cfg: &Config) -> Vec<&String> {

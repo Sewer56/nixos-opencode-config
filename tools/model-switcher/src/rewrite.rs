@@ -4,21 +4,20 @@ use regex::Regex;
 use std::collections::BTreeMap;
 use std::sync::LazyLock;
 
+const MAX_WALK_DEPTH: usize = 32;
 /// Regex for discovering tier tags from model lines in agent markdown files.
 pub static MODEL_LINE_DISCOVERY_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"^\s*model:\s*\S+\s*#\s*(\S+)\b.*$"#).unwrap());
-
 static VARIANT_LINE_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"^(\s*variant:\s*)(\S+)(.*)$"#).unwrap());
 
-/// Build a regex that matches tagged frontmatter model lines with given tier names.
-/// Tiers are sorted longest-first so overlapping names match correctly.
-pub fn build_model_line_re(tiers: &[String]) -> Regex {
-    let mut sorted = tiers.to_vec();
-    sorted.sort_by_key(|b| std::cmp::Reverse(b.len()));
-    let alt: Vec<String> = sorted.iter().map(|t| regex::escape(t)).collect();
-    let pattern = format!(r#"^(\s*model:\s*)(\S+)(\s*#\s*({})\b.*)$"#, alt.join("|"));
-    Regex::new(&pattern).expect("build model line regex")
+// -- private helpers --
+
+/// A parsed tagged model line.
+#[derive(Debug)]
+struct TaggedModelLine {
+    model: String,
+    tier: String,
 }
 
 /// Apply a profile's tier values to all agent markdown files.
@@ -51,6 +50,16 @@ pub fn apply_profile(
     Ok(result)
 }
 
+/// Build a regex that matches tagged frontmatter model lines with given tier names.
+/// Tiers are sorted longest-first so overlapping names match correctly.
+pub fn build_model_line_re(tiers: &[String]) -> Regex {
+    let mut sorted = tiers.to_vec();
+    sorted.sort_by_key(|b| std::cmp::Reverse(b.len()));
+    let alt: Vec<String> = sorted.iter().map(|t| regex::escape(t)).collect();
+    let pattern = format!(r#"^(\s*model:\s*)(\S+)(\s*#\s*({})\b.*)$"#, alt.join("|"));
+    Regex::new(&pattern).expect("build model line regex")
+}
+
 /// Count current assignments per tier/model in agent files.
 pub fn current_counts(
     env: &Env,
@@ -75,6 +84,16 @@ pub fn current_counts(
         }
     }
     Ok(counts)
+}
+
+/// Find all .md files under agent directories.
+pub fn agent_files(env: &Env) -> anyhow::Result<Vec<String>> {
+    let mut files = Vec::new();
+    for dir in &env.agent_dirs {
+        walk_dir_entries(dir, &mut files)?;
+    }
+    files.sort();
+    Ok(files)
 }
 
 /// Rewrite full file content. Pure function — easy to test.
@@ -149,16 +168,6 @@ pub fn rewrite_content(
     (out, by_tier, changed)
 }
 
-/// Find all .md files under agent directories.
-pub fn agent_files(env: &Env) -> anyhow::Result<Vec<String>> {
-    let mut files = Vec::new();
-    for dir in &env.agent_dirs {
-        walk_dir_entries(dir, &mut files)?;
-    }
-    files.sort();
-    Ok(files)
-}
-
 /// Rewrite a single line if it is a tagged model assignment whose tier maps to a different model.
 /// Returns (new_line, tier, changed).
 pub fn rewrite_line(line: &str, values: &TierSet, re: &Regex) -> (String, Option<String>, bool) {
@@ -185,21 +194,27 @@ pub fn rewrite_line(line: &str, values: &TierSet, re: &Regex) -> (String, Option
     )
 }
 
-// -- private helpers --
-
-/// A parsed tagged model line.
-#[derive(Debug)]
-struct TaggedModelLine {
-    model: String,
-    tier: String,
-}
-
 fn parse_tagged_model_line(line: &str, re: &Regex) -> Option<TaggedModelLine> {
     let (body, _eol) = split_eol(line);
     re.captures(body).map(|caps| TaggedModelLine {
         model: caps.get(2).unwrap().as_str().to_string(),
         tier: caps.get(4).unwrap().as_str().to_string(),
     })
+}
+
+fn walk_dir_entries(dir: &str, files: &mut Vec<String>) -> anyhow::Result<()> {
+    walk_dir_entries_depth(dir, files, 0)
+}
+
+fn write_file_atomic(path: &str, data: &[u8]) -> anyhow::Result<()> {
+    let tmp = format!("{}.tmp", path);
+    std::fs::write(&tmp, data).context("write tmp")?;
+    std::fs::rename(&tmp, path)
+        .inspect_err(|_| {
+            let _ = std::fs::remove_file(&tmp);
+        })
+        .context("rename atomic")?;
+    Ok(())
 }
 
 fn split_eol(line: &str) -> (&str, &str) {
@@ -211,12 +226,6 @@ fn split_eol(line: &str) -> (&str, &str) {
         (line, "")
     }
 }
-
-fn walk_dir_entries(dir: &str, files: &mut Vec<String>) -> anyhow::Result<()> {
-    walk_dir_entries_depth(dir, files, 0)
-}
-
-const MAX_WALK_DEPTH: usize = 32;
 
 fn walk_dir_entries_depth(dir: &str, files: &mut Vec<String>, depth: usize) -> anyhow::Result<()> {
     if depth > MAX_WALK_DEPTH {
@@ -231,16 +240,5 @@ fn walk_dir_entries_depth(dir: &str, files: &mut Vec<String>, depth: usize) -> a
             files.push(path.to_string_lossy().into_owned());
         }
     }
-    Ok(())
-}
-
-fn write_file_atomic(path: &str, data: &[u8]) -> anyhow::Result<()> {
-    let tmp = format!("{}.tmp", path);
-    std::fs::write(&tmp, data).context("write tmp")?;
-    std::fs::rename(&tmp, path)
-        .inspect_err(|_| {
-            let _ = std::fs::remove_file(&tmp);
-        })
-        .context("rename atomic")?;
     Ok(())
 }

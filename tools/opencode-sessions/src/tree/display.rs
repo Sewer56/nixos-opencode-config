@@ -1,11 +1,10 @@
-use anyhow::Result;
-use serde_json::json;
-use std::path::Path;
-
 use crate::cli::*;
 use crate::format::*;
 use crate::models::*;
 use crate::tree::browse::*;
+use anyhow::Result;
+use serde_json::json;
+use std::path::Path;
 
 pub(crate) fn run_tree_command(
     db_path: &Path,
@@ -40,6 +39,31 @@ pub(crate) fn run_tree_command(
         println!("{line}");
     }
     Ok(())
+}
+
+pub(crate) fn build_text_tree(
+    index: &OverviewIndex,
+    search: &str,
+    limit: Option<usize>,
+) -> Vec<String> {
+    let mut lines = Vec::new();
+    let roots: Vec<&String> = limit_roots(&index.roots, limit)
+        .iter()
+        .filter(|root_id| subtree_matches(index, root_id, search))
+        .collect();
+
+    for (root_index, root_id) in roots.iter().enumerate() {
+        push_text_tree_lines(
+            index,
+            root_id,
+            search,
+            String::new(),
+            root_index + 1 == roots.len(),
+            &mut lines,
+        );
+    }
+
+    lines
 }
 
 pub(crate) fn build_tree_nodes(
@@ -84,47 +108,6 @@ pub(crate) fn build_tree_node(
         child_count: children.len(),
         children,
     })
-}
-
-pub(crate) fn build_text_tree(
-    index: &OverviewIndex,
-    search: &str,
-    limit: Option<usize>,
-) -> Vec<String> {
-    let mut lines = Vec::new();
-    let roots: Vec<&String> = limit_roots(&index.roots, limit)
-        .iter()
-        .filter(|root_id| subtree_matches(index, root_id, search))
-        .collect();
-
-    for (root_index, root_id) in roots.iter().enumerate() {
-        push_text_tree_lines(
-            index,
-            root_id,
-            search,
-            String::new(),
-            root_index + 1 == roots.len(),
-            &mut lines,
-        );
-    }
-
-    lines
-}
-
-pub(crate) fn subtree_matches(index: &OverviewIndex, session_id: &str, search: &str) -> bool {
-    if search.trim().is_empty() {
-        return true;
-    }
-
-    let Some(session) = index.sessions.get(session_id) else {
-        return false;
-    };
-
-    session_matches_query(session, search)
-        || index
-            .children_of(session_id)
-            .iter()
-            .any(|child_id| subtree_matches(index, child_id, search))
 }
 
 pub(crate) fn push_text_tree_lines(
@@ -188,4 +171,20 @@ pub(crate) fn push_text_tree_lines(
             lines,
         );
     }
+}
+
+pub(crate) fn subtree_matches(index: &OverviewIndex, session_id: &str, search: &str) -> bool {
+    if search.trim().is_empty() {
+        return true;
+    }
+
+    let Some(session) = index.sessions.get(session_id) else {
+        return false;
+    };
+
+    session_matches_query(session, search)
+        || index
+            .children_of(session_id)
+            .iter()
+            .any(|child_id| subtree_matches(index, child_id, search))
 }

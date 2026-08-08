@@ -1,3 +1,5 @@
+use crate::format::*;
+use crate::models::*;
 use anyhow::{Context, Result};
 use serde::Serialize;
 use serde_json::Value;
@@ -5,9 +7,6 @@ use sha2::{Digest, Sha256};
 use std::fs::{self, File};
 use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
-
-use crate::format::*;
-use crate::models::*;
 
 pub(crate) struct ArtifactWriter<'a> {
     pub(crate) artifacts_dir: &'a Path,
@@ -46,81 +45,39 @@ pub(crate) fn build_deliverable_snapshot(
     }))
 }
 
-pub(crate) fn resolve_workspace_deliverable_path(path: &str) -> Option<PathBuf> {
-    if path.trim().is_empty() || path.starts_with("external/") {
-        return None;
-    }
-    let relative = Path::new(path);
-    if relative.is_absolute() {
-        return None;
-    }
-    if relative
-        .components()
-        .any(|component| matches!(component, std::path::Component::ParentDir))
-    {
-        return None;
-    }
-    Some(repo_root_dir().join(relative))
+pub(crate) fn default_export_base_dir() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("exports")
 }
 
-pub(crate) fn repo_root_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .and_then(Path::parent)
-        .unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")))
-        .to_path_buf()
+pub(crate) fn session_folder_name(
+    is_root: bool,
+    session_path: &str,
+    agent: Option<&str>,
+    title: &str,
+    session_id: &str,
+) -> String {
+    let prefix = if is_root { "root" } else { "subagent" };
+    let agent = agent
+        .map(sanitize_filename)
+        .unwrap_or_else(|| String::from("unknown"));
+    format!(
+        "{}__{}__{}__{}",
+        session_path.replace('.', "-"),
+        prefix,
+        agent,
+        sanitize_filename(&format!("{}-{}", title, short_id(session_id))),
+    )
 }
 
-pub(crate) fn sha256_hex(bytes: &[u8]) -> String {
-    let mut hasher = Sha256::new();
-    hasher.update(bytes);
-    format!("{:x}", hasher.finalize())
-}
-
-pub(crate) fn ensure_artifacts_dir(created: &mut bool, dir: &Path) -> Result<()> {
-    if !*created {
-        fs::create_dir_all(dir).with_context(|| format!("create {}", dir.display()))?;
-        *created = true;
+pub(crate) fn unique_child_dir(base: &Path, name: &str) -> Result<PathBuf> {
+    let mut candidate = base.join(name);
+    let mut suffix = 2usize;
+    while candidate.exists() {
+        candidate = base.join(format!("{name}-{suffix}"));
+        suffix += 1;
     }
-    Ok(())
-}
-
-pub(crate) fn write_text_artifact(
-    aw: &mut ArtifactWriter,
-    file_name: &str,
-    text: &str,
-    force: bool,
-    threshold: usize,
-) -> Result<Option<String>> {
-    if text.trim().is_empty() {
-        return Ok(None);
-    }
-    if !force && text.chars().count() <= threshold {
-        return Ok(None);
-    }
-    ensure_artifacts_dir(aw.artifacts_created, aw.artifacts_dir)?;
-    let path = aw.artifacts_dir.join(file_name);
-    fs::write(&path, text).with_context(|| format!("write {}", path.display()))?;
-    *aw.artifact_count += 1;
-    Ok(Some(path_string(&aw.artifacts_rel_dir.join(file_name))))
-}
-
-pub(crate) fn write_json_artifact(
-    aw: &mut ArtifactWriter,
-    file_name: &str,
-    value: &Value,
-    force: bool,
-    threshold: usize,
-) -> Result<Option<String>> {
-    let text = serde_json::to_string(value).map_err(|err| anyhow::anyhow!(err.to_string()))?;
-    if !force && text.len() <= threshold {
-        return Ok(None);
-    }
-    ensure_artifacts_dir(aw.artifacts_created, aw.artifacts_dir)?;
-    let path = aw.artifacts_dir.join(file_name);
-    fs::write(&path, text).with_context(|| format!("write {}", path.display()))?;
-    *aw.artifact_count += 1;
-    Ok(Some(path_string(&aw.artifacts_rel_dir.join(file_name))))
+    fs::create_dir_all(&candidate).with_context(|| format!("create {}", candidate.display()))?;
+    Ok(candidate)
 }
 
 pub(crate) fn write_artifacts_manifest(
@@ -169,6 +126,61 @@ pub(crate) fn write_artifacts_manifest(
     ))
 }
 
+pub(crate) fn write_json_artifact(
+    aw: &mut ArtifactWriter,
+    file_name: &str,
+    value: &Value,
+    force: bool,
+    threshold: usize,
+) -> Result<Option<String>> {
+    let text = serde_json::to_string(value).map_err(|err| anyhow::anyhow!(err.to_string()))?;
+    if !force && text.len() <= threshold {
+        return Ok(None);
+    }
+    ensure_artifacts_dir(aw.artifacts_created, aw.artifacts_dir)?;
+    let path = aw.artifacts_dir.join(file_name);
+    fs::write(&path, text).with_context(|| format!("write {}", path.display()))?;
+    *aw.artifact_count += 1;
+    Ok(Some(path_string(&aw.artifacts_rel_dir.join(file_name))))
+}
+
+pub(crate) fn write_jsonl(path: PathBuf, lines: &[Value]) -> Result<()> {
+    let file = File::create(&path).with_context(|| format!("create {}", path.display()))?;
+    let mut writer = BufWriter::new(file);
+    for line in lines {
+        serde_json::to_writer(&mut writer, line)
+            .with_context(|| format!("write line to {}", path.display()))?;
+        writer.write_all(b"\n")?;
+    }
+    writer.flush()?;
+    Ok(())
+}
+
+pub(crate) fn write_text(path: PathBuf, text: &str) -> Result<()> {
+    fs::write(&path, text).with_context(|| format!("write {}", path.display()))?;
+    Ok(())
+}
+
+pub(crate) fn write_text_artifact(
+    aw: &mut ArtifactWriter,
+    file_name: &str,
+    text: &str,
+    force: bool,
+    threshold: usize,
+) -> Result<Option<String>> {
+    if text.trim().is_empty() {
+        return Ok(None);
+    }
+    if !force && text.chars().count() <= threshold {
+        return Ok(None);
+    }
+    ensure_artifacts_dir(aw.artifacts_created, aw.artifacts_dir)?;
+    let path = aw.artifacts_dir.join(file_name);
+    fs::write(&path, text).with_context(|| format!("write {}", path.display()))?;
+    *aw.artifact_count += 1;
+    Ok(Some(path_string(&aw.artifacts_rel_dir.join(file_name))))
+}
+
 pub(crate) fn classify_artifact_manifest_entry(
     name: &str,
 ) -> (String, Option<usize>, Option<usize>) {
@@ -211,6 +223,37 @@ pub(crate) fn classify_artifact_manifest_entry(
     (String::from("other"), None, None)
 }
 
+pub(crate) fn ensure_artifacts_dir(created: &mut bool, dir: &Path) -> Result<()> {
+    if !*created {
+        fs::create_dir_all(dir).with_context(|| format!("create {}", dir.display()))?;
+        *created = true;
+    }
+    Ok(())
+}
+
+pub(crate) fn resolve_workspace_deliverable_path(path: &str) -> Option<PathBuf> {
+    if path.trim().is_empty() || path.starts_with("external/") {
+        return None;
+    }
+    let relative = Path::new(path);
+    if relative.is_absolute() {
+        return None;
+    }
+    if relative
+        .components()
+        .any(|component| matches!(component, std::path::Component::ParentDir))
+    {
+        return None;
+    }
+    Some(repo_root_dir().join(relative))
+}
+
+pub(crate) fn sha256_hex(bytes: &[u8]) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(bytes);
+    format!("{:x}", hasher.finalize())
+}
+
 pub(crate) fn write_json_pretty(path: PathBuf, value: &impl Serialize) -> Result<()> {
     let file = File::create(&path).with_context(|| format!("create {}", path.display()))?;
     let writer = BufWriter::new(file);
@@ -219,54 +262,10 @@ pub(crate) fn write_json_pretty(path: PathBuf, value: &impl Serialize) -> Result
     Ok(())
 }
 
-pub(crate) fn write_text(path: PathBuf, text: &str) -> Result<()> {
-    fs::write(&path, text).with_context(|| format!("write {}", path.display()))?;
-    Ok(())
-}
-
-pub(crate) fn write_jsonl(path: PathBuf, lines: &[Value]) -> Result<()> {
-    let file = File::create(&path).with_context(|| format!("create {}", path.display()))?;
-    let mut writer = BufWriter::new(file);
-    for line in lines {
-        serde_json::to_writer(&mut writer, line)
-            .with_context(|| format!("write line to {}", path.display()))?;
-        writer.write_all(b"\n")?;
-    }
-    writer.flush()?;
-    Ok(())
-}
-
-pub(crate) fn unique_child_dir(base: &Path, name: &str) -> Result<PathBuf> {
-    let mut candidate = base.join(name);
-    let mut suffix = 2usize;
-    while candidate.exists() {
-        candidate = base.join(format!("{name}-{suffix}"));
-        suffix += 1;
-    }
-    fs::create_dir_all(&candidate).with_context(|| format!("create {}", candidate.display()))?;
-    Ok(candidate)
-}
-
-pub(crate) fn default_export_base_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("exports")
-}
-
-pub(crate) fn session_folder_name(
-    is_root: bool,
-    session_path: &str,
-    agent: Option<&str>,
-    title: &str,
-    session_id: &str,
-) -> String {
-    let prefix = if is_root { "root" } else { "subagent" };
-    let agent = agent
-        .map(sanitize_filename)
-        .unwrap_or_else(|| String::from("unknown"));
-    format!(
-        "{}__{}__{}__{}",
-        session_path.replace('.', "-"),
-        prefix,
-        agent,
-        sanitize_filename(&format!("{}-{}", title, short_id(session_id))),
-    )
+pub(crate) fn repo_root_dir() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .and_then(Path::parent)
+        .unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")))
+        .to_path_buf()
 }

@@ -1,3 +1,5 @@
+use crate::constants::*;
+use crate::models::*;
 use anyhow::{Context, Result};
 use serde::de::DeserializeOwned;
 use serde_json::{Map, Value};
@@ -5,8 +7,72 @@ use std::collections::HashMap;
 use std::fs::{self};
 use std::path::Path;
 
-use crate::constants::*;
-use crate::models::*;
+pub(crate) fn build_delta_from_previous(
+    base_dir: &Path,
+    export_root: &Path,
+    current: &ExportIndexFile,
+) -> Result<Option<DeltaFromPrevious>> {
+    let Some(previous_export_path) = &current.iteration_meta.previous_export_path else {
+        return Ok(None);
+    };
+    let previous_index_path = base_dir.join(previous_export_path).join("index.json");
+    if !previous_index_path.exists() {
+        return Ok(None);
+    }
+    let previous_value: Value = serde_json::from_str(
+        &fs::read_to_string(&previous_index_path)
+            .with_context(|| format!("read {}", previous_index_path.display()))?,
+    )
+    .with_context(|| format!("parse {}", previous_index_path.display()))?;
+    let previous_obj = previous_value.as_object().cloned().unwrap_or_default();
+    let current_value =
+        serde_json::to_value(current).map_err(|err| anyhow::anyhow!(err.to_string()))?;
+    let current_obj = current_value.as_object().cloned().unwrap_or_default();
+    let current_fields = [
+        "schema_version",
+        "schema_file",
+        "fields_file",
+        "iteration_meta",
+        "classification_policy",
+        "artifact_policy",
+        "hotspots",
+        "tool_rollup",
+        "session_index",
+        "totals",
+        "root_session_status",
+        "token_efficiency",
+    ];
+    let mut added_index_fields = Vec::new();
+    let mut changed_index_fields = Vec::new();
+    let mut removed_index_fields = Vec::new();
+    for field in current_fields {
+        match (previous_obj.get(field), current_obj.get(field)) {
+            (Some(_), None) => removed_index_fields.push(field.to_string()),
+            (Some(previous), Some(_)) => {
+                if current_obj.get(field) != Some(previous) {
+                    changed_index_fields.push(field.to_string());
+                }
+            }
+            (None, Some(_)) => added_index_fields.push(field.to_string()),
+            (None, None) => {}
+        }
+    }
+    Ok(Some(DeltaFromPrevious {
+        previous_export_path: previous_export_path.clone(),
+        previous_schema_version: previous_obj
+            .get("schema_version")
+            .and_then(Value::as_str)
+            .unwrap_or("unknown")
+            .to_string(),
+        current_schema_version: current.schema_version.to_string(),
+        added_index_fields,
+        removed_index_fields,
+        changed_index_fields,
+        totals_delta: build_totals_delta(&previous_obj, current),
+        tool_rollup_deltas: build_tool_rollup_deltas(&previous_obj, current),
+        turn_deltas: build_turn_deltas(base_dir, export_root, &previous_obj, current)?,
+    }))
+}
 
 pub(crate) fn build_iteration_meta(
     base_dir: &Path,
@@ -44,82 +110,6 @@ pub(crate) fn build_iteration_meta(
         iteration_number,
         previous_export_path,
     })
-}
-
-pub(crate) fn export_group_sort_key(root_name: &str, name: &str) -> (usize, usize, String) {
-    if name == root_name {
-        return (0, 0, name.to_string());
-    }
-    if let Some(suffix) = name.strip_prefix(&format!("{root_name}-")) {
-        return (
-            1,
-            suffix.parse::<usize>().unwrap_or(usize::MAX),
-            name.to_string(),
-        );
-    }
-    (2, usize::MAX, name.to_string())
-}
-
-pub(crate) fn json_number_i64(value: Option<&Value>) -> i64 {
-    value
-        .and_then(|value| {
-            value
-                .as_i64()
-                .or_else(|| value.as_u64().and_then(|num| i64::try_from(num).ok()))
-        })
-        .unwrap_or_default()
-}
-
-pub(crate) fn json_number_f64(value: Option<&Value>) -> f64 {
-    value.and_then(Value::as_f64).unwrap_or_default()
-}
-
-pub(crate) fn build_totals_delta(
-    previous_obj: &Map<String, Value>,
-    current: &ExportIndexFile,
-) -> Option<TotalsDelta> {
-    let previous = previous_obj.get("totals").and_then(Value::as_object)?;
-    let delta = TotalsDelta {
-        session_count: current.totals.session_count as i64
-            - json_number_i64(previous.get("session_count")),
-        turn_count: current.totals.turn_count as i64 - json_number_i64(previous.get("turn_count")),
-        message_count: current.totals.message_count as i64
-            - json_number_i64(previous.get("message_count")),
-        user_message_count: current.totals.user_message_count as i64
-            - json_number_i64(previous.get("user_message_count")),
-        assistant_message_count: current.totals.assistant_message_count as i64
-            - json_number_i64(previous.get("assistant_message_count")),
-        text_chars: current.totals.text_chars as i64 - json_number_i64(previous.get("text_chars")),
-        reasoning_chars: current.totals.reasoning_chars as i64
-            - json_number_i64(previous.get("reasoning_chars")),
-        tool_calls: current.totals.tool_calls as i64 - json_number_i64(previous.get("tool_calls")),
-        input_tokens: current.totals.input_tokens as i64
-            - json_number_i64(previous.get("input_tokens")),
-        output_tokens: current.totals.output_tokens as i64
-            - json_number_i64(previous.get("output_tokens")),
-        reasoning_tokens: current.totals.reasoning_tokens as i64
-            - json_number_i64(previous.get("reasoning_tokens")),
-        cache_read_tokens: current.totals.cache_read_tokens as i64
-            - json_number_i64(previous.get("cache_read_tokens")),
-        cache_write_tokens: current.totals.cache_write_tokens as i64
-            - json_number_i64(previous.get("cache_write_tokens")),
-        cost: current.totals.cost - json_number_f64(previous.get("cost")),
-    };
-    let has_non_zero = delta.session_count != 0
-        || delta.turn_count != 0
-        || delta.message_count != 0
-        || delta.user_message_count != 0
-        || delta.assistant_message_count != 0
-        || delta.text_chars != 0
-        || delta.reasoning_chars != 0
-        || delta.tool_calls != 0
-        || delta.input_tokens != 0
-        || delta.output_tokens != 0
-        || delta.reasoning_tokens != 0
-        || delta.cache_read_tokens != 0
-        || delta.cache_write_tokens != 0
-        || delta.cost != 0.0;
-    has_non_zero.then_some(delta)
 }
 
 pub(crate) fn build_tool_rollup_deltas(
@@ -187,20 +177,52 @@ pub(crate) fn build_tool_rollup_deltas(
     deltas
 }
 
-pub(crate) fn read_jsonl_typed<T: DeserializeOwned>(path: &Path) -> Result<Vec<T>> {
-    let text = fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
-    text.lines()
-        .filter(|line| !line.trim().is_empty())
-        .map(|line| serde_json::from_str(line).with_context(|| format!("parse {}", path.display())))
-        .collect()
-}
-
-pub(crate) fn total_tokens_from_turn_delta(turn: &TurnDeltaDigest) -> u64 {
-    turn.input_tokens
-        + turn.output_tokens
-        + turn.reasoning_tokens
-        + turn.cache_read_tokens
-        + turn.cache_write_tokens
+pub(crate) fn build_totals_delta(
+    previous_obj: &Map<String, Value>,
+    current: &ExportIndexFile,
+) -> Option<TotalsDelta> {
+    let previous = previous_obj.get("totals").and_then(Value::as_object)?;
+    let delta = TotalsDelta {
+        session_count: current.totals.session_count as i64
+            - json_number_i64(previous.get("session_count")),
+        turn_count: current.totals.turn_count as i64 - json_number_i64(previous.get("turn_count")),
+        message_count: current.totals.message_count as i64
+            - json_number_i64(previous.get("message_count")),
+        user_message_count: current.totals.user_message_count as i64
+            - json_number_i64(previous.get("user_message_count")),
+        assistant_message_count: current.totals.assistant_message_count as i64
+            - json_number_i64(previous.get("assistant_message_count")),
+        text_chars: current.totals.text_chars as i64 - json_number_i64(previous.get("text_chars")),
+        reasoning_chars: current.totals.reasoning_chars as i64
+            - json_number_i64(previous.get("reasoning_chars")),
+        tool_calls: current.totals.tool_calls as i64 - json_number_i64(previous.get("tool_calls")),
+        input_tokens: current.totals.input_tokens as i64
+            - json_number_i64(previous.get("input_tokens")),
+        output_tokens: current.totals.output_tokens as i64
+            - json_number_i64(previous.get("output_tokens")),
+        reasoning_tokens: current.totals.reasoning_tokens as i64
+            - json_number_i64(previous.get("reasoning_tokens")),
+        cache_read_tokens: current.totals.cache_read_tokens as i64
+            - json_number_i64(previous.get("cache_read_tokens")),
+        cache_write_tokens: current.totals.cache_write_tokens as i64
+            - json_number_i64(previous.get("cache_write_tokens")),
+        cost: current.totals.cost - json_number_f64(previous.get("cost")),
+    };
+    let has_non_zero = delta.session_count != 0
+        || delta.turn_count != 0
+        || delta.message_count != 0
+        || delta.user_message_count != 0
+        || delta.assistant_message_count != 0
+        || delta.text_chars != 0
+        || delta.reasoning_chars != 0
+        || delta.tool_calls != 0
+        || delta.input_tokens != 0
+        || delta.output_tokens != 0
+        || delta.reasoning_tokens != 0
+        || delta.cache_read_tokens != 0
+        || delta.cache_write_tokens != 0
+        || delta.cost != 0.0;
+    has_non_zero.then_some(delta)
 }
 
 pub(crate) fn build_turn_deltas(
@@ -324,69 +346,46 @@ pub(crate) fn build_turn_deltas(
     Ok(deltas)
 }
 
-pub(crate) fn build_delta_from_previous(
-    base_dir: &Path,
-    export_root: &Path,
-    current: &ExportIndexFile,
-) -> Result<Option<DeltaFromPrevious>> {
-    let Some(previous_export_path) = &current.iteration_meta.previous_export_path else {
-        return Ok(None);
-    };
-    let previous_index_path = base_dir.join(previous_export_path).join("index.json");
-    if !previous_index_path.exists() {
-        return Ok(None);
+pub(crate) fn export_group_sort_key(root_name: &str, name: &str) -> (usize, usize, String) {
+    if name == root_name {
+        return (0, 0, name.to_string());
     }
-    let previous_value: Value = serde_json::from_str(
-        &fs::read_to_string(&previous_index_path)
-            .with_context(|| format!("read {}", previous_index_path.display()))?,
-    )
-    .with_context(|| format!("parse {}", previous_index_path.display()))?;
-    let previous_obj = previous_value.as_object().cloned().unwrap_or_default();
-    let current_value =
-        serde_json::to_value(current).map_err(|err| anyhow::anyhow!(err.to_string()))?;
-    let current_obj = current_value.as_object().cloned().unwrap_or_default();
-    let current_fields = [
-        "schema_version",
-        "schema_file",
-        "fields_file",
-        "iteration_meta",
-        "classification_policy",
-        "artifact_policy",
-        "hotspots",
-        "tool_rollup",
-        "session_index",
-        "totals",
-        "root_session_status",
-        "token_efficiency",
-    ];
-    let mut added_index_fields = Vec::new();
-    let mut changed_index_fields = Vec::new();
-    let mut removed_index_fields = Vec::new();
-    for field in current_fields {
-        match (previous_obj.get(field), current_obj.get(field)) {
-            (Some(_), None) => removed_index_fields.push(field.to_string()),
-            (Some(previous), Some(_)) => {
-                if current_obj.get(field) != Some(previous) {
-                    changed_index_fields.push(field.to_string());
-                }
-            }
-            (None, Some(_)) => added_index_fields.push(field.to_string()),
-            (None, None) => {}
-        }
+    if let Some(suffix) = name.strip_prefix(&format!("{root_name}-")) {
+        return (
+            1,
+            suffix.parse::<usize>().unwrap_or(usize::MAX),
+            name.to_string(),
+        );
     }
-    Ok(Some(DeltaFromPrevious {
-        previous_export_path: previous_export_path.clone(),
-        previous_schema_version: previous_obj
-            .get("schema_version")
-            .and_then(Value::as_str)
-            .unwrap_or("unknown")
-            .to_string(),
-        current_schema_version: current.schema_version.to_string(),
-        added_index_fields,
-        removed_index_fields,
-        changed_index_fields,
-        totals_delta: build_totals_delta(&previous_obj, current),
-        tool_rollup_deltas: build_tool_rollup_deltas(&previous_obj, current),
-        turn_deltas: build_turn_deltas(base_dir, export_root, &previous_obj, current)?,
-    }))
+    (2, usize::MAX, name.to_string())
+}
+
+pub(crate) fn json_number_f64(value: Option<&Value>) -> f64 {
+    value.and_then(Value::as_f64).unwrap_or_default()
+}
+
+pub(crate) fn json_number_i64(value: Option<&Value>) -> i64 {
+    value
+        .and_then(|value| {
+            value
+                .as_i64()
+                .or_else(|| value.as_u64().and_then(|num| i64::try_from(num).ok()))
+        })
+        .unwrap_or_default()
+}
+
+pub(crate) fn read_jsonl_typed<T: DeserializeOwned>(path: &Path) -> Result<Vec<T>> {
+    let text = fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
+    text.lines()
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| serde_json::from_str(line).with_context(|| format!("parse {}", path.display())))
+        .collect()
+}
+
+pub(crate) fn total_tokens_from_turn_delta(turn: &TurnDeltaDigest) -> u64 {
+    turn.input_tokens
+        + turn.output_tokens
+        + turn.reasoning_tokens
+        + turn.cache_read_tokens
+        + turn.cache_write_tokens
 }

@@ -18,67 +18,6 @@ struct Args {
     paths: Vec<PathBuf>,
 }
 
-fn bytes_per_token() -> f64 {
-    env::var("BYTES_PER_TOKEN")
-        .ok()
-        .and_then(|v| v.parse().ok())
-        .unwrap_or(4.0)
-}
-
-fn expand(path: &Path) -> Result<Vec<PathBuf>> {
-    if path.is_file() {
-        return Ok(vec![path.to_path_buf()]);
-    }
-    if path.is_dir() {
-        let mut paths = Vec::new();
-        let walker = WalkBuilder::new(path)
-            .git_ignore(true)
-            .git_global(true)
-            .git_exclude(true)
-            .require_git(false)
-            .sort_by_file_name(|a, b| a.cmp(b))
-            .filter_entry(|entry| entry.file_name() != ".git")
-            .build();
-        for entry in walker {
-            let entry = entry?;
-            if entry.file_type().map_or(false, |ft| ft.is_file()) {
-                paths.push(entry.into_path());
-            }
-        }
-        return Ok(paths);
-    }
-    Ok(Vec::new())
-}
-
-fn input_paths(args: &[PathBuf]) -> Result<Vec<PathBuf>> {
-    let mut paths = Vec::new();
-    if args.is_empty() {
-        for line in io::stdin().lock().lines() {
-            let line = line?;
-            let trimmed = line.trim();
-            if !trimmed.is_empty() {
-                paths.extend(expand(Path::new(trimmed))?);
-            }
-        }
-    } else {
-        for path in args {
-            paths.extend(expand(path)?);
-        }
-    }
-
-    let mut seen = BTreeSet::new();
-    paths.retain(|path| seen.insert(path.clone()));
-    Ok(paths)
-}
-
-fn tokens(path: &Path, bytes_per_token: f64) -> Option<u64> {
-    let size = fs::metadata(path).ok()?.len();
-    if size == 0 {
-        return None;
-    }
-    Some((size as f64 / bytes_per_token) as u64)
-}
-
 fn main() -> Result<()> {
     let args = Args::parse();
     let bytes_per_token = bytes_per_token();
@@ -151,4 +90,65 @@ fn main() -> Result<()> {
         args.size, bytes_per_token
     );
     Ok(())
+}
+
+fn input_paths(args: &[PathBuf]) -> Result<Vec<PathBuf>> {
+    let mut paths = Vec::new();
+    if args.is_empty() {
+        for line in io::stdin().lock().lines() {
+            let line = line?;
+            let trimmed = line.trim();
+            if !trimmed.is_empty() {
+                paths.extend(expand(Path::new(trimmed))?);
+            }
+        }
+    } else {
+        for path in args {
+            paths.extend(expand(path)?);
+        }
+    }
+
+    let mut seen = BTreeSet::new();
+    paths.retain(|path| seen.insert(path.clone()));
+    Ok(paths)
+}
+
+fn tokens(path: &Path, bytes_per_token: f64) -> Option<u64> {
+    let size = fs::metadata(path).ok()?.len();
+    if size == 0 {
+        return None;
+    }
+    Some((size as f64 / bytes_per_token) as u64)
+}
+
+fn bytes_per_token() -> f64 {
+    env::var("BYTES_PER_TOKEN")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(4.0)
+}
+
+fn expand(path: &Path) -> Result<Vec<PathBuf>> {
+    if path.is_file() {
+        return Ok(vec![path.to_path_buf()]);
+    }
+    if path.is_dir() {
+        let mut paths = Vec::new();
+        let walker = WalkBuilder::new(path)
+            .git_ignore(true)
+            .git_global(true)
+            .git_exclude(true)
+            .require_git(false)
+            .sort_by_file_name(|a, b| a.cmp(b))
+            .filter_entry(|entry| entry.file_name() != ".git")
+            .build();
+        for entry in walker {
+            let entry = entry?;
+            if entry.file_type().map_or(false, |ft| ft.is_file()) {
+                paths.push(entry.into_path());
+            }
+        }
+        return Ok(paths);
+    }
+    Ok(Vec::new())
 }

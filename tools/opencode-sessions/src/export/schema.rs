@@ -1,7 +1,123 @@
-use serde_json::{Value, json};
-
 use crate::constants::*;
 use crate::models::*;
+use serde_json::{Value, json};
+
+pub(crate) fn build_export_fields_catalog() -> Value {
+    json!({
+        "format": "opencode-sessions-fields-v1",
+        "schema_version": SCHEMA_VERSION,
+        "files": {
+            "index.json": {
+                "description": "Bundle root. Start here for totals, tree, policies, read order, and iteration metadata.",
+                "fields": [
+                    { "name": "schema_file", "type": "string", "description": "Path to formal JSON Schema for bundle files." },
+                    { "name": "fields_file", "type": "string", "description": "Path to machine-readable field dictionary." },
+                    { "name": "recommended_read_order", "type": "array<string>", "description": "Cheap-to-expensive traversal order for analyzers." },
+                    { "name": "root_snapshot_completeness", "type": "enum", "description": "Whether root snapshot is final, live-running, stale-running, or partial." },
+                    { "name": "delta_from_previous", "type": "object?", "description": "Sibling-export diff summary for benchmark iteration tracking." },
+                    { "name": "classification_policy", "type": "object", "description": "Heuristic enum vocabularies and confidence semantics." },
+                    { "name": "artifact_policy", "type": "object", "description": "Thresholds that decide inline previews versus sidecar artifacts." }
+                ]
+            },
+            "summary.json": {
+                "description": "Session-local rollups, file churn, children, and deliverables.",
+                "fields": [
+                    { "name": "session_narrative", "type": "string?", "description": "Short machine-targeted storyline for session." },
+                    { "name": "snapshot_completeness", "type": "enum", "description": "Whether session snapshot is final, live-running, stale-running, or partial." },
+                    { "name": "turns_compact_file", "type": "string?", "description": "Pointer to compact turn digest file for cheapest turn scan." },
+                    { "name": "messages_compact_file", "type": "string?", "description": "Pointer to compact message digest file for cheap chronological scan." },
+                    { "name": "largest_artifacts", "type": "array<object>", "description": "Largest sidecars for quick artifact triage by size and category." },
+                    { "name": "artifacts_manifest_file", "type": "string?", "description": "Pointer to artifacts/index.json catalog." },
+                    { "name": "session_deliverables", "type": "array<object>", "description": "Final modified files with last-write turn, patch intent, hashes, and optional snapshots." },
+                    { "name": "file_transition_rollup", "type": "array<object>", "description": "Per-file rewrite history with supersession chains." },
+                    { "name": "turn_dependency_edges", "type": "array<object>", "description": "Cross-turn overwrite graph edges." }
+                ]
+            },
+            "turns.compact.jsonl": {
+                "description": "Compact turn digest for cheapest bulk triage before opening full turns.jsonl.",
+                "fields": [
+                    { "name": "turn_index", "type": "integer", "description": "Zero-based turn id within session." },
+                    { "name": "message_index_end", "type": "integer", "description": "Last message index covered by this turn span." },
+                    { "name": "user_intent", "type": "enum", "description": "Heuristic task class for user request." },
+                    { "name": "agent_strategy", "type": "enum", "description": "High-level phase label for turn." },
+                    { "name": "turn_cost_tier", "type": "enum", "description": "Coarse spend bucket independent from value." },
+                    { "name": "turn_effectiveness", "type": "enum", "description": "Durable value estimate for turn output." },
+                    { "name": "recommended_attention", "type": "enum", "description": "Cheap skip/read guidance for analyzers." },
+                    { "name": "failure_narrative", "type": "string?", "description": "Compact why-low-value summary for waste/low-value turns." },
+                    { "name": "reasoning_summary", "type": "string?", "description": "Turn-level reasoning rollup from assistant messages in turn." },
+                    { "name": "turn_change_summary", "type": "string?", "description": "Compact what-changed summary for turn." },
+                    { "name": "key_diff_preview", "type": "string?", "description": "Strongest edit preview for turn." }
+                ]
+            },
+            "turns.jsonl": {
+                "description": "One user turn digest per line. Primary optimization layer.",
+                "fields": [
+                    { "name": "turn_index", "type": "integer", "description": "Zero-based turn id within session." },
+                    { "name": "user_intent", "type": "enum", "description": "Heuristic task class for user request." },
+                    { "name": "turn_cost_tier", "type": "enum", "description": "Coarse spend bucket independent from outcome quality." },
+                    { "name": "turn_effectiveness", "type": "enum", "description": "Durable value estimate for turn output." },
+                    { "name": "recommended_attention", "type": "enum", "description": "Cheap skip/read guidance for analyzers." },
+                    { "name": "effectiveness_signals", "type": "object", "description": "Supporting metrics like retry ratio and redundant reads." },
+                    { "name": "change_stats", "type": "object", "description": "Patch-count and line-delta summary across turn tool calls." },
+                    { "name": "call_purpose_rollup", "type": "array<object>", "description": "Why tools were used in this turn." },
+                    { "name": "optimization_hints", "type": "array<string>", "description": "Heuristic coaching strings for future optimization." }
+                ]
+            },
+            "messages.compact.jsonl": {
+                "description": "Cheap chronological message scan before opening full messages.jsonl.",
+                "fields": [
+                    { "name": "message_index", "type": "integer", "description": "Chronological message id in session." },
+                    { "name": "turn_index", "type": "integer?", "description": "Owning turn id when message belongs to a user turn span." },
+                    { "name": "message_kind", "type": "enum", "description": "User / assistant text / tool-only / mixed / reasoning-only." },
+                    { "name": "total_tokens", "type": "integer?", "description": "Cheap token signal for prioritizing heavy messages." },
+                    { "name": "activity_summary", "type": "string?", "description": "Compact tool/activity rollup for sparse assistant messages." },
+                    { "name": "reasoning_summary", "type": "string?", "description": "Cheap reasoning rollup before opening full message digest." }
+                ]
+            },
+            "messages.jsonl": {
+                "description": "Chronological full message digests with previews, metadata, and pointers.",
+                "fields": [
+                    { "name": "message_index", "type": "integer", "description": "Chronological message id in session." },
+                    { "name": "turn_index", "type": "integer?", "description": "Owning turn id when message belongs to a user turn span." },
+                    { "name": "message_kind", "type": "enum", "description": "User / assistant text / tool-only / mixed / reasoning-only." },
+                    { "name": "text_preview", "type": "string?", "description": "Inline text preview before opening sidecar." },
+                    { "name": "reasoning_summary", "type": "string?", "description": "Cheap middle layer for long reasoning content." },
+                    { "name": "text_file", "type": "string?", "description": "Sidecar pointer when full text lives outside digest." }
+                ]
+            },
+            "tool_calls.jsonl": {
+                "description": "One tool invocation per line with direct turn linkage.",
+                "fields": [
+                    { "name": "message_index", "type": "integer", "description": "Hosting message id." },
+                    { "name": "turn_index", "type": "integer?", "description": "Direct join back to turns.jsonl." },
+                    { "name": "tool_index", "type": "integer", "description": "Tool ordinal within message." },
+                    { "name": "call_purpose", "type": "enum?", "description": "Heuristic why-label for tool usage." },
+                    { "name": "patch_summary", "type": "object?", "description": "Structured edit scope for apply_patch." },
+                    { "name": "patch_file", "type": "string?", "description": "Full diff sidecar when patch text is large." },
+                    { "name": "output_file", "type": "string?", "description": "Large tool output sidecar pointer." }
+                ]
+            },
+            "artifacts/index.json": {
+                "description": "Catalog of sidecar files with size, category, and message/tool linkage.",
+                "fields": [
+                    { "name": "total_size_bytes", "type": "integer", "description": "Total bytes across all listed artifacts." },
+                    { "name": "category", "type": "string", "description": "Artifact class such as message-reasoning or tool-output." },
+                    { "name": "size_bytes", "type": "integer", "description": "Artifact size for triage and largest-artifact ranking." },
+                    { "name": "message_index", "type": "integer?", "description": "Owning message when artifact came from message or tool under message." },
+                    { "name": "tool_index", "type": "integer?", "description": "Owning tool ordinal for tool artifacts." }
+                ]
+            },
+            "deliverables/*": {
+                "description": "Embedded final snapshots copied from current workspace when file still exists locally.",
+                "fields": [
+                    { "name": "content_sha256", "type": "string", "description": "Hash for cheap comparison without opening snapshot file." },
+                    { "name": "line_count", "type": "integer", "description": "Final line count for deliverable snapshot." },
+                    { "name": "snapshot_source", "type": "string", "description": "Origin of embedded snapshot bytes." }
+                ]
+            }
+        }
+    })
+}
 
 pub(crate) fn build_export_schema() -> Value {
     json!({
@@ -613,123 +729,6 @@ pub(crate) fn build_export_schema() -> Value {
                     "summary_file": { "type": "string" },
                     "children": { "type": "array", "items": { "$ref": "#/$defs/exportTreeNode" } }
                 }
-            }
-        }
-    })
-}
-
-pub(crate) fn build_export_fields_catalog() -> Value {
-    json!({
-        "format": "opencode-sessions-fields-v1",
-        "schema_version": SCHEMA_VERSION,
-        "files": {
-            "index.json": {
-                "description": "Bundle root. Start here for totals, tree, policies, read order, and iteration metadata.",
-                "fields": [
-                    { "name": "schema_file", "type": "string", "description": "Path to formal JSON Schema for bundle files." },
-                    { "name": "fields_file", "type": "string", "description": "Path to machine-readable field dictionary." },
-                    { "name": "recommended_read_order", "type": "array<string>", "description": "Cheap-to-expensive traversal order for analyzers." },
-                    { "name": "root_snapshot_completeness", "type": "enum", "description": "Whether root snapshot is final, live-running, stale-running, or partial." },
-                    { "name": "delta_from_previous", "type": "object?", "description": "Sibling-export diff summary for benchmark iteration tracking." },
-                    { "name": "classification_policy", "type": "object", "description": "Heuristic enum vocabularies and confidence semantics." },
-                    { "name": "artifact_policy", "type": "object", "description": "Thresholds that decide inline previews versus sidecar artifacts." }
-                ]
-            },
-            "summary.json": {
-                "description": "Session-local rollups, file churn, children, and deliverables.",
-                "fields": [
-                    { "name": "session_narrative", "type": "string?", "description": "Short machine-targeted storyline for session." },
-                    { "name": "snapshot_completeness", "type": "enum", "description": "Whether session snapshot is final, live-running, stale-running, or partial." },
-                    { "name": "turns_compact_file", "type": "string?", "description": "Pointer to compact turn digest file for cheapest turn scan." },
-                    { "name": "messages_compact_file", "type": "string?", "description": "Pointer to compact message digest file for cheap chronological scan." },
-                    { "name": "largest_artifacts", "type": "array<object>", "description": "Largest sidecars for quick artifact triage by size and category." },
-                    { "name": "artifacts_manifest_file", "type": "string?", "description": "Pointer to artifacts/index.json catalog." },
-                    { "name": "session_deliverables", "type": "array<object>", "description": "Final modified files with last-write turn, patch intent, hashes, and optional snapshots." },
-                    { "name": "file_transition_rollup", "type": "array<object>", "description": "Per-file rewrite history with supersession chains." },
-                    { "name": "turn_dependency_edges", "type": "array<object>", "description": "Cross-turn overwrite graph edges." }
-                ]
-            },
-            "turns.compact.jsonl": {
-                "description": "Compact turn digest for cheapest bulk triage before opening full turns.jsonl.",
-                "fields": [
-                    { "name": "turn_index", "type": "integer", "description": "Zero-based turn id within session." },
-                    { "name": "message_index_end", "type": "integer", "description": "Last message index covered by this turn span." },
-                    { "name": "user_intent", "type": "enum", "description": "Heuristic task class for user request." },
-                    { "name": "agent_strategy", "type": "enum", "description": "High-level phase label for turn." },
-                    { "name": "turn_cost_tier", "type": "enum", "description": "Coarse spend bucket independent from value." },
-                    { "name": "turn_effectiveness", "type": "enum", "description": "Durable value estimate for turn output." },
-                    { "name": "recommended_attention", "type": "enum", "description": "Cheap skip/read guidance for analyzers." },
-                    { "name": "failure_narrative", "type": "string?", "description": "Compact why-low-value summary for waste/low-value turns." },
-                    { "name": "reasoning_summary", "type": "string?", "description": "Turn-level reasoning rollup from assistant messages in turn." },
-                    { "name": "turn_change_summary", "type": "string?", "description": "Compact what-changed summary for turn." },
-                    { "name": "key_diff_preview", "type": "string?", "description": "Strongest edit preview for turn." }
-                ]
-            },
-            "turns.jsonl": {
-                "description": "One user turn digest per line. Primary optimization layer.",
-                "fields": [
-                    { "name": "turn_index", "type": "integer", "description": "Zero-based turn id within session." },
-                    { "name": "user_intent", "type": "enum", "description": "Heuristic task class for user request." },
-                    { "name": "turn_cost_tier", "type": "enum", "description": "Coarse spend bucket independent from outcome quality." },
-                    { "name": "turn_effectiveness", "type": "enum", "description": "Durable value estimate for turn output." },
-                    { "name": "recommended_attention", "type": "enum", "description": "Cheap skip/read guidance for analyzers." },
-                    { "name": "effectiveness_signals", "type": "object", "description": "Supporting metrics like retry ratio and redundant reads." },
-                    { "name": "change_stats", "type": "object", "description": "Patch-count and line-delta summary across turn tool calls." },
-                    { "name": "call_purpose_rollup", "type": "array<object>", "description": "Why tools were used in this turn." },
-                    { "name": "optimization_hints", "type": "array<string>", "description": "Heuristic coaching strings for future optimization." }
-                ]
-            },
-            "messages.compact.jsonl": {
-                "description": "Cheap chronological message scan before opening full messages.jsonl.",
-                "fields": [
-                    { "name": "message_index", "type": "integer", "description": "Chronological message id in session." },
-                    { "name": "turn_index", "type": "integer?", "description": "Owning turn id when message belongs to a user turn span." },
-                    { "name": "message_kind", "type": "enum", "description": "User / assistant text / tool-only / mixed / reasoning-only." },
-                    { "name": "total_tokens", "type": "integer?", "description": "Cheap token signal for prioritizing heavy messages." },
-                    { "name": "activity_summary", "type": "string?", "description": "Compact tool/activity rollup for sparse assistant messages." },
-                    { "name": "reasoning_summary", "type": "string?", "description": "Cheap reasoning rollup before opening full message digest." }
-                ]
-            },
-            "messages.jsonl": {
-                "description": "Chronological full message digests with previews, metadata, and pointers.",
-                "fields": [
-                    { "name": "message_index", "type": "integer", "description": "Chronological message id in session." },
-                    { "name": "turn_index", "type": "integer?", "description": "Owning turn id when message belongs to a user turn span." },
-                    { "name": "message_kind", "type": "enum", "description": "User / assistant text / tool-only / mixed / reasoning-only." },
-                    { "name": "text_preview", "type": "string?", "description": "Inline text preview before opening sidecar." },
-                    { "name": "reasoning_summary", "type": "string?", "description": "Cheap middle layer for long reasoning content." },
-                    { "name": "text_file", "type": "string?", "description": "Sidecar pointer when full text lives outside digest." }
-                ]
-            },
-            "tool_calls.jsonl": {
-                "description": "One tool invocation per line with direct turn linkage.",
-                "fields": [
-                    { "name": "message_index", "type": "integer", "description": "Hosting message id." },
-                    { "name": "turn_index", "type": "integer?", "description": "Direct join back to turns.jsonl." },
-                    { "name": "tool_index", "type": "integer", "description": "Tool ordinal within message." },
-                    { "name": "call_purpose", "type": "enum?", "description": "Heuristic why-label for tool usage." },
-                    { "name": "patch_summary", "type": "object?", "description": "Structured edit scope for apply_patch." },
-                    { "name": "patch_file", "type": "string?", "description": "Full diff sidecar when patch text is large." },
-                    { "name": "output_file", "type": "string?", "description": "Large tool output sidecar pointer." }
-                ]
-            },
-            "artifacts/index.json": {
-                "description": "Catalog of sidecar files with size, category, and message/tool linkage.",
-                "fields": [
-                    { "name": "total_size_bytes", "type": "integer", "description": "Total bytes across all listed artifacts." },
-                    { "name": "category", "type": "string", "description": "Artifact class such as message-reasoning or tool-output." },
-                    { "name": "size_bytes", "type": "integer", "description": "Artifact size for triage and largest-artifact ranking." },
-                    { "name": "message_index", "type": "integer?", "description": "Owning message when artifact came from message or tool under message." },
-                    { "name": "tool_index", "type": "integer?", "description": "Owning tool ordinal for tool artifacts." }
-                ]
-            },
-            "deliverables/*": {
-                "description": "Embedded final snapshots copied from current workspace when file still exists locally.",
-                "fields": [
-                    { "name": "content_sha256", "type": "string", "description": "Hash for cheap comparison without opening snapshot file." },
-                    { "name": "line_count", "type": "integer", "description": "Final line count for deliverable snapshot." },
-                    { "name": "snapshot_source", "type": "string", "description": "Origin of embedded snapshot bytes." }
-                ]
             }
         }
     })

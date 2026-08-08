@@ -1,13 +1,13 @@
+use crate::constants::*;
+use crate::export::classify::*;
+use crate::export::io::*;
+use crate::export::turn::*;
+use crate::format::*;
+use crate::models::*;
 use anyhow::Result;
 use serde_json::Value;
 use std::collections::{BTreeSet, HashMap};
 use std::path::Path;
-
-use crate::constants::*;
-use crate::export::classify::*;
-use crate::export::turn::*;
-use crate::format::*;
-use crate::models::*;
 
 pub(crate) struct SessionOutput {
     pub(crate) turn_digests: Vec<TurnDigest>,
@@ -19,45 +19,28 @@ pub(crate) struct SessionOutput {
     pub(crate) artifacts_dir: Option<String>,
     pub(crate) artifact_count: usize,
 }
-use crate::export::io::*;
 
-pub(crate) fn compact_message(
-    message: &LoadedMessage,
-    session_path: &str,
-    depth: usize,
-    message_index: usize,
-) -> Result<CompactMessage> {
-    let parts = message
-        .parts
+pub(crate) fn build_message_compact_entries(
+    messages: &[MessageDigest],
+) -> Vec<MessageCompactEntry> {
+    messages
         .iter()
-        .filter_map(compact_part)
-        .collect::<Vec<_>>();
-
-    Ok(CompactMessage {
-        session_path: session_path.to_string(),
-        depth,
-        message_index,
-        message_id: message.id.clone(),
-        role: message.info.role.clone(),
-        agent: message.info.agent.clone(),
-        parent_message_id: message.info.parent_id.clone(),
-        model: message.info.model_name(),
-        provider: message.info.provider_name(),
-        created_ms: message.info.created_ms(message.time_created),
-        completed_ms: message.info.completed_ms(),
-        duration_ms: message.info.duration_ms(),
-        finish: message.info.finish.clone(),
-        cost: message.info.cost,
-        tokens: message.info.tokens.as_ref().map(|tokens| TokenStatsExport {
-            total: tokens.total,
-            input: tokens.input,
-            output: tokens.output,
-            reasoning: tokens.reasoning,
-            cache_read: tokens.cache.read,
-            cache_write: tokens.cache.write,
-        }),
-        parts,
-    })
+        .map(|message| MessageCompactEntry {
+            message_index: message.message_index,
+            turn_index: message.turn_index,
+            role: message.role.clone(),
+            message_kind: message.message_kind.clone(),
+            time_ms: message.time_ms,
+            wall_gap_ms: message.wall_gap_ms,
+            duration_ms: message.duration_ms,
+            total_tokens: message.tokens.as_ref().and_then(|tokens| tokens.total),
+            tool_count: message.tool_count,
+            tool_error_count: message.tool_error_count,
+            text_preview: message.text_preview.clone(),
+            activity_summary: message.activity_summary.clone(),
+            reasoning_summary: message.reasoning_summary.clone(),
+        })
+        .collect()
 }
 
 pub(crate) fn build_session_machine_output(
@@ -570,27 +553,108 @@ pub(crate) fn build_turn_compact_entries(turns: &[TurnDigest]) -> Vec<TurnCompac
         .collect()
 }
 
-pub(crate) fn build_message_compact_entries(
-    messages: &[MessageDigest],
-) -> Vec<MessageCompactEntry> {
-    messages
+pub(crate) fn compact_message(
+    message: &LoadedMessage,
+    session_path: &str,
+    depth: usize,
+    message_index: usize,
+) -> Result<CompactMessage> {
+    let parts = message
+        .parts
         .iter()
-        .map(|message| MessageCompactEntry {
-            message_index: message.message_index,
-            turn_index: message.turn_index,
-            role: message.role.clone(),
-            message_kind: message.message_kind.clone(),
-            time_ms: message.time_ms,
-            wall_gap_ms: message.wall_gap_ms,
-            duration_ms: message.duration_ms,
-            total_tokens: message.tokens.as_ref().and_then(|tokens| tokens.total),
-            tool_count: message.tool_count,
-            tool_error_count: message.tool_error_count,
-            text_preview: message.text_preview.clone(),
-            activity_summary: message.activity_summary.clone(),
-            reasoning_summary: message.reasoning_summary.clone(),
-        })
-        .collect()
+        .filter_map(compact_part)
+        .collect::<Vec<_>>();
+
+    Ok(CompactMessage {
+        session_path: session_path.to_string(),
+        depth,
+        message_index,
+        message_id: message.id.clone(),
+        role: message.info.role.clone(),
+        agent: message.info.agent.clone(),
+        parent_message_id: message.info.parent_id.clone(),
+        model: message.info.model_name(),
+        provider: message.info.provider_name(),
+        created_ms: message.info.created_ms(message.time_created),
+        completed_ms: message.info.completed_ms(),
+        duration_ms: message.info.duration_ms(),
+        finish: message.info.finish.clone(),
+        cost: message.info.cost,
+        tokens: message.info.tokens.as_ref().map(|tokens| TokenStatsExport {
+            total: tokens.total,
+            input: tokens.input,
+            output: tokens.output,
+            reasoning: tokens.reasoning,
+            cache_read: tokens.cache.read,
+            cache_write: tokens.cache.write,
+        }),
+        parts,
+    })
+}
+
+pub(crate) fn compute_session_stats(
+    session: &LoadedSession,
+    compact_messages: &[CompactMessage],
+    session_path: &str,
+    depth: usize,
+    agent: Option<String>,
+) -> SessionStats {
+    let mut stats = SessionStats {
+        session_path: session_path.to_string(),
+        depth,
+        session_id: session.meta.id.clone(),
+        parent_session_id: session.meta.parent_id.clone(),
+        title: session.meta.title.clone(),
+        agent,
+        created_ms: session.meta.time_created,
+        updated_ms: session.meta.time_updated,
+        duration_ms: session.meta.duration_ms(),
+        turn_count: 0,
+        message_count: compact_messages.len(),
+        user_message_count: 0,
+        assistant_message_count: 0,
+        child_session_count: session.children.len(),
+        text_chars: 0,
+        reasoning_chars: 0,
+        tool_calls: 0,
+        input_tokens: 0,
+        output_tokens: 0,
+        reasoning_tokens: 0,
+        cache_read_tokens: 0,
+        cache_write_tokens: 0,
+        cost: 0.0,
+    };
+
+    for message in compact_messages {
+        if message.role == "user" {
+            stats.turn_count += 1;
+            stats.user_message_count += 1;
+        }
+        if message.role == "assistant" {
+            stats.assistant_message_count += 1;
+        }
+
+        for part in &message.parts {
+            match part {
+                CompactPart::Text { text, .. } => stats.text_chars += text.chars().count(),
+                CompactPart::Reasoning { text } => stats.reasoning_chars += text.chars().count(),
+                CompactPart::Tool { .. } => stats.tool_calls += 1,
+                _ => {}
+            }
+        }
+
+        if let Some(tokens) = &message.tokens {
+            stats.input_tokens += tokens.input;
+            stats.output_tokens += tokens.output;
+            stats.reasoning_tokens += tokens.reasoning;
+            stats.cache_read_tokens += tokens.cache_read;
+            stats.cache_write_tokens += tokens.cache_write;
+        }
+
+        stats.cost += message.cost.unwrap_or(0.0);
+    }
+
+    stats
 }
 
 pub(crate) fn infer_session_status(
@@ -631,6 +695,31 @@ pub(crate) fn infer_session_status(
         return String::from("abandoned");
     }
     String::from("abandoned")
+}
+
+pub(crate) fn parent_session_path(session_path: &str) -> Option<String> {
+    session_path
+        .rsplit_once('.')
+        .map(|(parent, _)| parent.to_string())
+}
+
+pub(crate) fn session_totals(stats: &SessionStats) -> SessionTotals {
+    SessionTotals {
+        turn_count: stats.turn_count,
+        message_count: stats.message_count,
+        user_message_count: stats.user_message_count,
+        assistant_message_count: stats.assistant_message_count,
+        child_session_count: stats.child_session_count,
+        text_chars: stats.text_chars,
+        reasoning_chars: stats.reasoning_chars,
+        tool_calls: stats.tool_calls,
+        input_tokens: stats.input_tokens,
+        output_tokens: stats.output_tokens,
+        reasoning_tokens: stats.reasoning_tokens,
+        cache_read_tokens: stats.cache_read_tokens,
+        cache_write_tokens: stats.cache_write_tokens,
+        cost: stats.cost,
+    }
 }
 
 pub(crate) fn compact_part(part: &LoadedPart) -> Option<CompactPart> {
@@ -759,94 +848,4 @@ pub(crate) fn compact_part(part: &LoadedPart) -> Option<CompactPart> {
         "step-start" | "step-finish" | "snapshot" | "compaction" => None,
         _ => None,
     }
-}
-
-pub(crate) fn compute_session_stats(
-    session: &LoadedSession,
-    compact_messages: &[CompactMessage],
-    session_path: &str,
-    depth: usize,
-    agent: Option<String>,
-) -> SessionStats {
-    let mut stats = SessionStats {
-        session_path: session_path.to_string(),
-        depth,
-        session_id: session.meta.id.clone(),
-        parent_session_id: session.meta.parent_id.clone(),
-        title: session.meta.title.clone(),
-        agent,
-        created_ms: session.meta.time_created,
-        updated_ms: session.meta.time_updated,
-        duration_ms: session.meta.duration_ms(),
-        turn_count: 0,
-        message_count: compact_messages.len(),
-        user_message_count: 0,
-        assistant_message_count: 0,
-        child_session_count: session.children.len(),
-        text_chars: 0,
-        reasoning_chars: 0,
-        tool_calls: 0,
-        input_tokens: 0,
-        output_tokens: 0,
-        reasoning_tokens: 0,
-        cache_read_tokens: 0,
-        cache_write_tokens: 0,
-        cost: 0.0,
-    };
-
-    for message in compact_messages {
-        if message.role == "user" {
-            stats.turn_count += 1;
-            stats.user_message_count += 1;
-        }
-        if message.role == "assistant" {
-            stats.assistant_message_count += 1;
-        }
-
-        for part in &message.parts {
-            match part {
-                CompactPart::Text { text, .. } => stats.text_chars += text.chars().count(),
-                CompactPart::Reasoning { text } => stats.reasoning_chars += text.chars().count(),
-                CompactPart::Tool { .. } => stats.tool_calls += 1,
-                _ => {}
-            }
-        }
-
-        if let Some(tokens) = &message.tokens {
-            stats.input_tokens += tokens.input;
-            stats.output_tokens += tokens.output;
-            stats.reasoning_tokens += tokens.reasoning;
-            stats.cache_read_tokens += tokens.cache_read;
-            stats.cache_write_tokens += tokens.cache_write;
-        }
-
-        stats.cost += message.cost.unwrap_or(0.0);
-    }
-
-    stats
-}
-
-pub(crate) fn session_totals(stats: &SessionStats) -> SessionTotals {
-    SessionTotals {
-        turn_count: stats.turn_count,
-        message_count: stats.message_count,
-        user_message_count: stats.user_message_count,
-        assistant_message_count: stats.assistant_message_count,
-        child_session_count: stats.child_session_count,
-        text_chars: stats.text_chars,
-        reasoning_chars: stats.reasoning_chars,
-        tool_calls: stats.tool_calls,
-        input_tokens: stats.input_tokens,
-        output_tokens: stats.output_tokens,
-        reasoning_tokens: stats.reasoning_tokens,
-        cache_read_tokens: stats.cache_read_tokens,
-        cache_write_tokens: stats.cache_write_tokens,
-        cost: stats.cost,
-    }
-}
-
-pub(crate) fn parent_session_path(session_path: &str) -> Option<String> {
-    session_path
-        .rsplit_once('.')
-        .map(|(parent, _)| parent.to_string())
 }

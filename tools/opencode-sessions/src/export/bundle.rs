@@ -1,13 +1,3 @@
-use anyhow::{Context, Result};
-use chrono::Utc;
-use rusqlite::{Connection, params};
-use serde_json::Value;
-use std::cmp::Reverse;
-use std::collections::HashMap;
-use std::fs::{self};
-use std::path::{Path, PathBuf};
-use uuid::Uuid;
-
 use crate::constants::*;
 use crate::export::classify::*;
 use crate::export::delta::*;
@@ -19,6 +9,15 @@ use crate::export::session_output::*;
 use crate::export::turn::*;
 use crate::format::*;
 use crate::models::*;
+use anyhow::{Context, Result};
+use chrono::Utc;
+use rusqlite::{Connection, params};
+use serde_json::Value;
+use std::cmp::Reverse;
+use std::collections::HashMap;
+use std::fs::{self};
+use std::path::{Path, PathBuf};
+use uuid::Uuid;
 
 pub(crate) fn export_bundle(
     conn: &Connection,
@@ -264,58 +263,6 @@ pub(crate) fn load_session_tree(
     })
 }
 
-pub(crate) fn load_messages(conn: &Connection, session_id: &str) -> Result<Vec<LoadedMessage>> {
-    let mut messages = Vec::new();
-    let mut stmt = conn.prepare(
-        r#"
-        select id, session_id, time_created, time_updated, data
-        from message
-        where session_id = ?1
-        order by time_created asc, id asc
-        "#,
-    )?;
-    let mut rows = stmt.query(params![session_id])?;
-    while let Some(row) = rows.next()? {
-        let id: String = row.get(0)?;
-        let time_created: i64 = row.get(2)?;
-        let raw_json: String = row.get(4)?;
-        let info: MessageInfo = serde_json::from_str(&raw_json)
-            .with_context(|| format!("parse message json for {id}"))?;
-        messages.push(LoadedMessage {
-            id,
-            time_created,
-            info,
-            parts: Vec::new(),
-        });
-    }
-
-    let mut parts_by_message: HashMap<String, Vec<LoadedPart>> = HashMap::new();
-    let mut stmt = conn.prepare(
-        r#"
-        select id, message_id, session_id, time_created, time_updated, data
-        from part
-        where session_id = ?1
-        order by time_created asc, id asc
-        "#,
-    )?;
-    let mut rows = stmt.query(params![session_id])?;
-    while let Some(row) = rows.next()? {
-        let message_id: String = row.get(1)?;
-        let raw_json: String = row.get(5)?;
-        let raw: Value = serde_json::from_str(&raw_json)
-            .with_context(|| format!("parse part json for message {message_id}"))?;
-        parts_by_message
-            .entry(message_id.clone())
-            .or_default()
-            .push(LoadedPart { raw });
-    }
-
-    for message in &mut messages {
-        message.parts = parts_by_message.remove(&message.id).unwrap_or_default();
-    }
-
-    Ok(messages)
-}
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn write_session_bundle(
     session: &LoadedSession,
@@ -652,4 +599,57 @@ pub(crate) fn write_session_bundle(
         summary_file,
         children: child_tree_nodes,
     })
+}
+
+pub(crate) fn load_messages(conn: &Connection, session_id: &str) -> Result<Vec<LoadedMessage>> {
+    let mut messages = Vec::new();
+    let mut stmt = conn.prepare(
+        r#"
+        select id, session_id, time_created, time_updated, data
+        from message
+        where session_id = ?1
+        order by time_created asc, id asc
+        "#,
+    )?;
+    let mut rows = stmt.query(params![session_id])?;
+    while let Some(row) = rows.next()? {
+        let id: String = row.get(0)?;
+        let time_created: i64 = row.get(2)?;
+        let raw_json: String = row.get(4)?;
+        let info: MessageInfo = serde_json::from_str(&raw_json)
+            .with_context(|| format!("parse message json for {id}"))?;
+        messages.push(LoadedMessage {
+            id,
+            time_created,
+            info,
+            parts: Vec::new(),
+        });
+    }
+
+    let mut parts_by_message: HashMap<String, Vec<LoadedPart>> = HashMap::new();
+    let mut stmt = conn.prepare(
+        r#"
+        select id, message_id, session_id, time_created, time_updated, data
+        from part
+        where session_id = ?1
+        order by time_created asc, id asc
+        "#,
+    )?;
+    let mut rows = stmt.query(params![session_id])?;
+    while let Some(row) = rows.next()? {
+        let message_id: String = row.get(1)?;
+        let raw_json: String = row.get(5)?;
+        let raw: Value = serde_json::from_str(&raw_json)
+            .with_context(|| format!("parse part json for message {message_id}"))?;
+        parts_by_message
+            .entry(message_id.clone())
+            .or_default()
+            .push(LoadedPart { raw });
+    }
+
+    for message in &mut messages {
+        message.parts = parts_by_message.remove(&message.id).unwrap_or_default();
+    }
+
+    Ok(messages)
 }

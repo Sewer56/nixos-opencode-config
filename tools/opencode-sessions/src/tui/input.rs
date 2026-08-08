@@ -1,3 +1,9 @@
+use crate::cli::*;
+use crate::db::*;
+use crate::export::*;
+use crate::models::*;
+use crate::tui::app::*;
+use crate::tui::render::*;
 use anyhow::{Context, Result};
 use crossterm::ExecutableCommand;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
@@ -10,13 +16,6 @@ use std::fs::{self};
 use std::io::{self};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
-
-use crate::cli::*;
-use crate::db::*;
-use crate::export::*;
-use crate::models::*;
-use crate::tui::app::*;
-use crate::tui::render::*;
 
 pub(crate) fn run_tui(db_path: PathBuf, index: OverviewIndex, args: TuiArgs) -> Result<()> {
     let export_base = default_export_base_dir();

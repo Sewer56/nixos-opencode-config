@@ -1,43 +1,51 @@
-use anyhow::Result;
-use std::collections::{BTreeSet, HashMap};
-use std::path::Path;
-
 use crate::constants::*;
 use crate::export::io::*;
 use crate::export::turn::*;
 use crate::format::*;
 use crate::models::*;
+use anyhow::Result;
+use std::collections::{BTreeSet, HashMap};
+use std::path::Path;
 
-pub(crate) fn rollup_tools(tools: &[ToolCallDigest]) -> Vec<ToolAggregate> {
-    let mut map: HashMap<String, ToolAggregate> = HashMap::new();
-    for tool in tools {
+pub(crate) fn build_error_patterns(
+    turns: &[TurnDigest],
+    tools: &[ToolCallDigest],
+) -> Vec<ErrorPatternEntry> {
+    let turn_by_message = build_message_turn_index(turns);
+    let mut map: HashMap<(String, String), ErrorPatternEntry> = HashMap::new();
+
+    for tool in tools.iter().filter(|tool| tool.status == "error") {
+        let error_type = tool
+            .error_type
+            .clone()
+            .unwrap_or_else(|| String::from("tool-error"));
         let entry = map
-            .entry(tool.tool.clone())
-            .or_insert_with(|| ToolAggregate {
+            .entry((tool.tool.clone(), error_type.clone()))
+            .or_insert_with(|| ErrorPatternEntry {
                 tool: tool.tool.clone(),
-                calls: 0,
-                error_calls: 0,
-                total_duration_ms: 0,
-                max_duration_ms: 0,
-                total_output_chars: 0,
-                total_input_tokens_proxy: 0,
-                avg_input_tokens_proxy: None,
+                error_type: error_type.clone(),
+                count: 0,
+                turn_indexes: Vec::new(),
+                sample_message_index: tool.message_index,
+                sample_error_preview: tool.error_preview.clone(),
             });
-        entry.calls += 1;
-        if tool.status == "error" {
-            entry.error_calls += 1;
+        entry.count += 1;
+        if let Some(turn_index) = turn_by_message.get(&tool.message_index).copied()
+            && !entry.turn_indexes.contains(&turn_index)
+        {
+            entry.turn_indexes.push(turn_index);
         }
-        entry.total_duration_ms += tool.duration_ms.unwrap_or_default();
-        entry.max_duration_ms = entry
-            .max_duration_ms
-            .max(tool.duration_ms.unwrap_or_default());
-        entry.total_output_chars += tool.output_chars.unwrap_or_default();
-        entry.total_input_tokens_proxy += tool.input_tokens_proxy;
     }
+
     let mut items = map.into_values().collect::<Vec<_>>();
-    for item in &mut items {
-        item.avg_input_tokens_proxy = average_u64(item.total_input_tokens_proxy, item.calls);
-    }
+    items.sort_by(|left, right| {
+        right
+            .count
+            .cmp(&left.count)
+            .then_with(|| left.tool.cmp(&right.tool))
+            .then_with(|| left.error_type.cmp(&right.error_type))
+    });
+    items.truncate(ERROR_PATTERN_LIMIT);
     items
 }
 
@@ -102,129 +110,6 @@ pub(crate) fn build_file_access_rollup(
     }
     items.truncate(FILE_ACCESS_ROLLUP_LIMIT);
     items
-}
-
-pub(crate) fn build_error_patterns(
-    turns: &[TurnDigest],
-    tools: &[ToolCallDigest],
-) -> Vec<ErrorPatternEntry> {
-    let turn_by_message = build_message_turn_index(turns);
-    let mut map: HashMap<(String, String), ErrorPatternEntry> = HashMap::new();
-
-    for tool in tools.iter().filter(|tool| tool.status == "error") {
-        let error_type = tool
-            .error_type
-            .clone()
-            .unwrap_or_else(|| String::from("tool-error"));
-        let entry = map
-            .entry((tool.tool.clone(), error_type.clone()))
-            .or_insert_with(|| ErrorPatternEntry {
-                tool: tool.tool.clone(),
-                error_type: error_type.clone(),
-                count: 0,
-                turn_indexes: Vec::new(),
-                sample_message_index: tool.message_index,
-                sample_error_preview: tool.error_preview.clone(),
-            });
-        entry.count += 1;
-        if let Some(turn_index) = turn_by_message.get(&tool.message_index).copied()
-            && !entry.turn_indexes.contains(&turn_index)
-        {
-            entry.turn_indexes.push(turn_index);
-        }
-    }
-
-    let mut items = map.into_values().collect::<Vec<_>>();
-    items.sort_by(|left, right| {
-        right
-            .count
-            .cmp(&left.count)
-            .then_with(|| left.tool.cmp(&right.tool))
-            .then_with(|| left.error_type.cmp(&right.error_type))
-    });
-    items.truncate(ERROR_PATTERN_LIMIT);
-    items
-}
-
-pub(crate) fn build_retry_chains(
-    turns: &[TurnDigest],
-    tools: &[ToolCallDigest],
-) -> Vec<RetryChainEntry> {
-    let turn_by_message = build_message_turn_index(turns);
-    let mut chains = Vec::new();
-    let mut current: Option<RetryChainEntry> = None;
-
-    for tool in tools.iter().filter(|tool| tool.status == "error") {
-        let turn_index = turn_by_message
-            .get(&tool.message_index)
-            .copied()
-            .unwrap_or_default();
-        let error_type = tool
-            .error_type
-            .clone()
-            .unwrap_or_else(|| String::from("tool-error"));
-        match &mut current {
-            Some(chain)
-                if chain.turn_index == turn_index
-                    && chain.tool == tool.tool
-                    && chain.error_type == error_type
-                    && tool.message_index <= chain.end_message_index + 1 =>
-            {
-                chain.attempts += 1;
-                chain.end_message_index = tool.message_index;
-            }
-            Some(chain) => {
-                chains.push(chain.clone());
-                current = Some(RetryChainEntry {
-                    turn_index,
-                    tool: tool.tool.clone(),
-                    error_type,
-                    attempts: 1,
-                    start_message_index: tool.message_index,
-                    end_message_index: tool.message_index,
-                    recovery_strategy: None,
-                    sample_error_preview: tool.error_preview.clone(),
-                });
-            }
-            None => {
-                current = Some(RetryChainEntry {
-                    turn_index,
-                    tool: tool.tool.clone(),
-                    error_type,
-                    attempts: 1,
-                    start_message_index: tool.message_index,
-                    end_message_index: tool.message_index,
-                    recovery_strategy: None,
-                    sample_error_preview: tool.error_preview.clone(),
-                });
-            }
-        }
-    }
-    if let Some(chain) = current {
-        chains.push(chain);
-    }
-    chains.retain(|chain| chain.attempts > 1);
-    for chain in &mut chains {
-        chain.recovery_strategy = tools
-            .iter()
-            .find(|tool| {
-                turn_by_message
-                    .get(&tool.message_index)
-                    .copied()
-                    .unwrap_or_default()
-                    == chain.turn_index
-                    && tool.message_index > chain.end_message_index
-            })
-            .map(|tool| match tool.tool.as_str() {
-                "read" | "grep" | "glob" => String::from("re-read-and-retry"),
-                "apply_patch" if chain.tool != "apply_patch" => String::from("change-approach"),
-                "bash" => String::from("verify-or-build"),
-                _ if tool.tool == chain.tool => String::from("retry"),
-                _ => String::from("change-approach"),
-            })
-            .or_else(|| Some(String::from("abandon")));
-    }
-    chains
 }
 
 pub(crate) fn build_file_transition_rollup(
@@ -312,6 +197,87 @@ pub(crate) fn build_file_transition_rollup(
     });
     items.truncate(FILE_ACCESS_ROLLUP_LIMIT);
     items
+}
+
+pub(crate) fn build_retry_chains(
+    turns: &[TurnDigest],
+    tools: &[ToolCallDigest],
+) -> Vec<RetryChainEntry> {
+    let turn_by_message = build_message_turn_index(turns);
+    let mut chains = Vec::new();
+    let mut current: Option<RetryChainEntry> = None;
+
+    for tool in tools.iter().filter(|tool| tool.status == "error") {
+        let turn_index = turn_by_message
+            .get(&tool.message_index)
+            .copied()
+            .unwrap_or_default();
+        let error_type = tool
+            .error_type
+            .clone()
+            .unwrap_or_else(|| String::from("tool-error"));
+        match &mut current {
+            Some(chain)
+                if chain.turn_index == turn_index
+                    && chain.tool == tool.tool
+                    && chain.error_type == error_type
+                    && tool.message_index <= chain.end_message_index + 1 =>
+            {
+                chain.attempts += 1;
+                chain.end_message_index = tool.message_index;
+            }
+            Some(chain) => {
+                chains.push(chain.clone());
+                current = Some(RetryChainEntry {
+                    turn_index,
+                    tool: tool.tool.clone(),
+                    error_type,
+                    attempts: 1,
+                    start_message_index: tool.message_index,
+                    end_message_index: tool.message_index,
+                    recovery_strategy: None,
+                    sample_error_preview: tool.error_preview.clone(),
+                });
+            }
+            None => {
+                current = Some(RetryChainEntry {
+                    turn_index,
+                    tool: tool.tool.clone(),
+                    error_type,
+                    attempts: 1,
+                    start_message_index: tool.message_index,
+                    end_message_index: tool.message_index,
+                    recovery_strategy: None,
+                    sample_error_preview: tool.error_preview.clone(),
+                });
+            }
+        }
+    }
+    if let Some(chain) = current {
+        chains.push(chain);
+    }
+    chains.retain(|chain| chain.attempts > 1);
+    for chain in &mut chains {
+        chain.recovery_strategy = tools
+            .iter()
+            .find(|tool| {
+                turn_by_message
+                    .get(&tool.message_index)
+                    .copied()
+                    .unwrap_or_default()
+                    == chain.turn_index
+                    && tool.message_index > chain.end_message_index
+            })
+            .map(|tool| match tool.tool.as_str() {
+                "read" | "grep" | "glob" => String::from("re-read-and-retry"),
+                "apply_patch" if chain.tool != "apply_patch" => String::from("change-approach"),
+                "bash" => String::from("verify-or-build"),
+                _ if tool.tool == chain.tool => String::from("retry"),
+                _ => String::from("change-approach"),
+            })
+            .or_else(|| Some(String::from("abandon")));
+    }
+    chains
 }
 
 pub(crate) fn build_session_deliverables(
@@ -413,5 +379,38 @@ pub(crate) fn build_turn_dependency_edges(
             .then_with(|| left.from_turn.cmp(&right.from_turn))
     });
     items.truncate(FILE_ACCESS_ROLLUP_LIMIT);
+    items
+}
+
+pub(crate) fn rollup_tools(tools: &[ToolCallDigest]) -> Vec<ToolAggregate> {
+    let mut map: HashMap<String, ToolAggregate> = HashMap::new();
+    for tool in tools {
+        let entry = map
+            .entry(tool.tool.clone())
+            .or_insert_with(|| ToolAggregate {
+                tool: tool.tool.clone(),
+                calls: 0,
+                error_calls: 0,
+                total_duration_ms: 0,
+                max_duration_ms: 0,
+                total_output_chars: 0,
+                total_input_tokens_proxy: 0,
+                avg_input_tokens_proxy: None,
+            });
+        entry.calls += 1;
+        if tool.status == "error" {
+            entry.error_calls += 1;
+        }
+        entry.total_duration_ms += tool.duration_ms.unwrap_or_default();
+        entry.max_duration_ms = entry
+            .max_duration_ms
+            .max(tool.duration_ms.unwrap_or_default());
+        entry.total_output_chars += tool.output_chars.unwrap_or_default();
+        entry.total_input_tokens_proxy += tool.input_tokens_proxy;
+    }
+    let mut items = map.into_values().collect::<Vec<_>>();
+    for item in &mut items {
+        item.avg_input_tokens_proxy = average_u64(item.total_input_tokens_proxy, item.calls);
+    }
     items
 }

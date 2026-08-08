@@ -1,3 +1,5 @@
+use super::handler::AppModelHandler;
+use super::render::AppModelRender;
 use crate::config::load_config;
 use crate::models::available_models;
 use crate::rewrite::{build_model_line_re, current_counts};
@@ -6,15 +8,6 @@ use anyhow::bail;
 use crossterm::event::{self, Event, KeyEventKind};
 use ratatui::DefaultTerminal;
 use std::collections::BTreeMap;
-
-use super::handler::AppModelHandler;
-use super::render::AppModelRender;
-
-pub(crate) enum Mode {
-    Main,
-    ModelPicker,
-    VariantPicker,
-}
 
 /// Interactive TUI state for reviewing and editing tier-model assignments.
 ///
@@ -36,6 +29,12 @@ pub(crate) struct AppModel<'a> {
     pub(crate) should_quit: bool,
     pub(crate) apply_preview: Option<ApplyResult>,
     pub(crate) apply_preview_err: Option<String>,
+}
+
+pub(crate) enum Mode {
+    Main,
+    ModelPicker,
+    VariantPicker,
 }
 
 impl<'a> AppModel<'a> {

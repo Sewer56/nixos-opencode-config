@@ -1,12 +1,11 @@
+use anyhow::{Result, bail};
+
 mod config;
 mod env;
 mod models;
 mod rewrite;
-
 mod tui;
 mod types;
-
-use anyhow::{Result, bail};
 
 fn main() -> Result<()> {
     let env = env::find_env()?;

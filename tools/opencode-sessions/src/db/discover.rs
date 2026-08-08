@@ -1,10 +1,18 @@
+use crate::format::*;
 use anyhow::{Context, Result, bail};
 use rusqlite::{Connection, OpenFlags};
 use std::fs::{self};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use crate::format::*;
+pub(crate) fn open_db(path: &Path) -> Result<Connection> {
+    let flags = OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX;
+    let conn = Connection::open_with_flags(path, flags)
+        .with_context(|| format!("open sqlite db {}", path.display()))?;
+    conn.busy_timeout(Duration::from_secs(5))?;
+    conn.pragma_update(None, "query_only", true)?;
+    Ok(conn)
+}
 
 pub(crate) fn print_discovered_dbs(explicit: Option<&Path>) -> Result<()> {
     let discovered = discover_db_paths()?;
@@ -42,10 +50,38 @@ pub(crate) fn print_discovered_dbs(explicit: Option<&Path>) -> Result<()> {
     Ok(())
 }
 
-pub(crate) fn opencode_data_dir() -> Result<PathBuf> {
-    dirs::home_dir()
-        .map(|home| home.join(".local/share/opencode"))
-        .context("could not resolve home directory")
+pub(crate) fn resolve_db_path(explicit: Option<&Path>) -> Result<PathBuf> {
+    if let Some(path) = explicit {
+        let path = if path.is_absolute() {
+            path.to_path_buf()
+        } else {
+            std::env::current_dir()?.join(path)
+        };
+        if !path.is_file() {
+            bail!("db file not found: {}", path.display());
+        }
+        return Ok(path);
+    }
+
+    if let Some(env_db) = std::env::var_os("OPENCODE_DB") {
+        let raw = PathBuf::from(env_db);
+        if raw.as_os_str() != ":memory:" {
+            let resolved = if raw.is_absolute() {
+                raw
+            } else {
+                opencode_data_dir()?.join(raw)
+            };
+            if resolved.is_file() {
+                return Ok(resolved);
+            }
+        }
+    }
+
+    let discovered = discover_db_paths()?;
+    discovered
+        .into_iter()
+        .next()
+        .context("no OpenCode sqlite database found; use --db to point at one")
 }
 
 pub(crate) fn discover_db_paths() -> Result<Vec<PathBuf>> {
@@ -81,45 +117,8 @@ pub(crate) fn discover_db_paths() -> Result<Vec<PathBuf>> {
     Ok(found)
 }
 
-pub(crate) fn resolve_db_path(explicit: Option<&Path>) -> Result<PathBuf> {
-    if let Some(path) = explicit {
-        let path = if path.is_absolute() {
-            path.to_path_buf()
-        } else {
-            std::env::current_dir()?.join(path)
-        };
-        if !path.is_file() {
-            bail!("db file not found: {}", path.display());
-        }
-        return Ok(path);
-    }
-
-    if let Some(env_db) = std::env::var_os("OPENCODE_DB") {
-        let raw = PathBuf::from(env_db);
-        if raw.as_os_str() != ":memory:" {
-            let resolved = if raw.is_absolute() {
-                raw
-            } else {
-                opencode_data_dir()?.join(raw)
-            };
-            if resolved.is_file() {
-                return Ok(resolved);
-            }
-        }
-    }
-
-    let discovered = discover_db_paths()?;
-    discovered
-        .into_iter()
-        .next()
-        .context("no OpenCode sqlite database found; use --db to point at one")
-}
-
-pub(crate) fn open_db(path: &Path) -> Result<Connection> {
-    let flags = OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX;
-    let conn = Connection::open_with_flags(path, flags)
-        .with_context(|| format!("open sqlite db {}", path.display()))?;
-    conn.busy_timeout(Duration::from_secs(5))?;
-    conn.pragma_update(None, "query_only", true)?;
-    Ok(conn)
+pub(crate) fn opencode_data_dir() -> Result<PathBuf> {
+    dirs::home_dir()
+        .map(|home| home.join(".local/share/opencode"))
+        .context("could not resolve home directory")
 }

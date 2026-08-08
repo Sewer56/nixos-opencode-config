@@ -1,9 +1,8 @@
+use crate::cli::*;
+use crate::models::*;
 use anyhow::{Context, Result, bail};
 use rusqlite::Connection;
 use std::collections::HashMap;
-
-use crate::cli::*;
-use crate::models::*;
 
 pub(crate) fn load_overview(conn: &Connection) -> Result<OverviewIndex> {
     let sql = r#"
