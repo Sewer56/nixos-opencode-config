@@ -487,10 +487,15 @@ class ImplementWorkflowTests(unittest.TestCase):
 
     def test_advisory_repair_split(self) -> None:
         card = text(ROOT / "config/rules/cards/implementation/review-findings.md")
-        self.assertIn("In the cohort loop, accepted BLOCKING findings, accepted advisories", card)
-        self.assertIn("At the final integration gate, only accepted BLOCKING findings", card)
+        self.assertIn("Accepted BLOCKING findings and accepted advisories enter repair", card)
+        self.assertIn("final integration gate", card)
+        self.assertIn("without widening scope", card)
+        self.assertIn("is not a FAIL", card)
         self.assertIn("Repair accepted blockers and advisories", text(COHORT))
-        self.assertIn("Never repair advisories", text(ORCHESTRATOR))
+        self.assertIn("accepted blockers and accepted advisories", text(ORCHESTRATOR))
+        self.assertNotIn("Never repair advisories", text(ORCHESTRATOR))
+        self.assertIn("Accepted advisories", text(INTEGRATION_REPAIR))
+        self.assertIn("without widening scope", text(INTEGRATION_REPAIR))
 
     def test_cohort_delegation_honesty_and_reverify(self) -> None:
         body = text(COHORT)

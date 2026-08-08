@@ -55,7 +55,7 @@ It routes through same draft and implementation pipeline.
 
 Implementation artifacts under `artifact/` include handoff/cohorts, validation ledgers, candidate reviews, and verifier verdicts. Iterate artifacts use `artifacts/iterate/`.
 
-Internal review findings are hypotheses; only blockers accepted by shared verifier enter automatic repair. CodeRabbit uses its own structured findings as authority. Advisories never trigger automatic repair.
+Internal review findings are hypotheses; blockers and advisories accepted by the shared verifier enter automatic repair within approved plan scope. CodeRabbit uses its own structured findings as authority.
 
 Validator scope is documented in module docstring at top of `scripts/validate-opencode-config.py`.
 

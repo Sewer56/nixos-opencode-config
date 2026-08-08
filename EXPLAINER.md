@@ -165,8 +165,8 @@ Reviewer findings are often false positives, so no finding is trusted directly. 
 
 Once a finding survives verification, repair stays with the cohort agent:
 
-- only accepted blockers may enter repair; the cohort has at most five repair turns total, shared between quick-check failures and verified review blockers;
-- advisories remain visible and never trigger edits;
+- accepted blockers and accepted advisories enter repair; the cohort has at most five repair turns total, shared between quick-check failures and verified review findings;
+- advisories are repaired only within approved plan scope; one that cannot be fixed without widening scope stays recorded and is not a FAIL;
 - after repair, the cohort restages, reruns all quick checks, core reviews, and affected optional reviews, then re-verifies the new findings;
 - every selected reviewer must complete before commit.
 
@@ -237,7 +237,7 @@ contract -> one editor -> exact staging -> validator/tests
 - Context expands from concrete dependency evidence rather than exhaustive graph or embedding retrieval. [Repoformer][repoformer] and [Lost in the Middle][lost-middle] motivate selectivity; they do not prescribe local thresholds.
 - No learned reviewer memory feeds automatic decisions. [Greptile's reported feedback-clustering gain][greptile-filtering] depends on team votes; this configuration has no governed feedback corpus.[^greptile-vendor]
 - No fixed context percentage, reviewer vote, or finding quota determines correctness. [Refute-or-Promote's][refute-promote] unanimous false positive shows why agreement alone is weak evidence.[^refute-preprint]
-- Advisories never enter automatic repair. [Greptile's reported 79% nit share][greptile-filtering] illustrates cost of treating every comment as action.[^greptile-vendor]
+- Advisories enter automatic repair only when verifier-vetted and fixable within approved plan scope. [Greptile's reported 79% nit share][greptile-filtering] illustrates cost of treating every comment as action.[^greptile-vendor]
 - Repair loops are bounded: five turns per cohort, two at final integration, two in iterate, and one CodeRabbit re-review.
 - Runtime execution stays within available repository environment. [Greptile describes][greptile-trex] each TREX review using “a disposable sandboxed environment”; local workflow does not claim equivalent isolation.
 - Implementation uses real Git index and one-writer assumption. Each invocation starts from approved draft and creates fresh evidence artifacts.
