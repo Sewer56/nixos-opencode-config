@@ -60,6 +60,8 @@ Review only whether the scoped documentation helps its intended reader complete 
 
 {{ file="./rules/groups/style/wording.md" }}
 
+{{ file="./rules/cards/style/adhd-format.md" }}
+
 # Checks
 - The reader sees the outcome, prerequisites, and shortest successful path before detail.
 - Steps are ordered, imperative, and independently checkable.

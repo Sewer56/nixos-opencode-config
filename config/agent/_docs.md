@@ -68,6 +68,8 @@ Create or overwrite each exact assigned path. Never create placeholder or stub f
 
 {{ file="./rules/groups/style/wording.md" }}
 
+{{ file="./rules/cards/style/adhd-format.md" }}
+
 # Process
 
 ## 1. Resolve and discover

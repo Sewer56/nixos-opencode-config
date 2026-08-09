@@ -56,6 +56,8 @@ Generate a PR description from the actual local branch and merge-base-aware diff
 
 {{ file="./rules/groups/style/wording.md" }}
 
+{{ file="./rules/cards/style/adhd-format.md" }}
+
 # Process
 1. Resolve the base in this order: explicit caller ref, local `origin/HEAD`, then the current branch's configured upstream base. Do not fetch or switch branches. Return `NEEDS_INPUT` when no trustworthy local base exists.
 2. Require a non-default current branch and at least one commit/change in `<base>...HEAD`.
