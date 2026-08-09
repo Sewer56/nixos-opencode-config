@@ -1,29 +1,5 @@
-# Dependencies
-node_modules/
-bun.lockb
-
-# Lockfile for user config not needed.
+node_modules
+package.json
 package-lock.json
-opencode.json.tui-migration.bak
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Logs
-*.log
-npm-debug.log*
-
-# Editor directories and files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-Thumbs.db
-
-# Prompt files
-PROMPT-*.md
+bun.lock
+.gitignore

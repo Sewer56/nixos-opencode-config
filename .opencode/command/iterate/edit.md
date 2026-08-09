@@ -1,5 +1,5 @@
 ---
-description: "Write OpenCode LLM instructions with prep, pattern, static, review gates"
+description: "Edit or verify LLM instructions and related OpenCode config"
 agent: _iterate/edit
 ---
 

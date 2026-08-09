@@ -1,7 +1,6 @@
 use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 
-
 #[derive(Parser)]
 #[command(name = "opencode-sessions")]
 #[command(version)]
@@ -27,27 +26,6 @@ pub(crate) enum Command {
 }
 
 #[derive(Args, Clone)]
-pub(crate) struct TuiArgs {
-    #[arg(long)]
-    pub(crate) search: Option<String>,
-
-    #[arg(long)]
-    pub(crate) limit: Option<usize>,
-}
-
-#[derive(Args, Clone)]
-pub(crate) struct TreeArgs {
-    #[arg(long)]
-    pub(crate) search: Option<String>,
-
-    #[arg(long)]
-    pub(crate) limit: Option<usize>,
-
-    #[arg(long)]
-    pub(crate) json: bool,
-}
-
-#[derive(Args, Clone)]
 pub(crate) struct ExportArgs {
     /// Session id, or search text if exact id not found
     pub(crate) target: Option<String>,
@@ -70,4 +48,25 @@ pub(crate) struct ExportArgs {
     /// Accepts ISO8601, "YYYY-MM-DD", or "YYYY-MM-DD HH:MM:SS" (UTC)
     #[arg(long, conflicts_with_all = ["target", "search", "latest", "all"])]
     pub(crate) since: Option<String>,
+}
+
+#[derive(Args, Clone)]
+pub(crate) struct TreeArgs {
+    #[arg(long)]
+    pub(crate) search: Option<String>,
+
+    #[arg(long)]
+    pub(crate) limit: Option<usize>,
+
+    #[arg(long)]
+    pub(crate) json: bool,
+}
+
+#[derive(Args, Clone)]
+pub(crate) struct TuiArgs {
+    #[arg(long)]
+    pub(crate) search: Option<String>,
+
+    #[arg(long)]
+    pub(crate) limit: Option<usize>,
 }

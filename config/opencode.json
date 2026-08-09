@@ -1,21 +1,21 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": false,
+  "subagent_depth": 5,
   "plugin": [
-    "@sewer56/opencode-models-discovery@0.9.1"
+    "./plugins/opencode-models-discovery/src/index",
+    "./plugins/caveman/src/index",
+    "./plugins/opencode-plugin-md-expand/src/index"
   ],
-  "small_model": "sewer-axonhub/step-3.7-flash",
+  "small_model": "sewer-axonhub/deepseek-v4-flash",
   "permission": {
     "bash": {
       "*": "allow"
     },
-    "task": {
-      "discord-messages": "deny"
-    },
+    "task": {},
     "webfetch": "allow",
     "doom_loop": "deny",
     "github_*": "deny",
-    "discord_*": "deny",
     "context7_*": "deny",
     "deepwiki_*": "deny",
     "external_directory": "allow"
@@ -59,9 +59,13 @@
     "github": {
       "type": "local",
       "command": [
-        "bash",
-        "-c",
-        "if [ ! -f \"$HOME/.secrets/github-token\" ]; then echo \"Error: GitHub token secret file not found\" >&2; exit 1; fi; export GITHUB_PERSONAL_ACCESS_TOKEN=\"$(cat \"$HOME/.secrets/github-token\")\"; exec docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN ghcr.io/github/github-mcp-server"
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN={file:~/.secrets/github-token}",
+        "ghcr.io/github/github-mcp-server"
       ],
       "enabled": true
     },
@@ -76,17 +80,8 @@
     },
     "deepwiki": {
       "type": "remote",
-      "url": "https://mcp.deepwiki.com/sse",
+      "url": "https://mcp.deepwiki.com/mcp",
       "enabled": true
-    },
-    "discord": {
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "if [ ! -f \"$HOME/.secrets/discord-token\" ]; then echo \"Error: Discord token secret file not found\" >&2; exit 1; fi; export DISCORD_TOKEN=\"$(cat \"$HOME/.secrets/discord-token\")\"; exec docker run -i --rm -e DISCORD_TOKEN barryy625/mcp-discord:latest"
-      ],
-      "enabled": false
     }
   },
   "provider": {
@@ -99,10 +94,58 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "Sewer AxonHub",
       "options": {
-        "baseURL": "{file:/home/sewer/.secrets/axonhub-url}",
-        "apiKey": "{file:/home/sewer/.secrets/axonhub-key}",
+        "baseURL": "{file:~/.secrets/axonhub-url}",
+        "apiKey": "{file:~/.secrets/axonhub-key}",
         "modelsDiscovery": {
-          "enabled": true
+          "enabled": true,
+          "modelInfoFormat": "axonhub"
+        }
+      },
+      "models": {
+        "gpt-5.6-luna": {
+          "name": "GPT 5.6 Luna",
+          "reasoning": true,
+          "variants": {
+            "none": {
+              "reasoningEffort": "none"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "gpt-5.6-sol": {
+          "name": "GPT 5.6 Sol",
+          "reasoning": true,
+          "variants": {
+            "none": {
+              "reasoningEffort": "none"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "gpt-5.6-terra": {
+          "name": "GPT 5.6 Terra",
+          "reasoning": true,
+          "variants": {
+            "none": {
+              "reasoningEffort": "none"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
         }
       }
     },
@@ -110,15 +153,151 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "AxonHub (Work Mode)",
       "options": {
-        "baseURL": "{file:/home/sewer/.secrets/axonhub-url}",
-        "apiKey": "{file:/home/sewer/.secrets/axonhub-work-key}",
+        "baseURL": "{file:~/.secrets/axonhub-url}",
+        "apiKey": "{file:~/.secrets/axonhub-work-key}",
         "modelsDiscovery": {
-          "enabled": true
+          "enabled": true,
+          "modelInfoFormat": "axonhub"
+        }
+      },
+      "models": {
+        "claude-sonnet-5": {
+          "name": "Claude Sonnet 5",
+          "reasoning": true,
+          "variants": {
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "claude-opus-4-8": {
+          "name": "Claude Opus 4.8",
+          "reasoning": true,
+          "variants": {
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "claude-opus-4-7": {
+          "name": "Claude Opus 4.7",
+          "reasoning": true,
+          "variants": {
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "claude-opus-5": {
+          "name": "Claude Opus 5",
+          "reasoning": true,
+          "variants": {
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "claude-fable-5": {
+          "name": "Claude Fable 5",
+          "reasoning": true,
+          "variants": {
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "gpt-5.6-luna": {
+          "name": "GPT 5.6 Luna",
+          "reasoning": true,
+          "variants": {
+            "none": {
+              "reasoningEffort": "none"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "gpt-5.6-sol": {
+          "name": "GPT 5.6 Sol",
+          "reasoning": true,
+          "variants": {
+            "none": {
+              "reasoningEffort": "none"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "gpt-5.6-terra": {
+          "name": "GPT 5.6 Terra",
+          "reasoning": true,
+          "variants": {
+            "none": {
+              "reasoningEffort": "none"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
         }
       }
     }
   },
   "experimental": {
     "disable_paste_summary": true
+  },
+  "tool_output": {
+    "max_lines": 1000,
+    "max_bytes": 40000
+  },
+  "compaction": {
+    "auto": true,
+    /* Remove contents of old tool calls. */
+    "prune": false,
+    "reserved": 12000
+  },
+  // Ignore certain locations in file watcher in OpenCode.
+  "watcher": {
+    "ignore": [
+      ".git/**",
+      "artifact/**",
+      "artifacts/**",
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      "target/**",
+      "coverage/**",
+      ".venv/**",
+      ".direnv/**",
+      ".cache/**",
+      "bin/**",
+      "tmp/**"
+    ]
   }
 }

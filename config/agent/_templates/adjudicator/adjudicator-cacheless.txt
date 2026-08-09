@@ -1,9 +1,0 @@
-1. Run only `{{arg:reviewer_a}}` and `{{arg:reviewer_b}}` independently {{arg:run_context}}. Pass each leg only artifact paths, changed ids/paths, trigger flags, decision ids, and short `user_notes`.
-2. Keep leg inputs isolated. Apply only adjudicated merged findings. Legs emit review output only.
-3. Validate both outputs: `# REVIEW`{{arg:validation_extra}} and `Decision: PASS | ADVISORY | BLOCKING`. Treat `IDs:` as routing data only.
-4. Parse findings from each leg's inline `## Findings` section. Do not read sidecar files.
-5. Merge findings: {{arg:merge_scope}}.
-6. Merge duplicates and resolve conflicting fixes by preferring concrete evidence over reviewer confidence and minimal diffs over broad rewrites.
-7. Inspect {{arg:inspect_context}} yourself after reviewer validation. Do not read prior review caches.
-8. Emit merged findings inline in the output block. Do not write cache or actions files.
-9. GATE: your response MUST contain exactly one `# REVIEW` fenced block with `Decision:`{{arg:validation_extra}}, `## Findings`, and conditional `IDs:`. Do not add `Cache:`, `Actions:`, headings, tables, summaries, narrative prose, or content outside the block. The caller validates this exact shape and rejects malformed responses as protocol failures.

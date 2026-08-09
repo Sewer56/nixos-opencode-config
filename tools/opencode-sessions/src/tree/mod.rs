@@ -1,4 +1,4 @@
-pub mod display;
-pub mod browse;
-
 pub(crate) use browse::*;
+
+pub mod browse;
+pub mod display;

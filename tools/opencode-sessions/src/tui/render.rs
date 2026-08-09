@@ -1,11 +1,10 @@
+use crate::format::*;
+use crate::models::*;
+use crate::tui::app::*;
 use ratatui::layout::{Constraint, Direction, Layout};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, List, ListItem, Paragraph, Wrap};
-
-use crate::format::*;
-use crate::models::*;
-use crate::tui::app::*;
 
 pub(crate) fn draw_tui(frame: &mut ratatui::Frame<'_>, app: &mut TuiApp) {
     let areas = Layout::default()
@@ -43,7 +42,11 @@ pub(crate) fn draw_tui(frame: &mut ratatui::Frame<'_>, app: &mut TuiApp) {
     .block(Block::default().borders(Borders::ALL));
     frame.render_widget(header, areas[0]);
 
-    let search_title = if app.search_mode { "Search (typing)" } else { "Search (/ to edit)" };
+    let search_title = if app.search_mode {
+        "Search (typing)"
+    } else {
+        "Search (/ to edit)"
+    };
     let search = Paragraph::new(app.search.as_str())
         .block(Block::default().borders(Borders::ALL).title(search_title))
         .wrap(Wrap { trim: false });
@@ -59,7 +62,11 @@ pub(crate) fn draw_tui(frame: &mut ratatui::Frame<'_>, app: &mut TuiApp) {
     };
 
     let list = List::new(items)
-        .block(Block::default().borders(Borders::ALL).title("Recent conversations"))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title("Recent conversations"),
+        )
         .highlight_style(Style::default().bg(Color::Rgb(30, 30, 70)).fg(Color::White))
         .highlight_symbol("▶ ");
 
@@ -77,6 +84,25 @@ pub(crate) fn draw_tui(frame: &mut ratatui::Frame<'_>, app: &mut TuiApp) {
     ])
     .block(Block::default().borders(Borders::ALL));
     frame.render_widget(footer, areas[3]);
+}
+
+pub(crate) fn selected_summary(app: &TuiApp) -> String {
+    let Some(session_id) = app.selected_session_id() else {
+        return String::from("none");
+    };
+    let Some(session) = app.index.sessions.get(session_id) else {
+        return String::from("none");
+    };
+
+    let kind = if session.parent_id.is_some() {
+        session
+            .agent_hint()
+            .unwrap_or_else(|| String::from("subagent"))
+    } else {
+        String::from("root")
+    };
+
+    format!("[{}] {}  {}", kind, session.title, short_id(&session.id))
 }
 
 pub(crate) fn format_row(app: &TuiApp, row: &VisibleRow) -> String {
@@ -98,7 +124,9 @@ pub(crate) fn format_row(app: &TuiApp, row: &VisibleRow) -> String {
     let kind = if row.depth == 0 {
         String::from("root")
     } else {
-        session.agent_hint().unwrap_or_else(|| String::from("subagent"))
+        session
+            .agent_hint()
+            .unwrap_or_else(|| String::from("subagent"))
     };
 
     format!(
@@ -112,21 +140,4 @@ pub(crate) fn format_row(app: &TuiApp, row: &VisibleRow) -> String {
         session.message_count,
         format_duration(session.duration_ms()),
     )
-}
-
-pub(crate) fn selected_summary(app: &TuiApp) -> String {
-    let Some(session_id) = app.selected_session_id() else {
-        return String::from("none");
-    };
-    let Some(session) = app.index.sessions.get(session_id) else {
-        return String::from("none");
-    };
-
-    let kind = if session.parent_id.is_some() {
-        session.agent_hint().unwrap_or_else(|| String::from("subagent"))
-    } else {
-        String::from("root")
-    };
-
-    format!("[{}] {}  {}", kind, session.title, short_id(&session.id))
 }

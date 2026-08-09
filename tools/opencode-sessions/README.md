@@ -3,6 +3,7 @@
 Read local OpenCode SQLite database. No OpenCode API. No IPC.
 
 Machine-first export format.
+Vibecoded. Not great code, but does the job.
 
 ## Features
 

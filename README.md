@@ -1,404 +1,155 @@
 # OpenCode Config
 
-Personal [OpenCode] setup with a Home Manager module for
-repeatable NixOS setup, pinned source, and multi-provider LLM routing.
+Personal [OpenCode] configuration for focused repository-scale coding. Main flow turns a request into one human-approved behavioral draft, then implements it in dependency-ordered, validated, reviewed cohorts.
+
+```text
+/draft <request>
+# Review or edit PROMPT-PLAN-<slug>.draft.md
+/implement PROMPT-PLAN-<slug>.draft.md
+```
+
+Design favors selective context, deterministic evidence, precise review, and few clear roles—not maximum agents or prompt volume. See [architecture and rationale](EXPLAINER.md#architecture).
 
 > [!WARNING]
-> This is a personal config — not intended for public use and not portable.
-> It contains hardcoded paths, references to local secrets, and opinionated
-> defaults. Feel free to study it for ideas though.
+> Personal provider names, secret paths, Nix assumptions, plugins, and pinned submodules need adaptation before reuse.
 
-I split this off from my main system repo to keep history isolated; I
-update it often enough that tracking OS/system changes becomes hard.
+## Main workflow
 
-## Directory Structure
+### Draft and approve
 
-```
-.
-├── default.nix            # Home Manager module (packages, symlinks)
-├── opencode-source/       # Pinned OpenCode source (submodule)
-├── config/                # Active OpenCode configuration (symlinked)
-│   ├── opencode.json      # Provider, agent, MCP, and permission config
-│   ├── tui.json           # TUI theme and keybind overrides
-│   ├── agent/             # Agent prompt definitions
-│   ├── command/           # Slash-command definitions
-│   ├── doc/               # Supplementary workflow docs
-│   ├── rules/             # Coding and documentation rules (cards + groups)
-│   └── plugins/           # TypeScript plugins
-├── plugins/               # Local plugin source packages
-├── scripts/               # Utility scripts
-├── tools/                 # Workflow tools (Python and Go)
-└── AGENTS.md              # Repo-level agent instructions
-```
+`/draft` creates or refines one root `PROMPT-PLAN-<slug>.draft.md` containing behavioral goal, decisions, invariants, non-goals, acceptance criteria, logical work, validation, review routes, and unresolved questions.
 
-`config/` is symlinked to `~/.config/opencode` at build time (see
-[default.nix](default.nix)).
+Draft describes behavior, decisions, invariants, non-goals, acceptance criteria, and validation. Review it until status is `READY_FOR_IMPLEMENT`; approved file becomes downstream behavioral authority.
 
-## Configuration
-
-### Commands
-
-Slash commands live under `config/command/`.
-
-**Plan then implement** — draft a plan, finalize it, then write the code:
-
-1. `/plan/draft` — generate a plan from a prompt
-2. `/plan/finalize` — validate and lock the plan
-3. `/plan/convert-to-draft` — convert current context into a draft plan
-4. `/implement/plan` — write the code from the finalized plan
-
-Or skip planning and implement directly with `/implement/freeform`.
-
-Clean up after an implementation with `/implement/cleanup-diff`.
-
-**Refactor**
-
-- `/refactor/errors` — refactor error handling
-- `/refactor/modularize` — split large modules
-- `/refactor/parameterize` — extract parameters
-- `/refactor/reorder` — reorder declarations
-- `/refactor/document` — add doc comments to source code
-
-**Docs**
-
-- `/docs/write` — write end-user documentation
-- `/docs/review` — review end-user documentation
-
-**Review & Audit**
-
-- `/audit/public-api` — audit public API surface
-- `/audit/public-api-targeted` — audit a specific API subset
-- `/review/coderabbit` — run CodeRabbit review
-
-**Git & Issues**
-
-- `/commit/main` — generate a conventional commit
-- `/summarize/pr-simple` — simple PR summary
-- `/write/issue` — write a GitHub issue
-
-**Other**
-
-### Review Topology
-
-#### Cache/action contract
-
-Use action files only for cached pointer-output reviewers. Cache files are
-durable reviewer state; action files are the current fix queue for the caller.
-
-##### Cached single reviewer
-
-Inputs: artifact paths, `cache_path`, optional `actions_path`.
-
-1. Reviewer reads `cache_path` (memory/history).
-2. Reviewer inspects changed material and current findings.
-3. Reviewer updates `cache_path` in place.
-4. Reviewer updates `<cache-base>.actions.md` with current OPEN fixes only.
-5. Reviewer returns a pointer:
+### Implement
 
 ```text
-# REVIEW
-Cache: <cache_path>
-Actions: <cache-base>.actions.md
-Decision: BLOCKING
-IDs: TST-001
+/implement PROMPT-PLAN-example.draft.md
 ```
 
-6. Caller reads `Actions:` file for current fixes. Does not read cache.
-
-##### Cached A/B adjudicator
-
-Inputs: canonical `cache_path`, optional `actions_path`.
-
-1. Adjudicator dispatches leg A and leg B independently.
-2. Each leg writes its own cache and current actions:
-   - `<base>.a.md`, `<base>.a.actions.md`
-   - `<base>.b.md`, `<base>.b.actions.md`
-3. Adjudicator reads leg action files, merges findings.
-4. Adjudicator writes canonical `<base>.md` (cache) and `<base>.actions.md` (actions).
-5. Adjudicator returns pointer with `Cache:` + `Actions:`.
-6. Caller reads canonical actions file for merged fixes.
-
-##### Cached re-review
-
-Inputs: `cache_path`, changed paths/ids, optional `actions_path`.
-
-1. Reviewer reads `cache_path` — trusts observations for unchanged material.
-2. Reviewer reads only changed step/path content.
-3. Reviewer verifies resolved findings and checks for new issues.
-4. Reviewer updates `cache_path` and `<cache-base>.actions.md`.
-5. Reviewer returns pointer with `Cache:` + `Actions:`.
-6. Caller reads actions file for current fixes.
-
-##### Cacheless / inline review
-
-Inputs: artifact paths only. No sidecar files.
-
-1. Reviewer reads artifacts from scratch.
-2. Reviewer returns inline `## Findings` with exact fixes.
-3. Caller applies fixes directly from the inline response.
-4. No `Cache:`, no `Actions:`, no file I/O.
-
-##### Path conventions
-
-Stable names, updated each pass:
+`/implement` reconciles approved draft with live repository, creates dependency-ordered cohorts, and calls one cohort agent per cohort:
 
 ```text
-review-audit.md             # cache/history/state
-review-audit.actions.md     # current open fixes only
-review-audit.a.md           # A-leg cache
-review-audit.a.actions.md   # A-leg current fixes
-review-audit.b.md           # B-leg cache
-review-audit.b.actions.md   # B-leg current fixes
+one writer -> deterministic checks -> focused review -> finding verification
+           -> bounded repair when needed -> exact local commit
 ```
 
-##### Rules
+Correctness and quality review every proposed commit. Test, security, and performance specialists run only for matching risk. Final gate validates and reviews complete base-to-final result. Workflow never pushes.
 
-- `cache_path` owns history, evidence, resolved/deferred findings, verified observations, and ledger state.
-- `actions_path` owns only current OPEN actionable findings and exact fixes. Updated each pass.
-- Caller treats missing, malformed, or insufficient actions as reviewer protocol failure and reruns the reviewer.
-- Caller never mines the cache for fixes.
+Each implementation invocation starts from approved draft. Existing unrelated user changes are preserved; a planned target already changed by user requires input.
 
-#### Adjudicated review (high-risk)
+For low-ambiguity work:
 
-Correctness, audit, and implementation fidelity domains use per-domain
-adjudicators (review processes that merge findings from multiple reviewers).
-The caller dispatches the `-cached` adjudicator during normal
-iterations and the `-cacheless` adjudicator for the final full-artifact audit.
-
-```
-domain-adjudicator-cached (normal iterations)
-  ├── domain-a-cached  (GLM-5.1, temp 1.0)
-  ├── domain-b-cached  (GLM-5.1, temp 0.7)
-  ├── emits merged # REVIEW with Decision + IDs
-
-domain-adjudicator-cacheless (final full-artifact audit)
-  ├── domain-a-cacheless  (GLM-5.1, temp 1.0)
-  ├── domain-b-cacheless  (GLM-5.1, temp 0.7)
-  ├── emits merged # REVIEW with inline findings (no file I/O)
+```text
+/implement/one-shot <request>
 ```
 
-Cached: each leg (A and B) writes findings and cache to separate sidecar files
-(`.a.` / `.b.`). The adjudicator reads sidecar actions, merges, and overwrites
-one canonical actions file plus one canonical cache. The caller reads the
-actions file directly. Cacheless: legs return findings inline; the adjudicator
-parses each leg's inline `## Findings` and emits merged findings inline. No
-sidecar file I/O.
+It routes through same draft and implementation pipeline.
 
-Every autonomous workflow runs a final cacheless audit before returning READY
-or SUCCESS.
+## Outcomes and artifacts
 
-Both legs currently use GLM-5.1 (A at temp 1.0, B at temp 0.7) because
-DeepSeek-V4-Pro is unreliable right now. Once it stabilizes, the intended
-setup is GLM + DeepSeek — model diversity beats temperature diversity.
+- `SUCCESS`: required implementation and evidence complete.
+- `INCOMPLETE`: no known blocker, but required evidence unavailable.
+- `NEEDS_INPUT`: material human decision or ambiguous pre-existing target change requires resolution.
+- `FAIL`: proven failure remains after bounded repair or protocol integrity failed.
 
-#### Single review (low-risk)
+Implementation artifacts under `artifact/` include handoff/cohorts, validation ledgers, candidate reviews, and verifier verdicts. Iterate artifacts use `artifacts/iterate/`.
 
-Tests, performance, docs, and placement domains use one reviewer
-with `-cached` and `-cacheless` variants. No adjudicator.
+Internal review findings are hypotheses; blockers and advisories accepted by the shared verifier enter automatic repair within approved plan scope. CodeRabbit uses its own structured findings as authority.
 
-- **Cached**: writes history to `cache_path` and overwrites
-  `<cache-base>.actions.md` with current fixes. Caller reads the actions file.
-- **Cacheless**: returns findings inline. No sidecar file I/O.
+Validator scope is documented in module docstring at top of `scripts/validate-opencode-config.py`.
 
-Re-review reads the canonical cache from the prior round, trusts it for
-unchanged steps, and only inspects what changed.
+## Commands
 
-#### Cache isolation
+### Planning and implementation
 
-Each cached reviewer leg writes to its own sidecar cache. Neither leg sees the
-other's output or the canonical cache. Cacheless legs return findings inline —
-no sidecar files, no file I/O.
+| Command | Purpose |
+|---|---|
+| `/draft` | Create or refine human-reviewed implementation draft. |
+| `/plan/convert-to-draft` | Convert useful conversation context into same draft format. |
+| `/implement` | Implement approved draft in validated logical cohorts. |
+| `/implement/one-shot` | Draft, review, and implement bounded request. |
 
-Why isolate? Shared cache (auxiliary review state) lets Leg B see Leg A's
-findings before forming its
-own judgment; agreeableness bias (LLMs reject invalid findings <25% of the
-time) turns B into a rubber stamp. Cacheless extends this further: the
-final-check audit leg never sees prior review state, eliminating anchoring
-from cached observations.
+### Refactoring
 
-Relevant:
-- SWR-Bench (arxiv 2509.01494) — multi-review aggregation: 15.25% to 21.91% F1
-- CodeAgent (EMNLP 2024) — supervisory QA-Checker patterns map well to
-  adjudicators
-- Beyond Majority Voting (OpenReview) — aggregation should not be simple voting
-- HCCA (arxiv 2603.21454) — information restriction is the necessary condition
-  for effective multi-LLM verification
-- Agreeableness Bias (OpenReview) — TNR below 25% in LLM judges
-- Anchors in the Machine (arxiv 2511.05766) — anchoring bias cannot be
-  instructed away
-- Behavioral Entanglement (arxiv 2604.07650) — shared evaluative context
-  reintroduces model coupling
+| Command | Purpose |
+|---|---|
+| `/refactor/modularize` | Draft behavior-preserving modularization. |
+| `/refactor/parameterize` | Draft safe test parameterization. |
+| `/refactor/reorder` | Preview and reorder declarations after explicit `go`. |
+| `/refactor/document` | Repair scoped source documentation. |
+| `/refactor/errors` | Trace and repair public error documentation. |
 
-### Rules
+### Documentation, review, and audits
 
-Coding and documentation rules live under `config/rules/`. Rules are organized
-as **cards** (judgment definitions) grouped into **groups** (the
-public import API). Agents and commands import groups, not individual cards.
+| Command | Purpose |
+|---|---|
+| `/docs/write` | Write scoped end-user documentation. |
+| `/docs/review` | Review and repair scoped end-user documentation. |
+| `/review/coderabbit` | Run CodeRabbit and repair its blocking findings. |
+| `/audit/public-api` | Audit unnecessarily public APIs. |
 
-### Plugins
+### Repository maintenance
 
-Three TypeScript plugins extend OpenCode's behavior:
+| Command | Purpose |
+|---|---|
+| `/commit/main` | Create intentional semantic commits with explicit staging. |
+| `/write/issue` | Write repository-grounded issue file. |
+| `/write/pr` | Generate evidence-backed `pr.md` from branch diff. |
+| `/iterate/edit` | Create, edit, move, delete, or verify instruction artifacts. |
+| `/migrate` | Run separate pinned-source migration workflow. |
 
-#### Caveman (`caveman.ts`)
+See [practical iterate guide](.opencode/ITERATE.md) for instruction work.
 
-Makes `build` and `plan` agent responses terse. Three intensity modes:
+## Layout
 
-- `/caveman` — full mode (drop articles, use fragments)
-- `/caveman lite` — professional tight, keep articles
-- `/caveman ultra` — ultra-terse, abbreviations, arrows
-
-Deactivate with "stop caveman" or "normal mode". Code blocks and commit
-messages are unaffected.
-
-#### Markdown Expand (`md-expand.ts`)
-
-Re-exports the local `opencode-plugin-md-expand` package. Expands
-`{file:...}` and `{env:...}` tokens in `.md` agent prompts. Useful for
-injecting secrets or project-specific context without hardcoding them in
-prompt files. Supported tokens:
-
-- `{file:~/.secrets/key}` — absolute or `~`-relative file content
-- `{file:./relative/path}` — relative to project directory
-- `{env:VAR_NAME}` — environment variable value
-
-#### RTK — Rust Token Killer (`rtk.ts`)
-
-Delegates shell-command rewriting to the `rtk` binary for token savings.
-Intercepts `bash`/`shell` tool calls before execution and rewrites them
-through `rtk rewrite`. Currently disabled (`rtk.ts.bak`) due to bugs.
-
-### Permissions
-
-All agents, tools, and MCP servers are disabled by default — everything is
-opt-in rather than OpenCode's default opt-out. Set permissions in
-`opencode.json` and in agent header files (frontmatter `permission` blocks).
-
-### MCP Servers
-
-Only enabled for specific agents (see `opencode.json` permissions).
-
-| Server   | Transport      | Purpose                                           |
-| -------- | -------------- | ------------------------------------------------- |
-| GitHub   | Local (Docker) | GitHub API (token from `~/.secrets/github-token`) |
-| Context7 | Local (NPX)    | Library documentation lookup                      |
-| DeepWiki | Remote (SSE)   | Repository documentation analysis                 |
-| Discord  | Local (Docker) | Discord API — **disabled**                        |
-
-### TUI
-
-`config/tui.json` customizes the terminal UI:
-
-- **Theme**: Catppuccin
-- **Scroll speed**: 1
-- **Keybind**: `Ctrl+[` opens the command list
-- **Plugin**: `oc-tps@latest` (tokens per second)
-
-### Provider
-
-A custom provider `sewer-axonhub` (OpenAI-compatible) routes to various
-providers. Configured models include GLM-5-Turbo, GLM-5.1, GLM-5V-Turbo,
-MiniMax-M2.7, Step 3.7 Flash, DeepSeek V4 Flash, and DeepSeek V4 Pro. Small
-model (used for titles) is Step 3.7 Flash.
-
-### Model tiers
-
-Tier presets are discovered from `scripts/model-tiers.json` at runtime.
-A `$tierOrder` key declares the canonical tier list and display order:
-
-```json
-{
-  "$tierOrder": {"0": "LOW", "1": "MED", "2": "HIGH"},
-  "normal": { ... },
-  "work":   { ... }
-}
+```text
+config/       installed OpenCode config, agents, commands, rules, plugins
+.opencode/    repository-local iterate and migration workflows
+scripts/      deterministic validation and platform setup
+tests/        implementation workflow contract tests
+flake.nix     Home Manager module, tools, and reproducible validation deps
+EXPLAINER.md  architecture, authoring guidance, research, tradeoffs
 ```
 
-If `$tierOrder` is absent, tiers are collected from all profiles and sorted
-alphabetically — so adding a new tier to the JSON is sufficient; no code change
-or recompilation is needed.
+Agents use least-privilege permissions and receive only tools and paths required for their role.
 
-Agent files opt in with frontmatter markers:
+## Installation
 
-```yaml
-model: sewer-axonhub/MiniMax-M3 # MED
-```
-
-The tool rewrites only the model token and preserves the tier marker comment
-(e.g. `# LOW`, `# MED`, `# HIGH`). Unmarked `model:` lines are left untouched.
+Full checkout:
 
 ```bash
-scripts/opencode-model-tiers              # TUI
-scripts/opencode-model-tiers status
-scripts/opencode-model-tiers apply normal --dry-run
-scripts/opencode-model-tiers apply normal
-scripts/opencode-work-mode --dry-run
-scripts/opencode-work-mode
-scripts/opencode-model-tiers set normal MED sewer-axonhub/MiniMax-M3
+git submodule update --init --recursive
 ```
 
-The TUI reads choices from `opencode models`, supports typed filtering, previews
-file changes, saves `scripts/model-tiers.json` (including the `$tierOrder` key),
-and can apply the selected profile.
-Work mode is guarded to only use `sewer-axonhub-work/*` models.
-
-Extra CLI helpers:
+Nix/Home Manager setup links `~/.config/opencode` to editable `config/` and provides `opencode`, `opencode-build`, local tools, CodeRabbit CLI, and validation dependencies.
 
 ```bash
-scripts/opencode-model-tiers models
-scripts/opencode-model-tiers models --work
-scripts/opencode-model-tiers configure work
-```
-
-The Go app can also be run through the root flake:
-
-```bash
-nix run .#opencode-model-tiers -- status
-nix run .#opencode-model-tiers
-nix run .#opencode-work-mode -- --dry-run
-```
-
-Root `direnv` support is enabled through `.envrc` / `flake.nix`; run
-`direnv allow` after cloning or changing the dev shell.
-
-## Building OpenCode
-
-I use a local self-built copy of OpenCode, pinned as a submodule in
-`opencode-source/`.
-
-This is a fork that replaces the default ~8.5k system prompt with a minimal
-~2.5k one. The prompt is conditionally assembled based on which tools are
-available — cross-tool instructions are omitted when the tool isn't present.
-Optional supplemental sections (e.g. git workflow, GitHub CLI) can be enabled
-per-agent.
-
-```bash
-# Build from source
 opencode-build
-
-# Run (defaults to current directory)
-opencode
-
-# Run with arguments
 opencode /path/to/project
 ```
 
-## Nix Module
+Windows:
 
-`default.nix` provides two shell wrappers and installs the dependencies
-OpenCode needs at runtime:
+```powershell
+pwsh ./scripts/windows/setup.ps1
+```
 
-| Package                   | Purpose                                                                                         |
-| ------------------------- | ----------------------------------------------------------------------------------------------- |
-| `opencode`                | Wrapper — runs the self-built binary with `OPENCODE_ENABLE_EXA=1` set; defaults to `opencode .` |
-| `opencode-build`          | Builds the forked OpenCode from source (`bun install` + `bun run build --single`)               |
-| `coderabbit-cli`          | CodeRabbit review tool (from `llm-agents` flake input)                                          |
-| `nodejs` / `yarn` / `bun` | Runtime for MCP servers and plugin development                                                  |
-| `docker`                  | Container runtime for GitHub and Discord MCP servers                                            |
-| `typescript` / `go`       | Language toolchains for local development                                                       |
+Pre-flight offers to install missing prerequisites (cargo, bun, git, Node.js LTS, Yarn, Docker Desktop) via `winget`, with a y/N prompt per tool and a direct-installer fallback for cargo/bun/yarn. Installs are never fatal; declines fall back to the old detect-and-warn behaviour. Pass `-NoInstallPrereqs` to force detect-only.
 
-### Symlinks
+CodeRabbit CLI is intentionally not installed on Windows: upstream ships Linux/macOS binaries only (WSL-only on Windows). The `/review/coderabbit` command returns `INCOMPLETE` when `cr`/`coderabbit` is absent. To use it, install under WSL: `wsl -c 'curl -fsSL https://cli.coderabbit.ai/install.sh | sh'`.
 
-- `~/.config/opencode` → this repo's `config/` directory
-- `~/opencode` → this repo's root (convenient access)
+## Validation
+
+From repository root:
+
+```bash
+python3 scripts/validate-opencode-config.py --repo-root .
+python3 -m unittest discover -s tests -p 'test_*.py'
+```
+
+Use `nix develop` when local Python lacks `json5` or `PyYAML`.
+
+Static checks cannot certify provider credentials, plugin loading, CodeRabbit service, installed OpenCode runtime, or stochastic model behavior. Those remain environment checks.
 
 [OpenCode]: https://opencode.ai

@@ -1,6 +1,0 @@
-Enumerate: `public`, `protected`, `internal`, or no modifier (public by default). Skip: `private`. No explicit modifier → record visibility as `public`.
-Module Boundary: directory containing `build.gradle` or `build.gradle.kts`. `internal` scoped to compilation module, not package.
-Re-export: `public fun`/`public val` delegating to internal items → re-exports.
-Qualified Path: `org.pkg.Class.item` or `import org.pkg.Class.item`.
-Test Patterns: `*Tests.kt`, `*Test.kt`.
-Special Case: `internal` item used from different Gradle module → either dead code or architecture violation (compiler would reject). Classify as `review` — not privatization candidate.

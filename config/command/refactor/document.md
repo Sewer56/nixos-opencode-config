@@ -1,7 +1,7 @@
 ---
-description: "Add and review missing code documentation in source files"
+description: "Add or repair scoped source documentation with verified review"
 agent: _refactor/document
 ---
 
-Additional instructions (if any):
+Target paths and documentation focus:
 $ARGUMENTS

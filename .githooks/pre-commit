@@ -1,7 +1,13 @@
 #!/usr/bin/env sh
+
+# Validate instruction topology and workflow contracts before each commit.
+# Input: current repository worktree. Output: diagnostics on stdout/stderr;
+# exit nonzero blocks commit. Run manually with `.githooks/pre-commit`.
 set -eu
 
 repo_root="$(git rev-parse --show-toplevel)"
-cd "$repo_root/config"
+cd "$repo_root"
 
-bun run check
+python3 scripts/validate-opencode-config.py --repo-root .
+python3 -m unittest discover -s tests -p 'test_*.py'
+exec tools/validate-file-interp.sh

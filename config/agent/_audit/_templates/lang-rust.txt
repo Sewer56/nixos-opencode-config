@@ -1,6 +1,0 @@
-Enumerate: bare `pub`, `pub(crate)`, `pub(super)`, `pub(in ...)`. Skip: no visibility keyword or `pub(self)`.
-Module Boundary: directory containing `Cargo.toml`.
-Re-export: `pub use item;` → item is re-exported.
-Qualified Path: `module::item` or `crate::module::item`. Import-only: `use crate::module::Item;` with no subsequent reference → count separately, exclude from usage totals.
-Test Patterns: `#[cfg(test)]` modules, `#[test]` functions, `tests/` directory, `*_test.rs`.
-Special Case: `#[doc(hidden)]` items → append `[doc(hidden)]` to Visibility field (e.g. `pub [doc(hidden)]`, `pub(crate) [doc(hidden)]`).

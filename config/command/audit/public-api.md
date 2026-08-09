@@ -1,7 +1,7 @@
 ---
-description: "Audit the entire repository for unnecessarily public APIs with privatization diffs"
+description: "Audit the repository or optional target paths for unnecessarily public APIs"
 agent: _audit/public-api
 ---
 
-Additional instructions (if any):
+Optional target files/directories, constraints, or exclusions:
 $ARGUMENTS

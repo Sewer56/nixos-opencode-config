@@ -1,6 +1,5 @@
-use std::collections::HashSet;
-
 use crate::models::*;
+use std::collections::HashSet;
 
 pub(crate) fn build_visible_rows(
     index: &OverviewIndex,
@@ -28,27 +27,6 @@ pub(crate) fn limit_roots(roots: &[String], limit: Option<usize>) -> &[String] {
     match limit {
         Some(limit) => &roots[..roots.len().min(limit)],
         None => roots,
-    }
-}
-
-pub(crate) fn push_rows_normal(
-    index: &OverviewIndex,
-    session_id: &str,
-    depth: usize,
-    expanded: &HashSet<String>,
-    rows: &mut Vec<VisibleRow>,
-) {
-    rows.push(VisibleRow {
-        session_id: session_id.to_string(),
-        depth,
-    });
-
-    if !expanded.contains(session_id) {
-        return;
-    }
-
-    for child_id in index.children_of(session_id) {
-        push_rows_normal(index, child_id, depth + 1, expanded, rows);
     }
 }
 
@@ -86,6 +64,27 @@ pub(crate) fn push_rows_filtered(
     }
 
     false
+}
+
+pub(crate) fn push_rows_normal(
+    index: &OverviewIndex,
+    session_id: &str,
+    depth: usize,
+    expanded: &HashSet<String>,
+    rows: &mut Vec<VisibleRow>,
+) {
+    rows.push(VisibleRow {
+        session_id: session_id.to_string(),
+        depth,
+    });
+
+    if !expanded.contains(session_id) {
+        return;
+    }
+
+    for child_id in index.children_of(session_id) {
+        push_rows_normal(index, child_id, depth + 1, expanded, rows);
+    }
 }
 
 pub(crate) fn session_matches_query(session: &SessionOverview, search: &str) -> bool {

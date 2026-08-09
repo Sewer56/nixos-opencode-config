@@ -1,1 +1,0 @@
-"""Git-aware file listing utilities."""

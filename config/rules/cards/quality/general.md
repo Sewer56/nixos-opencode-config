@@ -22,5 +22,5 @@ Preserve behavior unless explicitly changing it.
 ### Clean changed scope
 Remove dead code, unused imports, and newly-unused paths. Avoid debug-only logging, temporary instrumentation, and unnecessary abstractions.
 
-### Line locators
-`Lines: ~start-end` values are approximate (±10 lines); context lines are authoritative.
+### Review locators
+`path:line` references are navigation hints and may drift after repairs; the cited symbol, contract, and surrounding context are authoritative.
