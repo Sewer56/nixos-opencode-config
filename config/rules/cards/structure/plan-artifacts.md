@@ -16,7 +16,7 @@ Use this order:
 Use `None` for an empty required section.
 
 ### Stable identifiers
-Use `[D#]` for decisions, `[INV-#]` for invariants, `[AC-#]` for acceptance criteria, `[P#]` for plan items, and `[Q#]` for questions. Keep identifiers stable across revisions; append new ids rather than renumbering accepted content. These identifiers are plan-internal: never cite them in committed code, comments, tests, docs, or commit messages.
+Use `[D#]` for decisions, `[INV-#]` for invariants, `[AC-#]` for acceptance criteria, `[P#]` for plan items, and `[Q#]` for questions. Keep identifiers stable across revisions; append new ids rather than renumbering accepted content. These identifiers are plan-internal in any form, bare or bracketed (`AC-1`, `[AC-#]`): never cite them in committed code, comments, tests, docs, or commit messages.
 
 ### Plan item shape
 Each `[P#]` item has:

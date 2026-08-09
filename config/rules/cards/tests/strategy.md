@@ -1,6 +1,7 @@
 ### Acceptance lens
 Tests must prove behavior the implementation could get wrong. Never write tests that only assert what the compiler or type system already guarantees (e.g., field access after assignment, enum variant identity, trivial delegation).
 Prefer observable behavior tied to an acceptance criterion over private helper call order.
+Tests map to acceptance behavior, never criterion labels; committed test comments/docs never cite internal ids (`AC-1`) — describe the behavior.
 
 ### Changed behavior coverage
 Cover critical new or changed behavior, including success, failure, and relevant edge cases. Cover all new code when the task requires tests.

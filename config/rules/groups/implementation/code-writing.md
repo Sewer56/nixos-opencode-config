@@ -9,6 +9,10 @@ Before reviewer or parent validation handoff, run from `PATH`:
 
 Auto mode checks repository-wide tracked staged and unstaged `.rs`/`.md` changes. It may include unrelated tracked changes; untracked files are excluded until staged. No eligible tracked changes is a successful skip. Non-zero blocks handoff; repair and rerun within the caller's bounded writer loop, returning its failure status on exhaustion.
 
+### Writer gate
+
+Before staging: committed code/comments/tests/docs/commit messages never cite internal ids (`AC-1`) — apply the 'Self-contained committed content' rule.
+
 {{ file="./rules/groups/quality/general.md" }}
 
 {{ file="./rules/groups/tests/test-strategy.md" }}

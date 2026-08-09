@@ -35,4 +35,4 @@ Do not backfill untouched legacy files solely for docs.
 In implementation plans, name the affected documentation surface, audience, and behavioral change. Generic `update docs` notes are insufficient; exact prose or patch hunks are not required.
 
 ### Self-contained committed content
-Committed code, comments, tests, docs, and commit messages must stand alone: never cite plan- or cohort-only identifiers (`[INV-#]`, `[D#]`, `[AC-#]`, `[P#]`, `[Q#]`, `Cnn`) — those artifacts are not committed. Explain the behavior instead.
+Committed code, comments, tests, docs, and commit messages must stand alone: never cite plan- or cohort-only identifiers in any form (`AC-1`, `[AC-#]`, `P1`, `Cnn`, review-finding ids) — describe the behavior instead.
