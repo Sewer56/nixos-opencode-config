@@ -81,7 +81,7 @@ Set `Status: READY_FOR_IMPLEMENT` only when:
 - targets and validation are grounded enough to begin implementation;
 - the latest review is `READY`.
 
-Otherwise set `Status: DRAFT`. Never implement here. `/implement <plan_path>` approves draft; `/implement/one-shot` preauthorizes implementation only after `READY_FOR_IMPLEMENT`.
+Otherwise set `Status: DRAFT`. Never implement here. `/implement <plan_path>` approves draft.
 
 # Output
 Return exactly:

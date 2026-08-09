@@ -44,7 +44,7 @@ For low-ambiguity work:
 /implement/one-shot <request>
 ```
 
-It routes through same draft and implementation pipeline.
+It skips the draft pipeline and runs a single writer -> subagent review -> subagent verifier -> repair loop for a bounded request, then commits.
 
 ## Outcomes and artifacts
 
@@ -68,7 +68,7 @@ Validator scope is documented in module docstring at top of `scripts/validate-op
 | `/draft` | Create or refine human-reviewed implementation draft. |
 | `/plan/convert-to-draft` | Convert useful conversation context into same draft format. |
 | `/implement` | Implement approved draft in validated logical cohorts. |
-| `/implement/one-shot` | Draft, review, and implement bounded request. |
+| `/implement/one-shot` | Implement a bounded request in one writer-review-verify-repair loop. |
 
 ### Refactoring
 
