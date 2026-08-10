@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Writes a repository-grounded issue using the local template and a concise problem statement
-model: sewer-axonhub/deepseek-v4-flash-fast # MEDIUM
+model: sewer-axonhub/deepseek-v4-flash # MEDIUM
 variant: medium
 permission:
   "*": deny

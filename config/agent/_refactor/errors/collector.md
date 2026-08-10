@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Exhaustively traces public error-returning APIs in an explicit bounded file chunk
-model: sewer-axonhub/deepseek-v4-flash-fast # EASY
+model: sewer-axonhub/deepseek-v4-flash # EASY
 variant: medium
 permission:
   "*": deny

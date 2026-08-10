@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Adds or repairs scoped source documentation without changing runtime behavior
-model: sewer-axonhub/deepseek-v4-flash-fast # MEDIUM
+model: sewer-axonhub/deepseek-v4-flash # MEDIUM
 variant: medium
 permission:
   "*": deny

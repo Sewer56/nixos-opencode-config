@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Finds the smallest repository context needed to answer a concrete implementation question
-model: sewer-axonhub/deepseek-v4-flash-fast # EASY
+model: sewer-axonhub/deepseek-v4-flash # EASY
 variant: medium
 permission:
   "*": deny

@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Reorders declarations within source files after an explicit symbol-order preview
-model: sewer-axonhub/deepseek-v4-flash-fast # MEDIUM
+model: sewer-axonhub/deepseek-v4-flash # MEDIUM
 variant: medium
 permission:
   "*": deny

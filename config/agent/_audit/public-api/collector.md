@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Enumerates public items in explicit files and verifies repository-wide usage with language-aware matching
-model: sewer-axonhub/deepseek-v4-flash-fast # EASY
+model: sewer-axonhub/deepseek-v4-flash # EASY
 variant: medium
 permission:
   "*": deny

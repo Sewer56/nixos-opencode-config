@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews every proposed commit for code quality, placement, documentation, readability, and wording
-model: sewer-axonhub/deepseek-v4-flash-fast # HARD
+model: sewer-axonhub/deepseek-v4-flash # HARD
 variant: high
 permission:
   "*": deny

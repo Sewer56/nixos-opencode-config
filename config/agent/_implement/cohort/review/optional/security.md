@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Optionally produces evidence-backed security candidates for trust-boundary changes
-model: sewer-axonhub/deepseek-v4-flash-fast # HARD
+model: sewer-axonhub/deepseek-v4-flash # HARD
 variant: high
 permission:
   "*": deny

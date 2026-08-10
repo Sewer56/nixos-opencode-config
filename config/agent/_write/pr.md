@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Generates an evidence-backed PR description from the actual branch diff
-model: sewer-axonhub/deepseek-v4-flash-fast # MEDIUM
+model: sewer-axonhub/deepseek-v4-flash # MEDIUM
 variant: medium
 permission:
   "*": deny

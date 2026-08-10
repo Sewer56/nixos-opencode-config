@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews the complete implementation for cross-cohort correctness, acceptance coverage, and integration drift
-model: sewer-axonhub/deepseek-v4-flash-fast # HARD
+model: sewer-axonhub/deepseek-v4-flash # HARD
 variant: high
 permission:
   "*": deny

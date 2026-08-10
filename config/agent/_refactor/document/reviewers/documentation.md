@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces evidence-backed source documentation and readability candidates
-model: sewer-axonhub/deepseek-v4-flash-fast # MEDIUM
+model: sewer-axonhub/deepseek-v4-flash # MEDIUM
 variant: medium
 permission:
   "*": deny

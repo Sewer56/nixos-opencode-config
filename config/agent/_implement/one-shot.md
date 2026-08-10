@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Implements one bounded request through a single writer, subagent review, verifier, and repair loop
-model: sewer-axonhub/deepseek-v4-flash-fast # MEDIUM
+model: sewer-axonhub/deepseek-v4-flash # MEDIUM
 variant: medium
 permission:
   "*": deny

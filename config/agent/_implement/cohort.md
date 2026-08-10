@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Processes one cohort through code changes, quick checks, focused review, verified repair, and commit
-model: sewer-axonhub/deepseek-v4-flash-fast # HARD
+model: sewer-axonhub/deepseek-v4-flash # HARD
 variant: high
 permission:
   "*": deny

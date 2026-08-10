@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces focused documentation usability, clarity, and information-design candidates
-model: sewer-axonhub/deepseek-v4-flash-fast # MEDIUM
+model: sewer-axonhub/deepseek-v4-flash # MEDIUM
 variant: medium
 permission:
   "*": deny

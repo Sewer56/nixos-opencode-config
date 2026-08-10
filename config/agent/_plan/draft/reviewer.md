@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews a collaborative draft for fidelity, completeness, dependency order, and implementation readiness
-model: sewer-axonhub/deepseek-v4-flash-fast # HARD
+model: sewer-axonhub/deepseek-v4-flash # HARD
 variant: high
 permission:
   "*": deny

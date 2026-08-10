@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Repairs final integration failures across approved plan scope
-model: sewer-axonhub/deepseek-v4-flash-fast # HARD
+model: sewer-axonhub/deepseek-v4-flash # HARD
 variant: high
 permission:
   "*": deny

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces evidence-backed correctness candidates for one proposed commit
-model: sewer-axonhub/deepseek-v4-flash-fast # HARD
+model: sewer-axonhub/deepseek-v4-flash # HARD
 variant: high
 permission:
   "*": deny
