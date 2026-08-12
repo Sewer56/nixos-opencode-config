@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Orchestrates an approved draft through dependency-ordered cohorts and final integration review
-model: sewer-axonhub/deepseek-v4-flash # HARD
+model: sewer-axonhub/deepseek-v4-pro # HARD
 variant: high
 permission:
   "*": deny

@@ -3,7 +3,7 @@
   "normal": {
     "EASY": {"model":"sewer-axonhub/deepseek-v4-flash","variant":"medium"},
     "MEDIUM": {"model":"sewer-axonhub/deepseek-v4-flash","variant":"medium"},
-    "HARD": {"model":"sewer-axonhub/deepseek-v4-flash","variant":"high"}
+    "HARD": {"model":"sewer-axonhub/deepseek-v4-pro","variant":"high"}
   },
   "work": {
     "EASY": {"model":"sewer-axonhub-work/claude-sonnet-5","variant":"low"},

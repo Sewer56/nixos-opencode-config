@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Collaboratively creates or refines a human-readable implementation draft
-model: sewer-axonhub/deepseek-v4-flash # HARD
+model: sewer-axonhub/deepseek-v4-pro # HARD
 variant: high
 permission:
   "*": deny

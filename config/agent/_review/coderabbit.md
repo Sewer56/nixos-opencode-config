@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Runs structured CodeRabbit review with bounded repair and one re-review
-model: sewer-axonhub/deepseek-v4-flash # HARD
+model: sewer-axonhub/deepseek-v4-pro # HARD
 variant: high
 permission:
   "*": deny

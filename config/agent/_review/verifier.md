@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Attempts to refute candidate findings, then promotes only evidence-backed blockers or advisories
-model: sewer-axonhub/deepseek-v4-flash # HARD
+model: sewer-axonhub/deepseek-v4-pro # HARD
 variant: high
 permission:
   "*": deny

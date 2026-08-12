@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Produces evidence-backed documentation accuracy and coverage candidates
-model: sewer-axonhub/deepseek-v4-flash # HARD
+model: sewer-axonhub/deepseek-v4-pro # HARD
 variant: high
 permission:
   "*": deny
