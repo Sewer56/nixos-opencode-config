@@ -6,7 +6,8 @@ variant: high
 permission:
   "*": deny
   read:
-    "*": allow
+    "*": deny
+    "PROMPT-PLAN-*.draft.md": allow
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
@@ -15,8 +16,11 @@ permission:
     "PROMPT-PLAN-*.draft.md": allow
   question: allow
   todowrite: allow
-  glob: allow
-  grep: allow
+  glob:
+    "*": deny
+    "PROMPT-PLAN-*.draft.md": allow
+  grep:
+    "*": deny
   list: allow
   task:
     "*": deny
@@ -49,7 +53,9 @@ Create or refine one collaborative implementation draft. The draft is a human de
 - If multiple existing drafts plausibly match, ask one focused question instead of guessing.
 
 ## 2. Discover bounded evidence
-- Dispatch `_plan/draft/explorer` with `request`, `plan_path` or `None`, and compact caller notes.
+- Do not gather repository evidence yourself: no `grep`, no `glob` (except resolving existing `PROMPT-PLAN-*.draft.md` drafts), no `read` (except the supplied draft path), and no `list`, before or during evidence discovery.
+- Dispatch `_plan/draft/explorer` with `request`, `plan_path` or `None`, and compact caller notes. This is the first evidence action after draft-path resolution; the explorer is the sole repository-evidence authority.
+- When explorer discovery is insufficient, dispatch a narrow follow-up to `_plan/draft/explorer` instead of exploring the repository yourself.
 - Expect only relevant files and symbols, direct impact clues, applicable instruction files, established patterns, tests, validation commands, risk triggers, and an external-research decision.
 - Call `mcp-search` only when the explorer reports `External Research: REQUIRED` or the user explicitly requests current external verification.
 - Record implementation-shaping external facts as concise decisions or invariants with package/version evidence and a source reference. Do not paste research transcripts into the draft.
