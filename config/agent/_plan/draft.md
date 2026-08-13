@@ -5,6 +5,7 @@ model: sewer-axonhub/deepseek-v4-flash # MEDIUM
 variant: medium
 permission:
   "*": deny
+  bash: allow
   read:
     "*": deny
     "PROMPT-PLAN-*.draft.md": allow
