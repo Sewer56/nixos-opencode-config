@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Traces and repairs public error documentation with complete reviewed coverage
-model: sewer-axonhub/deepseek-v4-flash # MEDIUM
+model: sewer-axonhub/gpt-5.6-luna # MEDIUM
 variant: medium
 permission:
   "*": deny

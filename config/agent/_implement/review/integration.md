@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Reviews the complete implementation for cross-cohort correctness, acceptance coverage, and integration drift
-model: sewer-axonhub/deepseek-v4-pro # HARD
-variant: high
+model: sewer-axonhub/gpt-5.6-luna # HARD
+variant: max
 permission:
   "*": deny
   read:

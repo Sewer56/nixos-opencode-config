@@ -1,8 +1,8 @@
 ---
 mode: all
 description: Orchestrates an approved draft through dependency-ordered cohorts and final integration review
-model: sewer-axonhub/deepseek-v4-pro # HARD
-variant: high
+model: sewer-axonhub/gpt-5.6-luna # HARD
+variant: max
 permission:
   "*": deny
   read:

@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Repairs final integration failures across approved plan scope
-model: sewer-axonhub/deepseek-v4-pro # HARD
-variant: high
+model: sewer-axonhub/gpt-5.6-luna # HARD
+variant: max
 permission:
   "*": deny
   read:

@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Reviews every proposed commit for code quality, placement, documentation, readability, and wording
-model: sewer-axonhub/deepseek-v4-pro # HARD
-variant: high
+model: sewer-axonhub/gpt-5.6-luna # HARD
+variant: max
 permission:
   "*": deny
   read:

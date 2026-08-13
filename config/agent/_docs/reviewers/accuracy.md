@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Produces evidence-backed documentation accuracy and coverage candidates
-model: sewer-axonhub/deepseek-v4-pro # HARD
-variant: high
+model: sewer-axonhub/gpt-5.6-luna # HARD
+variant: max
 permission:
   "*": deny
   read:

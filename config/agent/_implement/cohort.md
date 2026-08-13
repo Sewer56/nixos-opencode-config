@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Processes one cohort through code changes, quick checks, focused review, verified repair, and commit
-model: sewer-axonhub/deepseek-v4-pro # HARD
-variant: high
+model: sewer-axonhub/gpt-5.6-luna # HARD
+variant: max
 permission:
   "*": deny
   read:

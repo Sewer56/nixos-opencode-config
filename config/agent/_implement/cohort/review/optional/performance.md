@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Optionally produces evidence-backed performance candidates for realistic changed workloads
-model: sewer-axonhub/deepseek-v4-pro # HARD
-variant: high
+model: sewer-axonhub/gpt-5.6-luna # HARD
+variant: max
 permission:
   "*": deny
   read:

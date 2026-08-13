@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Collaboratively creates or refines a human-readable implementation draft
-model: sewer-axonhub/deepseek-v4-flash # MEDIUM
+model: sewer-axonhub/gpt-5.6-luna # MEDIUM
 variant: medium
 permission:
   "*": deny

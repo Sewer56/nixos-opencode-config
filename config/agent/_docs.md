@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Writes or reviews scoped end-user documentation, validates it, and repairs only verified blockers
-model: sewer-axonhub/deepseek-v4-flash # MEDIUM
+model: sewer-axonhub/gpt-5.6-luna # MEDIUM
 variant: medium
 permission:
   "*": deny
