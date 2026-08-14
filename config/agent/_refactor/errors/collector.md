@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Exhaustively traces public error-returning APIs in an explicit bounded file chunk
-model: sewer-axonhub/gpt-5.6-luna # EASY
+model: sewer-axonhub/glm-5.3 # EASY
 variant: low
 permission:
   "*": deny

@@ -1,8 +1,8 @@
 ---
 mode: all
 description: Generates an evidence-backed PR description from the actual branch diff
-model: sewer-axonhub/gpt-5.6-luna # MEDIUM
-variant: medium
+model: sewer-axonhub/glm-5.3 # MEDIUM
+variant: high
 permission:
   "*": deny
   read:

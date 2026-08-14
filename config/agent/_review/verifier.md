@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Attempts to refute candidate findings, then promotes only evidence-backed blockers or advisories
-model: sewer-axonhub/gpt-5.6-luna # HARD
-variant: max
+model: sewer-axonhub/glm-5.3 # HARD
+variant: high
 permission:
   "*": deny
   read:

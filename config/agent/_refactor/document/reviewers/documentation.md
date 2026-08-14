@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Produces evidence-backed source documentation and readability candidates
-model: sewer-axonhub/gpt-5.6-luna # MEDIUM
-variant: medium
+model: sewer-axonhub/glm-5.3 # MEDIUM
+variant: high
 permission:
   "*": deny
   read:

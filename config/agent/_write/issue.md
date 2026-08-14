@@ -1,8 +1,8 @@
 ---
 mode: all
 description: Writes a repository-grounded issue using the local template and a concise problem statement
-model: sewer-axonhub/gpt-5.6-luna # MEDIUM
-variant: medium
+model: sewer-axonhub/glm-5.3 # MEDIUM
+variant: high
 permission:
   "*": deny
   read:

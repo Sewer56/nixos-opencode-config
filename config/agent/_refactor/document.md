@@ -1,8 +1,8 @@
 ---
 mode: primary
 description: Adds or repairs scoped source documentation without changing runtime behavior
-model: sewer-axonhub/gpt-5.6-luna # MEDIUM
-variant: medium
+model: sewer-axonhub/glm-5.3 # MEDIUM
+variant: high
 permission:
   "*": deny
   read:

@@ -1,8 +1,8 @@
 ---
 mode: all
 description: Collaboratively creates or refines a human-readable implementation draft
-model: sewer-axonhub/gpt-5.6-luna # MEDIUM
-variant: medium
+model: sewer-axonhub/glm-5.3 # MEDIUM
+variant: high
 permission:
   "*": deny
   bash: allow

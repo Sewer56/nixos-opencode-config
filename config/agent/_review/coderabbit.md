@@ -1,8 +1,8 @@
 ---
 mode: all
 description: Runs structured CodeRabbit review with bounded repair and one re-review
-model: sewer-axonhub/gpt-5.6-luna # HARD
-variant: max
+model: sewer-axonhub/glm-5.3 # HARD
+variant: high
 permission:
   "*": deny
   read:

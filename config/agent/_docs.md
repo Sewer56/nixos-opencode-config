@@ -1,8 +1,8 @@
 ---
 mode: primary
 description: Writes or reviews scoped end-user documentation, validates it, and repairs only verified blockers
-model: sewer-axonhub/gpt-5.6-luna # MEDIUM
-variant: medium
+model: sewer-axonhub/glm-5.3 # MEDIUM
+variant: high
 permission:
   "*": deny
   read:

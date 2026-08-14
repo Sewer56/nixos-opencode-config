@@ -1,8 +1,8 @@
 ---
 mode: primary
 description: Audits scoped or repository-wide public APIs for evidence-backed visibility reductions
-model: sewer-axonhub/gpt-5.6-luna # MEDIUM
-variant: medium
+model: sewer-axonhub/glm-5.3 # MEDIUM
+variant: high
 permission:
   "*": deny
   read:

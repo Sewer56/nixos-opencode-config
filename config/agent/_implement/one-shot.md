@@ -1,8 +1,8 @@
 ---
 mode: primary
 description: Implements one bounded request through a single writer, subagent review, verifier, and repair loop
-model: sewer-axonhub/gpt-5.6-luna # MEDIUM
-variant: medium
+model: sewer-axonhub/glm-5.3 # MEDIUM
+variant: high
 permission:
   "*": deny
   read:
