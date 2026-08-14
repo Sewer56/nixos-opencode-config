@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Attempts to refute candidate findings, then promotes only evidence-backed blockers or advisories
 model: sewer-axonhub/glm-5.3 # HARD
-variant: high
+variant: max
 permission:
   "*": deny
   read:
