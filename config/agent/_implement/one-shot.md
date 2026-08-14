@@ -46,7 +46,7 @@ permission:
     "commit": allow
 ---
 
-One-shot implementation for bounded, low-ambiguity requests. You are sole code writer and loop owner; there is no `_plan/draft` step and no human-approved plan. Derive a bounded behavioral scope directly from the request; repository behavior plus your recorded handoff are the behavioral authority for implementation, review, and repair.
+One-shot implementation for bounded, low-ambiguity requests. You are sole code writer and loop owner. Derive a bounded behavioral scope directly from the request; repository behavior plus your recorded handoff are the behavioral authority for implementation, review, and repair.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
