@@ -19,7 +19,14 @@ Design favors selective context, deterministic evidence, precise review, and few
 
 `/draft` creates or refines one root `PROMPT-PLAN-<slug>.draft.md` containing behavioral goal, decisions, invariants, non-goals, acceptance criteria, logical work, validation, review routes, and unresolved questions.
 
-Draft describes behavior, decisions, invariants, non-goals, acceptance criteria, and validation. Review it until status is `READY_FOR_IMPLEMENT`; approved file becomes downstream behavioral authority.
+Draft review follows the `draft reviewer -> verifier -> human approval` flow: `explorer -> draft -> reviewer (candidate) -> verifier (promote/reject) -> human approval`.
+
+- Every `_plan/draft/reviewer` call is followed by the read-only `_plan/draft/verifier`, including a reviewer that reports no required changes.
+- The reviewer report is a candidate; the verifier checks required corrections against the request, draft, discovery, and repository evidence.
+- Only verifier-promoted, evidence-backed corrections may change the draft.
+- A verifier rejection leaves the draft unchanged; unavailable evidence or a required human decision stops safely.
+
+Review the draft until status is `READY_FOR_IMPLEMENT`; human approval then makes the approved file downstream behavioral authority.
 
 ### Implement
 

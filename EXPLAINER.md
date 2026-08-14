@@ -21,9 +21,10 @@ flowchart TD
     subgraph s1["1. Draft agent"]
         explorer[explorer: repository impact map] --> draft[behavioral draft]
         draft --> draftReview[draft reviewer]
+        draftReview --> draftVerify[draft verifier]
     end
 
-    draftReview --> approval([human approval])
+    draftVerify --> approval([human approval])
 ```
 
 Implementation:
@@ -97,7 +98,13 @@ This aims to improve relevant context density:
 
 These sources motivate selective context in general; the specific one-dependency-hop rule above is this repository's own design choice, not something these sources prescribe.
 
-Draft is independently reviewed and requires human approval before implementation starts.
+Draft review is a bounded `draft reviewer -> verifier -> human approval` flow.
+
+- Every `_plan/draft/reviewer` call is followed by the read-only [draft verifier][draft-review-verifier], even when the reviewer reports `READY` or no required changes.
+- The reviewer report is a candidate rather than authority; the verifier refutes candidates against the request, draft, explorer discovery, and repository evidence.
+- The verifier only promotes or rejects reviewer candidates; it promotes only evidence-backed required corrections and never becomes a second planner.
+- A verifier rejection leaves the draft unchanged; unavailable evidence or a required human decision stops safely.
+- Human approval is required before implementation starts.
 
 ## 2. Cohort planning
 
@@ -252,6 +259,7 @@ contract -> one editor -> exact staging -> validator/tests
 - Python/shell syntax, required global options.
 
 [Workflow tests][workflow-tests] cover implementation-specific contracts.
+[Draft workflow tests][draft-workflow-tests] deterministically cover the draft reviewer-verifier route, permissions, handoff, correction gate, and documentation claims.
 
 [^repoformer-scope]: Repoformer evaluates repository-level code completion, not issue-resolution workflow.
 [^refute-preprint]: Refute-or-Promote is arXiv preprint and retrospective field study; authors report no autonomous vulnerability discovery and no component ablation.
@@ -267,12 +275,14 @@ contract -> one editor -> exact staging -> validator/tests
 [review-verifier]: config/agent/_review/verifier.md
 [commit-agent]: config/agent/commit.md
 [draft-explorer]: config/agent/_plan/draft/explorer.md
+[draft-review-verifier]: config/agent/_plan/draft/verifier.md
 [create-cohorts]: config/agent/_implement/create-cohorts.md
 [review-findings]: config/rules/groups/implementation/review-findings.md
 [instruction-standard]: .opencode/rules/instruction-authoring.md
 [iterate-agent]: .opencode/agent/_iterate/edit.md
 [validator]: scripts/validate-opencode-config.py
 [workflow-tests]: tests/test_implement_workflow.py
+[draft-workflow-tests]: tests/test_draft_workflow.py
 [repoformer]: https://proceedings.mlr.press/v235/wu24a.html
 [lost-middle]: https://aclanthology.org/2024.tacl-1.9/
 [refute-promote]: https://arxiv.org/abs/2604.19049

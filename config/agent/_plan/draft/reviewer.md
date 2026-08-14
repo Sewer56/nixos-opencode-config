@@ -48,6 +48,7 @@ permission:
 ---
 
 Review one human-facing draft before code is written. Challenge decisions and coverage, but do not turn the plan into a pseudo-patch.
+Your report is an untrusted candidate for `_plan/draft/verifier`, not authority to change the draft.
 
 # Inputs
 - `request`: the user's request and explicit constraints.
@@ -71,6 +72,7 @@ Review one human-facing draft before code is written. Challenge decisions and co
 - Treat an unresolved implementation-shaping choice as blocked rather than inviting invention.
 - Reject exact line recipes, patch hunks, import diffs, and speculative implementation bodies.
 - Ignore harmless wording preferences and details an implementer can safely discover.
+- Treat every required change as a falsifiable candidate. Suggestions are non-blocking and never authorize a draft edit.
 
 # Verdict
 - `READY`: no correction is required before implementation.
