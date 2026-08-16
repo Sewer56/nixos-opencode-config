@@ -94,7 +94,7 @@ Review only after quick checks PASS.
   - `SECURITY` for trust boundaries, auth, secrets, IPC, untrusted input, filesystem/shell/SQL, serialization, cryptography, permissions, or dependency trust;
   - `PERFORMANCE` for growing-input loops, per-item I/O, large allocation/serialization/logging, concurrency, or algorithmic risk.
 
-Before each call, compute `review_path` for the current round. Supply one explicit envelope with every declared input and placeholder resolved; use `Scope: STANDALONE` for correctness, quality, and tests, and the reviewer-declared `Scope: COHORT_STAGED` for security and performance:
+Call the selected reviewers in parallel. Before each call, compute `review_path` for the current round. Supply one explicit envelope with every declared input and placeholder resolved; use `Scope: STANDALONE` for correctness, quality, and tests, and the reviewer-declared `Scope: COHORT_STAGED` for security and performance:
 
 ```text
 <review-inputs>
@@ -116,7 +116,7 @@ Add every other input declared by the selected reviewer to that envelope. Requir
 
 Send candidates to `_review/verifier` only when any review artifact contains findings; skip it when every review reports zero findings. Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`; use `scope=STANDALONE`, `scope_boundary=STAGED`, `plan_path=None`, `handoff_path=[[handoff_path]]`, `cohort_path=None`, and `base_commit=[[base_commit]]`. Repair accepted blockers and accepted advisories within the derived scope.
 
-After repair, rerun the Section 2 all-checks loop from the lint gate before restaging, then rerun correctness, quality, and affected optional reviews; rerun the verifier when re-reviews emit new candidates.
+After repair, rerun the Section 2 all-checks loop from the lint gate before restaging, then rerun correctness, quality, and affected optional reviews in parallel; rerun the verifier when re-reviews emit new candidates.
 
 Allow at most five repair turns total across deterministic and verified-review failures. Remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
 

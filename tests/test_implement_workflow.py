@@ -377,7 +377,7 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertIn("Every selected reviewer must complete", parent)
         self.assertIn("both source/destination", parent)
         self.assertIn("write fresh ledger before review", parent)
-        self.assertIn("validate including tests, then rerun integration, correctness, quality, and affected optional reviews", parent)
+        self.assertIn("validate including tests, then rerun integration; rerun correctness, quality, and affected optional reviews in parallel", parent)
         self.assertNotIn("diff_hash", parent)
         self.assertNotIn("plan_hash", parent)
 
