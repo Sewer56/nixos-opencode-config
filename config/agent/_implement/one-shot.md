@@ -114,7 +114,7 @@ Add every other input declared by the selected reviewer to that envelope. Requir
 
 ## 4. Call exact verifier and repair
 
-Send candidates to `_review/verifier` with an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`; use `scope=STANDALONE`, `scope_boundary=STAGED`, `plan_path=None`, `handoff_path=[[handoff_path]]`, `cohort_path=None`, and `base_commit=[[base_commit]]`. Repair accepted blockers and accepted advisories within the derived scope.
+Send candidates to `_review/verifier` only when any review artifact contains findings; skip it when every review reports zero findings. Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`; use `scope=STANDALONE`, `scope_boundary=STAGED`, `plan_path=None`, `handoff_path=[[handoff_path]]`, `cohort_path=None`, and `base_commit=[[base_commit]]`. Repair accepted blockers and accepted advisories within the derived scope.
 
 After repair, rerun the Section 2 all-checks loop from the lint gate before restaging, then rerun correctness, quality, and affected optional reviews; rerun the verifier when re-reviews emit new candidates.
 

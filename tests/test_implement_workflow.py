@@ -400,6 +400,33 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertIn("Always call `_implement/review/integration`", body)
         self.assertIn("Send candidates to `_review/verifier`", body)
 
+    def test_verifier_dispatch_is_conditional_on_findings(self) -> None:
+        implement_gate = (
+            "Send candidates to `_review/verifier` only when any review artifact "
+            "contains findings; skip it when every review reports zero findings"
+        )
+        for path in (ORCHESTRATOR, COHORT, ROOT / "config/agent/_implement/one-shot.md"):
+            with self.subTest(path=path.relative_to(ROOT)):
+                self.assertIn(implement_gate, text(path))
+        for relative in (
+            "config/agent/_docs.md",
+            "config/agent/_refactor/document.md",
+            "config/agent/_refactor/errors.md",
+        ):
+            with self.subTest(path=relative):
+                self.assertIn(
+                    "Dispatch `_review/verifier` only when a reviewer produced findings; skip it when none did",
+                    text(ROOT / relative),
+                )
+        self.assertIn(
+            "Send candidates to `_iterate/verifier` only when the review reports findings; skip it when there are none",
+            text(ITERATE_EDIT),
+        )
+        self.assertIn(
+            "attempts to refute candidates only when the review reports findings; it is skipped when there are none",
+            text(ROOT / ".opencode/ITERATE.md"),
+        )
+
     def test_orchestrator_is_compact_and_cannot_edit_code(self) -> None:
         body = text(ORCHESTRATOR)
         self.assertLess(len(body.encode()), 12_000)

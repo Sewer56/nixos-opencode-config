@@ -100,7 +100,7 @@ These sources motivate selective context in general; the specific one-dependency
 
 Draft review is a bounded `draft reviewer -> verifier -> human approval` flow.
 
-- Every `_plan/draft/reviewer` call is followed by the read-only [draft verifier][draft-review-verifier], even when the reviewer reports `READY` or no required changes.
+- The read-only [draft verifier][draft-review-verifier] runs only when the reviewer reports findings; it is skipped when there are none.
 - The reviewer report is a candidate rather than authority; the verifier refutes candidates against the request, draft, explorer discovery, and repository evidence.
 - The verifier only promotes or rejects reviewer candidates; it promotes only evidence-backed required corrections and never becomes a second planner.
 - A verifier rejection leaves the draft unchanged; unavailable evidence or a required human decision stops safely.

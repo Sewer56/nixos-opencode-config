@@ -21,7 +21,7 @@ Design favors selective context, deterministic evidence, precise review, and few
 
 Draft review follows the `draft reviewer -> verifier -> human approval` flow: `explorer -> draft -> reviewer (candidate) -> verifier (promote/reject) -> human approval`.
 
-- Every `_plan/draft/reviewer` call is followed by the read-only `_plan/draft/verifier`, including a reviewer that reports no required changes.
+- The read-only `_plan/draft/verifier` runs only when the reviewer reports findings; it is skipped when there are none.
 - The reviewer report is a candidate; the verifier checks required corrections against the request, draft, discovery, and repository evidence.
 - Only verifier-promoted, evidence-backed corrections may change the draft.
 - A verifier rejection leaves the draft unchanged; unavailable evidence or a required human decision stops safely.

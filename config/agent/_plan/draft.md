@@ -77,8 +77,8 @@ Create or refine one collaborative implementation draft. The draft is a human de
 
 ## 4. Review and refine within the bound
 - Dispatch `_plan/draft/reviewer` with `request`, `plan_path`, discovery, and compact notes. The reviewer report is a candidate report, never direct authority to edit the draft.
-- Every `_plan/draft/reviewer` call is followed by `_plan/draft/verifier`.
-- Immediately after every `_plan/draft/reviewer` call, dispatch the verifier exactly once, including a reviewer that reports `READY` or no required changes.
+- Dispatch `_plan/draft/verifier` exactly once only when the reviewer report lists required changes; skip it when the report lists none.
+- On reviewer `READY`, make no verifier call and apply nothing.
 - Pass one labeled envelope containing `request`, `plan_path`, `discovery`, the exact `reviewer_report`, and `notes`:
   ```text
   <draft-verifier-inputs>
@@ -91,14 +91,14 @@ Create or refine one collaborative implementation draft. The draft is a human de
   ```
 - The read-only verifier checks each required-change candidate against the request, draft, discovery, and repository evidence.
   - It returns `PROMOTE`, `REJECT`, `BLOCKED`, or `FAIL` and may only promote or reject reviewer candidates; it is not a second planner.
-- If the reviewer reports `BLOCKED`, still complete that one verifier call, then preserve the issue as a blocking open question and return `NEEDS_INPUT` without applying a correction.
+- If the reviewer reports `BLOCKED`, make no verifier call; preserve the issue as a blocking open question and return `NEEDS_INPUT` without applying a correction.
 - On `PROMOTE`, apply only the verifier-promoted, evidence-backed required corrections.
   - Never apply reviewer suggestions, rejected candidates, or a correction the verifier did not list; a mixed result may apply only separately promoted corrections.
 - On `REJECT`, leave the draft unchanged.
 - On `BLOCKED`, leave the draft unchanged and return `NEEDS_INPUT`;
   - preserve the issue as a blocking open question for unavailable evidence or a required human decision.
 - On malformed verifier output or `FAIL`, leave the draft unchanged and return `FAIL`.
-- On reviewer `REVISE`, use the verifier gate above before any correction; on reviewer `READY`, apply none and still complete the verifier call.
+- On reviewer `REVISE`, use the verifier gate above before any correction.
 - If a promoted correction changes scope, acceptance, dependencies, targets, or risk routing, re-run the reviewer and its verifier once. Never call either agent beyond the existing two-pass bound.
 - After two review passes, stop. Do not create an unbounded critic loop.
 
@@ -109,7 +109,7 @@ Set `Status: READY_FOR_IMPLEMENT` only when:
 - dependencies are acyclic and understandable;
 - targets and validation are grounded enough to begin implementation;
 - the latest review is `READY`;
-- every review pass has a completed verifier result with no unresolved verifier block.
+- every review pass that reported findings has a completed verifier result with no unresolved verifier block.
 
 Otherwise set `Status: DRAFT`. Never implement here. `/implement <plan_path>` approves draft.
 

@@ -60,7 +60,7 @@ Implementation tests run when workflow/validator changes. Whole-config validator
 
 ## Review
 
-One reviewer applies only required behavior, architecture, and adversarial lenses to staged diff. Separate verifier attempts to refute candidates. Only verified target blockers reach editor. Advisories remain visible but are not automatic repairs.
+One reviewer applies only required behavior, architecture, and adversarial lenses to staged diff. Separate verifier attempts to refute candidates only when the review reports findings; it is skipped when there are none. Only verified target blockers reach editor. Advisories remain visible but are not automatic repairs.
 
 Self-edits rerun whole-config validation and implementation workflow tests, then receive architecture and adversarial review.
 

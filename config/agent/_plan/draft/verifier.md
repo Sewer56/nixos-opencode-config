@@ -76,7 +76,7 @@ this agent is read-only and is the only stage that can promote a required draft 
 - Do not edit the draft, reviewer report, repository, documentation, tests, or artifacts. Do not create a review cache or sidecar. Return the verification report inline.
 
 # Refute-first process
-1. Validate every required input and the exact `reviewer_report` envelope before any READY/no-change shortcut. Require the report to contain only that envelope:
+1. Validate every required input and the exact `reviewer_report` envelope. Require the report to contain only that envelope:
    - one `# Plan review`;
    - one allowed `Verdict` line;
    - the headings `## Required changes`, `## Suggestions`, and `## Confirmed` in that order;
@@ -96,7 +96,6 @@ this agent is read-only and is the only stage that can promote a required draft 
    - If an input or cited evidence cannot be checked, return `BLOCKED` without promoting any correction.
    - Never read or echo an absolute, escaping, or symlink-escaped citation.
 3. Read the request, draft, discovery, and repository evidence relevant to the candidates.
-   - For a valid `READY` report with no required changes, still perform this verifier call and return `PROMOTE` with zero promoted changes and no draft edit.
    - If the reviewer reports `BLOCKED`, return `BLOCKED`, preserve that safe stop, and do not promote a correction.
 4. For each reviewer required-change candidate, locate its cited draft/request/evidence claim and test the strongest plausible refutation:
    - an existing draft decision;

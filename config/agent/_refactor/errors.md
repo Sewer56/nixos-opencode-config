@@ -86,7 +86,7 @@ Create or overwrite each exact assigned path. Never create placeholder or stub f
 - Compare current target diffs with baseline. Any new executable change is blocking.
 - Run the narrowest repository-native formatter, parser/doc check, type/build check, or documentation test. Record evidence in a new validation artifact.
 - Dispatch `_refactor/document/reviewers/errors` with all facts paths, handoff, changed paths, validation, prior verdicts, and a new candidate path.
-- Dispatch `_review/verifier` with `scope=STANDALONE` and `scope_boundary=WORKTREE`.
+- Dispatch `_review/verifier` only when a reviewer produced findings; skip it when none did. Use `scope=STANDALONE` and `scope_boundary=WORKTREE`.
 
 ## 5. Repair and certify
 - Repair deterministic failures and accepted blockers only.

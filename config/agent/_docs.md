@@ -99,7 +99,7 @@ Run both reviewers in parallel with handoff, target paths, validation path, prio
 Reviewers return hypotheses only. They must not edit documentation or see each other's output.
 
 ## 5. Refute and repair
-- Dispatch `_review/verifier` with `scope=STANDALONE`, `scope_boundary=WORKTREE`, both candidate paths, validation evidence, and target paths.
+- Dispatch `_review/verifier` only when a reviewer produced findings; skip it when none did. Pass `scope=STANDALONE`, `scope_boundary=WORKTREE`, both candidate paths, validation evidence, and target paths.
 - Repair deterministic failures and accepted blockers only. Never auto-apply advisories.
 - Keep every repair inside the declared scope and frozen-region boundary.
 - After a product edit, create a new round, rerun relevant deterministic checks, rerun accuracy, and rerun usability when wording, ordering, examples, or navigation changed.

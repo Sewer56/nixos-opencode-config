@@ -100,7 +100,7 @@ Add every other input declared by the selected reviewer to that envelope. Requir
 
 ## 4. Call exact verifier and repair
 
-Send candidates to `_review/verifier` with an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`. Repair accepted blockers and advisories.
+Send candidates to `_review/verifier` only when any review artifact contains findings; skip it when every review reports zero findings. Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`. Repair accepted blockers and advisories.
 
 After repair, rerun the Section 2 all-checks loop from the lint gate before restaging, then rerun correctness, quality, and affected optional reviews; rerun the verifier when re-reviews emit new candidates.
 

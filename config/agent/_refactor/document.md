@@ -93,7 +93,7 @@ Create or overwrite each exact assigned path. Never create placeholder or stub f
 - Always dispatch `_refactor/document/reviewers/documentation`.
 - Dispatch `_refactor/document/reviewers/errors` only when an in-scope public error-returning API or error section changed.
 - Pass artifact paths, target paths, validation evidence, and prior verdicts. Reviewers do not edit source and do not see each other's output.
-- Dispatch `_review/verifier` with `scope=STANDALONE` and `scope_boundary=WORKTREE` to refute or promote candidates.
+- Dispatch `_review/verifier` only when a reviewer produced findings; skip it when none did. Use `scope=STANDALONE` and `scope_boundary=WORKTREE` to refute or promote candidates.
 
 ## 5. Repair and certify
 - Repair deterministic failures and accepted blockers only. Never auto-apply advisories.

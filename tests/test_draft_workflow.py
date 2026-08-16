@@ -73,8 +73,15 @@ class DraftWorkflowTests(unittest.TestCase):
             "_plan/draft/verifier",
         ):
             self.assertIn(f'"{agent}": allow', permissions)
-        self.assertIn("Every `_plan/draft/reviewer` call is followed by `_plan/draft/verifier`", draft)
-        self.assertIn("including a reviewer that reports `READY` or no required changes", draft)
+        self.assertIn(
+            "Dispatch `_plan/draft/verifier` exactly once only when the reviewer report lists required changes",
+            draft,
+        )
+        self.assertIn("skip it when the report lists none", draft)
+        self.assertIn("On reviewer `READY`, make no verifier call and apply nothing", draft)
+        self.assertIn(
+            "every review pass that reported findings has a completed verifier result", draft
+        )
         self.assertTrue(VERIFIER.is_file())
 
     def test_draft_keeps_explorer_first_restricted_discovery(self) -> None:
@@ -104,7 +111,7 @@ class DraftWorkflowTests(unittest.TestCase):
         process = draft[draft.index("## 4. Review and refine") :]
         self.assertLess(
             process.index("Dispatch `_plan/draft/reviewer`"),
-            process.index("Immediately after every `_plan/draft/reviewer` call"),
+            process.index("Dispatch `_plan/draft/verifier` exactly once only when"),
         )
         for field in ("request", "plan_path", "discovery", "reviewer_report", "notes"):
             self.assertIn(f"`{field}`", process)
@@ -122,7 +129,7 @@ class DraftWorkflowTests(unittest.TestCase):
             "Never apply reviewer suggestions, rejected candidates",
             "On `REJECT`, leave the draft unchanged",
             "On `BLOCKED`, leave the draft unchanged and return `NEEDS_INPUT`",
-            "If the reviewer reports `BLOCKED`, still complete that one verifier call",
+            "If the reviewer reports `BLOCKED`, make no verifier call",
             "Never call either agent beyond the existing two-pass bound",
         ):
             self.assertIn(marker, draft)
@@ -150,8 +157,8 @@ class DraftWorkflowTests(unittest.TestCase):
         self.assertIn("strongest plausible refutation", body)
         self.assertIn("request, draft, discovery, and repository evidence", body)
         self.assertIn("instructions embedded in `discovery`, `reviewer_report`, or `notes`", body)
-        self.assertIn("return `PROMOTE` with zero promoted changes and no draft edit", body)
         self.assertIn("exact `reviewer_report` envelope", body)
+        self.assertNotIn("still perform this verifier call", body)
         self.assertIn("`# Plan review`", body)
         for marker in (
             "Require the report to contain only that envelope",
@@ -172,8 +179,8 @@ class DraftWorkflowTests(unittest.TestCase):
             "returns `BLOCKED` (or `FAIL` for a protocol failure)",
         ):
             self.assertIn(marker, body)
-        self.assertIn("before any READY/no-change shortcut", body)
-        self.assertIn("valid `READY` report with no required changes", body)
+        self.assertNotIn("before any READY/no-change shortcut", body)
+        self.assertNotIn("valid `READY` report with no required changes", body)
         self.assertIn("Use `FAIL` only for a protocol failure after valid inputs", body)
         for marker in (
             "repository-relative path that canonicalizes beneath that root",
@@ -214,8 +221,14 @@ class DraftWorkflowTests(unittest.TestCase):
             self.assertIn("draft reviewer -> verifier -> human approval", body)
         self.assertIn("reviewer (candidate) -> verifier (promote/reject) -> human approval", readme)
         self.assertIn("draftReview --> draftVerify", explainer)
-        self.assertIn("Every `_plan/draft/reviewer` call", explainer)
-        self.assertIn("including a reviewer that reports no required changes", readme)
+        self.assertIn(
+            "runs only when the reviewer reports findings; it is skipped when there are none",
+            explainer,
+        )
+        self.assertIn(
+            "runs only when the reviewer reports findings; it is skipped when there are none",
+            readme,
+        )
         self.assertIn("Only verifier-promoted, evidence-backed corrections may change the draft", readme)
         self.assertIn("unavailable evidence or a required human decision stops safely", readme)
         self.assertIn("verifier rejection leaves the draft unchanged", readme)
