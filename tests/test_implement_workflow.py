@@ -111,6 +111,8 @@ CROSS_WORKFLOW_READ_ONLY_BASH = (
     ROOT / "config/agent/_refactor/errors/collector.md",
     ROOT / "config/agent/_audit/public-api/collector.md",
     ROOT / "config/agent/_write/pr.md",
+    ROOT / "config/agent/_write/review/adherence.md",
+    ROOT / "config/agent/_write/issue.md",
 )
 WRITABLE_SURFACE_CROSS_ARTIFACT = (
     ROOT / "config/agent/_docs/reviewers/accuracy.md",

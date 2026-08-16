@@ -16,6 +16,9 @@ permission:
   glob: allow
   grep: allow
   list: allow
+  task:
+    "*": deny
+    "_write/review/adherence": allow
   bash:
     "*": allow
     "sudo *": deny
@@ -76,6 +79,36 @@ Write `pr.md` with:
 
 Keep the body under about 400 words unless the change genuinely needs more. Omit sections that add no information. Never start with `This PR` or `This change`.
 
+# Gate
+After writing `pr.md` and before reporting SUCCESS, run this scan. Empty output
+passes; otherwise repair the artifact and rerun until it prints nothing:
+
+```bash
+awk 'BEGIN{f=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && $0 !~ /^#/ && length($0) > 80 {print FNR": "$0}' pr.md
+```
+
+Fenced code, URLs, table rows, and headings are exempt. The gate owns the
+mechanical checks: this scan plus the hard constraints above (title length,
+opener, word count, em dashes). Gate failure blocks SUCCESS and forces repair
+before review.
+
+Measure `Longest Prose Line` from the same exemptions; never estimate it:
+
+```bash
+awk 'BEGIN{f=0;m=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && $0 !~ /^#/ && length($0)>m {m=length($0)} END{print m+0}' pr.md
+```
+
+# Review loop
+1. After the gate passes, call `_write/review/adherence` once with the request
+   summary, the absolute `pr.md` path, and the applicable rule constraints.
+2. Repair every required change from the review, rerun the gate, then request
+   one re-review.
+3. Allow at most 2 repair turns. Required changes remaining after the second
+   turn return `FAIL` with the remaining finding in `Errors`. Suggestions are
+   optional.
+4. Reviewer unavailability or a `BLOCKED` verdict returns `NEEDS_INPUT` with
+   the reason in `Errors`.
+
 # Output
 Return exactly:
 
@@ -85,6 +118,8 @@ Output Path: <absolute path | N/A>
 Base Ref: <ref | N/A>
 Files in Diff: <n>
 Word Count: <n>
+Gate: PASS | FAIL
+Longest Prose Line: <n>
 Summary: <one-line outcome>
 Errors: <one-line error or None>
 ```
