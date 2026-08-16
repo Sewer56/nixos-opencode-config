@@ -133,6 +133,8 @@ For `Decision: PASS`, write `- None` under `## Findings`.
 
 {{ file="./rules/groups/docs/error-docs.md" }}
 
+{{ file="./rules/groups/style/wording.md" }}
+
 {{ file="./rules/groups/security/security.md" }}
 
 # Output

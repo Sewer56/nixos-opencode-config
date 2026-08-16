@@ -25,6 +25,8 @@ Before staging: committed code/comments/tests/docs/commit messages never cite in
 
 {{ file="./rules/groups/quality/placement.md" }}
 
+{{ file="./rules/groups/style/wording.md" }}
+
 {{ file="./rules/groups/performance/performance.md" }}
 
 {{ file="./rules/groups/security/security.md" }}

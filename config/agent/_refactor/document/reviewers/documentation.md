@@ -60,6 +60,8 @@ Review the scoped source-documentation diff. Produce candidates only; do not edi
 
 {{ file="./rules/groups/style/readability.md" }}
 
+{{ file="./rules/groups/style/wording.md" }}
+
 # Checks
 - Required public and non-trivial API documentation is present, specific, and faithful to code.
 - Purpose, parameters, return behavior, side effects, invariants, and examples are included only when useful.

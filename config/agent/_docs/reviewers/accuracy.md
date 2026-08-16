@@ -56,6 +56,8 @@ Review only factual fidelity and coverage in the scoped end-user documentation. 
 - `handoff_path` and target paths.
 - `validation_path`, `prior_verdict_paths`, and `candidate_path`.
 
+{{ file="./rules/groups/docs/end-user-correctness.md" }}
+
 # Checks
 - Claims, defaults, flags, paths, APIs, examples, and failure behavior match current source, configuration, manifests, and tests.
 - Commands are syntactically coherent and use the documented working directory and prerequisites.

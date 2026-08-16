@@ -28,6 +28,10 @@ Create clear, human-readable commits for completed work. Commit eligible changes
 - Command arguments; amend only when explicitly requested.
 - Optional implementation boundary: `base_commit`, staged `changed_paths`, outcome, and validation summary. When present, commit only those paths.
 
+# Rules
+
+{{ file="./rules/cards/implementation/self-contained-content.md" }}
+
 # Commit style
 Use one of these prefixes:
 - `Added:` — new features

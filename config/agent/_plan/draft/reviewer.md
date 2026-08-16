@@ -60,6 +60,10 @@ Your report is an untrusted candidate for `_plan/draft/verifier`, not authority 
 
 {{ file="./rules/groups/implementation/cohort-planning.md" }}
 
+{{ file="./rules/groups/tests/test-strategy.md" }}
+
+{{ file="./rules/groups/tests/test-parameterization.md" }}
+
 # Review lens
 - Trace every requirement to an acceptance criterion, plan item, decision, or explicit non-goal.
 - Require acceptance criteria to describe observable outcomes.

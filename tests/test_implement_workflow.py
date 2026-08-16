@@ -512,7 +512,7 @@ class ImplementWorkflowTests(unittest.TestCase):
     def test_committed_content_is_self_contained(self) -> None:
         self.assertIn(
             "never cite plan- or cohort-only identifiers",
-            text(ROOT / "config/rules/cards/docs/code-documentation.md"),
+            text(ROOT / "config/rules/cards/implementation/self-contained-content.md"),
         )
         self.assertIn("plan-internal", text(ROOT / "config/rules/cards/structure/plan-artifacts.md"))
 

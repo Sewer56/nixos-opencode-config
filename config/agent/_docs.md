@@ -66,6 +66,8 @@ Derive a short `slug`, UTC `run_id`, and:
 
 Create or overwrite each exact assigned path. Never create placeholder or stub files.
 
+{{ file="./rules/groups/docs/end-user-correctness.md" }}
+
 {{ file="./rules/groups/style/wording.md" }}
 
 {{ file="./rules/cards/style/adhd-format.md" }}
