@@ -17,6 +17,8 @@ Before staging: committed code/comments/tests/docs/commit messages never cite in
 
 {{ file="./rules/groups/tests/test-strategy.md" }}
 
+{{ file="./rules/groups/tests/test-parameterization.md" }}
+
 {{ file="./rules/groups/docs/code-docs.md" }}
 
 {{ file="./rules/groups/docs/error-docs.md" }}
