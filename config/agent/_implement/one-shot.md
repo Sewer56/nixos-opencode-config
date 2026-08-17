@@ -89,10 +89,10 @@ Review only after quick checks PASS.
 
 - Always call `_implement/cohort/review/correctness`; it owns checking that applicable tests ran after staging.
 - Always call `_implement/cohort/review/quality` before commit.
-- Call optional tests, security, or performance reviewer only when concrete risk matches:
+- Always call `_implement/cohort/review/optional/performance` unless the change is docs-only; record the reason.
+- Call optional tests or security reviewer only when concrete risk matches:
   - `TESTS` for changed observable behavior;
-  - `SECURITY` for trust boundaries, auth, secrets, IPC, untrusted input, filesystem/shell/SQL, serialization, cryptography, permissions, or dependency trust;
-  - `PERFORMANCE` for growing-input loops, per-item I/O, large allocation/serialization/logging, concurrency, or algorithmic risk.
+  - `SECURITY` for trust boundaries, auth, secrets, IPC, untrusted input, filesystem/shell/SQL, serialization, cryptography, permissions, or dependency trust.
 
 Call the selected reviewers in parallel. Before each call, compute `review_path` for the current round. Supply one explicit envelope with every declared input and placeholder resolved; use `Scope: STANDALONE` for correctness, quality, and tests, and the reviewer-declared `Scope: COHORT_STAGED` for security and performance:
 

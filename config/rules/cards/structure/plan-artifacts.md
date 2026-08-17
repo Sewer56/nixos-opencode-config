@@ -27,7 +27,7 @@ Each `[P#]` item has:
 - `Change:` contract-level behavior and explicit non-goals.
 - `Tests:` observable coverage or `None` with a reason.
 - `Documentation:` affected user/code docs or `None` with a reason.
-- `Review Routes:` always `CORRECTNESS` and `QUALITY`, plus grounded optional `TESTS`, `SECURITY`, and `PERFORMANCE`. `QUALITY` reviews each proposed commit before commit.
+- `Review Routes:` always `CORRECTNESS` and `QUALITY`; `PERFORMANCE` on every item (`NO` with a reason only when docs-only); plus grounded optional `TESTS` and `SECURITY`. `QUALITY` reviews each proposed commit before commit.
 - `Completion Evidence:` checks or observations proving completion.
 
 ### Questions

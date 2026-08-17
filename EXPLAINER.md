@@ -51,7 +51,7 @@ flowchart TD
         checkLoop -- PASS --> review
 
         subgraph repairLoop["review-repair loop — ≤ 5 turns/cohort"]
-            review[reviewers: correctness + quality<br/>+ optional specialists] --> verifier[shared finding verifier]
+            review[reviewers: correctness + quality + performance<br/>+ optional specialists] --> verifier[shared finding verifier]
             verifier -- accepted blocker --> blockerRepair[repair, restage,<br/>rerun checks + reviews]
             blockerRepair --> review
         end
@@ -112,7 +112,7 @@ Draft review is a bounded `draft reviewer -> verifier -> human approval` flow.
 
 - groups source, tests, and required documentation by observable outcome;
 - orders groups by repository dependency;
-- routes correctness and quality always; routes tests, security, or performance only for concrete risk;
+- routes correctness, quality, and performance always for runtime-code cohorts; routes tests or security only for concrete risk;
 - marks cross-cohort risk for the final gate;
 - derives full validation commands from manifests, task runners, CI, and developer docs — never invented.
 
@@ -149,7 +149,7 @@ It does not manufacture screenshots or logs. [Greptile's TREX article][greptile-
 The cohort agent calls reviewers only after quick checks pass:
 
 - correctness and quality always review exact proposed commit;
-- [tests][optional-reviews], [security][optional-security], and [performance][optional-performance] reviewers run only when routed or matching concrete risk;
+- [tests][optional-reviews] and [security][optional-security] reviewers run only when routed or matching concrete risk; the [performance][optional-performance] reviewer runs on every runtime-code commit and again at the final gate;
 - reviewers inspect staged diff independently and remain read-only.
 
 Reviewers inspect code and repository evidence rather than trusting surrounding prose. Plans define approved intent; PR text, comments, summaries, and tool narration remain claims to check.
@@ -164,7 +164,7 @@ Reviewers inspect code and repository evidence rather than trusting surrounding 
 
 Severity, confidence, reviewer count, and repetition are metadata—not proof.
 
-Signal budget also matters. [Greptile reports][greptile-filtering] its own comments were 19% useful, 2% incorrect, and 79% nits; team-feedback filtering raised reported address rate from 19% to 55%+ in two weeks.[^greptile-vendor] Local reviewers cap low-value output and keep micro-optimizations advisory unless material evidence exists.
+Signal budget also matters. [Greptile reports][greptile-filtering] its own comments were 19% useful, 2% incorrect, and 79% nits; team-feedback filtering raised reported address rate from 19% to 55%+ in two weeks.[^greptile-vendor] Local reviewers cap low-value output; only findings with material impact become blocking.
 
 ### Verify and repair (shared verifier + cohort agent)
 

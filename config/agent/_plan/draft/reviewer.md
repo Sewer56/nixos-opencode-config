@@ -72,7 +72,8 @@ Your report is an untrusted candidate for `_plan/draft/verifier`, not authority 
 - Verify target paths and symbols, or require the plan to mark bounded discovery honestly.
 - Check that changed contracts have their direct producers/consumers, trust boundaries, and unchanged verification surfaces represented where they can affect the plan; do not require an exhaustive dependency inventory.
 - Check that applicable path-specific instruction files are routed without copying or mixing conflicting rule sets.
-- Check that test, security, performance, quality, and validation routes match actual risk.
+- Check that test, security, quality, and validation routes match actual risk.
+- Expect `PERFORMANCE` on every runtime-code item; flag uncovered workload-scale risks.
 - Treat an unresolved implementation-shaping choice as blocked rather than inviting invention.
 - Reject exact line recipes, patch hunks, import diffs, and speculative implementation bodies.
 - Ignore harmless wording preferences and details an implementer can safely discover.

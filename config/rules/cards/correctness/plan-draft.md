@@ -14,7 +14,7 @@ Dependencies are acyclic. Contract/data/schema producers precede consumers unles
 Named paths and symbols must be verified or explicitly described as plausible new targets under an existing module. Bounded discovery areas are allowed when exact placement is an implementation detail rather than a design decision.
 
 ### Risk and verification coverage
-Changed behavior needs tests or an explicit reason tests are not applicable. Material security, performance, migration, compatibility, and user-documentation risks must be routed and reflected in acceptance or verification.
+Changed behavior needs tests or an explicit reason tests are not applicable. Performance review is always routed; docs-only items record the skip reason. Material security, migration, compatibility, and user-documentation risks and concrete workload-scale performance risks must be routed and reflected in acceptance or verification.
 
 ### Appropriate detail
 Plans contain approved behavior, contracts, dependencies, and evidence—not speculative patch mechanics. Exact code is advisory at best and blocking when it falsely constrains a valid implementation or quickly becomes stale.

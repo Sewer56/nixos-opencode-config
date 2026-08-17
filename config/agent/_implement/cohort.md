@@ -79,7 +79,8 @@ Review only after quick checks PASS.
 
 - Always call `_implement/cohort/review/correctness`; it owns checking that applicable tests ran after staging.
 - Always call `_implement/cohort/review/quality` before commit.
-- Call optional tests, security, or performance reviewer only when routed or matching concrete risk.
+- Always call `_implement/cohort/review/optional/performance` unless the cohort is docs-only; record the reason.
+- Call optional tests or security reviewer only when routed or matching concrete risk.
 
 Call the selected reviewers in parallel. Before each call, compute `review_path` per the artifact-paths card for the current round; the writer creates or overwrites it. Supply one explicit envelope with every declared input and placeholder resolved; for security or performance add `Scope: COHORT_STAGED`:
 

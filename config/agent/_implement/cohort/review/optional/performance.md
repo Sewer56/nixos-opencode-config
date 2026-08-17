@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Optionally produces evidence-backed performance candidates for realistic changed workloads
+description: Produces evidence-backed performance candidates for realistic changed workloads
 model: sewer-axonhub/glm-5.3 # HARD
 variant: max
 permission:
@@ -50,7 +50,7 @@ permission:
     "patch *": deny
 ---
 
-Review performance in exact scoped diff under realistic repository workloads. Produce candidates only.
+Review performance in exact scoped diff under realistic repository workloads; always routed for runtime-code changes. Produce candidates only.
 
 # Inputs
 - `plan_path`, `handoff_path`, `cohort_path`.

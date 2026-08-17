@@ -66,7 +66,7 @@ Create compact executable cohorts from approved behavior. Reconcile live reposit
 2. Start with one dependency hop. Expand only when an import, call, manifest, schema, migration, test, trace, or other concrete clue can change implementation or review.
 3. Record mechanical reconciliations such as verified moves or equivalent repository patterns. Return `NEEDS_INPUT` for behavior, public contract, compatibility, security, migration, non-goal, or acceptance changes.
 4. Build cohesive dependency-ordered cohorts. Keep source, associated tests, and required docs with same outcome. Split at stable contracts; merge mutually dependent edits. Do not create file-type or ceremony-only cohorts.
-5. Correctness and quality are always routed. Route tests, security, or performance only for concrete risk. Mark cross-cohort risk for final review.
+5. Correctness, quality, and performance are always routed; docs-only cohorts skip performance with a recorded reason. Route tests or security only for concrete risk. Mark cross-cohort risk for final review.
 6. Derive non-mutating validation from manifests, task runners, CI, and developer docs. Use `None found`; never invent commands.
 
 # Artifacts
@@ -104,7 +104,8 @@ Run ID: [[run_id]]
 ## Final review routes
 - INTEGRATION — always
 - QUALITY — already required for every cohort commit and any final repair
-- [[SECURITY, PERFORMANCE only with cross-cohort reason]]
+- PERFORMANCE — always unless docs-only; record the reason
+- [[SECURITY only with cross-cohort reason]]
 ```
 
 Write one cohort artifact at `cohort_path` per cohort:
@@ -136,7 +137,8 @@ Plan/Acceptance: [[refs]]
 ## Review routes
 - CORRECTNESS: YES — always
 - QUALITY: YES — every commit
-- TESTS | SECURITY | PERFORMANCE: YES | NO — [[concrete reason]]
+- PERFORMANCE: YES — always | NO — docs-only cohort, [[reason]]
+- TESTS | SECURITY: YES | NO — [[concrete reason]]
 - Cross-Cohort: YES | NO — [[reason]]
 ```
 

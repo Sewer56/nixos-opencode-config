@@ -19,6 +19,7 @@ FLAKE = ROOT / "flake.nix"
 ORCHESTRATOR = ROOT / "config/agent/_implement.md"
 CREATE_COHORTS = ROOT / "config/agent/_implement/create-cohorts.md"
 COHORT = ROOT / "config/agent/_implement/cohort.md"
+ONE_SHOT = ROOT / "config/agent/_implement/one-shot.md"
 CODE_WRITING = ROOT / "config/rules/groups/implementation/code-writing.md"
 INTEGRATION_REPAIR = ROOT / "config/agent/_implement/integration-repair.md"
 ITERATE_EDIT = ROOT / ".opencode/agent/_iterate/edit.md"
@@ -278,12 +279,51 @@ class ImplementWorkflowTests(unittest.TestCase):
         ):
             self.assertIn(name, body)
 
-    def test_mandatory_and_risk_routed_reviews(self) -> None:
+    def test_mandatory_and_always_on_performance_reviews(self) -> None:
         body = text(COHORT)
         self.assertIn("Always call `_implement/cohort/review/correctness`", body)
         self.assertIn("it owns checking that applicable tests ran after staging", body)
         self.assertIn("Always call `_implement/cohort/review/quality` before commit", body)
-        self.assertIn("Call optional tests, security, or performance reviewer only when routed or matching concrete risk", body)
+        self.assertIn(
+            "Always call `_implement/cohort/review/optional/performance` unless the cohort is docs-only; record the reason",
+            body,
+        )
+        self.assertIn(
+            "Call optional tests or security reviewer only when routed or matching concrete risk",
+            body,
+        )
+
+        one_shot = text(ONE_SHOT)
+        self.assertIn(
+            "Always call `_implement/cohort/review/optional/performance` unless the change is docs-only; record the reason",
+            one_shot,
+        )
+        self.assertIn(
+            "Call optional tests or security reviewer only when concrete risk matches",
+            one_shot,
+        )
+        self.assertIn("the reviewer-declared `Scope: COHORT_STAGED` for security and performance", one_shot)
+
+        orchestrator = text(ORCHESTRATOR)
+        self.assertIn(
+            "Also call `_implement/cohort/review/optional/performance` unless the implementation is docs-only; record the reason",
+            orchestrator,
+        )
+        self.assertIn("Route security only for concrete cross-cohort risk", orchestrator)
+        self.assertIn(
+            "Use implementation `base_commit` and final changed paths for integration/security/performance",
+            orchestrator,
+        )
+
+        planner = text(CREATE_COHORTS)
+        self.assertIn(
+            "Correctness, quality, and performance are always routed; docs-only cohorts skip performance with a recorded reason",
+            planner,
+        )
+        self.assertIn(
+            "- PERFORMANCE: YES — always | NO — docs-only cohort, [[reason]]",
+            planner,
+        )
 
     def test_review_calls_supply_and_validate_explicit_envelopes(self) -> None:
         for path in (COHORT, ORCHESTRATOR):

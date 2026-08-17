@@ -41,7 +41,7 @@ one writer -> deterministic checks -> focused review -> finding verification
            -> bounded repair when needed -> exact local commit
 ```
 
-Correctness and quality review every proposed commit. Test, security, and performance specialists run only for matching risk. Final gate validates and reviews complete base-to-final result. Workflow never pushes.
+Correctness and quality review every proposed commit. Performance reviews every commit that changes runtime code, plus the final gate; docs-only work records a skip reason. Test and security specialists run only for matching risk. Final gate validates and reviews complete base-to-final result. Workflow never pushes.
 
 Each implementation invocation starts from approved draft. Existing unrelated user changes are preserved; a planned target already changed by user requires input.
 

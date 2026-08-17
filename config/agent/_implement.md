@@ -69,7 +69,7 @@ Stop on non-success. Before next cohort, require returned commit at `HEAD` and n
 1. Get committed paths from `base_commit..HEAD`, including both source/destination for renames and copies.
 2. Run handoff full validation. Missing environment is `INCOMPLETE`; code failure enters `_implement/integration-repair`.
 3. After repair, reject out-of-scope paths and stage only repair paths. Rerun full validation, including applicable tests, and write fresh ledger before review.
-4. Always call `_implement/review/integration`. For staged repair, also call `_implement/cohort/review/correctness` and `_implement/cohort/review/quality`. Route security/performance only for concrete cross-cohort risk. Call the selected `_implement/cohort/review/*` reviewers in parallel. Every selected reviewer must complete.
+4. Always call `_implement/review/integration`. Also call `_implement/cohort/review/optional/performance` unless the implementation is docs-only; record the reason. For staged repair, also call `_implement/cohort/review/correctness` and `_implement/cohort/review/quality`. Route security only for concrete cross-cohort risk. Call the selected `_implement/cohort/review/*` reviewers in parallel. Every selected reviewer must complete.
 5. Before every reviewer call, compute `review_path` per the artifact-paths card for the current round; the writer creates or overwrites it. Supply one explicit envelope with every declared input and placeholder resolved:
 
 ```text

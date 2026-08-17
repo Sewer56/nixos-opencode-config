@@ -61,7 +61,7 @@ Build a compact repository manifest for planning. Report facts and uncertainty; 
 4. Locate repository instruction files that actually apply to the likely target paths, such as nearest `AGENTS.md`, `CLAUDE.md`, path-specific instruction files, or repository equivalents. Report paths and material constraints, not duplicated full text.
 5. Identify existing repository patterns that should be reused.
 6. Identify plausible dependency order, unchanged surfaces that need verification, and whether proposed work can remain valid after each logical group.
-7. Mark review triggers only when concrete code or requirements justify them.
+7. Mark review triggers only when concrete code or requirements justify them. Report `PERFORMANCE` only for concrete workload-scale risks that deserve explicit invariant or acceptance coverage.
 8. Mark external research `REQUIRED` only for a third-party API/version/standard whose current contract cannot be established locally. Otherwise mark `NOT_REQUIRED`.
 
 # Output
@@ -99,7 +99,8 @@ External Question: <narrow question | None>
 - None
 
 ## Review Triggers
-- TESTS | SECURITY | PERFORMANCE | QUALITY — <grounded reason>
+- TESTS | SECURITY | QUALITY — <grounded reason>
+- PERFORMANCE — <concrete workload-scale risk needing explicit invariant/acceptance coverage>
 - None
 
 ## Uncertainty
