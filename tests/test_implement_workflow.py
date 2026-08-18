@@ -475,11 +475,13 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertNotIn('edit:\n    "*": allow', frontmatter)
         self.assertIn('"artifact/**": allow', frontmatter)
 
-    def test_no_agent_overrides_global_external_directory(self) -> None:
+    def test_agent_external_directory_matches_global(self) -> None:
         for root in (ROOT / "config/agent", ROOT / ".opencode/agent"):
             for path in root.rglob("*.md"):
                 with self.subTest(path=path.relative_to(ROOT)):
-                    self.assertNotIn("external_directory:", text(path).split("---", 2)[1] if text(path).startswith("---") else "")
+                    frontmatter = text(path).split("---", 2)[1] if text(path).startswith("---") else ""
+                    for decision in re.findall(r"(?m)^\s*external_directory:\s*(\S+)", frontmatter):
+                        self.assertEqual("allow", decision)
 
     def test_coderabbit_uses_no_local_verifier(self) -> None:
         body = text(ROOT / "config/agent/_review/coderabbit.md")

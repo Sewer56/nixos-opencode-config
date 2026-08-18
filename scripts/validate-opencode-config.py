@@ -167,8 +167,9 @@ def validate_permission_map(ident: str, permission: Any, errors: list[str]) -> N
                 errors.append(
                     f"agent {ident} permission {tool!r} pattern {pattern!r} has invalid decision {decision!r}"
                 )
-    if "external_directory" in permission:
-        errors.append(f"agent {ident} must inherit global external_directory policy")
+    external = permission.get("external_directory")
+    if external is not None and str(external).lower() != "allow":
+        errors.append(f"agent {ident} external_directory must be allow (global policy)")
     read = permission.get("read")
     if not isinstance(read, dict):
         errors.append(f"agent {ident} read permission must be a mapping")
