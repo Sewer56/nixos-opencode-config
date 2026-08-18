@@ -11,8 +11,18 @@ Avoid duplicate coverage and setup; do not restate what an existing test already
 When new assertions share an existing test's setup and entry point, append them there rather than creating a separate function.
 Do not flag: intentionally repeated coverage across different public entry points.
 
+Before adding a test, check whether its unique assertions fold into an
+existing test with the same setup and entry point, or whether an existing
+test can be parameterized to cover them. When removing a redundant test,
+map every assertion to a surviving home. Example binaries never substitute
+for test coverage.
+
 ### Test helpers
 Reuse existing test helpers. Extract shared helpers only when they reduce repetition or clarify setup across multiple tests.
+
+Prefer one parameterizable local helper over re-declared per-test mock
+structs: closure adapters, failure constructors (`fail_hook(msg)`), test
+builders, shared stub modules.
 
 ### Determinism
 Keep tests deterministic. Avoid real I/O, time, and network unless controlled, seeded, or frozen.

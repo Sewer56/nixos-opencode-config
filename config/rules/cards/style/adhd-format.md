@@ -2,6 +2,8 @@
 Shape comments and documentation for an ADHD reader: answer first, one action per step, no filler. Defers to the wording card (sentence economy, fillers and closers), the code-documentation card (purpose-first, current-behavior-only, release-note back-compat exception), and the error-documentation card (variant completeness). Those rules and task or accuracy requirements win on any conflict.
 
 - **Answer first**: open comments and docs with the point or next action; context follows.
+- **Header shape**: file, module, and example headers are one capability
+  line plus bullets, one fact each. Never open with a narrative paragraph.
 - **One action per step**: numbered steps, fewest steps, no double "and then".
 - **State markers**: name the resulting state where identifiers leave intent unclear, like `// After this line: ...`; never on trivial code.
 - **End with next**: docs end with `Next:` or a checkable `Done when:`; API docs surface errors and returns last.

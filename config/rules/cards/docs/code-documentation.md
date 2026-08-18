@@ -8,9 +8,26 @@ New or changed modules need top-level purpose/usage docs when the language or re
 ### Documentation placement
 Package docs cover import/usage shape; in-code docs cover exported symbols. Update both only when both exist and are affected. If examples are requested, place them in in-code API docs when the API owns them.
 
+### Examples
+One concept per example, named for that concept. Spin-off behavior gets
+its own example with a cross-reference. Examples exercise real APIs on
+hermetic fixtures and show value static configuration cannot express;
+never toy stand-ins (`[hook observed]`).
+
 ### Documentation fidelity
 Docs must not contradict implementation. When documented surfaces are moved, renamed, or replaced, preserve or update affected docs.
 Block stale names, options, defaults, links, examples, or behavior.
+
+### Single-source facts
+State each fact once, on the surface that owns it. No summary sentence
+plus a section repeating it. Cross-reference another type's contract
+instead of restating it.
+
+### Documentation scope
+Document only the key facts an API user needs; no fluff, no exhaustive
+feature notes. Spin-off or related behavior gets its own `#` section with
+a cross-reference, not more paragraphs. State edge cases as one general
+sentence (`Empty chains are skipped.`); never enumerate permutations.
 
 ### Describe current behavior only
 Code comments and in-code docs state the current contract and behavior only.
@@ -27,6 +44,12 @@ Example: `// Normalize aliases before validation so deprecated names share one e
 ### Documentation style
 Lead with a one-sentence purpose in plain language. Prefer goal-oriented phrasing. Use language-native doc-link syntax for types/variants when supported. Prefer short in-text doc links plus reference definitions over long inline link targets. Always include language tags on fenced code blocks; never use bare `ignore` fences.
 Prefer `[Name]` in text plus one reference definition over repeated long inline targets.
+Summary is one line. Scope limits and caveats go in a trailing `# Remarks`
+section (or language equivalent), never in the summary paragraph.
+
+Split multi-aspect docs into `#` sections, not dense paragraphs. Name the
+concrete mechanism (`suppress it by returning `None``) over the vague
+effect (`may suppress the event`).
 
 ### No legacy docs backfill
 Do not backfill untouched legacy files solely for docs.
