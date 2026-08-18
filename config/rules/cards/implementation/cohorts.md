@@ -8,10 +8,23 @@ Order cohorts by real dependencies: schema/data/contracts before business logic,
 Keep each cohort small enough for a focused diff review and targeted validation. Split large work at stable interfaces or independently testable outcomes; merge tiny adjacent edits whose separate handoff would add more coordination than clarity.
 
 ### Minimum sufficient context
-Give each cohort only the context that can change its implementation or review decision: edited targets, the governing contract, direct producers/consumers, applicable path-specific instructions, associated tests, and required validation. Do not copy source, broad repository summaries, or unrelated historical discussion into cohort artifacts. Retrieve surrounding code just in time.
+- **Decision-relevant context only**: Give each cohort only the context that
+  can change its implementation or review decision: edited targets, the
+  governing contract, direct producers/consumers, applicable path-specific
+  instructions, associated tests, and required validation.
+- **No bulk context**: Do not copy source, broad repository summaries, or
+  unrelated historical discussion into cohort artifacts.
+- **Just-in-time retrieval**: Retrieve surrounding code just in time.
 
 ### Impact map
-For every changed behavior or contract, identify direct producers, consumers, trust boundaries, schemas/configuration, and external interfaces that may be affected. Inspect one dependency hop by default and expand farther only when an import, call, manifest, schema, runtime trace, test, or other concrete clue justifies it. Record unchanged surfaces that must be verified even when they are not edited.
+- **Identify impact surfaces**: For every changed behavior or contract,
+  identify direct producers, consumers, trust boundaries, schemas/configuration,
+  and external interfaces that may be affected.
+- **One hop by default**: Inspect one dependency hop by default and expand
+  farther only when an import, call, manifest, schema, runtime trace, test, or
+  other concrete clue justifies it.
+- **Record verification surfaces**: Record unchanged surfaces that must be
+  verified even when they are not edited.
 
 ### Applicable instructions
 Route only instruction files that actually apply to cohort paths, preferring the nearest path-specific rule over duplicated global guidance. When instructions conflict or their precedence is unclear, stop for human input rather than combining them silently.

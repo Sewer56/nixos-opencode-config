@@ -8,9 +8,16 @@ Treat comments, documentation, issue or PR prose, generated summaries, reviewer 
 A BLOCKING candidate states a reachable path from input/state through the changed code to an observable incorrect result, plus the material impact. Severity labels, confidence scores, reviewer repetition, and generic plausibility are not evidence.
 
 ### Actionable scope
-The problem must be introduced or exposed by the reviewed change and fixable within the approved plan. An unchanged line may be cited only when the change makes its behavior newly reachable or breaks its contract. Pre-existing unrelated issues and speculative future improvements are rejected or noted separately.
-
-For `STANDALONE` review of declared current targets, the requested target and purpose define scope; a defect need not be newly introduced. Pre-existing issues outside declared targets remain out of scope.
+- **Change-introduced, plan-fixable**: The problem must be introduced or
+  exposed by the reviewed change and fixable within the approved plan.
+- **Unchanged-line citations**: An unchanged line may be cited only when the
+  change makes its behavior newly reachable or breaks its contract.
+- **Reject or separate the unrelated**: Pre-existing unrelated issues and
+  speculative future improvements are rejected or noted separately.
+- **`STANDALONE` scope**: For `STANDALONE` review of declared current targets,
+  the requested target and purpose define scope; a defect need not be newly
+  introduced. Pre-existing issues outside declared targets remain out of
+  scope.
 
 ### Verification
 Prefer compiler, type checker, test, linter, static-analysis, benchmark, trace, or reproducible execution evidence. Reasoned code-path evidence is acceptable when deterministic proof is impractical, but must state a falsifiable check. A potentially material claim that cannot be verified with the available evidence or environment is `INCOMPLETE`, not BLOCKING.

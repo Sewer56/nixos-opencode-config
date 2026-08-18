@@ -30,11 +30,22 @@ a cross-reference, not more paragraphs. State edge cases as one general
 sentence (`Empty chains are skipped.`); never enumerate permutations.
 
 ### Describe current behavior only
-Code comments and in-code docs state the current contract and behavior only.
-Never narrate old, removed, or previous behavior or versions in code ("no longer", "previously", "was", "used to", "before", "now" describing a change).
-Old behavior may be referenced only in human-facing backward-compatibility documentation (e.g. release notes or migration notes), only when a genuine compatibility concern exists for consumers, and only on public APIs with an expectation of backward compatibility.
-Never reference old behavior in private code, internals, tests, or helpers.
-If a doc comment would need to mention old behavior, treat that as a signal that the draft must confirm a real public-API backward-compatibility obligation with the user (see draft change) rather than narrating the change.
+- **Current contract only**: Code comments and in-code docs state the current
+  contract and behavior only.
+- **Never narrate old behavior**: Never narrate old, removed, or previous
+  behavior or versions in code ("no longer", "previously", "was", "used to",
+  "before", "now" describing a change).
+- **Backward-compatibility docs only**: Old behavior may be referenced only in
+  human-facing backward-compatibility documentation (e.g. release notes or
+  migration notes), only when a genuine compatibility concern exists for
+  consumers, and only on public APIs with an expectation of backward
+  compatibility.
+- **Never in private code**: Never reference old behavior in private code,
+  internals, tests, or helpers.
+- **Signal to confirm, not narrate**: If a doc comment would need to mention
+  old behavior, treat that as a signal that the draft must confirm a real
+  public-API backward-compatibility obligation with the user (see draft
+  change) rather than narrating the change.
 
 ### Inline readability comments
 Non-trivial function bodies need short inline comments at logical steps when names and control flow do not explain intent.
