@@ -210,6 +210,8 @@ The local review loop is roughly based on CodeRabbit's concepts — scoped diff,
 
 CodeRabbit itself can also be invoked directly via `/review/coderabbit`, which runs the official [CodeRabbit CLI][coderabbit-cli]. As an external review authority, its findings skip the local verifier.
 
+The [implementation orchestrator][implement] and [one-shot writer][one-shot] call this review after their final integration checks. Unresolved blocking findings fail the run; an unavailable external service is `INCOMPLETE`; its repairs commit as exact scoped commits.
+
 ## Instruction authoring and iterate
 
 [Instruction standard][instruction-standard] chooses smallest mechanism:
@@ -244,6 +246,7 @@ contract -> one editor -> exact staging -> validator/tests
 - Context expands from concrete dependency evidence rather than exhaustive graph or embedding retrieval. [Repoformer][repoformer] and [Lost in the Middle][lost-middle] motivate selectivity; they do not prescribe local thresholds.
 - No learned reviewer memory feeds automatic decisions. [Greptile's reported feedback-clustering gain][greptile-filtering] depends on team votes; this configuration has no governed feedback corpus.[^greptile-vendor]
 - No fixed context percentage, reviewer vote, or finding quota determines correctness. [Refute-or-Promote's][refute-promote] unanimous false positive shows why agreement alone is weak evidence.[^refute-preprint]
+- Every pipeline agent pins `sewer-axonhub/glm-5.3` — the only model family the pipeline wires for writing and review. Reviewer decorrelation via a second model family is known and currently unexercised; same-family writer and reviewers share blind spots.
 - Advisories enter automatic repair only when verifier-vetted and fixable within approved plan scope. [Greptile's reported 79% nit share][greptile-filtering] illustrates cost of treating every comment as action.[^greptile-vendor]
 - Repair loops are bounded: five turns per cohort, two at final integration, two in iterate, and one CodeRabbit re-review.
 - Runtime execution stays within available repository environment. [Greptile describes][greptile-trex] each TREX review using “a disposable sandboxed environment”; local workflow does not claim equivalent isolation.
@@ -268,6 +271,7 @@ contract -> one editor -> exact staging -> validator/tests
 [readme]: README.md
 [iterate-guide]: .opencode/ITERATE.md
 [implement]: config/agent/_implement.md
+[one-shot]: config/agent/_implement/one-shot.md
 [cohort]: config/agent/_implement/cohort.md
 [optional-reviews]: config/agent/_implement/cohort/review/optional/tests.md
 [optional-security]: config/agent/_implement/cohort/review/optional/security.md

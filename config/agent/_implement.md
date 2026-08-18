@@ -35,6 +35,7 @@ permission:
     "_implement/cohort/review/optional/security": allow
     "_implement/cohort/review/optional/performance": allow
     "_review/verifier": allow
+    "_review/coderabbit": allow
     "commit": allow
 ---
 
@@ -90,9 +91,18 @@ Prior Verdict Paths: [[concrete paths or None]]
 7. Allow two final repair turns. Each turn: repair supplied failures plus accepted blockers and advisories within approved plan scope, stage approved paths, validate including tests, then rerun integration; rerun correctness, quality, and affected optional reviews in parallel with fresh ledger. Remaining blocker is `FAIL`; missing evidence is `INCOMPLETE`. An advisory that cannot be fixed without widening approved scope stays recorded and is not a FAIL.
 8. Re-read staged repair, call `commit` with exact repair paths, and confirm commit scope plus preserved unrelated changes. Do not create empty commit.
 
-## 4. Finish
+## 4. External CodeRabbit review
 
-Require acceptance coverage, committed cohorts, final validation PASS, complete reviews, no blocker, and preserved unrelated changes.
+After the final repair commit, call `_review/coderabbit` with `review_type=all`, explicit `base_branch=base_commit`, and `apply_advisories=false`; never do its work yourself. Gate its outcome:
+
+- `PASS` or `ADVISORY`: proceed, recording its artifact paths.
+- `FAIL`: return `FAIL`. `NEEDS_INPUT`: surface unchanged.
+- `INCOMPLETE`: return `INCOMPLETE` with the remaining evidence (service, rate limit, missing CLI); local work stays committed.
+- Modified Paths not `None`: intersect them with the implementation's own changed paths (`base_commit..HEAD` committed paths plus staged writer paths); stage exactly that intersection, run `git diff --cached --check`, and call `commit` for it. Never stage or commit preserved unrelated changes — report them instead. Committing bounded repair paths preserves the returned outcome status (`FAIL` stays `FAIL`). Its own validation and single re-review govern repairs; never widen scope.
+
+## 5. Finish
+
+Require acceptance coverage, committed cohorts, final validation PASS, complete reviews, completed external review, no blocker, and preserved unrelated changes.
 
 # Output
 

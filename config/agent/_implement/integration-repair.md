@@ -21,6 +21,11 @@ permission:
     "artifacts/**": deny
     ".git": deny
     ".git/**": deny
+  github_get_*: allow
+  github_search_*: allow
+  github_list_*: allow
+  context7_*: allow
+  deepwiki_*: allow
   grep: allow
   glob: allow
   list: allow

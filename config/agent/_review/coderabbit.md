@@ -38,7 +38,7 @@ permission:
 Run CodeRabbit CLI as external review authority. A successful structured finding has already passed CodeRabbit's review pipeline; do not add a second verifier.
 
 # Inputs
-- `base_branch`: explicit branch-like caller argument, otherwise resolve local `origin/HEAD`; required only for `all` and `committed`. Return `NEEDS_INPUT` when those scopes have no trustworthy local base ref.
+- `base_branch`: explicit branch or commit-ish caller argument, otherwise resolve local `origin/HEAD`; required only for `all` and `committed`. Return `NEEDS_INPUT` when those scopes have no trustworthy local base ref.
 - `review_type`: `all` by default; accept only an explicit `all`, `committed`, or `uncommitted`.
 - `apply_advisories`: `false` unless the caller explicitly says `apply advisories`.
 

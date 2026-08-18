@@ -22,6 +22,11 @@ permission:
     "artifact/ONESHOT-*.r??.quick.validation.md": allow
     ".git": deny
     ".git/**": deny
+  github_get_*: allow
+  github_search_*: allow
+  github_list_*: allow
+  context7_*: allow
+  deepwiki_*: allow
   question: allow
   todowrite: allow
   grep: allow
@@ -43,6 +48,7 @@ permission:
     "_implement/cohort/review/optional/security": allow
     "_implement/cohort/review/optional/performance": allow
     "_review/verifier": allow
+    "_review/coderabbit": allow
     "commit": allow
 ---
 
@@ -70,7 +76,7 @@ Create or overwrite each exact assigned path as its writer; never create placeho
 
 1. Record and preserve unrelated changes. Return `NEEDS_INPUT` when the derived target is already changed or no safe scope can be derived.
 2. Bound the request into one cohesive change: explicit target files, required behavior, preserve/exclude rules, validation commands, and review routes. Ask one focused question only when scope, targets, or a decision cannot be resolved safely.
-3. Write `handoff_path` recording that bound scope: goal, required behavior, targets, preserve/exclude, completion evidence, quick validation, and review routes.
+3. Write `handoff_path` recording that bound scope: goal, required behavior, targets, preserve/exclude, completion evidence, quick validation, review routes, and any equivalence or parity claims with their differential-test evidence.
 4. Read the handoff, applicable instructions, and needed context. Implement required behavior, tests, and docs as the smallest cohesive diff. Do not change behavior outside the derived scope.
 5. Return `NEEDS_INPUT` before making an unapproved behavior, contract, compatibility, security, migration, or scope decision.
 
@@ -123,6 +129,15 @@ Allow at most five repair turns total across deterministic and verified-review f
 ## 5. Commit
 
 Require validation PASS, complete reviews, and no blocker. If changed, re-read the staged diff and call `commit` for the staged writer-changed paths with the implementation boundary (`base_commit`, changed paths, outcome). Require one scoped commit and preserved unrelated changes. Otherwise skip commit with completion evidence.
+
+## 6. External CodeRabbit review
+
+After commit, ensure the target repository excludes `artifact/` (append `artifact/` to `.git/info/exclude` when missing) so this run's own artifacts cannot trip the gate's untracked-files `NEEDS_INPUT`. Call `_review/coderabbit` with `review_type=all`, explicit `base_branch=[[base_commit]]`, and `apply_advisories=false`; never do its work yourself. Gate its outcome:
+
+- `PASS` or `ADVISORY`: proceed, recording its artifact paths.
+- `FAIL`: return `FAIL`. `NEEDS_INPUT`: surface unchanged.
+- `INCOMPLETE`: return `INCOMPLETE` with the remaining evidence (service, rate limit, missing CLI); local work stays committed.
+- Modified Paths not `None`: intersect them with this implementation's own changed paths (`base_commit..HEAD` committed paths plus staged writer paths); stage exactly that intersection, run `git diff --cached --check`, and call `commit` for it. Never stage or commit preserved unrelated changes — report them instead. Committing bounded repair paths preserves the returned outcome status (`FAIL` stays `FAIL`). Its own validation and single re-review govern repairs; never widen scope.
 
 # Output
 

@@ -14,6 +14,11 @@ permission:
   edit:
     "*": deny
     "artifact/**": allow
+  github_get_*: allow
+  github_search_*: allow
+  github_list_*: allow
+  context7_*: allow
+  deepwiki_*: allow
   grep: allow
   glob: allow
   list: allow
@@ -64,7 +69,7 @@ Verify candidate findings against the actual scoped code. Candidate reviewers ge
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Refute-first process
-Apply imported evidence rules to exact scope. For each candidate, locate cited code and test strongest plausible refutation using nearby guards, dependents, validation, contracts, and prior verdicts. For `STANDALONE`, repository behavior and applicable rules replace plan authority. Classify:
+Apply imported evidence rules to exact scope. For each candidate, locate cited code and test strongest plausible refutation using nearby guards, dependents, validation, contracts, prior verdicts, and pinned dependency sources when a claim depends on third-party behavior. For `STANDALONE`, repository behavior and applicable rules replace plan authority. Classify:
 
     - `ACCEPT_BLOCKER`: concrete in-scope correctness, security, acceptance, compatibility, required-validation, or material-performance failure.
     - `ACCEPT_ADVISORY`: grounded, useful, non-blocking improvement.

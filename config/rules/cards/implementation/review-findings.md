@@ -22,6 +22,12 @@ A BLOCKING candidate states a reachable path from input/state through the change
 ### Verification
 Prefer compiler, type checker, test, linter, static-analysis, benchmark, trace, or reproducible execution evidence. Reasoned code-path evidence is acceptable when deterministic proof is impractical, but must state a falsifiable check. A potentially material claim that cannot be verified with the available evidence or environment is `INCOMPLETE`, not BLOCKING.
 
+### External dependency evidence
+For claims that depend on third-party behavior, acceptable evidence is, best-first: the pinned dependency source already on disk (cargo registry cache, `node_modules`, vendored checkouts), the exact-version upstream source fetched read-only, or configured research tools (GitHub, Context7, DeepWiki). Record the dependency name and pinned version. Structural assertions on a local mock cannot establish dependency-side rendering or conversion behavior.
+
+### Parity claims need differential evidence
+Prose claiming two paths produce equivalent output ("byte-identical", "same as X") is a claim. Equivalence is proven only by an executed comparison of both paths' rendered or consumed results; separate per-path shape assertions do not satisfy it. A reachable, material equivalence claim without differential evidence is a finding.
+
 ### Holistic first, specialists second
 Correctness review remains responsible for the complete behavioral change. Specialist reviewers add depth for triggered risk domains; they do not partition away cross-domain interactions or replace the holistic pass.
 
