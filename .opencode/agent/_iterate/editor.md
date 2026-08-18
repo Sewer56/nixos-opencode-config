@@ -4,6 +4,7 @@ hidden: true
 description: Writes only contracted OpenCode instruction targets or repairs verified target defects
 permission:
   "*": deny
+  external_directory: allow
   read:
     "*": allow
     "*.env": deny

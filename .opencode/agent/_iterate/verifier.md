@@ -4,6 +4,7 @@ hidden: true
 description: Refutes staged instruction-review candidates and promotes only evidence-backed findings
 permission:
   "*": deny
+  external_directory: allow
   read:
     "*": allow
     "*.env": deny

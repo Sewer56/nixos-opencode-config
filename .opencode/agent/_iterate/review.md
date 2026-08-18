@@ -4,6 +4,7 @@ hidden: true
 description: Independently reviews one staged instruction change through required risk lenses
 permission:
   "*": deny
+  external_directory: allow
   read:
     "*": allow
     "*.env": deny

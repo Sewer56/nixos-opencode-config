@@ -3,6 +3,7 @@ mode: primary
 description: Creates, changes, moves, deletes, or verifies OpenCode instructions with exact scope and verified review
 permission:
   "*": deny
+  external_directory: allow
   read:
     "*": allow
     "*.env": deny
