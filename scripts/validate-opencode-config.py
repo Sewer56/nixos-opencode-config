@@ -61,6 +61,7 @@ BUILTIN_AGENTS = {"build", "explore", "general", "plan"}
 FORBIDDEN_AGENT_KEYS = {"temperature", "steps", "maxSteps", "tools"}
 VALID_AGENT_MODES = {"primary", "subagent", "all"}
 VALID_PERMISSION_DECISIONS = {"allow", "ask", "deny"}
+BUILTIN_AGENT_ALLOW_EXTERNAL = ("build", "plan")
 MAX_CUSTOM_TASK_DEPTH = 3
 REQUIRED_PATHS = (
     "README.md",
@@ -559,6 +560,20 @@ def main() -> int:
                     errors.append(
                         f"config.permission {tool!r} pattern {pattern!r} has invalid decision {decision!r}"
                     )
+
+    # Default modes (build, plan) run user-driven, so they inherit a global
+    # allow policy instead of the ask-everywhere default for subagents.
+    agents = config.get("agent")
+    if not isinstance(agents, dict):
+        errors.append("config.agent must be a mapping")
+    else:
+        for ident in BUILTIN_AGENT_ALLOW_EXTERNAL:
+            agent_perm = agents.get(ident, {}).get("permission") if isinstance(agents.get(ident), dict) else None
+            got = agent_perm.get("external_directory") if isinstance(agent_perm, dict) else None
+            if str(got).lower() != "allow":
+                errors.append(
+                    f"config.agent.{ident}.permission.external_directory must be allow (default mode)"
+                )
 
     details.extend(
         [

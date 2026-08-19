@@ -8,6 +8,7 @@ permission:
   "*": deny
   external_directory:
     "*": ask
+    "/tmp/*": allow
     "/home/sewer/projects/devspace/*": allow
     "/home/sewer/Project/devspace/*": allow
     "/home/sewer/Project/sewers-reveng-workspace/*": allow
