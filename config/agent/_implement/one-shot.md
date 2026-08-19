@@ -132,12 +132,13 @@ Require validation PASS, complete reviews, and no blocker. If changed, re-read t
 
 ## 6. External CodeRabbit review
 
-After commit, ensure the target repository excludes `artifact/` (append `artifact/` to `.git/info/exclude` when missing) so this run's own artifacts cannot trip the gate's untracked-files `NEEDS_INPUT`. Call `_review/coderabbit` with `review_type=all`, explicit `base_branch=[[base_commit]]`, and `apply_advisories=false`; never do its work yourself. Gate its outcome:
+After commit, ensure `artifact/` is Git-excluded (append to `.git/info/exclude` when missing) so run artifacts cannot trip the gate's untracked-files `NEEDS_INPUT`. Call `_review/coderabbit` with `review_type=all`, explicit `base_branch=[[base_commit]]`, and `apply_advisories=false`; never do its review yourself. It applies its own bounded fixes as last code writer, governed by its own validation and single re-review. Gate its outcome:
 
-- `PASS` or `ADVISORY`: proceed, recording its artifact paths.
-- `FAIL`: return `FAIL`. `NEEDS_INPUT`: surface unchanged.
-- `INCOMPLETE`: return `INCOMPLETE` with the remaining evidence (service, rate limit, missing CLI); local work stays committed.
-- Modified Paths not `None`: intersect them with this implementation's own changed paths (`base_commit..HEAD` committed paths plus staged writer paths); stage exactly that intersection, run `git diff --cached --check`, and call `commit` for it. Never stage or commit preserved unrelated changes — report them instead. Committing bounded repair paths preserves the returned outcome status (`FAIL` stays `FAIL`). Its own validation and single re-review govern repairs; never widen scope.
+- `PASS`/`ADVISORY`: proceed, recording its artifact paths.
+- `FAIL`: return `FAIL`; its newest artifact enumerates the remaining blockers, and its edits stay uncommitted and reported.
+- `NEEDS_INPUT`: surface unchanged.
+- `INCOMPLETE`: return `INCOMPLETE` with the remaining evidence; local work stays committed.
+- `Modified Paths` not `None`: treat its edits as a staged final repair. Stage the union of its Modified Paths and your own repair paths within the derived scope; out-of-scope paths: report and return `NEEDS_INPUT`, never widen scope. Rerun Sections 2–4 (all-checks from the lint gate with `rNN` incremented, reviewers, `_review/verifier`, repairing accepted findings yourself) within the existing budgets, then `commit`; never stage or commit preserved unrelated changes. A CodeRabbit blocker remaining after those budgets is `FAIL`.
 
 # Output
 

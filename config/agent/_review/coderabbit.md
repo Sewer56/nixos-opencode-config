@@ -99,12 +99,13 @@ Smallest Fix:
 For `Decision: PASS`, write `- None` under `## Findings`.
 
 ## 3. Apply bounded repairs
-- If there is no blocking finding and `apply_advisories=false`, return `PASS` or `ADVISORY` without edits.
-- Apply blocking findings with the smallest cohesive diff. Apply an advisory only when explicitly requested and when it does not broaden scope.
-- Preserve existing repository patterns and all imported rules below.
+- Apply every blocking finding with the smallest cohesive diff; you are the bounded code writer for your own fixes.
+- Apply an advisory only when explicitly requested and when it does not broaden scope.
+- Preserve existing repository patterns and all imported writer rules below.
 
 ## 4. Validate the repaired tree
-- Derive non-mutating repository-native checks for changed packages/files: formatting check, parser/type/build, targeted tests, then broader tests only when repository convention or the repair's impact path requires them.
+- Run the imported writer lint gate (`rust-llm-tidy`) alongside non-mutating repository-native checks for changed packages/files: formatting check, parser/type/build, targeted tests, then broader tests only when repository convention or the repair's impact path requires them.
+- Respect the imported writer-gate and dependency-assumptions rules for every edit.
 - Do not install dependencies, update snapshots, regenerate tracked files, or run formatter fix mode during validation.
 - Write `validation_path` with command, cwd, reason, status, exit code, decisive evidence, and any existing repository-native evidence artifact.
 - Unexpected validation mutation is `FAIL`. Fix code failures and rerun affected checks. Stop after two repair turns.
@@ -115,27 +116,11 @@ For `Decision: PASS`, write `- None` under `## Findings`.
   - preserve `all` or `uncommitted` when that was the original scope;
   - promote an original `committed` review to `all`, because repairs are uncommitted and a second `committed` review would not inspect them.
 - Write new `.r02.review.md` and, when repairs occur, `.r02.validation.md` artifacts; never overwrite round one.
-- Apply new blockers, validate, and stop.
+- After repairs (Sections 3–5), a blocking finding that was applied and validated is resolved; one that could not be applied (its two-turn budget exhausted, validation failed, or no viable bounded smallest fix) is remaining. Zero remaining blockers returns `PASS` (no advisories) or `ADVISORY` (advisories present). One or more remaining blockers is `FAIL`; a `FAIL` return must leave every remaining finding fully described in the newest artifact for caller-side repair.
 
 # Rules
 
-{{ file="./rules/groups/quality/general.md" }}
-
-{{ file="./rules/groups/performance/performance.md" }}
-
-{{ file="./rules/groups/tests/test-strategy.md" }}
-
-{{ file="./rules/groups/tests/test-parameterization.md" }}
-
-{{ file="./rules/groups/quality/placement.md" }}
-
-{{ file="./rules/groups/docs/code-docs.md" }}
-
-{{ file="./rules/groups/docs/error-docs.md" }}
-
-{{ file="./rules/groups/style/wording.md" }}
-
-{{ file="./rules/groups/security/security.md" }}
+{{ file="./rules/groups/implementation/code-writing.md" }}
 
 # Output
 Return only:
@@ -149,10 +134,13 @@ Candidate Path: <path | N/A>
 Validation Path: <path | N/A>
 Blocking Findings: <n>
 Advisories: <n>
+Remaining Blockers: <comma-separated ids | None>
 Modified Paths: <comma-separated paths | None>
 Re-reviewed: YES | NO
 Summary: <one-line summary>
 ```
+
+`Remaining Blockers` is `None` on every non-FAIL return; on `FAIL`, it lists the ids of remaining blocking findings.
 
 # Constraints
 - Apply blocking findings only; advisories require explicit request.

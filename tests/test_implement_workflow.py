@@ -533,6 +533,50 @@ class ImplementWorkflowTests(unittest.TestCase):
                 self.assertIn(base_branch, body)
                 self.assertIn('"_review/coderabbit": allow', body)
 
+    def test_coderabbit_is_final_gate_writer_checked_by_reviewers(self) -> None:
+        with self.subTest(subject="review writer parity and FAIL semantics"):
+            coderabbit = text(ROOT / "config/agent/_review/coderabbit.md")
+            self.assertIn('{{ file="./rules/groups/implementation/code-writing.md" }}', coderabbit)
+            for subsumed in (
+                "./rules/groups/quality/general.md",
+                "./rules/groups/tests/test-strategy.md",
+                "./rules/groups/tests/test-parameterization.md",
+                "./rules/groups/docs/code-docs.md",
+                "./rules/groups/docs/error-docs.md",
+                "./rules/groups/quality/placement.md",
+                "./rules/groups/style/wording.md",
+                "./rules/groups/performance/performance.md",
+                "./rules/groups/security/security.md",
+            ):
+                self.assertNotIn(subsumed, coderabbit)
+            self.assertIn("One or more remaining blockers is `FAIL`", coderabbit)
+            self.assertIn("Remaining Blockers: <comma-separated ids | None>", coderabbit)
+
+        body = text(ORCHESTRATOR)
+        gate = body[body.index("## 4. External CodeRabbit review") : body.index("## 5. Finish")]
+        for marker in (
+            "applies its own bounded fixes",
+            "staged final repair",
+            "A remaining blocker after that budget is `FAIL`",
+            "_review/verifier",
+            "_implement/integration-repair",
+            "never stage or commit preserved unrelated changes",
+        ):
+            self.assertIn(marker, gate)
+
+        one_shot = text(ONE_SHOT)
+        for marker in (
+            "applies its own bounded fixes",
+            "staged final repair",
+            "A CodeRabbit blocker remaining after those budgets is `FAIL`",
+        ):
+            self.assertIn(marker, one_shot)
+
+        repair = text(INTEGRATION_REPAIR)
+        self.assertNotIn("remaining external-reviewer blockers", repair)
+        self.assertNotIn("coderabbit", repair.lower())
+        self.assertIn("one CodeRabbit self-fix pass with one re-review", text(ROOT / "EXPLAINER.md"))
+
     def test_writers_have_read_only_research_grants(self) -> None:
         research_keys = (
             "github_get_*: allow",

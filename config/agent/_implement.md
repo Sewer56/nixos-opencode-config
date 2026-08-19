@@ -93,12 +93,13 @@ Prior Verdict Paths: [[concrete paths or None]]
 
 ## 4. External CodeRabbit review
 
-After the final repair commit, call `_review/coderabbit` with `review_type=all`, explicit `base_branch=base_commit`, and `apply_advisories=false`; never do its work yourself. Gate its outcome:
+After the final repair commit, call `_review/coderabbit` with `review_type=all`, explicit `base_branch=base_commit`, and `apply_advisories=false`; never do its review yourself. It applies its own bounded fixes as last code writer, governed by its own validation and single re-review. Gate its outcome:
 
-- `PASS` or `ADVISORY`: proceed, recording its artifact paths.
-- `FAIL`: return `FAIL`. `NEEDS_INPUT`: surface unchanged.
-- `INCOMPLETE`: return `INCOMPLETE` with the remaining evidence (service, rate limit, missing CLI); local work stays committed.
-- Modified Paths not `None`: intersect them with the implementation's own changed paths (`base_commit..HEAD` committed paths plus staged writer paths); stage exactly that intersection, run `git diff --cached --check`, and call `commit` for it. Never stage or commit preserved unrelated changes — report them instead. Committing bounded repair paths preserves the returned outcome status (`FAIL` stays `FAIL`). Its own validation and single re-review govern repairs; never widen scope.
+- `PASS`/`ADVISORY`: proceed, recording its artifact paths.
+- `FAIL`: return `FAIL`; its newest artifact enumerates the remaining blockers, and its edits stay uncommitted and reported.
+- `NEEDS_INPUT`: surface unchanged.
+- `INCOMPLETE`: return `INCOMPLETE` with the remaining evidence; local work stays committed.
+- `Modified Paths` not `None`: treat its edits as a staged final repair entering Section 3 steps 3–8, which govern staging, full validation including applicable tests, fresh-ledger reviews, `_review/verifier` → `_implement/integration-repair` within the existing two-turn budget, and exact-path commit. Stage exactly the intersection of Modified Paths with the implementation's own changed paths (`base_commit..HEAD` committed plus staged writer paths); report any Modified Path outside that set and return `NEEDS_INPUT`; run `git diff --cached --check`; never stage or commit preserved unrelated changes. A remaining blocker after that budget is `FAIL`.
 
 ## 5. Finish
 
