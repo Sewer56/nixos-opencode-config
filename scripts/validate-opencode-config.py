@@ -6,13 +6,13 @@ optional path supplied with ``--report``.
 
 Configuration documents:
 - Parse active JSON/JSONC configuration and local Caveman plugin package data.
-- Require positive tool output limits and globally allowed external-directory
-  access. Compaction pruning is optional.
+- Require positive tool output limits and a global external-directory policy of
+  ask, allow, or a pattern map. Compaction pruning is optional.
 
 Agent frontmatter and permissions:
 - Validate IDs, YAML, modes, descriptions, provider-qualified models, permission
-  decisions/defaults/order, environment-file denial, and inherited external
-  directory policy.
+  decisions/defaults/order, environment-file denial, and external-directory
+  policy of ask, allow, or a pattern map.
 - Reject temperature, step-limit, and tools fields.
 
 Commands and task graph:
@@ -60,6 +60,7 @@ COMMAND_ROOTS = (Path("config/command"), Path(".opencode/command"))
 BUILTIN_AGENTS = {"build", "explore", "general", "plan"}
 FORBIDDEN_AGENT_KEYS = {"temperature", "steps", "maxSteps", "tools"}
 VALID_AGENT_MODES = {"primary", "subagent", "all"}
+VALID_PERMISSION_DECISIONS = {"allow", "ask", "deny"}
 MAX_CUSTOM_TASK_DEPTH = 3
 REQUIRED_PATHS = (
     "README.md",
@@ -151,7 +152,7 @@ def validate_permission_map(ident: str, permission: Any, errors: list[str]) -> N
         return
     if str(permission.get("*", "")).lower() != "deny":
         errors.append(f"agent {ident} permission must start from top-level '*: deny'")
-    valid = {"allow", "ask", "deny"}
+    valid = VALID_PERMISSION_DECISIONS
     for tool, rules in permission.items():
         if isinstance(rules, str):
             if rules.lower() not in valid:
@@ -168,8 +169,8 @@ def validate_permission_map(ident: str, permission: Any, errors: list[str]) -> N
                     f"agent {ident} permission {tool!r} pattern {pattern!r} has invalid decision {decision!r}"
                 )
     external = permission.get("external_directory")
-    if external is not None and str(external).lower() != "allow":
-        errors.append(f"agent {ident} external_directory must be allow (global policy)")
+    if external is not None and not isinstance(external, dict) and str(external).lower() not in {"ask", "allow"}:
+        errors.append(f"agent {ident} external_directory must be ask, allow, or a pattern mapping")
     read = permission.get("read")
     if not isinstance(read, dict):
         errors.append(f"agent {ident} read permission must be a mapping")
@@ -544,8 +545,20 @@ def main() -> int:
     # Compaction pruning is optional by policy; prune:false preserves old
     # tool-call contents in context, so it is not mandated here.
     permission = config.get("permission")
-    if not isinstance(permission, dict) or permission.get("external_directory") != "allow":
-        errors.append("config.permission.external_directory must be allow")
+    external = permission.get("external_directory") if isinstance(permission, dict) else None
+    if not isinstance(permission, dict) or (
+        not isinstance(external, dict) and str(external).lower() not in {"ask", "allow"}
+    ):
+        errors.append("config.permission.external_directory must be ask, allow, or a pattern mapping")
+    if isinstance(permission, dict):
+        for tool, rules in permission.items():
+            if not isinstance(rules, dict):
+                continue
+            for pattern, decision in rules.items():
+                if str(decision).lower() not in VALID_PERMISSION_DECISIONS:
+                    errors.append(
+                        f"config.permission {tool!r} pattern {pattern!r} has invalid decision {decision!r}"
+                    )
 
     details.extend(
         [

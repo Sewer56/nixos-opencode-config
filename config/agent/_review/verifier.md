@@ -6,6 +6,11 @@ model: sewer-axonhub/glm-5.3 # HARD
 variant: max
 permission:
   "*": deny
+  external_directory:
+    "*": ask
+    "/home/sewer/projects/devspace/*": allow
+    "/home/sewer/Project/devspace/*": allow
+    "/home/sewer/Project/sewers-reveng-workspace/*": allow
   read:
     "*": allow
     "*.env": deny

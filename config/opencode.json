@@ -18,7 +18,12 @@
     "github_*": "deny",
     "context7_*": "deny",
     "deepwiki_*": "deny",
-    "external_directory": "allow"
+    "external_directory": {
+      "*": "ask",
+      "/home/sewer/projects/devspace/*": "allow",
+      "/home/sewer/Project/devspace/*": "allow",
+      "/home/sewer/Project/sewers-reveng-workspace/*": "allow"
+    }
   },
   "agent": {
     "plan": {

@@ -482,8 +482,8 @@ class ImplementWorkflowTests(unittest.TestCase):
             for path in root.rglob("*.md"):
                 with self.subTest(path=path.relative_to(ROOT)):
                     frontmatter = text(path).split("---", 2)[1] if text(path).startswith("---") else ""
-                    for decision in re.findall(r"(?m)^\s*external_directory:\s*(\S+)", frontmatter):
-                        self.assertEqual("allow", decision)
+                    for decision in re.findall(r"(?m)^\s*external_directory:[ \t]*(\S+)[ \t]*$", frontmatter):
+                        self.assertIn(decision, {"ask", "allow"})
 
     def test_coderabbit_uses_no_local_verifier(self) -> None:
         body = text(ROOT / "config/agent/_review/coderabbit.md")
