@@ -12,6 +12,18 @@ permission:
     "/home/sewer/Work/**": allow
     "/home/sewer/Obsidian Vault/**": allow
     "/var/tmp/**": allow
+    "/home/sewer/.cargo/**": allow
+    "/home/sewer/.rustup/**": allow
+    "/home/sewer/go/**": allow
+    "/home/sewer/.bun/**": allow
+    "/home/sewer/.nuget/**": allow
+    "/home/sewer/.dotnet/**": allow
+    "/home/sewer/.npm/**": allow
+    "/home/sewer/.pnpm-store/**": allow
+    "/home/sewer/.yarn/**": allow
+    "/home/sewer/.cache/**": allow
+    "/home/sewer/.config/**": allow
+    "/home/sewer/.local/**": allow
     "/proc/**": allow
     "/sys/**": allow
     "/etc/**": allow
@@ -20,6 +32,9 @@ permission:
     "/home/sewer/projects/**": allow
     "/home/sewer/Project/**": allow
     "/home/sewer/projects/nixos-secrets/**": deny
+    "/home/sewer/.config/gh/hosts.yml": deny
+    "/home/sewer/.config/yara-report-app/credentials.json": deny
+    "/home/sewer/.local/share/opencode/*.json": deny
   read:
     "*": allow
     "*.env": deny
