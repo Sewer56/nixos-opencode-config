@@ -7,10 +7,13 @@ permission:
   "*": deny
   external_directory:
     "*": ask
-    "/tmp/*": allow
-    "/home/sewer/projects/devspace/*": allow
-    "/home/sewer/Project/devspace/*": allow
-    "/home/sewer/Project/sewers-reveng-workspace/*": allow
+    "/tmp/**": allow
+    "/etc/**": allow
+    "/nix/store/**": allow
+    "/var/log/**": allow
+    "/home/sewer/projects/**": allow
+    "/home/sewer/Project/**": allow
+    "/home/sewer/projects/nixos-secrets/**": deny
   read:
     "*": allow
     "*.env": deny
