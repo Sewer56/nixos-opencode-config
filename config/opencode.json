@@ -21,9 +21,13 @@
     "external_directory": {
       "*": "ask",
       "/tmp/**": "allow",
+      "/proc/**": "allow",
+      "/sys/**": "allow",
       "/etc/**": "allow",
       "/nix/store/**": "allow",
       "/var/log/**": "allow",
+      "/home/sewer/Downloads/**": "allow",
+      "/home/sewer/Documents/**": "allow",
       "/home/sewer/projects/**": "allow",
       "/home/sewer/Project/**": "allow",
       "/home/sewer/projects/nixos-secrets/**": "deny"

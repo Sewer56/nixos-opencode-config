@@ -8,6 +8,8 @@ permission:
   external_directory:
     "*": ask
     "/tmp/**": allow
+    "/proc/**": allow
+    "/sys/**": allow
     "/etc/**": allow
     "/nix/store/**": allow
     "/var/log/**": allow
