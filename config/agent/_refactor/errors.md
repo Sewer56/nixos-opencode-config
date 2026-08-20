@@ -8,6 +8,7 @@ permission:
   external_directory:
     "*": ask
     "/tmp/**": allow
+    "/home/sewer/Temp/**": allow
     "/proc/**": allow
     "/sys/**": allow
     "/etc/**": allow
