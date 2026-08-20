@@ -9,6 +9,9 @@ permission:
     "*": ask
     "/tmp/**": allow
     "/home/sewer/Temp/**": allow
+    "/home/sewer/Work/**": allow
+    "/home/sewer/Obsidian Vault/**": allow
+    "/var/tmp/**": allow
     "/proc/**": allow
     "/sys/**": allow
     "/etc/**": allow

@@ -29,6 +29,9 @@
       "/home/sewer/Downloads/**": "allow",
       "/home/sewer/Documents/**": "allow",
       "/home/sewer/Temp/**": "allow",
+      "/home/sewer/Work/**": "allow",
+      "/home/sewer/Obsidian Vault/**": "allow",
+      "/var/tmp/**": "allow",
       "/home/sewer/projects/**": "allow",
       "/home/sewer/Project/**": "allow",
       "/home/sewer/projects/nixos-secrets/**": "deny"
