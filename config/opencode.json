@@ -47,9 +47,9 @@
       "/home/sewer/projects/**": "allow",
       "/home/sewer/Project/**": "allow",
       "/home/sewer/projects/nixos-secrets/**": "deny",
-      "/home/sewer/.config/gh/hosts.yml": "deny",
-      "/home/sewer/.config/yara-report-app/credentials.json": "deny",
-      "/home/sewer/.local/share/opencode/*.json": "deny"
+      "/home/sewer/.config/gh/hosts.yml": "ask",
+      "/home/sewer/.config/yara-report-app/credentials.json": "ask",
+      "/home/sewer/.local/share/opencode/*.json": "ask"
     }
   },
   "agent": {
