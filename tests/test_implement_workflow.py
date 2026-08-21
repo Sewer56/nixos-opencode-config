@@ -9,8 +9,10 @@ Run: ``python3 -m unittest discover -s tests -p 'test_*.py'``.
 from __future__ import annotations
 
 import ast
+import os
 import re
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -89,6 +91,8 @@ READ_ONLY_BASH_PERMISSION = """  bash:
     "chown *": deny
     "patch *": deny
 """
+GATE_SCRIPT = ROOT / "config/scripts/rust-llm-tidy-gate.sh"
+GATE_IMPORT = '{{ file="./scripts/rust-llm-tidy-gate.sh" }}'
 VERIFIER = ROOT / "config/agent/_review/verifier.md"
 ARTIFACT_PATHS_CARD = ROOT / "config/rules/cards/implementation/artifact-paths.md"
 ARTIFACT_WRITERS = (ORCHESTRATOR, *IMPLEMENT_REVIEWERS, VERIFIER, CREATE_COHORTS)
@@ -158,6 +162,10 @@ def expand_config_imports(source: str) -> str:
     )
 
 
+def lint_gate_block(rule: str) -> str:
+    return re.search(r"```sh\n(.+?)\n```", rule, re.DOTALL).group(1)
+
+
 class ImplementWorkflowTests(unittest.TestCase):
     def test_shell_owners_use_shared_permissive_bash_map(self) -> None:
         for path in SHELL_OWNING_AGENTS:
@@ -222,10 +230,14 @@ class ImplementWorkflowTests(unittest.TestCase):
         rule = text(CODE_WRITING)
         self.assertTrue(rule.startswith("## RULE GROUP: IMPLEMENTATION / CODE WRITING\n"))
         self.assertIn("\n### Lint gate\n", rule)
-        self.assertEqual(
-            ["rust-llm-tidy"],
-            re.findall(r"`(rust-llm-tidy[^`]*)`", rule),
-        )
+        self.assertEqual([], re.findall(r"`(rust-llm-tidy[^`]*)`", rule))
+        self.assertEqual(1, rule.count("```sh"))
+        self.assertEqual(GATE_IMPORT, lint_gate_block(rule))
+        self.assertIn("exec rust-llm-tidy", text(GATE_SCRIPT))
+        self.assertIn("```sh\n" + text(GATE_SCRIPT) + "\n```", expand_config_imports(rule))
+        self.assertIn("if git grep", lint_gate_block(expand_config_imports(rule)))
+        self.assertIn("from the repository root before reviewer or parent validation handoff", rule)
+        self.assertIn("a successful skip, not missing environment", rule)
         self.assertIn("repository-wide tracked staged and unstaged `.rs`/`.md` changes", rule)
         self.assertIn("may include unrelated tracked changes", rule)
         self.assertIn("untracked files are excluded until staged", rule)
@@ -237,6 +249,75 @@ class ImplementWorkflowTests(unittest.TestCase):
         for path in (COHORT, INTEGRATION_REPAIR):
             with self.subTest(path=path.relative_to(ROOT)):
                 self.assertIn(rule_import, text(path))
+
+    def test_lint_gate_condition_truth_table(self) -> None:
+        script = text(GATE_SCRIPT)
+        gate = script[script.index("if ") + 3 : script.index("; then")]
+        condition = " ".join(gate.replace("\\\n", " ").split())
+        env = {name: value for name, value in os.environ.items() if not name.startswith("GIT_")}
+
+        def init(repo: Path, remote: bool) -> None:
+            subprocess.run(["git", "init", "-q"], cwd=repo, check=True, env=env)
+            if remote:
+                subprocess.run(
+                    ["git", "remote", "add", "origin", "https://example.com/repo.git"],
+                    cwd=repo,
+                    check=True,
+                    env=env,
+                )
+
+        def track(repo: Path, relative: str, content: str) -> None:
+            path = repo / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content, encoding="utf-8")
+            subprocess.run(["git", "add", "--", relative], cwd=repo, check=True, env=env)
+
+        def case_local_repo_without_remote(repo: Path) -> None:
+            init(repo, remote=False)
+
+        def case_remote_without_config_or_reference(repo: Path) -> None:
+            init(repo, remote=True)
+
+        def case_remote_with_root_config(repo: Path) -> None:
+            init(repo, remote=True)
+            (repo / ".rust-llm-tidy.yml").write_text("", encoding="utf-8")
+
+        def case_remote_with_tracked_reference(repo: Path) -> None:
+            init(repo, remote=True)
+            track(repo, ".github/workflows/ci.yml", "uses: Sewer56/rust-llm-tidy-action@v1\n")
+
+        def case_reference_only_in_untracked_file(repo: Path) -> None:
+            init(repo, remote=True)
+            (repo / "notes.md").write_text("uses: Sewer56/rust-llm-tidy-action@v1\n", encoding="utf-8")
+
+        def case_vendored_tool_directory(repo: Path) -> None:
+            init(repo, remote=True)
+            (repo / "tools" / "rust-llm-tidy").mkdir(parents=True)
+
+        def case_tool_directory_beyond_depth_three(repo: Path) -> None:
+            init(repo, remote=True)
+            (repo / "a" / "b" / "c" / "rust-llm-tidy").mkdir(parents=True)
+
+        for name, setup, expected in (
+            ("local repo without remote runs", case_local_repo_without_remote, True),
+            ("remote without config or reference skips", case_remote_without_config_or_reference, False),
+            ("remote with root config runs", case_remote_with_root_config, True),
+            ("remote with tracked reference runs", case_remote_with_tracked_reference, True),
+            ("reference only in untracked file skips", case_reference_only_in_untracked_file, False),
+            ("vendored tool directory runs", case_vendored_tool_directory, True),
+            ("tool directory beyond depth three skips", case_tool_directory_beyond_depth_three, False),
+        ):
+            with self.subTest(case=name):
+                with tempfile.TemporaryDirectory() as tmp:
+                    repo = Path(tmp)
+                    setup(repo)
+                    probe = subprocess.run(
+                        ["bash", "-c", f"if {condition}; then exit 0; else exit 1; fi"],
+                        cwd=repo,
+                        env=env,
+                        capture_output=True,
+                    )
+                    self.assertEqual(expected, probe.returncode == 0)
 
     def test_rust_llm_tidy_wrapper_preserves_caller_cwd(self) -> None:
         flake = text(FLAKE)
