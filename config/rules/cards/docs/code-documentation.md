@@ -62,6 +62,22 @@ Split multi-aspect docs into `#` sections, not dense paragraphs. Name the
 concrete mechanism (`suppress it by returning `None``) over the vague
 effect (`may suppress the event`).
 
+### Lists over prose
+- **Enumerations are lists**: Inputs, outputs, parameters, variants,
+  field mappings, branch points, and named-item sets are bullet lists,
+  never comma-spliced prose.
+- **Label data groups**: `Inputs:` and `Outputs:` label lines carry
+  short noun-fragment bullets, one fact each, no periods.
+- **Label named aspects**: Branches and variants use `Label:
+  sentence.` bullets ending in periods; field mappings use one
+  sentence per bullet, source field in code font first; command,
+  type, and parameter sets use one bullet per item: name in code
+  font, dash, terse description.
+- **Lead-in then bullets**: Lead-ins end with a colon and never
+  restate the bullets; delete the enumerated clause from the prose.
+- **Narrative stays prose**: Short sentence sets with nothing
+  enumerable and single coherent mechanics stay prose.
+
 ### No legacy docs backfill
 Do not backfill untouched legacy files solely for docs.
 
