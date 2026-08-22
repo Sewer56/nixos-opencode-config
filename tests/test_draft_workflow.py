@@ -147,7 +147,9 @@ class DraftWorkflowTests(unittest.TestCase):
             permissions.index('    "*": allow'),
             permissions.index('    "../*": deny'),
         )
-        self.assertNotIn("external_directory:", permissions)
+        self.assertIn('  external_directory:\n    "*": ask', permissions)
+        self.assertIn('    "/tmp/**": allow', permissions)
+        self.assertIn('    "/home/sewer/projects/nixos-secrets/**": deny', permissions)
         for marker in ("  grep: deny", "  glob: deny", "  list: deny"):
             self.assertIn(marker, permissions)
         bash_start = permissions.index("  bash:\n")
