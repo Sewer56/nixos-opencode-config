@@ -194,6 +194,10 @@ Integration repair is bounded to two turns; each turn revalidates, re-reviews, a
 
 This matters because separately valid changes can compose badly, which per-cohort review cannot see; only the cumulative base-to-final diff shows the composition.
 
+## Rules-baked general agent
+
+For work that needs neither a draft nor cohorts, [code][code-agent] sits beside `build` and one-shot: an interactive, general-purpose coding agent on the session model — no pin — with the shared code-writing rules baked in. Reviewer and verifier delegation happens only on explicit request, reusing the one-shot standalone review flow; commits stay user-initiated.
+
 ## Git boundaries
 
 Implementation assumes it is the only writer in the repository:
@@ -272,6 +276,7 @@ contract -> one editor -> exact staging -> validator/tests
 [iterate-guide]: .opencode/ITERATE.md
 [implement]: config/agent/_implement.md
 [one-shot]: config/agent/_implement/one-shot.md
+[code-agent]: config/agent/code.md
 [cohort]: config/agent/_implement/cohort.md
 [optional-reviews]: config/agent/_implement/cohort/review/optional/tests.md
 [optional-security]: config/agent/_implement/cohort/review/optional/security.md

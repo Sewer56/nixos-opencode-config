@@ -76,6 +76,7 @@ Validator scope is documented in module docstring at top of `scripts/validate-op
 | `/plan/convert-to-draft` | Convert useful conversation context into same draft format. |
 | `/implement` | Implement approved draft in validated logical cohorts. |
 | `/implement/one-shot` | Implement a bounded request in one writer-review-verify-repair loop. |
+| `/code` | General rules-baked coding agent with on-request reviewer/verifier. |
 
 ### Refactoring
 
