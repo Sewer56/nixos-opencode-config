@@ -4,7 +4,39 @@ hidden: true
 description: Writes only contracted OpenCode instruction targets or repairs verified target defects
 permission:
   "*": deny
-  external_directory: allow
+  external_directory:
+    "*": ask
+    "/tmp/**": allow
+    "/proc/**": allow
+    "/sys/**": allow
+    "/etc/**": allow
+    "/nix/store/**": allow
+    "/var/log/**": allow
+    "/home/sewer/opencode/**": allow
+    "/home/sewer/Downloads/**": allow
+    "/home/sewer/Documents/**": allow
+    "/home/sewer/Temp/**": allow
+    "/home/sewer/Work/**": allow
+    "/home/sewer/Obsidian Vault/**": allow
+    "/var/tmp/**": allow
+    "/home/sewer/.cargo/**": allow
+    "/home/sewer/.rustup/**": allow
+    "/home/sewer/go/**": allow
+    "/home/sewer/.bun/**": allow
+    "/home/sewer/.nuget/**": allow
+    "/home/sewer/.dotnet/**": allow
+    "/home/sewer/.npm/**": allow
+    "/home/sewer/.pnpm-store/**": allow
+    "/home/sewer/.yarn/**": allow
+    "/home/sewer/.cache/**": allow
+    "/home/sewer/.config/**": allow
+    "/home/sewer/.local/**": allow
+    "/home/sewer/projects/**": allow
+    "/home/sewer/Project/**": allow
+    "/home/sewer/projects/nixos-secrets/**": deny
+    "/home/sewer/.config/gh/hosts.yml": ask
+    "/home/sewer/.config/yara-report-app/credentials.json": ask
+    "/home/sewer/.local/share/opencode/*.json": ask
   read:
     "*": allow
     "*.env": deny
