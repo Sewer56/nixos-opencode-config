@@ -87,6 +87,7 @@ Validator scope is documented in module docstring at top of `scripts/validate-op
 | `/refactor/reorder` | Preview and reorder declarations after explicit `go`. |
 | `/refactor/document` | Repair scoped source documentation. |
 | `/refactor/errors` | Trace and repair public error documentation. |
+| `/cleanup` | Clean existing code to current standards through the implement review gauntlet. |
 
 ### Documentation, review, and audits
 
