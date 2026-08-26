@@ -152,6 +152,21 @@
             }
           }
         },
+        "glm-5.3-flash": {
+          "name": "GLM 5.3 Flash",
+          "reasoning": true,
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
         "glm-5.2": {
           "name": "GLM 5.2",
           "reasoning": true,
