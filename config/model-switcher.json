@@ -6,8 +6,8 @@
     "HARD": {"model":"sewer-axonhub/glm-5.3","variant":"max"}
   },
   "work": {
-    "EASY": {"model":"sewer-axonhub-work/claude-sonnet-5","variant":"low"},
-    "MEDIUM": {"model":"sewer-axonhub-work/claude-sonnet-5","variant":"medium"},
-    "HARD": {"model":"sewer-axonhub-work/claude-opus-5","variant":"medium"}
+    "EASY": {"model":"sewer-axonhub-work/gpt-5.6-luna","variant":"low"},
+    "MEDIUM": {"model":"sewer-axonhub-work/gpt-5.6-terra","variant":"medium"},
+    "HARD": {"model":"sewer-axonhub-work/gpt-5.6-sol","variant":"medium"}
   }
 }
