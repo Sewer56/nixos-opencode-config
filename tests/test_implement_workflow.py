@@ -221,10 +221,37 @@ class ImplementWorkflowTests(unittest.TestCase):
             "Stage and run quick checks",
             "Call exact reviewers",
             "Call exact verifier and repair",
-            "Allow at most five repair turns total",
+            "Allow at most `repair_turn_limit` repair turns total",
             "Commit",
         ):
             self.assertIn(marker, body)
+
+    def test_repair_turn_limits_default_and_honor_explicit_override(self) -> None:
+        orchestrator = text(ORCHESTRATOR)
+        self.assertIn("command user's `$ARGUMENTS`", orchestrator)
+        self.assertIn("positive integer repair-turn limit or no limit", orchestrator)
+        self.assertIn(
+            "otherwise retain the applicable default: five for each cohort and two for final integration",
+            orchestrator,
+        )
+        self.assertIn("supplying the resolved `repair_turn_limit`", orchestrator)
+        self.assertIn("Allow at most `repair_turn_limit` final repair turns", orchestrator)
+        self.assertIn("Repair Limit: [[repair_turn_limit]]", orchestrator)
+        self.assertIn("Repair Limit: [[n | unlimited]]", orchestrator)
+
+        self.assertIn(
+            "resolved by the parent from the command user's explicit positive integer, `no limit`, or the default of five",
+            text(COHORT),
+        )
+        self.assertIn("Repair Limit: [[repair_turn_limit]]", text(COHORT))
+
+        one_shot = text(ONE_SHOT)
+        self.assertIn("command-user request from `$ARGUMENTS`", one_shot)
+        self.assertIn("positive integer repair-turn limit or no limit", one_shot)
+        self.assertIn("otherwise use the default of five", one_shot)
+        self.assertIn("Allow at most `repair_turn_limit` repair turns total", one_shot)
+        self.assertIn("Repair Limit: [[repair_turn_limit]]", one_shot)
+        self.assertIn("Repair Limit: <n | unlimited>", one_shot)
 
     def test_shared_writer_lint_uses_auto_mode(self) -> None:
         rule = text(CODE_WRITING)

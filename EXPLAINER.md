@@ -190,7 +190,7 @@ After all cohorts commit, the [implementation orchestrator][implement] owns the 
 - cumulative base-to-final diff for integration review;
 - staged repair diff for correctness, quality, and commit.
 
-Integration repair is bounded to two turns; each turn revalidates, re-reviews, and commits exact repair paths.
+Integration repair defaults to two turns. Only an explicit command-user request may set a positive repair-turn limit or no limit, overriding the applicable five-turn cohort/one-shot or two-turn integration default. A bounded limit failure reports the resolved limit. Each turn revalidates, re-reviews, and commits exact repair paths.
 
 This matters because separately valid changes can compose badly, which per-cohort review cannot see; only the cumulative base-to-final diff shows the composition.
 
@@ -252,7 +252,7 @@ contract -> one editor -> exact staging -> validator/tests
 - No fixed context percentage, reviewer vote, or finding quota determines correctness. [Refute-or-Promote's][refute-promote] unanimous false positive shows why agreement alone is weak evidence.[^refute-preprint]
 - Every pipeline agent pins `sewer-axonhub/glm-5.3` — the only model family the pipeline wires for writing and review. Reviewer decorrelation via a second model family is known and currently unexercised; same-family writer and reviewers share blind spots.
 - Advisories enter automatic repair only when verifier-vetted and fixable within approved plan scope. [Greptile's reported 79% nit share][greptile-filtering] illustrates cost of treating every comment as action.[^greptile-vendor]
-- Repair loops are bounded: five turns per cohort, two at final integration, two in iterate, and one CodeRabbit self-fix pass with one re-review.
+- Repair loops default to five turns per cohort and one-shot implementation, two at final integration and in iterate, and one CodeRabbit self-fix pass with one re-review. Only an explicit command-user request may override applicable implementation defaults with a positive limit or no limit.
 - Runtime execution stays within available repository environment. [Greptile describes][greptile-trex] each TREX review using “a disposable sandboxed environment”; local workflow does not claim equivalent isolation.
 - Implementation uses real Git index and one-writer assumption. Each invocation starts from approved draft and creates fresh evidence artifacts.
 

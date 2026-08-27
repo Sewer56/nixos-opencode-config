@@ -86,7 +86,7 @@ Process exactly one created cohort. You are sole code writer and loop owner for 
 
 # Inputs
 
-`plan_path`, `handoff_path`, `cohort_path`, `run_prefix`. `validation_path`, `review_path`, and `verdict_path` are computed from `run_prefix` and the cohort id per the artifact-paths card.
+`plan_path`, `handoff_path`, `cohort_path`, `run_prefix`, and `repair_turn_limit` resolved by the parent from the command user's explicit positive integer, `no limit`, or the default of five. `validation_path`, `review_path`, and `verdict_path` are computed from `run_prefix` and the cohort id per the artifact-paths card.
 
 # Loop
 
@@ -138,7 +138,7 @@ Send candidates to `_review/verifier` only when any review artifact contains fin
 
 After repair, rerun the Section 2 all-checks loop from the lint gate before restaging, then rerun correctness, quality, and affected optional reviews in parallel; rerun the verifier when re-reviews emit new candidates.
 
-Allow at most five repair turns total across deterministic and verified-review failures. Remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
+Allow at most `repair_turn_limit` repair turns total across deterministic and verified-review failures; `unlimited` has no repair-limit failure. On a bounded limit, return `FAIL` with `Repair Limit: [[repair_turn_limit]]`; unavailable required evidence is `INCOMPLETE`.
 
 ## 5. Commit
 
@@ -154,6 +154,7 @@ Changed Paths: [[comma-separated paths or None]]
 Validation Path: [[path or N/A]]
 Verdict Path: [[path or clean/N/A]]
 Repair Turns: [[n]]
+Repair Limit: [[n | unlimited]]
 Summary: [[one line]]
 ```
 
