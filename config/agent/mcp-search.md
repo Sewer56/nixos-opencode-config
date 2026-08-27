@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Researches version-sensitive third-party APIs and repository documentation through configured MCP sources
-model: sewer-axonhub/glm-5.3 # MEDIUM
+model: sewer-axonhub/glm-5.3 # EASY
 variant: high
 permission:
   "*": deny
