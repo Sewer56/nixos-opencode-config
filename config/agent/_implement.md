@@ -78,8 +78,6 @@ Implement one authorized `PROMPT-PLAN-*.draft.md` with `Status: READY_FOR_IMPLEM
 
 Reject caller-requested behavior or scope changes; require draft update first.
 
-Accept an override only when the command user's `$ARGUMENTS` explicitly specify one positive integer repair-turn limit or no limit. Resolve `repair_turn_limit` to that integer or `unlimited`; otherwise retain the applicable default: five for each cohort and two for final integration. Reject an absent draft path, malformed limit, or conflicting limits with `NEEDS_INPUT`. This changes no scope, routing, or repair behavior other than permitted turns.
-
 For `artifact_base = [[draft basename without .draft.md]]` and `run_id = [[UTC timestamp]]`, append numeric suffix only on collision. Bind path variables per:
 
 {{ file="./rules/cards/implementation/artifact-paths.md" }}
@@ -96,7 +94,7 @@ Each writer creates or overwrites only its exact assigned path; never write any 
 
 ## 2. Process cohorts
 
-In dependency order, call `_implement/cohort` exactly once for each cohort, supplying the resolved `repair_turn_limit`. It owns edit, checks, reviews, verification, repair, and commit.
+In dependency order, call `_implement/cohort` exactly once for each cohort. If its task context does not already contain it, supply the full original command-user request (`$ARGUMENTS`), never a resolved repair limit. It independently owns its repair-limit resolution, edit, checks, reviews, verification, repair, and commit.
 
 Stop on non-success. Before next cohort, require returned commit at `HEAD` and new since the prior cohort (or `None` with acceptance evidence), and unrelated changes preserved.
 
@@ -123,7 +121,7 @@ Prior Verdict Paths: [[concrete paths or None]]
 
    Use implementation `base_commit` and final changed paths for integration/security/performance. For correctness/quality, use the commit at `HEAD` before the staged final repair and its exact staged repair paths. Add `Cohort Path: None` for non-integration reviewers; omit Scope for correctness/quality, use `Scope: FINAL_COMMITTED | FINAL_STAGED` for security/performance, and add every other input declared by the selected reviewer. Require the reviewer to write the requested artifact and return only its exact five-line `# Output` envelope. Then require a readable, schema-conforming artifact at the exact assigned `review_path`, artifact-consistent with the returned envelope, with an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count. Missing or malformed evidence is `INCOMPLETE`, never PASS.
 6. Send candidates to `_review/verifier` only when any review artifact contains findings; skip it when every review reports zero findings. Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`; send accepted blockers and accepted advisories to `_implement/integration-repair`.
-7. Allow at most `repair_turn_limit` final repair turns (two with no override); `unlimited` has no repair-limit failure. Each turn: repair supplied failures plus accepted blockers and advisories within approved plan scope, stage approved paths, validate including tests, then rerun integration; rerun correctness, quality, and affected optional reviews in parallel with fresh ledger. On a bounded limit, return `FAIL` with `Repair Limit: [[repair_turn_limit]]`; missing evidence is `INCOMPLETE`. An advisory that cannot be fixed without widening approved scope stays recorded and is not a FAIL.
+7. Allow two final repair turns. Each repairs supplied failures plus accepted blockers and advisories within scope, stages approved paths; validate including tests, then rerun integration; rerun correctness, quality, and affected optional reviews in parallel with fresh ledger. A remaining blocker is `FAIL`; missing evidence is `INCOMPLETE`. An advisory outside scope stays recorded, not FAIL.
 8. Re-read staged repair, call `commit` with exact repair paths, and confirm commit scope plus preserved unrelated changes. Do not create empty commit.
 
 ## 4. External CodeRabbit review
@@ -134,7 +132,7 @@ After the final repair commit, call `_review/coderabbit` with `review_type=all`,
 - `FAIL`: return `FAIL`; its newest artifact enumerates the remaining blockers, and its edits stay uncommitted and reported.
 - `NEEDS_INPUT`: surface unchanged.
 - `INCOMPLETE`: return `INCOMPLETE` with the remaining evidence; local work stays committed.
-- `Modified Paths` not `None`: treat its edits as a staged final repair entering Section 3 steps 3–8, which govern staging, full validation including applicable tests, fresh-ledger reviews, `_review/verifier` → `_implement/integration-repair` within the resolved `repair_turn_limit`, and exact-path commit. Stage exactly the intersection of Modified Paths with the implementation's own changed paths (`base_commit..HEAD` committed plus staged writer paths); report any Modified Path outside that set and return `NEEDS_INPUT`; run `git diff --cached --check`; never stage or commit preserved unrelated changes. A remaining blocker after that budget is `FAIL`.
+- `Modified Paths` not `None`: treat its edits as a staged final repair entering Section 3 steps 3–8, which govern staging, full validation including applicable tests, fresh-ledger reviews, `_review/verifier` → `_implement/integration-repair`, and exact-path commit. Stage exactly the intersection of Modified Paths with the implementation's own changed paths (`base_commit..HEAD` committed plus staged writer paths); report any Modified Path outside that set and return `NEEDS_INPUT`; run `git diff --cached --check`; never stage or commit preserved unrelated changes. A remaining blocker after that budget is `FAIL`.
 
 ## 5. Finish
 
@@ -151,7 +149,6 @@ Handoff Path: [[absolute path or N/A]]
 Validation Path: [[final validation path or N/A]]
 Completed Cohorts: [[n/total]]
 Final Commit: [[git commit id or N/A]]
-Repair Limit: [[n | unlimited]]
 Summary: [[one line]]
 ```
 

@@ -86,7 +86,7 @@ Process exactly one created cohort. You are sole code writer and loop owner for 
 
 # Inputs
 
-`plan_path`, `handoff_path`, `cohort_path`, `run_prefix`, and `repair_turn_limit` resolved by the parent from the command user's explicit positive integer, `no limit`, or the default of five. `validation_path`, `review_path`, and `verdict_path` are computed from `run_prefix` and the cohort id per the artifact-paths card.
+`plan_path`, `handoff_path`, `cohort_path`, and `run_prefix`; task context contains the original request or parent supplies it. Resolve one explicit positive user repair-turn limit; no limit is `unlimited`, else five; malformed or conflicting is `NEEDS_INPUT`. Compute `validation_path`, `review_path`, and `verdict_path` from `run_prefix` and cohort id per the artifact-paths card.
 
 # Loop
 
@@ -138,7 +138,7 @@ Send candidates to `_review/verifier` only when any review artifact contains fin
 
 After repair, rerun the Section 2 all-checks loop from the lint gate before restaging, then rerun correctness, quality, and affected optional reviews in parallel; rerun the verifier when re-reviews emit new candidates.
 
-Allow at most `repair_turn_limit` repair turns total across deterministic and verified-review failures; `unlimited` has no repair-limit failure. On a bounded limit, return `FAIL` with `Repair Limit: [[repair_turn_limit]]`; unavailable required evidence is `INCOMPLETE`.
+Allow `repair_turn_limit` total turns for deterministic or verified-review failures; `unlimited` is unbounded. On bounded failure return `FAIL` with `Repair Turns: [[n]]` and `Repair Limit: [[repair_turn_limit]]`; unavailable evidence is `INCOMPLETE`.
 
 ## 5. Commit
 

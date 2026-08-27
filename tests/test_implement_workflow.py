@@ -221,35 +221,37 @@ class ImplementWorkflowTests(unittest.TestCase):
             "Stage and run quick checks",
             "Call exact reviewers",
             "Call exact verifier and repair",
-            "Allow at most `repair_turn_limit` repair turns total",
+            "Allow `repair_turn_limit` total turns",
             "Commit",
         ):
             self.assertIn(marker, body)
 
     def test_repair_turn_limits_default_and_honor_explicit_override(self) -> None:
         orchestrator = text(ORCHESTRATOR)
-        self.assertIn("command user's `$ARGUMENTS`", orchestrator)
-        self.assertIn("positive integer repair-turn limit or no limit", orchestrator)
-        self.assertIn(
-            "otherwise retain the applicable default: five for each cohort and two for final integration",
-            orchestrator,
-        )
-        self.assertIn("supplying the resolved `repair_turn_limit`", orchestrator)
-        self.assertIn("Allow at most `repair_turn_limit` final repair turns", orchestrator)
-        self.assertIn("Repair Limit: [[repair_turn_limit]]", orchestrator)
-        self.assertIn("Repair Limit: [[n | unlimited]]", orchestrator)
+        self.assertIn("full original command-user request (`$ARGUMENTS`)", orchestrator)
+        self.assertIn("never a resolved repair limit", orchestrator)
+        self.assertIn("Allow two final repair turns", orchestrator)
+        self.assertNotIn("repair_turn_limit", orchestrator)
+        self.assertNotIn("Repair Limit:", orchestrator)
 
         self.assertIn(
-            "resolved by the parent from the command user's explicit positive integer, `no limit`, or the default of five",
+            "task context contains the original request",
             text(COHORT),
         )
+        self.assertIn("else five", text(COHORT))
+        self.assertIn("explicit positive user repair-turn limit", text(COHORT))
+        self.assertIn("no limit is `unlimited`", text(COHORT))
+        self.assertIn("malformed or conflicting is `NEEDS_INPUT`", text(COHORT))
+        self.assertIn("Repair Turns: [[n]]` and `Repair Limit: [[repair_turn_limit]]", text(COHORT))
         self.assertIn("Repair Limit: [[repair_turn_limit]]", text(COHORT))
 
         one_shot = text(ONE_SHOT)
-        self.assertIn("command-user request from `$ARGUMENTS`", one_shot)
-        self.assertIn("positive integer repair-turn limit or no limit", one_shot)
-        self.assertIn("otherwise use the default of five", one_shot)
-        self.assertIn("Allow at most `repair_turn_limit` repair turns total", one_shot)
+        self.assertIn("full original command-user request from `$ARGUMENTS`", one_shot)
+        self.assertIn("explicit positive user repair-turn limit", one_shot)
+        self.assertIn("else five", one_shot)
+        self.assertIn("no limit is `unlimited`", one_shot)
+        self.assertIn("Allow `repair_turn_limit` total turns", one_shot)
+        self.assertIn("Repair Turns: <n>` and `Repair Limit: [[repair_turn_limit]]", one_shot)
         self.assertIn("Repair Limit: [[repair_turn_limit]]", one_shot)
         self.assertIn("Repair Limit: <n | unlimited>", one_shot)
 

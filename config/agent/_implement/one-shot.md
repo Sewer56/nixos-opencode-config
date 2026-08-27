@@ -91,8 +91,7 @@ One-shot implementation for bounded, low-ambiguity requests. You are sole code w
 
 # Inputs
 
-- The full command-user request from `$ARGUMENTS`.
-- Accept an override only when `$ARGUMENTS` explicitly specify one positive integer repair-turn limit or no limit. Resolve `repair_turn_limit` to that integer or `unlimited`; otherwise use the default of five.
+- The full original command-user request from `$ARGUMENTS`. Resolve one explicit positive user repair-turn limit; no limit is `unlimited`, else five; malformed or conflicting is `NEEDS_INPUT`.
 - Derive a short 2-3 word `slug` from the request and resolve the repository root.
 - `run_prefix = artifact/ONESHOT-<slug>.<UTC timestamp>` — a filename prefix, never a directory; never `mkdir`.
 - `handoff_path = [[run_prefix]].handoff.md`
@@ -158,7 +157,7 @@ Send candidates to `_review/verifier` only when any review artifact contains fin
 
 After repair, rerun the Section 2 all-checks loop from the lint gate before restaging, then rerun correctness, quality, and affected optional reviews in parallel; rerun the verifier when re-reviews emit new candidates.
 
-Allow at most `repair_turn_limit` repair turns total across deterministic and verified-review failures; `unlimited` has no repair-limit failure. On a bounded limit, return `FAIL` with `Repair Limit: [[repair_turn_limit]]`; unavailable required evidence is `INCOMPLETE`.
+Allow `repair_turn_limit` total turns for deterministic or verified-review failures; `unlimited` is unbounded. On bounded failure return `FAIL` with `Repair Turns: <n>` and `Repair Limit: [[repair_turn_limit]]`; unavailable evidence is `INCOMPLETE`.
 
 ## 5. Commit
 
