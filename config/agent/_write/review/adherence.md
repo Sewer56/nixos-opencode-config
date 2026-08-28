@@ -103,6 +103,10 @@ candidate findings; never edit anything.
 - Lists capped per the adhd-format card, honoring the required-coverage
   exception.
 - Issue artifacts preserve unknowns explicitly.
+- PR artifacts: flag placeholder or no-information sections, including
+  boilerplate risk or verification, and exhaustive diff-visible detail
+  that buries the changes that matter.
+- PR artifacts: conversational, first-person tone is not a finding.
 - Titles state a specific outcome or action.
 - Exclude the mechanical checks the gate owns: line length, em dashes, opener
   phrasing, title length, and word count. Never raise findings on them.

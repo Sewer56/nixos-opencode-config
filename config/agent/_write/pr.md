@@ -103,14 +103,31 @@ Generate a PR description from the actual local branch and merge-base-aware diff
 
 Write `pr.md` with:
 - a verb-first title no longer than 72 characters;
-- an opening that states the user-visible outcome or fixed failure;
-- usage or before/after examples when they materially explain behavior;
-- motivation or linked issue;
-- risk or migration notes only for real blast radius;
-- concrete verification evidence, or `Not run` with a reason;
-- required repository-template fields.
+- issue links as a short `Fixes` list when issues are referenced;
+- a 2-3 sentence opener: what the branch does now and what was wrong
+  before;
+- `## Changes` covering only the changes that matter, grouped under `###`
+  subheadings per logical area, each subheading opening with one sentence
+  of reasoning then the concrete facts;
+- enumerable values (modes, flags, options) as bullet lists, not inline
+  prose;
+- a short `## Why` only when the opener has not already carried the
+  motivation;
+- risk, migration, examples, or verification sections only when they
+  carry real information;
+- verification only for checks actually run and evidenced; never a
+  `Not run` placeholder line, never an empty section;
+- required repository-template fields, without boilerplate the template
+  lacks.
 
-Keep the body under about 400 words unless the change genuinely needs more. Omit sections that add no information. Never start with `This PR` or `This change`.
+Write like the maintainer explaining their own change: plain sentences,
+first person natural, honest uncertainty allowed. One clear sentence beats
+telegraphic compression; the imported wording card's terseness is advisory
+for this narrative prose.
+
+Keep the body under about 250 words unless the change genuinely needs more.
+When over budget, cut diff-visible micro-detail before motivation. Never
+start with `This PR` or `This change`.
 
 # Gate
 After writing `pr.md` and before reporting SUCCESS, run this scan. Empty output
