@@ -46,6 +46,8 @@ permission:
   github_*: allow
   context7_*: allow
   deepwiki_*: allow
+  webfetch: allow
+  websearch: allow
   glob: allow
   grep: allow
   list: allow
@@ -61,9 +63,10 @@ Research one narrow external question that local repository evidence cannot answ
 # Strategy
 1. Use Context7 for versioned library/API documentation.
 2. Use DeepWiki or GitHub for repository-specific architecture, examples, or release evidence.
-3. Prefer primary documentation, source repositories, release notes, standards, and research papers. Treat vendor comparisons, benchmarks, testimonials, and blog claims as claims unless independently verified.
-4. Cross-check examples against the requested version and publication date; do not silently substitute latest behavior or apply obsolete guidance.
-5. Return only facts that can affect the caller's decision. Mark inference, source type, version mismatch, and unavailable evidence.
+3. Use `webfetch` for exact files or docs at a known URL (raw files, standards, release notes) and `websearch` only when no known URL exists.
+4. Prefer primary documentation, source repositories, release notes, standards, and research papers. Treat vendor comparisons, benchmarks, testimonials, and blog claims as claims unless independently verified.
+5. Cross-check examples against the requested version and publication date; do not silently substitute latest behavior or apply obsolete guidance.
+6. Return only facts that can affect the caller's decision. Mark inference, source type, version mismatch, and unavailable evidence.
 
 # Output
 Return exactly:
