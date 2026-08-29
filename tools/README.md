@@ -8,6 +8,7 @@ Rust workspace for local OpenCode utilities.
 - `opencode-sessions` — browse/export OpenCode SQLite sessions.
 - `chunk-files-by-tokens` — split files/directories into token-sized chunks.
 - `token-count-after-expand` — render md-expand prompt files and estimate tokens.
+- `opencode-yolo-mode` — flip external_directory `'*'` ask↔allow across agent frontmatter and `config/opencode.json`; guards after `'*'` (secrets deny/ask) keep winning.
 - `rust-llm-tidy` — reorder/lint Rust source (CLI from the `rust-llm-tidy` submodule).
 
 ## Shell helpers
@@ -22,5 +23,6 @@ cargo run -p opencode-model-switcher              # Launch TUI (default profile)
 cargo run -p opencode-model-switcher -- normal    # Launch TUI with "normal" profile
 cargo run -p chunk-files-by-tokens -- -s 32000 config/agent
 cargo run -p token-count-after-expand -- config/agent/mcp-search.md
+cargo run -p opencode-yolo-mode -- status   # report mode; also: on, off
 cargo run --manifest-path rust-llm-tidy/src/Cargo.toml -p rust-llm-tidy-cli -- reorder --dry-run src/main.rs
 ```

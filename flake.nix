@@ -91,6 +91,11 @@
         description = "Estimate prompt token counts after md-expand rendering";
       };
 
+      opencode-yolo-mode = mkTool {
+        pname = "opencode-yolo-mode";
+        description = "Toggle external_directory '*' between ask (regular) and allow (yolo) across agent frontmatter and global config";
+      };
+
       # rust-llm-tidy lives in a git submodule with its own workspace.
       # Pure flakes cannot track submodule files, so it is built at runtime
       # via the cargo-backed wrapper in the Home-Manager module.
@@ -207,6 +212,7 @@
         (mkCargoTool {name = "opencode-sessions";})
         (mkCargoTool {name = "chunk-files-by-tokens";})
         (mkCargoTool {name = "token-count-after-expand";})
+        (mkCargoTool {name = "opencode-yolo-mode";})
         (mkCargoTool {
           name = "rust-llm-tidy";
           package = "rust-llm-tidy-cli";
@@ -254,6 +260,7 @@
       opencode-sessions = self.packages.${system}.opencode-sessions;
       chunk-files-by-tokens = self.packages.${system}.chunk-files-by-tokens;
       token-count-after-expand = self.packages.${system}.token-count-after-expand;
+      opencode-yolo-mode = self.packages.${system}.opencode-yolo-mode;
     });
 
     # nix run .#opencode-sessions -- tui
@@ -280,6 +287,12 @@
         type = "app";
         program = "${self.packages.${system}.token-count-after-expand}/bin/token-count-after-expand";
         meta.description = "Estimate prompt token counts after md-expand rendering";
+      };
+
+      opencode-yolo-mode = {
+        type = "app";
+        program = "${self.packages.${system}.opencode-yolo-mode}/bin/opencode-yolo-mode";
+        meta.description = "Toggle external_directory yolo mode";
       };
 
       default = opencode-model-switcher;
@@ -310,6 +323,7 @@
           tools.opencode-sessions
           tools.chunk-files-by-tokens
           tools.token-count-after-expand
+          tools.opencode-yolo-mode
         ];
       };
     });

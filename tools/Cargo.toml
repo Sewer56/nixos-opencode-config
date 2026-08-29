@@ -4,6 +4,7 @@ members = [
   "model-switcher",
   "chunk-files-by-tokens",
   "token-count-after-expand",
+  "opencode-yolo-mode",
 ]
 resolver = "3"
 
