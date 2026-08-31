@@ -5,11 +5,9 @@ Owns: minimal code changes, repository conventions, naming, tests, comments/docs
 
 ### Lint gate
 
-Run this gate from the repository root before reviewer or parent validation handoff:
+Before review or handoff, run the linter:
 
-```sh
-{{ file="./scripts/rust-llm-tidy-gate.sh" }}
-```
+`{{path:./scripts/rust-llm-tidy-gate.sh}}`
 
 ### Writer gate
 

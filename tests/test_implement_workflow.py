@@ -106,7 +106,7 @@ READ_ONLY_BASH_PERMISSION = """  bash:
     "patch *": deny
 """
 GATE_SCRIPT = ROOT / "config/scripts/rust-llm-tidy-gate.sh"
-GATE_IMPORT = '{{ file="./scripts/rust-llm-tidy-gate.sh" }}'
+GATE_IMPORT = "{{path:./scripts/rust-llm-tidy-gate.sh}}"
 VERIFIER = ROOT / "config/agent/_review/verifier.md"
 ARTIFACT_PATHS_CARD = ROOT / "config/rules/cards/implementation/artifact-paths.md"
 ARTIFACT_WRITERS = (ORCHESTRATOR, *IMPLEMENT_REVIEWERS, VERIFIER, CREATE_COHORTS)
@@ -288,11 +288,9 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertTrue(rule.startswith("## RULE GROUP: IMPLEMENTATION / CODE WRITING\n"))
         self.assertIn("\n### Lint gate\n", rule)
         self.assertEqual([], re.findall(r"`(rust-llm-tidy[^`]*)`", rule))
-        self.assertEqual(1, rule.count("```sh"))
-        self.assertEqual(GATE_IMPORT, lint_gate_block(rule))
-        self.assertIn("```sh\n" + script + "\n```", expand_config_imports(rule))
-        self.assertIn("if git grep", lint_gate_block(expand_config_imports(rule)))
-        self.assertIn("from the repository root before reviewer or parent validation handoff", rule)
+        self.assertEqual(0, rule.count("```sh"))
+        self.assertIn(GATE_IMPORT, rule)
+        self.assertIn("run the linter", rule)
 
         self.assertIn("tool not ran (OK)", script)
         self.assertIn("repo not opted in", script)
