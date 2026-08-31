@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Processes one cohort through code changes, quick checks, focused review, verified repair, and commit
 model: sewer-axonhub/glm-5.3 # HARD
-variant: low
+variant: high
 permission:
   "*": deny
   external_directory:

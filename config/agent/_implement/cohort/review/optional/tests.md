@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Optionally produces evidence-backed test-strategy candidates for changed behavior in one cohort
 model: sewer-axonhub/glm-5.3 # HARD
-variant: low
+variant: high
 permission:
   "*": deny
   external_directory:

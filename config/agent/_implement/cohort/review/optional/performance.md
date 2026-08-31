@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Produces evidence-backed performance candidates for realistic changed workloads
 model: sewer-axonhub/glm-5.3 # HARD
-variant: low
+variant: high
 permission:
   "*": deny
   external_directory:
