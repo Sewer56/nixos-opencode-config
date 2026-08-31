@@ -18,11 +18,14 @@ Prefer direct imperatives for instructions.
 
 ### Filler and token density
 Flag: hedging and zero-information phrases such as `please note`, `it's important to`, `make sure to`, `ensure that`, `simply`, `just`, `arguably`, `possibly`, `might want to`.
+
 Severity: BLOCKING in operational instructions; ADVISORY in narrative prose.
 
 ### Wordiness
 Flag: phrasing that can be tightened without changing meaning; use the fewest words that preserve exact meaning.
+
 Allow: necessary technical terms and identifiers; prefer precise terms over cryptic shortcuts.
+
 Severity: ADVISORY; BLOCKING only for egregious inflation.
 
 ### Terminology consistency
@@ -32,8 +35,11 @@ Fix by choosing one term or defining the distinction.
 
 ### Short synonym
 Flag: verbose word choice when a shorter synonym preserves meaning.
+
 Allow: required technical terms, code identifiers, API/CLI names, safety wording, precise technical jargon.
+
 Severity: ADVISORY.
+
 Examples: use not utilize, show not demonstrate, help not facilitate, to not in order to.
 
 ### Paragraph length
@@ -48,8 +54,13 @@ Split into one bullet per checkable action.
 
 ### Example-prose redundancy
 Prose must not restate what the adjacent example already shows: the call made, literal argument values, or defaults the example passes.
+
 Fix: delete the restated clause; keep any non-duplicated remainder, e.g. a trailing cross-reference such as `[Override the policy] shows values that differ:`.
+
 Keep prose when the example cannot show the fact: behavior, consequences, ordering, or differing values.
+
 Precedence: Keep wins for any fact the example cannot show, including a consequence fused with a restated literal; purpose-bearing lead-ins that introduce the example are exempt.
+
 Flag: sentences that paraphrase the adjacent example's literal code.
+
 Severity: BLOCKING in end-user and in-code docs; ADVISORY in narrative prose.

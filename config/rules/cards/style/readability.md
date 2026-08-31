@@ -1,6 +1,8 @@
 ### Undefined jargon
 Flag: technical, project-specific, or internal taxonomy terms the intended reader cannot resolve nearby.
+
 Allow: inline definition, plain-language rewrite, glossary/link/path pointer, tooltip, or suitable comment.
+
 Severity: BLOCKING when the reader could act incorrectly; otherwise ADVISORY.
 
 ### Ambiguous language

@@ -101,8 +101,7 @@ Trace public error-returning APIs in one explicit file chunk. The caller owns fi
 5. Classify each API as `specific`, `missing`, `vague`, `incorrect`, or `incomplete-evidence`.
 6. Write all facts once. Do not suppress `specific` APIs; the complete inventory is how the caller proves file coverage.
 
-# Writable surface
-Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
+{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
 # Artifact
 Write `facts_path`:

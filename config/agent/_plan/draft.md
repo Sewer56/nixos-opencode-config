@@ -99,13 +99,14 @@ Create or refine one collaborative implementation draft. The draft is a human de
 - Preserve valid human decisions unless the user changes them or repository evidence disproves them.
 - Map every acceptance criterion to at least one `[P#]` item.
 - Route `PERFORMANCE` on every plan item; record `NO` with a reason only for docs-only items.
-- Record concrete workload-scale risks — growing-input loops, per-item I/O, large allocation/serialization/logging, concurrency, algorithmic risk — on the items that carry them.
+- Record concrete workload-scale risks on the items that carry them: growing-input loops, per-item I/O, large allocation/serialization/logging, concurrency, algorithmic risk.
 - Route optional reviews only when grounded:
   - `TESTS` for changed observable behavior.
   - `SECURITY` for trust boundaries, auth, secrets, IPC, untrusted input, filesystem/shell/SQL, serialization, cryptography, permissions, or dependency trust.
 - `QUALITY` always runs per implementation commit; record special quality obligations.
 - When a plan item changes, replaces, or removes observable behavior of an existing surface and a code comment or doc could reference the old behavior, the draft must not guess whether a backward-compatibility note is warranted.
-- If it is unclear whether the affected surface is a public API carrying a backward-compatibility obligation, record the decision under `## Open Questions` with `Blocking: YES` (ask the user) instead of planning an old-behavior code comment or silently asserting no compatibility concern.
+- If it is unclear whether the affected surface is a public API carrying a backward-compatibility obligation, record the decision under `## Open Questions` with `Blocking: YES` (ask the user).
+- Use that question instead of planning an old-behavior code comment or silently asserting no compatibility concern.
 - Put implementation-shaping unresolved decisions under `## Open Questions` with `Blocking: YES`. Never invent an answer merely to mark the draft ready.
 
 ## 4. Review and refine within the bound

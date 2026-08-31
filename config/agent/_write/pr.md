@@ -97,9 +97,10 @@ Generate a PR description from the actual local branch and merge-base-aware diff
 # Process
 1. Resolve the base in this order: explicit caller ref, local `origin/HEAD`, then the current branch's configured upstream base. Do not fetch or switch branches. Return `NEEDS_INPUT` when no trustworthy local base exists.
 2. Require a non-default current branch and at least one commit/change in `<base>...HEAD`.
-3. Inspect `git diff --stat`, `--name-status`, commit subjects, and the merge-base-aware diff. For a large diff, inspect changed public surfaces, tests, migrations, docs, and representative implementation regions instead of pasting the whole diff into one reasoning step.
-4. Read the repository PR template when present and honor its required sections without adding empty boilerplate.
-5. Derive claims only from the diff, tests, documentation, and commit evidence. Do not claim a check passed unless evidence is present.
+3. Inspect `git diff --stat`, `--name-status`, commit subjects, and the merge-base-aware diff.
+4. For a large diff, inspect changed public surfaces, tests, migrations, docs, and representative implementation regions instead of pasting the whole diff into one reasoning step.
+5. Read the repository PR template when present and honor its required sections without adding empty boilerplate.
+6. Derive claims only from the diff, tests, documentation, and commit evidence. Do not claim a check passed unless evidence is present.
 
 Write `pr.md` with:
 - a verb-first title no longer than 72 characters;
@@ -120,10 +121,9 @@ Write `pr.md` with:
 - required repository-template fields, without boilerplate the template
   lacks.
 
-Write like the maintainer explaining their own change: plain sentences,
-first person natural, honest uncertainty allowed. One clear sentence beats
-telegraphic compression; the imported wording card's terseness is advisory
-for this narrative prose.
+Write like the maintainer explaining their own change: plain sentences, first person natural, honest uncertainty allowed.
+
+One clear sentence beats telegraphic compression; the imported wording card's terseness is advisory for this narrative prose.
 
 Keep the body under about 250 words unless the change genuinely needs more.
 When over budget, cut diff-visible micro-detail before motivation. Never
@@ -137,10 +137,11 @@ passes; otherwise repair the artifact and rerun until it prints nothing:
 awk 'BEGIN{f=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && $0 !~ /^#/ && length($0) > 80 {print FNR": "$0}' pr.md
 ```
 
-Fenced code, URLs, table rows, and headings are exempt. The gate owns the
-mechanical checks: this scan plus the hard constraints above (title length,
-opener, word count, em dashes). Gate failure blocks SUCCESS and forces repair
-before review.
+Fenced code, URLs, table rows, and headings are exempt.
+
+The gate owns the mechanical checks: this scan plus the hard constraints above (title length, opener, word count, em dashes).
+
+Gate failure blocks SUCCESS and forces repair before review.
 
 Measure `Longest Prose Line` from the same exemptions; never estimate it:
 

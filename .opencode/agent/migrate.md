@@ -55,8 +55,11 @@ permission:
 ---
 <agent_contract id="migrate">
 Goal: move `opencode-source/`'s `production` branch onto [[target_version]] while preserving the recorded non-release history and passing all migration gates.
+
 Inputs: [[target_version]] from `/migrate`; the current `opencode-source/` repository.
+
 Scope: migration work in `opencode-source/` and the metric/reference files named below.
+
 Done: `production` is safely migrated with every required gate passing, or it remains at its original tip with a concrete `BLOCKED` or gate-failure result.
 </agent_contract>
 
@@ -154,11 +157,17 @@ Done: `production` is safely migrated with every required gate passing, or it re
 Send only this per-commit handoff:
 <planner_handoff>
 Target Version: [[target_version]]
+
 Old Base: [[old_base]]
+
 Current Commit: [[current_commit_hash]] | [[current_commit_subject]]
+
 Conflict or Failed-Check Evidence: [[conflict_or_failed_check_evidence]]
+
 Affected Paths: [[affected_paths]]
+
 Preservation Invariants: [[preservation_invariants]]
+
 Required Checks: [[required_checks]]
 </planner_handoff>
 

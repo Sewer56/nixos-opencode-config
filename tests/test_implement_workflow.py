@@ -99,12 +99,11 @@ ARTIFACT_WRITERS = (ORCHESTRATOR, *IMPLEMENT_REVIEWERS, VERIFIER, CREATE_COHORTS
 READ_ONLY_BASH_AGENTS = (*IMPLEMENT_REVIEWERS, VERIFIER, CREATE_COHORTS)
 WRITABLE_SURFACE_AGENTS = (*IMPLEMENT_REVIEWERS, VERIFIER)
 PLAN_REVIEWER = ROOT / "config/agent/_plan/draft/reviewer.md"
-WRITABLE_SURFACE = """# Writable surface
-Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
-"""
-WRITABLE_SURFACE_ITERATE = """# Writable surface
-Create or overwrite files only under `artifacts/iterate/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
-"""
+WRITABLE_SURFACE_TEMPLATE = ROOT / "config/rules/cards/structure/writable-surface.md"
+WRITABLE_SURFACE_IMPORT = '{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}'
+WRITABLE_SURFACE_ITERATE_IMPORT = (
+    '{{ file="./config/rules/cards/structure/writable-surface.md" root="artifacts/iterate" }}'
+)
 CROSS_WORKFLOW_READ_ONLY_BASH = (
     ROOT / ".opencode/agent/_iterate/review.md",
     ROOT / ".opencode/agent/_iterate/verifier.md",
@@ -155,11 +154,25 @@ def bash_permission(frontmatter: str) -> str:
 
 
 def expand_config_imports(source: str) -> str:
-    pattern = re.compile(r'\{\{ file="(?P<path>\./[^"]+)" \}\}')
-    return pattern.sub(
-        lambda match: text(ROOT / "config" / match.group("path").removeprefix("./")),
-        source,
-    )
+    pattern = re.compile(r'\{\{ file="(?P<path>\./[^"]+)"(?P<args>(?:\s+\w+="[^"]*")*)\s*\}\}')
+
+    def substitute(match: re.Match[str]) -> str:
+        relative = match.group("path").removeprefix("./")
+        candidates = (ROOT / "config" / relative, ROOT / relative)
+        imported = text(next(path for path in candidates if path.is_file()))
+        for key, value in re.findall(r'(\w+)="([^"]*)"', match.group("args")):
+            imported = imported.replace("{{arg:" + key + "}}", value)
+        return imported
+
+    return pattern.sub(substitute, source)
+
+
+def writable_surface(root: str) -> str:
+    return text(WRITABLE_SURFACE_TEMPLATE).replace("{{arg:root}}", root)
+
+
+WRITABLE_SURFACE = writable_surface("artifact")
+WRITABLE_SURFACE_ITERATE = writable_surface("artifacts/iterate")
 
 
 def lint_gate_block(rule: str) -> str:
@@ -764,7 +777,8 @@ class ImplementWorkflowTests(unittest.TestCase):
         for path in WRITABLE_SURFACE_AGENTS:
             with self.subTest(path=path.relative_to(ROOT)):
                 body = text(path)
-                self.assertIn(WRITABLE_SURFACE, body)
+                self.assertIn(WRITABLE_SURFACE_IMPORT, body)
+                self.assertIn(WRITABLE_SURFACE, expand_config_imports(body))
 
     def test_reviewer_gate_fails_closed_without_writes(self) -> None:
         rule = text(REVIEW_FINDINGS)
@@ -821,11 +835,13 @@ class ImplementWorkflowTests(unittest.TestCase):
         for path in WRITABLE_SURFACE_CROSS_ARTIFACT:
             with self.subTest(path=path.relative_to(ROOT)):
                 body = text(path)
-                self.assertIn(WRITABLE_SURFACE, body)
+                self.assertIn(WRITABLE_SURFACE_IMPORT, body)
+                self.assertIn(WRITABLE_SURFACE, expand_config_imports(body))
         for path in WRITABLE_SURFACE_CROSS_ITERATE:
             with self.subTest(path=path.relative_to(ROOT)):
                 body = text(path)
-                self.assertIn(WRITABLE_SURFACE_ITERATE, body)
+                self.assertIn(WRITABLE_SURFACE_ITERATE_IMPORT, body)
+                self.assertIn(WRITABLE_SURFACE_ITERATE, expand_config_imports(body))
 
     def test_cross_workflow_writers_use_broad_artifact_glob(self) -> None:
         for path in WRITABLE_SURFACE_CROSS_ARTIFACT:

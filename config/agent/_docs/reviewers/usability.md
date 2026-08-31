@@ -107,8 +107,7 @@ Review only whether the scoped documentation helps its intended reader complete 
 # Candidate threshold
 `BLOCKING` requires genuine ambiguity, unsafe ordering, missing task-critical context, or wording likely to make a reader perform the wrong action. Other useful improvements are advisory; low-value copy-editing is omitted.
 
-# Writable surface
-Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
+{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
 # Artifact
 Write `candidate_path`:

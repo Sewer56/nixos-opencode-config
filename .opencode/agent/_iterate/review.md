@@ -103,8 +103,7 @@ Review exact staged instruction change. Generate hypotheses; verifier owns repai
 
 Write concise `review_path` with decision `PASS | CANDIDATES | INCOMPLETE`, findings, important verified behavior, and missing evidence.
 
-# Writable surface
-Create or overwrite files only under `artifacts/iterate/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
+{{ file="./config/rules/cards/structure/writable-surface.md" root="artifacts/iterate" }}
 
 # Output
 

@@ -16,7 +16,11 @@ Use this order:
 Use `None` for an empty required section.
 
 ### Stable identifiers
-Use `[D#]` for decisions, `[INV-#]` for invariants, `[AC-#]` for acceptance criteria, `[P#]` for plan items, and `[Q#]` for questions. Keep identifiers stable across revisions; append new ids rather than renumbering accepted content. These identifiers are plan-internal in any form, bare or bracketed (`AC-1`, `[AC-#]`): never cite them in committed code, comments, tests, docs, or commit messages.
+Use `[D#]` for decisions, `[INV-#]` for invariants, `[AC-#]` for acceptance criteria, `[P#]` for plan items, and `[Q#]` for questions.
+
+Keep identifiers stable across revisions; append new ids rather than renumbering accepted content.
+
+These identifiers are plan-internal in any form, bare or bracketed (`AC-1`, `[AC-#]`): never cite them in committed code, comments, tests, docs, or commit messages.
 
 ### Plan item shape
 Each `[P#]` item has:
@@ -37,10 +41,20 @@ Each open question states `Blocking: YES | NO`, the decision needed, and its aff
 Separate `### Targeted` and `### Full` commands. Commands must come from repository manifests, CI, or existing developer documentation when available. Use `None found` rather than inventing commands.
 
 ### Relevant files table
-`## Relevant Files` uses columns `Path | Type | Plan Refs | Why`. Use `change`, `contract`, `verify`, `instruction`, `test`, `docs`, `config`, or `schema` as useful type labels. Include only files likely to change a planning or implementation decision: intended targets, direct contracts/consumers, applicable path-specific instructions, associated tests/docs, and validation owners. A path must exist or be marked `new` with a plausible parent/module. This table is not an exhaustive dependency inventory.
+`## Relevant Files` uses columns `Path | Type | Plan Refs | Why`.
+
+Use `change`, `contract`, `verify`, `instruction`, `test`, `docs`, `config`, or `schema` as useful type labels.
+
+Include only files likely to change a planning or implementation decision: intended targets, direct contracts/consumers, applicable path-specific instructions, associated tests/docs, and validation owners.
+
+A path must exist or be marked `new` with a plausible parent/module.
+
+This table is not an exhaustive dependency inventory.
 
 ### Intent and rationale
-`Source Request`, `Overall Goal`, approved decisions, invariants, acceptance criteria, and non-goals are the durable behavioral authority. Preserve rationale only when it changes how an ambiguous implementation or review decision should be resolved; encode it with the relevant decision, invariant, risk, or non-goal rather than creating a general history transcript.
+`Source Request`, `Overall Goal`, approved decisions, invariants, acceptance criteria, and non-goals are the durable behavioral authority.
+
+Preserve rationale only when it changes how an ambiguous implementation or review decision should be resolved; encode it with the relevant decision, invariant, risk, or non-goal rather than creating a general history transcript.
 
 ### No pseudo-patch planning
 Do not require or include exact line ranges, import diffs, unified diffs, or near-final function bodies. Symbol anchors and short illustrative interface/data shapes are allowed only when they clarify an approved decision.

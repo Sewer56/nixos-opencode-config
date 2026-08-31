@@ -111,7 +111,11 @@ Repair Notes: [[failed checks or verified target blockers, otherwise None]]
 
 ## 4. Review and verify
 
-Call `_iterate/review` for the required lenses. Pass no editor narration. Send candidates to `_iterate/verifier` only when the review reports findings; skip it when there are none. Repair accepted `TARGET` blockers only. Contract/evidence defects are `INCOMPLETE`; never repair advisories.
+Call `_iterate/review` for the required lenses. Pass no editor narration.
+
+Send candidates to `_iterate/verifier` only when the review reports findings; skip it when there are none.
+
+Repair accepted `TARGET` blockers only. Contract/evidence defects are `INCOMPLETE`; never repair advisories.
 
 ## 5. Repair and finish
 

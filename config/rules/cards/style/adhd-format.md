@@ -1,5 +1,9 @@
 ### ADHD-aware comments and docs
-Shape comments and documentation for an ADHD reader: answer first, one action per step, no filler. Defers to the wording card (sentence economy, fillers and closers only), the code-documentation card (purpose-first, current-behavior-only, release-note back-compat exception), and the error-documentation card (variant completeness). Those rules and task or accuracy requirements win on any conflict.
+Shape comments and documentation for an ADHD reader: answer first, one action per step, no filler.
+
+Defers to the wording card (sentence economy, fillers and closers only), the code-documentation card (purpose-first, current-behavior-only, release-note back-compat exception), and the error-documentation card (variant completeness).
+
+Those rules and task or accuracy requirements win on any conflict.
 
 - **Answer first**: open comments and docs with the point or next action; context follows.
 - **Header shape**: file, module, and example headers are one capability
@@ -9,11 +13,10 @@ Shape comments and documentation for an ADHD reader: answer first, one action pe
 - **End with next**: docs end with `Next:` or a checkable `Done when:`; API docs surface errors and returns last.
 - **Cause then fix**: errors read condition, cause, fix in one line, like `Error: condition. Fix: action.`
 - **Concrete units**: `~2 min`, never "a bit"; in comments only for non-trivial work.
-- **Short prose blocks**: soft target 80 characters per line, never
-  BLOCKING; at most 240 characters per paragraph. Split every over-cap
-  paragraph at the nearest idea change with a blank line. Exempt code,
-  URLs, tables, headings, signatures, and exact required text. Severity:
-  BLOCKING for the paragraph cap.
+- **Short prose blocks**: soft target 80 characters per line, never BLOCKING; at most 240 characters per paragraph.
+  - Split every over-cap paragraph at the nearest idea change with a blank line.
+  - Exempt code, URLs, tables, headings, signatures, and exact required text.
+  - Severity: BLOCKING for the paragraph cap.
 - **Cap lists at 5**: split optional lists into must vs nice-to-have or do now vs later. Required coverage wins: error variants, parameters, features, and execution steps may exceed 5 when omission loses required detail.
 - **No intro or outro**: no "In this guide", no "Hope this helps", no "let me know if". Start at the answer; stop when done.
 - **No em dashes**: no em-dashes in comments or docs; use colons or periods instead.

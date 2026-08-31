@@ -83,7 +83,11 @@ permission:
     "_review/verifier": allow
 ---
 
-Cleanup of existing, working code. You are sole code writer and loop owner: bring targets up to the standards the implement workflow enforces — same imported rules, same review gauntlet. Behavior preservation is the authority boundary; repository behavior plus your recorded handoff are the authority for cleanup, review, and repair.
+Cleanup of existing, working code.
+
+You are sole code writer and loop owner: bring targets up to the standards the implement workflow enforces. Use the same imported rules and the same review gauntlet.
+
+Behavior preservation is the authority boundary. Repository behavior plus your recorded handoff are the authority for cleanup, review, and repair.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
@@ -91,7 +95,7 @@ Cleanup of existing, working code. You are sole code writer and loop owner: brin
 
 - The full request from `$ARGUMENTS`. Require explicit target paths; return `NEEDS_INPUT` when no target paths are supplied.
 - Derive a short 2-3 word `slug` from the cleanup request and resolve the repository root.
-- `run_prefix = artifact/CLEANUP-<slug>.<UTC timestamp>` — a filename prefix, never a directory; never `mkdir`.
+- `run_prefix = artifact/CLEANUP-<slug>.<UTC timestamp>`: a filename prefix, never a directory; never `mkdir`.
 - `handoff_path = [[run_prefix]].handoff.md`
 - `validation_path = [[run_prefix]].rNN.quick.validation.md`
 - `review_path = [[run_prefix]].rNN.<domain>.review.md`
@@ -108,8 +112,9 @@ Create or overwrite each exact assigned path as its writer; never create placeho
 1. Record and preserve unrelated changes. Return `NEEDS_INPUT` when any target is already changed or no safe scope can be derived.
 2. Bound the cleanup into one cohesive change: explicit target paths, standards focus, preserve/exclude rules, validation commands, and review routes.
 3. Write `handoff_path` recording targets, standards focus, preserve/exclude, validation commands, and review routes.
-4. Read the handoff, applicable instructions, and needed context. Apply the smallest diff that brings the targets into compliance with the imported rules with no observable behavior change. Skip generated, vendored, snapshot, fixture, and lock files.
-5. Return `NEEDS_INPUT` before making an unapproved behavior, contract, compatibility, security, or scope decision.
+4. Read the handoff, applicable instructions, and needed context. Apply the smallest diff that brings the targets into compliance with the imported rules with no observable behavior change.
+5. Skip generated, vendored, snapshot, fixture, and lock files.
+6. Return `NEEDS_INPUT` before making an unapproved behavior, contract, compatibility, security, or scope decision.
 
 ## 2. Stage and run quick checks
 
@@ -118,7 +123,8 @@ Create or overwrite each exact assigned path as its writer; never create placeho
 3. Inspect the staged diff and run `git diff --cached --check`.
 4. Run quick validation, then applicable targeted tests. Record a concrete reason when no test applies. Do not install dependencies or update snapshots/generated files.
 5. Record commands, results, decisive output, missing environment, and test evidence in `validation_path`.
-6. Repair code or lint failures, then rerun this all-checks loop from the lint gate before restaging and rerunning every quick check, overwriting the current round's `validation_path`; `rNN` increments only on post-review repair turns. Missing environment is `INCOMPLETE`.
+6. Repair code or lint failures, then rerun this all-checks loop from the lint gate before restaging and rerunning every quick check, overwriting the current round's `validation_path`.
+7. `rNN` increments only on post-review repair turns; missing environment is `INCOMPLETE`.
 
 ## 3. Call exact reviewers
 
@@ -131,7 +137,15 @@ Review only after quick checks PASS.
   - `TESTS` when the staged diff changes observable behavior or touches test code;
   - `SECURITY` for trust boundaries, auth, secrets, IPC, untrusted input, filesystem/shell/SQL, serialization, cryptography, permissions, or dependency trust.
 
-Call the selected reviewers in parallel. Before each call, compute `review_path` for the current round. Supply one explicit envelope with every declared input and placeholder resolved; use `Scope: STANDALONE` for correctness, quality, and tests, and the reviewer-declared `Scope: COHORT_STAGED` for security and performance:
+Call the selected reviewers in parallel.
+
+Before each call, compute `review_path` for the current round.
+
+Supply one explicit envelope with every declared input and placeholder resolved.
+
+Use `Scope: STANDALONE` for correctness, quality, and tests.
+
+Use the reviewer-declared `Scope: COHORT_STAGED` for security and performance:
 
 ```text
 <review-inputs>
@@ -147,11 +161,31 @@ Prior Verdict Paths: [[concrete paths or None]]
 </review-inputs>
 ```
 
-Add every other input declared by the selected reviewer to that envelope. Require it to inspect the staged diff independently, write the requested artifact, and return only its exact `# Output` envelope. After each reviewer returns, read the artifact at the exact assigned `review_path`; require a readable, schema-conforming artifact, artifact-consistent with the returned envelope, with an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count. Missing or malformed evidence is `INCOMPLETE`, never PASS; an envelope without its on-disk artifact is missing evidence. Every selected reviewer must complete. A failed or cancelled delegation is `FAIL` or `INCOMPLETE`; never perform delegated review or verdict work yourself; never report SUCCESS without its evidence.
+Add every other input declared by the selected reviewer to that envelope.
+
+Require it to inspect the staged diff independently, write the requested artifact, and return only its exact `# Output` envelope.
+
+After each reviewer returns, read the artifact at the exact assigned `review_path`.
+
+Require a readable, schema-conforming artifact, artifact-consistent with the returned envelope.
+
+Require an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count.
+
+Missing or malformed evidence is `INCOMPLETE`, never PASS; an envelope without its on-disk artifact is missing evidence.
+
+Every selected reviewer must complete.
+
+A failed or cancelled delegation is `FAIL` or `INCOMPLETE`; never perform delegated review or verdict work yourself; never report SUCCESS without its evidence.
 
 ## 4. Call exact verifier and repair
 
-Send candidates to `_review/verifier` only when any review artifact contains findings; skip it when every review reports zero findings. Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`; use `scope=STANDALONE`, `scope_boundary=STAGED`, `plan_path=None`, `handoff_path=[[handoff_path]]`, `cohort_path=None`, and `base_commit=[[base_commit]]`. Repair accepted blockers and accepted advisories within the bound scope.
+Send candidates to `_review/verifier` only when any review artifact contains findings; skip it when every review reports zero findings.
+
+Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`.
+
+Use `scope=STANDALONE`, `scope_boundary=STAGED`, `plan_path=None`, `handoff_path=[[handoff_path]]`, `cohort_path=None`, and `base_commit=[[base_commit]]`.
+
+Repair accepted blockers and accepted advisories within the bound scope.
 
 After repair, rerun the Section 2 all-checks loop from the lint gate before restaging, then rerun correctness, quality, and affected optional reviews in parallel; rerun the verifier when re-reviews emit new candidates.
 

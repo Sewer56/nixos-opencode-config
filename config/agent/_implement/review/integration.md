@@ -99,10 +99,13 @@ Review the complete base-to-final implementation as one system. Focus on interac
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
-Apply imported rules to cumulative base-to-final diff. Audit acceptance and impact map, then inspect only cross-cohort composition: end-to-end contracts, unchanged consumers, registrations/exports/migrations, cleanup/rollback, compatibility, and integration evidence. Do not repeat cohort findings unless cumulative evidence changes conclusion.
+Apply imported rules to cumulative base-to-final diff.
 
-# Writable surface
-Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
+Audit acceptance and impact map, then inspect only cross-cohort composition: end-to-end contracts, unchanged consumers, registrations/exports/migrations, cleanup/rollback, compatibility, and integration evidence.
+
+Do not repeat cohort findings unless cumulative evidence changes conclusion.
+
+{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
 # Artifact
 Write `review_path`:

@@ -67,12 +67,12 @@ Create clear, human-readable commits for completed work. Commit eligible changes
 
 # Commit style
 Use one of these prefixes:
-- `Added:` — new features
-- `Changed:` — changes to existing functionality
-- `Deprecated:` — soon-to-be removed features
-- `Removed:` — removed features
-- `Fixed:` — bug fixes
-- `Security:` — vulnerability fixes
+- `Added:` new features
+- `Changed:` changes to existing functionality
+- `Deprecated:` soon-to-be removed features
+- `Removed:` removed features
+- `Fixed:` bug fixes
+- `Security:` vulnerability fixes
 
 Write what changed and why, not a file inventory or implementation transcript. One logical change per commit.
 
@@ -85,7 +85,9 @@ Use subject only for small change; add concise outcome/test/compatibility bullet
 4. Without implementation boundary, split only obvious valid change groups; otherwise return `NEEDS_INPUT`.
 5. Without a pre-staged reviewed boundary, stage explicit paths or hunks. Never use blanket `git add -A` or `git add .`.
 6. Re-read staged diff and write message for logical outcome.
-7. Create a new commit by default. Amend current `HEAD` only when user explicitly requests it and inspected `HEAD` is intended target. For an implementation boundary, confirm resulting commit contains only intended paths, committed paths are clean, and unrelated changes remain. Never push, reset, or commit inside a dirty submodule unless user explicitly requested that exact submodule operation.
+7. Create a new commit by default. Amend current `HEAD` only when user explicitly requests it and inspected `HEAD` is intended target.
+8. For an implementation boundary, confirm resulting commit contains only intended paths, committed paths are clean, and unrelated changes remain.
+9. Never push, reset, or commit inside a dirty submodule unless user explicitly requested that exact submodule operation.
 
 # Safety
 - Commit with `git commit -m` or `git commit -F -` (heredoc); amend only on explicit user request via `git commit --amend -m` or `git commit --amend -F -`.

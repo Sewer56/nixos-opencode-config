@@ -14,17 +14,21 @@ Evaluate top-to-bottom; first match wins.
 |---|-----------|----------|
 | 1 | Re-exported by another module's public API | **KEEP PUBLIC** |
 | 2 | Documented as public API contract (doc comments, `# API` sections) | **KEEP PUBLIC** |
-| 3 | Required by derive macro on non-fully-private type — any derive accessing fields or generating public methods forces field visibility ≥ type visibility (see language file; e.g. `serde`, `pyo3` families) | **KEEP PUBLIC** |
+| 3 | Required by derive macro on non-fully-private type: any derive accessing fields or generating public methods forces field visibility ≥ type visibility (see language file; e.g. `serde`, `pyo3` families) | **KEEP PUBLIC** |
 | 4 | Part of trait impl on non-fully-private type (visibility must satisfy trait contract) | **KEEP PUBLIC** |
 | 5 | Referenced in binary, example, or FFI binding outside module | **KEEP PUBLIC** |
 | 6 | Accessed via reflection/string reference or DI wiring (invisible to grep; see language file; e.g. `getattr`) | **KEEP PUBLIC** |
-| 7 | Visibility contains `doc(hidden)` — author flagged intentionally hidden | **MANUAL REVIEW** |
+| 7 | Visibility contains `doc(hidden)`: author flagged intentionally hidden | **MANUAL REVIEW** |
 | 8 | `candidate-medium` AND used only in code-generated files (`Code generated`, `DO NOT EDIT` headers) | **CANDIDATE LOW** |
 | 9 | `candidate-high` | **CANDIDATE HIGH** |
 | 10 | `candidate-medium` | **CANDIDATE MEDIUM** |
 | 11 | `review` | **MANUAL REVIEW** |
 
-Decision table = sole authority for initial classification. Rules 1–6 → KEEP PUBLIC. Rule 7 → MANUAL REVIEW (doc-hidden). Rule 8 → demote MEDIUM to LOW. Restriction hint override: if hint is `none` AND table outcome ≠ KEEP PUBLIC → reclassify as MANUAL REVIEW (no specific visibility change can be recommended). KEEP PUBLIC items are correctly public regardless of hint.
+Decision table = sole authority for initial classification. Rules 1–6 → KEEP PUBLIC. Rule 7 → MANUAL REVIEW (doc-hidden). Rule 8 → demote MEDIUM to LOW.
+
+Restriction hint override: if hint is `none` AND table outcome ≠ KEEP PUBLIC → reclassify as MANUAL REVIEW (no specific visibility change can be recommended).
+
+KEEP PUBLIC items are correctly public regardless of hint.
 
 ### Restriction hint mapping
 For every candidate, map Restriction Hint to target visibility in diff:

@@ -105,10 +105,13 @@ Review one staged cohort or final-repair commit. Produce candidate findings only
 # Review
 Check `validation_path` first. Require applicable tests to pass after staging. Accept “no test applies” only when diff and test layout support it. Missing evidence is `INCOMPLETE`; code-caused failure is a candidate.
 
-Then apply imported rules to staged diff as one behavioral change. Include mapped impact surfaces, completed predecessor compatibility, and planned callers/registrations/exports/schemas/migrations/configuration. Leave test-design advisories and optional-domain advisories to routed reviewers.
+Then apply imported rules to staged diff as one behavioral change.
 
-# Writable surface
-Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
+Include mapped impact surfaces, completed predecessor compatibility, and planned callers/registrations/exports/schemas/migrations/configuration.
+
+Leave test-design advisories and optional-domain advisories to routed reviewers.
+
+{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
 # Artifact
 Write `review_path`:

@@ -101,10 +101,11 @@ Review only factual fidelity and coverage in the scoped end-user documentation. 
 - Prior refuted findings are not repeated without new evidence.
 
 # Candidate threshold
-Raise a blocker only when a reader could follow the documentation and get wrong behavior, fail a required task, use an invalid command/API, or miss a material safety/compatibility constraint. Minor optional elaboration is advisory or omitted.
+Raise a blocker only when a reader could follow the documentation and get wrong behavior, fail a required task, use an invalid command/API, or miss a material safety/compatibility constraint.
 
-# Writable surface
-Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
+Minor optional elaboration is advisory or omitted.
+
+{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
 # Artifact
 Write `candidate_path`:

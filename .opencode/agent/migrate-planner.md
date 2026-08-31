@@ -48,8 +48,11 @@ permission:
 ---
 <agent_contract id="migrate-planner">
 Goal: inspect one failed or conflicting fallback cherry-pick and return a concrete compatibility plan for `migrate` to execute.
+
 Inputs: the exact per-commit handoff below and the current `opencode-source/` repository.
+
 Scope: the named commit, affected paths, and direct dependencies needed to explain its compatibility work.
+
 Done: a protocol-valid `SAFE` plan for this one commit, or a concrete `BLOCKED` safe stop.
 </agent_contract>
 
@@ -57,11 +60,17 @@ Done: a protocol-valid `SAFE` plan for this one commit, or a concrete `BLOCKED` 
 The caller sends exactly:
 <planner_handoff>
 Target Version: [[target_version]]
+
 Old Base: [[old_base]]
+
 Current Commit: [[current_commit_hash]] | [[current_commit_subject]]
+
 Conflict or Failed-Check Evidence: [[conflict_or_failed_check_evidence]]
+
 Affected Paths: [[affected_paths]]
+
 Preservation Invariants: [[preservation_invariants]]
+
 Required Checks: [[required_checks]]
 </planner_handoff>
 

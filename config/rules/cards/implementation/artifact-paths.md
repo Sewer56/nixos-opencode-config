@@ -1,5 +1,5 @@
 ### Artifact paths
-`run_prefix` is `artifact/[[artifact_base]].[[run_id]].implement` — a filename prefix, never a directory; never `mkdir`.
+`run_prefix` is `artifact/[[artifact_base]].[[run_id]].implement`: a filename prefix, never a directory; never `mkdir`.
 
 Bind each path variable by substitution: `Cnn` = cohort id (`C01`, `C02`, …), `rNN` = round starting `r01`, +1 per repair round, `<domain>` = reviewer domain (`correctness`, `quality`, `tests`, `security`, `performance`, `integration`).
 

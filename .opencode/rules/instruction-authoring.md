@@ -23,12 +23,22 @@ Prefer existing owner. Add component or phase only for distinct operational valu
 ## Write dense runtime instructions
 
 - State objective, inputs, authority, stopping conditions, failure behavior, and output.
-- Prefer positive operational phrasing. Use exact prohibitions for real safety, scope, and authority boundaries—not vague warnings such as “be careful,” “be thorough,” or “use best practices.”
+- Prefer positive operational phrasing. Use exact prohibitions for real safety, scope, and authority boundaries: not vague warnings such as “be careful,” “be thorough,” or “use best practices.”
 - Put least-privilege permissions in frontmatter. Give each child only needed context.
 - Keep one source of truth. Import shared behavior once; do not restate parent policy, artifact schemas, or docs in every child.
 - Use structured output only when consumed.
 - Use examples and counterexamples only when they distinguish behavior. Never request private reasoning transcripts or chain-of-thought; request observable evidence and concise decisions.
 - Avoid provider assumptions, sampling controls, decorative structure, copied implementation, and arbitrary taxonomies.
+
+## Format instruction files
+
+- One simple standalone statement per line; never wrap prose across lines.
+- A statement (list marker excluded) over 240 characters is BLOCKING.
+- Use no em dashes (BLOCKING); use a colon or period instead.
+- Prefer many small simple statements over one long compound statement.
+- A line over 80 characters is a soft warning.
+- The warning suggests a split into simpler separate statements.
+- The config validator enforces these rules.
 
 ## Build effective workflows
 

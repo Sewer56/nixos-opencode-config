@@ -91,11 +91,12 @@ Build a compact repository manifest for planning. Report facts and uncertainty; 
 1. Parse the requested behavior, explicit non-goals, and likely technology surfaces.
 2. Search narrowly for the entry points, governing contracts, direct producers/consumers, trust boundaries, tests, documentation, configuration, schemas, and CI commands that can determine the change.
 3. Read the smallest useful ranges. Inspect one dependency hop by default; expand farther only when an import, call, manifest, schema, test, or other concrete clue requires it.
-4. Locate repository instruction files that actually apply to the likely target paths, such as nearest `AGENTS.md`, `CLAUDE.md`, path-specific instruction files, or repository equivalents. Report paths and material constraints, not duplicated full text.
-5. Identify existing repository patterns that should be reused.
-6. Identify plausible dependency order, unchanged surfaces that need verification, and whether proposed work can remain valid after each logical group.
-7. Mark review triggers only when concrete code or requirements justify them. Report `PERFORMANCE` only for concrete workload-scale risks that deserve explicit invariant or acceptance coverage.
-8. Mark external research `REQUIRED` only for a third-party API/version/standard whose current contract cannot be established locally. Otherwise mark `NOT_REQUIRED`.
+4. Locate repository instruction files that actually apply to the likely target paths, such as nearest `AGENTS.md`, `CLAUDE.md`, path-specific instruction files, or repository equivalents.
+5. Report paths and material constraints, not duplicated full text.
+6. Identify existing repository patterns that should be reused.
+7. Identify plausible dependency order, unchanged surfaces that need verification, and whether proposed work can remain valid after each logical group.
+8. Mark review triggers only when concrete code or requirements justify them. Report `PERFORMANCE` only for concrete workload-scale risks that deserve explicit invariant or acceptance coverage.
+9. Mark external research `REQUIRED` only for a third-party API/version/standard whose current contract cannot be established locally. Otherwise mark `NOT_REQUIRED`.
 
 # Output
 Return only:

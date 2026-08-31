@@ -10,18 +10,26 @@ Optional scope, issue reference, grouping preference, or message guidance:
 $ARGUMENTS
 ```
 
-If no instructions are given above, commit the changes made during this conversation/session. Resolve the exact set by mapping the conversation's known work onto the working tree, and confirm that mapping with `git status` / `git diff` reads; if nothing the conversation produced maps onto a change, fall back to the current unstaged changes.
+If no instructions are given above, commit the changes made during this conversation/session.
+
+Resolve the exact set by mapping the conversation's known work onto the working tree, and confirm that mapping with `git status` / `git diff` reads.
+
+If nothing the conversation produced maps onto a change, fall back to the current unstaged changes.
 
 # Commit style
 Use one of these prefixes:
-- `Added:` — new features
-- `Changed:` — changes to existing functionality
-- `Deprecated:` — soon-to-be removed features
-- `Removed:` — removed features
-- `Fixed:` — bug fixes
-- `Security:` — vulnerability fixes
+- `Added:` new features
+- `Changed:` changes to existing functionality
+- `Deprecated:` soon-to-be removed features
+- `Removed:` removed features
+- `Fixed:` bug fixes
+- `Security:` vulnerability fixes
 
-Write what changed and why, not a file inventory or implementation transcript. One logical change per commit. Use subject only for small change; add concise outcome/test/compatibility bullets when useful. Preserve multiline messages with `git commit -F -`.
+Write what changed and why, not a file inventory or implementation transcript. One logical change per commit.
+
+Use subject only for small change; add concise outcome/test/compatibility bullets when useful.
+
+Preserve multiline messages with `git commit -F -`.
 
 # Process
 1. Inspect `git status`, `git diff`, `git diff --check`, and recent commits in parallel.

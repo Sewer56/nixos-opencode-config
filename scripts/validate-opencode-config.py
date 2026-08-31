@@ -24,6 +24,9 @@ Commands and task graph:
 Prompt structure and imports:
 - Check Markdown fences, output contracts, imports, import cycles, rule
   reachability and names, and imported support files.
+- Check instruction format: per-line statement cap of 240 characters, em-dash
+  ban, and soft split-suggestion warnings over 80 characters across prompt and
+  rule Markdown.
 
 Documentation and source syntax:
 - Require README.md, EXPLAINER.md, and .opencode/ITERATE.md.
@@ -70,6 +73,12 @@ REQUIRED_PATHS = (
 )
 LOCAL_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 REFERENCE_LINK_RE = re.compile(r"(?m)^\[(?!\^)[^\]]+\]:\s*(\S+)")
+INSTRUCTION_LIST_RE = re.compile(r"^\s*(?:[-*+]\s+|\d+\.\s+)")
+INSTRUCTION_TABLE_RE = re.compile(r"^\s*\|")
+INSTRUCTION_URL_RE = re.compile(r"^\s*(https?://\S+|<https?://[^>]+>)\s*$")
+INSTRUCTION_TEMPLATE_RE = re.compile(r"^\s*\{\{")
+INSTRUCTION_PARAGRAPH_CAP = 240
+INSTRUCTION_LINE_TARGET = 80
 
 def load_frontmatter(path: Path) -> dict[str, Any]:
     text = path.read_text(encoding="utf-8")
@@ -145,6 +154,60 @@ def active_prompt_files(repo: Path) -> list[Path]:
             paths.extend(root.rglob("*.md"))
             paths.extend(root.rglob("*.txt"))
     return sorted(set(paths))
+
+
+def instruction_format_issues(text: str) -> list[tuple[str, str]]:
+    """Return ``(severity, message)`` instruction-format issues for one text.
+
+    Each line is one statement; consecutive lines are never joined. Error: a
+    non-exempt line whose statement (list marker excluded) exceeds 240
+    characters. Error: any em dash. Warning: a non-exempt line over 80
+    characters, suggesting a split into simpler separate statements. Exempt
+    from all three rules: YAML frontmatter, fenced code content, table rows,
+    URL-only lines, ``{{ ... }}`` template directive lines, and blank lines.
+    """
+    issues: list[tuple[str, str]] = []
+    lines = text.split("\n")
+    frontmatter_lines = 0
+    if text.startswith("---\n"):
+        end = text.find("\n---\n", 4)
+        if end >= 0:
+            frontmatter_lines = text[: end + 5].count("\n")
+
+    def exempt(number: int, line: str) -> bool:
+        if number <= frontmatter_lines:
+            return True
+        if not line.strip():
+            return True
+        return bool(
+            INSTRUCTION_TABLE_RE.match(line)
+            or INSTRUCTION_URL_RE.match(line)
+            or INSTRUCTION_TEMPLATE_RE.match(line)
+        )
+
+    fenced = False
+    for number, line in enumerate(lines, 1):
+        if FENCE_RE.match(line):
+            fenced = not fenced
+            continue
+        if fenced or exempt(number, line):
+            continue
+        if "—" in line:
+            issues.append(("error", f"line {number}: em dash"))
+        statement = INSTRUCTION_LIST_RE.sub("", line, count=1)
+        if len(statement) > INSTRUCTION_PARAGRAPH_CAP:
+            issues.append(
+                ("error", f"line {number}: statement exceeds 240 characters ({len(statement)})")
+            )
+        elif len(line) > INSTRUCTION_LINE_TARGET:
+            issues.append(
+                (
+                    "warning",
+                    f"line {number}: {len(line)} characters; "
+                    "split into simpler separate statements",
+                )
+            )
+    return issues
 
 
 def validate_permission_map(ident: str, permission: Any, errors: list[str]) -> None:
@@ -506,6 +569,23 @@ def main() -> int:
     for path in sorted((repo / "config/agent").rglob("*")):
         if path.is_file() and path.suffix != ".md" and path.resolve() not in imported_targets:
             errors.append(f"unreferenced prompt support file: {path.relative_to(repo)}")
+
+    instruction_targets = sorted({*all_prompt_files, *(repo / ".opencode/rules").glob("*.md")})
+    instruction_format_error_count = 0
+    instruction_format_warning_count = 0
+    for path in instruction_targets:
+        for severity, message in instruction_format_issues(path.read_text(encoding="utf-8")):
+            entry = f"{path.relative_to(repo)}: {message}"
+            if severity == "error":
+                instruction_format_error_count += 1
+                errors.append(entry)
+            else:
+                instruction_format_warning_count += 1
+                warnings.append(entry)
+    details.append(
+        f"Instruction format: {instruction_format_error_count} statement error(s), "
+        f"{instruction_format_warning_count} split-suggestion warning(s)"
+    )
 
     for part in REQUIRED_PATHS:
         if not (repo / part).is_file():

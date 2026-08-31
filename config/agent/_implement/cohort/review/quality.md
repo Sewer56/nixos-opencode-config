@@ -109,10 +109,13 @@ Review one proposed cohort or final-repair commit for material quality defects. 
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
-Apply imported groups to staged diff. General quality and placement apply to code; documentation and language groups apply to corresponding changed text. Do not duplicate correctness or optional-domain findings unless quality impact is distinct.
+Apply imported groups to staged diff.
 
-# Writable surface
-Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
+General quality and placement apply to code; documentation and language groups apply to corresponding changed text.
+
+Do not duplicate correctness or optional-domain findings unless quality impact is distinct.
+
+{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
 # Artifact
 Write `review_path`:

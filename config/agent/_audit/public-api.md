@@ -82,7 +82,9 @@ Derive a short `slug`, UTC `run_id`, and `report_path = artifact/PROMPT-API-AUDI
 
 ## 2. Chunk and collect
 - Group files by language.
-- Use `chunk-files-by-tokens -s 32000 [[paths]]` when available. If absent, use `cargo run -q -p chunk-files-by-tokens -- -s 32000 [[paths]]` only when this repository provides that workspace; otherwise create deterministic sorted chunks and record the fallback.
+- Use `chunk-files-by-tokens -s 32000 [[paths]]` when available.
+- If absent, use `cargo run -q -p chunk-files-by-tokens -- -s 32000 [[paths]]` only when this repository provides that workspace.
+- Otherwise create deterministic sorted chunks and record the fallback.
 - Dispatch `_audit/public-api/collector` in batches of at most four parallel tasks. Each collector receives one language and explicit files.
 - Retry malformed/transient output once. Do not re-run a completed chunk or ask collectors to expand scope.
 

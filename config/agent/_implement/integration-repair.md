@@ -85,9 +85,11 @@ Repair final integration. You are sole code writer for this turn.
 
 1. Read global contract/impact map and only failed commands, verifier `Accepted blockers`, and verifier `Accepted advisories`.
 2. Trace issue across plan-covered producers, consumers, schemas, tests, and configuration. Use smallest correction preserving every completed cohort contract.
-3. Ignore rejected and eschewed candidates. Implement accepted blockers and accepted advisories only within approved plan scope; an advisory that cannot be fixed without widening scope stays recorded and is not a FAIL. Do not broaden plan or redesign architecture.
-4. Add focused regression evidence when correction needs it. Leave full validation to parent orchestrator.
-5. Inspect complete writer-local diff for accidental scope. Never touch protected user-change paths. Return `NEEDS_INPUT` for any new behavior, compatibility, security, migration, or authority decision.
+3. Ignore rejected and eschewed candidates. Implement accepted blockers and accepted advisories only within approved plan scope.
+4. An advisory that cannot be fixed without widening scope stays recorded and is not a FAIL.
+5. Do not broaden plan or redesign architecture.
+6. Add focused regression evidence when correction needs it. Leave full validation to parent orchestrator.
+7. Inspect complete writer-local diff for accidental scope. Never touch protected user-change paths. Return `NEEDS_INPUT` for any new behavior, compatibility, security, migration, or authority decision.
 
 # Output
 

@@ -102,7 +102,13 @@ Verify candidate findings against the actual scoped code. Candidate reviewers ge
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Refute-first process
-Apply imported evidence rules to exact scope. For each candidate, locate cited code and test strongest plausible refutation using nearby guards, dependents, validation, contracts, prior verdicts, and pinned dependency sources when a claim depends on third-party behavior. For `STANDALONE`, repository behavior and applicable rules replace plan authority. Classify:
+Apply imported evidence rules to exact scope.
+
+For each candidate, locate cited code and test strongest plausible refutation using nearby guards, dependents, validation, contracts, prior verdicts, and pinned dependency sources when a claim depends on third-party behavior.
+
+For `STANDALONE`, repository behavior and applicable rules replace plan authority.
+
+Classify:
 
     - `ACCEPT_BLOCKER`: concrete in-scope correctness, security, acceptance, compatibility, required-validation, or material-performance failure.
     - `ACCEPT_ADVISORY`: grounded, useful, non-blocking improvement.
@@ -111,8 +117,7 @@ Apply imported evidence rules to exact scope. For each candidate, locate cited c
 
 Rewrite accepted item as smallest self-contained correction and proof step. Never copy speculative patch.
 
-# Writable surface
-Create or overwrite files only under `artifact/` with the write/edit tools (both share one permission); `edit` cannot fill an existing empty file. Bash is read-only inspection: never create or modify tracked files or git state with it. If writing the assigned path fails, return only the `# Output` envelope with `Status: INCOMPLETE` — never probe, relocate, write any other artifact, or write via bash. Env/secret files (`*.env*`, except `*.env.example`) are off-limits via bash too.
+{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
 # Artifact
 Write `verdict_path`:

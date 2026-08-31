@@ -101,7 +101,9 @@ Create or overwrite each exact assigned path. Never create placeholder or stub f
 - Record complete file list in handoff before collection. Collectors may not expand it.
 - Record current target diffs as run-start baseline.
 - Treat current target contents as baseline; never reconstruct files from `HEAD` or discard pre-existing edits.
-- Use `chunk-files-by-tokens -s 24000 <paths>` when available. If the binary is absent, use the repository's `cargo run -q -p chunk-files-by-tokens -- -s 24000 <paths>` only when that workspace exists; otherwise create deterministic sorted chunks of bounded file count and record the fallback.
+- Use `chunk-files-by-tokens -s 24000 <paths>` when available.
+- If the binary is absent, use the repository's `cargo run -q -p chunk-files-by-tokens -- -s 24000 <paths>` only when that workspace exists.
+- Otherwise create deterministic sorted chunks of bounded file count and record the fallback.
 
 ## 2. Collect once per chunk
 - Dispatch `_refactor/errors/collector` in batches of at most four parallel tasks, one unique facts path per chunk.

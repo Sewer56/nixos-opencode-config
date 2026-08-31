@@ -81,7 +81,8 @@ Run CodeRabbit CLI as external review authority. A successful structured finding
 - Resolve an installed `cr` or `coderabbit` executable. If neither exists, return `INCOMPLETE`; never install or update it.
 - Inspect Git status. If selected scope contains untracked files, return `NEEDS_INPUT` unless caller excludes them; never add them.
 - Match Git comparison to CLI review scope:
-  - `all`: resolve `base_branch` from caller or local `origin/HEAD` without fetching; set `comparison_commit = git merge-base <base_branch> HEAD`; run `cr review --agent --type all --base-commit <comparison_commit>` and derive paths from committed plus staged/unstaged Git diff;
+  - `all`: resolve `base_branch` from caller or local `origin/HEAD` without fetching; set `comparison_commit = git merge-base <base_branch> HEAD`; run `cr review --agent --type all --base-commit <comparison_commit>`.
+  - For `all`, derive paths from committed plus staged/unstaged Git diff.
   - `committed`: resolve the same base; derive paths from `comparison_commit..HEAD`; run `cr review --agent --type committed --base-commit <comparison_commit>`;
   - `uncommitted`: no base branch is required; set `comparison_commit=HEAD`, derive paths from index/worktree against `HEAD`, and run `cr review --agent --type uncommitted`.
 - When selected Git diff is empty, write deterministic `PASS` artifact with terminal status `NO_CHANGES` and do not call service.
@@ -137,7 +138,9 @@ For `Decision: PASS`, write `- None` under `## Findings`.
 - Preserve existing repository patterns and all imported writer rules below.
 
 ## 4. Validate the repaired tree
-- Run the imported writer lint gate (`rust-llm-tidy`) alongside non-mutating repository-native checks for changed packages/files: formatting check, parser/type/build, targeted tests, then broader tests only when repository convention or the repair's impact path requires them.
+- Run the imported writer lint gate (`rust-llm-tidy`) alongside non-mutating repository-native checks for changed packages/files.
+- Those checks are formatting check, parser/type/build, and targeted tests.
+- Run broader tests only when repository convention or the repair's impact path requires them.
 - Respect the imported writer-gate and dependency-assumptions rules for every edit.
 - Do not install dependencies, update snapshots, regenerate tracked files, or run formatter fix mode during validation.
 - Write `validation_path` with command, cwd, reason, status, exit code, decisive evidence, and any existing repository-native evidence artifact.
@@ -149,7 +152,10 @@ For `Decision: PASS`, write `- None` under `## Findings`.
   - preserve `all` or `uncommitted` when that was the original scope;
   - promote an original `committed` review to `all`, because repairs are uncommitted and a second `committed` review would not inspect them.
 - Write new `.r02.review.md` and, when repairs occur, `.r02.validation.md` artifacts; never overwrite round one.
-- After repairs (Sections 3–5), a blocking finding that was applied and validated is resolved; one that could not be applied (its two-turn budget exhausted, validation failed, or no viable bounded smallest fix) is remaining. Zero remaining blockers returns `PASS` (no advisories) or `ADVISORY` (advisories present). One or more remaining blockers is `FAIL`; a `FAIL` return must leave every remaining finding fully described in the newest artifact for caller-side repair.
+- After repairs (Sections 3–5), a blocking finding that was applied and validated is resolved.
+- A blocking finding that could not be applied (its two-turn budget exhausted, validation failed, or no viable bounded smallest fix) is remaining.
+- Zero remaining blockers returns `PASS` (no advisories) or `ADVISORY` (advisories present).
+- One or more remaining blockers is `FAIL`; a `FAIL` return must leave every remaining finding fully described in the newest artifact for caller-side repair.
 
 # Rules
 
