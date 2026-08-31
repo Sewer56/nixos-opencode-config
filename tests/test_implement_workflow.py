@@ -270,22 +270,34 @@ class ImplementWorkflowTests(unittest.TestCase):
 
     def test_shared_writer_lint_uses_auto_mode(self) -> None:
         rule = text(CODE_WRITING)
+        script = text(GATE_SCRIPT)
         self.assertTrue(rule.startswith("## RULE GROUP: IMPLEMENTATION / CODE WRITING\n"))
         self.assertIn("\n### Lint gate\n", rule)
         self.assertEqual([], re.findall(r"`(rust-llm-tidy[^`]*)`", rule))
         self.assertEqual(1, rule.count("```sh"))
         self.assertEqual(GATE_IMPORT, lint_gate_block(rule))
-        self.assertIn("exec rust-llm-tidy", text(GATE_SCRIPT))
-        self.assertIn("```sh\n" + text(GATE_SCRIPT) + "\n```", expand_config_imports(rule))
+        self.assertIn("```sh\n" + script + "\n```", expand_config_imports(rule))
         self.assertIn("if git grep", lint_gate_block(expand_config_imports(rule)))
         self.assertIn("from the repository root before reviewer or parent validation handoff", rule)
-        self.assertIn("a successful skip, not missing environment", rule)
-        self.assertIn("repository-wide tracked staged and unstaged `.rs`/`.md` changes", rule)
-        self.assertIn("may include unrelated tracked changes", rule)
-        self.assertIn("untracked files are excluded until staged", rule)
-        self.assertIn("No eligible tracked changes is a successful skip", rule)
-        self.assertIn("Non-zero blocks handoff", rule)
-        self.assertIn("bounded writer loop", rule)
+
+        self.assertIn("tool not ran (OK)", script)
+        self.assertIn("repo not opted in", script)
+        self.assertIn("non-blocking", script)
+        self.assertIn("tool executed", script)
+        self.assertIn("tracked staged/unstaged .rs/.md", script)
+        self.assertIn("untracked excluded until staged", script)
+        self.assertIn("exit $rc", script)
+        self.assertIn("blocks handoff", script)
+        self.assertIn("repair and rerun", script)
+        self.assertIn('exit "$rc"', script)
+        self.assertIn("rc=$?", script)
+        self.assertRegex(script, r"(?m)^\s*rust-llm-tidy\s*$")
+        self.assertNotIn("exec rust-llm-tidy", script)
+
+        self.assertNotIn("blocks handoff", rule)
+        self.assertNotIn("successful skip", rule)
+        self.assertNotIn("not opted in", rule)
+        self.assertNotIn("bounded writer loop", rule)
 
         rule_import = '{{ file="./rules/groups/implementation/code-writing.md" }}'
         for path in (COHORT, INTEGRATION_REPAIR):
