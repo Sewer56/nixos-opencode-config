@@ -30,6 +30,13 @@ COMMAND = ROOT / "config/command/implement.md"
 REVIEW_FINDINGS = ROOT / "config/rules/groups/implementation/review-findings.md"
 REVIEW_FINDINGS_CARD = ROOT / "config/rules/cards/implementation/review-findings.md"
 TESTS_STRATEGY_CARD = ROOT / "config/rules/cards/tests/strategy.md"
+COMMIT_MESSAGE_CARD = ROOT / "config/rules/cards/implementation/commit-message.md"
+SELF_CONTAINED_IMPORT = '{{ file="./rules/cards/implementation/self-contained-content.md" }}'
+COMMIT_MESSAGE_IMPORT = '{{ file="./rules/cards/implementation/commit-message.md" }}'
+COMMIT_PROMPTS = (
+    ROOT / "config/agent/commit.md",
+    ROOT / "config/command/commit/current.md",
+)
 IMPLEMENT_REVIEWERS = (
     ROOT / "config/agent/_implement/cohort/review/correctness.md",
     ROOT / "config/agent/_implement/cohort/review/quality.md",
@@ -48,7 +55,6 @@ SHELL_OWNING_AGENTS = (
     ROOT / "config/agent/_refactor/errors.md",
     ROOT / "config/agent/_refactor/reorder.md",
     ROOT / "config/agent/_review/coderabbit.md",
-    ROOT / "config/agent/commit.md",
 )
 SHARED_BASH_PERMISSION = """  bash:
     "*": allow
@@ -57,6 +63,14 @@ SHARED_BASH_PERMISSION = """  bash:
     "git reset --hard *": deny
     "git clean *": deny
     "git commit --no-verify *": deny
+"""
+COMMIT_BASH_PERMISSION = """  bash:
+    "*": allow
+    "sudo *": deny
+    "git push *": ask
+    "git reset --hard *": ask
+    "git clean *": ask
+    "git commit --no-verify *": ask
 """
 COHORT_BASH_PERMISSION = SHARED_BASH_PERMISSION + '    "git commit *": deny\n'
 READ_ONLY_BASH_PERMISSION = """  bash:
@@ -740,16 +754,44 @@ class ImplementWorkflowTests(unittest.TestCase):
     def test_implementation_commit_uses_path_boundary_and_optional_amend(self) -> None:
         body = text(ROOT / "config/agent/commit.md")
         frontmatter = body.split("---", 2)[1]
-        self.assertIn(SHARED_BASH_PERMISSION, frontmatter)
+        self.assertEqual(COMMIT_BASH_PERMISSION, bash_permission(frontmatter))
         self.assertNotIn('"git add', frontmatter)
         self.assertNotIn('"git commit --amend', frontmatter)
         self.assertIn("For an implementation boundary", body)
-        self.assertIn("Amend current `HEAD` only when user explicitly requests it", body)
         self.assertNotIn("expected_staged_diff_hash", body)
         self.assertNotIn("SHA-256", body)
-        self.assertIn('git commit --amend', body)
         self.assertIn("Never bypass hooks", body)
         self.assertIn("stage with blanket pathspecs", body)
+
+    def test_commit_message_card_owns_style_and_tidy_pass(self) -> None:
+        card = text(COMMIT_MESSAGE_CARD)
+        for marker in (
+            "rust-llm-tidy --no-config --dry-run --json",
+            "temp file ending in `.md`",
+            "Repeat until the JSON output is `[]`",
+            "Delete the temp file after the commit",
+            "commit without the tidy pass",
+            "git commit -F <file>",
+            "git commit --amend -F <file>",
+            "after confirming inspected `HEAD` is the intended target",
+            "<Prefix>: concise outcome",
+            "`Perf:` performance work",
+            "short one-line bullets",
+            "key-detail paragraph",
+            "subject only for small changes",
+        ):
+            self.assertIn(marker, card)
+
+    def test_commit_prompts_import_shared_rules_in_sync(self) -> None:
+        for path in COMMIT_PROMPTS:
+            with self.subTest(path=path.relative_to(ROOT)):
+                body = text(path)
+                self.assertIn(SELF_CONTAINED_IMPORT, body)
+                self.assertIn(COMMIT_MESSAGE_IMPORT, body)
+                self.assertNotIn("# Commit style", body)
+                self.assertNotIn("# Message tidy pass", body)
+                self.assertNotIn("git commit -F", body)
+                self.assertNotIn("git commit --amend", body)
 
     def test_artifact_writers_can_write_only_artifacts(self) -> None:
         for path in ARTIFACT_WRITERS:

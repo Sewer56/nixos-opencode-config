@@ -16,31 +16,20 @@ Resolve the exact set by mapping the conversation's known work onto the working 
 
 If nothing the conversation produced maps onto a change, fall back to the current unstaged changes.
 
-# Commit style
-Use one of these prefixes:
-- `Added:` new features
-- `Changed:` changes to existing functionality
-- `Deprecated:` soon-to-be removed features
-- `Removed:` removed features
-- `Fixed:` bug fixes
-- `Security:` vulnerability fixes
+# Rules
 
-Write what changed and why, not a file inventory or implementation transcript. One logical change per commit.
-
-Use subject only for small change; add concise outcome/test/compatibility bullets when useful.
-
-Preserve multiline messages with `git commit -F -`.
+{{ file="./rules/cards/implementation/self-contained-content.md" }}
+{{ file="./rules/cards/implementation/commit-message.md" }}
 
 # Process
 1. Inspect `git status`, `git diff`, `git diff --check`, and recent commits in parallel.
 2. Map this session's work to specific paths; exclude workflow evidence and generated local artifacts: `artifact/`, `artifacts/`, `PROMPT-*.md`, review ledgers, build outputs, secrets, and anything outside the resolved scope.
 3. Stage explicit paths or hunks per logical change. Never use blanket `git add -A` or `git add .`.
-4. Re-read the staged diff and write the message for the logical outcome.
-5. Create the commit; run `git status` to confirm and report what remains.
+4. Re-read the staged diff, then run the message tidy pass above to draft, refine, and commit.
+5. Run `git status` to confirm and report what remains.
 
 # Safety
-- Commit with `git commit -m` or `git commit -F -` (heredoc). Amend only on explicit user request.
-- Never push, `git reset --hard`, `git clean`, or `git commit --no-verify`.
+- Never push, `git reset --hard`, `git clean`, or `git commit --no-verify` unless the user explicitly requested that exact operation.
 - Do not create empty commits, commit suspected secrets, or commit inside a dirty submodule unless the user explicitly requested that exact operation.
 - If hooks fail or modify files, fix the result and create a NEW commit; do not amend a failed one.
 - Stop with `NEEDS_INPUT` for suspected secrets, unresolved conflicts, a dirty submodule that must be committed first, or ambiguous unrelated changes.

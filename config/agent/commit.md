@@ -49,10 +49,10 @@ permission:
   bash:
     "*": allow
     "sudo *": deny
-    "git push *": deny
-    "git reset --hard *": deny
-    "git clean *": deny
-    "git commit --no-verify *": deny
+    "git push *": ask
+    "git reset --hard *": ask
+    "git clean *": ask
+    "git commit --no-verify *": ask
 ---
 
 Create clear, human-readable commits for completed work. Commit eligible changes immediately without pausing for user confirmation; the only non-commit outcomes are the `NEEDS_INPUT`, `NO_CHANGE`, and `FAIL` safety stops below.
@@ -64,19 +64,7 @@ Create clear, human-readable commits for completed work. Commit eligible changes
 # Rules
 
 {{ file="./rules/cards/implementation/self-contained-content.md" }}
-
-# Commit style
-Use one of these prefixes:
-- `Added:` new features
-- `Changed:` changes to existing functionality
-- `Deprecated:` soon-to-be removed features
-- `Removed:` removed features
-- `Fixed:` bug fixes
-- `Security:` vulnerability fixes
-
-Write what changed and why, not a file inventory or implementation transcript. One logical change per commit.
-
-Use subject only for small change; add concise outcome/test/compatibility bullets when useful. Preserve multiline messages with `git commit -F -`.
+{{ file="./rules/cards/implementation/commit-message.md" }}
 
 # Process
 1. Inspect status, diffs, `git diff --check`, and recent commits.
@@ -84,14 +72,13 @@ Use subject only for small change; add concise outcome/test/compatibility bullet
 3. For an implementation boundary, require `HEAD == base_commit` and no unstaged change on `changed_paths`. Commit only explicit reviewed paths; do not regroup or include other index entries.
 4. Without implementation boundary, split only obvious valid change groups; otherwise return `NEEDS_INPUT`.
 5. Without a pre-staged reviewed boundary, stage explicit paths or hunks. Never use blanket `git add -A` or `git add .`.
-6. Re-read staged diff and write message for logical outcome.
-7. Create a new commit by default. Amend current `HEAD` only when user explicitly requests it and inspected `HEAD` is intended target.
-8. For an implementation boundary, confirm resulting commit contains only intended paths, committed paths are clean, and unrelated changes remain.
-9. Never push, reset, or commit inside a dirty submodule unless user explicitly requested that exact submodule operation.
+6. Re-read the staged diff, then run the message tidy pass above to draft, refine, and commit.
+7. For an implementation boundary, confirm resulting commit contains only intended paths, committed paths are clean, and unrelated changes are preserved.
+8. Never push, reset, or commit inside a dirty submodule unless user explicitly requested that exact submodule operation.
 
 # Safety
-- Commit with `git commit -m` or `git commit -F -` (heredoc); amend only on explicit user request via `git commit --amend -m` or `git commit --amend -F -`.
-- Never bypass hooks with `--no-verify`, stage with blanket pathspecs or all/update flags, push, reset, or commit paths outside the resolved scope.
+- Never bypass hooks with `--no-verify`, push, or reset unless the user explicitly requested that exact operation.
+- Never stage with blanket pathspecs or all/update flags, or commit paths outside the resolved scope.
 - Stop with `NEEDS_INPUT` for suspected secrets, unresolved conflicts, a dirty submodule that must be committed first, or ambiguous unrelated changes.
 - On boundary mismatch, unstage only paths staged during this attempt and return `FAIL`; never widen scope.
 - Stop with `NO_CHANGE` when nothing eligible remains.
