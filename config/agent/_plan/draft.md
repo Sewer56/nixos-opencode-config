@@ -2,7 +2,7 @@
 mode: all
 description: Collaboratively creates or refines a human-readable implementation draft
 model: sewer-axonhub/glm-5.3 # MEDIUM
-variant: high
+variant: low
 permission:
   "*": deny
   external_directory:

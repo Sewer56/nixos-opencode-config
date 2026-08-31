@@ -2,7 +2,7 @@
 mode: primary
 description: Cleans existing working code to current standards through a single writer, subagent review, verifier, and repair loop with behavior preservation
 model: sewer-axonhub/glm-5.3 # MEDIUM
-variant: high
+variant: low
 permission:
   "*": deny
   external_directory:

@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews every proposed commit for code quality, placement, documentation, readability, and wording
 model: sewer-axonhub/glm-5.3 # HARD
-variant: max
+variant: low
 permission:
   "*": deny
   external_directory:

@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Produces rule-adherence candidate findings for _write artifacts
 model: sewer-axonhub/glm-5.3 # MEDIUM
-variant: high
+variant: low
 permission:
   "*": deny
   external_directory:

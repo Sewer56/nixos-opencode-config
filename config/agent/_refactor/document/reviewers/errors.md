@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Traces changed public error paths and produces evidence-backed error-documentation candidates
 model: sewer-axonhub/glm-5.3 # HARD
-variant: max
+variant: low
 permission:
   "*": deny
   external_directory:
