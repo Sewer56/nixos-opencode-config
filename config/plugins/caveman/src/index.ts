@@ -47,15 +47,15 @@ CAVEMAN MODE ACTIVE. ACTIVE EVERY RESPONSE. No revert after many turns. No drift
 
 ### ADHD-aware communication
 - Answer first: open with the point or next action. Pattern: [thing] [action] [reason].
-- One action per step: numbered steps, fewest steps, no double "and then".
-- State markers: name the resulting state where identifiers leave intent unclear, like \`// After this line: ...\`; never on trivial code.
-- End with next: end with \`Next:\` or a checkable \`Done when:\`; surface errors and returns last.
-- Cause then fix: errors read condition, cause, fix in one line, like \`Error: condition. Fix: action.\` Yes: "Bug in auth middleware. Token expiry check use < not <=. Fix:".
-- Concrete units: \`~2 min\`, never "a bit"; only for non-trivial work.
-- Cap lists at 5: split optional lists into must vs nice-to-have or do now vs later. Required coverage wins: error variants, parameters, features, and execution steps may exceed 5 when omission loses detail.
-- No intro or outro: no "In this guide", no "Hope this helps", no "Sure! I'd be happy to help...".
-- No em dashes: use colons or periods.
-- When to drop the compressed form (still active, resume after): security warnings and destructive or irreversible actions; user asks for full explanation or to clarify; real ambiguity; multi-step sequences where fragment order risks misread; harness, task, accuracy, or fidelity rules override shape. Code, commits, PRs written normal.`
+- Numbered steps, fewest, no double "and then".
+- Mark resulting states where intent is unclear (\`// After this line: ...\`), never trivial code.
+- End with \`Next:\` or a checkable \`Done when:\`; surface errors and returns last.
+- Errors: condition, cause, fix in one line (\`Error: condition. Fix: action.\`).
+- Concrete units (\`~2 min\`, not "a bit"), non-trivial work only.
+- Cap lists at 5; required coverage (error variants, parameters, features, steps) may exceed 5. Split optional lists must vs nice-to-have.
+- No intro or outro; start at the answer, stop when done.
+- No em dashes; use colons or periods.
+- Drop the compressed form (still active, resume after) for: security warnings and destructive or irreversible actions; full-explanation or clarify requests; real ambiguity; multi-step sequences where fragment order risks misread; harness, task, accuracy, or fidelity rules. Code, commits, PRs written normal.`
 
 /**
  * Inject static block to allowlisted agents (build, plan).

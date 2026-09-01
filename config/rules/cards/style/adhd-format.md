@@ -1,23 +1,30 @@
 ### ADHD-aware comments and docs
-Shape comments and documentation for an ADHD reader: answer first, one action per step, no filler.
+Shape comments and docs for an ADHD reader: answer first, one action per
+step, no filler.
 
-Defers to the wording card (sentence economy, fillers and closers only), the code-documentation card (purpose-first, current-behavior-only, release-note back-compat exception), and the error-documentation card (variant completeness).
+Defers to wording (sentence economy, fillers/closers), code-documentation
+(purpose-first, current-behavior-only, release-note back-compat), and
+error-documentation (variant completeness) cards.
 
-Those rules and task or accuracy requirements win on any conflict.
+Those plus accuracy requirements win on conflicts.
 
-- **Answer first**: open comments and docs with the point or next action; context follows.
-- **Header shape**: file, module, and example headers are one capability
-  line plus bullets, one fact each. Never open with a narrative paragraph.
-- **One action per step**: numbered steps, fewest steps, no double "and then".
-- **State markers**: name the resulting state where identifiers leave intent unclear, like `// After this line: ...`; never on trivial code.
-- **End with next**: docs end with `Next:` or a checkable `Done when:`; API docs surface errors and returns last.
-- **Cause then fix**: errors read condition, cause, fix in one line, like `Error: condition. Fix: action.`
-- **Concrete units**: `~2 min`, never "a bit"; in comments only for non-trivial work.
-- **Short prose blocks**: soft target 80 characters per line, never BLOCKING; at most 240 characters per paragraph.
-  - Split every over-cap paragraph at the nearest idea change with a blank line.
-  - Exempt code, URLs, tables, headings, signatures, and exact required text.
-  - Severity: BLOCKING for the paragraph cap.
-- **Cap lists at 5**: split optional lists into must vs nice-to-have or do now vs later. Required coverage wins: error variants, parameters, features, and execution steps may exceed 5 when omission loses required detail.
-- **No intro or outro**: no "In this guide", no "Hope this helps", no "let me know if". Start at the answer; stop when done.
-- **No em dashes**: no em-dashes in comments or docs; use colons or periods instead.
-- **Shape never wins**: full-explain requests, destructive actions, real ambiguity, and harness, task, accuracy, or fidelity rules override shape. Keep the compact lead; drop closers.
+- Open with the point or next action; context follows.
+- Headers: one capability line plus one-fact bullets; never narrative.
+- Numbered steps, fewest, no double "and then".
+- Mark resulting states where intent is unclear (`// After this line:
+  ...`), never trivial code.
+- End with `Next:` or checkable `Done when:`; API docs put errors and
+  returns last.
+- Errors: condition, cause, fix in one line (`Error: condition. Fix:
+  action.`).
+- Concrete units (`~2 min`, not "a bit"), non-trivial work only.
+- 80 chars/line soft, never BLOCKING; 240 chars/paragraph, BLOCKING.
+  Split over-cap paragraphs at idea changes; exempt code, URLs, tables,
+  headings, signatures, exact text.
+- Cap lists at 5; required coverage (error variants, parameters,
+  features, steps) may exceed 5. Split optional lists must vs
+  nice-to-have.
+- No intro or outro; start at the answer, stop when done.
+- No em dashes; use colons or periods.
+- Full-explain requests, destructive actions, real ambiguity, harness or
+  accuracy rules override shape; keep the lead, drop closers.
