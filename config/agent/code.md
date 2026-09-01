@@ -143,9 +143,7 @@ Compute `review_path` for the current round before each call.
 
 Supply one explicit envelope with every declared input and placeholder resolved.
 
-Use `Scope: STANDALONE` for correctness, quality, and tests.
-
-Use the reviewer-declared `Scope: COHORT_STAGED` for security and performance:
+Scope: `STANDALONE` for correctness, quality, and tests; reviewer-declared `COHORT_STAGED` for security and performance:
 
 ```text
 <review-inputs>
