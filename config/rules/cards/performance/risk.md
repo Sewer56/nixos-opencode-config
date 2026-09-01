@@ -3,14 +3,14 @@ Prefer the highest-performance correct implementation; simplify for readability,
 
 ### Allocation-conscious authorship
 In changed code, write the allocation- and copy-conscious form by default:
-- Prefer borrowing, moving, or reusing an existing value over cloning or copying it.
+- Borrow, move, or reuse over cloning or copying.
 - Pre-size or reserve capacity when the final size is known or cheaply bounded.
-- Prefer single-pass or fused iteration over building intermediate collections.
-- Resolve lookups and parses once; do not re-lookup or re-parse the same data.
+- Single-pass or fused iteration over intermediate collections.
+- Resolve lookups and parses once; never re-lookup or re-parse.
 - Reuse buffers, handles, and connections across loop iterations.
-- Avoid per-item I/O, lock acquisition, or serialization inside loops; batch or hoist them.
+- Batch or hoist per-item I/O, lock acquisition, or serialization out of loops.
 
-An avoidable allocation, clone, or copy in changed code is a fix-by-default writer obligation when an equally clear bounded alternative exists. Never trade clarity for speculative micro-gains: no obfuscation for unmeasured wins.
+An avoidable allocation, clone, or copy in changed code is fix-by-default when an equally clear bounded alternative exists; never obfuscate for unmeasured wins.
 
 ### Bounded and batched work
 Avoid unbounded work on growing inputs: add pagination, limits, early exits, batching, streaming, or explicit workload bounds.
