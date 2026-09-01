@@ -21,9 +21,6 @@ Those plus accuracy requirements win on conflicts.
 - 80 chars/line soft, never BLOCKING; 240 chars/paragraph, BLOCKING.
   Split over-cap paragraphs at idea changes; exempt code, URLs, tables,
   headings, signatures, exact text.
-- Cap lists at 5; required coverage (error variants, parameters,
-  features, steps) may exceed 5. Split optional lists must vs
-  nice-to-have.
 - No intro or outro; start at the answer, stop when done.
 - No em dashes; use colons or periods.
 - Full-explain requests, destructive actions, real ambiguity, harness or
