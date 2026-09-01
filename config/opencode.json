@@ -5,7 +5,8 @@
   "plugin": [
     "./plugins/opencode-models-discovery/src/index",
     "./plugins/caveman/src/index",
-    "./plugins/opencode-plugin-md-expand/src/index"
+    "./plugins/opencode-plugin-md-expand/src/index",
+    "opencode-axonhub-tracing"
   ],
   "small_model": "sewer-axonhub/deepseek-v4-flash",
   "permission": {
