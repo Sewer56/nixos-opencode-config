@@ -32,5 +32,7 @@ wrapping: formatters.
   source was dense; carried-over density is not fidelity.
 
 ### Severity
-- BLOCKING: a new or substantively rewritten body with 3+ logical groups and zero internal blank lines; a new or changed test missing its summary.
-- ADVISORY: all other misses here: partial separation, missing group-purpose comment, arrange or loop sub-grouping, interior summary duplication.
+- BLOCKING: 3+ groups with zero internal blank lines; test missing its
+  summary.
+- ADVISORY: everything else: partial separation, no group-purpose
+  comment, arrange/loop sub-grouping, summary duplication.
