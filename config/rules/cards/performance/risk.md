@@ -21,5 +21,4 @@ Cap user-controlled workload size before proportional allocation, sorting, loggi
 Avoid unbounded fan-out, shared mutable state races, blocking calls in async paths, and missing backpressure.
 
 ### Avoid discarded full work
-Do not compute or sort results that will be discarded when a bounded/top-N algorithm is available.
-Example: select the top slice, then sort only the kept slice.
+Never compute or sort results that will be discarded when a bounded/top-N algorithm exists: select the top slice, then sort only the kept slice.
