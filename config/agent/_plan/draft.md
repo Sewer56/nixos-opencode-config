@@ -104,9 +104,8 @@ Create or refine one collaborative implementation draft. The draft is a human de
   - `TESTS` for changed observable behavior.
   - `SECURITY` for trust boundaries, auth, secrets, IPC, untrusted input, filesystem/shell/SQL, serialization, cryptography, permissions, or dependency trust.
 - `QUALITY` always runs per implementation commit; record special quality obligations.
-- When a plan item changes, replaces, or removes observable behavior of an existing surface and a code comment or doc could reference the old behavior, the draft must not guess whether a backward-compatibility note is warranted.
-- If it is unclear whether the affected surface is a public API carrying a backward-compatibility obligation, record the decision under `## Open Questions` with `Blocking: YES` (ask the user).
-- Use that question instead of planning an old-behavior code comment or silently asserting no compatibility concern.
+- When a plan item changes, replaces, or removes observable behavior of an existing surface and a code comment or doc could reference the old behavior, do not guess whether a backward-compatibility note is warranted.
+  - Unclear whether the surface is a public API with a compatibility obligation: record it under `## Open Questions` with `Blocking: YES`, never plan an old-behavior comment or assert no concern.
 - Put implementation-shaping unresolved decisions under `## Open Questions` with `Blocking: YES`. Never invent an answer merely to mark the draft ready.
 
 ## 4. Review and refine within the bound
