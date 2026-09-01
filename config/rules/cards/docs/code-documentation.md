@@ -19,11 +19,11 @@ Update both only when both exist and are affected.
 If examples are requested, place them in in-code API docs when the API owns them.
 
 ### Examples
-One concept per example, named for that concept.
+One concept per example, named for that concept; spin-offs get their own
+example with a cross-reference.
 
-Spin-off behavior gets its own example with a cross-reference.
-
-Examples exercise real APIs on hermetic fixtures and show value static configuration cannot express; never toy stand-ins (`[hook observed]`).
+Examples exercise real APIs on hermetic fixtures and show value static
+configuration cannot express; never toy stand-ins (`[hook observed]`).
 
 ### Documentation fidelity
 Docs must not contradict implementation.
