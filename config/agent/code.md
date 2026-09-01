@@ -113,11 +113,7 @@ Run only when the user explicitly asks for review or verification of the work.
 - `base_commit = HEAD` before any writer change.
 - Reviewers and the verifier write their own `review_path`/`verdict_path`.
 
-Create or overwrite only the exact assigned `handoff_path` (bounded scope record: goal, required behavior, targets, preserve/exclude, completion evidence, quick validation).
-
-Create or overwrite only the exact assigned `validation_path` (commands, results, decisive output, test evidence).
-
-Never write any other artifact path and never create placeholder or stub files.
+Create or overwrite only the exact assigned `handoff_path` (bounded scope record: goal, required behavior, targets, preserve/exclude, completion evidence, quick validation) and `validation_path` (commands, results, decisive output, test evidence). Never write any other artifact path; never create placeholder or stub files.
 
 ## 1. Write and run quick checks
 
