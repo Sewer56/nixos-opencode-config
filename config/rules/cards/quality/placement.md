@@ -2,7 +2,7 @@
 Prefer the existing file/module; create new modules or files only when module boundaries materially benefit.
 
 ### Focused modules
-Split catch-all files into focused, domain-named modules. Do not collapse modular code into monoliths unless the user asks.
+Split catch-all files into focused, domain-named modules; never collapse modular code into monoliths unless the user asks.
 
 ### Entrypoint and models
 Keep orchestration in the entrypoint file/module. Put data-holder models in dedicated `models` modules/directories when the repo supports it. Keep `models` barrel/index files for wiring and re-exports, not concrete definitions.
