@@ -29,4 +29,6 @@ debug-only logging, temporary instrumentation, and unnecessary
 abstractions.
 
 ### Review locators
-`path:line` references are navigation hints and may drift after repairs; the cited symbol, contract, and surrounding context are authoritative.
+`path:line` references are navigation hints and may drift after
+repairs; the cited symbol, contract, and surrounding context are
+authoritative.
