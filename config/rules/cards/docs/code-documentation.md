@@ -62,30 +62,18 @@ Example: `// Normalize aliases before validation so deprecated names
 share one error path.`
 
 ### Documentation style
-Lead with a one-sentence purpose in plain language.
+Lead with one plain-language purpose sentence; prefer goal-oriented
+phrasing. Summary is one line; caveats go in a trailing `# Remarks`
+section (or equivalent), never the summary.
 
-Prefer goal-oriented phrasing.
+Use language-native doc-link syntax; prefer `[Name]` plus reference
+definitions over long or repeated inline targets.
 
-Use language-native doc-link syntax for types/variants when supported.
+Always tag fenced code blocks; never bare `ignore`. Split multi-aspect
+docs into `#` sections, not dense paragraphs.
 
-Prefer short in-text doc links plus reference definitions over long
-inline link targets.
-
-Always include language tags on fenced code blocks; never use bare
-`ignore` fences.
-
-Prefer `[Name]` in text plus one reference definition over repeated long
-inline targets.
-
-Summary is one line.
-
-Scope limits and caveats go in a trailing `# Remarks` section (or
-language equivalent), never in the summary paragraph.
-
-Split multi-aspect docs into `#` sections, not dense paragraphs.
-
-Name the concrete mechanism (`suppress it by returning `None``) over the
-vague effect (`may suppress the event`).
+Name the concrete mechanism (`suppress it by returning `None``) over
+the vague effect (`may suppress the event`).
 
 ### Lists over prose
 - **Enumerations are lists**: Inputs, outputs, parameters, variants,
