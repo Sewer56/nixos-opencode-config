@@ -37,6 +37,11 @@ COMMIT_PROMPTS = (
     ROOT / "config/agent/commit.md",
     ROOT / "config/command/commit/current.md",
 )
+LLM_TIDY_PASS_CARD = ROOT / "config/rules/cards/implementation/llm-tidy-pass.md"
+LLM_TIDY_PASS_IMPORT = '{{ file="./rules/cards/implementation/llm-tidy-pass.md" }}'
+PR_WRITER = ROOT / "config/agent/_write/pr.md"
+DOCS_WRITER = ROOT / "config/agent/_docs.md"
+TIDY_WRITER_PROMPTS = (PR_WRITER, DOCS_WRITER)
 IMPLEMENT_REVIEWERS = (
     ROOT / "config/agent/_implement/cohort/review/correctness.md",
     ROOT / "config/agent/_implement/cohort/review/quality.md",
@@ -790,6 +795,40 @@ class ImplementWorkflowTests(unittest.TestCase):
                 self.assertNotIn("# Message tidy pass", body)
                 self.assertNotIn("git commit -F", body)
                 self.assertNotIn("git commit --amend", body)
+
+    def test_llm_tidy_pass_card_owns_mechanics(self) -> None:
+        card = text(LLM_TIDY_PASS_CARD)
+        for marker in (
+            "rust-llm-tidy --no-config --dry-run --json",
+            "Repeat until the JSON output is `[]`",
+            "declared scope and frozen regions",
+        ):
+            self.assertIn(marker, card)
+        self.assertNotIn("only processes", card)
+        self.assertNotIn("unavailable", card)
+
+    def test_writer_prompts_import_llm_tidy_pass_card(self) -> None:
+        for path in TIDY_WRITER_PROMPTS:
+            with self.subTest(path=path.relative_to(ROOT)):
+                body = text(path)
+                self.assertIn(LLM_TIDY_PASS_IMPORT, body)
+                self.assertNotIn("rust-llm-tidy --", body)
+        self.assertIn(
+            "Run the imported tidy pass on every drafted or repaired `.md` target",
+            text(DOCS_WRITER),
+        )
+
+    def test_pr_tidy_pass_precedes_gate_and_reruns_after_repairs(self) -> None:
+        body = text(PR_WRITER)
+        self.assertLess(body.index("Write `pr.md` with:"), body.index("# Tidy pass"))
+        self.assertLess(body.index("# Tidy pass"), body.index("# Gate"))
+        self.assertIn("rerun the tidy pass and", body)
+        self.assertIn("the gate, then request one re-review", body)
+
+    def test_commit_prompts_do_not_import_llm_tidy_pass_card(self) -> None:
+        for path in COMMIT_PROMPTS:
+            with self.subTest(path=path.relative_to(ROOT)):
+                self.assertNotIn(LLM_TIDY_PASS_IMPORT, text(path))
 
     def test_artifact_writers_can_write_only_artifacts(self) -> None:
         for path in ARTIFACT_WRITERS:

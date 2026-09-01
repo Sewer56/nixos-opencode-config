@@ -105,6 +105,8 @@ Create or overwrite each exact assigned path. Never create placeholder or stub f
 
 {{ file="./rules/cards/style/adhd-format.md" }}
 
+{{ file="./rules/cards/implementation/llm-tidy-pass.md" }}
+
 # Process
 
 ## 1. Resolve and discover
@@ -123,6 +125,7 @@ Create or overwrite each exact assigned path. Never create placeholder or stub f
 ## 3. Run deterministic checks first
 - Validate current target files directly. Do not stage files.
 - Run the narrowest repository-native documentation checks first: formatter, Markdown linter, link/anchor checker, documentation build, example compilation, or project-specific equivalent.
+- Run the imported tidy pass on every drafted or repaired `.md` target.
 - Do not install missing tools or invent commands. Record command, exit status, decisive output, and environment gaps in the round validation artifact.
 - A deterministic failure is a blocker without waiting for an LLM reviewer.
 

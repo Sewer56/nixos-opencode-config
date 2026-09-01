@@ -94,6 +94,8 @@ Generate a PR description from the actual local branch and merge-base-aware diff
 
 {{ file="./rules/cards/style/adhd-format.md" }}
 
+{{ file="./rules/cards/implementation/llm-tidy-pass.md" }}
+
 # Process
 1. Resolve the base in this order: explicit caller ref, local `origin/HEAD`, then the current branch's configured upstream base. Do not fetch or switch branches. Return `NEEDS_INPUT` when no trustworthy local base exists.
 2. Require a non-default current branch and at least one commit/change in `<base>...HEAD`.
@@ -129,6 +131,10 @@ Keep the body under about 250 words unless the change genuinely needs more.
 When over budget, cut diff-visible micro-detail before motivation. Never
 start with `This PR` or `This change`.
 
+# Tidy pass
+After writing `pr.md`, run the imported tidy pass on it before the gate scan.
+Repairs from the pass edit `pr.md` only.
+
 # Gate
 After writing `pr.md` and before reporting SUCCESS, run this scan. Empty output
 passes; otherwise repair the artifact and rerun until it prints nothing:
@@ -152,8 +158,8 @@ awk 'BEGIN{f=0;m=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/
 # Review loop
 1. After the gate passes, call `_write/review/adherence` once with the request
    summary, the absolute `pr.md` path, and the applicable rule constraints.
-2. Repair every required change from the review, rerun the gate, then request
-   one re-review.
+2. Repair every required change from the review, rerun the tidy pass and
+   the gate, then request one re-review.
 3. Allow at most 2 repair turns. Required changes remaining after the second
    turn return `FAIL` with the remaining finding in `Errors`. Suggestions are
    optional.
