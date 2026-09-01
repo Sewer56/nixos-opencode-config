@@ -11,9 +11,7 @@ Keep orchestration in the entrypoint file/module; put data-holder models in dedi
 Keep enums, newtypes, and value objects with the parent type when only that parent uses them; keep non-public helper types local. Keep conversions next to the type; never global `conversions` buckets.
 
 ### Shared behavior ownership
-Put shared behavior in the lowest shared package that owns it.
-
-Keep extension, adapter, middleware, and integration packages focused on wiring and package-specific behavior.
+Put shared behavior in the lowest shared package that owns it. Keep extension, adapter, middleware, and integration packages focused on wiring and package-specific behavior.
 
 When ownership is unclear, place code in the package that others depend on.
 
