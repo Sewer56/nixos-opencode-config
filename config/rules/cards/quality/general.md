@@ -7,7 +7,8 @@ and functions; no jargon, cleverness, or vague buckets (`utils`,
 `helpers`, `common`, `misc`) unless established and intentionally narrow.
 
 ### Existing patterns
-Prefer existing types, constants, schemas, signatures, and repo patterns.
+Prefer existing types, constants, schemas, signatures, and repo
+patterns.
 
 ### Helper size
 Inline tiny single-use helpers unless a name improves readability, reuse, or boundaries. Avoid unneeded single-implementation abstractions.
