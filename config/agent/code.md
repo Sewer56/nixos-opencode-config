@@ -163,7 +163,7 @@ Add every other input declared by the selected reviewer to that envelope.
 
 Require each reviewer to inspect the staged diff independently, write the requested artifact, and return only its exact `# Output` envelope.
 
-After each reviewer returns, read the artifact at the exact assigned `review_path`; require a readable, schema-conforming artifact, artifact-consistent with the returned envelope.
+After each reviewer returns, read the artifact at the exact assigned `review_path`; require it readable, schema-conforming, and consistent with the returned envelope.
 
 Every selected reviewer must complete.
 
