@@ -83,7 +83,8 @@ Change LLM instructions and related config, tests, or docs. Request defines inte
    - exact `CREATE`, `UPDATE`, `DELETE`, `MOVE old -> new`, or `VERIFY` targets;
    - observable required behavior;
    - behavior to preserve and non-goals;
-   - selected review lenses from `behavior`, `architecture`, and `adversarial`.
+   - selected review lenses from `behavior`, `architecture`, and `adversarial`;
+   - for `UPDATE`, compaction goal: preserve every decision boundary at equal or smaller token count.
 
 Runtime/routing changes need behavior review; structural changes need architecture review; permissions/source boundaries/self-edit need adversarial review.
 

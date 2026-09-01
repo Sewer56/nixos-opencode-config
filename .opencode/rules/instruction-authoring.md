@@ -30,6 +30,13 @@ Prefer existing owner. Add component or phase only for distinct operational valu
 - Use examples and counterexamples only when they distinguish behavior. Never request private reasoning transcripts or chain-of-thought; request observable evidence and concise decisions.
 - Avoid provider assumptions, sampling controls, decorative structure, copied implementation, and arbitrary taxonomies.
 
+## Compact existing instructions
+
+- On UPDATE, cut structure before words: merge duplicate rules, drop restated examples and openers, remove qualifiers that change no decision.
+- Prefer deleting a redundant sentence over rewording it; a word swap that cuts no tokens is not compaction.
+- Preserve every decision boundary, authority, and stopping condition at the smallest token count.
+- Record old-to-new token counts for each updated artifact in run artifacts.
+
 ## Format instruction files
 
 - One simple standalone statement per line; never wrap prose across lines.
