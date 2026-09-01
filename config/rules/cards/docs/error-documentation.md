@@ -20,7 +20,7 @@ Use the language's documentation convention and link syntax: Rust `# Errors` wit
 Prefer `[Name]` in text plus one reference definition over long or repeated inline targets.
 
 ### No vague error wording
-Block vague triggers such as `when the operation fails`, `on error`, `if something goes wrong`, or `if invalid`.
+Block vague triggers such as `when the operation fails`, `on error`, `if something goes wrong`, `if invalid`.
 
 ### No error-doc legacy backfill
 Do not backfill untouched legacy files solely for error docs.
