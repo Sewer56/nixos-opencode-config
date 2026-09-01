@@ -13,8 +13,8 @@ boundaries change.
 
 ### Documentation placement
 Package docs cover import/usage shape; in-code docs cover exported
-symbols; update both only when both exist and are affected. Requested
-examples go in in-code API docs when the API owns them.
+symbols; update both only when both exist and change. Put requested
+examples in in-code API docs when the API owns them.
 
 ### Examples
 One concept per example, named for that concept; spin-offs get their own
