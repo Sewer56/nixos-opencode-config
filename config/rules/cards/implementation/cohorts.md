@@ -12,7 +12,7 @@ Keep each cohort small enough for a focused diff review and targeted validation.
 Split large work at stable interfaces or independently testable outcomes; merge tiny adjacent edits whose separate handoff would add more coordination than clarity.
 
 ### Minimum sufficient context
-- **Decision-relevant context only**: Give each cohort only the context that can change its implementation or review decision.
+- **Decision-relevant context only**: Give each cohort only context that can change its implementation or review decision:
   - That context is edited targets, the governing contract, direct producers/consumers, applicable path-specific instructions, associated tests, and required validation.
 - **No bulk context**: Do not copy source, broad repository summaries, or unrelated historical discussion into cohort artifacts.
 - **Just-in-time retrieval**: Retrieve surrounding code just in time.
@@ -38,7 +38,7 @@ Natural-language claims may explain intent but cannot prove correctness, safety,
 Use one code writer at a time. Read-only discovery and review agents may run in parallel. This workflow assumes one shared repository and no concurrent writer.
 
 ### Vertical completion
-A cohort includes the source change, directly associated tests, required code documentation, and required user documentation needed to make that outcome complete and reviewable.
+A cohort includes the source change, directly associated tests, and required code/user documentation, enough to make the outcome complete and reviewable.
 
 ### Adaptive reconciliation
 Reconcile mechanical repository drift during compilation and record it: renames, moved symbols, equivalent established patterns.
