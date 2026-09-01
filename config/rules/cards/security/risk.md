@@ -7,7 +7,7 @@ filesystem, or network boundaries.
 Expose the smallest named capability needed. Avoid generic command/channel invocation, token or secret getters, raw storage primitives, broad filesystem access, and ambient authority when an explicit operation suffices.
 
 ### Untrusted input
-Validate and normalize untrusted input before using it in shell, SQL, paths, templates, deserialization, dynamic imports, regular expressions, redirects, or resource allocation. Preserve parameterization and canonicalization boundaries.
+Validate and normalize untrusted input before it reaches shell, SQL, paths, templates, deserialization, dynamic imports, regular expressions, redirects, or resource allocation. Preserve parameterization and canonicalization boundaries.
 
 ### Secrets and sensitive data
 Do not log, return, persist, cache, or expose secrets beyond their owning boundary. Redact diagnostics and ensure clearing/revocation behavior is complete.
