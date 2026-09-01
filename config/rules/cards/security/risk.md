@@ -13,7 +13,7 @@ Validate and normalize untrusted input before it reaches shell, SQL, paths, temp
 Never log, return, persist, cache, or expose secrets beyond their owning boundary. Redact diagnostics; ensure clearing/revocation behavior is complete.
 
 ### Failure behavior
-Security checks fail closed. Authentication/authorization errors must not fall through to privileged behavior, leak sensitive distinctions, or be converted into success by retries or defaults.
+Security checks fail closed. Auth errors must not fall through to privileged behavior, leak sensitive distinctions, or convert to success via retries or defaults.
 
 ### Dependencies and cryptography
 Use established repository mechanisms and maintained libraries. Do not invent cryptography, weaken verification, disable certificate/signature checks, or broaden dependency trust without an explicit approved decision.
