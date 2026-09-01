@@ -25,4 +25,4 @@ Order declarations most-public to most-private; within each visibility tier, cal
 When priority is equal or dependency unclear, preserve existing relative order. Do not block whole-file reorder opportunities unless the selected change leaves a touched declaration clearly out of order.
 
 ### Placement ambiguity
-When placement/order requires broad semantic inference or repo-wide call-graph reconstruction beyond selected files, do not guess; ask for the missing local declaration/call evidence.
+When placement needs broad semantic inference or repo-wide call-graph reconstruction beyond selected files, do not guess; ask for the missing declaration/call evidence.
