@@ -143,9 +143,7 @@ Before each call, compute `review_path` for the current round.
 
 Supply one explicit envelope with every declared input and placeholder resolved.
 
-Use `Scope: STANDALONE` for correctness, quality, and tests.
-
-Use the reviewer-declared `Scope: COHORT_STAGED` for security and performance:
+Scope: `STANDALONE` for correctness, quality, and tests; reviewer-declared `COHORT_STAGED` for security and performance:
 
 ```text
 <review-inputs>
@@ -165,9 +163,7 @@ Add every other input declared by the selected reviewer to that envelope.
 
 Require it to inspect the staged diff independently, write the requested artifact, and return only its exact `# Output` envelope.
 
-After each reviewer returns, read the artifact at the exact assigned `review_path`.
-
-Require a readable, schema-conforming artifact, artifact-consistent with the returned envelope.
+After each reviewer returns, read the artifact at the exact assigned `review_path`; require it readable, schema-conforming, and consistent with the returned envelope.
 
 Require an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count.
 
@@ -179,7 +175,7 @@ A failed or cancelled delegation is `FAIL` or `INCOMPLETE`; never perform delega
 
 ## 4. Call exact verifier and repair
 
-Send candidates to `_review/verifier` only when any review artifact contains findings; skip it when every review reports zero findings.
+Send candidates to `_review/verifier` only when any review artifact contains findings; skip when all reviews report zero.
 
 Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`.
 

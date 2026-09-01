@@ -111,7 +111,7 @@ class CleanupWorkflowTests(unittest.TestCase):
         for name in (*REVIEWERS, "_review/verifier"):
             self.assertIn(name, agent)
         self.assertIn("Scope: STANDALONE", agent)
-        self.assertIn("Scope: COHORT_STAGED", agent)
+        self.assertIn("reviewer-declared `COHORT_STAGED` for security and performance", agent)
         self.assertIn("at most five repair turns", agent)
 
     def test_agent_requires_targets_and_leaves_work_staged(self) -> None:
