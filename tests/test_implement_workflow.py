@@ -111,7 +111,7 @@ READ_ONLY_BASH_PERMISSION = """  bash:
     "patch *": deny
 """
 GATE_SCRIPT = ROOT / "config/scripts/rust-llm-tidy-gate.sh"
-GATE_IMPORT = "{{path:./scripts/rust-llm-tidy-gate.sh}}"
+GATE_COMMAND = "~/opencode/config/scripts/rust-llm-tidy-gate.sh"
 VERIFIER = ROOT / "config/agent/_review/verifier.md"
 ARTIFACT_PATHS_CARD = ROOT / "config/rules/cards/implementation/artifact-paths.md"
 ARTIFACT_WRITERS = (ORCHESTRATOR, *IMPLEMENT_REVIEWERS, VERIFIER, CREATE_COHORTS)
@@ -294,7 +294,7 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertIn("\n### Lint gate\n", rule)
         self.assertEqual([], re.findall(r"`(rust-llm-tidy[^`]*)`", rule))
         self.assertEqual(0, rule.count("```sh"))
-        self.assertIn(GATE_IMPORT, rule)
+        self.assertIn(GATE_COMMAND, rule)
         self.assertIn("run the linter", rule)
 
         self.assertIn("tool not ran (OK)", script)

@@ -83,8 +83,13 @@ class CleanupWorkflowTests(unittest.TestCase):
 
     def test_agent_frontmatter_matches_one_shot_shape(self) -> None:
         meta = frontmatter(AGENT)
+        one_shot_meta = frontmatter(ROOT / "config/agent/_implement/one-shot.md")
         self.assertIn("mode: primary", meta)
-        self.assertIn("model: sewer-axonhub/glm-5.3", meta)
+        for field in ("model:", "variant:"):
+            self.assertEqual(
+                re.search(rf"(?m)^{re.escape(field)}.*$", one_shot_meta).group(),
+                re.search(rf"(?m)^{re.escape(field)}.*$", meta).group(),
+            )
         edit = permission_block(meta, "edit")
         self.assertIn('"artifact/CLEANUP-*.handoff.md": allow', edit)
         self.assertIn('"artifact/CLEANUP-*.r??.quick.validation.md": allow', edit)

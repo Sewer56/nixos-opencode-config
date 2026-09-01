@@ -7,7 +7,7 @@ Owns: minimal code changes, repository conventions, naming, tests, comments/docs
 
 Before review or handoff, run the linter:
 
-`{{path:./scripts/rust-llm-tidy-gate.sh}}`
+`~/opencode/config/scripts/rust-llm-tidy-gate.sh`
 
 ### Writer gate
 
