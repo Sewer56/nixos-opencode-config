@@ -138,8 +138,7 @@ For `Decision: PASS`, write `- None` under `## Findings`.
 - Preserve existing repository patterns and all imported writer rules below.
 
 ## 4. Validate the repaired tree
-- Run the imported writer lint gate (`rust-llm-tidy`) alongside non-mutating repository-native checks for changed packages/files.
-- Those checks are formatting check, parser/type/build, and targeted tests.
+- Run the imported writer lint gate (`rust-llm-tidy`) alongside non-mutating repository-native checks for changed packages/files: formatting check, parser/type/build, and targeted tests.
 - Run broader tests only when repository convention or the repair's impact path requires them.
 - Respect the imported writer-gate and dependency-assumptions rules for every edit.
 - Do not install dependencies, update snapshots, regenerate tracked files, or run formatter fix mode during validation.
@@ -150,10 +149,9 @@ For `Decision: PASS`, write `- None` under `## Findings`.
 ## 5. One bounded re-review
 - If product code changed, run one more structured review on the complete repaired scope:
   - preserve `all` or `uncommitted` when that was the original scope;
-  - promote an original `committed` review to `all`, because repairs are uncommitted and a second `committed` review would not inspect them.
+  - promote an original `committed` review to `all`; a second `committed` review would not inspect uncommitted repairs.
 - Write new `.r02.review.md` and, when repairs occur, `.r02.validation.md` artifacts; never overwrite round one.
-- After repairs (Sections 3–5), a blocking finding that was applied and validated is resolved.
-- A blocking finding that could not be applied (its two-turn budget exhausted, validation failed, or no viable bounded smallest fix) is remaining.
+- After repairs (Sections 3–5): a blocking finding applied and validated is resolved; one not applied (two-turn budget exhausted, validation failed, or no viable bounded fix) is remaining.
 - Zero remaining blockers returns `PASS` (no advisories) or `ADVISORY` (advisories present).
 - One or more remaining blockers is `FAIL`; a `FAIL` return must leave every remaining finding fully described in the newest artifact for caller-side repair.
 
