@@ -12,12 +12,9 @@ language or repo supports them; refresh boundary docs when a change
 alters module/file boundaries.
 
 ### Documentation placement
-Package docs cover import/usage shape; in-code docs cover exported symbols.
-
-Update both only when both exist and are affected.
-
-If examples are requested, place them in in-code API docs when the API
-owns them.
+Package docs cover import/usage shape; in-code docs cover exported
+symbols; update both only when both exist and are affected. Requested
+examples go in in-code API docs when the API owns them.
 
 ### Examples
 One concept per example, named for that concept; spin-offs get their own
