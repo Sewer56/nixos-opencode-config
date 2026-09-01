@@ -186,6 +186,8 @@
       # binaries.  This avoids a full workspace‑wide Rust rebuild inside
       # `home‑manager switch` whenever a single .rs file changes.
       # Cargo handles incremental compilation; second run is near‑instant.
+      # `cargo build` runs first so a stale binary is refreshed (or the
+      # failure surfaces) before `cargo run` executes it.
       mkCargoTool = {
         name,
         package ? name,
@@ -196,9 +198,11 @@
           set -euo pipefail
           ${
             if manifestPath == null
-            then ''cd "${dir}"
-          exec cargo run --release --package ${package} -- "$@"''
-            else ''exec cargo run --release --manifest-path "${manifestPath}" --package ${package} -- "$@"''
+            then ''              cd "${dir}"
+                        cargo build --release --package ${package}
+                        exec cargo run --release --package ${package} -- "$@"''
+            else ''              cargo build --release --manifest-path "${manifestPath}" --package ${package}
+                        exec cargo run --release --manifest-path "${manifestPath}" --package ${package} -- "$@"''
           }
         '';
     in {
