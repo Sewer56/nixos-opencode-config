@@ -7,10 +7,9 @@ Non-trivial private APIs need purpose plus non-obvious parameters, returns,
 side effects, or invariants. Do not flag trivial private APIs.
 
 ### Module and boundary docs
-New or changed modules need top-level purpose/usage docs when the
-language or repo supports them.
-
-If a change alters module/file boundaries, refresh boundary docs.
+New or changed modules get top-level purpose/usage docs when the
+language or repo supports them; refresh boundary docs when a change
+alters module/file boundaries.
 
 ### Documentation placement
 Package docs cover import/usage shape; in-code docs cover exported symbols.
