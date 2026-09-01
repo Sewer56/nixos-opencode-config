@@ -672,7 +672,7 @@ class ImplementWorkflowTests(unittest.TestCase):
         with self.subTest(subject="tests strategy card"):
             strategy = text(TESTS_STRATEGY_CARD)
             self.assertIn("### Differential tests for equivalence claims", strategy)
-            self.assertIn("mocks capturing request shape do not establish rendered equivalence", strategy)
+            self.assertIn("request-shape mocks prove nothing about equivalence", strategy)
 
         for path, gate_heading, base_branch in (
             (ORCHESTRATOR, "## 4. External CodeRabbit review", "`base_branch=base_commit`"),

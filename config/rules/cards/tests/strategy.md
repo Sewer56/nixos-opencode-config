@@ -9,7 +9,7 @@ Tests name acceptance behavior, never labels or internal ids (`AC-1`).
 Cover critical new or changed behavior: success, failure, edge cases. Cover all new code when the task requires tests.
 
 ### Differential tests for equivalence claims
-For a claim that two paths produce equivalent output, one test executes both paths and asserts equality of the final rendered or consumed result; mocks capturing request shape do not establish rendered equivalence.
+Equivalence claims need one test running both paths and asserting equal final rendered/consumed results; request-shape mocks prove nothing about equivalence.
 
 ### Redundancy
 - **No duplicate coverage**: Avoid duplicate coverage and setup; do not
