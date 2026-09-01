@@ -19,7 +19,7 @@ When ownership is unclear, place code in the package that others depend on.
 Co-locate tests with their module unless the repo has a stronger convention.
 
 ### Declaration order
-Order declarations most-public to most-private. Within each visibility tier, place callers before callees. Place primary entry points, structs, types, plugins, or exports before helpers in call sequence.
+Order declarations most-public to most-private; within each visibility tier, callers before callees (entry points, structs, types, plugins, exports first).
 
 ### Stable order
 When priority is equal or dependency is unclear, preserve existing relative order. Do not block broad whole-file reorder opportunities unless the selected change creates or leaves a touched declaration clearly out of order.
