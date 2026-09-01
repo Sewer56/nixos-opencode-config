@@ -98,7 +98,7 @@ Work interactively like `build`:
 
 1. Read targets, direct consumers, applicable instructions, and decision-changing context; implement the requested behavior as the smallest cohesive diff under the imported rules. Preserve unrelated user changes.
 2. Run the imported lint gate before staging or any review handoff; repair failures and rerun it within your writer loop.
-3. When staging, stage only paths changed by this writer; never stage `artifact/` or `artifacts/`. Inspect the staged diff and run `git diff --cached --check`.
+3. Stage only writer-changed paths, never `artifact/` or `artifacts/`; inspect the staged diff and run `git diff --cached --check`.
 4. Write no review artifacts and delegate no reviewer or verifier. Commit with `git commit` only when the user asks.
 
 # Review-on-request flow
