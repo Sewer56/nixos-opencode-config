@@ -29,9 +29,9 @@ or replaced surfaces. Block stale names, options, defaults, links,
 examples, or behavior.
 
 ### Single-source facts
-State each fact once, on the surface that owns it; no summary sentence
-plus a repeating section; cross-reference another type's contract
-instead of restating it.
+State each fact once, on the owning surface; no summary sentence plus
+repeating section; cross-reference another type's contract instead of
+restating it.
 
 ### Documentation scope
 Document only key facts an API user needs; no fluff or feature notes.
