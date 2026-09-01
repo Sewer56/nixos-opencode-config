@@ -1,9 +1,11 @@
 ### Body layout
-Non-trivial bodies, test bodies included, need scannable shape: blank lines between logical groups, a purpose comment only where intent is non-obvious, a summary on every test.
+Non-trivial bodies (tests included) need scannable shape: blank lines
+between logical groups, purpose comments where non-obvious, a summary
+on every test. Governs created or substantively rewritten bodies;
+incidental edits need no re-layout.
 
-This card governs bodies created or substantively rewritten in the change; an incidental edit inside an otherwise unchanged body does not require re-layout.
-
-The code-documentation card owns inline-comment wording and its skip list; formatters own line wrapping.
+Inline-comment wording and skip list: code-documentation card. Line
+wrapping: formatters.
 
 ### Blank-line grouping
 - One blank line between logical groups, never two. A group is one coherent step: validate, transform, decide, build result.
