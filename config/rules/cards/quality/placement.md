@@ -22,7 +22,7 @@ Co-locate tests with their module unless the repo has a stronger convention.
 Order declarations most-public to most-private; within each visibility tier, callers before callees (entry points, structs, types, plugins, exports first).
 
 ### Stable order
-When priority is equal or dependency is unclear, preserve existing relative order. Do not block broad whole-file reorder opportunities unless the selected change creates or leaves a touched declaration clearly out of order.
+When priority is equal or dependency unclear, preserve existing relative order. Do not block whole-file reorder opportunities unless the selected change leaves a touched declaration clearly out of order.
 
 ### Placement ambiguity
 When placement/order requires broad semantic inference or repo-wide call-graph reconstruction beyond selected files, do not guess; ask for the missing local declaration/call evidence.
