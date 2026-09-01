@@ -17,8 +17,9 @@ wrapping: formatters.
 - Skip single-group bodies; skipped tests still get their summary.
 
 ### Group-purpose comments
-- Comment a group only when names and control flow leave its intent non-obvious: one comment above the group naming what it achieves. Never comment every group.
-- Apply the inline-comment skip list owned by the code-documentation card.
+- Comment a group only when names and control flow leave intent
+  non-obvious: one comment above, naming what it achieves; never every
+  group. The inline-comment skip list applies.
 
 ### Test summaries
 - Every test opens with a 1-2 line doc comment (`///` in Rust) above the test attribute: the condition under test plus the outcome it pins. The name carries the scenario; the summary carries the outcome.
