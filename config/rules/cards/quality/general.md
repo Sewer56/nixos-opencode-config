@@ -15,7 +15,7 @@ Inline tiny single-use helpers unless a name improves readability,
 reuse, or boundaries; no single-implementation abstractions.
 
 ### Obvious control flow
-Keep control flow obvious and change sets cohesive.
+Keep control flow obvious, change sets cohesive.
 
 ### Minimal visibility
 Keep visibility minimal while preserving required API boundaries.
