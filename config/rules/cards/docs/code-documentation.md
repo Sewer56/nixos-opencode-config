@@ -38,11 +38,9 @@ No summary sentence plus a section repeating it.
 Cross-reference another type's contract instead of restating it.
 
 ### Documentation scope
-Document only the key facts an API user needs; no fluff, no exhaustive feature notes.
-
-Spin-off or related behavior gets its own `#` section with a cross-reference, not more paragraphs.
-
-State edge cases as one general sentence (`Empty chains are skipped.`); never enumerate permutations.
+Document only key facts an API user needs; no fluff or feature notes.
+Spin-offs get their own `#` section with a cross-reference. Edge cases are
+one general sentence (`Empty chains are skipped.`), never enumerations.
 
 ### Describe current behavior only
 - **Current contract only**: Code comments and in-code docs state the current contract and behavior only.
