@@ -5,7 +5,7 @@ format, specificity, completeness. Block missing sections and vague
 `may fail` coverage.
 
 ### Specific error triggers
-Each error bullet must name the condition that produces it. Vague catch-all wording is insufficient.
+Each error bullet names the condition that produces it; vague catch-all wording is insufficient.
 Example: `Returns ParseError when the config file contains invalid TOML.`
 
 ### Error completeness
