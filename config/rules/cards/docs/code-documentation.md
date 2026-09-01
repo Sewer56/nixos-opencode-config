@@ -1,11 +1,10 @@
 ### Required documentation coverage
-Public APIs (`pub`, `pub(crate)`, `export`, `public`) need purpose and parameter docs.
+Public APIs (`pub`, `pub(crate)`, `export`, `public`) need purpose and
+parameter docs; non-trivial ones also need returns, failure behavior, and
+examples when helpful.
 
-Non-trivial public APIs also need returns, failure behavior, and examples when helpful.
-
-Non-trivial private APIs need purpose plus non-obvious parameters, returns, side effects, or invariants.
-
-Do not flag: trivial private APIs with obvious names and direct behavior.
+Non-trivial private APIs need purpose plus non-obvious parameters, returns,
+side effects, or invariants. Do not flag trivial private APIs.
 
 ### Module and boundary docs
 New or changed modules need top-level purpose/usage docs when the language or repo supports them.
