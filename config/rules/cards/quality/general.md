@@ -24,7 +24,9 @@ Keep visibility minimal while preserving required API boundaries.
 Preserve behavior unless explicitly changing it.
 
 ### Clean changed scope
-Remove dead code, unused imports, and newly-unused paths. Avoid debug-only logging, temporary instrumentation, and unnecessary abstractions.
+Remove dead code, unused imports, and newly-unused paths; avoid
+debug-only logging, temporary instrumentation, and unnecessary
+abstractions.
 
 ### Review locators
 `path:line` references are navigation hints and may drift after repairs; the cited symbol, contract, and surrounding context are authoritative.
