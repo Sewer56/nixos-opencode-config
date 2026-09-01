@@ -1,5 +1,5 @@
 ### Minimal change
-Use the smallest viable diff. Avoid broad refactors unless required or requested.
+Smallest viable diff; no broad refactors unless required or requested.
 
 ### Plain domain names
 Prefer plain code and descriptive, domain-first names for modules, files, types, and functions. Avoid jargon, cleverness, and vague buckets like `utils`, `helpers`, `common`, or `misc` unless already established and intentionally narrow.
