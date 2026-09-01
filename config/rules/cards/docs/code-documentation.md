@@ -84,7 +84,7 @@ the vague effect (`may suppress the event`).
   mechanics stay prose.
 
 ### No legacy docs backfill
-Do not backfill untouched legacy files solely for docs.
+Never backfill untouched legacy files solely for docs.
 
 ### Implementation-plan docs specificity
 Plans name the docs surface, audience, and behavioral change; generic
