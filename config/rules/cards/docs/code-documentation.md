@@ -26,11 +26,9 @@ Examples exercise real APIs on hermetic fixtures and show value static
 configuration cannot express; never toy stand-ins (`[hook observed]`).
 
 ### Documentation fidelity
-Docs must not contradict implementation.
-
-When documented surfaces are moved, renamed, or replaced, preserve or update affected docs.
-
-Block stale names, options, defaults, links, examples, or behavior.
+Docs must not contradict implementation; update docs for moved, renamed,
+or replaced surfaces. Block stale names, options, defaults, links,
+examples, or behavior.
 
 ### Single-source facts
 State each fact once, on the surface that owns it.
