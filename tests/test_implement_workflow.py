@@ -456,7 +456,7 @@ class ImplementWorkflowTests(unittest.TestCase):
             "Call optional tests or security reviewer only when concrete risk matches",
             one_shot,
         )
-        self.assertIn("the reviewer-declared `Scope: COHORT_STAGED` for security and performance", one_shot)
+        self.assertIn("reviewer-declared `COHORT_STAGED` for security and performance", one_shot)
 
         orchestrator = text(ORCHESTRATOR)
         self.assertIn(
@@ -597,7 +597,7 @@ class ImplementWorkflowTests(unittest.TestCase):
     def test_verifier_dispatch_is_conditional_on_findings(self) -> None:
         implement_gate = (
             "Send candidates to `_review/verifier` only when any review artifact "
-            "contains findings; skip it when every review reports zero findings"
+            "contains findings; skip when all reviews report zero"
         )
         for path in (ORCHESTRATOR, COHORT, ROOT / "config/agent/_implement/one-shot.md"):
             with self.subTest(path=path.relative_to(ROOT)):

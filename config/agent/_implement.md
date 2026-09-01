@@ -141,7 +141,7 @@ Prior Verdict Paths: [[concrete paths or None]]
    - Then require a readable, schema-conforming artifact at the exact assigned `review_path`, artifact-consistent with the returned envelope.
    - Require an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count.
    - Missing or malformed evidence is `INCOMPLETE`, never PASS.
-6. Send candidates to `_review/verifier` only when any review artifact contains findings; skip it when every review reports zero findings.
+6. Send candidates to `_review/verifier` only when any review artifact contains findings; skip when all reviews report zero.
    - Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`.
    - Send accepted blockers and accepted advisories to `_implement/integration-repair`.
 7. Allow two final repair turns.

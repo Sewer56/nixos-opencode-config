@@ -157,7 +157,7 @@ A failed or cancelled delegation is `FAIL` or `INCOMPLETE`; never perform delega
 
 ## 4. Call exact verifier and repair
 
-Send candidates to `_review/verifier` only when any review artifact contains findings; skip it when every review reports zero findings.
+Send candidates to `_review/verifier` only when any review artifact contains findings; skip when all reviews report zero.
 
 Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`.
 
