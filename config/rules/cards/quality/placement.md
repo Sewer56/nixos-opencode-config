@@ -8,7 +8,7 @@ Split catch-all files into focused, domain-named modules; never collapse modular
 Keep orchestration in the entrypoint file/module; put data-holder models in dedicated `models` modules/directories when the repo supports it. `models` barrel/index files hold wiring and re-exports, not concrete definitions.
 
 ### Type and conversion ownership
-Keep enums, newtypes, and value objects with the parent type when only that parent uses them. Keep non-public helper types local. Keep conversions next to the type; avoid global `conversions` buckets.
+Keep enums, newtypes, and value objects with the parent type when only that parent uses them; keep non-public helper types local. Keep conversions next to the type; never global `conversions` buckets.
 
 ### Shared behavior ownership
 Put shared behavior in the lowest shared package that owns it.
