@@ -21,10 +21,8 @@ Flag: hedging and zero-information phrases such as `please note`, `it's importan
 Severity: BLOCKING in operational instructions; ADVISORY in narrative prose.
 
 ### Wordiness
-Flag: phrasing that can be tightened without changing meaning; use the fewest words that preserve exact meaning.
-
-Allow: necessary technical terms and identifiers; prefer precise terms over cryptic shortcuts.
-
+Flag: phrasing that can be tightened without changing meaning.
+Allow: technical terms and identifiers; precise terms over cryptic shortcuts.
 Severity: ADVISORY; BLOCKING only for egregious inflation.
 
 ### Terminology consistency
