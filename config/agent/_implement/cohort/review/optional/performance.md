@@ -97,7 +97,7 @@ Review performance in exact scoped diff under realistic repository workloads; al
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
-Apply imported rules to current diff and supplied workload evidence. For final scope, include cross-cohort composition. Do not infer scale unsupported by repository.
+Apply imported rules to the current diff and supplied workload evidence. For final scope, include cross-cohort composition. Do not infer scale unsupported by repository.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
