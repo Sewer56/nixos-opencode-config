@@ -12,7 +12,7 @@ Example: `Returns ParseError when the config file contains invalid TOML.`
 Error sections enumerate every reachable error variant/type/path the changed API can produce; list variants in enum/union order when one exists.
 
 ### Error doc fidelity
-Error documentation must not contradict implementation. Each listed variant/type must be actually returnable from the function.
+Error docs must not contradict implementation; each listed variant/type must be returnable from the function.
 
 ### Error doc format
 Use the language's documentation convention and link syntax: Rust `# Errors` with `[`Error::Variant`]`; TypeScript `@throws` or equivalent project convention.
