@@ -54,11 +54,9 @@ one general sentence (`Empty chains are skipped.`), never enumerations.
   compatibility obligation with the user, not to narrate.
 
 ### Inline readability comments
-Non-trivial function bodies need short inline comments at logical steps
-when names and control flow do not explain intent.
-
-Skip: trivial assignments, getters, direct delegation, and code already
-explained by names.
+Non-trivial bodies get short comments at logical steps when names and
+control flow do not explain intent; skip trivial assignments, getters,
+delegation, or names-explained code.
 
 Example: `// Normalize aliases before validation so deprecated names
 share one error path.`
