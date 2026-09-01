@@ -12,19 +12,14 @@ Cover critical new or changed behavior: success, failure, edge cases. Cover all 
 Equivalence claims need one test running both paths and asserting equal final rendered/consumed results; request-shape mocks prove nothing about equivalence.
 
 ### Redundancy
-- **No duplicate coverage**: Avoid duplicate coverage and setup; do not
-  restate what an existing test already proves.
-- **Append, do not fork**: When new assertions share an existing test's setup
-  and entry point, append them there rather than creating a separate function.
-- **Intentional repetition**: Do not flag intentionally repeated coverage
-  across different public entry points.
-- **Check fold-in first**: Before adding a test, check whether its unique
-  assertions fold into an existing test with the same setup and entry point,
-  or whether an existing test can be parameterized to cover them.
-- **Map surviving homes**: When removing a redundant test, map every assertion
-  to a surviving home.
-- **Examples are not coverage**: Example binaries never substitute for test
-  coverage.
+- **No duplicates**: Never restate what an existing test proves. Before adding
+  a test, fold its assertions into one with the same setup and entry point,
+  or parameterize that test.
+- **Intentional repetition**: Coverage repeated across public entry points is
+  intentional; do not flag it.
+- **Map surviving homes**: Removing a redundant test requires mapping every
+  assertion to a surviving home.
+- **Examples are not coverage**: Example binaries never substitute for tests.
 
 ### Test helpers
 Reuse existing test helpers. Extract shared helpers only when they reduce repetition or clarify setup across multiple tests.
