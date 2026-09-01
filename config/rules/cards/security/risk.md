@@ -1,5 +1,7 @@
 ### Trust boundaries
-Validate identity, authorization, provenance, and ownership whenever data or control crosses process, service, tenant, privilege, IPC, plugin, filesystem, or network boundaries.
+Validate identity, authorization, provenance, and ownership when data
+or control crosses process, service, tenant, privilege, IPC, plugin,
+filesystem, or network boundaries.
 
 ### Narrow capabilities
 Expose the smallest named capability needed. Avoid generic command/channel invocation, token or secret getters, raw storage primitives, broad filesystem access, and ambient authority when an explicit operation is sufficient.
