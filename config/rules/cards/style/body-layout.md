@@ -22,8 +22,10 @@ wrapping: formatters.
   group. The inline-comment skip list applies.
 
 ### Test summaries
-- Every test opens with a 1-2 line doc comment (`///` in Rust) above the test attribute: the condition under test plus the outcome it pins. The name carries the scenario; the summary carries the outcome.
-- Interior comments must not restate the summary; single-source rules apply.
+- Every test opens with a 1-2 line doc comment (`///` in Rust) above
+  the attribute: condition plus pinned outcome. Name carries scenario,
+  summary carries outcome.
+- Interior comments never restate the summary; single-source applies.
 
 ### Ported and moved code
 - Regions moved, ported, or rewritten in a change get this layout even when the source was dense. Carried-over density is not fidelity.
