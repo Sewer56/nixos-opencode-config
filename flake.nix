@@ -188,6 +188,10 @@
       # Cargo handles incremental compilation; second run is near‑instant.
       # `cargo build` runs first so a stale binary is refreshed (or the
       # failure surfaces) before `cargo run` executes it.
+      # manifestPath tools must not `cd`: rust-llm-tidy lints the caller's
+      # repo, discovered from the caller's CWD. Their manifest is resolved
+      # to a physical path so all invocations share one cargo workspace
+      # root.
       mkCargoTool = {
         name,
         package ? name,
@@ -198,11 +202,15 @@
           set -euo pipefail
           ${
             if manifestPath == null
-            then ''              cd "${dir}"
+            then ''              # `cd` gives cargo the physical workspace path; a symlinked
+                        # path alone would be a second workspace root and force full
+                        # rebuilds whenever the invocation style switches.
+                        cd "${dir}"
                         cargo build --release --package ${package}
                         exec cargo run --release --package ${package} -- "$@"''
-            else ''              cargo build --release --manifest-path "${manifestPath}" --package ${package}
-                        exec cargo run --release --manifest-path "${manifestPath}" --package ${package} -- "$@"''
+            else ''              manifest="$(readlink -f "${manifestPath}")"
+                        cargo build --release --manifest-path "$manifest" --package ${package}
+                        exec cargo run --release --manifest-path "$manifest" --package ${package} -- "$@"''
           }
         '';
     in {

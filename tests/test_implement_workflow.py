@@ -394,7 +394,9 @@ class ImplementWorkflowTests(unittest.TestCase):
         flake = text(FLAKE)
         self.assertIn("manifestPath ? null", flake)
         self.assertIn('manifestPath = "$HOME/opencode/tools/rust-llm-tidy/src/Cargo.toml";', flake)
-        self.assertIn('--manifest-path "${manifestPath}"', flake)
+        # Physical manifest path keeps external and in-dir builds on one
+        # cargo workspace root; no `cd` keeps the caller's CWD.
+        self.assertIn('manifest="$(readlink -f "${manifestPath}")"', flake)
         tidy = flake.index('name = "rust-llm-tidy"')
         tidy_block = flake[tidy : flake.index("})", tidy) + 2]
         self.assertIn("manifestPath =", tidy_block)
