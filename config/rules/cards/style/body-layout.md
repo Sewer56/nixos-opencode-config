@@ -28,7 +28,8 @@ wrapping: formatters.
 - Interior comments never restate the summary; single-source applies.
 
 ### Ported and moved code
-- Regions moved, ported, or rewritten in a change get this layout even when the source was dense. Carried-over density is not fidelity.
+- Moved, ported, or rewritten regions get this layout even when the
+  source was dense; carried-over density is not fidelity.
 
 ### Severity
 - BLOCKING: a new or substantively rewritten body with 3+ logical groups and zero internal blank lines; a new or changed test missing its summary.
