@@ -54,7 +54,7 @@ This table is not an exhaustive dependency inventory.
 ### Intent and rationale
 `Source Request`, `Overall Goal`, approved decisions, invariants, acceptance criteria, and non-goals are the durable behavioral authority.
 
-Preserve rationale only when it changes how an ambiguous implementation or review decision should be resolved; encode it with the relevant decision, invariant, risk, or non-goal rather than creating a general history transcript.
+Preserve rationale only when it changes how an ambiguous implementation or review decision should be resolved; encode it with the relevant decision, invariant, risk, or non-goal, not a history transcript.
 
 ### No pseudo-patch planning
 Do not require or include exact line ranges, import diffs, unified diffs, or near-final function bodies. Symbol anchors and short illustrative interface/data shapes are allowed only when they clarify an approved decision.
