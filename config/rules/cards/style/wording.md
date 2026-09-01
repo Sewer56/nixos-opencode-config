@@ -3,7 +3,6 @@
 Professional but tight. Every sentence carries weight.
 
 - Technical terms exact: use the project's defined name for every concept. Code identifiers, commands, paths, and URLs stay verbatim.
-- Short synonyms: use not utilize, show not demonstrate, help not facilitate, to not in order to.
 - Active voice, one idea per sentence (≤20 words).
 - No filler, hedging, or pleasantries: `please note`, `simply`, `just`, `of course`, `certainly`, `basically`.
 
