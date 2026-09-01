@@ -1,5 +1,5 @@
 ### Existing location first
-Prefer the existing file/module. Create new modules or files only when module boundaries materially benefit.
+Prefer the existing file/module; create new modules or files only when module boundaries materially benefit.
 
 ### Focused modules
 Split catch-all files into focused, domain-named modules. Do not collapse modular code into monoliths unless the user asks.
