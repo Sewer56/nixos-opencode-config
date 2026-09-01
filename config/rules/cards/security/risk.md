@@ -16,7 +16,7 @@ Never log, return, persist, cache, or expose secrets beyond their owning boundar
 Security checks fail closed. Auth errors must not fall through to privileged behavior, leak sensitive distinctions, or convert to success via retries or defaults.
 
 ### Dependencies and cryptography
-Use established repository mechanisms and maintained libraries. Do not invent cryptography, weaken verification, disable certificate/signature checks, or broaden dependency trust without an explicit approved decision.
+Use established repository mechanisms and maintained libraries. Never invent cryptography, weaken verification, disable certificate/signature checks, or broaden dependency trust without an explicit approved decision.
 
 ### Grounded review
 A security finding states the attacker-controlled input or privilege boundary, the reachable path, the missing/incorrect control, and the resulting impact. Generic hardening advice is advisory at most.
