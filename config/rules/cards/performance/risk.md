@@ -1,5 +1,5 @@
 ### Highest-performance correct implementation
-Prefer the highest-performance correct implementation. Then simplify for readability and reviewability, but never trade meaningful performance for brevity or superficial simplicity.
+Prefer the highest-performance correct implementation; simplify for readability, but never trade meaningful performance for brevity or superficial simplicity.
 
 ### Allocation-conscious authorship
 In changed code, write the allocation- and copy-conscious form by default:
