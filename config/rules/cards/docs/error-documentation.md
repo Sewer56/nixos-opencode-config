@@ -1,6 +1,8 @@
 ### Error-section ownership
-Own all `# Errors`, `@throws`, or language-equivalent error documentation for public error-returning APIs in changed scope: existence, placement, format, specificity, and completeness.
-Block missing sections and vague `may fail` coverage.
+Own all `# Errors`, `@throws`, or language-equivalent error docs for
+public error-returning APIs in changed scope: existence, placement,
+format, specificity, completeness. Block missing sections and vague
+`may fail` coverage.
 
 ### Specific error triggers
 Each error bullet must name the condition that produces it. Vague catch-all wording is insufficient.
