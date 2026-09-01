@@ -13,13 +13,9 @@ In changed code, write the allocation- and copy-conscious form by default:
 An avoidable allocation, clone, or copy in changed code is fix-by-default when an equally clear bounded alternative exists; never obfuscate for unmeasured wins.
 
 ### Bounded and batched work
-Avoid unbounded work on growing inputs: add pagination, limits, early exits, batching, streaming, or explicit workload bounds.
+Avoid unbounded work on growing inputs: paginate, limit, batch, stream, or bound explicitly; avoid nested per-item database, network, or filesystem work on list paths.
 
-Avoid nested per-item database, network, filesystem, or expensive computation on list/batch paths.
-
-Validate or cap user-controlled workload size before allocating, sorting, logging, serializing, or spawning work proportional to it.
-
-Judge from read target code, not plan wording alone.
+Cap user-controlled workload size before proportional allocation, sorting, logging, or spawning. Judge from read target code, not plan wording.
 
 ### Unsafe concurrency
 Avoid unbounded fan-out, shared mutable state races, blocking calls in async paths, and missing backpressure.
