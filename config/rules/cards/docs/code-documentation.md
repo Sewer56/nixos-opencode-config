@@ -45,25 +45,13 @@ Spin-offs get their own `#` section with a cross-reference. Edge cases are
 one general sentence (`Empty chains are skipped.`), never enumerations.
 
 ### Describe current behavior only
-- **Current contract only**: Code comments and in-code docs state the
-  current contract and behavior only.
-- **Never narrate old behavior**: Never narrate old, removed, or previous
-  behavior or versions in code ("no longer", "previously", "was",
-  "used to", "before", "now" describing a change).
-- **Backward-compatibility docs only**: Old behavior may be referenced
-  only in human-facing backward-compatibility documentation (e.g.
-  release notes or migration notes).
-  - Reference old behavior only when a genuine compatibility concern
-    exists for consumers.
-  - Reference old behavior only on public APIs with an expectation of
-    backward compatibility.
-- **Never in private code**: Never reference old behavior in private
-  code, internals, tests, or helpers.
-- **Signal to confirm, not narrate**: If a doc comment would need to
-  mention old behavior, treat that as a signal rather than narrating
-  the change.
-  - The signal means the draft must confirm a real public-API
-    backward-compatibility obligation with the user (see draft change).
+- In-code docs state the current contract only, never old or removed
+  behavior ("no longer", "previously", "was", "used to", "before", "now").
+- Old behavior appears only in backward-compatibility docs (release or
+  migration notes), only for genuine public-API compatibility concerns.
+- Never in private code, internals, tests, or helpers.
+- Needing old-behavior wording is a signal to confirm a public-API
+  compatibility obligation with the user, not to narrate.
 
 ### Inline readability comments
 Non-trivial function bodies need short inline comments at logical steps
