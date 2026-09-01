@@ -50,14 +50,10 @@ Severity: ADVISORY unless combined conditions hide a required action.
 Split into one bullet per checkable action.
 
 ### Example-prose redundancy
-Prose must not restate what the adjacent example already shows: the call made, literal argument values, or defaults the example passes.
+Prose must not restate what the adjacent example shows: the call, literal arguments, or defaults.
 
 Fix: delete the restated clause; keep any non-duplicated remainder, e.g. a trailing cross-reference such as `[Override the policy] shows values that differ:`.
 
-Keep prose when the example cannot show the fact: behavior, consequences, ordering, or differing values.
-
-Precedence: Keep wins for any fact the example cannot show, including a consequence fused with a restated literal; purpose-bearing lead-ins that introduce the example are exempt.
-
-Flag: sentences that paraphrase the adjacent example's literal code.
+Keep prose for facts the example cannot show: behavior, consequences, ordering, differing values. Keep wins for such facts even when fused with a restated literal; purpose-bearing lead-ins are exempt.
 
 Severity: BLOCKING in end-user and in-code docs; ADVISORY in narrative prose.
