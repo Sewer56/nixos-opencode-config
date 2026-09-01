@@ -11,7 +11,7 @@ Before review or handoff, run the linter:
 
 ### Writer gate
 
-Before staging: committed code/comments/tests/docs/commit messages never cite internal ids (`AC-1`); apply the 'Self-contained committed content' rule.
+Before staging: committed content and commit messages never cite internal ids (`AC-1`); apply the Self-contained committed content rule.
 
 ### Dependency assumptions
 
