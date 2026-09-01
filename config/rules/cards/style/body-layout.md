@@ -8,11 +8,13 @@ Inline-comment wording and skip list: code-documentation card. Line
 wrapping: formatters.
 
 ### Blank-line grouping
-- One blank line between logical groups, never two. A group is one coherent step: validate, transform, decide, build result.
-- Comments carry why; blank lines carry shape. Comment-marked steps still need separation.
-- Tests: separate arrange, act, assert. Split long arrange blocks into harness, fixtures, inputs.
-- Loops: sub-group a multi-step per-iteration body like any other body.
-- Skip: bodies with a single logical group, including short single-group tests. Skipped tests still get their summary.
+- One blank line between logical groups, never two; a group is one
+  coherent step (validate, transform, decide, build result).
+- Comments carry why; blank lines carry shape; both still separate.
+- Tests: separate arrange, act, assert; split long arrange into
+  harness, fixtures, inputs.
+- Sub-group multi-step loop bodies like any other body.
+- Skip single-group bodies; skipped tests still get their summary.
 
 ### Group-purpose comments
 - Comment a group only when names and control flow leave its intent non-obvious: one comment above the group naming what it achieves. Never comment every group.
