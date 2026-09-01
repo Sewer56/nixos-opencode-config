@@ -2,7 +2,9 @@
 Smallest viable diff; no broad refactors unless required or requested.
 
 ### Plain domain names
-Prefer plain code and descriptive, domain-first names for modules, files, types, and functions. Avoid jargon, cleverness, and vague buckets like `utils`, `helpers`, `common`, or `misc` unless already established and intentionally narrow.
+Plain code, descriptive domain-first names for modules, files, types,
+and functions; no jargon, cleverness, or vague buckets (`utils`,
+`helpers`, `common`, `misc`) unless established and intentionally narrow.
 
 ### Existing patterns
 Prefer existing types, constants, schemas, signatures, and repo patterns.
