@@ -22,7 +22,8 @@ Equivalence claims need one test running both paths and asserting equal final re
 - **Examples are not coverage**: Example binaries never substitute for tests.
 
 ### Test helpers
-Reuse existing test helpers. Extract shared helpers only when they reduce repetition or clarify setup across multiple tests.
+Reuse existing helpers; extract shared ones only to reduce repetition or
+clarify setup across tests.
 
 Prefer one parameterizable local helper over re-declared per-test mock
 structs: closure adapters, failure constructors (`fail_hook(msg)`), test
