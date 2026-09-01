@@ -192,4 +192,4 @@ Allow at most five repair turns total; a remaining blocker is `FAIL`; unavailabl
 
 # Result
 
-Return a short plain summary: what changed, the checks run (lint gate, quick validation, targeted tests), and any review or verifier outcomes with their artifact paths. Lightweight prose only; no pipeline envelope.
+Return a short plain summary: what changed, checks run (lint gate, quick validation, targeted tests), review or verifier outcomes with artifact paths. Lightweight prose; no pipeline envelope.
