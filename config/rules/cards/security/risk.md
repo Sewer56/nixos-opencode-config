@@ -10,7 +10,7 @@ Expose the smallest named capability needed. Avoid generic command/channel invoc
 Validate and normalize untrusted input before it reaches shell, SQL, paths, templates, deserialization, dynamic imports, regular expressions, redirects, or resource allocation. Preserve parameterization and canonicalization boundaries.
 
 ### Secrets and sensitive data
-Do not log, return, persist, cache, or expose secrets beyond their owning boundary. Redact diagnostics and ensure clearing/revocation behavior is complete.
+Never log, return, persist, cache, or expose secrets beyond their owning boundary. Redact diagnostics; ensure clearing/revocation behavior is complete.
 
 ### Failure behavior
 Security checks fail closed. Authentication/authorization errors must not fall through to privileged behavior, leak sensitive distinctions, or be converted into success by retries or defaults.
