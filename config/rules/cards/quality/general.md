@@ -11,7 +11,8 @@ Prefer existing types, constants, schemas, signatures, and repo
 patterns.
 
 ### Helper size
-Inline tiny single-use helpers unless a name improves readability, reuse, or boundaries. Avoid unneeded single-implementation abstractions.
+Inline tiny single-use helpers unless a name improves readability,
+reuse, or boundaries; no single-implementation abstractions.
 
 ### Obvious control flow
 Keep control flow obvious and change sets cohesive.
