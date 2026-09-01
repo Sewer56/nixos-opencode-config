@@ -19,4 +19,4 @@ Security checks fail closed. Auth errors must not fall through to privileged beh
 Use established repository mechanisms and maintained libraries. Never invent cryptography, weaken verification, disable certificate/signature checks, or broaden dependency trust without an explicit approved decision.
 
 ### Grounded review
-A security finding states the attacker-controlled input or privilege boundary, the reachable path, the missing/incorrect control, and the resulting impact. Generic hardening advice is advisory at most.
+A security finding states the attacker-controlled input or privilege boundary, the reachable path, the missing or incorrect control, and the impact. Generic hardening advice is advisory at most.
