@@ -93,8 +93,5 @@ the vague effect (`may suppress the event`).
 Do not backfill untouched legacy files solely for docs.
 
 ### Implementation-plan docs specificity
-In implementation plans, name the affected documentation surface,
-audience, and behavioral change.
-
-Generic `update docs` notes are insufficient; exact prose or patch hunks
-are not required.
+Plans name the docs surface, audience, and behavioral change; generic
+`update docs` is insufficient, exact prose or hunks are not required.
