@@ -1,12 +1,33 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-# Validate instruction topology and workflow contracts before each commit.
+# Gate each commit: config validation, unit tests, file-reference checks,
+# and flake.lock sync after a tools/rust-llm-tidy submodule bump.
 # Input: current repository worktree. Output: diagnostics on stdout/stderr;
 # exit nonzero blocks commit. Run manually with `.githooks/pre-commit`.
-set -eu
+set -euo pipefail
 
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
+
+# Staged submodule pointer must equal flake.lock's pinned rev for the
+# rust-llm-tidy input, or the build silently keeps the old binary. The
+# hook updates and stages flake.lock when needed.
+# Mirrors hooks/pre-commit in the root NixOS repo (nixos-secrets pair).
+lock_rev() {
+  python3 -c "import json,sys; print(json.load(sys.stdin)['nodes']['rust-llm-tidy']['locked']['rev'])" \
+    < flake.lock 2>/dev/null || true
+}
+
+staged="$(git ls-files -s -- tools/rust-llm-tidy | awk '{print $2}')"
+head_rev="$(git ls-tree HEAD -- tools/rust-llm-tidy | awk '{print $3}')"
+if [ -n "$staged" ] && [ "$staged" != "$head_rev" ]; then
+  locked="$(lock_rev)"
+  if [ -z "$locked" ] || [ "$staged" != "$locked" ]; then
+    echo "Updating flake.lock: rust-llm-tidy ${locked:-MISSING} -> ${staged:0:12}" >&2
+    nix flake update rust-llm-tidy
+    git add flake.lock
+  fi
+fi
 
 python3 scripts/validate-opencode-config.py --repo-root .
 python3 -m unittest discover -s tests -p 'test_*.py'

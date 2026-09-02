@@ -1,9 +1,6 @@
 {
   description = "OpenCode config utilities";
-  # ── Inputs ──────────────────────────────────────────────────────────────
-  # nixpkgs      – package set
-  # rust-overlay – latest stable Rust toolchain (rustc, cargo, clippy, …)
-  # llm-agents   – provides coderabbit-cli (auto-review tool)
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -13,49 +10,49 @@
     };
 
     llm-agents.url = "github:numtide/llm-agents.nix";
+
+    # Flakes cannot see submodule files, so consume the rust-llm-tidy
+    # working repo directly (nixos-secrets pattern). .githooks/pre-commit
+    # keeps the locked rev in sync with the submodule pointer.
+    rust-llm-tidy = {
+      url = "git+file:///home/sewer/nixos/users/sewer/home-manager/programs/opencode/tools/rust-llm-tidy";
+      flake = false;
+    };
   };
 
-  # ── Outputs ─────────────────────────────────────────────────────────────
   outputs = {
     self,
     nixpkgs,
     rust-overlay,
     llm-agents,
+    rust-llm-tidy,
     ...
   }: let
-    # ── Helpers ───────────────────────────────────────────────────────────
     systems = ["x86_64-linux"];
 
-    # Nixpkgs instantiated *with* the Rust overlay so every system gets the
-    # same toolchain (buildRustPackage + devShell).
+    # nixpkgs + rust overlay: one toolchain for builds and shells.
     mkPkgs = system:
       import nixpkgs {
         inherit system;
         overlays = [rust-overlay.overlays.default];
       };
 
-    # Map a function over each system with overlay‑patched pkgs.
     eachSystem = fn:
       nixpkgs.lib.genAttrs systems (system: fn system (mkPkgs system));
 
-    # ── Tool derivations (shared by packages / apps / devShells) ──────────
-    # Build entire Rust workspace *once* – all crates share the same
-    # dependency tree so compiling 5× was pure waste.  Each per‑tool
-    # derivation below just plucks its binary from this shared build.
-    mkTools = pkgs: let
+    # ── Tool packages (packages / apps / devShells) ───────────────────────
+    # tools/ compiles once; per-tool packages pluck their binary.
+    # rust-llm-tidy is a separate workspace built from the pinned input.
+    mkTools = pkgs: llmTidySrc: let
       workspaceDrv = pkgs.rustPlatform.buildRustPackage {
         pname = "opencode-tools";
         version = "0.1.0";
-
         src = ./tools;
         cargoLock.lockFile = ./tools/Cargo.lock;
-
-        # Build every workspace member together → one compilation unit.
-        # Default cargoInstallHook copies *all* built binaries to $out/bin.
+        # --workspace: one compilation unit; install copies every bin.
         cargoBuildFlags = ["--workspace"];
       };
 
-      # Derive a single‑binary package from the shared workspace build.
       mkTool = {
         pname,
         description,
@@ -70,6 +67,23 @@
           mkdir -p $out/bin
           cp ${workspaceDrv}/bin/${binary} $out/bin/
         '';
+
+      rustLlmTidy = pkgs.rustPlatform.buildRustPackage {
+        pname = "rust-llm-tidy";
+        # Version comes from the locked source, so it cannot go stale here.
+        version = (pkgs.lib.importTOML "${llmTidySrc}/src/cli/Cargo.toml").package.version;
+        src = "${llmTidySrc}/src";
+        cargoLock.lockFile = "${llmTidySrc}/src/Cargo.lock";
+        # Only the CLI member ships a binary; the rest are libraries.
+        cargoBuildFlags = ["--package" "rust-llm-tidy-cli"];
+        # Upstream's corpus test needs the nested submodule checkout;
+        # its CI covers that, this package build does not.
+        doCheck = false;
+        meta = {
+          description = "Reorder and lint Rust source and doc comments";
+          mainProgram = "rust-llm-tidy";
+        };
+      };
     in rec {
       opencode-model-switcher = mkTool {
         pname = "opencode-model-switcher";
@@ -96,21 +110,13 @@
         description = "Toggle external_directory '*' between ask (regular) and allow (yolo) across agent frontmatter and global config";
       };
 
-      # rust-llm-tidy lives in a git submodule with its own workspace.
-      # Pure flakes cannot track submodule files, so it is built at runtime
-      # via the cargo-backed wrapper in the Home-Manager module.
+      rust-llm-tidy = rustLlmTidy;
+
       default = opencode-model-switcher;
     };
 
-    # ── Home‑Manager module ──────────────────────────────────────────────
-    # Exported as homeManagerModules.default so the root NixOS flake can
-    # import it directly.  Adds:
-    #   • opencode & opencode-build wrapper scripts
-    #   • CLI tools above
-    #   • coderabbit-cli
-    #   • MCP/runtime deps (node, yarn, docker, bun)
-    #   • ~/.config/opencode → editable config symlink
-    #   • ~/opencode           → convenience symlink to this repo
+    # ── Home-Manager module ────────────────────────────────────────────────
+    # Consumed by the root NixOS flake.
     homeModule = {
       pkgs,
       config,
@@ -122,7 +128,7 @@
       opencodeSource = "${opencodeRepo}/opencode-source";
       opencodeBin = "${opencodeSource}/packages/opencode/dist/opencode-linux-x64/bin/opencode";
 
-      # Thin wrapper: default to CWD, forwards args. Runs with Exa search enabled.
+      # Defaults to CWD, forwards args, enables Exa search.
       opencodeScript = pkgs.writeShellScriptBin "opencode" ''
         export OPENCODE_ENABLE_EXA=1
         if [ "$#" -eq 0 ]; then
@@ -132,23 +138,21 @@
         fi
       '';
 
-      # Install runtime deps for local plugins. Plugins with runtime deps
-      # (e.g. xdg-basedir) fail their dynamic import inside OpenCode silently
-      # when node_modules is missing, so this must run on fresh checkouts.
+      # Local plugins import node_modules at runtime; missing deps fail
+      # silently inside OpenCode.
       pluginDepsScript = pkgs.writeShellScriptBin "opencode-plugin-deps" ''
         set -uo pipefail
         failed=0
         for dir in ${opencodeRepo}/config/plugins/*/; do
           if [ ! -f "$dir/package.json" ]; then
-            # Empty dir = uninitialized submodule (clone without --recurse-submodules).
+            # Empty dir = uninitialized submodule.
             if [ -z "$(ls -A "$dir" 2>/dev/null)" ]; then
               echo "error: $dir is empty - uninitialized submodule? run: git submodule update --init" >&2
               failed=1
             fi
             continue
           fi
-          # Only install when the plugin declares runtime dependencies.
-          # jq parse failure (malformed package.json) must be surfaced, not skipped.
+          # Only install when deps are declared; jq failures must surface.
           if ! deps=$(${pkgs.jq}/bin/jq '.dependencies | length' "$dir/package.json" 2>&1); then
             echo "error: invalid package.json in $dir: $deps" >&2
             failed=1
@@ -156,8 +160,7 @@
           fi
           [ "$deps" -gt 0 ] 2>/dev/null || continue
           echo "installing plugin deps: $dir"
-          # Frozen lockfile when committed (submodules) so installs never
-          # rewrite bun.lock and dirty the tree; caveman has no lockfile.
+          # Frozen when a lockfile exists so installs never dirty the tree.
           if [ -f "$dir/bun.lock" ] || [ -f "$dir/bun.lockb" ]; then
             (cd "$dir" && ${pkgs.bun}/bin/bun install --production --frozen-lockfile) || failed=1
           else
@@ -167,11 +170,10 @@
         exit $failed
       '';
 
-      # Rebuild the opencode‑source submodule (bun build).
-      # I often iterate, so separate build via `opencode-build` command will do.
+      # Rebuild opencode-source (bun build); separate command for iteration.
       opencodeBuildScript = pkgs.writeShellScriptBin "opencode-build" ''
         set -euo pipefail
-        # Plugin deps failing (e.g. offline) shouldn't block the binary build.
+        # Plugin deps failing (e.g. offline) must not block the binary build.
         ${pluginDepsScript}/bin/opencode-plugin-deps || \
           echo "warning: plugin deps install failed; run opencode-plugin-deps manually"
         pushd ${opencodeSource}/packages/opencode > /dev/null
@@ -181,37 +183,23 @@
         chmod -R +x ${opencodeSource}/packages/opencode/dist/opencode-linux-x64/bin
       '';
 
-      # ── Cargo‑backed tool wrappers ──────────────────────────────────────
-      # Delegate to `cargo run` at runtime instead of baking Nix‑built
-      # binaries.  This avoids a full workspace‑wide Rust rebuild inside
-      # `home‑manager switch` whenever a single .rs file changes.
-      # Cargo handles incremental compilation; second run is near‑instant.
-      # `cargo build` runs first so a stale binary is refreshed (or the
-      # failure surfaces) before `cargo run` executes it.
-      # manifestPath tools must not `cd`: rust-llm-tidy lints the caller's
-      # repo, discovered from the caller's CWD. Their manifest is resolved
-      # to a physical path so all invocations share one cargo workspace
-      # root.
+      # ── Cargo wrappers for tools/ members ────────────────────────────────
+      # Editing tools/*.rs costs zero Nix rebuild. rust-llm-tidy is not
+      # wrapped: it would inherit the caller's rustup toolchain and
+      # recompile the shared target dir; the pinned Nix build installs
+      # instead.
       mkCargoTool = {
         name,
         package ? name,
         dir ? "$HOME/opencode/tools",
-        manifestPath ? null,
       }:
         pkgs.writeShellScriptBin name ''
           set -euo pipefail
-          ${
-            if manifestPath == null
-            then ''              # `cd` gives cargo the physical workspace path; a symlinked
-                        # path alone would be a second workspace root and force full
-                        # rebuilds whenever the invocation style switches.
-                        cd "${dir}"
-                        cargo build --release --package ${package}
-                        exec cargo run --release --package ${package} -- "$@"''
-            else ''              manifest="$(readlink -f "${manifestPath}")"
-                        cargo build --release --manifest-path "$manifest" --package ${package}
-                        exec cargo run --release --manifest-path "$manifest" --package ${package} -- "$@"''
-          }
+          # Physical path: a symlinked dir is a second workspace root and
+          # forces full rebuilds when invocation styles switch.
+          cd "${dir}"
+          cargo build --release --package ${package}
+          exec cargo run --release --package ${package} -- "$@"
         '';
     in {
       home.packages = [
@@ -219,18 +207,14 @@
         opencodeBuildScript
         pluginDepsScript
 
-        # CLI tools — cargo‑backed so editing tools/ costs zero Nix rebuild.
         (mkCargoTool {name = "opencode-model-switcher";})
         (mkCargoTool {name = "opencode-sessions";})
         (mkCargoTool {name = "chunk-files-by-tokens";})
         (mkCargoTool {name = "token-count-after-expand";})
         (mkCargoTool {name = "opencode-yolo-mode";})
-        (mkCargoTool {
-          name = "rust-llm-tidy";
-          package = "rust-llm-tidy-cli";
-          dir = "$HOME/opencode/tools/rust-llm-tidy/src";
-          manifestPath = "$HOME/opencode/tools/rust-llm-tidy/src/Cargo.toml";
-        })
+
+        # Pinned build: one toolchain, no per-caller recompilation.
+        self.packages.${system}.rust-llm-tidy
 
         llm-agents.packages.${system}.coderabbit-cli
 
@@ -245,9 +229,8 @@
       home.file.".config/opencode".source =
         config.lib.file.mkOutOfStoreSymlink "${opencodeRepo}/config";
 
-      # Plugin runtime deps on every switch (bun install is a fast no-op when
-      # node_modules is already in sync). Guarded so a missing repo checkout
-      # doesn't break activation on a partially bootstrapped machine.
+      # Plugin deps on every switch (no-op when in sync); guarded so a
+      # missing checkout doesn't break activation.
       home.activation.opencodePluginDeps = config.lib.dag.entryAfter ["writeBoundary"] ''
         if [ -d "${opencodeRepo}/config/plugins" ]; then
           run ${pluginDepsScript}/bin/opencode-plugin-deps || \
@@ -261,10 +244,9 @@
     };
   in {
     # ── Flake outputs ─────────────────────────────────────────────────────
-    # nix build / nix run / nix develop all work from this repo directly.
 
     # nix build .#opencode-model-switcher   etc.
-    packages = eachSystem (_system: pkgs: mkTools pkgs);
+    packages = eachSystem (_system: pkgs: mkTools pkgs rust-llm-tidy);
 
     # nix flake check
     checks = eachSystem (system: _pkgs: {
@@ -273,6 +255,7 @@
       chunk-files-by-tokens = self.packages.${system}.chunk-files-by-tokens;
       token-count-after-expand = self.packages.${system}.token-count-after-expand;
       opencode-yolo-mode = self.packages.${system}.opencode-yolo-mode;
+      rust-llm-tidy = self.packages.${system}.rust-llm-tidy;
     });
 
     # nix run .#opencode-sessions -- tui
@@ -307,6 +290,12 @@
         meta.description = "Toggle external_directory yolo mode";
       };
 
+      rust-llm-tidy = {
+        type = "app";
+        program = "${self.packages.${system}.rust-llm-tidy}/bin/rust-llm-tidy";
+        meta.description = "Reorder and lint Rust source";
+      };
+
       default = opencode-model-switcher;
     });
 
@@ -314,13 +303,13 @@
     devShells = eachSystem (system: pkgs: let
       tools = self.packages.${system};
       rustToolchain = pkgs.rust-bin.stable.latest.default.override {
-        extensions = ["rust-src"]; # needed for rust-analyzer type info
+        extensions = ["rust-src"]; # rust-analyzer type info
       };
     in {
       default = pkgs.mkShell {
         packages = [
-          # Rust (rust‑overlay gives rustc/cargo/rustfmt/clippy;
-          # standalone rust-analyzer is fresher than the bundled preview).
+          # rust-overlay toolchain; standalone rust-analyzer is fresher
+          # than the bundled preview.
           rustToolchain
           pkgs.rust-analyzer
           pkgs.pkg-config
@@ -330,12 +319,13 @@
             pythonPackages.pyyaml
           ]))
 
-          # Built CLI tools - ready to run inside the shell.
+          # Built CLI tools.
           tools.opencode-model-switcher
           tools.opencode-sessions
           tools.chunk-files-by-tokens
           tools.token-count-after-expand
           tools.opencode-yolo-mode
+          tools.rust-llm-tidy
         ];
       };
     });

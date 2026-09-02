@@ -113,7 +113,24 @@
       "inputs": {
         "llm-agents": "llm-agents",
         "nixpkgs": "nixpkgs_2",
+        "rust-llm-tidy": "rust-llm-tidy",
         "rust-overlay": "rust-overlay"
+      }
+    },
+    "rust-llm-tidy": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788384795,
+        "narHash": "sha256-85w8ltvPeqi6zHeZHXZ0+Ma8Rrg1psN/pNM6htKhbuo=",
+        "ref": "refs/heads/csharp",
+        "rev": "54a7df3e7a4fde61006ba84b00d8ea0dbb0a0171",
+        "revCount": 250,
+        "type": "git",
+        "url": "file:///home/sewer/nixos/users/sewer/home-manager/programs/opencode/tools/rust-llm-tidy"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:///home/sewer/nixos/users/sewer/home-manager/programs/opencode/tools/rust-llm-tidy"
       }
     },
     "rust-overlay": {

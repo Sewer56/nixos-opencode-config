@@ -17,7 +17,6 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FLAKE = ROOT / "flake.nix"
 ORCHESTRATOR = ROOT / "config/agent/_implement.md"
 CREATE_COHORTS = ROOT / "config/agent/_implement/create-cohorts.md"
 COHORT = ROOT / "config/agent/_implement/cohort.md"
@@ -389,19 +388,6 @@ class ImplementWorkflowTests(unittest.TestCase):
                         capture_output=True,
                     )
                     self.assertEqual(expected, probe.returncode == 0)
-
-    def test_rust_llm_tidy_wrapper_preserves_caller_cwd(self) -> None:
-        flake = text(FLAKE)
-        self.assertIn("manifestPath ? null", flake)
-        self.assertIn('manifestPath = "$HOME/opencode/tools/rust-llm-tidy/src/Cargo.toml";', flake)
-        # Physical manifest path keeps external and in-dir builds on one
-        # cargo workspace root; no `cd` keeps the caller's CWD.
-        self.assertIn('manifest="$(readlink -f "${manifestPath}")"', flake)
-        tidy = flake.index('name = "rust-llm-tidy"')
-        tidy_block = flake[tidy : flake.index("})", tidy) + 2]
-        self.assertIn("manifestPath =", tidy_block)
-        self.assertNotIn('cd "${dir}"', tidy_block)
-        self.assertIn('cd "${dir}"', flake[:tidy])
 
     def test_lint_gate_precedes_first_imported_rule_group_after_expansion(self) -> None:
         rule = text(CODE_WRITING)
