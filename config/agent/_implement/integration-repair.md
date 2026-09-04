@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Repairs final integration failures across approved plan scope
 model: sewer-axonhub/glm-5.3 # HARD
-variant: high
+variant: max
 permission:
   "*": deny
   external_directory:

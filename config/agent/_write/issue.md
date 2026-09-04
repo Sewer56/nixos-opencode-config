@@ -2,7 +2,7 @@
 mode: all
 description: Writes a repository-grounded issue using the local template and a concise problem statement
 model: sewer-axonhub/glm-5.3 # MEDIUM
-variant: low
+variant: high
 permission:
   "*": deny
   external_directory:

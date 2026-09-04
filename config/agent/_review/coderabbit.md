@@ -2,7 +2,7 @@
 mode: all
 description: Runs structured CodeRabbit review with bounded repair and one re-review
 model: sewer-axonhub/glm-5.3 # HARD
-variant: high
+variant: max
 permission:
   "*": deny
   external_directory:

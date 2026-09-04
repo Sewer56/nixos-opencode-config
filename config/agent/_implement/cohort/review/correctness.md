@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Produces evidence-backed correctness candidates for one proposed commit
 model: sewer-axonhub/glm-5.3 # HARD
-variant: high
+variant: max
 permission:
   "*": deny
   external_directory:

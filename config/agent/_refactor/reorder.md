@@ -2,7 +2,7 @@
 mode: primary
 description: Reorders declarations within source files after an explicit symbol-order preview
 model: sewer-axonhub/glm-5.3 # MEDIUM
-variant: low
+variant: high
 permission:
   "*": deny
   external_directory:

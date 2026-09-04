@@ -2,7 +2,7 @@
 mode: all
 description: Creates Keep a Changelog-style commits without pushing
 model: sewer-axonhub/glm-5.3 # MEDIUM
-variant: low
+variant: high
 permission:
   "*": deny
   external_directory:

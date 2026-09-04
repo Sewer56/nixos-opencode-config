@@ -2,7 +2,7 @@
 mode: primary
 description: Adds or repairs scoped source documentation without changing runtime behavior
 model: sewer-axonhub/glm-5.3 # MEDIUM
-variant: low
+variant: high
 permission:
   "*": deny
   external_directory:

@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Produces focused documentation usability, clarity, and information-design candidates
 model: sewer-axonhub/glm-5.3 # MEDIUM
-variant: low
+variant: high
 permission:
   "*": deny
   external_directory:
