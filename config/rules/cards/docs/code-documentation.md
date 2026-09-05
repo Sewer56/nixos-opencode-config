@@ -77,8 +77,7 @@ the vague effect (`may suppress the event`).
   periods; field mappings use one sentence per bullet, source field in
   code font first; command, type, and parameter sets use one bullet per
   item: name in code font, dash, terse description.
-- Lead-ins end with a colon and never restate bullets; delete the
-  enumerated clause from the prose.
+- Lead-ins never restate bullets.
 - Short sentence sets with nothing enumerable and single coherent
   mechanics stay prose.
 
