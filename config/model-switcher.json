@@ -7,7 +7,7 @@
   },
   "work": {
     "EASY": {"model":"sewer-axonhub-work/gpt-5.6-luna","variant":"low"},
-    "MEDIUM": {"model":"sewer-axonhub-work/gpt-5.6-sol","variant":"medium"},
-    "HARD": {"model":"sewer-axonhub-work/gpt-5.6-sol","variant":"medium"}
+    "MEDIUM": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"low"},
+    "HARD": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"}
   }
 }
