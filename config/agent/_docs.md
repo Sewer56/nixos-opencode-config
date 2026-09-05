@@ -54,6 +54,7 @@ permission:
     "artifact/**": deny
     "artifacts/**": deny
     "artifact/PROMPT-DOCS-*": allow
+    "artifact/review/PROMPT-DOCS-*/*.validation.md": allow
   question: allow
   todowrite: allow
   glob: allow
@@ -92,10 +93,11 @@ Write or review end-user documentation through one bounded, evidence-driven work
 Derive a short `slug`, UTC `run_id`, and:
 - `run_prefix = artifact/PROMPT-DOCS-<slug>.<run_id>`
 - `<run_prefix>.handoff.md`
-- `<run_prefix>.rNN.validation.md`
-- `<run_prefix>.rNN.accuracy.review.md`
-- `<run_prefix>.rNN.usability.review.md`
-- `<run_prefix>.rNN.verdict.md`
+- `review_dir = artifact/review/PROMPT-DOCS-<slug>.<run_id>`
+- `[[review_dir]]/rNN.validation.md`
+- `[[review_dir]]/accuracy/rNN.accuracy.review.md`
+- `[[review_dir]]/usability/rNN.usability.review.md`
+- `[[review_dir]]/verifier/rNN.verdict.md`
 
 Create or overwrite each exact assigned path. Never create placeholder or stub files.
 

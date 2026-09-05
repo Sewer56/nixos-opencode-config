@@ -53,7 +53,7 @@ permission:
     "artifacts/**": deny
     ".git": deny
     ".git/**": deny
-    "artifact/CODERABBIT-*": allow
+    "artifact/review/CODERABBIT-*/**": allow
   grep: allow
   glob: allow
   list: allow
@@ -86,9 +86,11 @@ Run CodeRabbit CLI as external review authority. A successful structured finding
   - `committed`: resolve the same base; derive paths from `comparison_commit..HEAD`; run `cr review --agent --type committed --base-commit <comparison_commit>`;
   - `uncommitted`: no base branch is required; set `comparison_commit=HEAD`, derive paths from index/worktree against `HEAD`, and run `cr review --agent --type uncommitted`.
 - When selected Git diff is empty, write deterministic `PASS` artifact with terminal status `NO_CHANGES` and do not call service.
-- Set `run_id = <UTC YYYYMMDDTHHMMSSZ>`; append suffix on collision. Create immutable round-one paths:
-  - `candidate_path = artifact/CODERABBIT-<run_id>.r01.review.md`
-  - `validation_path = artifact/CODERABBIT-<run_id>.r01.validation.md`
+- Set `run_id = <UTC YYYYMMDDTHHMMSSZ>`; append suffix on collision.
+- `review_dir = artifact/review/CODERABBIT-<run_id>/coderabbit`
+- Create immutable round-one paths:
+  - `candidate_path = [[review_dir]]/r01.review.md`
+  - `validation_path = [[review_dir]]/r01.validation.md`
 
 ## 2. Parse review
 - Run structured review once and parse JSONL. Collect `finding`; record `review_context` and `status`; ignore `heartbeat`; require one successful `complete`; stop on terminal `error`.

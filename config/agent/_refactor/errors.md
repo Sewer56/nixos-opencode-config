@@ -54,6 +54,7 @@ permission:
     "artifact/**": deny
     "artifacts/**": deny
     "artifact/PROMPT-ERROR-DOCS-*": allow
+    "artifact/review/PROMPT-ERROR-DOCS-*/**": allow
   question: allow
   todowrite: allow
   bash:
@@ -85,9 +86,10 @@ Derive a short `slug`, UTC `run_id`, and:
 - `run_prefix = artifact/PROMPT-ERROR-DOCS-<slug>.<run_id>`
 - `<run_prefix>.handoff.md`
 - `<run_prefix>.chunk-NN.facts.md`
-- `<run_prefix>.rNN.validation.md`
-- `<run_prefix>.rNN.errors.review.md`
-- `<run_prefix>.rNN.verdict.md`
+- `review_dir = artifact/review/PROMPT-ERROR-DOCS-<slug>.<run_id>`
+- `[[review_dir]]/rNN.validation.md`
+- `[[review_dir]]/errors/rNN.errors.review.md`
+- `[[review_dir]]/verifier/rNN.verdict.md`
 
 Create or overwrite each exact assigned path. Never create placeholder or stub files.
 

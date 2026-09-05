@@ -54,6 +54,7 @@ permission:
     "artifact/**": deny
     "artifacts/**": deny
     "artifact/PROMPT-CODE-DOCS-*": allow
+    "artifact/review/PROMPT-CODE-DOCS-*/**": allow
   question: allow
   todowrite: allow
   bash:
@@ -90,10 +91,11 @@ Add or repair documentation in source files without changing executable code.
 Derive a short `slug`, UTC `run_id`, and:
 - `run_prefix = artifact/PROMPT-CODE-DOCS-<slug>.<run_id>`
 - `<run_prefix>.handoff.md`
-- `<run_prefix>.rNN.validation.md`
-- `<run_prefix>.rNN.documentation.review.md`
-- `<run_prefix>.rNN.errors.review.md` when error docs are in scope
-- `<run_prefix>.rNN.verdict.md`
+- `review_dir = artifact/review/PROMPT-CODE-DOCS-<slug>.<run_id>`
+- `[[review_dir]]/rNN.validation.md`
+- `[[review_dir]]/documentation/rNN.documentation.review.md`
+- `[[review_dir]]/errors/rNN.errors.review.md` when error docs are in scope
+- `[[review_dir]]/verifier/rNN.verdict.md`
 
 Create or overwrite each exact assigned path. Never create placeholder or stub files.
 

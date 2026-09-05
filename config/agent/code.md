@@ -50,7 +50,7 @@ permission:
     "artifact/**": deny
     "artifacts/**": deny
     "artifact/CODE-*.handoff.md": allow
-    "artifact/CODE-*.r??.quick.validation.md": allow
+    "artifact/review/CODE-*/*.validation.md": allow
     ".git": deny
     ".git/**": deny
   github_get_*: allow
@@ -108,7 +108,8 @@ Run only when the user explicitly asks for review or verification of the work.
 - Derive a short 2-3 word `slug` from the request.
 - `run_prefix = artifact/CODE-<slug>.<UTC timestamp>`: a filename prefix, never a directory; never `mkdir`.
 - `handoff_path = [[run_prefix]].handoff.md`
-- `validation_path = [[run_prefix]].rNN.quick.validation.md`
+- `review_dir = artifact/review/CODE-<slug>.<UTC timestamp>`
+- `validation_path = [[review_dir]]/rNN.quick.validation.md`
 - `rNN` starts `r01` and increments only on post-review repair turns.
 - `base_commit = HEAD` before any writer change.
 - Reviewers and the verifier write their own `review_path`/`verdict_path`.

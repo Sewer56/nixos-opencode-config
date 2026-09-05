@@ -53,7 +53,7 @@ permission:
     "artifact/**": deny
     "artifacts/**": deny
     "artifact/CLEANUP-*.handoff.md": allow
-    "artifact/CLEANUP-*.r??.quick.validation.md": allow
+    "artifact/review/CLEANUP-*/*.validation.md": allow
     ".git": deny
     ".git/**": deny
   github_get_*: allow
@@ -98,9 +98,10 @@ Behavior preservation is the authority boundary. Repository behavior plus your r
 - Derive a short 2-3 word `slug` from the cleanup request and resolve the repository root.
 - `run_prefix = artifact/CLEANUP-<slug>.<UTC timestamp>`: a filename prefix, never a directory; never `mkdir`.
 - `handoff_path = [[run_prefix]].handoff.md`
-- `validation_path = [[run_prefix]].rNN.quick.validation.md`
-- `review_path = [[run_prefix]].rNN.<domain>.review.md`
-- `verdict_path = [[run_prefix]].rNN.verdict.md`
+- `review_dir = artifact/review/CLEANUP-<slug>.<UTC timestamp>`
+- `validation_path = [[review_dir]]/rNN.quick.validation.md`
+- `review_path = [[review_dir]]/<domain>/rNN.<domain>.review.md`
+- `verdict_path = [[review_dir]]/verifier/rNN.verdict.md`
 - `rNN` starts `r01` and increments only on post-review repair turns.
 - `base_commit = HEAD` before any writer change.
 

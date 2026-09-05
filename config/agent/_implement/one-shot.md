@@ -52,7 +52,7 @@ permission:
     "artifact/**": deny
     "artifacts/**": deny
     "artifact/ONESHOT-*.handoff.md": allow
-    "artifact/ONESHOT-*.r??.quick.validation.md": allow
+    "artifact/review/ONESHOT-*/*.validation.md": allow
     ".git": deny
     ".git/**": deny
   github_get_*: allow
@@ -97,9 +97,10 @@ Derive a bounded behavioral scope directly from the request; repository behavior
 - Derive a short 2-3 word `slug` from the request and resolve the repository root.
 - `run_prefix = artifact/ONESHOT-<slug>.<UTC timestamp>`: a filename prefix, never a directory; never `mkdir`.
 - `handoff_path = [[run_prefix]].handoff.md`
-- `validation_path = [[run_prefix]].rNN.quick.validation.md`
-- `review_path = [[run_prefix]].rNN.<domain>.review.md`
-- `verdict_path = [[run_prefix]].rNN.verdict.md`
+- `review_dir = artifact/review/ONESHOT-<slug>.<UTC timestamp>`
+- `validation_path = [[review_dir]]/rNN.quick.validation.md`
+- `review_path = [[review_dir]]/<domain>/rNN.<domain>.review.md`
+- `verdict_path = [[review_dir]]/verifier/rNN.verdict.md`
 - `rNN` starts `r01` and increments only on post-review repair turns.
 - `base_commit = HEAD` before any writer change.
 

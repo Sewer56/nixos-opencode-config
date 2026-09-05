@@ -845,7 +845,7 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertTrue(ARTIFACT_PATHS_CARD.is_file())
         card = text(ARTIFACT_PATHS_CARD)
         for marker in (
-            "never a directory",
+            "`<reviewer>` subfolder",
             "`review_path`",
             "`verdict_path`",
             "overwrite only current-round evidence",

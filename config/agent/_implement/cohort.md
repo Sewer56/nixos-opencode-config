@@ -52,7 +52,7 @@ permission:
     "*PROMPT-*.md": deny
     "artifact/**": deny
     "artifacts/**": deny
-    "artifact/*PROMPT-PLAN*.C??.r??.quick.validation.md": allow
+    "artifact/plan/*PROMPT-PLAN*/review/*.validation.md": allow
     ".git": deny
     ".git/**": deny
   grep: allow

@@ -92,7 +92,7 @@ class CleanupWorkflowTests(unittest.TestCase):
             )
         edit = permission_block(meta, "edit")
         self.assertIn('"artifact/CLEANUP-*.handoff.md": allow', edit)
-        self.assertIn('"artifact/CLEANUP-*.r??.quick.validation.md": allow', edit)
+        self.assertIn('"artifact/review/CLEANUP-*/*.validation.md": allow', edit)
         self.assertIn('"artifact/**": deny', edit)
         self.assertIn('"artifacts/**": deny', edit)
         self.assertIn('"*PROMPT-*.md": deny', edit)
