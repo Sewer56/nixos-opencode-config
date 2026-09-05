@@ -62,8 +62,7 @@ section (or equivalent), never the summary.
 
 Use language-native doc-link syntax.
 
-Always tag fenced code blocks; never bare `ignore`. Split multi-aspect
-docs into `#` sections, not dense paragraphs.
+Split multi-aspect docs into `#` sections, not dense paragraphs.
 
 Name the concrete mechanism (`suppress it by returning `None``) over
 the vague effect (`may suppress the event`).
