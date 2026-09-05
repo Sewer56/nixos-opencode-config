@@ -1,18 +1,9 @@
-### Specific error triggers
-Each error bullet names the condition that produces it; vague catch-all wording is insufficient.
-Example: `Returns ParseError when the config file contains invalid TOML.`
+### Error documentation
 
-### Error completeness
-Error sections enumerate every reachable error variant/type/path the changed API can produce.
-
-### Error doc fidelity
-Error docs must not contradict implementation; each listed variant/type must be returnable from the function.
-
-### Error doc format
-Use the language's documentation convention and link syntax: Rust `# Errors` with `[`Error::Variant`]`; TypeScript `@throws` or equivalent project convention.
-
-### No vague error wording
-Block vague triggers such as `when the operation fails`, `on error`, `if something goes wrong`, `if invalid`.
-
-### No error-doc legacy backfill
-Do not backfill untouched legacy files solely for error docs.
+- Each error bullet names the specific condition that produces it.
+- Block vague triggers such as `on error` or `if invalid`.
+- Error sections cover every reachable error variant/type/path in changed APIs.
+- Error docs must match implementation.
+- List only errors the function can return.
+- Follow language and project conventions for error docs and links.
+- Do not backfill untouched legacy files solely for error docs.
