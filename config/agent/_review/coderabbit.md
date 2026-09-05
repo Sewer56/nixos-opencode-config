@@ -14,6 +14,7 @@ permission:
     "/nix/store/**": allow
     "/var/log/**": allow
     "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**": allow
+    "/home/sewer/opencode/**": allow
     "/home/sewer/Downloads/**": allow
     "/home/sewer/Documents/**": allow
     "/home/sewer/Temp/**": allow

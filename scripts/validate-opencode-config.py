@@ -64,6 +64,10 @@ BUILTIN_AGENTS = {"build", "explore", "general", "plan"}
 FORBIDDEN_AGENT_KEYS = {"temperature", "steps", "maxSteps", "tools"}
 VALID_AGENT_MODES = {"primary", "subagent", "all"}
 VALID_PERMISSION_DECISIONS = {"allow", "ask", "deny"}
+CONFIG_PATH_FORMS = (
+    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**",
+    "/home/sewer/opencode/**",
+)
 BUILTIN_AGENT_ALLOW_EXTERNAL = ("build", "plan")
 MAX_CUSTOM_TASK_DEPTH = 3
 REQUIRED_PATHS = (
@@ -210,6 +214,18 @@ def instruction_format_issues(text: str) -> list[tuple[str, str]]:
     return issues
 
 
+def validate_config_path_pairing(ident: str, external: Any, errors: list[str]) -> None:
+    """Both the physical config path and its symlink must be allowed together."""
+    if not isinstance(external, dict):
+        return
+    for form in CONFIG_PATH_FORMS:
+        others = [f for f in CONFIG_PATH_FORMS if f != form]
+        if form in external and not any(o in external for o in others):
+            errors.append(
+                f"{ident} external_directory allows {form!r} without the other config path spelling"
+            )
+
+
 def validate_permission_map(ident: str, permission: Any, errors: list[str]) -> None:
     if not isinstance(permission, dict):
         errors.append(f"agent {ident} has no explicit permission mapping")
@@ -235,6 +251,7 @@ def validate_permission_map(ident: str, permission: Any, errors: list[str]) -> N
     external = permission.get("external_directory")
     if external is not None and not isinstance(external, dict) and str(external).lower() not in {"ask", "allow"}:
         errors.append(f"agent {ident} external_directory must be ask, allow, or a pattern mapping")
+    validate_config_path_pairing(f"agent {ident}", external, errors)
     read = permission.get("read")
     if not isinstance(read, dict):
         errors.append(f"agent {ident} read permission must be a mapping")
@@ -631,6 +648,7 @@ def main() -> int:
         not isinstance(external, dict) and str(external).lower() not in {"ask", "allow"}
     ):
         errors.append("config.permission.external_directory must be ask, allow, or a pattern mapping")
+    validate_config_path_pairing("config", external, errors)
     if isinstance(permission, dict):
         for tool, rules in permission.items():
             if not isinstance(rules, dict):
