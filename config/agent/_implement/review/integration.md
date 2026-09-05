@@ -4,6 +4,7 @@ hidden: true
 description: Reviews the complete implementation for cross-cohort correctness, acceptance coverage, and integration drift
 model: sewer-axonhub/glm-5.3 # HARD
 variant: max
+
 permission:
   "*": deny
   external_directory:
@@ -14,7 +15,7 @@ permission:
     "/etc/**": allow
     "/nix/store/**": allow
     "/var/log/**": allow
-    "/home/sewer/opencode/**": allow
+    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**": allow
     "/home/sewer/Downloads/**": allow
     "/home/sewer/Documents/**": allow
     "/home/sewer/Temp/**": allow
@@ -133,11 +134,11 @@ Smallest Fix:
 - None
 
 ## Acceptance Audit
-| Acceptance | Status | Proof | Evidence |
-| ---------- | ------ | ----- | -------- |
-| AC-1 | SATISFIED | EXECUTED | <test/command and result> |
-| AC-2 | SATISFIED | STATIC | <path/symbol/contract proof> |
-| AC-3 | INCOMPLETE | INCOMPLETE | <missing environment or evidence> |
+| Acceptance | Status     | Proof      | Evidence                          |
+| ---------- | ---------- | ---------- | --------------------------------- |
+| AC-1       | SATISFIED  | EXECUTED   | <test/command and result>         |
+| AC-2       | SATISFIED  | STATIC     | <path/symbol/contract proof>      |
+| AC-3       | INCOMPLETE | INCOMPLETE | <missing environment or evidence> |
 
 ## Verified
 - <cross-cohort behavior checked and correct>

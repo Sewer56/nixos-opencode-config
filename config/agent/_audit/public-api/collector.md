@@ -4,6 +4,7 @@ hidden: true
 description: Enumerates public items in explicit files and verifies repository-wide usage with language-aware matching
 model: sewer-axonhub/glm-5.3 # EASY
 variant: low
+
 permission:
   "*": deny
   external_directory:
@@ -14,7 +15,7 @@ permission:
     "/etc/**": allow
     "/nix/store/**": allow
     "/var/log/**": allow
-    "/home/sewer/opencode/**": allow
+    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**": allow
     "/home/sewer/Downloads/**": allow
     "/home/sewer/Documents/**": allow
     "/home/sewer/Temp/**": allow

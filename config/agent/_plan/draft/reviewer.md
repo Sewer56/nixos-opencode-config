@@ -14,7 +14,7 @@ permission:
     "/etc/**": allow
     "/nix/store/**": allow
     "/var/log/**": allow
-    "/home/sewer/opencode/**": allow
+    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**": allow
     "/home/sewer/Downloads/**": allow
     "/home/sewer/Documents/**": allow
     "/home/sewer/Temp/**": allow
@@ -82,6 +82,7 @@ permission:
 
 Review the entire declared bundle before code is written, not just its index.
 Your report is an untrusted candidate for `_plan/draft/verifier`, not authority to change the draft.
+
 Remain read-only, including shell commands; do not create artifacts or review caches.
 
 # Inputs

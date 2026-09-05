@@ -3,6 +3,7 @@ mode: primary
 description: Cleans existing working code to current standards through a single writer, subagent review, verifier, and repair loop with behavior preservation
 model: sewer-axonhub/glm-5.3 # MEDIUM
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -13,7 +14,7 @@ permission:
     "/etc/**": allow
     "/nix/store/**": allow
     "/var/log/**": allow
-    "/home/sewer/opencode/**": allow
+    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**": allow
     "/home/sewer/Downloads/**": allow
     "/home/sewer/Documents/**": allow
     "/home/sewer/Temp/**": allow
