@@ -1,127 +1,89 @@
 # OpenCode Config
 
-Personal [OpenCode] configuration for focused repository-scale coding. Main flow turns a request into one human-approved behavioral draft, then implements it in dependency-ordered, validated, reviewed cohorts.
+Personal [OpenCode] configuration for repository-scale coding.
 
 ```text
-/draft <request>
-# Review or edit PROMPT-PLAN-<slug>.draft.md
-/implement PROMPT-PLAN-<slug>.draft.md
+/draft [[request]]
+# Review PROMPT-PLAN-[[slug]].draft.md and its declared members
+/implement PROMPT-PLAN-[[slug]].draft.md
 ```
 
-Design favors selective context, deterministic evidence, precise review, and few clear roles—not maximum agents or prompt volume. See [architecture and rationale](EXPLAINER.md#architecture).
+See [architecture and rationale].
 
 > [!WARNING]
-> Personal provider names, secret paths, Nix assumptions, plugins, and pinned submodules need adaptation before reuse.
+> Adapt personal providers, secret paths, Nix assumptions, and plugins.
+> Check pinned submodules too.
 
 ## Main workflow
 
 ### Draft and approve
 
-`/draft` creates or refines one root `PROMPT-PLAN-<slug>.draft.md` containing behavioral goal, decisions, invariants, non-goals, acceptance criteria, logical work, validation, review routes, and unresolved questions.
-
-Draft review follows the `draft reviewer -> verifier -> human approval` flow: `explorer -> draft -> reviewer (candidate) -> verifier (promote/reject) -> human approval`.
-
-- The read-only `_plan/draft/verifier` runs only when the reviewer reports findings; it is skipped when there are none.
-- The reviewer report is a candidate; the verifier checks required corrections against the request, draft, discovery, and repository evidence.
-- Only verifier-promoted, evidence-backed corrections may change the draft.
-- A verifier rejection leaves the draft unchanged; unavailable evidence or a required human decision stops safely.
-
-Review the draft until status is `READY_FOR_IMPLEMENT`; human approval then makes the approved file downstream behavioral authority.
+Use `/draft` to define an ignored contract and small cohorts.
+Review their goals, scope, exclusions, and completion checks.
+Approve the ready bundle with `/implement [[plan_path]]`.
 
 ### Implement
 
-```text
-/implement PROMPT-PLAN-example.draft.md
-```
-
-`/implement` reconciles approved draft with live repository, creates dependency-ordered cohorts, and calls one cohort agent per cohort:
-
-```text
-one writer -> deterministic checks -> focused review -> finding verification
-           -> bounded repair when needed -> exact local commit
-```
-
-Correctness and quality review every proposed commit. Performance reviews every commit that changes runtime code, plus the final gate; docs-only work records a skip reason. Test and security specialists run only for matching risk. Final gate validates and reviews complete base-to-final result. Workflow never pushes.
-
-Each implementation invocation starts from approved draft. Existing unrelated user changes are preserved; a planned target already changed by user requires input.
-
-For low-ambiguity work:
-
-```text
-/implement/one-shot <request>
-```
-
-It skips the draft pipeline and runs a single writer -> subagent review -> subagent verifier -> repair loop for a bounded request, then commits.
+Children implement, test, review, and commit cohorts in order.
+Say “resume from C03” to continue without discarding prior work.
+Unclear ownership or material facts prompt a question.
+Final checks include CodeRabbit; nothing is pushed.
 
 ## Outcomes and artifacts
 
 - `SUCCESS`: required implementation and evidence complete.
 - `INCOMPLETE`: no known blocker, but required evidence unavailable.
-- `NEEDS_INPUT`: material human decision or ambiguous pre-existing target change requires resolution.
-- `FAIL`: proven failure remains after bounded repair or protocol integrity failed.
+- `NEEDS_INPUT`: material decision or unclear change ownership needs resolution.
+- `FAIL`: proven failure remains or protocol integrity failed.
 
-Implementation artifacts under `artifact/` include handoff/cohorts, validation ledgers, candidate reviews, and verifier verdicts. Iterate artifacts use `artifacts/iterate/`.
-
-Internal review findings are hypotheses; blockers and advisories accepted by the shared verifier enter automatic repair within approved plan scope. CodeRabbit uses its own structured findings as authority.
-
-Validator scope is documented in module docstring at top of `scripts/validate-opencode-config.py`.
+- Validation, reviews, and verdicts live under `artifact/`.
+- Instruction-edit evidence uses `artifacts/iterate/`.
+- Internal findings need verifier acceptance for bounded, in-scope repair.
+- CodeRabbit uses its own findings as authority.
 
 ## Commands
 
 ### Planning and implementation
 
-| Command | Purpose |
-|---|---|
-| `/draft` | Create or refine human-reviewed implementation draft. |
-| `/plan/convert-to-draft` | Convert useful conversation context into same draft format. |
-| `/implement` | Implement approved draft in validated logical cohorts. |
-| `/implement/one-shot` | Implement a bounded request in one writer-review-verify-repair loop. |
-| `/code` | General rules-baked coding agent with on-request reviewer/verifier. |
+| Command                  | Purpose                                                              |
+| ------------------------ | -------------------------------------------------------------------- |
+| `/draft`                 | Define cohorts in a human-reviewed plan bundle.                      |
+| `/plan/convert-to-draft` | Convert useful conversation context into same draft format.          |
+| `/implement`             | Execute approved cohorts in dependency order.                        |
+| `/implement/one-shot`    | Implement a bounded request in one writer-review-verify-repair loop. |
+| `/code`                  | General rules-baked coding agent with on-request reviewer/verifier.  |
 
 ### Refactoring
 
-| Command | Purpose |
-|---|---|
-| `/refactor/modularize` | Draft behavior-preserving modularization. |
-| `/refactor/parameterize` | Draft safe test parameterization. |
-| `/refactor/reorder` | Preview and reorder declarations after explicit `go`. |
-| `/refactor/document` | Repair scoped source documentation. |
-| `/refactor/errors` | Trace and repair public error documentation. |
-| `/cleanup` | Clean existing code to current standards through the implement review gauntlet. |
+| Command                  | Purpose                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| `/refactor/modularize`   | Draft behavior-preserving modularization.                                       |
+| `/refactor/parameterize` | Draft safe test parameterization.                                               |
+| `/refactor/reorder`      | Preview and reorder declarations after explicit `go`.                           |
+| `/refactor/document`     | Repair scoped source documentation.                                             |
+| `/refactor/errors`       | Trace and repair public error documentation.                                    |
+| `/cleanup`               | Clean existing code to current standards through the implement review gauntlet. |
 
 ### Documentation, review, and audits
 
-| Command | Purpose |
-|---|---|
-| `/docs/write` | Write scoped end-user documentation. |
-| `/docs/review` | Review and repair scoped end-user documentation. |
+| Command              | Purpose                                          |
+| -------------------- | ------------------------------------------------ |
+| `/docs/write`        | Write scoped end-user documentation.             |
+| `/docs/review`       | Review and repair scoped end-user documentation. |
 | `/review/coderabbit` | Run CodeRabbit and repair its blocking findings. |
-| `/audit/public-api` | Audit unnecessarily public APIs. |
+| `/audit/public-api`  | Audit unnecessarily public APIs.                 |
 
 ### Repository maintenance
 
-| Command | Purpose |
-|---|---|
-| `/commit/main` | Create intentional semantic commits with explicit staging. |
-| `/write/issue` | Write repository-grounded issue file. |
-| `/write/pr` | Generate evidence-backed `pr.md` from branch diff. |
+| Command         | Purpose                                                      |
+| --------------- | ------------------------------------------------------------ |
+| `/commit/main`  | Create intentional semantic commits with explicit staging.   |
+| `/write/issue`  | Write repository-grounded issue file.                        |
+| `/write/pr`     | Generate evidence-backed `pr.md` from branch diff.           |
 | `/iterate/edit` | Create, edit, move, delete, or verify instruction artifacts. |
-| `/migrate` | Run separate pinned-source migration workflow. |
+| `/migrate`      | Run separate pinned-source migration workflow.               |
 
-See [practical iterate guide](.opencode/ITERATE.md) for instruction work.
-
-## Layout
-
-```text
-config/       installed OpenCode config, agents, commands, rules, plugins
-.opencode/    repository-local iterate and migration workflows
-scripts/      deterministic validation and platform setup
-tests/        implementation workflow contract tests
-flake.nix     Home Manager module, tools, and reproducible validation deps
-EXPLAINER.md  architecture, authoring guidance, research, tradeoffs
-```
-
-Agents use least-privilege permissions and receive only tools and paths required for their role.
+See [practical iterate guide] for instruction work.
 
 ## Installation
 
@@ -131,7 +93,8 @@ Full checkout:
 git submodule update --init --recursive
 ```
 
-Nix/Home Manager setup links `~/.config/opencode` to editable `config/` and provides `opencode`, `opencode-build`, local tools, CodeRabbit CLI, and validation dependencies.
+- Nix/Home Manager links `~/.config/opencode` to editable `config/`.
+- It supplies OpenCode, local tools, CodeRabbit CLI, and validation tooling.
 
 ```bash
 opencode-build
@@ -144,9 +107,18 @@ Windows:
 pwsh ./scripts/windows/setup.ps1
 ```
 
-Pre-flight offers to install missing prerequisites (cargo, bun, git, Node.js LTS, Yarn, Docker Desktop) via `winget`, with a y/N prompt per tool and a direct-installer fallback for cargo/bun/yarn. Installs are never fatal; declines fall back to the old detect-and-warn behaviour. Pass `-NoInstallPrereqs` to force detect-only.
+- Setup offers missing cargo, bun, git, Node.js LTS, Yarn, and Docker Desktop.
+- Each tool gets a y/N `winget` prompt; cargo/bun/yarn have installer fallbacks.
+- Installation failures and declines warn without stopping setup.
+- Pass `-NoInstallPrereqs` for detect-only.
 
-CodeRabbit CLI is intentionally not installed on Windows: upstream ships Linux/macOS binaries only (WSL-only on Windows). The `/review/coderabbit` command returns `INCOMPLETE` when `cr`/`coderabbit` is absent. To use it, install under WSL: `wsl -c 'curl -fsSL https://cli.coderabbit.ai/install.sh | sh'`.
+- CodeRabbit CLI ships Linux/macOS binaries; Windows setup does not install it.
+- `/review/coderabbit` returns `INCOMPLETE` without `cr`/`coderabbit`.
+- Install under WSL:
+
+```bash
+wsl -c 'curl -fsSL https://cli.coderabbit.ai/install.sh | sh'
+```
 
 ## Validation
 
@@ -158,7 +130,12 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
 Use `nix develop` when local Python lacks `json5` or `PyYAML`.
+See the [validator docstring] for check scope.
 
-Static checks cannot certify provider credentials, plugin loading, CodeRabbit service, installed OpenCode runtime, or stochastic model behavior. Those remain environment checks.
+- Credentials, plugins, CodeRabbit, and OpenCode need environment checks.
+- Static checks cannot certify stochastic model behavior.
 
 [OpenCode]: https://opencode.ai
+[architecture and rationale]: EXPLAINER.md#architecture
+[practical iterate guide]: .opencode/ITERATE.md
+[validator docstring]: scripts/validate-opencode-config.py

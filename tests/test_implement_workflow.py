@@ -1,6 +1,6 @@
 """Static contract tests for simplified /implement workflow.
 
-Input: active command, orchestrator, cohort creator, cohort loop, and reviewer
+Input: active command, orchestrator, authored cohort loop, and reviewer
 prompt files. Output: unittest PASS/FAIL; repository remains unchanged.
 
 Run: ``python3 -m unittest discover -s tests -p 'test_*.py'``.
@@ -113,8 +113,8 @@ GATE_SCRIPT = ROOT / "config/scripts/rust-llm-tidy-gate.sh"
 GATE_COMMAND = "~/opencode/config/scripts/rust-llm-tidy-gate.sh"
 VERIFIER = ROOT / "config/agent/_review/verifier.md"
 ARTIFACT_PATHS_CARD = ROOT / "config/rules/cards/implementation/artifact-paths.md"
-ARTIFACT_WRITERS = (ORCHESTRATOR, *IMPLEMENT_REVIEWERS, VERIFIER, CREATE_COHORTS)
-READ_ONLY_BASH_AGENTS = (*IMPLEMENT_REVIEWERS, VERIFIER, CREATE_COHORTS)
+ARTIFACT_WRITERS = (ORCHESTRATOR, *IMPLEMENT_REVIEWERS, VERIFIER)
+READ_ONLY_BASH_AGENTS = (*IMPLEMENT_REVIEWERS, VERIFIER)
 WRITABLE_SURFACE_AGENTS = (*IMPLEMENT_REVIEWERS, VERIFIER)
 PLAN_REVIEWER = ROOT / "config/agent/_plan/draft/reviewer.md"
 WRITABLE_SURFACE_TEMPLATE = ROOT / "config/rules/cards/structure/writable-surface.md"
@@ -220,7 +220,6 @@ class ImplementWorkflowTests(unittest.TestCase):
 
     def test_required_workflow_files_exist(self) -> None:
         required = (
-            "config/agent/_implement/create-cohorts.md",
             "config/agent/_implement/cohort.md",
             "config/agent/_implement/integration-repair.md",
             "config/agent/_review/verifier.md",
@@ -241,7 +240,9 @@ class ImplementWorkflowTests(unittest.TestCase):
 
     def test_parent_calls_one_cohort_agent_per_cohort(self) -> None:
         body = text(ORCHESTRATOR)
-        self.assertIn("call `_implement/cohort` exactly once for each cohort", body)
+        self.assertFalse(CREATE_COHORTS.exists())
+        self.assertNotIn("_implement/create-cohorts", body)
+        self.assertIn("call `_implement/cohort` once for each unfinished cohort", body)
         self.assertIn('"_implement/cohort": allow', body)
         self.assertNotIn('"_implement/cohort/review/optional/tests": allow', body)
 
@@ -265,16 +266,14 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertNotIn("repair_turn_limit", orchestrator)
         self.assertNotIn("Repair Limit:", orchestrator)
 
-        self.assertIn(
-            "task context contains the original request",
-            text(COHORT),
-        )
-        self.assertIn("else five", text(COHORT))
-        self.assertIn("explicit positive user repair-turn limit", text(COHORT))
-        self.assertIn("no limit is `unlimited`", text(COHORT))
-        self.assertIn("malformed or conflicting is `NEEDS_INPUT`", text(COHORT))
-        self.assertIn("Repair Turns: [[n]]` and `Repair Limit: [[repair_turn_limit]]", text(COHORT))
-        self.assertIn("Repair Limit: [[repair_turn_limit]]", text(COHORT))
+        for marker in (
+            "Task context contains the original request", "else five",
+            "explicit positive user repair-turn limit", "no limit is `unlimited`",
+            "malformed or conflicting is `NEEDS_INPUT`",
+            "On bounded failure return `FAIL` with consumed turns and resolved limit",
+            "Repair Turns: [[n]]", "Repair Limit: [[n | unlimited]]",
+        ):
+            self.assertIn(marker, text(COHORT))
 
         one_shot = text(ONE_SHOT)
         self.assertIn("full original command-user request from `$ARGUMENTS`", one_shot)
@@ -401,13 +400,13 @@ class ImplementWorkflowTests(unittest.TestCase):
     def test_cohort_lints_before_staging_validation_and_review(self) -> None:
         body = text(COHORT)
         lint = body.index("Run the shared code-writing lint gate")
-        staging = body.index("stage only paths changed by cohort writer")
+        staging = body.index("stage only cohort-owned changes")
         validation = body.index("Run quick validation")
         review = body.index("Review only after quick checks PASS")
         self.assertLess(lint, staging)
         self.assertLess(staging, validation)
         self.assertLess(validation, review)
-        self.assertIn("rerun this all-checks loop from the lint gate before restaging", body)
+        self.assertIn("rerun this loop from lint before restaging", body)
 
     def test_exact_reviewer_and_verifier_names(self) -> None:
         body = text(COHORT)
@@ -424,14 +423,14 @@ class ImplementWorkflowTests(unittest.TestCase):
     def test_mandatory_and_always_on_performance_reviews(self) -> None:
         body = text(COHORT)
         self.assertIn("Always call `_implement/cohort/review/correctness`", body)
-        self.assertIn("it owns checking that applicable tests ran after staging", body)
+        self.assertIn("It checks that applicable tests ran after staging", body)
         self.assertIn("Always call `_implement/cohort/review/quality` before commit", body)
         self.assertIn(
-            "Always call `_implement/cohort/review/optional/performance` unless the cohort is docs-only; record the reason",
+            "Call `_implement/cohort/review/optional/performance` unless docs-only",
             body,
         )
         self.assertIn(
-            "Call optional tests or security reviewer only when routed or matching concrete risk",
+            "Call optional tests/security only when routed or matching concrete risk",
             body,
         )
 
@@ -448,24 +447,18 @@ class ImplementWorkflowTests(unittest.TestCase):
 
         orchestrator = text(ORCHESTRATOR)
         self.assertIn(
-            "Also call `_implement/cohort/review/optional/performance` unless the implementation is docs-only; record the reason",
+            "Call `_implement/cohort/review/optional/performance` unless docs-only",
             orchestrator,
         )
         self.assertIn("Route security only for concrete cross-cohort risk", orchestrator)
         self.assertIn(
-            "Use implementation `base_commit` and final changed paths for integration/security/performance",
+            "Integration/security/performance use original `base_commit` and final paths",
             orchestrator,
         )
 
-        planner = text(CREATE_COHORTS)
-        self.assertIn(
-            "Correctness, quality, and performance are always routed; docs-only cohorts skip performance with a recorded reason",
-            planner,
-        )
-        self.assertIn(
-            "- PERFORMANCE: YES — always | NO — docs-only cohort, [[reason]]",
-            planner,
-        )
+        planner = text(ROOT / "config/rules/cards/correctness/plan-draft.md")
+        self.assertIn("Route `CORRECTNESS` and `QUALITY` always", planner)
+        self.assertIn("only docs-only cohorts may record `NO` with a reason", planner)
 
     def test_review_calls_supply_and_validate_explicit_envelopes(self) -> None:
         for path in (COHORT, ORCHESTRATOR):
@@ -482,18 +475,24 @@ class ImplementWorkflowTests(unittest.TestCase):
                     "Review Path: [[review_path]]",
                     "Verdict Path: [[verdict_path]]",
                     "Prior Verdict Paths:",
-                    "write the requested artifact",
-                    "return only its exact five-line `# Output` envelope",
-                    "readable, schema-conforming artifact at the exact assigned `review_path`, artifact-consistent with the returned envelope",
-                    "artifact-consistent decision and count",
+                    "requested artifact",
+                    "exact five-line `# Output` envelope",
+                    "readable schema-valid evidence",
+                    "exact `review_path`",
+                    "artifact-consistent decision/count",
+                    "allowed Status",
+                    "expected Domain",
+                    "identical Review Path",
+                    "integer Finding Count",
+                    "one-line Summary",
                     "Missing or malformed evidence is `INCOMPLETE`, never PASS",
                 ):
                     self.assertIn(marker, body)
         self.assertIn("Cohort Path: [[cohort_path]]", text(COHORT))
         orchestrator = text(ORCHESTRATOR)
         self.assertIn("Add `Cohort Path: None` for non-integration reviewers", orchestrator)
-        self.assertIn("Use implementation `base_commit` and final changed paths for integration/security/performance", orchestrator)
-        self.assertIn("For correctness/quality, use the commit at `HEAD` before the staged final repair and its exact staged repair paths", orchestrator)
+        self.assertIn("Integration/security/performance use original `base_commit` and final paths", orchestrator)
+        self.assertIn("Correctness/quality use pre-repair `HEAD` and exact staged repair paths", orchestrator)
 
     def test_iterate_editor_calls_supply_and_validate_absolute_paths(self) -> None:
         caller = text(ITERATE_EDIT)
@@ -508,8 +507,8 @@ class ImplementWorkflowTests(unittest.TestCase):
         editor = text(ITERATE_EDITOR)
         for marker in (
             "Explicit absolute `request_path` and `contract_path`",
-            "Before editing, reject missing, non-absolute, unreadable, or non-file `request_path` or `contract_path`",
-            "read contract first and request second",
+            "Missing, relative, unreadable, or non-file input paths need `NEEDS_INPUT`",
+            "Read contract first and request second, before editing",
         ):
             self.assertIn(marker, editor)
 
@@ -555,11 +554,15 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertIn("Missing evidence is `INCOMPLETE`", text(correctness))
 
         parent = text(ORCHESTRATOR)
-        self.assertIn("also call `_implement/cohort/review/correctness` and `_implement/cohort/review/quality`", parent)
-        self.assertIn("Every selected reviewer must complete", parent)
-        self.assertIn("both source/destination", parent)
-        self.assertIn("write fresh ledger before review", parent)
-        self.assertIn("validate including tests, then rerun integration; rerun correctness, quality, and affected optional reviews in parallel", parent)
+        for marker in (
+            "Staged repairs also need `_implement/cohort/review/correctness`",
+            "Also call `_implement/cohort/review/quality` for staged repairs",
+            "Every selected reviewer must complete", "both source/destination",
+            "write fresh ledger before review",
+            "validate including tests, then rerun integration",
+            "Rerun correctness, quality, and affected optional reviews in parallel",
+        ):
+            self.assertIn(marker, parent)
         self.assertNotIn("diff_hash", parent)
         self.assertNotIn("plan_hash", parent)
 
@@ -573,8 +576,10 @@ class ImplementWorkflowTests(unittest.TestCase):
     def test_real_index_staging_is_scoped(self) -> None:
         frontmatter = text(COHORT).split("---", 2)[1]
         self.assertEqual(COHORT_BASH_PERMISSION, bash_permission(frontmatter))
-        self.assertIn("stage only paths changed by cohort writer", text(COHORT))
-        self.assertIn("git diff --cached", text(COHORT))
+        for marker in ("stage only cohort-owned changes",
+                       "Include authorized resumed work and required compatibility edits",
+                       "Preserve unrelated staged/unstaged hunks", "git diff --cached"):
+            self.assertIn(marker, text(COHORT))
 
     def test_incomplete_and_final_integration_remain(self) -> None:
         body = text(ORCHESTRATOR)
@@ -587,9 +592,11 @@ class ImplementWorkflowTests(unittest.TestCase):
             "Send candidates to `_review/verifier` only when any review artifact "
             "contains findings; skip when all reviews report zero"
         )
-        for path in (ORCHESTRATOR, COHORT, ROOT / "config/agent/_implement/one-shot.md"):
+        self.assertIn(implement_gate, text(ONE_SHOT))
+        for path in (ORCHESTRATOR, COHORT):
             with self.subTest(path=path.relative_to(ROOT)):
-                self.assertIn(implement_gate, text(path))
+                self.assertIn("Send candidates to `_review/verifier` only for findings in review artifacts", text(path))
+                self.assertIn("Skip when all reviews report zero", text(path))
         for relative in (
             "config/agent/_docs.md",
             "config/agent/_refactor/document.md",
@@ -601,9 +608,10 @@ class ImplementWorkflowTests(unittest.TestCase):
                     text(ROOT / relative),
                 )
         self.assertIn(
-            "Send candidates to `_iterate/verifier` only when the review reports findings; skip it when there are none",
+            "Send candidates to `_iterate/verifier` only when the review reports findings",
             text(ITERATE_EDIT),
         )
+        self.assertIn("Skip it when there are none", text(ITERATE_EDIT))
         self.assertIn(
             "attempts to refute candidates only when the review reports findings; it is skipped when there are none",
             text(ROOT / ".opencode/ITERATE.md"),
@@ -788,12 +796,10 @@ class ImplementWorkflowTests(unittest.TestCase):
         card = text(LLM_TIDY_PASS_CARD)
         for marker in (
             "rust-llm-tidy --no-config --dry-run --json",
-            "Repeat until the JSON output is `[]`",
-            "declared scope and frozen regions",
+            "Fix findings and rerun until no actionable findings remain",
+            "Leave out-of-scope/frozen findings untouched and report them",
         ):
             self.assertIn(marker, card)
-        self.assertNotIn("only processes", card)
-        self.assertNotIn("unavailable", card)
 
     def test_writer_prompts_import_llm_tidy_pass_card(self) -> None:
         for path in TIDY_WRITER_PROMPTS:
@@ -842,13 +848,13 @@ class ImplementWorkflowTests(unittest.TestCase):
             "never a directory",
             "`review_path`",
             "`verdict_path`",
-            "creates or overwrites that exact file",
+            "overwrite only current-round evidence",
             "never write any other path",
             "stub",
         ):
             self.assertIn(marker, card)
         card_import = '{{ file="./rules/cards/implementation/artifact-paths.md" }}'
-        for path in (ORCHESTRATOR, COHORT, CREATE_COHORTS):
+        for path in (ORCHESTRATOR, COHORT):
             with self.subTest(path=path.relative_to(ROOT)):
                 self.assertIn(card_import, text(path))
 
@@ -885,13 +891,8 @@ class ImplementWorkflowTests(unittest.TestCase):
 
     def test_cohort_delegation_honesty_and_reverify(self) -> None:
         body = text(COHORT)
-        self.assertIn("never perform delegated review, verdict, or commit work yourself", body)
-        self.assertIn("rerun the verifier when re-reviews emit new candidates", body)
-
-    def test_orchestrator_preflight_and_restart_hygiene(self) -> None:
-        body = text(ORCHESTRATOR)
-        self.assertIn(".git/info/exclude", body)
-        self.assertIn("remove its partial artifacts and stubs", body)
+        self.assertIn("Never perform delegated review, verdict, or commit work yourself", body)
+        self.assertIn("Rerun the verifier when re-reviews emit new candidates", body)
 
     def test_non_implement_writers_accept_current_target_state(self) -> None:
         for relative in (

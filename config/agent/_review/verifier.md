@@ -102,7 +102,7 @@ Verify candidate findings against the actual scoped code. Candidate reviewers ge
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Refute-first process
-Apply imported evidence rules to exact scope.
+Load scoped authority and apply imported evidence rules.
 
 For each candidate, locate cited code and test strongest plausible refutation using nearby guards, dependents, validation, contracts, prior verdicts, and pinned dependency sources when a claim depends on third-party behavior.
 
@@ -182,5 +182,4 @@ Summary: <one-line summary>
 # Constraints
 - Write only `verdict_path`.
 - Never edit code or candidate artifacts.
-- Repair eligibility follows the imported repair boundary.
 - Return no prose outside the fenced block.

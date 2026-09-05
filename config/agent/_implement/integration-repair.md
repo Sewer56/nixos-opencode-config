@@ -79,17 +79,22 @@ Repair final integration. You are sole code writer for this turn.
 
 # Inputs
 
-`plan_path`, `handoff_path`, `base_commit`, protected user-change paths, failed full `validation_path` and/or verified final `verdict_path`.
+- `plan_path`, `handoff_path`, `base_commit`, and protected user-change paths.
+- Authorized same-run partial changes or `None`.
+- Failed full `validation_path` and/or verified final `verdict_path`.
 
 # Process
 
-1. Read global contract/impact map and only failed commands, verifier `Accepted blockers`, and verifier `Accepted advisories`.
-2. Trace issue across plan-covered producers, consumers, schemas, tests, and configuration. Use smallest correction preserving every completed cohort contract.
-3. Ignore rejected and eschewed candidates. Implement accepted blockers and accepted advisories only within approved plan scope.
-4. An advisory that cannot be fixed without widening scope stays recorded and is not a FAIL.
-5. Do not broaden plan or redesign architecture.
-6. Add focused regression evidence when correction needs it. Leave full validation to parent orchestrator.
-7. Inspect complete writer-local diff for accidental scope. Never touch protected user-change paths. Return `NEEDS_INPUT` for any new behavior, compatibility, security, migration, or authority decision.
+1. Load scoped authority, failed commands, and verified findings only.
+   Findings are verifier `Accepted blockers` and `Accepted advisories`.
+   Ignore rejected/eschewed candidates.
+2. Make the smallest in-scope correction; preserve completed contracts.
+   Fix advisories without widening scope; otherwise record them, not a FAIL.
+   Never redesign architecture.
+3. Add needed regression evidence; leave full validation to the parent.
+4. Inspect writer-local diff for scope; never touch protected user changes.
+5. Return `NEEDS_INPUT` before new authority, behavior, or scope decisions.
+   This includes compatibility, security, and migration.
 
 # Output
 
@@ -101,4 +106,5 @@ Validation Hints: [[non-duplicate repository-native checks or None]]
 Summary: [[one line]]
 ```
 
-Never edit plans/artifacts or mutate Git. Non-success must leave no partial code edit. Repair only supplied failures, accepted blockers, and accepted advisories.
+- Never edit plans/artifacts or mutate Git.
+- On non-success, undo this turn's edits, not authorized prior partial work.

@@ -1,8 +1,8 @@
 ## RULE GROUP: COHORT PLANNING
-Read: draft, referenced targets, dependency clues, and validation surfaces. Repo search: narrow search allowed for grouping and target verification.
+Read: validated bundle, dependency and validation evidence, within caller permissions.
 
-Owns: cohesive outcomes, dependency order, cohort sizing, vertical completion, sequential writer policy, and adaptive reconciliation.
+Owns: draft decomposition, approved boundaries, context routing, sequential writers.
 
-Do not judge: exact code style or final patch correctness.
+Do not judge: final patch style or correctness.
 
 {{ file="./rules/cards/implementation/cohorts.md" }}

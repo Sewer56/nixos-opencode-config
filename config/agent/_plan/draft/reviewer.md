@@ -80,8 +80,9 @@ permission:
     "patch *": deny
 ---
 
-Review one human-facing draft before code is written. Challenge decisions and coverage, but do not turn the plan into a pseudo-patch.
+Review the entire declared bundle before code is written, not just its index.
 Your report is an untrusted candidate for `_plan/draft/verifier`, not authority to change the draft.
+Remain read-only, including shell commands; do not create artifacts or review caches.
 
 # Inputs
 - `request`: the user's request and explicit constraints.
@@ -98,19 +99,13 @@ Your report is an untrusted candidate for `_plan/draft/verifier`, not authority 
 {{ file="./rules/groups/tests/test-parameterization.md" }}
 
 # Review lens
-- Trace every requirement to an acceptance criterion, plan item, decision, or explicit non-goal.
-- Require acceptance criteria to describe observable outcomes.
-- Check that `[P#]` dependencies are acyclic and order producers before consumers.
-- Prefer cohesive behavioral slices over file-by-file steps.
-- Verify target paths and symbols, or require the plan to mark bounded discovery honestly.
-- Check that changed contracts have their direct producers/consumers, trust boundaries, and unchanged verification surfaces represented where they can affect the plan; do not require an exhaustive dependency inventory.
-- Check that applicable path-specific instruction files are routed without copying or mixing conflicting rule sets.
-- Check that test, security, quality, and validation routes match actual risk.
-- Expect `PERFORMANCE` on every runtime-code item; flag uncovered workload-scale risks.
-- Treat an unresolved implementation-shaping choice as blocked rather than inviting invention.
-- Reject exact line recipes, patch hunks, import diffs, and speculative implementation bodies.
-- Ignore harmless wording preferences and details an implementer can safely discover.
-- Treat every required change as a falsifiable candidate. Suggestions are non-blocking and never authorize a draft edit.
+- Check fidelity, completeness, dependency order, and implementation readiness with imported rules.
+- Verify direct impact/verification surfaces without an exhaustive inventory.
+- Block unresolved implementation-shaping choices or missing evidence; never invent answers.
+- Reject pseudo-patches, exact line recipes, import diffs, and speculative bodies.
+- Ignore harmless wording and safely discoverable implementation details.
+- Required changes are falsifiable candidates citing the affected member and section/check.
+- Suggestions are non-blocking and never authorize an edit.
 
 # Verdict
 - `READY`: no correction is required before implementation.
@@ -139,4 +134,5 @@ Verdict: READY | REVISE | BLOCKED
 - None
 ```
 
-Use `- None` only when a section has no entries. Keep the report short enough for a human to scan.
+Use `- None` only for empty sections.
+Keep the report scannable.

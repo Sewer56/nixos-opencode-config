@@ -1,7 +1,6 @@
 """Static contract tests for the draft reviewer-verifier workflow.
 
-Input: the draft agent, its reviewer and verifier, and the human workflow
-documentation. Output: unittest PASS/FAIL; repository remains unchanged.
+Input: draft prompts and workflow docs. Output: PASS/FAIL without repository writes.
 
 Run: ``python3 -m unittest discover -s tests -p 'test_*.py'``.
 """
@@ -11,6 +10,8 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
+from test_implement_workflow import READ_ONLY_BASH_PERMISSION
+
 
 ROOT = Path(__file__).resolve().parent.parent
 DRAFT = ROOT / "config/agent/_plan/draft.md"
@@ -18,38 +19,6 @@ REVIEWER = ROOT / "config/agent/_plan/draft/reviewer.md"
 VERIFIER = ROOT / "config/agent/_plan/draft/verifier.md"
 README = ROOT / "README.md"
 EXPLAINER = ROOT / "EXPLAINER.md"
-READ_ONLY_BASH_PERMISSION = """  bash:
-    "*": allow
-    "sudo *": deny
-    "git push *": deny
-    "git commit *": deny
-    "git add *": deny
-    "git reset *": deny
-    "git clean *": deny
-    "git rebase *": deny
-    "git merge *": deny
-    "git checkout *": deny
-    "git switch *": deny
-    "git restore *": deny
-    "git stash *": deny
-    "git rm *": deny
-    "git mv *": deny
-    "git apply *": deny
-    "git cherry-pick *": deny
-    "git revert *": deny
-    "rm *": deny
-    "mv *": deny
-    "cp *": deny
-    "touch *": deny
-    "mkdir *": deny
-    "rmdir *": deny
-    "tee *": deny
-    "dd *": deny
-    "ln *": deny
-    "chmod *": deny
-    "chown *": deny
-    "patch *": deny
-"""
 
 
 def text(path: Path) -> str:
@@ -74,13 +43,13 @@ class DraftWorkflowTests(unittest.TestCase):
         ):
             self.assertIn(f'"{agent}": allow', permissions)
         self.assertIn(
-            "Dispatch `_plan/draft/verifier` exactly once only when the reviewer report lists required changes",
+            "Dispatch `_plan/draft/verifier` once only for required-change candidates",
             draft,
         )
-        self.assertIn("skip it when the report lists none", draft)
-        self.assertIn("On reviewer `READY`, make no verifier call and apply nothing", draft)
+        self.assertIn("Skip it when the report lists none", draft)
+        self.assertIn("On reviewer `READY`, apply nothing", draft)
         self.assertIn(
-            "every review pass that reported findings has a completed verifier result", draft
+            "every pass with findings has a completed verifier result without blocks", draft
         )
         self.assertTrue(VERIFIER.is_file())
 
@@ -91,8 +60,9 @@ class DraftWorkflowTests(unittest.TestCase):
         self.assertIn('    "*": deny', permissions)
         self.assertIn('    "PROMPT-PLAN-*.draft.md": allow', permissions)
         body = text(DRAFT)
-        self.assertIn("the explorer is the sole repository-evidence authority", body)
-        self.assertIn("Do not gather repository evidence yourself", body)
+        self.assertIn("The explorer is the sole repository-evidence authority", body)
+        self.assertIn("Never bypass it with shell/search or product reads", body)
+        self.assertIn('    "artifact/plan/**/*.md": allow', permissions)
 
     def test_draft_bash_is_allowed_and_reviewer_uses_read_only_bash(self) -> None:
         draft_permissions = frontmatter(DRAFT)
@@ -111,28 +81,28 @@ class DraftWorkflowTests(unittest.TestCase):
         process = draft[draft.index("## 4. Review and refine") :]
         self.assertLess(
             process.index("Dispatch `_plan/draft/reviewer`"),
-            process.index("Dispatch `_plan/draft/verifier` exactly once only when"),
+            process.index("Dispatch `_plan/draft/verifier` once only for"),
         )
         for field in ("request", "plan_path", "discovery", "reviewer_report", "notes"):
             self.assertIn(f"`{field}`", process)
         self.assertIn("The reviewer report is a candidate report, never direct authority", draft)
-        self.assertIn("The read-only verifier checks each required-change candidate", draft)
         self.assertIn("exact `reviewer_report`", draft)
-        self.assertIn("`PROMOTE`, `REJECT`, `BLOCKED`, or `FAIL`", draft)
         for label in ("Request:", "Plan Path:", "Discovery:", "Reviewer Report:", "Notes:"):
             self.assertIn(label, process)
 
     def test_correction_gate_fails_closed(self) -> None:
         draft = text(DRAFT)
         for marker in (
-            "only the verifier-promoted, evidence-backed required corrections",
-            "Never apply reviewer suggestions, rejected candidates",
-            "On `REJECT`, leave the draft unchanged",
-            "On `BLOCKED`, leave the draft unchanged and return `NEEDS_INPUT`",
-            "If the reviewer reports `BLOCKED`, make no verifier call",
-            "Never call either agent beyond the existing two-pass bound",
+            "On `PROMOTE`, apply only promoted evidence-backed required corrections",
+            "Never apply suggestions, rejected candidates",
+            "On `REJECT`, leave the bundle unchanged",
+            "On `BLOCKED`, leave the bundle unchanged and return `NEEDS_INPUT`",
+            "Reviewer `BLOCKED`: make no verifier call",
+            "Use the same conditional verifier gate, at most two passes total",
         ):
             self.assertIn(marker, draft)
+        self.assertIn("rejection is not reviewer `READY`", draft)
+        self.assertIn("Malformed review/verifier output or `FAIL`", draft)
 
     def test_verifier_is_read_only_and_refute_first(self) -> None:
         body = text(VERIFIER)
@@ -214,26 +184,13 @@ class DraftWorkflowTests(unittest.TestCase):
         self.assertNotIn("_review/verifier", body)
 
     def test_human_docs_describe_reviewer_verifier_approval(self) -> None:
-        readme = text(README)
         explainer = text(EXPLAINER)
-        for body in (readme, explainer):
-            self.assertIn("reviewer", body.lower())
-            self.assertIn("verifier", body.lower())
-            self.assertIn("human approval", body.lower())
-            self.assertIn("draft reviewer -> verifier -> human approval", body)
-        self.assertIn("reviewer (candidate) -> verifier (promote/reject) -> human approval", readme)
+        self.assertIn("draft reviewer -> verifier -> human approval", explainer)
         self.assertIn("draftReview --> draftVerify", explainer)
         self.assertIn(
-            "runs only when the reviewer reports findings; it is skipped when there are none",
+            "runs only for findings",
             explainer,
         )
-        self.assertIn(
-            "runs only when the reviewer reports findings; it is skipped when there are none",
-            readme,
-        )
-        self.assertIn("Only verifier-promoted, evidence-backed corrections may change the draft", readme)
-        self.assertIn("unavailable evidence or a required human decision stops safely", readme)
-        self.assertIn("verifier rejection leaves the draft unchanged", readme)
         self.assertIn("verifier rejection leaves the draft unchanged", explainer)
         self.assertIn("[draft-review-verifier]: config/agent/_plan/draft/verifier.md", explainer)
 

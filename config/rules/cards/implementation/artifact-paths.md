@@ -1,13 +1,15 @@
 ### Artifact paths
-`run_prefix` is `artifact/[[artifact_base]].[[run_id]].implement`: a filename prefix, never a directory; never `mkdir`.
+- `run_prefix`: `artifact/[[artifact_base]].[[run_id]].implement`.
+- It is never a directory.
 
-Bind each path variable by substitution: `Cnn` = cohort id (`C01`, `C02`, …), `rNN` = round starting `r01`, +1 per repair round, `<domain>` = reviewer domain (`correctness`, `quality`, `tests`, `security`, `performance`, `integration`).
+- Authored `01` maps to runtime evidence key `C01`.
+- Start at `r01`; repairs/resume use unused rounds without resetting budgets.
 
-- `handoff_path`: `[[run_prefix]].handoff.md`
-- `cohort_path`: `[[run_prefix]].Cnn.md`
 - `validation_path`: `[[run_prefix]].Cnn.rNN.quick.validation.md`
 - `review_path`: `[[run_prefix]].Cnn.rNN.<domain>.review.md`
 - `verdict_path`: `[[run_prefix]].Cnn.rNN.verdict.md`
-- final gate: `validation_path` = `[[run_prefix]].final.rNN.validation.md`, `review_path` = `[[run_prefix]].final.rNN.<domain>.review.md`, `verdict_path` = `[[run_prefix]].final.rNN.verdict.md`
+- Final paths replace `Cnn` with `final` and omit `quick.`.
 
-The caller computes the exact path from these templates and passes it as the matching input; the addressed writer creates or overwrites that exact file. Never create placeholder or stub files (e.g. `touch`); never write any other path.
+- Callers assign exact paths; overwrite only current-round evidence.
+- Preserve historical evidence paths on resume.
+- Never create stub files; never write any other path.

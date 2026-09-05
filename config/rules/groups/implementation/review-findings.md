@@ -1,5 +1,6 @@
 ## RULE GROUP: REVIEW FINDINGS
-Read: scoped diff or declared standalone targets, affected symbols, authority, deterministic check results, and prior verdicts. Repo search: narrow verification only.
+Read: scoped diff or standalone targets, authority, checks, and prior verdicts.
+Search only for narrow verification.
 
 Owns: evidence threshold, scope, severity, deduplication, stale-finding rejection, and repair eligibility.
 
@@ -12,6 +13,7 @@ Candidate-review input gate for reviewers whose output contains `Domain` and `Re
   - Either way return only the reviewer's exact `# Output` envelope with `Status: INCOMPLETE`.
   - Never probe, relocate, or write any other artifact.
 - Valid input: write the requested artifact and return only the declared output envelope.
-- Never add prose outside the output envelope.
 
 {{ file="./rules/cards/implementation/review-findings.md" }}
+
+{{ file="./rules/cards/structure/plan-bundle.md" }}

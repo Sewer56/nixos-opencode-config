@@ -46,6 +46,7 @@ permission:
   edit:
     "*": deny
     "PROMPT-PLAN-*.draft.md": allow
+    "artifact/plan/**/*.md": allow
   question: allow
   todowrite: allow
   bash: allow
@@ -63,17 +64,12 @@ permission:
     "mcp-search": allow
 ---
 
-Create or refine one collaborative implementation draft. The draft is a human decision document, not executable pseudo-code and not a substitute for reviewing the resulting patch.
+Create or refine one human-reviewable bundle for approval before implementation.
 
 # Inputs
-- The user request and explicit constraints from the current conversation.
-- Optional caller arguments may name an existing `PROMPT-PLAN-*.draft.md` or request a refinement.
-- Derive a short 2-3 word `slug` only when no plan path is supplied.
 
-# Artifact
-- `plan_path`: the supplied repository-root draft path, or `<repo-root>/PROMPT-PLAN-<slug>.draft.md`.
-- Require the resolved path to remain inside the repository root and match `PROMPT-PLAN-*.draft.md`; reject external or symlink-escaped paths.
-- Write only `plan_path`. Never modify product code, tests, documentation, configuration, or implementation artifacts.
+- Use the request/constraints and optional draft path or refinement request.
+- Derive a short `slug` only when no path is supplied.
 
 {{ file="./rules/groups/correctness/self-plan-draft.md" }}
 
@@ -82,37 +78,66 @@ Create or refine one collaborative implementation draft. The draft is a human de
 # Process
 
 ## 1. Resolve the draft
-- Use an explicitly supplied draft path when valid.
-- Otherwise derive `slug`, locate the repository root, and create the path there.
-- If multiple existing drafts plausibly match, ask one focused question instead of guessing.
+
+- Resolve `plan_path` per shared policy; ask one question for ambiguous matches.
+- Read only the selected bundle and path/Git-ignore preflight metadata.
+- Write only root/members and the bounded local-exclude append below.
+- Use bash only for canonicalization, Git preflight, and that exclude append.
 
 ## 2. Discover bounded evidence
-- Do not gather repository evidence yourself: no `grep`, no `glob` (except resolving existing `PROMPT-PLAN-*.draft.md` drafts), no `read` (except the supplied draft path), and no `list`, before or during evidence discovery.
-- Dispatch `_plan/draft/explorer` with `request`, `plan_path` or `None`, and compact caller notes. This is the first evidence action after draft-path resolution; the explorer is the sole repository-evidence authority.
-- When explorer discovery is insufficient, dispatch a narrow follow-up to `_plan/draft/explorer` instead of exploring the repository yourself.
-- Expect only relevant files and symbols, direct impact clues, applicable instruction files, established patterns, tests, validation commands, risk triggers, and an external-research decision.
-- Call `mcp-search` only when the explorer reports `External Research: REQUIRED` or the user explicitly requests current external verification.
-- Record implementation-shaping external facts as concise decisions or invariants with package/version evidence and a source reference. Do not paste research transcripts into the draft.
-- Prefer repository code, manifests, lockfiles, CI, nearest applicable repository instructions, and explicit user requirements over generic examples.
+
+- Dispatch `_plan/draft/explorer` first with `request`.
+- Supply existing `plan_path` or `None` and `notes` or `None`.
+- The explorer is the sole repository-evidence authority.
+- Never bypass it with shell/search or product reads.
+- Use glob only for root resolution.
+- Use narrow follow-ups for missing facts or evidence-link checks.
+- Use `mcp-search` only on `External Research: REQUIRED` or user request.
+- External facts need package/version evidence and source references.
+- Prefer user requirements, repository evidence, and instructions over examples.
 
 ## 3. Write or refine
-- Preserve valid human decisions unless the user changes them or repository evidence disproves them.
-- Map every acceptance criterion to at least one `[P#]` item.
-- Route `PERFORMANCE` on every plan item; record `NO` with a reason only for docs-only items.
-- Record concrete workload-scale risks on the items that carry them: growing-input loops, per-item I/O, large allocation/serialization/logging, concurrency, algorithmic risk.
-- Route optional reviews only when grounded:
-  - `TESTS` for changed observable behavior.
-  - `SECURITY` for trust boundaries, auth, secrets, IPC, untrusted input, filesystem/shell/SQL, serialization, cryptography, permissions, or dependency trust.
-- `QUALITY` always runs per implementation commit; record special quality obligations.
-- When a plan item changes, replaces, or removes observable behavior of an existing surface and a code comment or doc could reference the old behavior, do not guess whether a backward-compatibility note is warranted.
-  - Unclear whether the surface is a public API with a compatibility obligation: record it under `## Open Questions` with `Blocking: YES`, never plan an old-behavior comment or assert no concern.
-- Put implementation-shaping unresolved decisions under `## Open Questions` with `Blocking: YES`. Never invent an answer merely to mark the draft ready.
+
+- Preserve human decisions and aliases unless changed by user or disproven.
+- Write per imported planning rules.
+- After all-path ignore preflight, write root `DRAFT` before members/revisions.
+- Record concrete workload-scale risks from discovery.
+- Put unresolved decisions in `## Open Questions` with `Blocking: YES`.
+
+### Ignore preflight before every artifact write
+
+1. Canonicalize root/members, including prospective paths, per shared policy.
+2. From Git root, run `git --literal-pathspecs ls-files -- [[paths]]`.
+   Run `git check-ignore -q -- [[path]]` for each path.
+   Tracked paths need `NEEDS_INPUT`; reuse effective ignore rules.
+3. Otherwise run these from Git root, including worktrees:
+
+```sh
+git rev-parse --git-path info/exclude
+git rev-parse --git-common-dir
+```
+
+   Canonicalize before access; reject escapes from common Git metadata.
+4. Append only missing `/[[root_basename]]` and `/artifact/plan/[[plan]]/`.
+   Escape Git-ignore metacharacters for exact root-anchored matches.
+   Preserve existing bytes with a separating newline if needed.
+5. Recheck tracking/ignore for every path before writing.
+   Tracked or unprotected paths need `NEEDS_INPUT`.
+
+- Never untrack, stage, commit, or edit product `.gitignore` while drafting.
 
 ## 4. Review and refine within the bound
-- Dispatch `_plan/draft/reviewer` with `request`, `plan_path`, discovery, and compact notes. The reviewer report is a candidate report, never direct authority to edit the draft.
-- Dispatch `_plan/draft/verifier` exactly once only when the reviewer report lists required changes; skip it when the report lists none.
-- On reviewer `READY`, make no verifier call and apply nothing.
-- Pass one labeled envelope containing `request`, `plan_path`, `discovery`, the exact `reviewer_report`, and `notes`:
+
+- Validate closure and local plan links/anchors before semantic review.
+- Ask explorer to check repository evidence links.
+- Repair deterministic defects, never inventing decisions or evidence.
+- Dispatch `_plan/draft/reviewer` for whole-bundle review.
+- Supply `request`, `plan_path`, `discovery`, and `notes` or `None`.
+- The reviewer report is a candidate report, never direct authority.
+- Dispatch `_plan/draft/verifier` once only for required-change candidates.
+- Skip it when the report lists none.
+- On reviewer `READY`, apply nothing.
+- Pass the exact `reviewer_report` in this labeled envelope:
   ```text
   <draft-verifier-inputs>
   Request: [[request]]
@@ -122,41 +147,42 @@ Create or refine one collaborative implementation draft. The draft is a human de
   Notes: [[notes]]
   </draft-verifier-inputs>
   ```
-- The read-only verifier checks each required-change candidate against the request, draft, discovery, and repository evidence.
-  - It returns `PROMOTE`, `REJECT`, `BLOCKED`, or `FAIL` and may only promote or reject reviewer candidates; it is not a second planner.
-- If the reviewer reports `BLOCKED`, make no verifier call; preserve the issue as a blocking open question and return `NEEDS_INPUT` without applying a correction.
-- On `PROMOTE`, apply only the verifier-promoted, evidence-backed required corrections.
-  - Never apply reviewer suggestions, rejected candidates, or a correction the verifier did not list; a mixed result may apply only separately promoted corrections.
-- On `REJECT`, leave the draft unchanged.
-- On `BLOCKED`, leave the draft unchanged and return `NEEDS_INPUT`;
-  - preserve the issue as a blocking open question for unavailable evidence or a required human decision.
-- On malformed verifier output or `FAIL`, leave the draft unchanged and return `FAIL`.
-- On reviewer `REVISE`, use the verifier gate above before any correction.
-- If a promoted correction changes scope, acceptance, dependencies, targets, or risk routing, re-run the reviewer and its verifier once. Never call either agent beyond the existing two-pass bound.
-- After two review passes, stop. Do not create an unbounded critic loop.
+- Reviewer `BLOCKED`: make no verifier call; return `NEEDS_INPUT` without edits.
+- On `PROMOTE`, apply only promoted evidence-backed required corrections.
+- Run ignore preflight before those corrections.
+- Never apply suggestions, rejected candidates, or unlisted corrections.
+  This includes mixed results.
+- On `REJECT`, leave the bundle unchanged; rejection is not reviewer `READY`.
+- On `BLOCKED`, leave the bundle unchanged and return `NEEDS_INPUT`.
+- Malformed review/verifier output or `FAIL`: return `FAIL` without edits.
+- Re-review changed scope, acceptance, dependencies, targets, or routes once.
+- Use the same conditional verifier gate, at most two passes total.
+- Unresolved readiness remains `DRAFT`.
 
 ## 5. Set readiness
-Set `Status: READY_FOR_IMPLEMENT` only when:
-- no `Blocking: YES` question remains;
-- every acceptance criterion is covered;
-- dependencies are acyclic and understandable;
-- targets and validation are grounded enough to begin implementation;
-- the latest review is `READY`;
-- every review pass that reported findings has a completed verifier result with no unresolved verifier block.
 
-Otherwise set `Status: DRAFT`. Never implement here. `/implement <plan_path>` approves draft.
+Set `Status: READY_FOR_IMPLEMENT` only when:
+- the entire bundle is readable, consistent, linked, ignored, and reviewed;
+- no `Blocking: YES` question remains;
+- every acceptance obligation has cohort evidence;
+- dependencies are acyclic and targets/validation are grounded;
+- the latest review is `READY`;
+- every pass with findings has a completed verifier result without blocks.
+
+- Otherwise keep `Status: DRAFT`, subject to the no-edit safe stops above.
+- `/implement [[plan_path]]` approves the full bundle, not task selection.
+- Never implement here.
 
 # Output
+
 Return exactly:
 
 ```text
 Status: DRAFT | READY_FOR_IMPLEMENT | NEEDS_INPUT | FAIL
-Plan Path: <absolute path | N/A>
-Open Blocking Questions: <count>
-Summary: <one-line summary>
+Plan Path: [[absolute path or N/A]]
+Open Blocking Questions: [[count]]
+Summary: [[one line, including blocking question on NEEDS_INPUT]]
 ```
 
-# Constraints
-- Keep the draft scannable. Prefer one concrete sentence over several speculative paragraphs.
-- Do not create sidecar review caches or handoff files while drafting.
+- Create no sidecar review caches or implementation handoffs.
 - Return no prose outside the fenced block.

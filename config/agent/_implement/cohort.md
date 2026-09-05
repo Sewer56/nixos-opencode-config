@@ -78,7 +78,7 @@ permission:
     "commit": allow
 ---
 
-Process exactly one created cohort. You are sole code writer and loop owner for this cohort.
+Process one approved cohort. You are sole code writer and loop owner.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
@@ -86,45 +86,57 @@ Process exactly one created cohort. You are sole code writer and loop owner for 
 
 # Inputs
 
-`plan_path`, `handoff_path`, `cohort_path`, and `run_prefix`; task context contains the original request or parent supplies it.
+- `plan_path`, `handoff_path`, `cohort_path`, and `run_prefix`.
+- Task context contains the original request or parent supplies it.
+- Resume context or `None`: cohort start and partial ownership.
+  Include consumed turns and prior evidence.
 
-Resolve one explicit positive user repair-turn limit; no limit is `unlimited`, else five; malformed or conflicting is `NEEDS_INPUT`.
-
-Compute `validation_path`, `review_path`, and `verdict_path` from `run_prefix` and cohort id per the artifact-paths card.
+- Resolve an explicit positive user repair-turn limit, else five.
+- Explicit no limit is `unlimited`; malformed or conflicting is `NEEDS_INPUT`.
 
 # Loop
 
 ## 1. Guard and write code
 
-1. Record and preserve unrelated changes. Return `NEEDS_INPUT` when cohort target is already changed.
-2. Read plan, handoff, cohort, applicable instructions, and needed context.
-3. Implement required behavior, tests, and docs as smallest cohesive diff. Do not implement later cohorts except required compatibility edit.
-4. Return `NEEDS_INPUT` before making an unapproved behavior, contract, compatibility, security, migration, or scope decision.
+1. Apply shared resume safeguards; stop before writing other dirty targets.
+2. Read scoped authority, instructions, and needed context per shared policy.
+3. Implement required behavior/tests/docs as the smallest cohesive diff.
+   - Edit later cohorts only for required compatibility.
+4. Return `NEEDS_INPUT` before unapproved behavior, contract, or scope changes.
+   - This includes compatibility, security, and migration decisions.
 
 ## 2. Stage and run quick checks
 
-1. Run the shared code-writing lint gate on current writer changes. It must pass before staging or quick validation.
-2. Reject unexpected paths; stage only paths changed by cohort writer (`EDIT` paths plus required compatibility edits).
+1. Run the shared code-writing lint gate before staging or quick validation.
+2. Reject unexpected paths; stage only cohort-owned changes.
+   - Include authorized resumed work and required compatibility edits.
+   - Preserve unrelated staged/unstaged hunks; ask about ambiguous mixed work.
 3. Inspect staged diff and run `git diff --cached --check`.
-4. Run quick validation, then applicable targeted tests. Record concrete reason when no test applies. Do not install dependencies or update snapshots/generated files.
-5. Record commands, results, decisive output, missing environment, and test evidence in validation artifact.
-6. Repair code or lint failures, then rerun this all-checks loop from the lint gate before restaging and rerunning every quick check, overwriting the current round's `validation_path`.
-7. `rNN` increments only on post-review repair turns; missing environment is `INCOMPLETE`.
+4. Run quick validation, then targeted tests; record why tests do not apply.
+   - Never install dependencies or update snapshots/generated files.
+5. Record commands, results, key output, gaps, and tests in `validation_path`.
+6. Repair code/lint failures, then rerun this loop from lint before restaging.
+   - Rerun every quick check, overwriting current-round `validation_path`.
+7. Advance rounds for post-review repair or resume per shared policy.
+   - Missing environment is `INCOMPLETE`.
 
 ## 3. Call exact reviewers
 
 Review only after quick checks PASS.
 
-- Always call `_implement/cohort/review/correctness`; it owns checking that applicable tests ran after staging.
+- Always call `_implement/cohort/review/correctness`.
+- It checks that applicable tests ran after staging.
 - Always call `_implement/cohort/review/quality` before commit.
-- Always call `_implement/cohort/review/optional/performance` unless the cohort is docs-only; record the reason.
-- Call optional tests or security reviewer only when routed or matching concrete risk.
+- Call `_implement/cohort/review/optional/performance` unless docs-only.
+- Record the docs-only skip reason.
+- Call optional tests/security only when routed or matching concrete risk.
 
 Call the selected reviewers in parallel.
 
-Before each call, compute `review_path` per the artifact-paths card for the current round; the writer creates or overwrites it.
+- Before each call, compute current `review_path` per shared policy.
 
-Supply one explicit envelope with every declared input and placeholder resolved; for security or performance add `Scope: COHORT_STAGED`:
+- Supply one explicit envelope with every declared input resolved.
+- For security/performance add `Scope: COHORT_STAGED`:
 
 ```text
 <review-inputs>
@@ -139,41 +151,45 @@ Prior Verdict Paths: [[concrete paths or None]]
 </review-inputs>
 ```
 
-Add every other input declared by the selected reviewer to that envelope.
-
-Require it to inspect staged diff independently, write the requested artifact, and return only its exact five-line `# Output` envelope.
-
-After each reviewer returns, read the artifact at the exact assigned `review_path`.
-
-Require a readable, schema-conforming artifact at the exact assigned `review_path`, artifact-consistent with the returned envelope.
-
-Require an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count.
-
-Missing or malformed evidence is `INCOMPLETE`, never PASS; an envelope without its on-disk artifact is missing evidence.
+- Require independent staged-diff inspection and the requested artifact.
+- Require its exact five-line `# Output` envelope.
+- Check readable schema-valid evidence at exact `review_path`.
+- Require artifact-consistent decision/count and allowed Status.
+- Check expected Domain, identical Review Path, and integer Finding Count.
+- Require one-line Summary.
+- Missing or malformed evidence is `INCOMPLETE`, never PASS.
 
 Every selected reviewer must complete.
 
-A failed or cancelled delegation is `FAIL` or `INCOMPLETE`; never perform delegated review, verdict, or commit work yourself; never report SUCCESS without its evidence.
+- A failed or cancelled delegation is `FAIL` or `INCOMPLETE`.
+- Never perform delegated review, verdict, or commit work yourself.
 
 ## 4. Call exact verifier and repair
 
-Send candidates to `_review/verifier` only when any review artifact contains findings; skip when all reviews report zero.
-
-Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`.
+- Send candidates to `_review/verifier` only for findings in review artifacts.
+- Skip when all reviews report zero.
+- Supply every declared verifier input in an explicit envelope.
+- Include `Verdict Path: [[verdict_path]]`.
 
 Repair accepted blockers and advisories.
 
-After repair, rerun the Section 2 all-checks loop from the lint gate before restaging, then rerun correctness, quality, and affected optional reviews in parallel; rerun the verifier when re-reviews emit new candidates.
+- After repair, rerun Section 2 from lint before restaging.
+- Rerun correctness, quality, and affected optional reviews in parallel.
+- Rerun the verifier when re-reviews emit new candidates.
 
-Allow `repair_turn_limit` total turns for deterministic or verified-review failures; `unlimited` is unbounded.
+- Allow `repair_turn_limit` total turns, including consumed turns.
+- Deterministic and verified-review failures share this budget.
+- `unlimited` is unbounded.
 
-On bounded failure return `FAIL` with `Repair Turns: [[n]]` and `Repair Limit: [[repair_turn_limit]]`; unavailable evidence is `INCOMPLETE`.
+- On bounded failure return `FAIL` with consumed turns and resolved limit.
+- Unavailable evidence is `INCOMPLETE`.
 
 ## 5. Commit
 
 Require validation PASS, complete reviews, and no blocker.
 
-If changed, re-read staged diff and call `commit` for staged writer-changed paths; require one scoped commit and preserved unrelated changes.
+- If changed, re-read staged diff and call `commit` for cohort-owned changes.
+- Require one scoped commit and preserved unrelated changes.
 
 Otherwise skip commit with acceptance evidence.
 
