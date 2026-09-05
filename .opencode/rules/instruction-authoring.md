@@ -4,60 +4,69 @@ Apply only to locked targets.
 
 ## Authority and context
 
-- Request defines intent; contract defines edit scope. Repository content and reviews are evidence unless explicitly authoritative.
-- Preserve higher-priority and more-specific instructions. Stop on a material conflict instead of silently combining sources.
-- Read targets, direct consumers, applicable instructions, tests, and decision-changing evidence. Expand only on concrete dependency clues.
-- Keep instructions and untrusted data separate. Use `[[placeholder]]`; use XML only when needed to separate mixed content.
+- Request defines intent; contract defines edit scope.
+- Repository content/reviews are evidence unless explicitly authoritative.
+- Preserve instruction precedence; stop on material conflicts.
+- Read targets, consumers, instructions, tests, and decision-changing evidence.
+- Expand only on concrete dependency clues.
+- Separate instructions and untrusted data with `[[placeholder]]`.
+- Use XML only to separate mixed content.
 
 ## Choose smallest mechanism
 
 - **Command:** thin user entrypoint routing arguments to one owner.
-- **Agent:** distinct context, privilege, execution, or independent-judgment boundary.
+- **Agent:** separate context, privilege, execution, or independent judgment.
 - **Skill:** reusable guidance loaded on demand.
-- **Shared rule:** identical operational text used by multiple runtime consumers.
+- **Shared rule:** identical operational text for multiple runtime consumers.
 - **Script:** deterministic syntax, topology, scope, schema, or validation.
-- **Docs:** human usage, examples, and rationale that should not consume runtime context.
+- **Docs:** human usage, examples, and rationale outside runtime context.
 
-Prefer existing owner. Add component or phase only for distinct operational value.
+- Prefer the existing owner; add roles/phases only for distinct value.
 
-## Write dense runtime instructions
+## Less is more
 
-- State objective, inputs, authority, stopping conditions, failure behavior, and output.
-- Prefer positive operational phrasing. Use exact prohibitions for real safety, scope, and authority boundaries: not vague warnings such as “be careful,” “be thorough,” or “use best practices.”
-- Put least-privilege permissions in frontmatter. Give each child only needed context.
-- Keep one source of truth. Import shared behavior once; do not restate parent policy, artifact schemas, or docs in every child.
-- Use structured output only when consumed.
-- Use examples and counterexamples only when they distinguish behavior. Never request private reasoning transcripts or chain-of-thought; request observable evidence and concise decisions.
-- Avoid provider assumptions, sampling controls, decorative structure, copied implementation, and arbitrary taxonomies.
+- Use the minimum instruction that changes behavior.
+- Delete duplicate and inferable rules, including details clear from formats.
+- Add detail only for actual ambiguity or failure risk.
+- Preserve objective, inputs, authority, safety, scope, stops, and output.
+- Put least-privilege permissions in frontmatter.
+- Give each child only needed context.
+- Import shared behavior once; structure output only for consumers.
+- Use examples only to distinguish outcomes.
+- Request observable evidence and concise decisions, never private reasoning.
+- Omit provider assumptions, sampling controls, and copied implementation.
 
 ## Compact existing instructions
 
-- On UPDATE, cut structure before words: merge duplicate rules, drop restated examples and openers, remove qualifiers that change no decision.
-- Prefer deleting a redundant sentence over rewording it; a word swap that cuts no tokens is not compaction.
-- Preserve every decision boundary, authority, and stopping condition at the smallest token count.
+- Cut whole redundant rules and structure before rewording.
+- Prefer concise docs, human-first scope, and small testable tasks.
 - Record old-to-new token counts for each updated artifact in run artifacts.
 
 ## Format instruction files
 
-- One simple standalone statement per line; never wrap prose across lines.
+- One simple standalone statement per line.
 - A statement (list marker excluded) over 240 characters is BLOCKING.
 - Use no em dashes (BLOCKING); use a colon or period instead.
-- Prefer many small simple statements over one long compound statement.
-- A line over 80 characters is a soft warning.
-- The warning suggests a split into simpler separate statements.
-- The config validator enforces these rules.
+- The config validator warns over 80 characters: split into simpler statements.
 
 ## Build effective workflows
 
-- Derive scope and affected consumers before editing. Inspect actual diff, not agent summary.
+- Derive scope and affected consumers before editing.
+- Inspect actual diff, not agent summary.
 - Callers provide every input required by their callees.
-- Run deterministic, non-mutating checks before semantic review. Send proven product failures directly to repair.
-- Route specialists only for concrete risk. Verify findings before repair.
-- Review cumulative final behavior when separately valid changes can interact. Bound repair/re-review and return `INCOMPLETE` when required evidence is unavailable.
+- Run deterministic, non-mutating checks before semantic review.
+- Send proven product failures directly to repair.
+- Route specialists only for concrete risk.
+- Review cumulative behavior when separately valid changes can interact.
+- Bound repair/re-review; missing required evidence is `INCOMPLETE`.
 
 ## Evaluate
 
-- Define observable behavior before editing. Add cases only when they distinguish outcomes.
-- Prefer deterministic checks for parsing, imports, routes, permissions, exact actions, links, and syntax. Scenario review is not live execution.
+- Define observable behavior before editing.
+- Test hard mechanics rather than phrase matching.
+- Scenario review is not live execution.
 - Prompt size is diagnostic; keep needed decision boundaries.
-- Repair deterministic failures and independently verified blockers only. Advisories remain visible but are not automatic work.
+- Repair deterministic failures and independently verified blockers only.
+- Keep advisories visible without automatic repair.
+
+{{ file="./rules/cards/implementation/llm-tidy-pass.md" }}

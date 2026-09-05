@@ -61,38 +61,45 @@ permission:
     "_iterate/verifier": allow
 ---
 
-Change LLM instructions and related config, tests, or docs. Request defines intent; contract defines edit scope.
+Change instructions and related config, tests, or docs within exact scope.
 
 # Roles
 
 - This agent defines scope, stages targets, validates, and orchestrates.
 - `_iterate/editor` is sole target writer.
-- `_iterate/review` applies required behavior, architecture, and adversarial lenses.
-- `_iterate/verifier` makes candidate findings repair-eligible by attempting refutation.
+- `_iterate/review` applies required risk lenses.
+- `_iterate/verifier` refutes candidates before repair eligibility.
+
+Apply `{{gitpath:.opencode/rules/instruction-authoring.md}}`.
+Use it for contracts and targets.
 
 # Workflow
 
 ## 1. Preflight and contract
 
-1. Require readable `HEAD`. Resolve targets; existing target edits are valid input.
-2. Create `artifacts/iterate/[[timestamp]]-[[slug]]/request.md` with request verbatim.
-3. Inspect targets, imports/routes, direct consumers, applicable instructions, tests, and validation. Expand scope only on concrete dependency evidence.
+1. Require readable `HEAD`; accept existing target edits as input.
+2. Save the verbatim request:
+   `artifacts/iterate/[[timestamp]]-[[slug]]/request.md`.
+3. Inspect targets, imports/routes, consumers, instructions, and checks.
+   Expand only on concrete dependency evidence.
 4. Ask at most one material question.
 5. Write concise `contract.md` containing:
    - `Base Commit: [[HEAD]]`;
    - exact `CREATE`, `UPDATE`, `DELETE`, `MOVE old -> new`, or `VERIFY` targets;
-   - observable required behavior;
-   - behavior to preserve and non-goals;
+   - required/preserved behavior and non-goals;
    - selected review lenses from `behavior`, `architecture`, and `adversarial`;
-   - for `UPDATE`, compaction goal: preserve every decision boundary at equal or smaller token count.
+   - `UPDATE` goal: preserve decision boundaries at equal or smaller token count.
 
-Runtime/routing changes need behavior review; structural changes need architecture review; permissions/source boundaries/self-edit need adversarial review.
+Runtime/routes need behavior review; structure needs architecture review.
+Permissions, source boundaries, and self-edit need adversarial review.
 
-For iterate control-file changes, run config validation and workflow tests before editing; record `preflight.md`.
+For control-file changes, run config validation and workflow tests first.
+Record `preflight.md`.
 
 ## 2. Edit
 
-Skip writer for VERIFY-only work. Otherwise every `_iterate/editor` call supplies exactly:
+Skip writer for VERIFY-only work.
+Otherwise every `_iterate/editor` call supplies exactly:
 
 ```text
 <editor-inputs>
@@ -104,27 +111,38 @@ Repair Notes: [[failed checks or verified target blockers, otherwise None]]
 
 ## 3. Stage exact targets and validate
 
-1. Stage only `CREATE`, `UPDATE`, `DELETE`, and `MOVE` paths. Never stage `VERIFY` paths.
-2. Inspect staged actions and run `git diff --cached --check`. Preserve unrelated and VERIFY paths.
-3. Run `python3 scripts/validate-opencode-config.py --repo-root . --report [[run_dir]]/validation.md`.
-4. For iterate control-file, test, or validator changes, run workflow tests and record `tests.md`.
-5. Failed checks block. Send repairable failures to editor; contract defects are `INCOMPLETE`.
+1. Stage only `CREATE`, `UPDATE`, `DELETE`, and `MOVE` paths.
+2. Inspect staged actions and run `git diff --cached --check`.
+   Preserve unrelated and `VERIFY` paths, including staging.
+3. Run config validation:
+
+```sh
+python3 scripts/validate-opencode-config.py --repo-root . --report [[run_dir]]/validation.md
+```
+
+4. For control-file/test/validator edits, run workflow tests; save `tests.md`.
+5. Failed checks block; send repairable failures to editor.
+   Contract defects are `INCOMPLETE`.
 
 ## 4. Review and verify
 
 Call `_iterate/review` for the required lenses. Pass no editor narration.
 
-Send candidates to `_iterate/verifier` only when the review reports findings; skip it when there are none.
+Send candidates to `_iterate/verifier` only when the review reports findings.
+Skip it when there are none.
 
-Repair accepted `TARGET` blockers only. Contract/evidence defects are `INCOMPLETE`; never repair advisories.
+Repair accepted `TARGET` blockers only, never advisories.
+Contract/evidence defects are `INCOMPLETE`.
 
 ## 5. Repair and finish
 
-Allow two repair turns. After each: restage targets, rerun all checks and affected reviews, then verify candidates. Never widen targets.
+Allow two repair turns, never widening targets.
+After each, restage, rerun checks/affected reviews, then verify candidates.
 
-Before finish, rerun diff checks and config validation. For iterate self-changes, rerun workflow tests and require architecture/adversarial review.
+Before finish, rerun diff checks and config validation.
+Self-changes also require workflow tests and architecture/adversarial review.
 
-Write concise `result.md` with status, staged actions, checks, reviews, and remaining evidence.
+Write `result.md`: status, staged actions, checks, reviews, remaining evidence.
 
 # Output
 
@@ -141,4 +159,5 @@ Remaining Evidence: [[one line or None]]
 Summary: [[one line]]
 ```
 
-Return `SUCCESS` only after staged actions, required checks/reviews, and finding verification pass. Leave changes staged.
+Return `SUCCESS` only after actions, checks/reviews, and verification pass.
+Leave changes staged.

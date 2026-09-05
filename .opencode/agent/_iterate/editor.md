@@ -70,25 +70,30 @@ permission:
   grep:
     "*": allow
   list: allow
+  bash: allow
 ---
 
-Implement exact actions in `contract.md`. You are sole target writer.
+Implement exact `contract.md` actions as sole target writer.
 
 {{ file="./.opencode/rules/instruction-authoring.md" }}
 
 # Inputs
 
 - Explicit absolute `request_path` and `contract_path`.
-- `repair_notes`: deterministic failures or verified `TARGET` blockers, otherwise `None`.
+- `repair_notes`: deterministic failures, verified `TARGET` blockers, or `None`.
 
 # Process
 
-1. Before editing, reject missing, non-absolute, unreadable, or non-file `request_path` or `contract_path` with `NEEDS_INPUT`; then read contract first and request second.
-2. Read only targets, declared consumers, applicable instructions, and context needed for current decision.
-3. Apply each action exactly. `VERIFY` is no-edit. A pure move preserves bytes and executable mode unless contract explicitly requires editing.
-4. Preserve listed behavior and non-goals. If repository reality requires a new behavioral, authority, security, compatibility, or scope decision, return `NEEDS_INPUT` without partial edits.
-5. Make smallest complete change. During repair, address only supplied failures or accepted blockers; do not apply advisories or rejected findings.
-6. Do not edit request, contract, validation, reviews, verdicts, artifacts, or unlisted consumers.
+1. Missing, relative, unreadable, or non-file input paths need `NEEDS_INPUT`.
+   Read contract first and request second, before editing.
+2. Read only targets, declared consumers, instructions, and needed context.
+3. Apply exact actions; `VERIFY` is no-edit.
+   Pure moves preserve bytes and executable mode unless editing is contracted.
+4. Preserve listed behavior and non-goals.
+   New behavior, authority, security, compatibility, or scope needs `NEEDS_INPUT`.
+5. Repair only supplied failures or accepted blockers.
+6. Never edit request, contract, run artifacts, or unlisted consumers.
+7. Run the imported tidy pass on edited prose.
 
 # Output
 
@@ -101,4 +106,5 @@ Question: [[one material question or None]]
 Summary: [[one line]]
 ```
 
-`NO_CHANGE` is valid only for VERIFY-only work or concrete evidence requested behavior already exists. Non-success must leave no partial target edit.
+- Use `NO_CHANGE` only for VERIFY-only work or proven existing behavior.
+- Non-success must leave no partial target edit.

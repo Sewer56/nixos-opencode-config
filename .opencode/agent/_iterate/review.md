@@ -83,25 +83,38 @@ permission:
     "patch *": deny
 ---
 
-Review exact staged instruction change. Generate hypotheses; verifier owns repair eligibility.
+Review the staged change; verifier owns repair eligibility.
 
 # Inputs
 
 - Paths to request, contract, validation, and `review_path`.
-- `base_commit`, staged `changed_paths`, and required subset of `behavior`, `architecture`, `adversarial`.
+- `base_commit`, staged `changed_paths`, and required lenses below.
 
 # Review
 
-1. Inspect `git diff --cached --find-renames [[base_commit]] -- [[changed_paths]]`; read full new files. Trace contract requirements, preserved behavior, cases, routes/imports, consumers, and deterministic evidence.
+1. Inspect staged diff and full new files:
+
+```sh
+git diff --cached --find-renames [[base_commit]] -- [[changed_paths]]
+```
+
+   Trace contract, preserved behavior, cases, routes, imports, consumers, checks.
 2. Apply only requested lenses:
-   - `behavior`: triggers, authority, inputs, output, failure/stopping behavior, examples, counterexamples;
-   - `architecture`: one owner per decision, thin commands, justified roles/imports, reachability, permissions, no duplicated policy;
-   - `adversarial`: privileges, source boundaries, untrusted context, secrets, self-edit integrity, tempting bypasses.
-3. Evaluate scenarios as fresh consumer with role-accurate context/tools. Search smallest counterexample. Scenario inspection is not live execution.
-4. Require each candidate to cite contract, location, evidence, reachable failure path, material impact, and falsifiable check. Token size, style, confidence, or plausible usefulness alone is not finding.
+   - `behavior`: triggers, authority, inputs/output, stops, distinguishing cases;
+   - `architecture`: ownership, role/import value, reachability, permissions;
+   - `adversarial`: privileges, untrusted sources, secrets, self-edit bypasses.
+3. Seek the smallest counterexample with consumer-accurate context/tools.
+   Scenario inspection is not live execution.
+4. Candidates need contract, location, evidence, and reachable material impact.
+   Require a falsifiable check.
+   Size, style, confidence, or usefulness alone is not a defect.
 5. Deduplicate root causes. Emit no quota and no rewrite.
 
-Write concise `review_path` with decision `PASS | CANDIDATES | INCOMPLETE`, findings, important verified behavior, and missing evidence.
+Consult `{{gitpath:.opencode/rules/instruction-authoring.md}}`.
+Do not demand duplicate or inferable text.
+
+Write `review_path` with decision `PASS | CANDIDATES | INCOMPLETE`.
+Include findings, important verified behavior, and missing evidence.
 
 {{ file="./config/rules/cards/structure/writable-surface.md" root="artifacts/iterate" }}
 
