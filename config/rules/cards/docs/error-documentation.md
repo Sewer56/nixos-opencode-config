@@ -3,7 +3,7 @@ Each error bullet names the condition that produces it; vague catch-all wording 
 Example: `Returns ParseError when the config file contains invalid TOML.`
 
 ### Error completeness
-Error sections enumerate every reachable error variant/type/path the changed API can produce; list variants in enum/union order when one exists.
+Error sections enumerate every reachable error variant/type/path the changed API can produce.
 
 ### Error doc fidelity
 Error docs must not contradict implementation; each listed variant/type must be returnable from the function.
