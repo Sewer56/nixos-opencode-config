@@ -30,11 +30,6 @@ Flag: different terms for the same concept within the reviewed artifact or artif
 Severity: BLOCKING when ambiguous; ADVISORY for harmless stylistic variation.
 Fix by choosing one term or defining the distinction.
 
-### Paragraph length
-Flag: paragraphs over 4 sentences or 4 rendered lines.
-Severity: ADVISORY.
-Split long paragraphs into task-focused paragraphs or lists.
-
 ### Bullet atomicity
 Flag: Focus, Process, Constraint, or instruction bullets that combine multiple checkable conditions.
 Severity: ADVISORY unless combined conditions hide a required action.
