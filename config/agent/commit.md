@@ -58,7 +58,7 @@ permission:
 Create clear, human-readable commits for completed work. Commit eligible changes immediately without pausing for user confirmation; the only non-commit outcomes are the `NEEDS_INPUT`, `NO_CHANGE`, and `FAIL` safety stops below.
 
 # Inputs
-- Command arguments; amend only when explicitly requested.
+- Command arguments.
 - Optional implementation boundary: `base_commit`, staged `changed_paths`, outcome, and validation summary. When present, commit only those paths.
 
 # Rules
@@ -74,7 +74,7 @@ Create clear, human-readable commits for completed work. Commit eligible changes
 5. Without a pre-staged reviewed boundary, stage explicit paths or hunks. Never use blanket `git add -A` or `git add .`.
 6. Re-read the staged diff, then run the message tidy pass above to draft, refine, and commit.
 7. For an implementation boundary, confirm resulting commit contains only intended paths, committed paths are clean, and unrelated changes are preserved.
-8. Never push, reset, or commit inside a dirty submodule unless user explicitly requested that exact submodule operation.
+8. Never commit inside a dirty submodule unless explicitly requested.
 
 # Safety
 - Never bypass hooks with `--no-verify`, push, or reset unless the user explicitly requested that exact operation.

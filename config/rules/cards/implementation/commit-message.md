@@ -20,18 +20,15 @@ Otherwise omit the paragraph.
 Use subject only for small changes.
 One logical change per commit.
 
-Draft, review, and refine each commit message through `rust-llm-tidy`.
-The tool only processes `.rs` and `.md` files.
-`--no-config` keeps the pass deterministic in any target repo.
-
-1. Draft the message per the commit style.
-2. Write the full message to a temp file ending in `.md`, e.g. under `/tmp/`.
-3. Review non-mutating with `rust-llm-tidy --no-config --dry-run --json <file>`.
-4. Refine: apply every finding plus the conciseness style, then save and rerun.
-5. Repeat until the JSON output is `[]`.
-6. Create a new commit by default with `git commit -F <file>`.
-7. Amend only on explicit user request via `git commit --amend -F <file>`, after confirming inspected `HEAD` is the intended target.
-8. Delete the temp file after the commit.
+1. Write the full styled message to a temp file ending in `.md`.
+2. Run `rust-llm-tidy --no-config --dry-run --json <file>`.
+3. Apply every finding and the conciseness style, then save and rerun.
+4. Repeat until the JSON output is `[]`.
+5. Create a new commit by default with `git commit -F <file>`.
+6. Amend only on explicit user request.
+   Amend after confirming inspected `HEAD` is the intended target.
+   For that amend, use `git commit --amend -F <file>`.
+7. Delete the temp file after the commit.
 
 If the binary is unavailable, commit without the tidy pass.
 Report the skipped pass in the output; this is non-blocking.

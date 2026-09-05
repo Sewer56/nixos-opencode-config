@@ -109,10 +109,6 @@ Review one proposed cohort or final-repair commit for material quality defects. 
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
-Apply imported groups to staged diff.
-
-General quality and placement apply to code; documentation and language groups apply to corresponding changed text.
-
 Do not duplicate correctness or optional-domain findings unless quality impact is distinct.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}

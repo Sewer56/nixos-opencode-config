@@ -96,10 +96,6 @@ Review the scoped source-documentation diff. Produce candidates only; do not edi
 {{ file="./rules/groups/style/wording.md" }}
 
 # Checks
-- Required public and non-trivial API documentation is present, specific, and faithful to code.
-- Purpose, parameters, return behavior, side effects, invariants, and examples are included only when useful.
-- Inline comments explain intent or phases rather than narrating syntax.
-- Changed comments and docs use current names, types, defaults, and behavior.
 - The diff is documentation-only and does not churn unrelated legacy code.
 - Prior refuted findings are not repeated without new evidence.
 

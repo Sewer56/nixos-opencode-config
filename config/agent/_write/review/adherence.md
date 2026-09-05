@@ -98,8 +98,6 @@ candidate findings; never edit anything.
 - Ground every claim: PR artifacts in diff, commit, or test evidence; issue
   artifacts in repository facts. Flag unevidenced claims.
 - Template conformance with required sections filled and no empty boilerplate.
-- Answer-first shape, one action per step, no intro, outro, or filler.
-- Paragraphs at most 240 characters.
 - Lists capped per the adhd-format card, honoring the required-coverage
   exception.
 - Issue artifacts preserve unknowns explicitly.

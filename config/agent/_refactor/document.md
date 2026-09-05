@@ -113,9 +113,6 @@ Create or overwrite each exact assigned path. Never create placeholder or stub f
 - Record target files, documentation gaps, public error-returning APIs, and validation commands in the handoff.
 
 ## 2. Apply the smallest documentation pass
-- Document required public and non-trivial APIs according to repository and language conventions.
-- Explain purpose, non-obvious parameters/returns, side effects, invariants, examples, and reachable failures only where they add value.
-- Add inline comments only for intent, invariants, or logical phases not already clear from names and control flow.
 - Trace actual error paths before writing `# Errors`, `@throws`, or equivalents; never infer variants from type names alone.
 
 ## 3. Validate before review

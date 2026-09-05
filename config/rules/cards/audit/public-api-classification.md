@@ -24,7 +24,7 @@ Evaluate top-to-bottom; first match wins.
 | 10 | `candidate-medium` | **CANDIDATE MEDIUM** |
 | 11 | `review` | **MANUAL REVIEW** |
 
-Decision table = sole authority for initial classification. Rules 1–6 → KEEP PUBLIC. Rule 7 → MANUAL REVIEW (doc-hidden). Rule 8 → demote MEDIUM to LOW.
+The ordered table is the sole initial-classification authority.
 
 Restriction hint override: if hint is `none` AND table outcome ≠ KEEP PUBLIC → reclassify as MANUAL REVIEW (no specific visibility change can be recommended).
 

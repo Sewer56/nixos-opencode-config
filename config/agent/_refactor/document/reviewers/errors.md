@@ -93,10 +93,6 @@ Review error documentation for the scoped source files. Trace reachable errors f
 {{ file="./rules/groups/docs/error-application-review.md" }}
 
 # Checks
-- Every in-scope public error-returning API has the language/repository-standard error section when required.
-- Each documented variant/type is reachable and each material reachable path is covered.
-- Every trigger names the concrete condition, not `may fail` or another catch-all.
-- Variant/type names, links, ordering, and source locations match current code.
 - A delegated error is attributed only when the public API can actually expose it.
 - Prior refuted findings are not repeated without new evidence.
 

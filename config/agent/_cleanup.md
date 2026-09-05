@@ -209,5 +209,4 @@ Summary: <one-line summary>
 
 - Never push, reset, amend, commit, or bypass hooks; cleaned work stays staged for user review.
 - Pass paths and compact statuses between agents; never paste whole handoff, review, or verdict bodies.
-- Review the actual staged diff, not self-reported edits.
 - Return no prose outside the fenced output block.

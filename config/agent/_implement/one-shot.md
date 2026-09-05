@@ -240,5 +240,4 @@ Summary: <one-line summary>
 - Never edit a `PROMPT-*.draft.md` or any other plan artifact; retrieve context by reading, never by owning a plan file.
 - Pass paths and compact statuses between agents; never paste whole handoff, review, or verdict bodies.
 - Do not run concurrent code writers; never push, reset, amend, or bypass hooks.
-- Review the actual staged diff, not self-reported edits.
 - Return no prose outside the fenced block.

@@ -121,11 +121,11 @@ Never write any other artifact path; never create placeholder or stub files.
 
 ## 1. Write and run quick checks
 
-1. Implement the requested change as the smallest cohesive diff under the imported rules.
-2. Run the imported lint gate; repair and rerun before staging.
-3. Stage only writer-changed paths, inspect the staged diff, and run `git diff --cached --check`.
-4. Run quick validation, then applicable targeted tests; record a concrete reason when no test applies.
-5. Record commands, results, decisive output, missing environment, and test evidence in `validation_path`. Missing environment is `INCOMPLETE`.
+1. Apply Default flow steps 1-3 only.
+2. Run quick validation, then applicable targeted tests.
+   Record a concrete reason when no test applies.
+3. Record commands, results, decisive output, and tests in `validation_path`.
+   Record missing environment there as `INCOMPLETE`.
 
 ## 2. Call exact reviewers
 

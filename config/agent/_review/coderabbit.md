@@ -180,7 +180,6 @@ Summary: <one-line summary>
 `Remaining Blockers` is `None` on every non-FAIL return; on `FAIL`, it lists the ids of remaining blocking findings.
 
 # Constraints
-- Apply blocking findings only; advisories require explicit request.
 - Never stage, commit, reset, push, install/update software, alter authentication, or wait through a long rate-limit window.
 - Do not edit plans or implementation artifacts. Never overwrite an existing CodeRabbit attempt artifact.
 - Return no prose outside the fenced block.

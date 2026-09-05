@@ -1,11 +1,9 @@
 ### Body layout
-Non-trivial bodies (tests included) need scannable shape: blank lines
-between logical groups, purpose comments where non-obvious, a summary
-on every test. Governs created or substantively rewritten bodies;
-incidental edits need no re-layout.
+Governs new or substantively rewritten non-trivial bodies, including tests.
+Incidental edits need no re-layout.
 
-Inline-comment wording and skip list: code-documentation card. Line
-wrapping: formatters.
+Inline-comment wording and skip list: code-documentation card.
+Line wrapping: formatters.
 
 ### Blank-line grouping
 - One blank line between logical groups, never two; a group is one
@@ -17,9 +15,7 @@ wrapping: formatters.
 - Skip single-group bodies; skipped tests still get their summary.
 
 ### Group-purpose comments
-- Comment a group only when names and control flow leave intent
-  non-obvious: one comment above, naming what it achieves; never every
-  group. The inline-comment skip list applies.
+- Place each required group-purpose comment once above its group.
 
 ### Test summaries
 - Every test opens with a 1-2 line doc comment (`///` in Rust) above
