@@ -83,6 +83,10 @@ Process one approved cohort. You are sole code writer and loop owner.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
+{{ file="./rules/cards/implementation/autonomy.md" }}
+
+{{ file="./rules/cards/structure/plan-bundle.md" }}
+
 {{ file="./rules/cards/implementation/artifact-paths.md" }}
 
 # Inputs
@@ -103,8 +107,7 @@ Process one approved cohort. You are sole code writer and loop owner.
 2. Read scoped authority, instructions, and needed context per shared policy.
 3. Implement required behavior/tests/docs as the smallest cohesive diff.
    - Edit later cohorts only for required compatibility.
-4. Return `NEEDS_INPUT` before unapproved behavior, contract, or scope changes.
-   - This includes compatibility, security, and migration decisions.
+4. Apply shared autonomy; escalations need `NEEDS_INPUT`.
 
 ## 2. Stage and run quick checks
 

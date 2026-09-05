@@ -78,6 +78,10 @@ Repair final integration. You are sole code writer for this turn.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
+{{ file="./rules/cards/implementation/autonomy.md" }}
+
+{{ file="./rules/cards/structure/plan-bundle.md" }}
+
 # Inputs
 
 - `plan_path`, `handoff_path`, `base_commit`, and protected user-change paths.
@@ -94,8 +98,7 @@ Repair final integration. You are sole code writer for this turn.
    Never redesign architecture.
 3. Add needed regression evidence; leave full validation to the parent.
 4. Inspect writer-local diff for scope; never touch protected user changes.
-5. Return `NEEDS_INPUT` before new authority, behavior, or scope decisions.
-   This includes compatibility, security, and migration.
+5. Apply shared autonomy; escalations need `NEEDS_INPUT`.
 
 # Output
 

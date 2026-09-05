@@ -180,7 +180,7 @@ def expand_config_imports(source: str) -> str:
         imported = text(next(path for path in candidates if path.is_file()))
         for key, value in re.findall(r'(\w+)="([^"]*)"', match.group("args")):
             imported = imported.replace("{{arg:" + key + "}}", value)
-        return imported
+        return expand_config_imports(imported)
 
     return pattern.sub(substitute, source)
 
@@ -198,6 +198,44 @@ def lint_gate_block(rule: str) -> str:
 
 
 class ImplementWorkflowTests(unittest.TestCase):
+    # Transitive writer routing isolates plan authority from standalone work.
+    def test_plan_bundle_should_load_only_for_plan_consumers(self) -> None:
+        bundle = text(ROOT / "config/rules/cards/structure/plan-bundle.md")
+        generic = (
+            CODE_WRITING,
+            ONE_SHOT,
+            ROOT / "config/agent/code.md",
+            ROOT / "config/agent/_cleanup.md",
+            ROOT / "config/agent/_review/coderabbit.md",
+        )
+        planned = (COHORT, INTEGRATION_REPAIR, ORCHESTRATOR,
+                   REVIEW_FINDINGS, *IMPLEMENT_REVIEWERS, VERIFIER)
+
+        for paths, expected in ((generic, 0), (planned, 1)):
+            for path in paths:
+                with self.subTest(path=path.relative_to(ROOT)):
+                    self.assertEqual(expected, expand_config_imports(text(path)).count(bundle))
+
+    # Only delegated multi-cohort writers receive autonomy policy.
+    def test_autonomy_should_load_only_for_multi_cohort_writers(self) -> None:
+        card = text(ROOT / "config/rules/cards/implementation/autonomy.md")
+        writers = (COHORT, INTEGRATION_REPAIR)
+        excluded = (
+            CODE_WRITING, ONE_SHOT, ORCHESTRATOR, REVIEW_FINDINGS,
+            ROOT / "config/agent/code.md",
+            ROOT / "config/agent/_cleanup.md",
+            ROOT / "config/agent/_review/coderabbit.md",
+            *IMPLEMENT_REVIEWERS, VERIFIER,
+        )
+
+        for paths, expected in ((writers, 1), (excluded, 0)):
+            for path in paths:
+                with self.subTest(path=path.relative_to(ROOT)):
+                    self.assertEqual(expected, expand_config_imports(text(path)).count(card))
+        direct = '{{ file="./rules/cards/implementation/autonomy.md" }}'
+        importers = {path for path in (ROOT / "config").rglob("*.md") if direct in text(path)}
+        self.assertEqual(set(writers), importers)
+
     def test_shell_owners_use_shared_permissive_bash_map(self) -> None:
         for path in SHELL_OWNING_AGENTS:
             with self.subTest(path=path.relative_to(ROOT)):
