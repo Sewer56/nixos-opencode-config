@@ -38,15 +38,6 @@ Document only key facts an API user needs; no fluff or feature notes.
 Spin-offs get their own `#` section with a cross-reference. Edge cases are
 one general sentence (`Empty chains are skipped.`), never enumerations.
 
-### Describe current behavior only
-- In-code docs state the current contract only, never old or removed
-  behavior ("no longer", "previously", "was", "used to", "before", "now").
-- Old behavior appears only in backward-compatibility docs (release or
-  migration notes), only for genuine public-API compatibility concerns.
-- Never in private code, internals, tests, or helpers.
-- Needing old-behavior wording is a signal to confirm a public-API
-  compatibility obligation with the user, not to narrate.
-
 ### Inline readability comments
 Non-trivial bodies get short comments at logical steps when names and
 control flow do not explain intent; skip trivial assignments, getters,

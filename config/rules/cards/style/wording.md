@@ -8,11 +8,6 @@
 Flag: choppy, run-on, or awkward sentence construction.
 Severity: ADVISORY.
 
-### Passive voice
-Flag: passive voice when active voice is clearer.
-Severity: BLOCKING for instructions; ADVISORY for descriptive prose.
-Prefer direct imperatives for instructions.
-
 ### Filler and token density
 Flag: filler, hedging, pleasantries, and zero-information phrases.
 Severity: BLOCKING in operational instructions; ADVISORY in narrative prose.
