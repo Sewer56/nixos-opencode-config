@@ -6,7 +6,7 @@ Inline-comment wording and skip list: code-documentation card.
 Line wrapping: formatters.
 
 ### Blank-line grouping
-- One blank line between logical groups, never two; a group is one
+- One blank line between logical groups; a group is one
   coherent step (validate, transform, decide, build result).
 - Comments carry why; blank lines carry shape; both still separate.
 - Tests: separate arrange, act, assert; split long arrange into

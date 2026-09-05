@@ -17,8 +17,6 @@ Error docs must not contradict implementation; each listed variant/type must be 
 ### Error doc format
 Use the language's documentation convention and link syntax: Rust `# Errors` with `[`Error::Variant`]`; TypeScript `@throws` or equivalent project convention.
 
-Prefer `[Name]` in text plus one reference definition over long or repeated inline targets.
-
 ### No vague error wording
 Block vague triggers such as `when the operation fails`, `on error`, `if something goes wrong`, `if invalid`.
 

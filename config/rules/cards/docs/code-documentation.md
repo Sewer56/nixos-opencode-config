@@ -60,8 +60,7 @@ Lead with one plain-language purpose sentence; prefer goal-oriented
 phrasing. Summary is one line; caveats go in a trailing `# Remarks`
 section (or equivalent), never the summary.
 
-Use language-native doc-link syntax; prefer `[Name]` plus reference
-definitions over long or repeated inline targets.
+Use language-native doc-link syntax.
 
 Always tag fenced code blocks; never bare `ignore`. Split multi-aspect
 docs into `#` sections, not dense paragraphs.
