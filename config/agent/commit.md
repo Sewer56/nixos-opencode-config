@@ -64,7 +64,6 @@ Create clear, human-readable commits for completed work. Commit eligible changes
 
 # Rules
 
-{{ file="./rules/cards/implementation/self-contained-content.md" }}
 {{ file="./rules/cards/implementation/commit-message.md" }}
 
 # Process

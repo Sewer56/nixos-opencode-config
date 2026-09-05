@@ -30,7 +30,6 @@ REVIEW_FINDINGS = ROOT / "config/rules/groups/implementation/review-findings.md"
 REVIEW_FINDINGS_CARD = ROOT / "config/rules/cards/implementation/review-findings.md"
 TESTS_STRATEGY_CARD = ROOT / "config/rules/cards/tests/strategy.md"
 COMMIT_MESSAGE_CARD = ROOT / "config/rules/cards/implementation/commit-message.md"
-SELF_CONTAINED_IMPORT = '{{ file="./rules/cards/implementation/self-contained-content.md" }}'
 COMMIT_MESSAGE_IMPORT = '{{ file="./rules/cards/implementation/commit-message.md" }}'
 COMMIT_PROMPTS = (
     ROOT / "config/agent/commit.md",
@@ -823,7 +822,6 @@ class ImplementWorkflowTests(unittest.TestCase):
         for path in COMMIT_PROMPTS:
             with self.subTest(path=path.relative_to(ROOT)):
                 body = text(path)
-                self.assertIn(SELF_CONTAINED_IMPORT, body)
                 self.assertIn(COMMIT_MESSAGE_IMPORT, body)
                 self.assertNotIn("# Commit style", body)
                 self.assertNotIn("# Message tidy pass", body)
@@ -908,11 +906,7 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertIn("not writable, write nothing", rule)
         self.assertIn("Never probe, relocate, or write any other artifact", rule)
 
-    def test_committed_content_is_self_contained(self) -> None:
-        self.assertIn(
-            "never cite plan- or cohort-only identifiers",
-            text(ROOT / "config/rules/cards/implementation/self-contained-content.md"),
-        )
+    def test_plan_artifacts_stay_plan_internal(self) -> None:
         self.assertIn("plan-internal", text(ROOT / "config/rules/cards/structure/plan-artifacts.md"))
 
     def test_advisory_repair_split(self) -> None:

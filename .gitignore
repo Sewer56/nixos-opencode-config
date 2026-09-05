@@ -27,3 +27,4 @@ __pycache__/
 
 # Editor-local reviews
 .vscode/local-reviews/
+config/IDEAS.MD

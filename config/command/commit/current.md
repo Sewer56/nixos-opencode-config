@@ -18,7 +18,6 @@ If nothing the conversation produced maps onto a change, fall back to the curren
 
 # Rules
 
-{{ file="./rules/cards/implementation/self-contained-content.md" }}
 {{ file="./rules/cards/implementation/commit-message.md" }}
 
 # Process
