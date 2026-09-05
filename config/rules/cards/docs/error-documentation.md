@@ -1,9 +1,3 @@
-### Error-section ownership
-Own all `# Errors`, `@throws`, or language-equivalent error docs for
-public error-returning APIs in changed scope: existence, placement,
-format, specificity, completeness. Block missing sections and vague
-`may fail` coverage.
-
 ### Specific error triggers
 Each error bullet names the condition that produces it; vague catch-all wording is insufficient.
 Example: `Returns ParseError when the config file contains invalid TOML.`
