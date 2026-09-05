@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Optionally produces evidence-backed security candidates for trust-boundary changes
 model: sewer-axonhub/glm-5.3 # HARD
-variant: max
+variant: high
 permission:
   "*": deny
   external_directory:

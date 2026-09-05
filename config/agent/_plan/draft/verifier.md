@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Refutes draft-review candidates and promotes only evidence-backed required corrections
 model: sewer-axonhub/glm-5.3 # HARD
-variant: max
+variant: high
 permission:
   "*": deny
   external_directory:

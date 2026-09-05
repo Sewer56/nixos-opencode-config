@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Produces evidence-backed documentation accuracy and coverage candidates
 model: sewer-axonhub/glm-5.3 # HARD
-variant: max
+variant: high
 permission:
   "*": deny
   external_directory:
