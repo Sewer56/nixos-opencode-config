@@ -73,7 +73,3 @@ the vague effect (`may suppress the event`).
 
 ### No legacy docs backfill
 Never backfill untouched legacy files solely for docs.
-
-### Implementation-plan docs specificity
-Plans name the docs surface, audience, and behavioral change; generic
-`update docs` is insufficient, exact prose or hunks are not required.
