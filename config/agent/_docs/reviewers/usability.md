@@ -97,6 +97,7 @@ Review only whether the scoped documentation helps its intended reader complete 
 {{ file="./rules/cards/style/adhd-format.md" }}
 
 # Checks
+- Read only referenced artifacts/ranges; do not search broadly.
 - The reader sees the outcome, prerequisites, and shortest successful path before detail.
 - Steps are ordered, imperative, and independently checkable.
 - Headings and examples support scanning; repeated or premature detail does not hide the task.

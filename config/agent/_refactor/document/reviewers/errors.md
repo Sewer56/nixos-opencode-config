@@ -94,6 +94,10 @@ Review error documentation for the scoped source files. Trace reachable errors f
 {{ file="./rules/groups/docs/error-application-review.md" }}
 
 # Checks
+- Read proposed docs, referenced source/error paths, and any supplied facts.
+- Do not search broadly or take over collector enumeration.
+- Exclude general docs coverage, inline comments, and broad prose polish.
+- Judge implementation only to verify reachable errors.
 - A delegated error is attributed only when the public API can actually expose it.
 - Prior refuted findings are not repeated without new evidence.
 

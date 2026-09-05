@@ -1,5 +1,5 @@
 # Rules
 
-- `cards/` contains reusable rules.
-- `groups/` is agent-facing import surface; groups define scope and bundle cards.
-- Agents import groups and add only role-specific instructions not already covered there.
+- `groups/` owns domain rules and imports shared cards.
+- `cards/` contains rules with multiple direct importers.
+- Agents import groups and add only role-specific instructions.

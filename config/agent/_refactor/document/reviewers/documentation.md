@@ -88,6 +88,7 @@ Review the scoped source-documentation diff. Produce candidates only; do not edi
 
 # Inputs
 - `handoff_path` and target paths.
+- `separate_error_review`: explicit `YES | NO` from the parent.
 - `validation_path`, `prior_verdict_paths`, and `candidate_path`.
 
 {{ file="./rules/groups/docs/code-docs.md" }}
@@ -97,6 +98,10 @@ Review the scoped source-documentation diff. Produce candidates only; do not edi
 {{ file="./rules/groups/style/wording.md" }}
 
 # Checks
+- Read referenced targets/ranges only; do not search broadly.
+- With `separate_error_review=YES`, delegate only error completeness.
+- With `NO`, retain error-completeness responsibility.
+- Check documentation fidelity and necessary clarity in both branches.
 - The diff is documentation-only and does not churn unrelated legacy code.
 - Prior refuted findings are not repeated without new evidence.
 

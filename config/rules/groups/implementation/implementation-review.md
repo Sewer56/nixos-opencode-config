@@ -1,8 +1,18 @@
-## RULE GROUP: IMPLEMENTATION REVIEW
-Read: scoped tree-to-tree diff, approved plan/handoff/cohort, affected symbols, and deterministic validation evidence. Repo search: narrow verification only.
+## Implementation Review
 
-Owns: implementation fidelity, severe regressions, unintended scope, and functional correctness.
+Changes must satisfy approved outcomes, acceptance criteria, contracts, and invariants.
+Exact syntax is unnecessary when behavior is equivalent.
 
-Do not judge: minor style differences or harmless plan drift when behavior and contracts are equivalent.
+Block unrelated edits that omit or contradict required behavior.
 
-{{ file="./rules/cards/implementation/review.md" }}
+Block concrete broken logic, missing critical error handling, invalid state transitions, compatibility failures, and unintended scope introduced/exposed by the change.
+
+Allow minor style differences, harmless refactors, and behavior-equivalent mechanical drift.
+
+### Functional evidence
+Use the supplied validation ledger and actual tree-to-tree diff.
+
+Executed failing builds, type checks, tests, linters, and static analyzers are blocking when they identify an in-scope product defect.
+
+Read-only reviewers do not rerun deterministic checks.
+Never infer PASS from a missing/unavailable check; report material evidence gaps as `INCOMPLETE`.

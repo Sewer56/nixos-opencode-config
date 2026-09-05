@@ -100,6 +100,9 @@ Review changed behavior and tests for meaningful acceptance coverage. Produce ca
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
+Read referenced test/source files; search only for narrow verification.
+Judge implementation only to assess observable coverage.
+
 Apply imported rules to staged diff, mapped acceptance, validation ledger, and nearest tests. State missing observable behavior and smallest test shape; do not write implementation.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}

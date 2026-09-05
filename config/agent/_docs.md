@@ -119,6 +119,8 @@ Create or overwrite each exact assigned path. Never create placeholder or stub f
 - Dispatch `mcp-search` only for version-sensitive third-party claims that local manifests and docs cannot establish. Record the version and source used.
 
 ## 2. Draft or inspect
+- Read scoped docs, mapped behavior, and referenced implementation.
+- Search only for narrow link/fidelity verification after discovery.
 - In `WRITE` mode, create or revise the requested content using repository terminology and examples backed by actual behavior.
 - In `REVIEW` mode, inspect without editing. Repair only deterministic failures and verifier-accepted blockers in step 5.
 - Keep task order obvious: outcome, prerequisites, steps, examples, verification, troubleshooting, then reference material when applicable.

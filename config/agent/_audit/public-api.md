@@ -90,6 +90,9 @@ Derive a short `slug`, UTC `run_id`, and `report_path = artifact/PROMPT-API-AUDI
 - Retry malformed/transient output once. Do not re-run a completed chunk or ask collectors to expand scope.
 
 ## 3. Classify
+- Read collector outputs and the repository evidence they name.
+- Search only for explicit overrides and visibility restrictions.
+- Judge other domains only as evidence for exposure classification.
 - Merge collector outputs by symbol identity and root cause.
 - Never recommend narrowing solely because a text search returned zero matches.
 

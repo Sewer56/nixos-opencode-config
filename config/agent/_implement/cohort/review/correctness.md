@@ -107,6 +107,8 @@ Review one staged cohort or final-repair commit. Produce candidate findings only
 Check `validation_path` first. Require applicable tests to pass after staging. Accept “no test applies” only when diff and test layout support it. Missing evidence is `INCOMPLETE`; code-caused failure is a candidate.
 
 Then apply imported rules to staged diff as one behavioral change.
+Search only for narrow verification of affected symbols and contracts.
+Ignore minor style and harmless plan drift with equivalent behavior/contracts.
 
 Include mapped impact surfaces, completed predecessor compatibility, and planned callers/registrations/exports/schemas/migrations/configuration.
 

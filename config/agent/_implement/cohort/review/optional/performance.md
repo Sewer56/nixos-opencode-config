@@ -98,6 +98,10 @@ Review performance in exact scoped diff under realistic repository workloads; al
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
+Read affected targets/callers, workload bounds, and relevant validation.
+Search only for narrow verification.
+Exclude style, coverage, and correctness unrelated to material performance.
+
 Apply imported rules to the current diff and supplied workload evidence. For final scope, include cross-cohort composition. Do not infer scale unsupported by repository.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}

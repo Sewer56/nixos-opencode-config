@@ -96,6 +96,7 @@ candidate findings; never edit anything.
 {{ file="./rules/cards/style/adhd-format.md" }}
 
 # Review lens
+- Read referenced artifacts and grounding evidence; do not search broadly.
 - Ground every claim: PR artifacts in diff, commit, or test evidence; issue
   artifacts in repository facts. Flag unevidenced claims.
 - Template conformance with required sections filled and no empty boilerplate.

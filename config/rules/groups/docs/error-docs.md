@@ -1,6 +1,3 @@
-## RULE GROUP: ERROR DOCUMENTATION
-Read: referenced target files/ranges and traced error paths only. Repo search: NO broad search.
-
-Do not judge: general docs coverage, inline comments, broad prose polish, or implementation correctness except to verify reachable error variants.
+## Error Documentation
 
 {{ file="./rules/cards/docs/error-documentation.md" }}

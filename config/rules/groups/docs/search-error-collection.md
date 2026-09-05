@@ -1,8 +1,11 @@
-## RULE GROUP: DOCS / SEARCH ERROR COLLECTION
-Read: target module plus language rules. Repo search: YES, scoped to public error-returning function enumeration and tracing.
+## Error Collection
 
-Owns: exhaustive public error-function enumeration, reachable error-path tracing, and existing-doc classification.
+Enumerate every public error-returning function in the target path, including nested modules, using language rules.
+Private/internal helpers are out of scope.
+Record path, line, and return type.
 
-Do not judge: general docs coverage, prose polish, inline comments, or implementation correctness beyond tracing reachable error paths.
+Trace every reachable error path in each function body, recording one entry per variant/trigger pair.
+Block generic `may fail` entries that collapse distinct variants or triggers.
 
-{{ file="./rules/cards/docs/error-collection.md" }}
+Classify existing docs using the language rule decision table.
+Mark docs specific only when each reachable path documents its concrete variant and trigger.

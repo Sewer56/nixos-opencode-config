@@ -95,6 +95,7 @@ Trace public error-returning APIs in one explicit file chunk. The caller owns fi
 {{ file="./rules/groups/docs/search-error-collection.md" }}
 
 # Process
+Judge only error enumeration, reachable paths, and existing error docs.
 1. Read every target file completely enough to enumerate public/exported error-returning APIs under the repository's language conventions.
 2. For each API, trace direct error construction, `?`/propagation, thrown/rejected errors, mapped errors, called helper contracts, and conditional branches.
 3. Follow only narrowly necessary local callees. Record an unresolved edge instead of guessing when the callee contract cannot be established.

@@ -98,6 +98,10 @@ Review only concrete security and trust-boundary risk in the scoped diff. Produc
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
+Read affected trust boundaries, referenced contracts/config, and tests.
+Search only for narrow verification.
+Exclude general style and performance unrelated to denial of service.
+
 Apply imported rules to current diff and approved trust boundaries. For final scope, include cross-cohort capability and data-flow composition.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}

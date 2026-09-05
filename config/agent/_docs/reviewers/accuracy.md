@@ -93,6 +93,9 @@ Review only factual fidelity and coverage in the scoped end-user documentation. 
 {{ file="./rules/groups/docs/end-user-correctness.md" }}
 
 # Checks
+- Read scoped docs, mapped behavior/acceptance, and referenced implementation.
+- Search only to verify links or fidelity.
+- Judge implementation only for documentation fidelity, not general quality.
 - Claims, defaults, flags, paths, APIs, examples, and failure behavior match current source, configuration, manifests, and tests.
 - Commands are syntactically coherent and use the documented working directory and prerequisites.
 - Links, anchors, navigation entries, and cross-page references resolve when locally verifiable.

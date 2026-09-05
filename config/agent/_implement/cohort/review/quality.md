@@ -110,6 +110,10 @@ Review one proposed cohort or final-repair commit for material quality defects. 
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
+Read changed/referenced files and traced error paths, not broad searches.
+Narrow verification may establish documentation fidelity and links.
+Retain both code-documentation and error-completeness duties.
+
 Do not duplicate correctness or optional-domain findings unless quality impact is distinct.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}

@@ -101,6 +101,8 @@ Remain read-only, including shell commands; do not create artifacts or review ca
 {{ file="./rules/groups/tests/test-parameterization.md" }}
 
 # Review lens
+- Read the request, bundle, discovery, and directly referenced targets.
+- Search only for narrow verification, not final implementation review.
 - Check fidelity, completeness, dependency order, and implementation readiness with imported rules.
 - Verify direct impact/verification surfaces without an exhaustive inventory.
 - Block unresolved implementation-shaping choices or missing evidence; never invent answers.

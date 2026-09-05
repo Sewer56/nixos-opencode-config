@@ -102,6 +102,8 @@ Review the complete base-to-final implementation as one system. Focus on interac
 
 # Review
 Apply imported rules to cumulative base-to-final diff.
+Search only for narrow verification of affected symbols and contracts.
+Ignore minor style and harmless plan drift with equivalent behavior/contracts.
 
 Audit acceptance and impact map, then inspect only cross-cohort composition: end-to-end contracts, unchanged consumers, registrations/exports/migrations, cleanup/rollback, compatibility, and integration evidence.
 

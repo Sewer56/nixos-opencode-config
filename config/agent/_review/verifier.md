@@ -104,6 +104,7 @@ Verify candidate findings against the actual scoped code. Candidate reviewers ge
 
 # Refute-first process
 Load scoped authority and apply imported evidence rules.
+Search only for narrow verification of candidate findings.
 
 For each candidate, locate cited code and test strongest plausible refutation using nearby guards, dependents, validation, contracts, prior verdicts, and pinned dependency sources when a claim depends on third-party behavior.
 

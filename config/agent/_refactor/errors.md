@@ -115,6 +115,7 @@ Create or overwrite each exact assigned path. Never create placeholder or stub f
 - Stop as `INCOMPLETE` when any file or error edge remains unexamined; do not guess documentation from an incomplete inventory.
 
 ## 3. Merge facts and edit
+- Read referenced targets and traced error paths; do not search broadly.
 - Merge fact paths into the handoff as an index; do not paste every trace into the primary context.
 - Edit only source files containing verified `missing`, `vague`, or `incorrect` gaps.
 - Use exact reachable variants/types and triggers. Preserve executable tokens and do not backfill untouched legacy APIs outside scope.

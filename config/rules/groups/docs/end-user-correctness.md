@@ -1,8 +1,12 @@
-## RULE GROUP: END-USER DOCUMENTATION CORRECTNESS
-Read: changed user-facing documentation, mapped behavior/acceptance, and directly referenced implementation targets. Repo search: narrow link/fidelity verification only.
+## End-User Documentation Correctness
 
-Owns: end-user docs coverage, implementation fidelity, specificity, frozen-region compliance, and changed-scope broken internal links.
+End-user docs must cover new/changed public features and match implementation.
+Block new public commands, flags, APIs, or UI flows without matching docs when end-user docs are in scope.
 
-Do not judge: broad prose polish, code docs, tests, or implementation correctness beyond documentation fidelity.
+Block mismatched names, defaults, options, outputs, examples, or behavior.
+Generic `update docs` without file, scope, affected sections, and concrete changes is BLOCKING.
 
-{{ file="./rules/cards/docs/end-user-correctness.md" }}
+Findings on frozen regions are invalid: do not flag version numbers, license blocks, or warnings marked frozen.
+
+When multiple docs steps exist, block links to headings another step removes or renames.
+Pass when the link is updated or a stable anchor preserved.

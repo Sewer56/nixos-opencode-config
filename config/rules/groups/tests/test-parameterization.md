@@ -1,6 +1,9 @@
-## RULE GROUP: TEST PARAMETERIZATION
-Read: referenced target test files/ranges only. Repo search: NO broad search.
+## Test Parameterization
 
-Do not judge: broader test coverage except where needed to decide whether cases share one behavioral claim.
+Parameterize when all cases make one claim and only data varies.
+Use separate tests with a shared helper when claims differ or no single name fits.
 
-{{ file="./rules/cards/tests/parameterization.md" }}
+Give each case a descriptive name; avoid `case_1`.
+Keep argument order stable: primary input → mode/flags → expected output.
+Comment only non-obvious parameters or assertions.
+Keep cases human-friendly around 80-100 characters per line.
