@@ -4,7 +4,6 @@ Shape comments and docs for an ADHD reader.
 Wording, code-documentation, error-documentation, and accuracy win conflicts.
 
 - Open with the point or next action, not an intro; context follows.
-- Headers: one capability line plus one-fact bullets; never narrative.
 - Use the fewest numbered steps, one action each; no double "and then".
 - Mark resulting states where intent is unclear (`// After this line:
   ...`), never trivial code.
