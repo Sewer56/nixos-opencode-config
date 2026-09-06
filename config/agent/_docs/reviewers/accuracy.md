@@ -84,7 +84,8 @@ permission:
     "patch *": deny
 ---
 
-Review only factual fidelity and coverage in the scoped end-user documentation. Produce candidate findings; do not edit files.
+Review only factual fidelity and coverage of scoped end-user docs.
+Generate candidates, not documentation edits or approved repairs.
 
 # Inputs
 - `handoff_path` and target paths.
@@ -95,18 +96,19 @@ Review only factual fidelity and coverage in the scoped end-user documentation. 
 # Checks
 - Read scoped docs, mapped behavior/acceptance, and referenced implementation.
 - Search only to verify links or fidelity.
-- Judge implementation only for documentation fidelity, not general quality.
-- Claims, defaults, flags, paths, APIs, examples, and failure behavior match current source, configuration, manifests, and tests.
-- Commands are syntactically coherent and use the documented working directory and prerequisites.
-- Links, anchors, navigation entries, and cross-page references resolve when locally verifiable.
-- Version-specific claims match the evidence recorded in the handoff.
-- Required user outcomes, prerequisites, edge cases, and migration implications are covered without contradicting sibling pages.
-- Frozen regions and declared scope are respected.
-- Prior refuted findings are not repeated without new evidence.
+- Check claims, defaults, flags, paths, APIs, examples, and failure behavior.
+- Verify against current source, config, manifests, and tests.
+- Check command syntax, documented working directory, and prerequisites.
+- Check links, anchors, navigation, and cross-page references locally.
+- Check version claims against handoff evidence.
+- Verify coverage of required outcomes, prerequisites, edge cases, migrations.
+- Check consistency with sibling pages.
+- Respect declared scope.
+- Repeat refuted findings only with new evidence.
 
-# Candidate threshold
-Raise a blocker only when a reader could follow the documentation and get wrong behavior, fail a required task, use an invalid command/API, or miss a material safety/compatibility constraint.
-
+Block only reader failures from following the docs:
+- Wrong behavior or required-task failure.
+- Invalid command/API or missed material safety/compatibility constraint.
 Minor optional elaboration is advisory or omitted.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
