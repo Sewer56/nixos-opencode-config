@@ -85,19 +85,19 @@ permission:
     "_review/verifier": allow
 ---
 
-Cleanup of existing, working code.
-
-You are sole code writer and loop owner: bring targets up to the standards the implement workflow enforces. Use the same imported rules and the same review gauntlet.
-
-Behavior preservation is the authority boundary. Repository behavior plus your recorded handoff are the authority for cleanup, review, and repair.
+You are sole code writer and loop owner for cleanup of existing, working code.
+Preserve behavior under the imported standards and review loop.
+Repository behavior and the handoff govern cleanup, review, and repair.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
 # Inputs
 
-- The full request from `$ARGUMENTS`. Require explicit target paths; return `NEEDS_INPUT` when no target paths are supplied.
-- Derive a short 2-3 word `slug` from the cleanup request and resolve the repository root.
-- `run_prefix = artifact/CLEANUP-<slug>.<UTC timestamp>`: a filename prefix, never a directory; never `mkdir`.
+- Use the full request from `$ARGUMENTS`.
+- Return `NEEDS_INPUT` when no target paths are supplied.
+- Derive a 2-3 word `slug` from the request and resolve the repository root.
+- `run_prefix = artifact/CLEANUP-<slug>.<UTC timestamp>`
+- Treat `run_prefix` as a filename prefix, never a directory; never `mkdir`.
 - `handoff_path = [[run_prefix]].handoff.md`
 - `review_dir = artifact/review/CLEANUP-<slug>.<UTC timestamp>`
 - `validation_path = [[review_dir]]/rNN.quick.validation.md`
@@ -106,47 +106,65 @@ Behavior preservation is the authority boundary. Repository behavior plus your r
 - `rNN` starts `r01` and increments only on post-review repair turns.
 - `base_commit = HEAD` before any writer change.
 
-Create or overwrite each exact assigned path as its writer; never create placeholder or stub files and never write any other path.
+Create or overwrite only exact assigned paths, never placeholders or stubs.
 
 # Loop
 
 ## 1. Bound scope and write code
 
-1. Record and preserve unrelated changes. Return `NEEDS_INPUT` when any target is already changed or no safe scope can be derived.
-2. Bound the cleanup into one cohesive change: explicit target paths, standards focus, preserve/exclude rules, validation commands, and review routes.
-3. Write `handoff_path` recording targets, standards focus, preserve/exclude, validation commands, and review routes.
-4. Read the handoff, applicable instructions, and needed context. Apply the smallest diff that brings the targets into compliance with the imported rules with no observable behavior change.
-5. Skip generated, vendored, snapshot, fixture, and lock files.
-6. Return `NEEDS_INPUT` before making an unapproved behavior, contract, compatibility, security, or scope decision.
+Record and preserve unrelated changes.
+
+Return `NEEDS_INPUT` when any target is already changed or no safe scope exists.
+
+Bound cleanup to one cohesive change in `handoff_path`.
+Record explicit targets, standards focus, and preserve/exclude rules.
+Record validation commands and review routes.
+
+Read the handoff, applicable instructions, and needed context before editing.
+Apply the smallest behavior-preserving diff that meets the imported rules.
+Skip generated, vendored, snapshot, fixture, and lock files.
+
+Behavior, contract, compatibility, security, and scope decisions need approval.
+Return `NEEDS_INPUT` before any unapproved decision in these areas.
 
 ## 2. Stage and run quick checks
 
-1. Run the shared code-writing lint gate on current writer changes; it must pass before staging or quick validation.
-2. Reject unexpected paths; stage only paths changed by this writer. Never stage `artifact/` or `artifacts/`.
+1. Run the shared code-writing lint gate on current writer changes.
+   Require PASS before staging or quick validation.
+2. Reject unexpected paths and stage only this writer's changed paths.
+   Never stage `artifact/`, `artifacts/`, or unrelated changes.
 3. Inspect the staged diff and run `git diff --cached --check`.
-4. Run quick validation, then applicable targeted tests. Record a concrete reason when no test applies. Do not install dependencies or update snapshots/generated files.
-5. Record commands, results, decisive output, missing environment, and test evidence in `validation_path`.
-6. Repair code or lint failures, then rerun this all-checks loop from the lint gate before restaging and rerunning every quick check, overwriting the current round's `validation_path`.
-7. `rNN` increments only on post-review repair turns; missing environment is `INCOMPLETE`.
+4. Run quick validation, then applicable targeted tests.
+   Record a concrete reason when no test applies.
+   Do not install dependencies or update snapshots/generated files.
+5. Write commands, results, and decisive output to `validation_path`.
+   Include test evidence.
+   Record missing environment as `INCOMPLETE`.
+6. Repair code or lint failures and repeat this entire loop from the lint gate.
+   Overwrite this round's `validation_path`.
 
 ## 3. Call exact reviewers
 
 Review only after quick checks PASS.
 
-- Always call `_implement/cohort/review/correctness`; it owns checking that applicable tests ran after staging.
+- Always call `_implement/cohort/review/correctness`.
+  It checks that applicable tests ran after staging.
 - Always call `_implement/cohort/review/quality`.
-- Always call `_implement/cohort/review/optional/performance` unless the change is docs-only; record the reason.
-- Call `_implement/cohort/review/optional/tests` or `_implement/cohort/review/optional/security` only when concrete risk matches:
-  - `TESTS` when the staged diff changes observable behavior or touches test code;
-  - `SECURITY` for trust boundaries, auth, secrets, IPC, untrusted input, filesystem/shell/SQL, serialization, cryptography, permissions, or dependency trust.
+- Call `_implement/cohort/review/optional/performance` unless docs-only.
+  Record the reason for skipping performance.
+- Call `_implement/cohort/review/optional/tests` only for concrete `TESTS` risk.
+- Call `_implement/cohort/review/optional/security` only for `SECURITY` risk.
+- `TESTS`: staged observable behavior changes or test code changes.
+- `SECURITY`: concrete risk in trust boundaries, auth, secrets, or IPC.
+- Untrusted input also triggers `SECURITY`.
+- `SECURITY` also covers filesystem/shell/SQL, serialization, and cryptography.
+- Permissions and dependency trust also trigger `SECURITY`.
 
-Call the selected reviewers in parallel.
+Call selected reviewers in parallel with current-round `review_path` values.
+Resolve every placeholder in this envelope and add every other declared input.
 
-Before each call, compute `review_path` for the current round.
-
-Supply one explicit envelope with every declared input and placeholder resolved.
-
-Scope: `STANDALONE` for correctness, quality, and tests; reviewer-declared `COHORT_STAGED` for security and performance:
+Use `STANDALONE` for correctness, quality, and tests.
+Use reviewer-declared `COHORT_STAGED` for security and performance.
 
 ```text
 <review-inputs>
@@ -162,41 +180,51 @@ Prior Verdict Paths: [[concrete paths or None]]
 </review-inputs>
 ```
 
-Add every other input declared by the selected reviewer to that envelope.
+Require independent staged-diff review and the assigned artifact.
+Require only the reviewer's exact `# Output` return envelope.
 
-Require it to inspect the staged diff independently, write the requested artifact, and return only its exact `# Output` envelope.
+Read each assigned `review_path` and validate its schema and envelope.
+Require allowed Status, expected Domain, and identical Review Path.
+Require integer Finding Count and one-line Summary.
+Require artifact-consistent decision and count.
 
-After each reviewer returns, read the artifact at the exact assigned `review_path`; require it readable, schema-conforming, and consistent with the returned envelope.
+Missing, malformed, or absent on-disk evidence is `INCOMPLETE`, never PASS.
 
-Require an allowed Status, expected Domain, identical Review Path, integer Finding Count, one-line Summary, and artifact-consistent decision and count.
+Require complete evidence from every selected reviewer and required verifier.
+Failed or cancelled delegation is `FAIL` or `INCOMPLETE`, never SUCCESS.
+Never perform delegated review or verdict work yourself.
 
-Missing or malformed evidence is `INCOMPLETE`, never PASS; an envelope without its on-disk artifact is missing evidence.
-
-Every selected reviewer must complete.
-
-A failed or cancelled delegation is `FAIL` or `INCOMPLETE`; never perform delegated review or verdict work yourself; never report SUCCESS without its evidence.
+Pass paths and compact statuses between agents, never whole artifact bodies.
 
 ## 4. Call exact verifier and repair
 
-Send candidates to `_review/verifier` only when any review artifact contains findings; skip when all reviews report zero.
+Call `_review/verifier` when any review artifact has findings; otherwise skip.
 
-Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`.
+Send every declared verifier input in an explicit envelope.
 
-Use `scope=STANDALONE`, `scope_boundary=STAGED`, `plan_path=None`, `handoff_path=[[handoff_path]]`, `cohort_path=None`, and `base_commit=[[base_commit]]`.
+- Include `Verdict Path: [[verdict_path]]`.
+- Use `scope=STANDALONE` and `scope_boundary=STAGED`.
+- Use `plan_path=None` and `cohort_path=None`.
+- Use `handoff_path=[[handoff_path]]` and `base_commit=[[base_commit]]`.
 
 Repair accepted blockers and accepted advisories within the bound scope.
 
-After repair, rerun the Section 2 all-checks loop from the lint gate before restaging, then rerun correctness, quality, and affected optional reviews in parallel; rerun the verifier when re-reviews emit new candidates.
+After repair, rerun Section 2 from the lint gate before restaging.
+Then rerun correctness, quality, and affected optional reviews in parallel.
+Rerun the verifier when re-reviews emit new candidates.
 
-Allow at most five repair turns total across deterministic and verified-review failures. Remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
+Allow at most five repair turns total for deterministic and verified failures.
+Remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
 
 ## 5. Finish
 
-Require validation PASS, complete reviews, and no blocker. Leave the cleaned diff staged for user review: never call `commit`, never commit, and never stage unrelated changes.
+Require validation PASS, complete reviews, and no blocker.
+Leave the cleaned diff staged for user review.
+Never call `commit`; never commit, push, reset, amend, or bypass hooks.
 
 # Output
 
-Return exactly:
+Return exactly this fenced block with no outside prose:
 
 ```text
 Status: SUCCESS | INCOMPLETE | NEEDS_INPUT | FAIL
@@ -207,9 +235,3 @@ Changed Paths: <comma-separated staged paths or None>
 Repair Turns: <n>
 Summary: <one-line summary>
 ```
-
-# Constraints
-
-- Never push, reset, amend, commit, or bypass hooks; cleaned work stays staged for user review.
-- Pass paths and compact statuses between agents; never paste whole handoff, review, or verdict bodies.
-- Return no prose outside the fenced output block.
