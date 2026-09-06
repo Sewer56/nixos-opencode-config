@@ -71,7 +71,7 @@ permission:
   task:
     "*": deny
     "codebase-explorer": allow
-    "mcp-search": allow
+    "web-search": allow
     "_docs/reviewers/accuracy": allow
     "_docs/reviewers/usability": allow
     "_review/verifier": allow
@@ -119,7 +119,7 @@ Create or overwrite exact assigned paths without placeholders or stubs.
 - Limit `codebase-explorer` to target-needed behavior and documentation context.
 - Include sibling docs, navigation, templates, commands, and check conventions.
 - Use local manifests and docs first for third-party claims.
-- Dispatch `mcp-search` only for unresolved version-sensitive claims.
+- Dispatch `web-search` only for unresolved version-sensitive claims.
 - Record the third-party version and source used.
 - Read scoped docs, mapped behavior, and referenced implementation.
 - Limit follow-up searches to narrow link/fidelity verification.

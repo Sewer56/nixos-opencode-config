@@ -62,7 +62,7 @@ permission:
     "_plan/draft/explorer": allow
     "_plan/draft/reviewer": allow
     "_plan/draft/verifier": allow
-    "mcp-search": allow
+    "web-search": allow
 ---
 
 Create or refine one bundle for human approval before implementation.
@@ -89,7 +89,7 @@ Create or refine one bundle for human approval before implementation.
 - The explorer is the sole repository-evidence authority.
 - Never bypass it with shell/search or product reads.
 - Follow up narrowly on missing facts or evidence links.
-- Use `mcp-search` only on `External Research: REQUIRED` or user request.
+- Use `web-search` only on `External Research: REQUIRED` or user request.
 - External facts need package/version evidence and sources.
 - Prefer user requirements, repository evidence, and instructions over examples.
 

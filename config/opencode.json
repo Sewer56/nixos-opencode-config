@@ -58,10 +58,12 @@
   "agent": {
     "plan": {
       "permission": {
+        "webfetch": "deny",
+        "websearch": "deny",
         "task": {
           "*": "deny",
           "general": "allow",
-          "mcp-search": "allow",
+          "web-search": "allow",
           "codebase-explorer": "allow"
         },
         "skill": "deny",
@@ -70,10 +72,12 @@
     },
     "build": {
       "permission": {
+        "webfetch": "deny",
+        "websearch": "deny",
         "task": {
           "*": "deny",
           "general": "allow",
-          "mcp-search": "allow",
+          "web-search": "allow",
           "codebase-explorer": "allow"
         },
         "skill": "deny",
@@ -82,9 +86,11 @@
     },
     "general": {
       "permission": {
+        "webfetch": "deny",
+        "websearch": "deny",
         "task": {
           "*": "deny",
-          "mcp-search": "allow"
+          "web-search": "allow"
         }
       }
     },

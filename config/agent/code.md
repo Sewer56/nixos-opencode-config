@@ -54,8 +54,6 @@ permission:
     "artifact/review/CODE-*/*.validation.md": allow
     ".git": deny
     ".git/**": deny
-  webfetch: allow
-  websearch: allow
   question: allow
   todowrite: allow
   grep: allow
@@ -71,7 +69,7 @@ permission:
     "git commit --no-verify *": ask
   task:
     "*": deny
-    "mcp-search": allow
+    "web-search": allow
     "codebase-explorer": allow
     "_implement/cohort/review/correctness": allow
     "_implement/cohort/review/quality": allow

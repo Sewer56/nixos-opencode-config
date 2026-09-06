@@ -29,6 +29,10 @@ Say “resume from C03” to continue without discarding prior work.
 Unclear ownership or material facts prompt a question.
 Final checks include CodeRabbit; nothing is pushed.
 
+## External research
+
+Web and MCP queries route through the `web-search` subagent: they can be expensive, especially MCPs.
+
 ## Outcomes and artifacts
 
 - `SUCCESS`: required implementation and evidence complete.
