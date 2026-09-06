@@ -107,11 +107,12 @@ Return `NEEDS_INPUT` without a trustworthy local base.
 Require at least one commit/change in `<base>...HEAD`.
 3. Inspect `git diff --stat`, `--name-status`, and commit subjects.
 Read the merge-base diff.
-4. Sample large diffs instead of pasting them whole.
+4. Sample large diffs and representative implementation regions.
 Inspect changed public surfaces, tests, migrations, and docs.
-Sample representative implementation regions.
-5. Read any PR template and honor required sections and fields.
-6. Ground claims only in diff, test, documentation, and commit evidence.
+5. Honor required PR-template sections and fields.
+Inspect CI and scripts for test automation.
+Filenames and lint-only CI do not qualify.
+6. Ground claims only in diff, test, doc, and commit evidence.
 
 Write `pr.md` with:
 - A verb-first title, at most 72 characters.
@@ -121,15 +122,14 @@ Write `pr.md` with:
 Open each area with one sentence of reasoning, then concrete facts.
 - Bullets for enumerable values (modes, flags, options), not inline prose.
 - A short `## Why` only if the opener lacks the motivation.
-- Risk, migration, examples, or verification sections only with real content.
-- Verification only for checks actually run and evidenced.
-Never include a `Not run` placeholder or empty section.
-Add no extra template boilerplate.
+- Risk, migration, or examples only with real content.
+- Omit optional `## Verification` if automation runs tests.
+Include verification only for evidenced runs.
+No `Not run` placeholders, empty sections, or extra template boilerplate.
 
-Write plain sentences as the maintainer.
-Allow natural first person and honest uncertainty.
-Prefer clear sentences to telegraphic compression.
-Wording-card terseness is advisory for narrative prose.
+Write clear maintainer prose, not telegraphic compression.
+Allow first person and honest uncertainty.
+Narrative clarity overrides wording-card terseness.
 
 Keep the body under about 250 words unless the change genuinely needs more.
 Over budget, cut diff-visible micro-detail before motivation.
