@@ -1,75 +1,68 @@
 ## Code Documentation
 
 ### Coverage and placement
-Public APIs (`pub`, `pub(crate)`, `export`, `public`) need purpose and parameter docs.
-Non-trivial public APIs also need returns, failure behavior, and helpful examples.
-
-Non-trivial private APIs need purpose and non-obvious parameters, returns, side effects, or invariants.
+Non-trivial private APIs need purpose and non-obvious contract details.
 Do not flag trivial private APIs.
 
-New/changed modules get top-level purpose/usage docs where supported by language or repo.
 Refresh boundary docs when module/file boundaries change.
 
-Package docs cover import/usage shape; in-code docs cover exported symbols.
+Package docs cover import/usage shape.
+In-code docs cover exported symbols.
 Update both only when both exist and change.
 
 Put requested examples in in-code API docs when the API owns them.
 Never backfill untouched legacy files solely for docs.
 
-### Examples and facts
+### Examples and style
 Use one concept per example, named for that concept.
 Spin-offs get their own example and `#` section with cross-references.
 
-Examples exercise real APIs on hermetic fixtures and show value static configuration cannot express.
-Never use toy stand-ins (`[hook observed]`).
+Examples use real APIs with hermetic fixtures.
+Show what static configuration cannot express.
 
-Docs must match implementation, including moved, renamed, or replaced surfaces.
-Block stale names, options, defaults, links, examples, or behavior.
+Block docs that misrepresent implementation or contain stale references.
 
-State each fact once on its owning surface, not in both summary and section.
-Cross-reference another type's contract instead of restating it.
+State facts once on their owning surface.
+Cross-reference other contracts.
 
-Document only key API-user facts, without fluff or feature notes.
-Describe edge cases in one general sentence, never enumerations.
+Document only key API-user facts, not feature notes.
+Summarize edge cases in one general sentence, not enumerations.
 
-### Inline readability comments
-Comment logical steps in non-trivial bodies when names/control flow do not explain intent.
-Skip trivial assignments, getters, delegation, and names-explained code.
-
-### Documentation style
-Lead with one plain-language purpose sentence; prefer goal-oriented phrasing.
-Keep the summary on one line; put caveats in a trailing `# Remarks` section or equivalent.
+Open with one plain-language purpose sentence, preferably goal-oriented.
+Keep the summary on one line.
+Put caveats in trailing `# Remarks` or equivalent.
 
 Use language-native doc links and `#` sections for multi-aspect docs.
-Name the concrete mechanism (`suppress it by returning None`), not the vague effect (`may suppress the event`).
+Name concrete mechanisms, not vague effects.
 
 ### Lists over prose
-- Use bullets for inputs, outputs, parameters, variants, field mappings, branch points, and named-item sets.
-- `Inputs:` and `Outputs:` labels take short noun-fragment bullets: one fact each, no periods.
-- Branches/variants use `Label: sentence.` bullets ending in periods.
+- Bullet each input, output, parameter, variant, mapping, branch or set item.
+- `Inputs:` and `Outputs:` bullets: short noun fragments, one fact, no periods.
+- Branches/variants use `Label: sentence.` bullets.
 - Field mappings use one sentence per bullet, source field in code font first.
-- Command, type, and parameter sets use one bullet per item: code-font name, dash, terse description.
+- Command/type/parameter bullets: code-font name, dash, terse description.
 - Lead-ins never restate bullets.
-- Keep short non-enumerable sentence sets and single coherent mechanics in prose.
+- Keep short non-enumerable sentences and single coherent mechanics in prose.
 
 {{ file="./rules/cards/style/adhd-format.md" }}
 
 ### Body layout
+Comment steps in non-trivial bodies if names/control flow leave intent unclear.
+
+#### Blank-line grouping
 Apply to new or substantively rewritten non-trivial bodies, including tests.
 Incidental edits need no re-layout.
-Use Inline readability comments above for comment wording and skips.
 Leave line wrapping to formatters.
 
-### Blank-line grouping
-- Separate logical groups with one blank line: each group is one coherent step.
-- Comments carry why; blank lines carry shape; both still separate.
-- Tests separate arrange, act, assert; split long arrange into harness, fixtures, inputs.
-- Sub-group multi-step loop bodies like any other body.
+- Separate coherent steps with one blank line.
+- Comments explain why without replacing blank lines.
+- Tests separate arrange, act, assert.
+- Split long arrange into harness, fixtures, inputs.
+- Sub-group multi-step loop bodies.
 - Skip single-group bodies.
 - Place each required group-purpose comment once above its group.
-- Apply layout to moved, ported, or rewritten regions even if the source was dense.
-- Carried-over density is not fidelity.
+- Apply layout to moved, ported, or rewritten regions despite source density.
 
 ### Severity
 - BLOCKING: 3+ groups with zero internal blank lines.
-- ADVISORY: partial separation, no group-purpose comment, arrange/loop sub-grouping, summary duplication, and everything else.
+- All other issues are ADVISORY.
