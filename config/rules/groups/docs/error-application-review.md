@@ -2,6 +2,8 @@
 
 Apply style groups below only to local error-doc text; keep error fidelity/specificity checks active.
 
+### Error documentation
+
 {{ file="./rules/cards/docs/error-documentation.md" }}
 
 ### Application fidelity

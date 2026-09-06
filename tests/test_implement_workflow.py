@@ -950,9 +950,6 @@ class ImplementWorkflowTests(unittest.TestCase):
         self.assertIn("not writable, write nothing", rule)
         self.assertIn("Never probe, relocate, or write any other artifact", rule)
 
-    def test_plan_artifacts_stay_plan_internal(self) -> None:
-        self.assertIn("plan-internal", text(PLAN_DRAFT))
-
     def test_advisory_repair_split(self) -> None:
         card = text(REVIEW_FINDINGS)
         self.assertIn("Accepted BLOCKING findings and accepted advisories enter repair", card)

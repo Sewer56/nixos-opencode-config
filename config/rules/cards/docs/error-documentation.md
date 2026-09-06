@@ -1,5 +1,3 @@
-### Error documentation
-
 - Each error bullet names the specific condition that produces it.
 - Block vague triggers such as `on error` or `if invalid`.
 - Error sections cover every reachable error variant/type/path in changed APIs.
