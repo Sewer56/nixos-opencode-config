@@ -47,9 +47,9 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
-    "*PROMPT-*.md": deny
-    "artifact/**": deny
-    "artifacts/**": deny
+    "*PROMPT-*.md": ask
+    "artifact/**": ask
+    "artifacts/**": ask
     "artifact/CODE-*.handoff.md": allow
     "artifact/review/CODE-*/*.validation.md": allow
     ".git": deny
@@ -199,7 +199,8 @@ A remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
 - Require explicit user request to commit, push, amend, reset, or clean.
 - Require explicit user request to bypass hooks.
 - Delegate to `code` only for bounded subtasks needing parallelism or isolation.
-- Read plan context; never edit `PROMPT-*.draft.md` or any plan artifact.
+- Read plan context.
+- Edit drafts or plan artifacts only on explicit current user request.
 - Pass paths and compact statuses, not whole handoff/review/verdict bodies.
 
 # Result
