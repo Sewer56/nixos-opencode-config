@@ -79,7 +79,7 @@ permission:
     "commit": allow
 ---
 
-Process one approved cohort. You are sole code writer and loop owner.
+Process one approved cohort as sole code writer and loop owner.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
@@ -99,15 +99,12 @@ Process one approved cohort. You are sole code writer and loop owner.
 - Resolve an explicit positive user repair-turn limit, else five.
 - Explicit no limit is `unlimited`; malformed or conflicting is `NEEDS_INPUT`.
 
-# Loop
-
 ## 1. Guard and write code
 
-1. Apply shared resume safeguards; stop before writing other dirty targets.
-2. Read scoped authority, instructions, and needed context per shared policy.
-3. Implement required behavior/tests/docs as the smallest cohesive diff.
-   - Edit later cohorts only for required compatibility.
-4. Apply shared autonomy; escalations need `NEEDS_INPUT`.
+- Stop before writing other dirty targets under shared resume safeguards.
+- Implement required behavior/tests/docs as the smallest cohesive diff.
+- Edit later cohorts only for required compatibility.
+- Autonomy escalations need `NEEDS_INPUT`.
 
 ## 2. Stage and run quick checks
 
@@ -121,8 +118,8 @@ Process one approved cohort. You are sole code writer and loop owner.
 5. Record commands, results, key output, gaps, and tests in `validation_path`.
 6. Repair code/lint failures, then rerun this loop from lint before restaging.
    - Rerun every quick check, overwriting current-round `validation_path`.
-7. Advance rounds for post-review repair or resume per shared policy.
-   - Missing environment is `INCOMPLETE`.
+
+Missing environment or unavailable evidence is `INCOMPLETE`.
 
 ## 3. Call exact reviewers
 
@@ -137,8 +134,7 @@ Review only after quick checks PASS.
 
 Call the selected reviewers in parallel.
 
-- Before each call, compute current `review_path` per shared policy.
-
+- Compute each call's current `review_path`.
 - Supply one explicit envelope with every declared input resolved.
 - For security/performance add `Scope: COHORT_STAGED`:
 
@@ -156,15 +152,14 @@ Prior Verdict Paths: [[concrete paths or None]]
 ```
 
 - Require independent staged-diff inspection and the requested artifact.
-- Require its exact five-line `# Output` envelope.
+- Require the exact five-line `# Output` envelope.
 - Check readable schema-valid evidence at exact `review_path`.
 - Require artifact-consistent decision/count and allowed Status.
 - Check expected Domain, identical Review Path, and integer Finding Count.
 - Require one-line Summary.
 - Missing or malformed evidence is `INCOMPLETE`, never PASS.
 
-Every selected reviewer must complete.
-
+- Every selected reviewer must complete.
 - A failed or cancelled delegation is `FAIL` or `INCOMPLETE`.
 - Never perform delegated review, verdict, or commit work yourself.
 
@@ -172,30 +167,27 @@ Every selected reviewer must complete.
 
 - Send candidates to `_review/verifier` only for findings in review artifacts.
 - Skip when all reviews report zero.
-- Supply every declared verifier input in an explicit envelope.
+- Supply every verifier input in an explicit envelope.
 - Include `Verdict Path: [[verdict_path]]`.
 
 Repair accepted blockers and advisories.
 
-- After repair, rerun Section 2 from lint before restaging.
+- After repair, rerun Section 2 from lint.
 - Rerun correctness, quality, and affected optional reviews in parallel.
 - Rerun the verifier when re-reviews emit new candidates.
 
 - Allow `repair_turn_limit` total turns, including consumed turns.
 - Deterministic and verified-review failures share this budget.
-- `unlimited` is unbounded.
-
 - On bounded failure return `FAIL` with consumed turns and resolved limit.
-- Unavailable evidence is `INCOMPLETE`.
 
 ## 5. Commit
 
 Require validation PASS, complete reviews, and no blocker.
 
 - If changed, re-read staged diff and call `commit` for cohort-owned changes.
-- Require one scoped commit and preserved unrelated changes.
+- Require one scoped commit preserving unrelated changes.
 
-Otherwise skip commit with acceptance evidence.
+- Otherwise skip commit with acceptance evidence.
 
 # Output
 
