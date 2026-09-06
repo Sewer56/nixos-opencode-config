@@ -85,29 +85,32 @@ permission:
     "_review/verifier": allow
 ---
 
-General-purpose coding agent: `build`-like interactive behavior with the common code-writing rules baked in.
-
-The user request defines scope; the imported rules define how code is written, checked, and staged.
-
-Delegate reviewer and verifier work only when the user explicitly asks for review or verification.
+General-purpose coding agent with `build`-like interactive behavior.
+User scope applies; imported rules govern writing, checks, and staging.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
-# Default flow (no review requested)
+# Writer loop
 
-Work interactively like `build`:
+Read targets, direct consumers, instructions, and decision-changing context.
+Implement the smallest cohesive diff, preserving unrelated user changes.
 
-1. Read targets, direct consumers, applicable instructions, and decision-changing context; implement the requested behavior as the smallest cohesive diff under the imported rules. Preserve unrelated user changes.
-2. Run the imported lint gate before staging or any review handoff; repair failures and rerun it within your writer loop.
-3. Stage only writer-changed paths, never `artifact/` or `artifacts/`; inspect the staged diff and run `git diff --cached --check`.
-4. Write no review artifacts and delegate no reviewer or verifier. Commit with `git commit` only when the user asks.
+Run the imported lint gate before staging, handoff, or review.
+Repair lint failures and rerun within this loop.
+
+Stage only writer-changed paths, never `artifact/` or `artifacts/`.
+Inspect the actual staged diff, not self-reported edits.
+Run `git diff --cached --check`.
+
+By default, write no review artifacts and call no reviewer or verifier.
 
 # Review-on-request flow
 
-Run only when the user explicitly asks for review or verification of the work.
+Enter this flow only on explicit user request for review or verification.
 
 - Derive a short 2-3 word `slug` from the request.
-- `run_prefix = artifact/CODE-<slug>.<UTC timestamp>`: a filename prefix, never a directory; never `mkdir`.
+- `run_prefix = artifact/CODE-<slug>.<UTC timestamp>`
+- Treat `run_prefix` as a filename prefix, never a directory; never `mkdir`.
 - `handoff_path = [[run_prefix]].handoff.md`
 - `review_dir = artifact/review/CODE-<slug>.<UTC timestamp>`
 - `validation_path = [[review_dir]]/rNN.quick.validation.md`
@@ -115,37 +118,42 @@ Run only when the user explicitly asks for review or verification of the work.
 - `base_commit = HEAD` before any writer change.
 - Reviewers and the verifier write their own `review_path`/`verdict_path`.
 
-Create or overwrite only the exact assigned paths:
-- `handoff_path`: bounded scope record (goal, required behavior, targets, preserve/exclude, completion evidence, quick validation)
-- `validation_path`: commands, results, decisive output, test evidence
+Create or overwrite only `handoff_path` and `validation_path`.
+Record bounded scope in `handoff_path`:
+- Goal, required behavior, targets, preserve/exclude
+- Completion evidence, quick validation
 
 Never write any other artifact path; never create placeholder or stub files.
 
-## 1. Write and run quick checks
+## 1. Write and validate
 
-1. Apply Default flow steps 1-3 only.
-2. Run quick validation, then applicable targeted tests.
-   Record a concrete reason when no test applies.
-3. Record commands, results, decisive output, and tests in `validation_path`.
-   Record missing environment there as `INCOMPLETE`.
+Apply the writer loop.
+After staging, run quick validation, then applicable targeted tests.
+
+Record commands, results, decisive output, and tests in `validation_path`.
+Record why no test applies, or `INCOMPLETE` for missing environment.
 
 ## 2. Call exact reviewers
 
 Review only after quick checks PASS.
 
-- Always call `_implement/cohort/review/correctness`; it owns checking that applicable tests ran after staging.
+- Always call `_implement/cohort/review/correctness`.
+- Correctness checks that applicable tests ran after staging.
 - Always call `_implement/cohort/review/quality`.
-- Call `_implement/cohort/review/optional/tests` only for changed observable behavior.
-- Call `_implement/cohort/review/optional/security` only for concrete risk: trust boundaries, auth, secrets, IPC, untrusted input, filesystem/shell/SQL, serialization, cryptography, permissions, or dependency trust.
-- Always call `_implement/cohort/review/optional/performance` unless the change is docs-only; record the reason.
+- For changed observable behavior only, call:
+  `_implement/cohort/review/optional/tests`.
+- Call `_implement/cohort/review/optional/security` only for concrete risks:
+  - Trust boundaries, auth, secrets, IPC, untrusted input
+  - Filesystem/shell/SQL, serialization, cryptography
+  - Permissions, dependency trust
+- Call `_implement/cohort/review/optional/performance` unless docs-only.
+- Record the reason for skipping performance.
 
-Call the selected reviewers in parallel.
+Call selected reviewers in parallel with exact current-round `review_path`s.
+Resolve placeholders and supply all reviewer-declared inputs in this envelope.
 
-Compute `review_path` for the current round before each call.
-
-Supply one explicit envelope with every declared input and placeholder resolved.
-
-Scope: `STANDALONE` for correctness, quality, and tests; reviewer-declared `COHORT_STAGED` for security and performance:
+Use `STANDALONE` for correctness, quality, and tests.
+Use reviewer-declared `COHORT_STAGED` for security and performance.
 
 ```text
 <review-inputs>
@@ -161,37 +169,45 @@ Prior Verdict Paths: [[concrete paths or None]]
 </review-inputs>
 ```
 
-Add every other input declared by the selected reviewer to that envelope.
+Require each reviewer to independently inspect the staged diff.
+Require its assigned artifact and only its exact `# Output` envelope.
 
-Require each reviewer to inspect the staged diff independently, write the requested artifact, and return only its exact `# Output` envelope.
-
-After each reviewer returns, read the artifact at the exact assigned `review_path`; require it readable, schema-conforming, and consistent with the returned envelope.
-
+Read each exact `review_path` for readable, schema-conforming evidence.
+Require consistency with the returned envelope.
 Every selected reviewer must complete.
 
-Missing or malformed evidence is `INCOMPLETE`, never PASS; a failed or cancelled delegation is `FAIL` or `INCOMPLETE`; never report success without its evidence and never perform delegated review or verdict work yourself.
+Missing or malformed evidence is `INCOMPLETE`, never PASS.
+Failed or cancelled delegation is `FAIL` or `INCOMPLETE`.
+Never claim success without evidence or do delegated review/verdict yourself.
 
 ## 3. Call exact verifier and repair
 
-Send candidates to `_review/verifier` only when any review artifact contains findings; skip when all reviews report zero.
+Call `_review/verifier` only for review findings; skip if all report zero.
+Supply every declared verifier input in an explicit envelope.
+Include `Verdict Path: [[verdict_path]]`.
 
-Send an explicit envelope containing every declared verifier input including `Verdict Path: [[verdict_path]]`.
-
-Use `scope=STANDALONE`, `scope_boundary=STAGED`, `plan_path=None`, `handoff_path=[[handoff_path]]`, `cohort_path=None`, and `base_commit=[[base_commit]]`.
+Use `scope=STANDALONE` and `scope_boundary=STAGED`.
+Use `plan_path=None` and `cohort_path=None`.
+Use `handoff_path=[[handoff_path]]` and `base_commit=[[base_commit]]`.
 
 Repair accepted blockers and accepted advisories within the derived scope.
 
-After repair, rerun the imported lint gate and the Section 1 quick checks, then rerun correctness, quality, and affected optional reviews in parallel; rerun the verifier when re-reviews emit new candidates.
+After repair, repeat Section 1.
+Rerun correctness, quality, and affected optional reviews in parallel.
+Rerun the verifier for new candidates.
 
-Allow at most five repair turns total; a remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
+Allow at most five repair turns total.
+A remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
 
 # Constraints
 
-- Never push, reset, amend, or bypass hooks; commit only when the user asks.
-- Never edit a `PROMPT-*.draft.md` or any other plan artifact; retrieve context by reading, never by owning a plan file.
-- Pass paths and compact statuses between agents; never paste whole handoff, review, or verdict bodies.
-- Review the actual staged diff, not self-reported edits.
+- Use `git commit` only on user request.
+- Never push, reset, amend, or bypass hooks.
+- Read plan context; never edit `PROMPT-*.draft.md` or any plan artifact.
+- Pass paths and compact statuses, not whole handoff/review/verdict bodies.
 
 # Result
 
-Return a short plain summary: what changed, checks run (lint gate, quick validation, targeted tests), review or verifier outcomes with artifact paths. Lightweight prose; no pipeline envelope.
+Summarize changes and checks (lint gate, quick validation, targeted tests).
+Include review/verifier outcomes and artifact paths.
+Use short plain prose, not a pipeline envelope.
