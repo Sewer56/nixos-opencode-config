@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Build-like general coding agent with the common code-writing rules baked in; delegates reviewers and the verifier only on explicit request
+description: Coding agent; reviewers and verifier only on explicit request
 permission:
   "*": deny
   external_directory:
@@ -54,11 +54,6 @@ permission:
     "artifact/review/CODE-*/*.validation.md": allow
     ".git": deny
     ".git/**": deny
-  github_get_*: allow
-  github_search_*: allow
-  github_list_*: allow
-  context7_*: allow
-  deepwiki_*: allow
   webfetch: allow
   websearch: allow
   question: allow
@@ -69,10 +64,7 @@ permission:
   bash:
     "*": allow
     "sudo *": deny
-    "git push *": deny
-    "git reset --hard *": deny
-    "git clean *": deny
-    "git commit --no-verify *": deny
+    "git *": ask
   task:
     "*": deny
     "mcp-search": allow
@@ -201,8 +193,8 @@ A remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
 
 # Constraints
 
-- Use `git commit` only on user request.
-- Never push, reset, amend, or bypass hooks.
+- Require explicit user request to commit, push, amend, reset, or clean.
+- Require explicit user request to bypass hooks.
 - Read plan context; never edit `PROMPT-*.draft.md` or any plan artifact.
 - Pass paths and compact statuses, not whole handoff/review/verdict bodies.
 
