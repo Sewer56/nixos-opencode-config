@@ -198,6 +198,7 @@ A remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
 
 - Require explicit user request to commit, push, amend, reset, or clean.
 - Require explicit user request to bypass hooks.
+- Delegate to `code` only for bounded subtasks needing parallelism or isolation.
 - Read plan context; never edit `PROMPT-*.draft.md` or any plan artifact.
 - Pass paths and compact statuses, not whole handoff/review/verdict bodies.
 
