@@ -89,7 +89,8 @@ permission:
     "patch *": deny
 ---
 
-Review one staged cohort or final-repair commit. Produce candidate findings only; verifier owns repair eligibility.
+Review one staged cohort or final-repair commit for candidates only.
+Verifier owns repair eligibility.
 
 # Inputs
 - `plan_path`, `handoff_path`, and `cohort_path` or `None` for final repair.
@@ -104,15 +105,16 @@ Review one staged cohort or final-repair commit. Produce candidate findings only
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
-Check `validation_path` first. Require applicable tests to pass after staging. Accept “no test applies” only when diff and test layout support it. Missing evidence is `INCOMPLETE`; code-caused failure is a candidate.
+Check `validation_path` first.
+Require applicable tests to pass after staging.
+Accept “no test applies” only when diff and test layout support it.
+Missing evidence is `INCOMPLETE`; code-caused failure is a candidate.
 
-Then apply imported rules to staged diff as one behavioral change.
-Search only for narrow verification of affected symbols and contracts.
-Ignore minor style and harmless plan drift with equivalent behavior/contracts.
+Then review the staged diff as one behavioral change.
+Include mapped impacts and completed predecessor compatibility.
+Check planned callers, registrations, exports, schemas, migrations, and config.
 
-Include mapped impact surfaces, completed predecessor compatibility, and planned callers/registrations/exports/schemas/migrations/configuration.
-
-Leave test-design advisories and optional-domain advisories to routed reviewers.
+Leave test-design and optional-domain advisories to routed reviewers.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
@@ -122,32 +124,33 @@ Write `review_path`:
 ```markdown
 # Candidate Review
 Domain: CORRECTNESS
-Scope: <cohort id | FINAL_REPAIR>
-Base Commit: <base_commit>
+Scope: [[cohort id | FINAL_REPAIR]]
+Base Commit: [[base_commit]]
 Decision: PASS | CANDIDATES | INCOMPLETE
 
 ## Findings
 ### [COR-NNN]
 Proposed Severity: BLOCKING | ADVISORY
-Requirement: <AC/INV/P id or concrete repository contract>
-Location: `<path:line>` or `<path:symbol>`
-Claim: <one falsifiable claim>
+Requirement: [[AC/INV/P id or concrete repository contract]]
+Location: `[[path:line]]` or `[[path:symbol]]`
+Claim: [[one falsifiable claim]]
 Evidence Type: EXECUTED | STATIC | CODE_PATH | CONTRACT
-Evidence: <diff/code/tool evidence>
-Failure Path: <input/state -> changed code -> affected consumer/result>
-Impact: <observable incorrect behavior or material risk>
-Verification: <specific falsifiable check>
+Evidence: [[diff/code/tool evidence]]
+Failure Path: [[input/state -> changed code -> affected consumer/result]]
+Impact: [[observable incorrect behavior or material risk]]
+Verification: [[specific falsifiable check]]
 Smallest Fix:
-<bounded correction; include a short fenced code block when exact shape matters; no full speculative rewrite>
+[[bounded correction; short fenced code if exact shape matters]]
+[[no full speculative rewrite]]
 - None
 
 ## Verified
-- Test Evidence: <commands and PASS results | concrete reason no test applies>
-- <important behavior checked and found correct>
+- Test Evidence: [[commands and PASS results | concrete reason no test applies]]
+- [[important behavior checked and found correct]]
 - None
 
 ## Notes
-- <uncertainty or out-of-scope pointer>
+- [[uncertainty or out-of-scope pointer]]
 - None
 ```
 
@@ -157,7 +160,7 @@ Return exactly:
 ```text
 Status: PASS | CANDIDATES | INCOMPLETE | FAIL
 Domain: CORRECTNESS
-Review Path: <review_path>
-Finding Count: <n>
-Summary: <one-line summary>
+Review Path: [[review_path]]
+Finding Count: [[n]]
+Summary: [[one-line summary]]
 ```
