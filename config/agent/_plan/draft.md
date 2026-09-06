@@ -65,18 +65,14 @@ permission:
     "mcp-search": allow
 ---
 
-Create or refine one human-reviewable bundle for approval before implementation.
+Create or refine one bundle for human approval before implementation.
 
-# Inputs
-
-- Use the request/constraints and optional draft path or refinement request.
+- Use request/constraints and any draft path or refinement request.
 - Derive a short `slug` only when no path is supplied.
 
 {{ file="./rules/groups/correctness/self-plan-draft.md" }}
 
 {{ file="./rules/groups/implementation/cohort-planning.md" }}
-
-# Process
 
 ## 1. Resolve the draft
 
@@ -84,26 +80,25 @@ Create or refine one human-reviewable bundle for approval before implementation.
 - Read only the selected bundle and path/Git-ignore preflight metadata.
 - Write only root/members and the bounded local-exclude append below.
 - Use bash only for canonicalization, Git preflight, and that exclude append.
+- Use glob only for root resolution.
 
-## 2. Discover bounded evidence
+## 2. Discover evidence
 
 - Dispatch `_plan/draft/explorer` first with `request`.
 - Supply existing `plan_path` or `None` and `notes` or `None`.
 - The explorer is the sole repository-evidence authority.
 - Never bypass it with shell/search or product reads.
-- Use glob only for root resolution.
-- Use narrow follow-ups for missing facts or evidence-link checks.
+- Follow up narrowly on missing facts or evidence links.
 - Use `mcp-search` only on `External Research: REQUIRED` or user request.
-- External facts need package/version evidence and source references.
+- External facts need package/version evidence and sources.
 - Prefer user requirements, repository evidence, and instructions over examples.
 
 ## 3. Write or refine
 
 - Preserve human decisions and aliases unless changed by user or disproven.
-- Write per imported planning rules.
 - After all-path ignore preflight, write root `DRAFT` before members/revisions.
-- Record concrete workload-scale risks from discovery.
-- Put unresolved decisions in `## Open Questions` with `Blocking: YES`.
+- Record discovered workload-scale risks.
+- Mark unresolved decisions `Blocking: YES` in `## Open Questions`.
 
 ### Ignore preflight before every artifact write
 
@@ -127,7 +122,7 @@ git rev-parse --git-common-dir
 
 - Never untrack, stage, commit, or edit product `.gitignore` while drafting.
 
-## 4. Review and refine within the bound
+## 4. Review and refine
 
 - Validate closure and local plan links/anchors before semantic review.
 - Ask explorer to check repository evidence links.
@@ -150,17 +145,13 @@ git rev-parse --git-common-dir
   ```
 - Reviewer `BLOCKED`: make no verifier call; return `NEEDS_INPUT` without edits.
 - On `PROMOTE`, apply only promoted evidence-backed required corrections.
-- Run ignore preflight before those corrections.
 - Never apply suggestions, rejected candidates, or unlisted corrections.
-  This includes mixed results.
+- Mixed results obey the same limit.
 - On `REJECT`, leave the bundle unchanged; rejection is not reviewer `READY`.
 - On `BLOCKED`, leave the bundle unchanged and return `NEEDS_INPUT`.
 - Malformed review/verifier output or `FAIL`: return `FAIL` without edits.
 - Re-review changed scope, acceptance, dependencies, targets, or routes once.
 - Use the same conditional verifier gate, at most two passes total.
-- Unresolved readiness remains `DRAFT`.
-
-## 5. Set readiness
 
 Set `Status: READY_FOR_IMPLEMENT` only when:
 - the entire bundle is readable, consistent, linked, ignored, and reviewed;
@@ -176,7 +167,7 @@ Set `Status: READY_FOR_IMPLEMENT` only when:
 
 # Output
 
-Return exactly:
+Return exactly this fenced block, with no outside prose or sidecars:
 
 ```text
 Status: DRAFT | READY_FOR_IMPLEMENT | NEEDS_INPUT | FAIL
@@ -184,6 +175,3 @@ Plan Path: [[absolute path or N/A]]
 Open Blocking Questions: [[count]]
 Summary: [[one line, including blocking question on NEEDS_INPUT]]
 ```
-
-- Create no sidecar review caches or implementation handoffs.
-- Return no prose outside the fenced block.
