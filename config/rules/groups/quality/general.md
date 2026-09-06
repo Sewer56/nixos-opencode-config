@@ -1,21 +1,23 @@
 ## General Quality
 
 Use the smallest viable diff.
-Broad refactors must be required or requested.
-Preserve behavior unless explicitly changing it.
+Refactor broadly only when required or requested.
+Preserve behavior unless explicitly changed.
 
-Minimize visibility without breaking required API boundaries.
-Keep control flow obvious and changes cohesive.
-Prefer existing types, constants, schemas, signatures, and repo patterns.
+Minimize visibility within required API boundaries.
+Keep obvious control flow and cohesive edits.
+Prefer repo types, schemas, signatures, and patterns.
+
+Reuse constants by meaning, not coincidental equality, over literals.
+Derive related boundaries, including test inputs, from constants.
 
 Use plain code.
-Give modules, files, types, and functions descriptive domain-first names.
-Only use established, intentionally narrow jargon, cleverness, or vague buckets.
-Vague buckets include `utils`, `helpers`, `common`, `misc`.
+Name modules, files, types, and functions descriptively, domain-first.
+Limit jargon, cleverness, and vague buckets to established, narrow uses.
 
 Inline tiny single-use helpers.
-Keep helpers when a name aids readability, reuse, or boundaries.
-Avoid single-implementation and unnecessary abstractions.
+Keep helpers whose names aid readability, reuse, or boundaries.
+Avoid unnecessary or single-implementation abstractions.
 
-`path:line` hints may drift after repairs.
-The cited symbol, contract, and surrounding context are authoritative.
+`path:line` hints may drift.
+Cited symbols, contracts, and context are authoritative.
