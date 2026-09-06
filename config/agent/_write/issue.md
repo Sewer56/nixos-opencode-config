@@ -88,61 +88,63 @@ permission:
     "patch *": deny
 ---
 
-Write one issue artifact grounded in the user's report and repository conventions.
+Write one issue grounded in the user's report and repository conventions.
 
-# Inputs
-- Bug, feature, maintenance, or investigation request plus optional scope and expected outcome.
+Accept bug, feature, maintenance, or investigation requests.
+Scope and expected outcome are optional.
+Do not modify source, commit, push, or create a remote issue.
 
 {{ file="./rules/groups/style/wording.md" }}
 
 {{ file="./rules/cards/style/adhd-format.md" }}
 
 # Process
-1. Inspect issue templates, contribution guidance, the main README, and only the code/config needed to use correct names and paths.
-2. Use `codebase-explorer` only when one narrow repository fact would materially improve the issue.
-3. Derive a short slug and write `ISSUE-<slug>.md` in the repository root.
-4. Follow the repository template. When no template exists, include only useful sections:
-   - outcome-oriented title;
-   - problem or motivation;
-   - current behavior and expected behavior;
-   - reproduction/example for a bug;
-   - acceptance criteria for a feature/fix;
-   - constraints, risk, or compatibility notes;
-   - relevant evidence.
-5. Preserve unknowns explicitly. Ask one focused question only when the issue would otherwise assert a false or unsafe requirement.
-6. Keep implementation prescriptions at contract level unless the user explicitly requested a technical design.
+Inspect issue templates, contribution guidance, and the main README.
+Read code/config only for correct names and paths.
 
-# Gate
-After writing `ISSUE-<slug>.md` and before reporting SUCCESS, run this scan.
-Empty output passes; otherwise repair the artifact and rerun until it prints
-nothing:
+Use `codebase-explorer` only for one narrow repository fact.
+The fact must materially improve the issue.
+
+Write root `ISSUE-<slug>.md` with a short slug and the repository template.
+Without a template, include only useful sections:
+- outcome-oriented title;
+- problem or motivation;
+- current and expected behavior;
+- reproduction/example for a bug;
+- acceptance criteria for a feature/fix;
+- constraints, risk, or compatibility notes;
+- relevant evidence.
+Preserve unknowns explicitly.
+Ask one focused question only to avoid asserting a false or unsafe requirement.
+Keep prescriptions at contract level unless technical design is requested.
+The user must request it explicitly.
+
+# Gate and review
+After writing, pass this gate before review or SUCCESS.
+Empty output passes; otherwise repair and rerun until empty.
+Fenced code, URLs, table rows, and headings are exempt.
 
 ```bash
 awk 'BEGIN{f=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && $0 !~ /^#/ && length($0) > 80 {print FNR": "$0}' ISSUE-<slug>.md
 ```
 
-Fenced code, URLs, table rows, and headings are exempt. Gate failure blocks
-SUCCESS and forces repair before review.
-
-Measure `Longest Prose Line` from the same exemptions; never estimate it:
+Measure `Longest Prose Line` with the same exemptions; never estimate:
 
 ```bash
 awk 'BEGIN{f=0;m=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && $0 !~ /^#/ && length($0)>m {m=length($0)} END{print m+0}' ISSUE-<slug>.md
 ```
 
-# Review loop
-1. After the gate passes, call `_write/review/adherence` once with the request
-   summary, the absolute issue path, and the applicable rule constraints.
-2. Repair every required change from the review, rerun the gate, then request
-   one re-review.
-3. Allow at most 2 repair turns. Required changes remaining after the second
-   turn return `FAIL` with the remaining finding in `Errors`. Suggestions are
-   optional.
-4. Reviewer unavailability or a `BLOCKED` verdict returns `NEEDS_INPUT` with
-   the reason in `Errors`.
+Once the gate passes, call `_write/review/adherence`.
+Supply request summary, absolute issue path, and applicable rule constraints.
+
+Repair all required changes, rerun the gate, then request one re-review.
+Allow at most 2 repair turns; suggestions are optional.
+
+Required changes after turn 2 return `FAIL` with the finding in `Errors`.
+Unavailable reviewer or `BLOCKED`: return `NEEDS_INPUT` with reason in `Errors`.
 
 # Output
-Return exactly:
+Return only this exact fenced block:
 
 ```text
 Status: SUCCESS | NEEDS_INPUT | FAIL
@@ -153,7 +155,3 @@ Longest Prose Line: <n>
 Summary: <one-line summary>
 Errors: <one-line error or None>
 ```
-
-# Constraints
-- Do not modify source, commit, push, or create a remote issue.
-- Return no prose outside the fenced block.
