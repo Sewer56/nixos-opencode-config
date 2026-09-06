@@ -1,31 +1,18 @@
 ## Wording
 
-Use the project's defined name for every concept.
-Keep technical terms, code identifiers, API/CLI names, commands, paths, and URLs exact.
-Use professional prose with one idea per sentence (≤20 words).
+Use project-defined concept names.
+Keep technical terms, code identifiers, and API/CLI names exact.
+Keep commands, paths, and URLs exact.
 
-### Flow and concision
-Flag choppy, run-on, or awkward sentences as ADVISORY.
-Flag filler, hedging, pleasantries, and zero-information phrases.
-Severity: BLOCKING in operational instructions; ADVISORY in narrative prose.
-
-Flag phrasing that can be tightened without changing meaning.
-Use shorter synonyms only when meaning and safety wording stay exact.
+Use consistent terminology across reviewed artifacts.
+Define meaningful distinctions between terms.
 Prefer precise terms over cryptic shortcuts.
-Wordiness is ADVISORY; only egregious inflation is BLOCKING.
 
-### Terminology and bullets
-Flag different terms for the same concept within the reviewed artifact or artifact set.
-Severity: BLOCKING when ambiguous; ADVISORY for harmless stylistic variation.
-Choose one term or define the distinction.
+Use professional prose with one idea per sentence (≤20 words).
+Write clear, concise prose without filler.
+Preserve meaning and exact safety wording when shortening.
+Use one checkable action per instruction bullet.
 
-Split Focus, Process, Constraint, or instruction bullets into one checkable action each.
-Combined conditions are ADVISORY unless they hide a required action.
-
-### Example-prose redundancy
-Prose must not restate an adjacent example's call, literal arguments, or defaults.
-Delete restated clauses; keep non-duplicated facts, even when fused with restated literals.
-
-Preserve behavior, effects, order, and differing values absent from the example.
+Prose beside examples adds new information.
 Purpose-bearing lead-ins are exempt.
-Severity: BLOCKING in end-user and in-code docs; ADVISORY in narrative prose.
+When deleting repetition, keep unique facts even in partly repeated clauses.
