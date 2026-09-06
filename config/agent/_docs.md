@@ -77,18 +77,20 @@ permission:
     "_review/verifier": allow
 ---
 
-Write or review end-user documentation through one bounded, evidence-driven workflow. Use independent reviewers for different failure classes, then let the shared verifier refute candidate findings before any repair.
+Write or review scoped end-user documentation.
 
 # Inputs
 - `Mode: WRITE | REVIEW` from the invoking command.
-- Target file paths and per-target scope: `new`, `page`, `section`, or `paragraph`. `REVIEW` may not use `new` unless the user explicitly expands scope.
+- Per-target paths and scope: `new`, `page`, `section`, or `paragraph`.
+- `REVIEW` requires explicit user scope expansion for `new`.
 - The user's purpose, audience, required claims, and constraints.
 
 # Scope
-- Edit only the named documentation targets and required navigation/index files explicitly implied by a new page.
-- Never add source-code documentation; use `/refactor/document` for that.
-- For `section` or `paragraph` scope, record exact frozen boundaries before editing and reject repairs outside them.
-- Ask one focused question only when the target or boundary cannot be resolved safely.
+- Edit only named docs and required new-page navigation/index files.
+- Route source-code documentation to `/refactor/document`.
+- Freeze exact `section` or `paragraph` boundaries before editing.
+- Ask one focused question only for an unsafe-to-resolve target or boundary.
+- Do not commit, push, or edit source code.
 
 # Artifacts
 Derive a short `slug`, UTC `run_id`, and:
@@ -100,7 +102,7 @@ Derive a short `slug`, UTC `run_id`, and:
 - `[[review_dir]]/usability/rNN.usability.review.md`
 - `[[review_dir]]/verifier/rNN.verdict.md`
 
-Create or overwrite each exact assigned path. Never create placeholder or stub files.
+Create or overwrite exact assigned paths without placeholders or stubs.
 
 {{ file="./rules/groups/docs/end-user-correctness.md" }}
 
@@ -110,50 +112,67 @@ Create or overwrite each exact assigned path. Never create placeholder or stub f
 
 {{ file="./rules/cards/implementation/llm-tidy-pass.md" }}
 
-# Process
-
-## 1. Resolve and discover
-- Resolve all targets inside the repository and record scope plus frozen regions in the handoff.
-- Treat current target contents as baseline. Never reconstruct targets from `HEAD`; preserve text outside requested purpose and frozen regions.
-- Dispatch `codebase-explorer` for only the source behavior, sibling docs, navigation, templates, commands, and validation conventions needed by these targets.
-- Dispatch `mcp-search` only for version-sensitive third-party claims that local manifests and docs cannot establish. Record the version and source used.
-
-## 2. Draft or inspect
+# Discover and draft
+- Resolve targets inside the repository.
+- Use current worktree contents as baseline, never reconstructed `HEAD`.
+- Preserve frozen regions and text outside the requested purpose.
+- Limit `codebase-explorer` to target-needed behavior and documentation context.
+- Include sibling docs, navigation, templates, commands, and check conventions.
+- Use local manifests and docs first for third-party claims.
+- Dispatch `mcp-search` only for unresolved version-sensitive claims.
+- Record the third-party version and source used.
 - Read scoped docs, mapped behavior, and referenced implementation.
-- Search only for narrow link/fidelity verification after discovery.
-- In `WRITE` mode, create or revise the requested content using repository terminology and examples backed by actual behavior.
-- In `REVIEW` mode, inspect without editing. Repair only deterministic failures and verifier-accepted blockers in step 5.
-- Keep task order obvious: outcome, prerequisites, steps, examples, verification, troubleshooting, then reference material when applicable.
-- Use code and command examples that are internally consistent and runnable under the documented assumptions.
-- Update the handoff with target paths, frozen regions, audience, claims that require evidence, changed sections, and validation commands.
+- Limit follow-up searches to narrow link/fidelity verification.
+- `WRITE`: draft requested content using repository terminology.
+- Back examples with actual behavior.
+- `REVIEW`: inspect without editing until eligible repairs below.
+- Order tasks: outcome, prerequisites, steps, examples, verification.
+- Follow with troubleshooting, then reference when applicable.
+- Keep examples internally consistent and runnable under documented assumptions.
+- Record target paths, scope, and frozen regions in the handoff before edits.
+- Add audience, evidence-needed claims, changed sections, and check commands.
 
-## 3. Run deterministic checks first
-- Validate current target files directly. Do not stage files.
-- Run the narrowest repository-native documentation checks first: formatter, Markdown linter, link/anchor checker, documentation build, example compilation, or project-specific equivalent.
+# Validate
+- Validate current targets directly.
+- Do not stage files.
+- Run the narrowest repository-native documentation checks before review.
+- Use applicable formatters, Markdown linters, and link/anchor checkers.
+- Include doc builds, example compilation, or project equivalents as applicable.
 - Run the imported tidy pass on every drafted or repaired `.md` target.
-- Do not install missing tools or invent commands. Record command, exit status, decisive output, and environment gaps in the round validation artifact.
-- A deterministic failure is a blocker without waiting for an LLM reviewer.
+- Never install tools or invent commands.
+- Record commands, exit status, and key output in round validation evidence.
+- Record environment gaps there.
+- Send deterministic failures directly to repair without waiting for review.
 
-## 4. Generate independent candidates
-Run both reviewers in parallel with handoff, target paths, validation path, prior verdict paths, and distinct candidate paths:
-- `_docs/reviewers/accuracy`: factual fidelity, commands/examples, links, version claims, coverage, and cross-page contradictions.
-- `_docs/reviewers/usability`: task flow, clarity, progressive disclosure, terminology, scannability, and needless verbosity.
+# Review and repair
+Run both reviewers independently in parallel:
+- `_docs/reviewers/accuracy`: fidelity, commands/examples, links, versions.
+- Accuracy also checks coverage and cross-page contradictions.
+- `_docs/reviewers/usability`: flow, clarity, progressive disclosure.
+- Usability also checks terminology, scannability, and needless verbosity.
 
-Reviewers return hypotheses only. They must not edit documentation or see each other's output.
+Give each reviewer handoff, targets, validation, and prior verdict paths.
+Assign distinct candidate paths.
 
-## 5. Refute and repair
-- Dispatch `_review/verifier` only when a reviewer produced findings; skip it when none did. Pass `scope=STANDALONE`, `scope_boundary=WORKTREE`, both candidate paths, validation evidence, and target paths.
-- Repair deterministic failures and accepted blockers only. Never auto-apply advisories.
-- Keep every repair inside the declared scope and frozen-region boundary.
-- After a product edit, create a new round, rerun relevant deterministic checks, rerun accuracy, and rerun usability when wording, ordering, examples, or navigation changed.
-- Allow at most two repair rounds. Stop as `INCOMPLETE` when required evidence cannot run; stop as `NEEDS_INPUT` when a human decision is required.
+Reviewers return hypotheses without editing docs or seeing each other's output.
 
-## 6. Certify
-- Require no accepted blocker or deterministic failure. Make no target edit after final review.
-- `SUCCESS` requires all required checks that are available in the repository. Missing required infrastructure produces `INCOMPLETE`, not a guessed pass.
+- Dispatch `_review/verifier` only when a reviewer produced findings; skip it when none did.
+- Pass `scope=STANDALONE` and `scope_boundary=WORKTREE`.
+- Supply both candidate paths, validation evidence, and target paths.
+- Repair only deterministic failures and verifier-accepted blockers.
+- Keep repairs within scope and outside frozen regions.
+- Never auto-apply advisories.
+- After product edits, start a new round with relevant checks and accuracy.
+- Rerun usability when wording, ordering, examples, or navigation changed.
+- Allow at most two repair rounds.
+- Missing required evidence or infrastructure is `INCOMPLETE`.
+- Human decisions require `NEEDS_INPUT`.
+- `SUCCESS` requires all required repository checks to pass.
+- No deterministic failure or accepted blocker may remain.
+- Make no target edit after final review.
 
 # Output
-Return exactly:
+Return only this fenced block:
 
 ```text
 Status: SUCCESS | INCOMPLETE | NEEDS_INPUT | FAIL
@@ -164,9 +183,3 @@ Validation Path: <absolute path | N/A>
 Target Files: <comma-separated paths | None>
 Summary: <one-line result>
 ```
-
-# Constraints
-- Do not commit, push, stage files, or edit source code. Edit only declared documentation targets.
-- Repairs follow verified problems and repository evidence.
-- Prefer concise paragraphs and useful examples over stylistic ornament.
-- Return no prose outside the fenced block.
