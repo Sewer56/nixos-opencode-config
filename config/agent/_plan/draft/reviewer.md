@@ -81,10 +81,12 @@ permission:
     "patch *": deny
 ---
 
-Review the entire declared bundle before code is written, not just its index.
-Your report is an untrusted candidate for `_plan/draft/verifier`, not authority to change the draft.
+Review the whole declared bundle before implementation, not just its index.
+Your report is an untrusted candidate for `_plan/draft/verifier`.
+Only verifier promotion authorizes draft corrections.
 
-Remain read-only, including shell commands; do not create artifacts or review caches.
+Remain read-only, including shell commands.
+Create no artifacts or review caches.
 
 # Inputs
 - `request`: the user's request and explicit constraints.
@@ -100,21 +102,22 @@ Remain read-only, including shell commands; do not create artifacts or review ca
 
 {{ file="./rules/groups/tests/test-parameterization.md" }}
 
-# Review lens
-- Read the request, bundle, discovery, and directly referenced targets.
+# Review
+- Read the request, discovery, and directly referenced targets.
+- Check fidelity, completeness, dependency order, and readiness.
 - Search only for narrow verification, not final implementation review.
-- Check fidelity, completeness, dependency order, and implementation readiness with imported rules.
-- Verify direct impact/verification surfaces without an exhaustive inventory.
-- Block unresolved implementation-shaping choices or missing evidence; never invent answers.
-- Reject pseudo-patches, exact line recipes, import diffs, and speculative bodies.
+- Check direct impact/verification surfaces, not exhaustive inventories.
+- Block unresolved implementation-shaping choices or missing evidence.
+- Never invent answers.
+- Reject pseudo-patches, exact line recipes, import diffs or speculative bodies.
 - Ignore harmless wording and safely discoverable implementation details.
-- Required changes are falsifiable candidates citing the affected member and section/check.
+- Required changes need falsifiable affected-member and section/check evidence.
 - Suggestions are non-blocking and never authorize an edit.
 
-# Verdict
 - `READY`: no correction is required before implementation.
-- `REVISE`: the plan has a concrete defect that can be corrected from the request or repository evidence without a new human decision.
-- `BLOCKED`: safe correction requires a human decision, unavailable access, or missing evidence.
+- `REVISE`: a concrete defect is correctable from request or repository facts.
+  No new human decision may be needed.
+- `BLOCKED`: safe correction needs a human decision or missing access/evidence.
 
 # Output
 Return only:
@@ -139,4 +142,4 @@ Verdict: READY | REVISE | BLOCKED
 ```
 
 Use `- None` only for empty sections.
-Keep the report scannable.
+Keep reports concise and scannable.
