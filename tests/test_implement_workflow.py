@@ -234,7 +234,7 @@ class ImplementWorkflowTests(unittest.TestCase):
             with self.subTest(card=card):
                 self.assertGreaterEqual(len(owners), 2)
         groups = list((ROOT / "config/rules/groups").rglob("*.md"))
-        self.assertEqual(19, len(groups))
+        self.assertEqual(18, len(groups))
         for group in groups:
             with self.subTest(group=group):
                 self.assertRegex(text(group), r"\A## [^\n:]+\n")

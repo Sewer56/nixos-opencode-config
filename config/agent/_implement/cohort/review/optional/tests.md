@@ -95,8 +95,6 @@ Review changed behavior and tests for meaningful acceptance coverage. Produce ca
 
 {{ file="./rules/groups/tests/test-strategy.md" }}
 
-{{ file="./rules/groups/tests/test-parameterization.md" }}
-
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review

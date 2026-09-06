@@ -100,8 +100,6 @@ Create no artifacts or review caches.
 
 {{ file="./rules/groups/tests/test-strategy.md" }}
 
-{{ file="./rules/groups/tests/test-parameterization.md" }}
-
 # Review
 - Read the request, discovery, and directly referenced targets.
 - Check fidelity, completeness, dependency order, and readiness.
