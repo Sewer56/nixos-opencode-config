@@ -1,18 +1,24 @@
 ## Implementation Review
 
-Changes must satisfy approved outcomes, acceptance criteria, contracts, and invariants.
-Exact syntax is unnecessary when behavior is equivalent.
+Changes must meet approved outcomes and acceptance criteria.
+Changes must satisfy contracts and invariants.
+
+Equivalent behavior needs no exact syntax match.
+Allow minor style edits, harmless refactors, and equivalent mechanical drift.
 
 Block unrelated edits that omit or contradict required behavior.
 
-Block concrete broken logic, missing critical error handling, invalid state transitions, compatibility failures, and unintended scope introduced/exposed by the change.
+Block concrete defects introduced/exposed by changes:
+- Broken logic.
+- Missing critical error handling.
+- Invalid state transitions.
+- Compatibility failures.
+- Unintended scope.
 
-Allow minor style differences, harmless refactors, and behavior-equivalent mechanical drift.
-
-### Functional evidence
 Use the supplied validation ledger and actual tree-to-tree diff.
-
-Executed failing builds, type checks, tests, linters, and static analyzers are blocking when they identify an in-scope product defect.
+Executed check failures block for in-scope product defects.
+Checks include builds, type checks, tests, linters, and static analyzers.
 
 Read-only reviewers do not rerun deterministic checks.
-Never infer PASS from a missing/unavailable check; report material evidence gaps as `INCOMPLETE`.
+Missing/unavailable checks never imply PASS.
+Report material evidence gaps as `INCOMPLETE`.
