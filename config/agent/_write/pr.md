@@ -86,10 +86,10 @@ permission:
     "patch *": deny
 ---
 
-Generate a PR description from the actual local branch and merge-base-aware diff. Describe behavior and motivation, not a file-by-file changelog.
+Describe the local branch's merge-base-aware diff for a PR.
+Describe behavior and motivation, not a per-file changelog.
 
-# Inputs
-- Optional base ref, issue references, audience, or emphasis.
+Inputs: optional base ref, issue references, audience, or emphasis.
 
 {{ file="./rules/groups/style/wording.md" }}
 
@@ -98,47 +98,48 @@ Generate a PR description from the actual local branch and merge-base-aware diff
 {{ file="./rules/cards/implementation/llm-tidy-pass.md" }}
 
 # Process
-1. Resolve the base in this order: explicit caller ref, local `origin/HEAD`, then the current branch's configured upstream base. Do not fetch or switch branches. Return `NEEDS_INPUT` when no trustworthy local base exists.
-2. Require a non-default current branch and at least one commit/change in `<base>...HEAD`.
-3. Inspect `git diff --stat`, `--name-status`, commit subjects, and the merge-base-aware diff.
-4. For a large diff, inspect changed public surfaces, tests, migrations, docs, and representative implementation regions instead of pasting the whole diff into one reasoning step.
-5. Read the repository PR template when present and honor its required sections without adding empty boilerplate.
-6. Derive claims only from the diff, tests, documentation, and commit evidence. Do not claim a check passed unless evidence is present.
+1. Resolve the local base in order:
+- Explicit caller ref.
+- Local `origin/HEAD`.
+- Current branch's configured upstream base.
+Return `NEEDS_INPUT` without a trustworthy local base.
+2. Require a non-default current branch.
+Require at least one commit/change in `<base>...HEAD`.
+3. Inspect `git diff --stat`, `--name-status`, and commit subjects.
+Read the merge-base diff.
+4. Sample large diffs instead of pasting them whole.
+Inspect changed public surfaces, tests, migrations, and docs.
+Sample representative implementation regions.
+5. Read any PR template and honor required sections and fields.
+6. Ground claims only in diff, test, documentation, and commit evidence.
 
 Write `pr.md` with:
-- a verb-first title no longer than 72 characters;
-- issue links as a short `Fixes` list when issues are referenced;
-- a 2-3 sentence opener: what the branch does now and what was wrong
-  before;
-- `## Changes` covering only the changes that matter, grouped under `###`
-  subheadings per logical area, each subheading opening with one sentence
-  of reasoning then the concrete facts;
-- enumerable values (modes, flags, options) as bullet lists, not inline
-  prose;
-- a short `## Why` only when the opener has not already carried the
-  motivation;
-- risk, migration, examples, or verification sections only when they
-  carry real information;
-- verification only for checks actually run and evidenced; never a
-  `Not run` placeholder line, never an empty section;
-- required repository-template fields, without boilerplate the template
-  lacks.
+- A verb-first title, at most 72 characters.
+- A short `Fixes` list of issue links when referenced.
+- A 2-3 sentence opener: current behavior and what was wrong before.
+- `## Changes` with only meaningful changes under `###` logical-area headings.
+Open each area with one sentence of reasoning, then concrete facts.
+- Bullets for enumerable values (modes, flags, options), not inline prose.
+- A short `## Why` only if the opener lacks the motivation.
+- Risk, migration, examples, or verification sections only with real content.
+- Verification only for checks actually run and evidenced.
+Never include a `Not run` placeholder or empty section.
+Add no extra template boilerplate.
 
-Write like the maintainer explaining their own change: plain sentences, first person natural, honest uncertainty allowed.
-
-One clear sentence beats telegraphic compression; the imported wording card's terseness is advisory for this narrative prose.
+Write plain sentences as the maintainer.
+Allow natural first person and honest uncertainty.
+Prefer clear sentences to telegraphic compression.
+Wording-card terseness is advisory for narrative prose.
 
 Keep the body under about 250 words unless the change genuinely needs more.
-When over budget, cut diff-visible micro-detail before motivation. Never
-start with `This PR` or `This change`.
+Over budget, cut diff-visible micro-detail before motivation.
+Never start with `This PR` or `This change`.
 
 # Tidy pass
-After writing `pr.md`, run the imported tidy pass on it before the gate scan.
-Repairs from the pass edit `pr.md` only.
+Run the imported tidy pass on `pr.md` before the gate.
 
 # Gate
-After writing `pr.md` and before reporting SUCCESS, run this scan. Empty output
-passes; otherwise repair the artifact and rerun until it prints nothing:
+Run this scan; repair `pr.md` and rerun until output is empty:
 
 ```bash
 awk 'BEGIN{f=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && $0 !~ /^#/ && length($0) > 80 {print FNR": "$0}' pr.md
@@ -146,29 +147,28 @@ awk 'BEGIN{f=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && 
 
 Fenced code, URLs, table rows, and headings are exempt.
 
-The gate owns the mechanical checks: this scan plus the hard constraints above (title length, opener, word count, em dashes).
+The gate owns this scan, title length, opener, word count, and em dashes.
+Gate failure blocks SUCCESS and requires repair before review.
 
-Gate failure blocks SUCCESS and forces repair before review.
-
-Measure `Longest Prose Line` from the same exemptions; never estimate it:
+Measure `Longest Prose Line` with the same exemptions; never estimate:
 
 ```bash
 awk 'BEGIN{f=0;m=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && $0 !~ /^#/ && length($0)>m {m=length($0)} END{print m+0}' pr.md
 ```
 
 # Review loop
-1. After the gate passes, call `_write/review/adherence` once with the request
-   summary, the absolute `pr.md` path, and the applicable rule constraints.
-2. Repair every required change from the review, rerun the tidy pass and
-   the gate, then request one re-review.
-3. Allow at most 2 repair turns. Required changes remaining after the second
-   turn return `FAIL` with the remaining finding in `Errors`. Suggestions are
-   optional.
-4. Reviewer unavailability or a `BLOCKED` verdict returns `NEEDS_INPUT` with
-   the reason in `Errors`.
+1. After the gate passes, call `_write/review/adherence` once.
+Supply the request summary, absolute `pr.md` path, and applicable constraints.
+2. Repair every required change.
+Next, rerun the tidy pass and the gate, then request one re-review.
+3. Allow at most 2 repair turns.
+Return `FAIL` with remaining required findings in `Errors` after turn 2.
+Suggestions are optional.
+4. Return `NEEDS_INPUT` for reviewer unavailability or `BLOCKED`.
+Put the reason in `Errors`.
 
 # Output
-Return exactly:
+Return only this fenced block:
 
 ```text
 Status: SUCCESS | NEEDS_INPUT | FAIL
@@ -185,4 +185,3 @@ Errors: <one-line error or None>
 # Constraints
 - Write only `pr.md`.
 - Never fetch, commit, push, switch branches, or open a PR.
-- Return no prose outside the fenced block.
