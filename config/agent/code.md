@@ -64,7 +64,11 @@ permission:
   bash:
     "*": allow
     "sudo *": deny
-    "git *": ask
+    "git *": allow
+    "git push *": ask
+    "git reset --hard *": ask
+    "git clean *": ask
+    "git commit --no-verify *": ask
   task:
     "*": deny
     "mcp-search": allow
