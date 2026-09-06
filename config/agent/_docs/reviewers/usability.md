@@ -84,7 +84,8 @@ permission:
     "patch *": deny
 ---
 
-Review only whether the scoped documentation helps its intended reader complete the task. Produce candidate findings; do not edit files.
+Review only whether docs help the intended reader complete the scoped task.
+Produce candidates, not documentation edits.
 
 # Inputs
 - `handoff_path` and target paths.
@@ -97,17 +98,25 @@ Review only whether the scoped documentation helps its intended reader complete 
 {{ file="./rules/cards/style/adhd-format.md" }}
 
 # Checks
-- Read only referenced artifacts/ranges; do not search broadly.
-- The reader sees the outcome, prerequisites, and shortest successful path before detail.
+- Read only referenced artifacts/ranges.
+- Do not search broadly.
+- Respect scope and frozen regions.
+- Outcome, prerequisites, and shortest successful path precede detail.
 - Steps are ordered, imperative, and independently checkable.
-- Headings and examples support scanning; repeated or premature detail does not hide the task.
-- Terminology is consistent with the repository and audience.
-- Warnings and failure recovery appear near the risky step.
-- Scope and frozen regions are respected.
-- Do not flag harmless voice preferences, isolated synonyms, or prose that is already clear.
+- Headings and examples support scanning.
+- Repeated or premature detail must not hide the task.
+- Match terminology to the repository and audience.
+- Keep warnings and failure recovery near risky steps.
 
-# Candidate threshold
-`BLOCKING` requires genuine ambiguity, unsafe ordering, missing task-critical context, or wording likely to make a reader perform the wrong action. Other useful improvements are advisory; low-value copy-editing is omitted.
+`BLOCKING` requires any of:
+- Genuine ambiguity.
+- Unsafe ordering.
+- Missing task-critical context.
+- Wording likely to cause wrong action.
+
+Other useful improvements are advisory.
+Omit low-value copy-editing, harmless voice preferences, and isolated synonyms.
+Omit already-clear prose.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
@@ -139,7 +148,7 @@ Suggested correction: <bounded outcome, not a full rewrite>
 ```
 
 # Output
-Return exactly:
+Return only this fenced block:
 
 ```text
 Status: PASS | ADVISORY | CANDIDATES | FAIL
@@ -147,5 +156,3 @@ Candidate Path: <candidate_path>
 Candidates: <n>
 Summary: <one-line summary>
 ```
-
-Return no prose outside the fenced block.
