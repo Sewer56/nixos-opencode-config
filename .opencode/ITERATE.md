@@ -1,53 +1,58 @@
 # Iterate guide
 
-`/iterate/edit` creates, updates, moves, deletes, or verifies LLM instructions and related OpenCode agents, commands, rules, skills, validation, tests, and human docs.
-
-Use it for instruction artifacts. Use `/draft` and `/implement` for product code.
-
-## Examples
+`/iterate/edit` changes or verifies instructions and related OpenCode files.
+Use `/draft` and `/implement` for product code.
+Give exact paths or describe observable behavior and its command/role.
 
 ```text
-/iterate/edit Update config/agent/codebase-explorer.md to report direct consumers.
 /iterate/edit Move config/command/write/pr.md and preserve routing.
-/iterate/edit Delete an obsolete agent and every active route to it.
 /iterate/edit Verify implementation reviewers cannot edit code; change nothing.
-/iterate/edit Simplify the iterate workflow without weakening review.
 ```
-
-Give exact paths when known. Otherwise name observable behavior and current command/role. Workflow asks at most one material question before editing.
 
 ## Lifecycle
 
-```text
-request
-  -> discover exact targets and direct consumers
-  -> write compact behavioral contract
-  -> one editor
-  -> stage exact target paths
-  -> deterministic checks
-  -> focused review when behavior or risk requires it
-  -> refute-first finding verification
-  -> at most two repairs
-  -> final result
-```
+1. Inspect targets, consumers, instructions, and dependent checks.
+2. Lock exact actions in a behavioral contract.
+3. Delegate to one editor, then stage permitted target changes.
+4. Run deterministic checks before independent review and finding verification.
+5. Allow at most two repair turns before final checks and result.
 
-Workflow assumes no concurrent writer. It edits current target contents, stages only target paths, and ignores unrelated Git state.
+Editor chooses routine in-scope details without questions.
+Precedence resolves apparent conflicts, not real authority conflicts.
+Only unresolved material choices or incompatible target edits need questions.
+
+Current target edits are input; unrelated index/worktree state is preserved.
+Changed targets are reread; compatible edits need no lock question.
+Only orchestrator stages; staging-only issues do not block writing.
 
 ## Contract
 
-Run-local `contract.md` names:
+`contract.md` records base commit, actions, behavior, non-goals, and lenses.
+Actions are `CREATE`, `UPDATE`, `DELETE`, `MOVE`, or `VERIFY`.
+Consumers provide context, not write permission.
 
-- base commit;
-- exact `CREATE`, `UPDATE`, `DELETE`, `MOVE`, or `VERIFY` actions;
-- observable required behavior;
-- behavior to preserve and non-goals;
-- required behavior, architecture, and adversarial review lenses.
+Assertions needing changes must be `UPDATE` before scope freezes.
+`VERIFY` is no-edit; pure moves preserve bytes/mode unless contracted.
+Frozen contract defects are `INCOMPLETE`, never permission to expand or ask.
 
-Consumers define context, not edit permission. `VERIFY` means no change. Pure moves preserve bytes/mode unless contract says otherwise.
+Updates preserve decision boundaries at equal or smaller token count.
+Orchestrator records reproducible old/new counts.
 
-## Deterministic checks
+## Continuation
 
-Orchestrator stages only contracted paths, then checks:
+Orchestrator saves returned editor `task_id` in run-local `editor-task.md`.
+Repairs and same-run continuation reuse it only with unchanged authority.
+Revalidate request, contract, and target state before resuming.
+
+The ID is a tool argument, never another `<editor-inputs>` prompt field.
+Changed authority requires fresh preflight and a new task.
+
+Stale or unavailable identity requires a recorded fallback before a new task.
+Never silently reuse identity across runs.
+
+## Checks and review
+
+Orchestrator inspects actual staged actions and runs:
 
 ```bash
 git diff --cached --name-status --find-renames HEAD -- <target paths>
@@ -56,54 +61,36 @@ python3 scripts/validate-opencode-config.py --repo-root .
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-Implementation tests run when workflow/validator changes. Whole-config validator covers parsing, frontmatter, imports, routes, reachability, task depth, permissions, syntax, documentation links, and required global options.
+Workflow tests apply to control-file, test, and validator changes.
+Static regression checks are not live agent execution.
+Validator checks syntax, imports, routing, permissions, and documentation links.
 
-## Review
+Missing required evidence is `INCOMPLETE`, not PASS.
+Use `nix develop` if declared Python dependencies are missing.
 
-One reviewer applies only required behavior, architecture, and adversarial lenses to staged diff. Separate verifier attempts to refute candidates only when the review reports findings; it is skipped when there are none. Only verified target blockers reach editor. Advisories remain visible but are not automatic repairs.
+Independent review applies required lenses to the staged diff.
+Separate verifier attempts to refute candidates only when the review reports findings; it is skipped when there are none.
 
-Self-edits rerun whole-config validation and implementation workflow tests, then receive architecture and adversarial review.
+Only deterministic failures and verified `TARGET` blockers reach editor.
+Advisories remain visible without automatic repair.
 
-## Artifacts
+Self-edits require workflow tests plus architecture and adversarial review.
+Each repair reruns checks, affected reviews, and candidate verification.
+
+## Artifacts and outcomes
 
 ```text
-request.md      original request
-contract.md     concise edit authority
-preflight.md    optional pre-edit checks for self-change
-validation.md   whole-config validation result
-tests.md        implementation workflow test result when required
-review.md       conditional candidates
-verdict.md      conditional verified findings
-result.md       concise final outcome
+request.md, contract.md       intent and frozen authority
+preflight.md, editor-task.md  checks and run-bound identity
+validation.md, tests.md       deterministic results
+review.md, verdict.md         review and conditional verification
+result.md                    status, actions, checks, reviews, missing evidence
 ```
 
-After interruption, inspect staged diff and artifacts; start fresh when authority is uncertain.
+- `SUCCESS`: permitted exact actions and all required gates pass.
+- `NEEDS_INPUT`: unresolved material choice needs a decision.
+- `INCOMPLETE`: contract defect or missing required evidence.
+- `FAIL`: target blocker survives two repairs or authority integrity fails.
 
-## Outcomes
-
-- `SUCCESS`: exact staged actions, checks, required review, and verification pass.
-- `NEEDS_INPUT`: material choice needs human decision.
-- `INCOMPLETE`: required live/evaluation evidence unavailable or contract defect discovered after editing.
-- `FAIL`: proven target defect remains after two repairs or authority integrity failed.
-
-## Troubleshooting
-
-### Out-of-contract change
-
-Restore only accidental workflow edit manually or start fresh with correct explicit target. Never widen contract after editing.
-
-### Validation dependency missing
-
-Use `nix develop` for declared Python dependencies. Missing required environment is `INCOMPLETE`, not PASS.
-
-## Active files
-
-| File | Role |
-|---|---|
-| [`edit.md`](agent/_iterate/edit.md) | Orchestrator, contract, staging, checks, repair limit. |
-| [`editor.md`](agent/_iterate/editor.md) | Sole instruction writer. |
-| [`review.md`](agent/_iterate/review.md) | Focused independent review. |
-| [`verifier.md`](agent/_iterate/verifier.md) | Refute-first finding gate. |
-| [`instruction-authoring.md`](rules/instruction-authoring.md) | Runtime authoring standard for future commands. |
-
-See [instruction architecture rationale](../EXPLAINER.md#instruction-authoring-and-iterate).
+Restore only accidental workflow edits, never pre-existing changes.
+Do not widen a frozen contract to repair an out-of-scope defect.

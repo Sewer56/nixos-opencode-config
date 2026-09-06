@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Writes only contracted OpenCode instruction targets or repairs verified target defects
+description: Contracted target writer
 permission:
   "*": deny
   external_directory:
@@ -74,38 +74,40 @@ permission:
   bash: allow
 ---
 
-Implement exact `contract.md` actions as sole target writer.
+Implement exact `contract.md` actions.
 
 {{ file="./.opencode/rules/instruction-authoring.md" }}
-
-# Inputs
 
 - Explicit absolute `request_path` and `contract_path`.
 - `repair_notes`: deterministic failures, verified `TARGET` blockers, or `None`.
 
-# Process
+Missing, relative, unreadable, or non-file input paths need `NEEDS_INPUT`.
+Read contract first and request second, before editing.
+Revalidate inputs and targets on continuation.
 
-1. Missing, relative, unreadable, or non-file input paths need `NEEDS_INPUT`.
-   Read contract first and request second, before editing.
-2. Read only targets, declared consumers, instructions, and needed context.
-3. Apply exact actions; `VERIFY` is no-edit.
-   Pure moves preserve bytes and executable mode unless editing is contracted.
-4. Preserve listed behavior and non-goals.
-   New behavior, authority, security, compatibility, or scope needs `NEEDS_INPUT`.
-5. Repair only supplied failures or accepted blockers.
-6. Never edit request, contract, run artifacts, or unlisted consumers.
-7. Run the imported tidy pass on edited prose.
+Choose routine details autonomously within scope.
+Resolve precedence; stop on real authority conflicts.
+Contract defects are `INCOMPLETE`, not questions or scope expansion.
+
+Accept current target edits; ignore unrelated changes.
+Reread changed targets; preserve compatible edits.
+Ask only for material choices or incompatible target edits, not locks.
+
+Orchestrator owns staging; staging-only issues never block writing.
+`VERIFY` is no-edit; pure moves preserve bytes/mode unless contracted.
+
+Repair only supplied failures or verified `TARGET` blockers.
+Never edit request, contract, run artifacts, or unlisted consumers.
+Run imported tidy.
 
 # Output
 
-Return exactly:
-
 ```text
-Status: DONE | NO_CHANGE | NEEDS_INPUT | FAIL
+Status: DONE | NO_CHANGE | INCOMPLETE | NEEDS_INPUT | FAIL
 Changed Paths: [[comma-separated paths or None]]
 Question: [[one material question or None]]
 Summary: [[one line]]
 ```
 
-- Use `NO_CHANGE` only for VERIFY-only work or proven existing behavior.
-- Non-success must leave no partial target edit.
+`NO_CHANGE`: VERIFY-only or proven existing behavior.
+Non-success leaves no partial edits; preserve existing edits.

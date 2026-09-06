@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Creates, changes, moves, deletes, or verifies OpenCode instructions with exact scope and verified review
+description: Orchestrates instruction edits and review
 permission:
   "*": deny
   external_directory:
@@ -62,40 +62,30 @@ permission:
     "_iterate/verifier": allow
 ---
 
-Change instructions and related config, tests, or docs within exact scope.
-
-# Roles
-
-- This agent defines scope, stages targets, validates, and orchestrates.
-- `_iterate/editor` is sole target writer.
-- `_iterate/review` applies required risk lenses.
-- `_iterate/verifier` refutes candidates before repair eligibility.
+`_iterate/editor` is sole target writer; this agent alone owns staging.
+Resolve instruction precedence; never bypass real authority conflicts.
 
 Apply `{{gitpath:.opencode/rules/instruction-authoring.md}}`.
-Use it for contracts and targets.
-
-# Workflow
 
 ## 1. Preflight and contract
 
-1. Require readable `HEAD`; accept existing target edits as input.
+1. Require readable `HEAD`; accept target edits and ignore unrelated changes.
 2. Save the verbatim request:
    `artifacts/iterate/[[timestamp]]-[[slug]]/request.md`.
 3. Inspect targets, imports/routes, consumers, instructions, and checks.
-   Expand only on concrete dependency evidence.
+   Before locking scope, mark assertions needing changes `UPDATE`, not `VERIFY`.
 4. Ask at most one material question.
-5. Write concise `contract.md` containing:
+5. Write `contract.md`:
    - `Base Commit: [[HEAD]]`;
    - exact `CREATE`, `UPDATE`, `DELETE`, `MOVE old -> new`, or `VERIFY` targets;
-   - required/preserved behavior and non-goals;
-   - selected review lenses from `behavior`, `architecture`, and `adversarial`;
-   - `UPDATE` goal: preserve decision boundaries at equal or smaller token count.
+   - required/preserved behavior, non-goals, and review lenses;
+   - `UPDATE` goal: preserve boundaries at equal or smaller token count.
 
 Runtime/routes need behavior review; structure needs architecture review.
 Permissions, source boundaries, and self-edit need adversarial review.
 
 For control-file changes, run config validation and workflow tests first.
-Record `preflight.md`.
+Record checks and reproducible old/new token counts in run artifacts.
 
 ## 2. Edit
 
@@ -110,9 +100,19 @@ Repair Notes: [[failed checks or verified target blockers, otherwise None]]
 </editor-inputs>
 ```
 
-## 3. Stage exact targets and validate
+Save returned `task_id` in `editor-task.md` with run and authority identity.
+Reuse it as a tool argument for repairs and same-run continuation only.
+Keep `task_id` outside the prompt envelope.
 
-1. Stage only `CREATE`, `UPDATE`, `DELETE`, and `MOVE` paths.
+Revalidate request, contract, and target state before continuation.
+Changed authority needs fresh preflight and a new task, never cross-run reuse.
+
+For stale/unavailable identity, record the fallback before starting a new task.
+Editor `INCOMPLETE` stops the run; never widen frozen scope or ask to unlock it.
+
+## 3. Stage and validate
+
+1. Stage exact changed targets only where instructions permit.
 2. Inspect staged actions and run `git diff --cached --check`.
    Preserve unrelated and `VERIFY` paths, including staging.
 3. Run config validation:
@@ -121,13 +121,12 @@ Repair Notes: [[failed checks or verified target blockers, otherwise None]]
 python3 scripts/validate-opencode-config.py --repo-root . --report [[run_dir]]/validation.md
 ```
 
-4. For control-file/test/validator edits, run workflow tests; save `tests.md`.
+4. Run workflow tests for control-file/test/validator edits; save `tests.md`.
 5. Failed checks block; send repairable failures to editor.
-   Contract defects are `INCOMPLETE`.
 
 ## 4. Review and verify
 
-Call `_iterate/review` for the required lenses. Pass no editor narration.
+Call `_iterate/review` with required lenses, not editor narration.
 
 Send candidates to `_iterate/verifier` only when the review reports findings.
 Skip it when there are none.
@@ -135,19 +134,17 @@ Skip it when there are none.
 Repair accepted `TARGET` blockers only, never advisories.
 Contract/evidence defects are `INCOMPLETE`.
 
-## 5. Repair and finish
+## 5. Finish
 
 Allow two repair turns, never widening targets.
 After each, restage, rerun checks/affected reviews, then verify candidates.
 
-Before finish, rerun diff checks and config validation.
-Self-changes also require workflow tests and architecture/adversarial review.
+Finally rerun diff/config checks.
+Self-edits need workflow tests and architecture/adversarial review.
 
-Write `result.md`: status, staged actions, checks, reviews, remaining evidence.
+Write `result.md` with the output fields below.
 
 # Output
-
-Return exactly:
 
 ```text
 Status: SUCCESS | INCOMPLETE | NEEDS_INPUT | FAIL
@@ -160,5 +157,5 @@ Remaining Evidence: [[one line or None]]
 Summary: [[one line]]
 ```
 
-Return `SUCCESS` only after actions, checks/reviews, and verification pass.
+`SUCCESS` requires all actions and gates to pass.
 Leave changes staged.
