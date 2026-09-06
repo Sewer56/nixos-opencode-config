@@ -502,6 +502,9 @@ def main() -> int:
 
     max_depth, max_path, cycles = longest_depth(graph, command_roots)
     for cycle in cycles:
+        # Only agent `code` may self-delegate; every other cycle is an error.
+        if cycle == ["code", "code"]:
+            continue
         errors.append("custom task cycle: " + " -> ".join(cycle))
     if max_depth > MAX_CUSTOM_TASK_DEPTH:
         errors.append(f"custom task depth {max_depth} exceeds policy maximum {MAX_CUSTOM_TASK_DEPTH}")

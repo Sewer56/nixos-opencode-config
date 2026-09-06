@@ -1,6 +1,6 @@
 ---
-mode: primary
-description: Coding agent; reviewers and verifier only on explicit request
+mode: all
+description: General-purpose coding agent
 permission:
   "*": deny
   external_directory:
@@ -69,6 +69,7 @@ permission:
     "git commit --no-verify *": ask
   task:
     "*": deny
+    "code": allow
     "web-search": allow
     "codebase-explorer": allow
     "_implement/cohort/review/correctness": allow
