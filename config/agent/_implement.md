@@ -81,19 +81,14 @@ permission:
 
 - For a new run, bind `base_commit=HEAD`.
 - Bind `artifact_base` to the draft basename without `.draft.md`.
-- Use a UTC `run_id`, with a numeric suffix on collision.
+- Suffix `run_id` numerically on collision.
 
 {{ file="./rules/cards/implementation/artifact-paths.md" }}
 
-## Resume
-
 - Accept user-directed resume using recovered context/history/evidence.
-  Recover original run/base, cohort starts, completion, and consumed limits.
-  Include cohort/final repairs and CodeRabbit fixes/re-reviews without resets.
-- Apply shared partial-work safeguards with fresh evidence, not checkpoints.
-- Ask for unclear ownership/facts; continue unfinished dependency-ready cohorts.
-
-# Process
+- Recover original run/base, cohort starts, completion, and consumed limits.
+- Include cohort/final repairs and CodeRabbit fixes/re-reviews without resets.
+- Apply shared resume safeguards; checkpoints are not evidence.
 
 ## 1. Preflight the root index
 
@@ -119,8 +114,7 @@ permission:
 
 - Resume authorized pending final edits through staged-repair steps 3–8.
 
-1. Get `base_commit..HEAD` paths, including both source/destination of renames.
-   - Include both paths for copies too.
+1. Get `base_commit..HEAD` paths, both source/destination for renames/copies.
 2. Run root full validation; missing environment is `INCOMPLETE`.
    - Send code failures to `_implement/integration-repair`.
    - Supply `plan_path`, `handoff_path`, `base_commit`, and protected user paths.
@@ -185,7 +179,7 @@ Prior Verdict Paths: [[concrete paths or None]]
 - It applies its own bounded fixes with validation and one re-review.
 - Never review for it; pass recovered resume limits/evidence.
 - Resume its existing task within remaining limits, or return `INCOMPLETE`.
-- Skip completed external work only with current evidence.
+- Skip completed work only with current evidence.
 
 - `PASS`/`ADVISORY`: proceed, recording its artifact paths.
 - `FAIL`: return `FAIL` with newest blockers artifact and uncommitted edits.
@@ -203,7 +197,6 @@ Prior Verdict Paths: [[concrete paths or None]]
 
 - Require acceptance coverage, committed cohorts, and final validation PASS.
 - Require complete local/external reviews and no blocker.
-- Preserve unrelated changes.
 
 # Output
 
