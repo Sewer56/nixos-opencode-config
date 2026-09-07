@@ -1,41 +1,42 @@
 ## Test Strategy
 
-Test implementation behavior, not compiler guarantees.
-Assert observable behavior tied to acceptance criteria.
+Test observable acceptance behavior, not compiler guarantees.
 
-Cover critical changes: success, failure, and edge cases.
-Cover all new code when the task requires tests.
+Cover critical success, failure, and edge cases.
+Cover all new code when tests are required.
 
 Equivalence claims need one test executing both paths and asserting equal final rendered/consumed results.
 Request-shape mocks do not prove equivalence.
 
-Do not add redundant coverage except across public entry points.
-Repeated coverage there is intentional and must not be flagged.
+Allow redundancy only across public entry points; never flag it there.
 
-Before adding tests, reuse tests matching setup and entry point.
-Fold in assertions.
-Parameterize when all cases make one claim and only data varies.
-Use separate tests with a shared helper if claims differ or no single name fits.
+First extend tests matching setup and entry point.
 
-Name each case descriptively.
-Keep argument order stable: primary input → mode/flags → expected output.
+Parameterize independent cases making one claim with data-only variation.
+Use named framework cases, not data loops.
+
+Use a parameterization framework, such as Rust's rstest; add it if needed.
+Keep separate tests if claims differ or no single name fits.
+
+Allow loops intrinsic to one stateful scenario or assertion.
+
+Name cases descriptively.
+Order arguments: primary input → mode/flags → expected output.
 Comment only non-obvious parameters or assertions.
-Keep cases human-friendly around 80-100 characters per line.
+Keep readable cases around 80-100 columns.
 
-Map every removed redundant assertion to a surviving test.
+Map removed redundant assertions to surviving tests.
 Examples never replace tests.
 
-Reuse helpers.
-Extract shared helpers only to reduce repetition or clarify setup across tests.
+Reuse helpers; extract only for repetition or shared setup clarity.
 Prefer one parameterizable local helper over per-test mock structs.
 
-Keep tests deterministic.
-Avoid real I/O, time, and network unless controlled, seeded, or frozen.
+Ensure determinism; control, seed, or freeze real I/O, time, and network.
 
-Name tests by acceptance behavior, not labels or internal IDs.
+Name tests by acceptance behavior, not labels or IDs.
 Use `subject_should_expectation_when_condition` in language identifier style.
 
-Include `when` for conditional or edge behavior, otherwise omit it.
+Use `when` only for conditional or edge behavior.
 Drop module-redundant prefixes.
 
 Group related tests with lightweight section comments.
