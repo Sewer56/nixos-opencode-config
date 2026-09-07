@@ -1,17 +1,15 @@
 ## Wording
 
-Use project-defined concept names consistently across artifacts.
-Keep technical terms, code identifiers, and API/CLI names exact.
-Keep commands, paths, and URLs exact.
-Keep safety wording exact.
+Use the fewest words that preserve meaning, clarity, and required coverage.
+Make prose scannable with headings, lists, and formatting.
 
-Define meaningful distinctions between terms.
-Prefer short ordinary words over filler or cryptic shorthand.
+Cut needless content, not useful structure or repetition.
+Keep unique facts and useful example lead-ins.
 
-Use the fewest words that preserve meaning and clarity.
+Keep terms, identifiers, and API/CLI names exact.
+Keep commands, paths, URLs, and safety wording exact.
+Use project terms without blurring distinctions.
+
 Use professional prose with one idea per sentence.
 Use one checkable action per instruction bullet.
-
-Prose beside examples adds new information.
-Purpose-bearing lead-ins are exempt.
-When cutting repetition, keep unique facts in partly repeated clauses.
+Stay within scope and permissions.

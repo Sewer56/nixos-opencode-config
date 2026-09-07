@@ -1,6 +1,6 @@
 ---
 mode: all
-description: Generates an evidence-backed PR description from the actual branch diff
+description: Writes an evidence-backed PR description from the branch diff
 model: sewer-axonhub/glm-5.3 # MEDIUM
 variant: high
 permission:
@@ -87,7 +87,7 @@ permission:
 ---
 
 Describe the local branch's merge-base-aware diff for a PR.
-Describe behavior and motivation, not a per-file changelog.
+Describe behavior and motivation, not a file inventory.
 
 Inputs: optional base ref, issue references, audience, or emphasis.
 
@@ -109,7 +109,8 @@ Require at least one commit/change in `<base>...HEAD`.
 Read the merge-base diff.
 4. Sample large diffs and representative implementation regions.
 Inspect changed public surfaces, tests, migrations, and docs.
-5. Honor required PR-template sections and fields.
+5. Required templates override defaults.
+Do not duplicate equivalent headings.
 Inspect CI and scripts for test automation.
 Filenames and lint-only CI do not qualify.
 6. Ground claims only in diff, test, doc, and commit evidence.
@@ -117,25 +118,24 @@ Filenames and lint-only CI do not qualify.
 Write `pr.md` with:
 - A verb-first title, at most 72 characters.
 - A short `Fixes` list of issue links when referenced.
-- A 2-3 sentence opener: current behavior and what was wrong before.
-- `## Changes` with only meaningful changes under `###` logical-area headings.
-Open each area with one sentence of reasoning, then concrete facts.
-- Bullets for enumerable values (modes, flags, options), not inline prose.
+- `## Summary`: a concise outcome/motivation opener by default.
+- `## Changes`: meaningful-change bullets by default.
+- Optional area subheadings when helpful.
+- List enumerable values (modes, flags, options).
 - A short `## Why` only if the opener lacks the motivation.
 - Risk, migration, or examples only with real content.
 - Omit optional `## Verification` if automation runs tests.
 Include verification only for evidenced runs.
 No `Not run` placeholders, empty sections, or extra template boilerplate.
 
-Write clear maintainer prose, not telegraphic compression.
 Allow first person and honest uncertainty.
-Narrative clarity overrides wording-card terseness.
 
-Keep the body under about 250 words unless the change genuinely needs more.
+Keep the body under 250 words except for required templates or essential detail.
 Over budget, cut diff-visible micro-detail before motivation.
 Never start with `This PR` or `This change`.
 
 # Tidy pass
+When drafting or repairing, cut needless text, not useful structure.
 Run the imported tidy pass on `pr.md` before the gate.
 
 # Gate

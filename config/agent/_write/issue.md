@@ -106,18 +106,17 @@ Use `codebase-explorer` only for one narrow repository fact.
 The fact must materially improve the issue.
 
 Write root `ISSUE-<slug>.md` with a short slug and the repository template.
-Without a template, include only useful sections:
-- outcome-oriented title;
-- problem or motivation;
-- current and expected behavior;
-- reproduction/example for a bug;
-- acceptance criteria for a feature/fix;
-- constraints, risk, or compatibility notes;
-- relevant evidence.
+Use an outcome-oriented title.
+Combine overlapping problem, current behavior, and expected outcome text.
+
+Include reproduction, acceptance criteria, and evidence only when useful.
+Include constraints, risks, and compatibility notes only when useful.
 Preserve unknowns explicitly.
+
 Ask one focused question only to avoid asserting a false or unsafe requirement.
-Keep prescriptions at contract level unless technical design is requested.
-The user must request it explicitly.
+Keep prescriptions at contract level unless the user explicitly requests design.
+
+In drafting or repair, briefly cut repetition and needless sections/examples.
 
 # Gate and review
 After writing, pass this gate before review or SUCCESS.

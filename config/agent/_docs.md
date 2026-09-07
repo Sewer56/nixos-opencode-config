@@ -124,11 +124,12 @@ Create or overwrite exact assigned paths without placeholders or stubs.
 - Read scoped docs, mapped behavior, and referenced implementation.
 - Limit follow-up searches to narrow link/fidelity verification.
 - `WRITE`: draft requested content using repository terminology.
-- Back examples with actual behavior.
 - `REVIEW`: inspect without editing until eligible repairs below.
-- Order tasks: outcome, prerequisites, steps, examples, verification.
-- Follow with troubleshooting, then reference when applicable.
-- Keep examples internally consistent and runnable under documented assumptions.
+- Choose sections for reader tasks and coverage, not a fixed outline.
+- Put optional depth after the shortest successful path.
+- Keep warnings and recovery near risky steps.
+- Keep examples faithful, consistent, and runnable under stated assumptions.
+- In authorized edits, briefly cut repetition and needless sections/examples.
 - Record target paths, scope, and frozen regions in the handoff before edits.
 - Add audience, evidence-needed claims, changed sections, and check commands.
 
@@ -136,8 +137,8 @@ Create or overwrite exact assigned paths without placeholders or stubs.
 - Validate current targets directly.
 - Do not stage files.
 - Run the narrowest repository-native documentation checks before review.
-- Use applicable formatters, Markdown linters, and link/anchor checkers.
-- Include doc builds, example compilation, or project equivalents as applicable.
+- Run applicable formatters, Markdown linters, and link/anchor checks.
+- Run doc builds and example compilation or project equivalents as applicable.
 - Run the imported tidy pass on every drafted or repaired `.md` target.
 - Never install tools or invent commands.
 - Record commands, exit status, and key output in round validation evidence.
