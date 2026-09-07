@@ -1,15 +1,15 @@
 ## Wording
 
-Use the fewest words that preserve meaning, clarity, and required coverage.
-Make prose scannable with headings, lists, and formatting.
+Use the fewest words preserving meaning, clarity, and required coverage.
+Keep useful structure, repetition, unique facts, and example lead-ins.
 
-Cut needless content, not useful structure or repetition.
-Keep unique facts and useful example lead-ins.
+Docs: prefer current behavior over implementation history.
+Emphasize this in code comments and API docs.
 
 Keep terms, identifiers, and API/CLI names exact.
 Keep commands, paths, URLs, and safety wording exact.
-Use project terms without blurring distinctions.
+Preserve project distinctions.
 
-Use professional prose with one idea per sentence.
+Use scannable professional prose with one idea per sentence.
 Use one checkable action per instruction bullet.
 Stay within scope and permissions.
