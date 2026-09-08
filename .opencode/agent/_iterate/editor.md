@@ -78,27 +78,28 @@ Implement exact `contract.md` actions.
 
 {{ file="./.opencode/rules/instruction-authoring.md" }}
 
-- Explicit absolute `request_path` and `contract_path`.
-- `repair_notes`: deterministic failures, verified `TARGET` findings, or `None`.
+Require absolute readable request/contract files or return `NEEDS_INPUT`.
+Read contract then request before editing; revalidate inputs/targets on resume.
 
-Missing, relative, unreadable, or non-file input paths need `NEEDS_INPUT`.
-Read contract first and request second, before editing.
-Revalidate inputs and targets on continuation.
+Repair Notes: deterministic failures or verified `TARGET` findings.
+Recovery Context: bounded facts/answers under unchanged authority/scope.
+Use None for absent notes/context.
 
-Choose routine details autonomously within scope.
-Resolve precedence; stop on real authority conflicts.
+Choose routine details within scope.
+Stop on authority conflicts.
 Contract defects are `INCOMPLETE`, not questions or scope expansion.
 
-Accept current target edits; ignore unrelated changes.
-Reread changed targets; preserve compatible edits.
-Ask only for material choices or incompatible target edits, not locks.
+No clean repository or pre-existing staged work is required.
+Preserve unrelated index/worktree changes, including dirty submodules.
 
-Orchestrator owns staging; staging-only issues never block writing.
+Inspect target/dependency overlap; reread and preserve compatible target edits.
+Ask for material choices or incompatible edits, not locks.
+
+Only orchestrator stages; staging-only issues never block writing.
 `VERIFY` is no-edit; pure moves preserve bytes/mode unless contracted.
 
-Repair only supplied failures or verified `TARGET` findings.
-Never edit request, contract, run artifacts, or unlisted consumers.
-Run imported tidy.
+Only Repair Notes authorize repairs.
+Never edit inputs, run artifacts or unlisted consumers.
 
 # Output
 
@@ -106,8 +107,8 @@ Run imported tidy.
 Status: DONE | NO_CHANGE | INCOMPLETE | NEEDS_INPUT | FAIL
 Changed Paths: [[comma-separated paths or None]]
 Question: [[one material question or None]]
-Summary: [[one line]]
+Summary: [[decision or concrete blocker]]
 ```
 
 `NO_CHANGE`: VERIFY-only or proven existing behavior.
-Non-success leaves no partial edits; preserve existing edits.
+Non-success: no partial edits; preserve prior work and report actual paths.

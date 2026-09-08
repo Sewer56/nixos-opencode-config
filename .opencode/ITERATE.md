@@ -2,7 +2,8 @@
 
 `/iterate/edit` changes or verifies instructions and related OpenCode files.
 Use `/draft` and `/implement` for product code.
-Give exact paths or describe observable behavior and its command/role.
+
+Give paths or observable behavior and its command/role.
 
 ```text
 /iterate/edit Move config/command/write/pr.md and preserve routing.
@@ -11,20 +12,22 @@ Give exact paths or describe observable behavior and its command/role.
 
 ## Lifecycle
 
-1. Discuss goal, constraints, design, success and a small task outline.
-2. Use bounded read-only discovery and focused questions until agreement.
-3. Require explicit design agreement and authorization before any documents.
-   Reuse earlier agreement for unchanged scope; invocation or thanks is not it.
-   Before agreement, create no request, contract, run record or local exclude.
-4. Inspect targets/consumers/checks and freeze exact actions in a contract.
-5. Delegate to one editor, then stage permitted target changes.
-6. Run deterministic checks before independent review and finding verification.
-7. Allow at most two repair turns before final checks and result.
+1. Discuss goal, constraints, design, success and outline using read-only work.
+2. Agree design and authorize documents before writes.
+   Reuse agreement only for unchanged scope.
+   Invocation or thanks is not agreement; ask focused questions until agreed.
+3. Inspect targets/consumers/checks and freeze exact actions in a contract.
+4. Delegate writing to one editor; orchestrator alone stages exact target paths.
+5. Run deterministic checks before independent review and finding verification.
 
-Editor chooses mechanics; material choices/incompatible edits need input.
+Both roles choose routine details.
+Material choices or incompatible edits need input.
 
-Current target edits are input; unrelated index/worktree state is preserved.
-Only orchestrator stages; staging-only issues do not block writing.
+No clean repository or pre-existing staged work is required.
+Preserve unrelated index/worktree state, including dirty submodules.
+
+Inspect target/dependency overlap and preserve compatible current target edits.
+Staging-only issues do not block writing.
 
 ## Contract
 
@@ -33,24 +36,32 @@ Actions are `CREATE`, `UPDATE`, `DELETE`, `MOVE`, or `VERIFY`.
 
 Assertions needing changes must be `UPDATE` before scope freezes.
 `VERIFY` is no-edit; pure moves preserve bytes/mode unless contracted.
-Frozen contract defects are `INCOMPLETE`, never permission to expand or ask.
+Frozen defects are `INCOMPLETE`, not permission to expand or ask.
 
-Updates preserve decision boundaries at equal or smaller token count.
-Orchestrator records raw cl100k_base old/new counts and expanded agent bodies.
-Expanded counts include imports so deduplication cannot hide prompt growth.
+Updates preserve boundaries without token growth.
+Orchestrator records raw/expanded cl100k_base old/new counts, including imports.
 
 ## Continuation
 
-Orchestrator saves returned editor `task_id` in run-local `editor-task.md`.
-Repairs and same-run continuation reuse it only with unchanged authority.
-Revalidate request, contract, and target state before resuming.
+On non-success, check cause/authority/contract/evidence/targets.
+Correct mistakes, obtain evidence, retry transient failures.
 
-The ID is a tool argument, not a prompt field; never reuse it across runs.
-Changed authority needs fresh preflight/task; stale IDs need recorded fallback.
+Recovery Context carries bounded facts/answers under unchanged authority/scope.
+Use None for absent notes/context.
+
+Save task_id and run/authority identity in editor-task.md.
+Resume same-run identity as a tool argument after input/target revalidation.
+
+Changed authority needs fresh preflight/task, never a child override.
+Record stale/unavailable identity before fallback; never reuse across runs.
+
+Recovery and repair share at most two extra editor turns.
+Real conflicts and frozen contract defects stop; material choices need input.
+Never widen targets or lose user work; unresolved recovery cannot succeed.
 
 ## Checks and review
 
-Orchestrator inspects actual staged actions and runs:
+Run baseline validator/smoke before edits; orchestrator inspects staged actions:
 
 ```bash
 git diff --cached --name-status --find-renames HEAD -- <target paths>
@@ -59,17 +70,16 @@ python3 scripts/validate-opencode-config.py --repo-root .
 bash scripts/check-workflows.sh
 ```
 
-The shell smoke exercises routing/pair/cycle/path safety in temporary fixtures.
 Static/scenario checks are not live agent execution or usability evidence.
-Validator checks syntax, imports, routing, permissions, and documentation links.
 
-Missing required evidence is `INCOMPLETE`, not PASS.
+Missing required evidence is `INCOMPLETE`.
 Use `nix develop` if declared Python dependencies are missing.
 
-Independent review applies required lenses to the staged diff.
+Independently review staged diff with required lenses.
 Verifier refutes candidate findings only; clean reviews skip it.
 
-Only deterministic failures and verified `TARGET` findings reach editor.
+Repair Notes: only deterministic failures or verified `TARGET` findings.
+Recovery Context cannot authorize repairs.
 Apply feasible advisories within frozen scope and budget.
 Explain skipped advisories; they never block success.
 
@@ -88,6 +98,6 @@ result.md                    status, actions, checks, reviews, missing evidence
 - `SUCCESS`: permitted exact actions and all required gates pass.
 - `NEEDS_INPUT`: unresolved material choice needs a decision.
 - `INCOMPLETE`: contract defect or missing required evidence.
-- `FAIL`: target blocker survives two repairs or authority integrity fails.
+- `FAIL`: blocker exhausts recovery/repair budget or authority integrity fails.
 
-Repairs rerun checks/reviews without widening scope or losing existing edits.
+Repairs rerun checks/reviews.

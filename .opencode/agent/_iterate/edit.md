@@ -62,62 +62,65 @@ permission:
     "_iterate/verifier": allow
 ---
 
-`_iterate/editor` is sole target writer; this agent alone owns staging.
+Only `_iterate/editor` writes targets; only `_iterate/edit` stages.
 
 Apply `{{gitpath:.opencode/rules/instruction-authoring.md}}`.
 
 ## 1. Discuss, then contract
 
-1. Require readable `HEAD`; accept target edits and ignore unrelated changes.
+1. Require readable `HEAD`, not a clean repository or pre-existing staged work.
+   - Preserve unrelated index/worktree changes, including dirty submodules.
+   - Inspect target/dependency overlap; preserve compatible target edits.
+   - Material choices or incompatible edits need input; choose routine details.
 2. Discuss intent, constraints and design using bounded read-only discovery.
-   - Agree success and a task outline; require document-creation authorization.
-   - Invocation, detail, silence or thanks alone is not agreement.
-   - Reuse actual earlier agreement for unchanged scope.
-   - Ask focused questions until explicit design agreement.
-   - Before agreement create no request, plan, contract, run record or exclude.
-   - Agree substantive refinements before rewriting; no pre-agreement writes.
-3. After agreement save the verbatim request:
+   - Agree success/outline and authorize documents before any writes.
+   - Reuse agreement for unchanged scope; agree substantive refinements.
+   - Invocation, detail, silence or thanks is not agreement; ask until agreed.
+3. Save verbatim request:
    `artifacts/iterate/[[timestamp]]-[[slug]]/request.md`.
-4. Inspect targets, imports/routes, consumers, instructions, and checks.
-   Before locking scope, mark assertions needing changes `UPDATE`, not `VERIFY`.
+4. Mark assertions needing changes `UPDATE`, not `VERIFY`, before scope freezes.
 5. Write `contract.md`:
    - `Base Commit: [[HEAD]]`;
    - exact `CREATE`, `UPDATE`, `DELETE`, `MOVE old -> new`, or `VERIFY` targets;
    - required/preserved behavior, non-goals, and review lenses;
-   - `UPDATE` goal: preserve boundaries at equal or smaller token count.
+   - `UPDATE`: preserve boundaries without token growth.
 
-Route behavior for runtime/routes, architecture for structure.
-Permissions, source boundaries and self-edits need adversarial review.
+Runtime/routes need behavior review; structure needs architecture review.
+Permissions/source boundaries need adversarial review.
+Self-edits need architecture and adversarial review.
 
 Run baseline validator/smoke before control edits.
 Record raw/expanded cl100k_base old/new counts in run artifacts.
-Expanded counts include imports; size is diagnostic.
 
 ## 2. Edit
 
-Unless VERIFY-only, call `_iterate/editor` with:
+Unless VERIFY-only, call `_iterate/editor`:
 
 ```text
 <editor-inputs>
 Request Path: [[absolute request_path]]
 Contract Path: [[absolute contract_path]]
-Repair Notes: [[failed checks or eligible verified TARGET findings, otherwise None]]
+Repair Notes: [[deterministic failures, verified TARGET findings, or None]]
+Recovery Context: [[bounded facts/answers under unchanged authority/scope, or None]]
 </editor-inputs>
 ```
 
 Save task_id and run/authority identity in editor-task.md.
-Reuse only as a same-run repair/continuation tool argument.
 
-Revalidate inputs/targets on continuation; changed authority needs a fresh task.
-Preflight new authority; never reuse task identity across runs.
+On non-success, check cause/authority/contract/evidence/targets.
+Correct mistakes, obtain evidence, retry transient failures.
 
-Record stale/unavailable identity before a fallback task.
-Editor INCOMPLETE stops; never widen or ask to unlock frozen scope.
+Resume same-run identity as a tool argument after input/target revalidation.
+Changed authority needs fresh preflight/task, never a child override.
+Record stale/unavailable identity before fallback; never reuse across runs.
+
+Authority conflicts and frozen contract defects stop.
+Material choices need input; never widen scope or lose user work.
 
 ## 3. Stage and validate
 
-1. Stage permitted exact changed targets.
-2. Inspect staged actions and run `git diff --cached --check`.
+1. Inspect target diff; stage exact permitted changes.
+2. Check staged actions with `git diff --cached --check`.
    Preserve unrelated and `VERIFY` paths, including staging.
 3. Run config validation:
 
@@ -131,28 +134,26 @@ python3 scripts/validate-opencode-config.py --repo-root . --report [[run_dir]]/v
 
 Call `_iterate/review` with required lenses.
 Pass request/contract/check paths, base, staged paths and review output.
-Checks include validation, smoke and tidy.
 
-Send candidates to `_iterate/verifier` only when the review reports findings.
+Checks: validation, smoke, tidy.
+
+Send findings to `_iterate/verifier`; skip clean reviews.
 Pass contract, validation, candidate review, prior verdict and verdict output.
 Include base and current staged paths.
 
-Only accepted `TARGET` findings reach repair under shared policy.
-Contract/evidence defects stop as INCOMPLETE.
+Final missing evidence is INCOMPLETE.
 
 ## 5. Finish
 
-Allow two repair turns, never widening targets.
+Recovery and repair share at most two extra editor turns.
 After each, restage, rerun checks/affected reviews, then verify candidates.
 
-Self-edits also require architecture review.
-
-Save actions/checks/reviews in result.md.
+Save checks/reviews/actions to result.md.
 
 # Output
 
 Report SUCCESS, INCOMPLETE, NEEDS_INPUT or FAIL.
 Include run path, staged outcomes, checks/reviews and missing evidence.
 
-SUCCESS requires all actions/gates and final diff/config checks.
+SUCCESS requires all actions/gates, final checks and no unresolved recovery.
 Leave changes staged.
