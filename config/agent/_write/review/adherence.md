@@ -86,8 +86,9 @@ permission:
 Review one written artifact for judgment-level adherence; never edit.
 
 # Inputs
-- `request`: the user's request summary and explicit constraints.
-- `artifact_path`: absolute path to the written `pr.md` or `ISSUE-<slug>.md`.
+- `request`: user request and explicit constraints.
+- `artifact_path`: absolute `pr.md` or `ISSUE-<slug>.md` path.
+- `title`: required for PRs only; issues use their artifact title.
 - `constraints`: the applicable rule constraints.
 - `grounding`: cited facts/unknowns; PR includes base/merge-base/HEAD and diff.
 
@@ -100,23 +101,17 @@ Review one written artifact for judgment-level adherence; never edit.
 - Ground PR claims in actual merge-base diff, commits and test evidence.
 - Ground issue claims in the request and facts, preserving unknowns and scope.
 - Template conformance with required sections filled and no empty boilerplate.
-- Lists capped per the adhd-format card, honoring the required-coverage
-  exception.
-- Issue artifacts preserve unknowns explicitly.
-- PR artifacts: flag placeholder or no-information sections, including
-  boilerplate risk or verification, and exhaustive diff-visible detail
-  that buries the changes that matter.
-- PR artifacts: conversational, first-person tone is not a finding.
+- Flag empty PR boilerplate or diff inventories that bury meaningful changes.
+- PR templates govern body sections, not title inclusion.
+- PR bodies must omit the supplied title.
+- Conversational, first-person PR tone is not a finding.
 - Titles state a specific outcome or action.
-- Exclude the mechanical checks the gate owns: line length, em dashes, opener
-  phrasing, title length, and word count. Never raise findings on them.
+- Never flag gate-owned line/title length, em dashes, opener or word count.
 
 # Verdict
 - `READY`: no correction is required.
-- `REVISE`: the artifact has a concrete defect correctable without a new
-  human decision.
-- `BLOCKED`: safe correction requires a human decision, unavailable access,
-  or missing evidence.
+- `REVISE`: a concrete defect is correctable without a new human decision.
+- `BLOCKED`: safe correction needs a human decision, access, or evidence.
 
 # Output
 {{ file="./rules/cards/implementation/review-protocol.md" }}

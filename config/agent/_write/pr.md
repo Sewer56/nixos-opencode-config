@@ -109,32 +109,29 @@ Require at least one commit/change in `<base>...HEAD`.
 Read the merge-base diff.
 4. Sample large diffs and representative implementation regions.
 Inspect changed public surfaces, tests, migrations, and docs.
-5. Required templates override defaults.
-Do not duplicate equivalent headings.
+5. Required templates override body defaults, never title separation.
+Omit template title fields and duplicate headings from the body.
 Inspect CI and scripts for test automation.
 Filenames and lint-only CI do not qualify.
 6. Ground claims only in diff, test, doc, and commit evidence.
 
-Write `pr.md` with:
-- A verb-first title, at most 72 characters.
+Return a verb-first title of at most 72 characters as `Title`.
+Write only the body to `pr.md`:
 - A short `Fixes` list of issue links when referenced.
 - `## Summary`: a concise outcome/motivation opener by default.
 - `## Changes`: meaningful-change bullets by default.
-- Optional area subheadings when helpful.
-- List enumerable values (modes, flags, options).
 - A short `## Why` only if the opener lacks the motivation.
 - Risk, migration, or examples only with real content.
 - Omit optional `## Verification` if automation runs tests.
 Include verification only for evidenced runs.
 No `Not run` placeholders, empty sections, or extra template boilerplate.
 
-Allow first person and honest uncertainty.
+Allow first person and uncertainty.
 
 Stay under 250 words except for templates or essential detail.
 Cut diff-visible details before motivation.
 Never start with `This PR` or `This change`.
 
-# Tidy pass
 Run the imported tidy pass on `pr.md` before the gate.
 
 # Gate
@@ -144,7 +141,7 @@ Run this scan; repair `pr.md` and rerun until output is empty:
 awk 'BEGIN{f=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && $0 !~ /^#/ && length($0) > 80 {print FNR": "$0}' pr.md
 ```
 
-The gate owns this scan, title length, opener, word count, and em dashes.
+Gate owns the scan, separate title length, body opener/count, and em dashes.
 Gate failure blocks SUCCESS and requires repair before review.
 
 Measure `Longest Prose Line` with the same exemptions; never estimate:
@@ -155,7 +152,7 @@ awk 'BEGIN{f=0;m=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/
 
 # Review loop
 1. After the gate passes, call `_write/review/adherence` once.
-Supply request/constraints and absolute `artifact_path` for `pr.md`.
+Supply request/constraints, absolute `artifact_path` and `title=[[Title]]`.
 
 Include resolved base, merge-base, current HEAD and scoped diff evidence.
 2. Repair required changes first; validate suggestions against request/evidence.
@@ -172,6 +169,7 @@ Return only:
 
 ```text
 Status: SUCCESS | NEEDS_INPUT | FAIL
+Title: [[title or N/A]]
 Output Path: <absolute path | N/A>
 Base Ref: <ref | N/A>
 Files in Diff: <n>

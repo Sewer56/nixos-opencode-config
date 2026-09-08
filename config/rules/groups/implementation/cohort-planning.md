@@ -1,15 +1,12 @@
 ## Cohort Planning
 
-`/draft` defines small tasks; `/implement` runs them in dependency order.
+Run tasks in dependency order.
 
-Prefer small testable tasks.
+Keep behavior, tests and required docs in one small testable task by default.
+Docs-only tasks need independent documentation outcomes.
 
-Split at stable interfaces.
-Keep mutually dependent edits together.
-Add only required groundwork.
-
-Avoid file-type/ceremony-only cohorts, quotas, and speculative scaffolding.
-Do not add per-cohort approval gates.
+Split at stable interfaces; keep dependent edits together.
+Avoid file-type cohorts, quotas, speculative groundwork and per-task gates.
 
 Include unchanged verification surfaces and relationship evidence.
 
@@ -22,7 +19,7 @@ Stop on unclear/conflicting precedence.
 Only routed instructions govern children.
 Other prose is not policy/proof.
 
-Use one code writer.
+Use the existing implementer as sole writer, including docs.
 Read-only discovery/review may run in parallel.
 
 Preserve task IDs, order, outcomes, scope/exclusions, checks and stops.

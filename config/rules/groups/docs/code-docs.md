@@ -1,6 +1,9 @@
 ## Code Documentation
 
 ### Coverage
+Choose detail for reader purpose, use, and consequential caveats.
+Preserve required public API contracts and complete changed-API error docs.
+
 Private APIs need purpose and non-obvious contracts unless trivial.
 Refresh changed module/file boundary docs.
 
@@ -18,22 +21,17 @@ Examples show what static configuration cannot express.
 Block false claims and stale references.
 State facts once where owned.
 Link other contracts.
-Keep key API-user facts, not feature notes.
 
-Summarize edge cases in one general sentence.
-Open with a plain purpose sentence, ideally goal-oriented.
-Use one-line summaries.
+Keep API-user facts, not behavior inventories or inferable internals.
+Open with a plain one-line purpose summary.
 Caveats: trailing `# Remarks` or equivalent.
 
 Use native doc links and `#` sections for multiple aspects.
 Name concrete mechanisms, not vague effects.
 
 ### Lists
-- Bullet each input/output/parameter/variant/mapping/branch/set item.
-- `Inputs:`/`Outputs:`: short noun fragments, one fact, no periods.
-- Branches/variants: `Label: sentence.`
-- Mappings: one sentence per bullet, code-font source field first.
-- Commands/types/params: code-font name, dash, terse text.
+- Summarize categories unless readers need their members.
+- Use bullets for required lists, with exact code-font identifiers.
 - Lead-ins never restate bullets.
 - Keep short non-list sentences and single coherent mechanics in prose.
 

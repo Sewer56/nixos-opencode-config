@@ -1,13 +1,10 @@
 ## End-User Documentation Correctness
 
-End-user docs must cover new/changed public features and match implementation.
+Cover scoped new/changed public features for reader purpose and use.
+Keep safety and compatibility caveats; do not demand irrelevant internals.
 
-When end-user docs are in scope, block undocumented new public commands, flags, APIs, or UI flows.
-
-Block mismatched names, defaults, options, outputs, examples, or behavior.
-
-Block `update docs` steps missing file, scope, affected sections, or concrete changes.
+Block missing public-feature coverage or claims mismatching implementation.
+Block docs steps missing file, scope, sections, or concrete changes.
 
 Reject frozen-region findings, including versions, licenses, or warnings.
-
-Block links to headings other docs steps remove or rename unless links are updated or stable anchors preserved.
+Block broken heading links across docs steps; update links or preserve anchors.
