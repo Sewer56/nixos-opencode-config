@@ -1,7 +1,7 @@
 ---
-description: "Generate an evidence-backed PR description from the current branch diff"
+description: "Draft a PR; open only on explicit request"
 agent: _write/pr
 ---
 
-Optional base ref, issue references, audience, or emphasis:
-$ARGUMENTS
+User request (optional base, issues, audience, emphasis):
+[[$ARGUMENTS]]
