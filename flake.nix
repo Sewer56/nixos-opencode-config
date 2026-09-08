@@ -72,8 +72,8 @@
         pname = "rust-llm-tidy";
         # Version comes from the locked source, so it cannot go stale here.
         version = (pkgs.lib.importTOML "${llmTidySrc}/src/cli/Cargo.toml").package.version;
-        src = "${llmTidySrc}/src";
-        cargoLock.lockFile = "${llmTidySrc}/src/Cargo.lock";
+        src = llmTidySrc;
+        cargoLock.lockFile = "${llmTidySrc}/Cargo.lock";
         # Only the CLI member ships a binary; the rest are libraries.
         cargoBuildFlags = ["--package" "rust-llm-tidy-cli"];
         # Upstream's corpus test needs the nested submodule checkout;
