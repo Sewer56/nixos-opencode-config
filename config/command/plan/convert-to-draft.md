@@ -1,7 +1,7 @@
 ---
-description: "Convert conversation context into the collaborative draft format"
+description: "Continue design discussion toward a human-first draft"
 agent: _plan/draft
 ---
 
-Create or update a draft from the current conversation. Extra instructions:
+Use current conversation and these refinements:
 $ARGUMENTS

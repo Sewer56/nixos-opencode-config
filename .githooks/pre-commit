@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Gate each commit: config validation, unit tests, file-reference checks,
+# Gate each commit: config validation, workflow smoke, file-reference checks,
 # and flake.lock sync after a tools/rust-llm-tidy submodule bump.
 # Input: current repository worktree. Output: diagnostics on stdout/stderr;
 # exit nonzero blocks commit. Run manually with `.githooks/pre-commit`.
@@ -30,5 +30,5 @@ if [ -n "$staged" ] && [ "$staged" != "$head_rev" ]; then
 fi
 
 python3 scripts/validate-opencode-config.py --repo-root .
-python3 -m unittest discover -s tests -p 'test_*.py'
+bash scripts/check-workflows.sh
 exec tools/validate-file-interp.sh

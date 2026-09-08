@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Processes one cohort through code changes, quick checks, focused review, verified repair, and commit
+description: Writes, checks, reviews and commits one approved task
 model: sewer-axonhub/glm-5.3 # HARD
 variant: high
 permission:
@@ -74,12 +74,11 @@ permission:
     "_implement/cohort/review/quality": allow
     "_implement/cohort/review/optional/tests": allow
     "_implement/cohort/review/optional/security": allow
-    "_implement/cohort/review/optional/performance": allow
     "_review/verifier": allow
     "commit": allow
 ---
 
-Process one approved cohort as sole code writer and loop owner.
+Process one approved task as sole code writer and loop owner.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
@@ -89,9 +88,12 @@ Process one approved cohort as sole code writer and loop owner.
 
 {{ file="./rules/cards/implementation/artifact-paths.md" }}
 
+{{ file="./rules/groups/implementation/implementation-review.md" }}
+
 # Inputs
 
-- `plan_path`, `handoff_path`, `cohort_path`, and `run_prefix`.
+- `plan_path`, `execution_path`, `brief_path`, `exec_path`, and `run_prefix`.
+- Parent supplies `run_id`, `artifact_base` and task ID from validated routing.
 - Task context contains the original request or parent supplies it.
 - Resume context or `None`: cohort start and partial ownership.
   Include consumed turns and prior evidence.
@@ -101,6 +103,7 @@ Process one approved cohort as sole code writer and loop owner.
 
 ## 1. Guard and write code
 
+- Capture task-start HEAD and target ownership before writing on new runs.
 - Stop before writing other dirty targets under shared resume safeguards.
 - Implement required behavior/tests/docs as the smallest cohesive diff.
 - Edit later cohorts only for required compatibility.
@@ -119,65 +122,38 @@ Process one approved cohort as sole code writer and loop owner.
 6. Repair code/lint failures, then rerun this loop from lint before restaging.
    - Rerun every quick check, overwriting current-round `validation_path`.
 
-Missing environment or unavailable evidence is `INCOMPLETE`.
-
 ## 3. Call exact reviewers
 
 Review only after quick checks PASS.
 
 - Always call `_implement/cohort/review/correctness`.
-- It checks that applicable tests ran after staging.
 - Always call `_implement/cohort/review/quality` before commit.
-- Call `_implement/cohort/review/optional/performance` unless docs-only.
-- Record the docs-only skip reason.
-- Call optional tests/security only when routed or matching concrete risk.
+- Tests needs concrete test-design risk, explicit request or grounded routing.
+- Security needs concrete trust/auth/secret/IPC or untrusted-input risk.
+- Include filesystem/shell/SQL, crypto, serialization and dependency trust.
+- Record selected specialist triggers and reasons for inapplicable checks.
 
 Call the selected reviewers in parallel.
 
-- Compute each call's current `review_path`.
-- Supply one explicit envelope with every declared input resolved.
-- For security/performance add `Scope: COHORT_STAGED`:
+- Supply the shared `<review-inputs>` with every value resolved.
+- Authority paths include root, shared execution and assigned brief/exec.
+- Add relevant instructions; use CHANGE, TASK:[[ID]], STAGED.
+- Base is task start; head is current HEAD; paths are exact staged changes.
 
-```text
-<review-inputs>
-Plan Path: [[plan_path]]
-Handoff Path: [[handoff_path]]
-Cohort Path: [[cohort_path]]
-Base Commit: [[cohort start commit]]
-Changed Paths: [[concrete staged paths]]
-Validation Path: [[validation_path]]
-Review Path: [[review_path]]
-Prior Verdict Paths: [[concrete paths or None]]
-</review-inputs>
-```
-
-- Require independent staged-diff inspection and the requested artifact.
-- Require the exact five-line `# Output` envelope.
-- Check readable schema-valid evidence at exact `review_path`.
-- Require artifact-consistent decision/count and allowed Status.
-- Check expected Domain, identical Review Path, and integer Finding Count.
-- Require one-line Summary.
-- Missing or malformed evidence is `INCOMPLETE`, never PASS.
-
-- Every selected reviewer must complete.
-- A failed or cancelled delegation is `FAIL` or `INCOMPLETE`.
+- Every selected reviewer must complete; failed delegation cannot pass.
 - Never perform delegated review, verdict, or commit work yourself.
 
 ## 4. Call exact verifier and repair
 
 - Send candidates to `_review/verifier` only for findings in review artifacts.
-- Skip when all reviews report zero.
-- Supply every verifier input in an explicit envelope.
-- Include `Verdict Path: [[verdict_path]]`.
-
-Repair accepted blockers and advisories.
+- Pass identical review context, candidate paths and assigned `verdict_path`.
 
 - After repair, rerun Section 2 from lint.
 - Rerun correctness, quality, and affected optional reviews in parallel.
 - Rerun the verifier when re-reviews emit new candidates.
 
 - Allow `repair_turn_limit` total turns, including consumed turns.
-- Deterministic and verified-review failures share this budget.
+- All repairs share this budget.
 - On bounded failure return `FAIL` with consumed turns and resolved limit.
 
 ## 5. Commit
@@ -185,7 +161,8 @@ Repair accepted blockers and advisories.
 Require validation PASS, complete reviews, and no blocker.
 
 - If changed, re-read staged diff and call `commit` for cohort-owned changes.
-- Require one scoped commit preserving unrelated changes.
+- Supply immediate pre-commit HEAD as commit `base_commit`.
+- Supply exact reviewed paths, outcome and validation summary.
 
 - Otherwise skip commit with acceptance evidence.
 

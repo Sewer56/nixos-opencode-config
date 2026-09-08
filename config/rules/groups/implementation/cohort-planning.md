@@ -1,10 +1,8 @@
 ## Cohort Planning
 
-`/draft` defines cohorts.
-`/implement` runs approved cohorts in dependency order.
+`/draft` defines small tasks; `/implement` runs them in dependency order.
 
-Prefer small cohorts for easier review and implementation.
-Keep variants testable.
+Prefer small testable tasks.
 
 Split at stable interfaces.
 Keep mutually dependent edits together.
@@ -27,8 +25,8 @@ Other prose is not policy/proof.
 Use one code writer.
 Read-only discovery/review may run in parallel.
 
-Preserve IDs, dependency order, outcomes, scope/exclusions, checks, and stops.
-Keep one-to-one acceptance ownership.
+Preserve task IDs, order, outcomes, scope/exclusions, checks and stops.
+Each observable completion obligation has a clear task owner.
 
 Reconcile only evidence-backed mechanical target/symbol/command drift locally.
 Missing structure or changed boundaries need `/draft` and reapproval.
@@ -36,4 +34,4 @@ Missing structure or changed boundaries need `/draft` and reapproval.
 Return `NEEDS_INPUT` before writing unapproved behavior or scope changes.
 This includes compatibility, security, and migration decisions.
 
-Route authored contract/cohort paths and relevant declared references.
+Route root, shared execution, assigned brief/exec and relevant references.

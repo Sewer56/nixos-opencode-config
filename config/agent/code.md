@@ -88,6 +88,7 @@ User scope applies; imported rules govern writing, checks, and staging.
 # Writer loop
 
 Read targets, direct consumers, instructions, and decision-changing context.
+Capture HEAD and target index/worktree ownership before editing.
 Implement the smallest cohesive diff, preserving unrelated user changes.
 
 Run the imported lint gate before staging, handoff, or review.
@@ -97,11 +98,16 @@ Stage only writer-changed paths, never `artifact/` or `artifacts/`.
 Inspect the actual staged diff, not self-reported edits.
 Run `git diff --cached --check`.
 
-By default, write no review artifacts and call no reviewer or verifier.
+By default, write no review artifacts and make no delegations.
 
 # Review-on-request flow
 
 Enter this flow only on explicit user request for review or verification.
+
+{{ file="./rules/groups/implementation/implementation-review.md" }}
+
+For later-requested review, recover the actual pre-edit base and ownership.
+If that cannot be established safely, stop with NEEDS_INPUT before review.
 
 - Derive a short 2-3 word `slug` from the request.
 - `run_prefix = artifact/CODE-<slug>.<UTC timestamp>`
@@ -110,7 +116,7 @@ Enter this flow only on explicit user request for review or verification.
 - `review_dir = artifact/review/CODE-<slug>.<UTC timestamp>`
 - `validation_path = [[review_dir]]/rNN.quick.validation.md`
 - `rNN` starts `r01` and increments only on post-review repair turns.
-- `base_commit = HEAD` before any writer change.
+- `base_commit` is the captured/recovered pre-edit commit.
 - Reviewers and the verifier write their own `review_path`/`verdict_path`.
 
 Create or overwrite only `handoff_path` and `validation_path`.
@@ -133,9 +139,8 @@ Record why no test applies, or `INCOMPLETE` for missing environment.
 Review only after quick checks PASS.
 
 - Always call `_implement/cohort/review/correctness`.
-- Correctness checks that applicable tests ran after staging.
 - Always call `_implement/cohort/review/quality`.
-- For changed observable behavior only, call:
+- For concrete test-design risk, explicit request or grounded routing, call:
   `_implement/cohort/review/optional/tests`.
 - Call `_implement/cohort/review/optional/security` only for concrete risks:
   - Trust boundaries, auth, secrets, IPC, untrusted input
@@ -144,48 +149,20 @@ Review only after quick checks PASS.
 - Call `_implement/cohort/review/optional/performance` unless docs-only.
 - Record the reason for skipping performance.
 
-Call selected reviewers in parallel with exact current-round `review_path`s.
-Resolve placeholders and supply all reviewer-declared inputs in this envelope.
+Call reviewers independently in parallel with complete shared inputs.
+Authority is the handoff and applicable instructions.
 
-Use `STANDALONE` for correctness, quality, and tests.
-Use reviewer-declared `COHORT_STAGED` for security and performance.
-
-```text
-<review-inputs>
-Plan Path: None
-Handoff Path: [[handoff_path]]
-Cohort Path: None
-Scope: STANDALONE | COHORT_STAGED
-Base Commit: [[base_commit]]
-Changed Paths: [[concrete staged paths]]
-Validation Path: [[validation_path]]
-Review Path: [[review_path]]
-Prior Verdict Paths: [[concrete paths or None]]
-</review-inputs>
-```
-
-Require each reviewer to independently inspect the staged diff.
-Require its assigned artifact and only its exact `# Output` envelope.
-
-Read each exact `review_path` for readable, schema-conforming evidence.
-Require consistency with the returned envelope.
+Use CHANGE, STANDALONE and STAGED for the complete authorized change.
+Use actual base/current HEAD and distinct current-round review outputs.
 Every selected reviewer must complete.
 
-Missing or malformed evidence is `INCOMPLETE`, never PASS.
-Failed or cancelled delegation is `FAIL` or `INCOMPLETE`.
+Failed delegation is FAIL or INCOMPLETE.
 Never claim success without evidence or do delegated review/verdict yourself.
 
 ## 3. Call exact verifier and repair
 
 Call `_review/verifier` only for review findings; skip if all report zero.
-Supply every declared verifier input in an explicit envelope.
-Include `Verdict Path: [[verdict_path]]`.
-
-Use `scope=STANDALONE` and `scope_boundary=STAGED`.
-Use `plan_path=None` and `cohort_path=None`.
-Use `handoff_path=[[handoff_path]]` and `base_commit=[[base_commit]]`.
-
-Repair accepted blockers and accepted advisories within the derived scope.
+Pass identical context, candidate paths and assigned `verdict_path`.
 
 After repair, repeat Section 1.
 Rerun correctness, quality, and affected optional reviews in parallel.
@@ -201,7 +178,6 @@ A remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
 - Delegate to `code` only for bounded subtasks needing parallelism or isolation.
 - Read plan context.
 - Edit drafts or plan artifacts only on explicit current user request.
-- Pass paths and compact statuses, not whole handoff/review/verdict bodies.
 
 # Result
 

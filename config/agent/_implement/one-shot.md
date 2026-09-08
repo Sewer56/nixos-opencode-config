@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Implements one bounded request through a single writer, subagent review, verifier, and repair loop
+description: Implements and reviews one bounded request
 model: sewer-axonhub/glm-5.3 # MEDIUM
 variant: high
 permission:
@@ -93,6 +93,8 @@ Repository behavior and your handoff govern implementation, review, and repair.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
+{{ file="./rules/groups/implementation/implementation-review.md" }}
+
 # Inputs
 
 Use the full original command-user request from `$ARGUMENTS`.
@@ -111,6 +113,10 @@ A malformed or conflicting limit is `NEEDS_INPUT`.
 - `rNN` starts `r01` and increments only on post-review repair turns.
 - `base_commit = HEAD` before any writer change.
 
+On resume recover original base, ownership, rounds and consumed repair limits.
+Preserve partial work and historical evidence; validate/review fresh diffs.
+Unknown ownership or unrecoverable budget evidence stops with NEEDS_INPUT.
+
 As assigned writer, create or overwrite only exact assigned paths.
 Never create placeholders or stubs.
 
@@ -124,6 +130,8 @@ Write `handoff_path` for one cohesive change:
 - Goal, required behavior, and explicit target files.
 - Preserve/exclude rules and completion evidence.
 - Quick validation commands and review routes.
+
+Clear authorized tasks need no new plan or approval ceremony.
 
 Record any equivalence or parity claims with their differential-test evidence.
 
@@ -155,74 +163,37 @@ Return `NEEDS_INPUT` before unapproved decisions about:
 Review only after quick checks PASS.
 
 - Always call `_implement/cohort/review/correctness`.
-  It checks that applicable tests ran after staging.
 - Always call `_implement/cohort/review/quality` before commit.
-- Always call `_implement/cohort/review/optional/performance` unless the change is docs-only; record the reason.
+- Call `_implement/cohort/review/optional/performance` unless docs-only.
+- Record a docs-only skip reason; review the complete standalone change.
 - Call optional tests or security reviewer only when concrete risk matches:
-  - `TESTS` for changed observable behavior;
+  - `TESTS` for concrete test-design risk, request or grounded routing.
   - `SECURITY` for trust boundaries, auth, secrets, IPC, or untrusted input.
   - Also for filesystem/shell/SQL, serialization, or cryptography.
   - Also for permissions or dependency trust.
 
-Call selected reviewers in parallel with current-round `review_path`.
-Resolve every declared input and placeholder in this envelope:
+Call selected reviewers independently in parallel with complete shared inputs.
 
-Use `STANDALONE` for correctness, quality, and tests.
-Use reviewer-declared `COHORT_STAGED` for security and performance.
+Authority is the handoff and applicable instructions, not evidence packets.
+Use CHANGE, STANDALONE, STAGED, original base and current HEAD.
 
-```text
-<review-inputs>
-Plan Path: None
-Handoff Path: [[handoff_path]]
-Cohort Path: None
-Scope: STANDALONE | COHORT_STAGED
-Base Commit: [[base_commit]]
-Changed Paths: [[concrete staged paths]]
-Validation Path: [[validation_path]]
-Review Path: [[review_path]]
-Prior Verdict Paths: [[concrete paths or None]]
-</review-inputs>
-```
-
-Require independent staged-diff inspection and the requested artifact.
-Require only the reviewer's exact `# Output` envelope.
-
-Read each `review_path`; require a readable, schema-conforming artifact.
-
-Require allowed Status, expected Domain, and identical Review Path.
-Require integer Finding Count and one-line Summary.
-Require artifact-consistent decision and count.
-
-Missing or malformed evidence is `INCOMPLETE`, never PASS.
-An absent on-disk artifact is missing evidence.
+Assign distinct current-round review outputs.
 
 Every selected reviewer must complete.
 
 A failed or cancelled delegation is `FAIL` or `INCOMPLETE`.
 Never perform delegated review, verdict, or commit work yourself.
-Never report SUCCESS without its evidence.
 
 ## 4. Call exact verifier and repair
 
-Send candidates to `_review/verifier` only when any review artifact contains findings; skip when all reviews report zero.
-
-Send every declared verifier input in an explicit envelope.
-Include `Verdict Path: [[verdict_path]]`.
-
-Use `scope=STANDALONE` and `scope_boundary=STAGED`.
-Use `plan_path=None` and `cohort_path=None`.
-Use `handoff_path=[[handoff_path]]` and `base_commit=[[base_commit]]`.
-
-Repair accepted blockers and accepted advisories within the derived scope.
+Call `_review/verifier` only for candidate-bearing reports.
+Pass identical review context, candidate paths and assigned `verdict_path`.
 
 After repair, rerun Section 2 from the lint gate before restaging.
 Rerun correctness, quality, and affected optional reviews in parallel.
 Rerun the verifier when re-reviews emit new candidates.
 
-Allow `repair_turn_limit` total turns for these failures:
-- Deterministic failures.
-- Verified-review failures.
-`unlimited` is unbounded.
+Allow `repair_turn_limit` total turns for all repairs.
 
 On bounded failure return `FAIL` with:
 `Repair Turns: <n>` and `Repair Limit: [[repair_turn_limit]]`.
@@ -234,7 +205,8 @@ Require validation PASS, complete reviews, and no blocker.
 
 If changed, re-read the staged diff.
 Call `commit` for staged writer-changed paths.
-Supply the implementation boundary: `base_commit`, changed paths, outcome.
+Supply exact reviewed paths, outcome and validation summary.
+Commit `base_commit` is immediate pre-commit HEAD, not cumulative review base.
 
 Require one scoped commit and preserved unrelated changes.
 
@@ -243,10 +215,10 @@ Otherwise skip commit with completion evidence.
 ## 6. External CodeRabbit review
 
 After commit, ensure `artifact/` is Git-excluded.
-Append to `.git/info/exclude` if missing.
+Use Git-resolved `info/exclude` in worktrees; preserve existing bytes.
 
 Call `_review/coderabbit` with explicit `base_branch=[[base_commit]]`.
-Set `review_type=all` and `apply_advisories=false`.
+Set `review_type=all` and pass user constraints.
 
 It applies its own bounded fixes as last code writer.
 It owns validation and one re-review.
@@ -261,30 +233,17 @@ It owns validation and one re-review.
   - Stage its Modified Paths union your repair paths within derived scope.
   - Out-of-scope paths: report and return `NEEDS_INPUT`, never widen scope.
   - Increment `rNN` and rerun Sections 2–4 within existing budgets.
-  - Repair accepted findings yourself, then `commit`.
+  - Apply shared repair policy yourself, then `commit`.
   - Never stage or commit preserved unrelated changes.
   - A CodeRabbit blocker remaining after those budgets is `FAIL`.
 
 # Output
 
-Return exactly:
-
-```text
-Status: SUCCESS | INCOMPLETE | NEEDS_INPUT | FAIL
-Handoff Path: <absolute path | N/A>
-Validation Path: <absolute path | N/A>
-Verdict Path: <absolute path | N/A>
-Commit: <git commit id | None>
-Changed Paths: <comma-separated paths or None>
-Repair Turns: <n>
-Repair Limit: <n | unlimited>
-Summary: <one-line summary>
-```
+Reply naturally with SUCCESS, INCOMPLETE, NEEDS_INPUT or FAIL.
+Include changes, commit, handoff/check/review paths and remaining evidence.
+Report repair turns/limit and visible advisories or blockers.
 
 # Constraints
 
 - Never edit `PROMPT-*.draft.md` or other plan artifacts; read for context.
-- Pass paths and compact statuses between agents.
-- Never paste whole handoff, review, or verdict bodies.
 - Do not run concurrent code writers; never push, reset, amend, or bypass hooks.
-- Return no prose outside the fenced block.

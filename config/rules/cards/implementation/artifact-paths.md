@@ -1,8 +1,8 @@
 ### Artifact paths
 - `run_prefix`: `artifact/plan/[[artifact_base]]/review`.
-- Reuse the `/draft` plan bundle dir (`plan_path`/`[[artifact_base]]`); create `review/` only when missing.
-- `[[run_id]]`: UTC timestamp set once per run.
-- `<reviewer>` subfolders match reviewer agent names.
+- `artifact_base`: root basename without `.draft.md`.
+- Create only runtime `review/`, never alter source members.
+- `run_id`: UTC timestamp bound once; reviewer subfolders match agent names.
 
 - Authored `01` maps to runtime evidence key `C01`.
 - Start at `r01`; repairs/resume use unused rounds without resetting budgets.
@@ -13,5 +13,6 @@
 - Final paths replace `Cnn` with `final` and omit `quick.`.
 
 - Callers assign exact paths; overwrite only current-round evidence.
+- Reject outputs aliasing source, inputs or historical evidence.
 - Preserve historical evidence paths on resume.
 - Never create stub files; never write any other path.

@@ -83,13 +83,13 @@ permission:
     "patch *": deny
 ---
 
-Review one `_write` artifact for judgment-level rule adherence. Produce
-candidate findings; never edit anything.
+Review one written artifact for judgment-level adherence; never edit.
 
 # Inputs
 - `request`: the user's request summary and explicit constraints.
 - `artifact_path`: absolute path to the written `pr.md` or `ISSUE-<slug>.md`.
 - `constraints`: the applicable rule constraints.
+- `grounding`: cited facts/unknowns; PR includes base/merge-base/HEAD and diff.
 
 {{ file="./rules/groups/style/wording.md" }}
 
@@ -97,8 +97,8 @@ candidate findings; never edit anything.
 
 # Review lens
 - Read referenced artifacts and grounding evidence; do not search broadly.
-- Ground every claim: PR artifacts in diff, commit, or test evidence; issue
-  artifacts in repository facts. Flag unevidenced claims.
+- Ground PR claims in actual merge-base diff, commits and test evidence.
+- Ground issue claims in the request and facts, preserving unknowns and scope.
 - Template conformance with required sections filled and no empty boilerplate.
 - Lists capped per the adhd-format card, honoring the required-coverage
   exception.
@@ -119,30 +119,15 @@ candidate findings; never edit anything.
   or missing evidence.
 
 # Output
-Return only:
+{{ file="./rules/cards/implementation/review-protocol.md" }}
 
-```text
-# Write review
-Verdict: READY | REVISE | BLOCKED
+Return `# Write review` with `Verdict: READY | REVISE | BLOCKED` inline.
+Name checked artifact and limits; required findings use stable IDs.
 
-## Required changes
-- <one concrete problem>
-  - Evidence: <artifact location plus the violated rule or repository fact>
-  - Correction: <smallest correction>
-- None
+Separate required corrections from advisory suggestions.
+Required findings are directly repairable within the writer's bounded loop.
 
-## Suggestions
-- <useful non-blocking refinement>
-- None
-
-## Confirmed
-- <rule, grounding, or shape requirement represented correctly>
-- None
-```
-
-Use `- None` only when a section has no entries. Keep the report short enough
-to scan.
+BLOCKED states missing evidence or the actual needed decision.
 
 # Constraints
 - Read-only: never edit any file; never modify git state.
-- Return no prose outside the fenced block.

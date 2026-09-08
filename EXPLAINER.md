@@ -1,174 +1,121 @@
 # Architecture and rationale
 
-- Use selected context, one decision owner, checks, and bounded review.
-- [README] covers usage; the [Iterate guide] covers instruction edits.
+[README] covers usage; the [Iterate guide] covers instruction edits.
 
 ## Architecture
 
-- The approved draft owns behavior and cohort decomposition.
-- The [implementation parent] dispatches cohorts and owns final integration.
-- Each [cohort agent] owns writing, checks, review/repair, and delegated commit.
-- Reviewers are read-only and independent, with role-scoped tools and context.
+Separate human decisions, execution instructions and evidence.
+A readable plan lets people audit what will change without reading tool recipes.
+Execution files translate that agreement; they cannot introduce product choices.
 
-```mermaid
-flowchart LR
-    approved[approved draft] --> cohorts[sequential cohorts]
-    cohorts --> final[full validation + complete final review]
-    final --> CodeRabbit
-```
+### Discussion before documents
 
-## Draft and approval
+The [draft owner] discusses goals, constraints, design and a small task outline.
+Explicit agreement and document authorization prevent premature plan writing.
+Earlier agreement covers unchanged scope; thanks alone is not approval.
 
-- The [explorer] alone gathers product evidence, starting with dependencies.
-- Discovery expands only on evidence that can change a decision.
-- The draft parent reads its bundle and checks paths/ignore protection.
-- External research needs a third-party contract question or user request.
-- External facts retain version and source provenance.
+The [explorer] gathers bounded repository evidence for the draft owner.
+Discovery follows concrete dependencies; external facts retain version/source.
+This keeps research separate from the authority to decide product behavior.
 
-- `PROMPT-PLAN-[[slug]].draft.md` is the entry point and ordered cohort index.
-- It links `artifact/plan/[[plan]]/contract.md` and cohorts like `01-models.md`.
-- `[[plan]]` is the root basename without `.draft.md`.
-- The contract holds shared decisions and acceptance ownership once.
-- Cohorts start with Goal, Scope, Not in Scope, and Done when.
-- Grounded technical context, tests/docs, commands, and review routes follow.
-- Prefer small testable variants: ZIP, then 7z, then RAR.
-- The root owns full-validation commands and final routes.
-- Partial milestones do not mean full completion.
+### Human and execution views
 
-- The [plan-bundle rule] owns path, membership, read, and trust boundaries.
+- Root: shared outcomes, decisions, boundaries and task links.
+- Human brief: task scope and observable completion.
+- Shared execution: technical constraints, checks and dependency routing.
+- Task exec: bounded targets, references, checks and stops.
 
-- Plans stay untracked and ignored using exact local excludes if needed.
-- Worktree-safe checks stop unprotected writes without changing `.gitignore`.
+Each brief links its exec; the root links shared execution and all briefs.
+Shared facts appear once instead of in milestones, matrices or copied requests.
+The [bundle rule] defines membership and who reads each view.
 
-The whole-bundle flow is `draft reviewer -> verifier -> human approval`:
+The read-only [bundle checker] validates routing, pairs, anchors and paths.
+Safe reference backlinks can reach the root or source without adding authority.
 
-```mermaid
-flowchart TD
-    explorer --> draft[contract + cohorts]
-    draft --> draftReview[whole-bundle reviewer]
-    draftReview --> draftVerify[verifier: findings only]
-    draftReview -- READY --> approval[human approval]
-    draftVerify -- promoted corrections --> draft
-```
+Source-member links and prospective writes keep stricter traversal boundaries.
+Exact worktree-safe excludes keep plans local without changing `.gitignore`.
 
-- The read-only [draft verifier][draft-review-verifier] runs only for findings.
-- It promotes evidence-backed required corrections, not a second plan.
-- A verifier rejection leaves the draft unchanged, not ready.
-- Missing evidence or decisions stop safely; malformed output fails closed.
-- Review has two passes; the latest must be ready for `READY_FOR_IMPLEMENT`.
-- `/implement` approves the whole plan, not individual tasks.
+Tidy and mechanical checks precede whole-bundle readability/fidelity review.
+The [draft verifier] tests candidates, not a second design.
+Rejection alone cannot make a plan ready; the latest review must be READY.
 
-## Implementation ownership
+Only the new root/shared-execution/task-pair format is supported.
+Standalone handoffs and iterate contracts are different artifacts, not adapters.
 
-- The parent reads root plan content, member metadata, and runtime evidence.
-- It validates routing and dispatches authored cohorts in dependency order.
-- Writers/cohort reviewers read the contract, assigned cohort, and references.
-- Final reviewers read full acceptance and cross-cohort authority.
-- Repair and finding verification read authority relevant to supplied issues.
-- Standalone work retains its separate handoff.
+## Execution and review
 
-- Implementation never edits plans or silently changes approved boundaries.
-- Missing structure or changed decisions needs `/draft` and renewed approval.
-- Only evidence-backed mechanical drift may be reconciled locally.
-- Successful cohorts advance without approval pauses.
+The [implementation parent] routes tasks in order without a handoff copy.
+It reads root/shared execution and evidence, not every sibling exec file.
 
-### Resume
+Each [task worker] reads human authority and owns writing through commit.
+One writer prevents overlap; independent reviewers inspect real changes.
 
-- “Resume from C03” continues unfinished work using the original run/base.
-- Repair/CodeRabbit budgets persist; partial work gets fresh checks/reviews.
-- Unclear ownership needs input; no checkpoints or discarded prior work.
+Correctness includes basic test adequacy; quality covers every proposed commit.
+Tests and security specialists need grounded risks rather than routine dispatch.
 
-### Checks, review, and repair
+Performance reviews cumulative integration or the complete standalone change.
+Task writers still preserve workload requirements and tests.
 
-- One cohort writer runs lint, scoped staging, quick checks, and targeted tests.
-- Checks precede semantic review and use the authorized repository environment.
-- Proven failures go to repair; missing required evidence is `INCOMPLETE`.
-- Evidence records commands, cwd, results, exit codes, and decisive output.
+Local task success does not prove that the whole implementation composes.
+Final review therefore covers all human outcomes and cross-task interactions.
+Commit calls use immediate HEAD, distinct from the cumulative review base.
 
-- Correctness and quality independently inspect every proposed commit.
-- Performance reviews runtime-code commits and final integration.
-- Docs-only work records a performance skip reason.
-- Test/security reviews need routing or concrete risk.
-- Every selected reviewer must finish and inspect actual diffs and evidence.
+The [evidence convention] separates authority, subject and output.
+Shared validation avoids rerunning suites in every reviewer.
 
-- [Finding rules] require falsifiable evidence of a material contract violation.
-- The [shared verifier] refutes candidates before they can trigger repair.
-- Accepted blockers/advisories enter repair only within approved scope.
-- Wider-scope advisories remain recorded, not failures.
-- Repair repeats checks, core/affected reviews, and findings verification.
+Compact findings retain consequences and proof; clean reviews skip verification.
+The [finding verifier] tests candidates before they become repair-eligible.
 
-- Cohort/one-shot repair defaults to five turns for checks and verified issues.
-- Each resolves a positive user limit or explicit no limit as `unlimited`.
-- Malformed or conflicting limits need input.
-- Final integration and iterate allow two repair turns.
-- Bounded failures report consumed turns and the limit.
-- Remaining blockers are `FAIL`; missing required evidence is `INCOMPLETE`.
+CHANGE reviews introduced/exposed defects, not every old problem nearby.
+TARGET_AUDIT retains docs/refactor's declared existing-defect scope.
 
-### Final gate and Git boundaries
+Apply feasible verified advisories by default.
+Keep scope, decisions and budgets; skipped advisories remain non-blocking.
+Missing required evidence remains INCOMPLETE rather than PASS.
 
-- After cohort commits, full validation/review checks cumulative interactions.
-- Final repairs get integration review plus staged correctness/quality review.
-- Each repair is revalidated, re-reviewed, and committed by exact path.
+Resume retains original baselines, ownership and consumed repair budgets.
+Partial work needs fresh checks/reviews; unclear ownership stops safely.
+These boundaries protect unrelated user changes rather than resetting the tree.
 
-- The [commit agent] preserves unrelated staged and unstaged work.
-- Implementation never pushes, resets, or amends.
-- Documentation/refactor workflows do not automatically commit.
+## External and interactive workflows
 
-## CodeRabbit and standalone work
+[CodeRabbit] owns verification of its original external findings.
+Its resulting edits still re-enter local checks/reviews before scoped commit.
+Immutable rounds and bounded re-review preserve evidence of what was checked.
 
-- `/review/coderabbit` uses the official [CodeRabbit CLI].
-- Its external findings bypass the local verifier.
-- Implementation and [one-shot] call it after integration, as last code writer.
-- There is one CodeRabbit self-fix pass with one re-review.
-- Its edits re-enter checks, staged review, verification, and scoped commit.
-- An unavailable external service remains `INCOMPLETE` after local commits.
+[One-shot] uses one compact handoff for an already-clear bounded request.
+[Code] stays interactive, with no review artifacts or delegation by default.
+Reviews/commits need explicit requests; later review needs the real baseline.
 
-- [Code] uses the session model and shared writing rules interactively.
-- Reviews need an explicit request; commits remain user-initiated.
-- Pipeline agents pin `sewer-axonhub/glm-5.3` and may share blind spots.
-- Cross-model review is unexercised.
+## Instruction work and validation
 
-## Instruction authoring and iterate
+The [instruction standard] favors one owner and the smallest useful mechanism.
+The [iterate owner] discusses design before creating request or contract files.
 
-- The [instruction standard] prefers one owner and the smallest mechanism.
-- Use the minimum instruction that changes behavior, omitting inferable rules.
-- Prefer human-first scope, small tasks, and tests for mechanics, not phrases.
-- Scripts enforce mechanics; docs explain usage without runtime context cost.
+Then one editor writes exact frozen targets; only the orchestrator stages.
+Self-edits require mechanical checks and architecture/adversarial review.
 
-The [iterate parent] runs:
+The [validator] checks syntax, imports, permissions, routes and task depth.
+It reports depth mismatches instead of silently rewriting configuration.
 
-```text
-contract -> one editor -> exact staging -> validator/tests
-         -> focused reviewer -> verifier -> at most two repairs
-```
+[Workflow smoke] exercises routing and path boundaries in temporary fixtures.
+Static checks and scenarios are not live-agent execution or usability evidence.
 
-- Self-edits require config validation and workflow tests.
-- Contracts route architecture/adversarial review when needed.
-
-## Validation
-
-- The [validator] documents its mechanical checks in its module docstring.
-- [Implementation tests] and [Draft tests] cover workflow contracts.
-- [Plan-bundle tests] exercise links and Git ignore/worktree mechanics.
-- Static checks and scenario review are not live model or usability tests.
-- Credentials, plugins, runtime, and services still require environment checks.
-
-[draft-review-verifier]: config/agent/_plan/draft/verifier.md
 [README]: README.md
 [Iterate guide]: .opencode/ITERATE.md
-[implementation parent]: config/agent/_implement.md
-[cohort agent]: config/agent/_implement/cohort.md
+[draft owner]: config/agent/_plan/draft.md
 [explorer]: config/agent/_plan/draft/explorer.md
-[plan-bundle rule]: config/rules/cards/structure/plan-bundle.md
-[Finding rules]: config/rules/groups/implementation/review-findings.md
-[shared verifier]: config/agent/_review/verifier.md
-[commit agent]: config/agent/commit.md
-[CodeRabbit CLI]: https://docs.coderabbit.ai/cli/reference
-[one-shot]: config/agent/_implement/one-shot.md
+[bundle rule]: config/rules/cards/structure/plan-bundle.md
+[bundle checker]: config/scripts/plan-bundle.py
+[draft verifier]: config/agent/_plan/draft/verifier.md
+[implementation parent]: config/agent/_implement.md
+[task worker]: config/agent/_implement/cohort.md
+[evidence convention]: config/rules/cards/implementation/review-protocol.md
+[finding verifier]: config/agent/_review/verifier.md
+[CodeRabbit]: config/agent/_review/coderabbit.md
+[One-shot]: config/agent/_implement/one-shot.md
 [Code]: config/agent/code.md
 [instruction standard]: .opencode/rules/instruction-authoring.md
-[iterate parent]: .opencode/agent/_iterate/edit.md
+[iterate owner]: .opencode/agent/_iterate/edit.md
 [validator]: scripts/validate-opencode-config.py
-[Implementation tests]: tests/test_implement_workflow.py
-[Draft tests]: tests/test_draft_workflow.py
-[Plan-bundle tests]: tests/test_plan_bundle.py
+[Workflow smoke]: scripts/check-workflows.sh

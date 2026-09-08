@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Cleans existing working code to current standards through a single writer, subagent review, verifier, and repair loop with behavior preservation
+description: Cleans and reviews explicit targets while preserving behavior
 model: sewer-axonhub/glm-5.3 # MEDIUM
 variant: high
 
@@ -91,6 +91,8 @@ Repository behavior and the handoff govern cleanup, review, and repair.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
+{{ file="./rules/groups/implementation/implementation-review.md" }}
+
 # Inputs
 
 - Use the full request from `$ARGUMENTS`.
@@ -148,72 +150,37 @@ Return `NEEDS_INPUT` before any unapproved decision in these areas.
 Review only after quick checks PASS.
 
 - Always call `_implement/cohort/review/correctness`.
-  It checks that applicable tests ran after staging.
 - Always call `_implement/cohort/review/quality`.
 - Call `_implement/cohort/review/optional/performance` unless docs-only.
   Record the reason for skipping performance.
 - Call `_implement/cohort/review/optional/tests` only for concrete `TESTS` risk.
 - Call `_implement/cohort/review/optional/security` only for `SECURITY` risk.
-- `TESTS`: staged observable behavior changes or test code changes.
+- `TESTS`: concrete test-design risk, explicit request or grounded routing.
 - `SECURITY`: concrete risk in trust boundaries, auth, secrets, or IPC.
 - Untrusted input also triggers `SECURITY`.
 - `SECURITY` also covers filesystem/shell/SQL, serialization, and cryptography.
 - Permissions and dependency trust also trigger `SECURITY`.
 
-Call selected reviewers in parallel with current-round `review_path` values.
-Resolve every placeholder in this envelope and add every other declared input.
+Call reviewers independently in parallel with complete shared inputs.
+Authority is handoff and applicable instructions; assign distinct round outputs.
 
-Use `STANDALONE` for correctness, quality, and tests.
-Use reviewer-declared `COHORT_STAGED` for security and performance.
-
-```text
-<review-inputs>
-Plan Path: None
-Handoff Path: [[handoff_path]]
-Cohort Path: None
-Scope: STANDALONE | COHORT_STAGED
-Base Commit: [[base_commit]]
-Changed Paths: [[concrete staged paths]]
-Validation Path: [[validation_path]]
-Review Path: [[review_path]]
-Prior Verdict Paths: [[concrete paths or None]]
-</review-inputs>
-```
-
-Require independent staged-diff review and the assigned artifact.
-Require only the reviewer's exact `# Output` return envelope.
-
-Read each assigned `review_path` and validate its schema and envelope.
-Require allowed Status, expected Domain, and identical Review Path.
-Require integer Finding Count and one-line Summary.
-Require artifact-consistent decision and count.
-
-Missing, malformed, or absent on-disk evidence is `INCOMPLETE`, never PASS.
+Use CHANGE, STANDALONE, STAGED and the captured base/current HEAD.
 
 Require complete evidence from every selected reviewer and required verifier.
 Failed or cancelled delegation is `FAIL` or `INCOMPLETE`, never SUCCESS.
 Never perform delegated review or verdict work yourself.
 
-Pass paths and compact statuses between agents, never whole artifact bodies.
-
 ## 4. Call exact verifier and repair
 
 Call `_review/verifier` when any review artifact has findings; otherwise skip.
 
-Send every declared verifier input in an explicit envelope.
-
-- Include `Verdict Path: [[verdict_path]]`.
-- Use `scope=STANDALONE` and `scope_boundary=STAGED`.
-- Use `plan_path=None` and `cohort_path=None`.
-- Use `handoff_path=[[handoff_path]]` and `base_commit=[[base_commit]]`.
-
-Repair accepted blockers and accepted advisories within the bound scope.
+Pass identical context, candidate paths and assigned `verdict_path`.
 
 After repair, rerun Section 2 from the lint gate before restaging.
 Then rerun correctness, quality, and affected optional reviews in parallel.
 Rerun the verifier when re-reviews emit new candidates.
 
-Allow at most five repair turns total for deterministic and verified failures.
+Allow at most five repair turns total.
 Remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
 
 ## 5. Finish

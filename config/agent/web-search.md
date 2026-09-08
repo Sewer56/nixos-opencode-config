@@ -70,8 +70,8 @@ Never send secrets or private content externally without authorization.
 
 # Output
 
-Return a concise answer with supporting facts and cited URLs.
-Identify source type, date, and version/reference where available.
+Answer with cited facts, source type/date and version/reference.
+Omit empty sections and repetition.
 
 Mark inference, version mismatch, uncertainty, and unavailable evidence.
 Say `Not established` when the evidence cannot support an answer.

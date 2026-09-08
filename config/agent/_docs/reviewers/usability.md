@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Produces focused documentation usability, clarity, and information-design candidates
+description: Audits documentation usability and clarity
 model: sewer-axonhub/glm-5.3 # MEDIUM
 variant: high
 permission:
@@ -47,7 +47,7 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifact/**": allow
+    "artifact/review/**": allow
   grep: allow
   glob: allow
   list: allow
@@ -87,9 +87,10 @@ permission:
 Review only whether docs help the intended reader complete the scoped task.
 Produce candidates, not documentation edits.
 
-# Inputs
-- `handoff_path` and target paths.
-- `validation_path`, `prior_verdict_paths`, and `candidate_path`.
+Use shared review inputs/output; domain is DOCUMENTATION_USABILITY.
+Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
+
+{{ file="./rules/groups/implementation/implementation-review.md" }}
 
 {{ file="./rules/groups/style/readability.md" }}
 
@@ -120,39 +121,4 @@ Omit already-clear prose.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
-# Artifact
-Write `candidate_path`:
-
-```markdown
-# Documentation usability candidates
-Scope: <target paths>
-Decision: PASS | ADVISORY | CANDIDATES
-
-## Candidates
-### [DOC-USE-NNN]
-Severity: BLOCKING | ADVISORY
-Requirement: <reader task or applicable writing rule>
-Location: `<path:line>` or `<path:heading>`
-Claim: <one concrete usability problem>
-Evidence Type: EXECUTED | STATIC | CODE_PATH | CONTRACT
-Evidence: <specific wording, ordering, or structure>
-Failure Path: <reader goal -> ambiguous/missing content -> likely wrong action or blocked result>
-Impact: <how the task becomes ambiguous, slow, or unsafe>
-Verification: <specific falsifiable check>
-Suggested correction: <bounded outcome, not a full rewrite>
-- None
-
-## Notes
-- <remaining uncertainty>
-- None
-```
-
-# Output
-Return only this fenced block:
-
-```text
-Status: PASS | ADVISORY | CANDIDATES | FAIL
-Candidate Path: <candidate_path>
-Candidates: <n>
-Summary: <one-line summary>
-```
+Use stable finding IDs `DOC-USE-NNN` with concrete reader consequences.

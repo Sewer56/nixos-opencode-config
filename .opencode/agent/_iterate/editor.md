@@ -79,7 +79,7 @@ Implement exact `contract.md` actions.
 {{ file="./.opencode/rules/instruction-authoring.md" }}
 
 - Explicit absolute `request_path` and `contract_path`.
-- `repair_notes`: deterministic failures, verified `TARGET` blockers, or `None`.
+- `repair_notes`: deterministic failures, verified `TARGET` findings, or `None`.
 
 Missing, relative, unreadable, or non-file input paths need `NEEDS_INPUT`.
 Read contract first and request second, before editing.
@@ -96,7 +96,7 @@ Ask only for material choices or incompatible target edits, not locks.
 Orchestrator owns staging; staging-only issues never block writing.
 `VERIFY` is no-edit; pure moves preserve bytes/mode unless contracted.
 
-Repair only supplied failures or verified `TARGET` blockers.
+Repair only supplied failures or verified `TARGET` findings.
 Never edit request, contract, run artifacts, or unlisted consumers.
 Run imported tidy.
 

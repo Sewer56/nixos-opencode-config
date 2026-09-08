@@ -130,12 +130,11 @@ No `Not run` placeholders, empty sections, or extra template boilerplate.
 
 Allow first person and honest uncertainty.
 
-Keep the body under 250 words except for required templates or essential detail.
-Over budget, cut diff-visible micro-detail before motivation.
+Stay under 250 words except for templates or essential detail.
+Cut diff-visible details before motivation.
 Never start with `This PR` or `This change`.
 
 # Tidy pass
-When drafting or repairing, cut needless text, not useful structure.
 Run the imported tidy pass on `pr.md` before the gate.
 
 # Gate
@@ -144,8 +143,6 @@ Run this scan; repair `pr.md` and rerun until output is empty:
 ```bash
 awk 'BEGIN{f=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && $0 !~ /^#/ && length($0) > 80 {print FNR": "$0}' pr.md
 ```
-
-Fenced code, URLs, table rows, and headings are exempt.
 
 The gate owns this scan, title length, opener, word count, and em dashes.
 Gate failure blocks SUCCESS and requires repair before review.
@@ -158,17 +155,20 @@ awk 'BEGIN{f=0;m=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/
 
 # Review loop
 1. After the gate passes, call `_write/review/adherence` once.
-Supply the request summary, absolute `pr.md` path, and applicable constraints.
-2. Repair every required change.
-Next, rerun the tidy pass and the gate, then request one re-review.
+Supply request/constraints and absolute `artifact_path` for `pr.md`.
+
+Include resolved base, merge-base, current HEAD and scoped diff evidence.
+2. Repair required changes first; validate suggestions against request/evidence.
+Apply feasible in-scope suggestions within the same budget.
+Rerun tidy and the gate, then request one re-review.
 3. Allow at most 2 repair turns.
 Return `FAIL` with remaining required findings in `Errors` after turn 2.
-Suggestions are optional.
+Skipped suggestions stay visible with reasons and never block success.
 4. Return `NEEDS_INPUT` for reviewer unavailability or `BLOCKED`.
 Put the reason in `Errors`.
 
 # Output
-Return only this fenced block:
+Return only:
 
 ```text
 Status: SUCCESS | NEEDS_INPUT | FAIL

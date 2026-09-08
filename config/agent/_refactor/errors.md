@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Traces and repairs public error documentation with complete reviewed coverage
+description: Traces and repairs complete public error documentation
 model: sewer-axonhub/glm-5.3 # MEDIUM
 variant: high
 permission:
@@ -79,7 +79,7 @@ permission:
 Repair verified error-documentation gaps in public APIs.
 
 # Inputs
-- Explicit files or directories from the user, or the repository's application/library source when no target is supplied.
+- Use explicit files/directories, otherwise repository application/library code.
 - Optional language or module constraints.
 
 # Artifacts
@@ -92,47 +92,64 @@ Derive a short `slug`, UTC `run_id`, and:
 - `[[review_dir]]/errors/rNN.errors.review.md`
 - `[[review_dir]]/verifier/rNN.verdict.md`
 
-Create or overwrite each exact assigned path. Never create placeholder or stub files.
+Start r01; repairs use unused rounds and preserve historical evidence.
+
+Write only exact assigned artifacts, never stubs.
 
 {{ file="./rules/groups/docs/error-docs.md" }}
+
+{{ file="./rules/groups/implementation/implementation-review.md" }}
 
 # Process
 
 ## 1. Resolve a deterministic file set
-- Use `codebase-explorer` once to identify repository languages, module boundaries, generated/vendor exclusions, and validation commands.
-- Resolve an explicit repository-relative file list with `git ls-files`; restrict it to supported source files and the user's scope.
-- Record complete file list in handoff before collection. Collectors may not expand it.
+- Use `codebase-explorer` once for languages, module boundaries and checks.
+- Include generated/vendor exclusions in its query.
+- Use `git ls-files` to bound repository-relative source files to user scope.
+- Record all files in handoff before collection; collectors cannot expand it.
 - Record current target diffs as run-start baseline.
-- Treat current target contents as baseline; never reconstruct files from `HEAD` or discard pre-existing edits.
+- Current contents are baseline; never reconstruct from HEAD or discard edits.
 - Use `chunk-files-by-tokens -s 24000 <paths>` when available.
-- If the binary is absent, use the repository's `cargo run -q -p chunk-files-by-tokens -- -s 24000 <paths>` only when that workspace exists.
-- Otherwise create deterministic sorted chunks of bounded file count and record the fallback.
+- If absent, use this fallback only when its workspace exists:
+
+```sh
+cargo run -q -p chunk-files-by-tokens -- -s 24000 [[paths]]
+```
+
+- Otherwise use sorted chunks of bounded file count and record the fallback.
 
 ## 2. Collect once per chunk
-- Dispatch `_refactor/errors/collector` in batches of at most four parallel tasks, one unique facts path per chunk.
-- Require each collector to report every assigned file read and a complete API inventory.
-- Retry only malformed or transient collector output once. Do not use cache convergence or repeatedly rescan already covered files.
-- Stop as `INCOMPLETE` when any file or error edge remains unexamined; do not guess documentation from an incomplete inventory.
+- Dispatch `_refactor/errors/collector` in batches of at most four.
+- Supply repo_root, language, target_files and a unique facts_path per chunk.
+- Require complete file/API coverage, including specific existing docs.
+- Retry malformed/transient output once; never repeatedly rescan covered files.
+- Unexamined files/error edges mean INCOMPLETE; never guess missing evidence.
 
 ## 3. Merge facts and edit
 - Read referenced targets and traced error paths; do not search broadly.
-- Merge fact paths into the handoff as an index; do not paste every trace into the primary context.
-- Edit only source files containing verified `missing`, `vague`, or `incorrect` gaps.
-- Use exact reachable variants/types and triggers. Preserve executable tokens and do not backfill untouched legacy APIs outside scope.
+- Index fact paths in handoff instead of copying traces.
+- Edit only verified missing, vague or incorrect documentation gaps.
+- Use exact reachable variants/types and triggers; preserve executable tokens.
+- Never backfill untouched APIs outside declared scope.
 
 ## 4. Validate and review
 - Validate current edited source files directly. Do not stage files.
-- Compare current target diffs with baseline. Any new executable change is blocking.
-- Run the narrowest repository-native formatter, parser/doc check, type/build check, or documentation test. Record evidence in a new validation artifact.
-- Dispatch `_refactor/document/reviewers/errors` with all facts paths, handoff, changed paths, validation, prior verdicts, and a new candidate path.
-- Dispatch `_review/verifier` only when a reviewer produced findings; skip it when none did. Use `scope=STANDALONE` and `scope_boundary=WORKTREE`.
+- Compare diff to baseline; new executable changes block.
+- Run narrow native formatter, parser/doc/type/build checks or doc tests.
+- Record command, result/exit and decisive evidence/gaps in validation.
+- Dispatch `_refactor/document/reviewers/errors` with complete review inputs.
+- Supply handoff/instruction authority and all collector `facts_paths`.
+- Use TARGET_AUDIT, STANDALONE, WORKTREE and all declared targets.
+- Assign round output; include shared context and run-start baseline evidence.
+- Dispatch `_review/verifier` only for candidate-bearing reports.
+- Pass identical context, candidate paths and assigned `verdict_path`.
 
 ## 5. Repair and certify
-- Repair deterministic failures and accepted blockers only.
 - After an edit, create a new round and review current declared targets.
 - Allow at most two repair rounds.
-- `SUCCESS` requires complete file coverage, no accepted blocker, no deterministic failure, and no target edit after final review.
-- Use `INCOMPLETE` for unavailable required evidence and `NEEDS_INPUT` for decisions that cannot be derived safely.
+- SUCCESS needs complete coverage with no deterministic or verified blocker.
+- Make no target edit after final review.
+- Missing evidence is INCOMPLETE; unsafe-to-derive decisions need NEEDS_INPUT.
 
 # Output
 Return exactly:
@@ -148,5 +165,6 @@ Summary: <one-line summary>
 ```
 
 # Constraints
-- Never commit, push, stage files, or change runtime behavior. Edit only declared source targets.
+- Never commit, push, stage or change runtime behavior.
+- Edit only declared source documentation.
 - Do not use reviewer agreement as evidence.

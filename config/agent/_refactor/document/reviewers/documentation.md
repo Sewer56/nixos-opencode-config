@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Produces evidence-backed source documentation and readability candidates
+description: Audits source documentation and readability
 model: sewer-axonhub/glm-5.3 # MEDIUM
 variant: high
 permission:
@@ -47,7 +47,7 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifact/**": allow
+    "artifact/review/**": allow
   grep: allow
   glob: allow
   list: allow
@@ -84,12 +84,14 @@ permission:
     "patch *": deny
 ---
 
-Review the scoped source-documentation diff. Produce candidates only; do not edit source.
+Audit scoped source documentation; never edit source.
 
 # Inputs
-- `handoff_path` and target paths.
+Use shared review inputs/output; domain is DOCUMENTATION.
+Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
 - `separate_error_review`: explicit `YES | NO` from the parent.
-- `validation_path`, `prior_verdict_paths`, and `candidate_path`.
+
+{{ file="./rules/groups/implementation/implementation-review.md" }}
 
 {{ file="./rules/groups/docs/code-docs.md" }}
 
@@ -107,41 +109,4 @@ Review the scoped source-documentation diff. Produce candidates only; do not edi
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
-# Artifact
-Write `candidate_path`:
-
-```markdown
-# Source documentation candidates
-Scope: <target paths>
-Decision: PASS | ADVISORY | CANDIDATES | INCOMPLETE
-
-## Candidates
-### [SRC-DOC-NNN]
-Severity: BLOCKING | ADVISORY
-Requirement: <API contract or documentation rule>
-Location: `<path:line>` or `<path:symbol>`
-Claim: <one concrete problem>
-Evidence Type: EXECUTED | STATIC | CODE_PATH | CONTRACT
-Evidence: <code and documentation evidence>
-Failure Path: <maintainer/readership task -> misleading or missing documentation -> likely wrong conclusion or action>
-Impact: <incorrect, missing, or misleading understanding>
-Suggested correction: <bounded outcome; no full replacement diff>
-Verification: <proof step>
-- None
-
-## Notes
-- <evidence limitation>
-- None
-```
-
-# Output
-Return exactly:
-
-```text
-Status: PASS | ADVISORY | CANDIDATES | INCOMPLETE | FAIL
-Candidate Path: <candidate_path>
-Candidates: <n>
-Summary: <one-line summary>
-```
-
-Return no prose outside the fenced block.
+Use stable finding IDs `SRC-DOC-NNN` and preserve target-audit completeness.

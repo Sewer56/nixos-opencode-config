@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Exhaustively traces public error-returning APIs in an explicit bounded file chunk
+description: Inventories public error APIs in a bounded chunk
 model: sewer-axonhub/glm-5.3 # EASY
 variant: low
 permission:
@@ -47,7 +47,7 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifact/**": allow
+    "artifact/PROMPT-ERROR-DOCS-*.chunk-*.facts.md": allow
   grep: allow
   glob: allow
   list: allow
@@ -84,7 +84,8 @@ permission:
     "patch *": deny
 ---
 
-Trace public error-returning APIs in one explicit file chunk. The caller owns file enumeration and chunk completeness; do not broaden scope or use iterative cache discovery.
+Trace every public error-returning API in one assigned chunk.
+Caller owns enumeration; never broaden scope or use iterative caches.
 
 # Inputs
 - `repo_root`: absolute repository root.
@@ -96,44 +97,26 @@ Trace public error-returning APIs in one explicit file chunk. The caller owns fi
 
 # Process
 Judge only error enumeration, reachable paths, and existing error docs.
-1. Read every target file completely enough to enumerate public/exported error-returning APIs under the repository's language conventions.
-2. For each API, trace direct error construction, `?`/propagation, thrown/rejected errors, mapped errors, called helper contracts, and conditional branches.
-3. Follow only narrowly necessary local callees. Record an unresolved edge instead of guessing when the callee contract cannot be established.
-4. Compare reachable paths with the existing `# Errors`, `@throws`, or language-equivalent section.
-5. Classify each API as `specific`, `missing`, `vague`, `incorrect`, or `incomplete-evidence`.
-6. Write all facts once. Do not suppress `specific` APIs; the complete inventory is how the caller proves file coverage.
+1. Read all assigned files and enumerate APIs using language conventions.
+2. Trace construction, propagation, mapped/thrown errors and every branch.
+3. Follow necessary local callees; record unresolved edges instead of guessing.
+4. Compare every variant/trigger with existing language-specific error docs.
+5. Classify as specific, missing, vague, incorrect or incomplete-evidence.
+6. Include specific APIs too; sparse prose never means omitted coverage.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
 # Artifact
-Write `facts_path`:
+{{ file="./rules/cards/implementation/review-protocol.md" }}
 
-```markdown
-# Error documentation facts
-Language: <language>
-Files: <comma-separated target files>
-Status: COMPLETE | INCOMPLETE
+Write `facts_path` with language, exact files and COMPLETE or INCOMPLETE.
+For every API record path/line/symbol, visibility and return/error shape.
 
-## APIs
-### `<path:line>` - `<symbol>`
-Visibility: <public/exported form>
-Return/Error Shape: <type or throw/rejection form>
-Documentation: specific | missing | vague | incorrect | incomplete-evidence
-Reachable Paths:
-- `<variant or type>` when <exact trigger> - Evidence: `<path:line or callee>`
-- None
-Documentation Gap: <specific gap or None>
-Unresolved Edges:
-- <callee or dynamic path that could not be established>
-- None
+Record classification and every reachable variant/type, exact trigger and cite.
+Include actual gaps and unresolved edges; explicitly identify zero-error APIs.
 
-## Coverage
-- Files read: <n>/<target_files count>
-- Public error-returning APIs: <n>
-- Specific: <n>
-- Missing/vague/incorrect: <n>
-- Incomplete evidence: <n>
-```
+Account for every file, including files with no public error-returning APIs.
+Report counts for files read, APIs, specific docs, gaps and incomplete evidence.
 
 # Output
 Return exactly:

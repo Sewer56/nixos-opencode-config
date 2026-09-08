@@ -1,7 +1,7 @@
 ---
-description: "Create or refine an implementation draft for human review"
+description: "Discuss a design, then author its human-first task bundle"
 agent: _plan/draft
 ---
 
-Request, existing draft path, or refinement instructions:
+Request or draft refinement:
 $ARGUMENTS

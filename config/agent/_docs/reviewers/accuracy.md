@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Produces evidence-backed documentation accuracy and coverage candidates
+description: Audits documentation accuracy and coverage
 model: sewer-axonhub/glm-5.3 # HARD
 variant: high
 permission:
@@ -47,7 +47,7 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifact/**": allow
+    "artifact/review/**": allow
   grep: allow
   glob: allow
   list: allow
@@ -87,9 +87,10 @@ permission:
 Review only factual fidelity and coverage of scoped end-user docs.
 Generate candidates, not documentation edits or approved repairs.
 
-# Inputs
-- `handoff_path` and target paths.
-- `validation_path`, `prior_verdict_paths`, and `candidate_path`.
+Use shared review inputs/output; domain is DOCUMENTATION_ACCURACY.
+Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
+
+{{ file="./rules/groups/implementation/implementation-review.md" }}
 
 {{ file="./rules/groups/docs/end-user-correctness.md" }}
 
@@ -113,41 +114,4 @@ Minor optional elaboration is advisory or omitted.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
-# Artifact
-Write `candidate_path`:
-
-```markdown
-# Documentation accuracy candidates
-Scope: <target paths>
-Decision: PASS | ADVISORY | CANDIDATES | INCOMPLETE
-
-## Candidates
-### [DOC-ACC-NNN]
-Severity: BLOCKING | ADVISORY
-Requirement: <documented task, repository behavior, or rule>
-Location: `<path:line>` or `<path:heading>`
-Claim: <one concrete problem>
-Evidence Type: EXECUTED | STATIC | CODE_PATH | CONTRACT
-Evidence: <source/config/test/link evidence>
-Failure Path: <how a reader is misled or blocked>
-Impact: <observable reader or maintainer consequence>
-Suggested correction: <bounded outcome, not a replacement passage>
-Verification: <check that would prove the correction>
-- None
-
-## Notes
-- <evidence limitation>
-- None
-```
-
-# Output
-Return exactly:
-
-```text
-Status: PASS | ADVISORY | CANDIDATES | INCOMPLETE | FAIL
-Candidate Path: <candidate_path>
-Candidates: <n>
-Summary: <one-line summary>
-```
-
-Return no prose outside the fenced block.
+Use stable finding IDs `DOC-ACC-NNN` and preserve full target-audit coverage.

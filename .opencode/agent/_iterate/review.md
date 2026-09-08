@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Independently reviews one staged instruction change through required risk lenses
+description: Reviews staged instructions through required risk lenses
 permission:
   "*": deny
   external_directory:
@@ -99,25 +99,27 @@ Review the staged change; verifier owns repair eligibility.
 git diff --cached --find-renames [[base_commit]] -- [[changed_paths]]
 ```
 
-   Trace contract, preserved behavior, cases, routes, imports, consumers, checks.
+   Trace contract, behavior, routes, imports, consumers and checks.
 2. Apply only requested lenses:
-   - `behavior`: triggers, authority, inputs/output, stops, distinguishing cases;
+   - `behavior`: triggers, authority, inputs/output, stops and cases;
    - `architecture`: ownership, role/import value, reachability, permissions;
    - `adversarial`: privileges, untrusted sources, secrets, self-edit bypasses.
 3. Seek the smallest counterexample with consumer-accurate context/tools.
    Scenario inspection is not live execution.
-4. Candidates need contract, location, evidence, and reachable material impact.
-   Require a falsifiable check.
+4. Candidates need grounded impact and falsifiable proof.
+   Blockers need material contract failure.
    Size, style, confidence, or usefulness alone is not a defect.
 5. Deduplicate root causes. Emit no quota and no rewrite.
 
 Consult `{{gitpath:.opencode/rules/instruction-authoring.md}}`.
-Do not demand duplicate or inferable text.
 
-Write `review_path` with decision `PASS | CANDIDATES | INCOMPLETE`.
-Include findings, important verified behavior, and missing evidence.
+{{ file="./config/rules/cards/implementation/review-protocol.md" }}
 
-{{ file="./config/rules/cards/structure/writable-surface.md" root="artifacts/iterate" }}
+Write `review_path` with decision PASS, CANDIDATES or INCOMPLETE.
+Identify request/contract authority and current staged base/head/paths.
+
+{{ file="./config/rules/cards/structure/writable-surface.md"
+   root="artifacts/iterate" }}
 
 # Output
 

@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Traces changed public error paths and produces evidence-backed error-documentation candidates
+description: Audits reachable error documentation
 model: sewer-axonhub/glm-5.3 # HARD
 variant: high
 permission:
@@ -47,7 +47,7 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifact/**": allow
+    "artifact/review/**": allow
   grep: allow
   glob: allow
   list: allow
@@ -84,12 +84,15 @@ permission:
     "patch *": deny
 ---
 
-Review error documentation for the scoped source files. Trace reachable errors from code before raising a candidate. Do not edit source.
+Audit scoped error documentation; trace reachable errors before findings.
+Never edit source.
 
 # Inputs
-- `handoff_path` and target paths.
-- `validation_path`, `prior_verdict_paths`, and `candidate_path`.
+Use shared review inputs/output; domain is ERROR_DOCUMENTATION.
+Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
 - Optional `facts_paths` from exhaustive collectors.
+
+{{ file="./rules/groups/implementation/implementation-review.md" }}
 
 {{ file="./rules/groups/docs/error-application-review.md" }}
 
@@ -98,46 +101,9 @@ Review error documentation for the scoped source files. Trace reachable errors f
 - Do not search broadly or take over collector enumeration.
 - Exclude general docs coverage, inline comments, and broad prose polish.
 - Judge implementation only to verify reachable errors.
-- A delegated error is attributed only when the public API can actually expose it.
+- Attribute delegated errors only when the public API can expose them.
 - Prior refuted findings are not repeated without new evidence.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
-# Artifact
-Write `candidate_path`:
-
-```markdown
-# Error documentation candidates
-Scope: <target paths>
-Decision: PASS | ADVISORY | CANDIDATES | INCOMPLETE
-
-## Candidates
-### [ERR-DOC-NNN]
-Severity: BLOCKING | ADVISORY
-Requirement: <error-documentation rule or public contract>
-Location: `<path:line>` or `<path:symbol>`
-Claim: <missing, vague, extra, or incorrect coverage>
-Evidence Type: EXECUTED | STATIC | CODE_PATH | CONTRACT
-Evidence: <reachable code path and current documentation>
-Failure Path: <variant/type and exact trigger>
-Impact: <observable reader or maintainer consequence>
-Suggested correction: <bounded documentation outcome>
-Verification: <trace or check proving coverage>
-- None
-
-## Notes
-- <unverified path or language limitation>
-- None
-```
-
-# Output
-Return exactly:
-
-```text
-Status: PASS | ADVISORY | CANDIDATES | INCOMPLETE | FAIL
-Candidate Path: <candidate_path>
-Candidates: <n>
-Summary: <one-line summary>
-```
-
-Return no prose outside the fenced block.
+Use stable finding IDs `ERR-DOC-NNN` with exact variant/trigger evidence.

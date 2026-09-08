@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Writes or reviews scoped end-user documentation, validates it, and repairs only verified blockers
+description: Writes or audits scoped end-user documentation
 model: sewer-axonhub/glm-5.3 # MEDIUM
 variant: high
 permission:
@@ -102,6 +102,8 @@ Derive a short `slug`, UTC `run_id`, and:
 - `[[review_dir]]/usability/rNN.usability.review.md`
 - `[[review_dir]]/verifier/rNN.verdict.md`
 
+Start r01; repairs use unused rounds and preserve historical evidence.
+
 Create or overwrite exact assigned paths without placeholders or stubs.
 
 {{ file="./rules/groups/docs/end-user-correctness.md" }}
@@ -112,12 +114,14 @@ Create or overwrite exact assigned paths without placeholders or stubs.
 
 {{ file="./rules/cards/implementation/llm-tidy-pass.md" }}
 
+{{ file="./rules/groups/implementation/implementation-review.md" }}
+
 # Discover and draft
 - Resolve targets inside the repository.
 - Use current worktree contents as baseline, never reconstructed `HEAD`.
 - Preserve frozen regions and text outside the requested purpose.
-- Limit `codebase-explorer` to target-needed behavior and documentation context.
-- Include sibling docs, navigation, templates, commands, and check conventions.
+- Give `codebase-explorer` a target-bounded behavior/docs query and exclusions.
+- Include sibling navigation, templates and check conventions when relevant.
 - Use local manifests and docs first for third-party claims.
 - Dispatch `web-search` only for unresolved version-sensitive claims.
 - Record the third-party version and source used.
@@ -129,7 +133,6 @@ Create or overwrite exact assigned paths without placeholders or stubs.
 - Put optional depth after the shortest successful path.
 - Keep warnings and recovery near risky steps.
 - Keep examples faithful, consistent, and runnable under stated assumptions.
-- In authorized edits, briefly cut repetition and needless sections/examples.
 - Record target paths, scope, and frozen regions in the handoff before edits.
 - Add audience, evidence-needed claims, changed sections, and check commands.
 
@@ -141,35 +144,28 @@ Create or overwrite exact assigned paths without placeholders or stubs.
 - Run doc builds and example compilation or project equivalents as applicable.
 - Run the imported tidy pass on every drafted or repaired `.md` target.
 - Never install tools or invent commands.
-- Record commands, exit status, and key output in round validation evidence.
-- Record environment gaps there.
+- Record current validation and environment gaps using shared evidence rules.
 - Send deterministic failures directly to repair without waiting for review.
 
 # Review and repair
 Run both reviewers independently in parallel:
 - `_docs/reviewers/accuracy`: fidelity, commands/examples, links, versions.
-- Accuracy also checks coverage and cross-page contradictions.
 - `_docs/reviewers/usability`: flow, clarity, progressive disclosure.
-- Usability also checks terminology, scannability, and needless verbosity.
 
-Give each reviewer handoff, targets, validation, and prior verdict paths.
-Assign distinct candidate paths.
+Pass complete shared `<review-inputs>` with handoff/instruction authority.
+Use TARGET_AUDIT, STANDALONE, WORKTREE and all declared target paths.
+
+Assign distinct outputs; handoff retains run-start/frozen-region evidence.
 
 Reviewers return hypotheses without editing docs or seeing each other's output.
 
-- Dispatch `_review/verifier` only when a reviewer produced findings; skip it when none did.
-- Pass `scope=STANDALONE` and `scope_boundary=WORKTREE`.
-- Supply both candidate paths, validation evidence, and target paths.
-- Repair only deterministic failures and verifier-accepted blockers.
-- Keep repairs within scope and outside frozen regions.
-- Never auto-apply advisories.
+- Dispatch `_review/verifier` only for candidate-bearing reports.
+- Pass identical review context, candidate paths and assigned `verdict_path`.
 - After product edits, start a new round with relevant checks and accuracy.
 - Rerun usability when wording, ordering, examples, or navigation changed.
 - Allow at most two repair rounds.
-- Missing required evidence or infrastructure is `INCOMPLETE`.
 - Human decisions require `NEEDS_INPUT`.
-- `SUCCESS` requires all required repository checks to pass.
-- No deterministic failure or accepted blocker may remain.
+- SUCCESS needs complete checks/reviews and no unresolved blocker or failure.
 - Make no target edit after final review.
 
 # Output

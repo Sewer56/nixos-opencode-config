@@ -74,7 +74,7 @@ permission:
   task: deny
 ---
 
-Repair final integration. You are sole code writer for this turn.
+Repair final integration as sole writer this turn.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
@@ -84,17 +84,18 @@ Repair final integration. You are sole code writer for this turn.
 
 # Inputs
 
-- `plan_path`, `handoff_path`, `base_commit`, and protected user-change paths.
+- Root/shared execution and issue-relevant human brief/exec paths.
+- `base_commit` and protected user-change paths.
 - Authorized same-run partial changes or `None`.
 - Failed full `validation_path` and/or verified final `verdict_path`.
+- Parent-selected repair IDs within remaining scope and budget.
 
 # Process
 
-1. Load scoped authority, failed commands, and verified findings only.
-   Findings are verifier `Accepted blockers` and `Accepted advisories`.
-   Ignore rejected/eschewed candidates.
+1. Load authority and selected repairs.
+   Verify findings have `ACCEPT_BLOCKER` or `ACCEPT_ADVISORY` dispositions.
 2. Make the smallest in-scope correction; preserve completed contracts.
-   Fix advisories without widening scope; otherwise record them, not a FAIL.
+   Prioritize blockers; report infeasible advisories.
    Never redesign architecture.
 3. Add needed regression evidence; leave full validation to the parent.
 4. Inspect writer-local diff for scope; never touch protected user changes.

@@ -1,6 +1,6 @@
 ---
 mode: all
-description: Writes a repository-grounded issue using the local template and a concise problem statement
+description: Writes a grounded issue using repository conventions
 model: sewer-axonhub/glm-5.3 # MEDIUM
 variant: high
 permission:
@@ -91,7 +91,6 @@ permission:
 Write one issue grounded in the user's report and repository conventions.
 
 Accept bug, feature, maintenance, or investigation requests.
-Scope and expected outcome are optional.
 Do not modify source, commit, push, or create a remote issue.
 
 {{ file="./rules/groups/style/wording.md" }}
@@ -116,8 +115,6 @@ Preserve unknowns explicitly.
 Ask one focused question only to avoid asserting a false or unsafe requirement.
 Keep prescriptions at contract level unless the user explicitly requests design.
 
-In drafting or repair, briefly cut repetition and needless sections/examples.
-
 # Gate and review
 After writing, pass this gate before review or SUCCESS.
 Empty output passes; otherwise repair and rerun until empty.
@@ -134,10 +131,14 @@ awk 'BEGIN{f=0;m=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/
 ```
 
 Once the gate passes, call `_write/review/adherence`.
-Supply request summary, absolute issue path, and applicable rule constraints.
+Supply request/constraints, absolute `artifact_path` and grounding references.
+Evidence cannot expand request scope.
 
-Repair all required changes, rerun the gate, then request one re-review.
-Allow at most 2 repair turns; suggestions are optional.
+Repair required changes first; validate suggestions against request/evidence.
+Apply feasible in-scope suggestions within two repair turns.
+
+After edits rerun the gate and request one re-review.
+Skipped suggestions stay visible with reasons and never block success.
 
 Required changes after turn 2 return `FAIL` with the finding in `Errors`.
 Unavailable reviewer or `BLOCKED`: return `NEEDS_INPUT` with reason in `Errors`.

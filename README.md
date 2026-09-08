@@ -18,20 +18,27 @@ See [architecture and rationale].
 
 ### Draft and approve
 
-Use `/draft` to define an ignored contract and small cohorts.
-Review their goals, scope, exclusions, and completion checks.
+Discuss goal, constraints, design and task outline with `/draft` first.
+Explicit agreement and authorization unlock documents.
+
+The readable root owns decisions; human task briefs own scope and completion.
+Shared `execution.md` and paired task exec files hold technical instructions.
+
+Plans are locally ignored and pass tidy, routing and whole-bundle review.
 Approve the ready bundle with `/implement [[plan_path]]`.
+Old combined plans are unsupported; nothing silently converts them.
 
 ### Implement
 
-Children implement, test, review, and commit cohorts in order.
+Children read human authority, implement, test, review and commit in order.
 Say “resume from C03” to continue without discarding prior work.
+
 Unclear ownership or material facts prompt a question.
 Final checks include CodeRabbit; nothing is pushed.
 
 ## External research
 
-Web and MCP queries route through the `web-search` subagent: they can be expensive, especially MCPs.
+Route external queries through `web-search`; MCP calls can be expensive.
 
 ## Outcomes and artifacts
 
@@ -42,50 +49,43 @@ Web and MCP queries route through the `web-search` subagent: they can be expensi
 
 - Validation, reviews, and verdicts live under `artifact/`.
 - Instruction-edit evidence uses `artifacts/iterate/`.
-- Internal findings need verifier acceptance for bounded, in-scope repair.
+- Internal findings need verifier acceptance for scoped repair.
+- Apply feasible verified advisories within scope and budget.
+- Skipped advisories stay visible with reasons; they never block success.
 - CodeRabbit uses its own findings as authority.
 
 ## Commands
 
 ### Planning and implementation
 
-| Command                  | Purpose                                                              |
-| ------------------------ | -------------------------------------------------------------------- |
-| `/draft`                 | Define cohorts in a human-reviewed plan bundle.                      |
-| `/plan/convert-to-draft` | Convert useful conversation context into same draft format.          |
-| `/implement`             | Execute approved cohorts in dependency order.                        |
-| `/implement/one-shot`    | Implement a bounded request in one writer-review-verify-repair loop. |
-| `/code`                  | General rules-baked coding agent with on-request reviewer/verifier.  |
+- `/draft`: discuss a design, then write a human/exec task bundle.
+- `/plan/convert-to-draft`: continue conversation toward an agreed draft.
+- `/implement`: execute approved tasks in dependency order.
+- `/implement/one-shot`: implement and review one bounded request.
+- `/code`: interactive coding with review only on request.
 
 ### Refactoring
 
-| Command                  | Purpose                                                                         |
-| ------------------------ | ------------------------------------------------------------------------------- |
-| `/refactor/modularize`   | Draft behavior-preserving modularization.                                       |
-| `/refactor/parameterize` | Draft safe test parameterization.                                               |
-| `/refactor/reorder`      | Preview and reorder declarations after explicit `go`.                           |
-| `/refactor/document`     | Repair scoped source documentation.                                             |
-| `/refactor/errors`       | Trace and repair public error documentation.                                    |
-| `/cleanup`               | Clean existing code to current standards through the implement review gauntlet. |
+- `/refactor/modularize`: draft behavior-preserving modularization.
+- `/refactor/parameterize`: draft safe test parameterization.
+- `/refactor/reorder`: preview, then reorder after explicit `go`.
+- `/refactor/document`: repair scoped source documentation.
+- `/refactor/errors`: trace and repair public error documentation.
+- `/cleanup`: clean and review targets while preserving behavior.
 
-### Documentation, review, and audits
+### Documentation and review
 
-| Command              | Purpose                                          |
-| -------------------- | ------------------------------------------------ |
-| `/docs/write`        | Write scoped end-user documentation.             |
-| `/docs/review`       | Review and repair scoped end-user documentation. |
-| `/review/coderabbit` | Run CodeRabbit and repair its blocking findings. |
-| `/audit/public-api`  | Audit unnecessarily public APIs.                 |
+- `/docs/write`: write scoped end-user documentation.
+- `/docs/review`: review and repair scoped end-user documentation.
+- `/review/coderabbit`: run CodeRabbit and apply scoped repairs.
 
 ### Repository maintenance
 
-| Command         | Purpose                                                      |
-| --------------- | ------------------------------------------------------------ |
-| `/commit/main`  | Create intentional semantic commits with explicit staging.   |
-| `/write/issue`  | Write repository-grounded issue file.                        |
-| `/write/pr`     | Generate evidence-backed `pr.md` from branch diff.           |
-| `/iterate/edit` | Create, edit, move, delete, or verify instruction artifacts. |
-| `/migrate`      | Run separate pinned-source migration workflow.               |
+- `/commit/main`: create semantic commits with explicit staging.
+- `/write/issue`: write a repository-grounded issue.
+- `/write/pr`: generate grounded `pr.md` from the branch diff.
+- `/iterate/edit`: discuss and edit or verify instruction artifacts.
+- `/migrate`: run the separate pinned-source migration workflow.
 
 See [practical iterate guide] for instruction work.
 
@@ -111,9 +111,9 @@ Windows:
 pwsh ./scripts/windows/setup.ps1
 ```
 
-- Setup offers missing cargo, bun, git, Node.js LTS, Yarn, and Docker Desktop.
-- Each tool gets a y/N `winget` prompt; cargo/bun/yarn have installer fallbacks.
-- Installation failures and declines warn without stopping setup.
+- Setup offers cargo, bun, git, Node.js LTS, Yarn and Docker Desktop.
+- Each gets a y/N winget prompt; cargo/bun/yarn have installer fallbacks.
+- Failed or declined installs warn without stopping setup.
 - Pass `-NoInstallPrereqs` for detect-only.
 
 - CodeRabbit CLI ships Linux/macOS binaries; Windows setup does not install it.
@@ -130,11 +130,14 @@ From repository root:
 
 ```bash
 python3 scripts/validate-opencode-config.py --repo-root .
-python3 -m unittest discover -s tests -p 'test_*.py'
+bash scripts/check-workflows.sh
 ```
 
 Use `nix develop` when local Python lacks `json5` or `PyYAML`.
 See the [validator docstring] for check scope.
+
+Validation writes only an explicitly requested report, never configuration.
+The shell smoke checks routing, pairs, cycles and path safety in temp fixtures.
 
 - Credentials, plugins, CodeRabbit, and OpenCode need environment checks.
 - Static checks cannot certify stochastic model behavior.

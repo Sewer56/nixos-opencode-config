@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 """OpenCode configuration validator.
 
-Performs deterministic static checks without calling a model. Writes only the
-optional path supplied with ``--report``.
+Runs static checks without a model; writes only the explicit ``--report``.
 
 Configuration documents:
 - Parse active JSON/JSONC configuration and local Caveman plugin package data.
-- Require positive tool output limits and a global external-directory policy of
-  ask, allow, or a pattern map. Compaction pruning is optional.
+- Require positive output limits and an ask/allow/pattern external policy.
 
 Agent frontmatter and permissions:
 - Validate IDs, YAML, modes, descriptions, provider-qualified models, permission
@@ -18,15 +16,13 @@ Agent frontmatter and permissions:
 Commands and task graph:
 - Validate command targets, entry points, routes, reachability, cycles, disabled
   agents, and maximum custom task depth of three edges.
-- Write config.subagent_depth as (maximum custom task depth + 2) so nested
-  Task calls never hit the runtime depth limit.
+- Require config.subagent_depth to equal maximum custom task depth + 2.
+  A mismatch is an error, never a configuration write.
 
 Prompt structure and imports:
 - Check Markdown fences, output contracts, imports, import cycles, rule
   reachability and names, and imported support files.
-- Check instruction format: per-line statement cap of 240 characters, em-dash
-  ban, and soft split-suggestion warnings over 80 characters across prompt and
-  rule Markdown.
+- Check instruction lines: 240-character cap, no em dashes, warnings over 80.
 
 Documentation and source syntax:
 - Require README.md, EXPLAINER.md, and .opencode/ITERATE.md.
@@ -34,8 +30,8 @@ Documentation and source syntax:
 - Parse project Python and run ``bash -n`` on configured shell scripts.
 
 Result:
-- Print Markdown metrics, errors, and warnings. Exit 0 for PASS and 1 for FAIL.
-- ``--report PATH`` writes the same report printed to stdout.
+- Print metrics/errors/warnings; exit 0 for PASS, 1 for FAIL.
+- ``--report PATH`` saves the stdout report.
 
 Outside scope:
 - Nix evaluation/formatting, unit tests, builds, type checks, broader linters,
@@ -371,6 +367,23 @@ def find_import_cycles(graph: dict[Path, set[Path]]) -> list[list[Path]]:
     return cycles
 
 
+def has_output_contract(repo: Path, path: Path, seen: set[Path] | None = None) -> bool:
+    """Recognize output contracts owned by reachable shared imports."""
+    seen = set() if seen is None else seen
+    path = path.resolve()
+    if path in seen:
+        return False
+    seen.add(path)
+    text = path.read_text(encoding="utf-8")
+    if re.search(r"(?mi)^#{1,3}\s+(?:output|result)\b|return (?:exactly|only)(?: this[^:\n]*)?:", text):
+        return True
+    return any(
+        target is not None and has_output_contract(repo, target, seen)
+        for raw in IMPORT_RE.findall(text)
+        for target in [resolve_import(repo, path, raw)]
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", default=".")
@@ -516,18 +529,7 @@ def main() -> int:
 
     required_subagent_depth = max_depth + 2
     if config.get("subagent_depth") != required_subagent_depth:
-        raw = config_path.read_text(encoding="utf-8")
-        match = re.search(r'"subagent_depth"\s*:\s*\d+', raw)
-        if match:
-            updated = raw[: match.start()] + f'"subagent_depth": {required_subagent_depth}' + raw[match.end() :]
-        else:
-            updated = raw.replace(
-                '"autoupdate": false,',
-                f'"autoupdate": false,\n  "subagent_depth": {required_subagent_depth},',
-                1,
-            )
-        config_path.write_text(updated, encoding="utf-8")
-        config["subagent_depth"] = required_subagent_depth
+        errors.append(f"config.subagent_depth must be {required_subagent_depth}, got {config.get('subagent_depth')!r}")
     details.append(f"config.subagent_depth: {required_subagent_depth}")
 
     all_prompt_files = active_prompt_files(repo)
@@ -540,7 +542,7 @@ def main() -> int:
         if len(fences) % 2:
             errors.append(f"{path.relative_to(repo)} has an unbalanced Markdown fence")
         if path.is_relative_to(repo / "config/agent") or path.is_relative_to(repo / ".opencode/agent"):
-            if text.startswith("---\n") and not re.search(r"(?mi)^#{1,3}\s+(output|result)\b|return (?:exactly|only):", text):
+            if text.startswith("---\n") and not has_output_contract(repo, path):
                 errors.append(f"{path.relative_to(repo)} has no explicit output/result contract")
         edges = import_edges.setdefault(path.resolve(), set())
         for raw in IMPORT_RE.findall(text):
@@ -615,7 +617,7 @@ def main() -> int:
     link_count = validate_doc_links(repo, [path for path in documentation if path.is_file()], errors)
 
     python_paths = sorted((repo / ".opencode").rglob("*.py")) + sorted((repo / "scripts").rglob("*.py")) + sorted(
-        (repo / "tests").rglob("*.py")
+        (repo / "config/scripts").rglob("*.py")
     )
     for path in python_paths:
         try:

@@ -11,32 +11,33 @@ Give exact paths or describe observable behavior and its command/role.
 
 ## Lifecycle
 
-1. Inspect targets, consumers, instructions, and dependent checks.
-2. Lock exact actions in a behavioral contract.
-3. Delegate to one editor, then stage permitted target changes.
-4. Run deterministic checks before independent review and finding verification.
-5. Allow at most two repair turns before final checks and result.
+1. Discuss goal, constraints, design, success and a small task outline.
+2. Use bounded read-only discovery and focused questions until agreement.
+3. Require explicit design agreement and authorization before any documents.
+   Reuse earlier agreement for unchanged scope; invocation or thanks is not it.
+   Before agreement, create no request, contract, run record or local exclude.
+4. Inspect targets/consumers/checks and freeze exact actions in a contract.
+5. Delegate to one editor, then stage permitted target changes.
+6. Run deterministic checks before independent review and finding verification.
+7. Allow at most two repair turns before final checks and result.
 
-Editor chooses routine in-scope details without questions.
-Precedence resolves apparent conflicts, not real authority conflicts.
-Only unresolved material choices or incompatible target edits need questions.
+Editor chooses mechanics; material choices/incompatible edits need input.
 
 Current target edits are input; unrelated index/worktree state is preserved.
-Changed targets are reread; compatible edits need no lock question.
 Only orchestrator stages; staging-only issues do not block writing.
 
 ## Contract
 
 `contract.md` records base commit, actions, behavior, non-goals, and lenses.
 Actions are `CREATE`, `UPDATE`, `DELETE`, `MOVE`, or `VERIFY`.
-Consumers provide context, not write permission.
 
 Assertions needing changes must be `UPDATE` before scope freezes.
 `VERIFY` is no-edit; pure moves preserve bytes/mode unless contracted.
 Frozen contract defects are `INCOMPLETE`, never permission to expand or ask.
 
 Updates preserve decision boundaries at equal or smaller token count.
-Orchestrator records reproducible old/new counts.
+Orchestrator records raw cl100k_base old/new counts and expanded agent bodies.
+Expanded counts include imports so deduplication cannot hide prompt growth.
 
 ## Continuation
 
@@ -44,11 +45,8 @@ Orchestrator saves returned editor `task_id` in run-local `editor-task.md`.
 Repairs and same-run continuation reuse it only with unchanged authority.
 Revalidate request, contract, and target state before resuming.
 
-The ID is a tool argument, never another `<editor-inputs>` prompt field.
-Changed authority requires fresh preflight and a new task.
-
-Stale or unavailable identity requires a recorded fallback before a new task.
-Never silently reuse identity across runs.
+The ID is a tool argument, not a prompt field; never reuse it across runs.
+Changed authority needs fresh preflight/task; stale IDs need recorded fallback.
 
 ## Checks and review
 
@@ -58,24 +56,24 @@ Orchestrator inspects actual staged actions and runs:
 git diff --cached --name-status --find-renames HEAD -- <target paths>
 git diff --cached --check -- <target paths>
 python3 scripts/validate-opencode-config.py --repo-root .
-python3 -m unittest discover -s tests -p 'test_*.py'
+bash scripts/check-workflows.sh
 ```
 
-Workflow tests apply to control-file, test, and validator changes.
-Static regression checks are not live agent execution.
+The shell smoke exercises routing/pair/cycle/path safety in temporary fixtures.
+Static/scenario checks are not live agent execution or usability evidence.
 Validator checks syntax, imports, routing, permissions, and documentation links.
 
 Missing required evidence is `INCOMPLETE`, not PASS.
 Use `nix develop` if declared Python dependencies are missing.
 
 Independent review applies required lenses to the staged diff.
-Separate verifier attempts to refute candidates only when the review reports findings; it is skipped when there are none.
+Verifier refutes candidate findings only; clean reviews skip it.
 
-Only deterministic failures and verified `TARGET` blockers reach editor.
-Advisories remain visible without automatic repair.
+Only deterministic failures and verified `TARGET` findings reach editor.
+Apply feasible advisories within frozen scope and budget.
+Explain skipped advisories; they never block success.
 
-Self-edits require workflow tests plus architecture and adversarial review.
-Each repair reruns checks, affected reviews, and candidate verification.
+Self-edits require shell smoke plus architecture and adversarial review.
 
 ## Artifacts and outcomes
 
@@ -92,5 +90,4 @@ result.md                    status, actions, checks, reviews, missing evidence
 - `INCOMPLETE`: contract defect or missing required evidence.
 - `FAIL`: target blocker survives two repairs or authority integrity fails.
 
-Restore only accidental workflow edits, never pre-existing changes.
-Do not widen a frozen contract to repair an out-of-scope defect.
+Repairs rerun checks/reviews without widening scope or losing existing edits.

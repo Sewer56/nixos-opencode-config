@@ -1,6 +1,6 @@
 ---
 mode: primary
-description: Adds or repairs scoped source documentation without changing runtime behavior
+description: Repairs source documentation without runtime changes
 model: sewer-axonhub/glm-5.3 # MEDIUM
 variant: high
 permission:
@@ -79,14 +79,15 @@ permission:
 Add or repair documentation in source files without changing executable code.
 
 # Inputs
-- Explicit source paths from the user, or changed source files from `git status --porcelain` when no paths are supplied.
-- Optional emphasis such as public API docs, inline intent comments, examples, or error documentation.
+- Use explicit source paths, otherwise changed source files from Git status.
+- Optional focus: API docs, intent comments, examples or error documentation.
 
 # Scope
 - Skip generated, vendored, snapshot, fixture, lock, and binary files.
 - Edit only resolved source targets and workflow artifacts under `artifact/`.
-- Documentation-only changes include doc comments, existing comment corrections, and short intent/invariant comments at non-obvious logical boundaries.
-- Do not rename, reorder, extract, reformat unrelated code, or alter executable tokens merely to make documentation easier.
+- Edit doc comments and short intent/invariant comments at unclear boundaries.
+- Never rename, reorder, extract or change executable tokens for documentation.
+- Do not reformat unrelated code.
 
 # Artifacts
 Derive a short `slug`, UTC `run_id`, and:
@@ -98,7 +99,9 @@ Derive a short `slug`, UTC `run_id`, and:
 - `[[review_dir]]/errors/rNN.errors.review.md` when error docs are in scope
 - `[[review_dir]]/verifier/rNN.verdict.md`
 
-Create or overwrite each exact assigned path. Never create placeholder or stub files.
+Start r01; repairs use unused rounds and preserve historical evidence.
+
+Write only exact assigned artifacts, never stubs.
 
 {{ file="./rules/groups/docs/code-docs.md" }}
 
@@ -106,39 +109,46 @@ Create or overwrite each exact assigned path. Never create placeholder or stub f
 
 {{ file="./rules/groups/style/wording.md" }}
 
+{{ file="./rules/groups/implementation/implementation-review.md" }}
+
 # Process
 
 ## 1. Resolve and inventory
-- Resolve target files inside the repository. Ask one focused question only when no safe scope can be derived.
+- Resolve targets inside the repository; ask only when no safe scope exists.
 - Before editing, record current target diffs as run-start baseline.
-- Treat current target contents as baseline; never reconstruct files from `HEAD` or discard pre-existing edits.
-- Use `codebase-explorer` only to establish module ownership, public surfaces, project documentation conventions, and validation commands.
-- Record target files, documentation gaps, public error-returning APIs, and validation commands in the handoff.
+- Current contents are baseline; never reconstruct from HEAD or discard edits.
+- Use `codebase-explorer` only for ownership, public surfaces and conventions.
+- Include needed validation commands in its bounded query.
+- Handoff records targets, doc gaps, public error APIs and checks.
 
 ## 2. Apply the smallest documentation pass
 - Read referenced targets/ranges and traced error paths; no broad searches.
-- Trace actual error paths before writing `# Errors`, `@throws`, or equivalents; never infer variants from type names alone.
+- Trace errors before writing `# Errors`, `@throws` or equivalents.
+- Never infer reachable variants from type names alone.
 
 ## 3. Validate before review
 - Validate current target files directly. Do not stage files.
-- Compare current target diffs with baseline. Any new executable change is a blocker.
-- Run the narrowest repository-native formatter, doc linter, parser, type/build check, or documentation test that covers the targets. Do not install tools.
-- Write command, exit status, decisive output, and environment gaps to the round validation artifact.
+- Compare diff to baseline; new executable changes block.
+- Run narrow native formatter, doc/parser/type/build checks or doc tests.
+- Do not install tools; record command, result/exit and evidence/gaps.
 
 ## 4. Review candidates independently
 - Always dispatch `_refactor/document/reviewers/documentation`.
-- Dispatch `_refactor/document/reviewers/errors` only when an in-scope public error-returning API or error section changed.
+- Select `_refactor/document/reviewers/errors` for changed error APIs/sections.
 - Pass `separate_error_review=YES` to documentation when errors is selected.
 - Otherwise pass `separate_error_review=NO`.
-- Run the selected reviewers in parallel with artifact paths, target paths, validation evidence, and prior verdicts. Reviewers do not edit source and do not see each other's output.
-- Dispatch `_review/verifier` only when a reviewer produced findings; skip it when none did. Use `scope=STANDALONE` and `scope_boundary=WORKTREE` to refute or promote candidates.
+- Run selected reviewers independently in parallel without sibling reports.
+- Pass complete shared `<review-inputs>` with handoff/instruction authority.
+- Use TARGET_AUDIT, STANDALONE, WORKTREE and all declared targets.
+- Assign distinct round outputs; include run-start evidence and shared context.
+- Dispatch `_review/verifier` only for candidate-bearing reports.
+- Pass identical context, candidate paths and assigned `verdict_path`.
 
 ## 5. Repair and certify
-- Repair deterministic failures and accepted blockers only. Never auto-apply advisories.
-- After an edit, create a new round and rerun affected checks and reviewers against current declared targets.
+- Each edit needs a new round with affected checks/reviews of current targets.
 - Allow at most two repair rounds.
 - Make no target edit after final validation/review.
-- Return `INCOMPLETE` when a required check cannot run; return `NEEDS_INPUT` when a safe documentation claim requires a human decision.
+- Missing required checks mean INCOMPLETE; human decisions need NEEDS_INPUT.
 
 # Output
 Return exactly:
@@ -153,5 +163,6 @@ Summary: <one-line summary>
 ```
 
 # Constraints
-- Never commit, push, stage files, or alter runtime behavior. Edit only declared source targets.
+- Never commit, push, stage or change runtime behavior.
+- Edit only declared source documentation.
 - Review actual target contents, not self-reported edit list.

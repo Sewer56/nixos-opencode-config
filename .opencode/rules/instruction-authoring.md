@@ -25,9 +25,7 @@ Apply only to locked targets.
 
 ## Less is more
 
-- Use the minimum instruction that changes behavior.
 - Delete duplicate and inferable rules, including details clear from formats.
-- Add detail only for actual ambiguity or failure risk.
 - Preserve objective, inputs, authority, safety, scope, stops, and output.
 - Put least-privilege permissions in frontmatter.
 - Give each child only needed context.
@@ -39,8 +37,8 @@ Apply only to locked targets.
 ## Compact existing instructions
 
 - Cut whole redundant rules and structure before rewording.
-- Prefer concise docs, human-first scope, and small testable tasks.
-- Record old-to-new token counts for each updated artifact in run artifacts.
+- Discuss human-first scope and design before authorizing documents.
+- Orchestrator records raw/expanded cl100k_base counts in run artifacts.
 
 ## Format instruction files
 
@@ -55,7 +53,6 @@ Apply only to locked targets.
 - Inspect actual diff, not agent summary.
 - Callers provide every input required by their callees.
 - Run deterministic, non-mutating checks before semantic review.
-- Send proven product failures directly to repair.
 - Route specialists only for concrete risk.
 - Review cumulative behavior when separately valid changes can interact.
 - Bound repair/re-review; missing required evidence is `INCOMPLETE`.
@@ -66,7 +63,9 @@ Apply only to locked targets.
 - Test hard mechanics rather than phrase matching.
 - Scenario review is not live execution.
 - Prompt size is diagnostic; keep needed decision boundaries.
-- Repair deterministic failures and independently verified blockers only.
-- Keep advisories visible without automatic repair.
+- Repair deterministic failures and independently verified blockers first.
+- Apply feasible verified advisories by default.
+- Preserve scope, decisions and budgets; edits need checks/re-review.
+- Report skipped advisories with reasons; they never block success.
 
 {{ file="./rules/cards/implementation/llm-tidy-pass.md" }}

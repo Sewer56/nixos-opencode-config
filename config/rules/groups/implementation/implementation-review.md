@@ -1,24 +1,18 @@
-## Implementation Review
+{{ file="./rules/cards/implementation/review-protocol.md" }}
 
-Changes must meet approved outcomes and acceptance criteria.
-Changes must satisfy contracts and invariants.
+`<review-inputs>`:
+- authority_paths; purpose: CHANGE|TARGET_AUDIT.
+- scope: TASK:[[ID]]|FINAL|STANDALONE.
+- boundary: STAGED|WORKTREE|COMMITTED; base_commit, head_commit.
+- Repo-relative paths; cwd; current validation_path.
+- prior_verdict_paths[]; assigned review_path.
 
-Equivalent behavior needs no exact syntax match.
-Allow minor style edits, harmless refactors, and equivalent mechanical drift.
+Prioritize deterministic failures and verifier-accepted blockers.
+Apply feasible accepted advisories.
 
-Block unrelated edits that omit or contradict required behavior.
+Explain nonblocking skips; preserve scope, decisions and budgets.
+Recheck/review edits.
 
-Block concrete defects introduced/exposed by changes:
-- Broken logic.
-- Missing critical error handling.
-- Invalid state transitions.
-- Compatibility failures.
-- Unintended scope.
-
-Use the supplied validation ledger and actual tree-to-tree diff.
-Executed check failures block for in-scope product defects.
-Checks include builds, type checks, tests, linters, and static analyzers.
-
-Read-only reviewers do not rerun deterministic checks.
-Missing/unavailable checks never imply PASS.
-Report material evidence gaps as `INCOMPLETE`.
+### Output
+Return Status: PASS|CANDIDATES|INCOMPLETE|FAIL.
+Domain, Review Path, Finding Count (all), one-line Summary.
