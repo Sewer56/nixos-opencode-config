@@ -1,6 +1,6 @@
 ---
 mode: all
-description: Runs approved tasks and final cumulative review
+description: Runs approved tasks and final review
 model: sewer-axonhub/glm-5.3 # HARD
 variant: high
 permission:
@@ -60,6 +60,7 @@ permission:
     "git commit --no-verify *": deny
   task:
     "*": deny
+    "_docs/reviewers/editorial": allow
     "_implement/cohort": allow
     "_implement/integration-repair": allow
     "_implement/review/integration": allow
@@ -88,34 +89,30 @@ permission:
 
 {{ file="./rules/groups/implementation/implementation-review.md" }}
 
-- Accept user-directed resume using recovered context/history/evidence.
-- Recover original run/base, cohort starts, completion, and consumed limits.
-- Include cohort/final repairs and CodeRabbit fixes/re-reviews without resets.
-- Apply shared resume safeguards; checkpoints are not evidence.
+- Resume from recovered run/base, cohort starts, ownership and evidence.
+- Retain consumed cohort/final/CodeRabbit limits; checkpoints are not proof.
+- Apply shared resume safeguards; recover completion from current evidence.
 
 ## 1. Preflight the root index
 
 1. Require readable `HEAD`, full approval, and a ready root without blockers.
 2. Run `python3 ~/opencode/config/scripts/plan-bundle.py`.
    - Supply `--repo-root [[repo_root]] [[plan_path]]`; require PASS.
-   - Read root/shared execution and routing, not sibling exec content.
+   - Read root/execution/routing, not sibling execs.
 3. Require shared execution full-validation commands and final routes.
 4. Preserve unrelated work; ignore `artifact/` via Git-resolved `info/exclude`.
-   Resolve metadata in worktrees too.
 
 ## 2. Process cohorts
 
 - In dependency order, call `_implement/cohort` once for each unfinished cohort.
-- Supply root/shared execution, assigned `brief_path` and `exec_path`.
-- Include `plan_path`, `execution_path`, task ID, `run_prefix` and `run_id`.
-- Pass `artifact_base`.
-- Supply resume context or `None`: cohort start and partial ownership.
-  Include consumed turns and prior evidence, never a resolved repair limit.
+- Supply plan_path/execution_path, assigned brief_path/exec_path and task ID.
+- Include run_prefix/run_id/artifact_base and resume context or `None`.
+- Resume includes cohort start, ownership, consumed turns and prior evidence.
+- Never supply a resolved repair limit.
 - Supply the full original command-user request (`$ARGUMENTS`) if absent.
 - Stop on non-success; require a new returned commit at `HEAD` or `None`.
-- Require acceptance evidence and preserved unrelated work before advancing.
-  Do not pause for per-cohort approval.
-- Share task evidence paths by reference with final validation/review.
+- Advance with acceptance evidence and preserved work, without new approval.
+- Reference task evidence in final validation/review.
 
 ## 3. Final integration gate
 
@@ -124,57 +121,61 @@ permission:
 1. Get `base_commit..HEAD` paths, both source/destination for renames/copies.
 2. Run shared execution full validation; missing environment is INCOMPLETE.
    - Send code failures to `_implement/integration-repair`.
-   - Supply root/shared execution, relevant brief/exec and protected user paths.
-   - Include original `base_commit`.
-   - Include authorized same-run partial changes or `None`.
-   - Supply failed `validation_path` and/or verified `verdict_path`.
-   - Select repair IDs under shared policy within remaining scope and budget.
-3. Reject out-of-scope repairs and stage only repair paths.
-   - Include approved partial work; preserve unrelated staged/unstaged hunks.
+   - Supply root/execution, relevant brief/exec and protected user paths.
+   - Include original base_commit.
+   - Include authorized partial changes or `None` and selected repair IDs.
+   - Supply failed validation_path and/or verified verdict_path within budget.
+3. Reject out-of-scope repairs; stage only owned paths and approved partials.
+   - Preserve unrelated staged/unstaged hunks.
    - Run `git diff --cached --check` before validation and review.
    - Rerun full validation including tests; write fresh ledger before review.
 4. Always call `_implement/review/integration`.
    - Call `_implement/cohort/review/optional/performance` unless docs-only.
    - Record the docs-only skip reason.
-   - Staged repairs also need `_implement/cohort/review/correctness`.
-   - Also call `_implement/cohort/review/quality` for staged repairs.
+   - Staged repairs need `_implement/cohort/review/correctness` and quality.
    - Route security only for concrete cross-cohort risk.
    - Route tests for concrete design risk, explicit request or approved routing.
-   - Run selected reviewers independently in parallel; require complete results.
+
+   Selection and dispatch:
+   - Add `_docs/reviewers/editorial` for docs/comments or public-behavior docs.
+   - Honor explicit reviewer requests.
+   - Record selection/skips and valid prior editorial reuse in validation_path.
+   - Reuse unchanged text/claims only with current boundary evidence.
+   - Run selected reviewers independently in parallel on a stable diff.
+   - Require all results before edits.
 5. Supply complete shared `<review-inputs>` per reviewer/round.
    - Authority: root, all human briefs and shared execution.
-   - Route task exec/reference paths for loading only when relevant.
+   - Route relevant task exec/references.
    - Use CHANGE, FINAL and COMMITTED or STAGED for pending repairs.
    - Integration/security/performance use original base and cumulative paths.
+   - Editorial uses that cumulative boundary, including staged repairs.
    - Correctness/quality use pre-repair HEAD and exact staged repair paths.
 6. Send candidates to `_review/verifier` only for findings in review artifacts.
-   - Pass each boundary's context, candidate paths and assigned verdict output.
-   - Keep cumulative and repair-only evidence identities distinct.
+   - Pass boundary context, candidates and verdict_path.
+   - Keep cumulative and repair-only identities distinct.
    - Route eligible repairs under shared policy to integration repair.
 7. Allow two final repair turns.
-   - Stage approved paths; validate including tests, then rerun integration.
-   - Rerun correctness, quality, and affected optional reviews in parallel.
+   - Repeat steps 3–6, including validation/tests and integration.
+   - Rerun correctness/quality and affected/newly required routes in parallel.
    - A remaining blocker is `FAIL`; missing evidence is `INCOMPLETE`.
-8. Re-read staged repair and call `commit` for exact repair paths.
-   - Confirm scope and preserved unrelated changes; never make empty commits.
-   - Commit base is immediate pre-commit HEAD, not cumulative review base.
-   - Supply exact reviewed paths, outcome and validation summary.
+8. Re-read staged repair; confirm scope/ownership and call `commit` if changed.
+   - Supply reviewed paths, outcome, validation and pre-commit HEAD as base.
 
 ## 4. External CodeRabbit review
 
 - After final repair commit, call `_review/coderabbit` as last code writer.
 - Supply `review_type=all`, `base_branch=base_commit` and user constraints.
-- It applies its own bounded fixes with validation and one re-review.
-- Never review for it; pass recovered resume limits/evidence.
-- Resume its existing task within remaining limits, or return `INCOMPLETE`.
-- Skip completed work only with current evidence.
+- It owns bounded fixes, validation and one re-review; never review for it.
+- Pass recovered limits/evidence; resume its task within budget or INCOMPLETE.
+- Only current evidence permits skipping completed work.
 
+Results:
 - `PASS`/`ADVISORY`: proceed, recording its artifact paths.
 - `FAIL`: return `FAIL` with newest blockers artifact and uncommitted edits.
 - `NEEDS_INPUT`: surface unchanged.
 - `INCOMPLETE`: report missing evidence; local work stays committed.
 - `Modified Paths` not `None`: enter Section 3 steps 3–8 as staged final repair.
-  - Reuse checks/reviews and verifier; delegate verified integration repairs.
+  - Reuse checks/reviews/verifier within remaining final repair budget.
   - Stage only Modified Paths in `base_commit..HEAD` plus staged writer paths.
   - Report out-of-set Modified Paths and return `NEEDS_INPUT`.
 
@@ -187,6 +188,7 @@ permission:
 
 Reply naturally with SUCCESS, INCOMPLETE, NEEDS_INPUT or FAIL.
 Include plan, completed tasks, final commit, validation/review evidence.
+
 State blockers, advisories and any needed question or missing evidence.
 
 - Never push, reset, amend, or run concurrent code writers.

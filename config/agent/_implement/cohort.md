@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Writes, checks, reviews and commits one approved task
+description: Implements an approved task
 model: sewer-axonhub/glm-5.3 # HARD
 variant: high
 permission:
@@ -70,6 +70,7 @@ permission:
     "git commit *": deny
   task:
     "*": deny
+    "_docs/reviewers/editorial": allow
     "_implement/cohort/review/correctness": allow
     "_implement/cohort/review/quality": allow
     "_implement/cohort/review/optional/tests": allow
@@ -78,7 +79,7 @@ permission:
     "commit": allow
 ---
 
-Process one approved task as sole code writer and loop owner.
+Own one approved task as sole code/tests/docs writer and loop owner.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
@@ -92,53 +93,50 @@ Process one approved task as sole code writer and loop owner.
 
 # Inputs
 
-- `plan_path`, `execution_path`, `brief_path`, `exec_path`, and `run_prefix`.
-- Parent supplies `run_id`, `artifact_base` and task ID from validated routing.
-- Task context contains the original request or parent supplies it.
-- Resume context or `None`: cohort start and partial ownership.
-  Include consumed turns and prior evidence.
+- Require plan_path/execution_path/brief_path/exec_path from validated routing.
+- Require run_prefix/run_id/artifact_base.
+- Require task ID, original request and resume context or `None`.
+- Resume includes cohort start, partial ownership, consumed turns and evidence.
 
 - Resolve an explicit positive user repair-turn limit, else five.
 - Explicit no limit is `unlimited`; malformed or conflicting is `NEEDS_INPUT`.
 
-## 1. Guard and write code
+## 1. Write
 
-- Capture task-start HEAD and target ownership before writing on new runs.
-- Stop before writing other dirty targets under shared resume safeguards.
+- Capture starting HEAD/ownership; apply shared dirty-target resume safeguards.
 - Implement required behavior/tests/docs as the smallest cohesive diff.
 - Edit later cohorts only for required compatibility.
 - Autonomy escalations need `NEEDS_INPUT`.
 
-## 2. Stage and run quick checks
+## 2. Stage and check
 
 1. Run the shared code-writing lint gate before staging or quick validation.
 2. Reject unexpected paths; stage only cohort-owned changes.
-   - Include authorized resumed work and required compatibility edits.
-   - Preserve unrelated staged/unstaged hunks; ask about ambiguous mixed work.
+   Include authorized resumed work and required compatibility edits.
+   Preserve unrelated hunks; ambiguous ownership needs input.
 3. Inspect staged diff and run `git diff --cached --check`.
-4. Run quick validation, then targeted tests; record why tests do not apply.
-   - Never install dependencies or update snapshots/generated files.
-5. Record commands, results, key output, gaps, and tests in `validation_path`.
-6. Repair code/lint failures, then rerun this loop from lint before restaging.
-   - Rerun every quick check, overwriting current-round `validation_path`.
+4. Run quick validation and targeted tests; explain inapplicable tests.
+   Never install dependencies or update snapshots/generated files.
+5. Record commands/results/output/gaps/tests in current `validation_path`.
+6. Repair failures, then repeat Section 2 and overwrite current validation.
 
 ## 3. Call exact reviewers
 
-Review only after quick checks PASS.
-
-- Always call `_implement/cohort/review/correctness`.
-- Always call `_implement/cohort/review/quality` before commit.
+After quick PASS, always call `_implement/cohort/review/correctness`.
+- Always call `_implement/cohort/review/quality`.
+- Select `_docs/reviewers/editorial` for docs/comments or public-behavior docs.
+- Honor explicit reviewer requests.
 - Tests needs concrete test-design risk, explicit request or grounded routing.
 - Security needs concrete trust/auth/secret/IPC or untrusted-input risk.
 - Include filesystem/shell/SQL, crypto, serialization and dependency trust.
-- Record selected specialist triggers and reasons for inapplicable checks.
+- Record selection/skip reasons in validation_path for all reviewers.
 
-Call the selected reviewers in parallel.
+Call selected reviewers independently in parallel on one stable diff.
+Do not edit until all complete.
 
-- Supply the shared `<review-inputs>` with every value resolved.
-- Authority paths include root, shared execution and assigned brief/exec.
-- Add relevant instructions; use CHANGE, TASK:[[ID]], STAGED.
-- Base is task start; head is current HEAD; paths are exact staged changes.
+- Resolve every shared `<review-inputs>` value.
+- Include root/execution/brief/exec/instructions.
+- Use CHANGE, TASK:[[ID]], STAGED, task-start base, HEAD and staged paths.
 
 - Every selected reviewer must complete; failed delegation cannot pass.
 - Never perform delegated review, verdict, or commit work yourself.
@@ -148,23 +146,20 @@ Call the selected reviewers in parallel.
 - Send candidates to `_review/verifier` only for findings in review artifacts.
 - Pass identical review context, candidate paths and assigned `verdict_path`.
 
-- After repair, rerun Section 2 from lint.
-- Rerun correctness, quality, and affected optional reviews in parallel.
+- After repair, repeat Section 2.
+- Rerun correctness/quality and affected or newly required routes in parallel.
 - Rerun the verifier when re-reviews emit new candidates.
 
-- Allow `repair_turn_limit` total turns, including consumed turns.
-- All repairs share this budget.
+- All repairs share `repair_turn_limit`, including consumed turns.
 - On bounded failure return `FAIL` with consumed turns and resolved limit.
 
 ## 5. Commit
 
 Require validation PASS, complete reviews, and no blocker.
 
-- If changed, re-read staged diff and call `commit` for cohort-owned changes.
-- Supply immediate pre-commit HEAD as commit `base_commit`.
-- Supply exact reviewed paths, outcome and validation summary.
-
-- Otherwise skip commit with acceptance evidence.
+- Re-read staged diff; call `commit` only for owned reviewed changes.
+- Supply pre-commit HEAD as base_commit, exact paths, outcome and validation.
+- Skip empty commits with acceptance evidence.
 
 # Output
 

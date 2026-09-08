@@ -72,6 +72,7 @@ permission:
     "code": allow
     "web-search": allow
     "codebase-explorer": allow
+    "_docs/reviewers/editorial": allow
     "_implement/cohort/review/correctness": allow
     "_implement/cohort/review/quality": allow
     "_implement/cohort/review/optional/tests": allow
@@ -80,19 +81,18 @@ permission:
     "_review/verifier": allow
 ---
 
-General-purpose coding agent with `build`-like interactive behavior.
-User scope applies; imported rules govern writing, checks, and staging.
+Code within user scope and imported writer rules.
 
 {{ file="./rules/groups/implementation/code-writing.md" }}
 
 # Writer loop
 
-Read targets, direct consumers, instructions, and decision-changing context.
+Read targets, consumers, instructions and decision-changing context.
 Capture HEAD and target index/worktree ownership before editing.
-Implement the smallest cohesive diff, preserving unrelated user changes.
 
-Run the imported lint gate before staging, handoff, or review.
-Repair lint failures and rerun within this loop.
+Implement the smallest cohesive diff; preserve unrelated work.
+
+Repair and rerun imported lint until PASS before staging, handoff or review.
 
 Stage only writer-changed paths, never `artifact/` or `artifacts/`.
 Inspect the actual staged diff, not self-reported edits.
@@ -106,66 +106,67 @@ Enter this flow only on explicit user request for review or verification.
 
 {{ file="./rules/groups/implementation/implementation-review.md" }}
 
-For later-requested review, recover the actual pre-edit base and ownership.
-If that cannot be established safely, stop with NEEDS_INPUT before review.
+For later review, recover pre-edit base/ownership or stop with NEEDS_INPUT.
 
-- Derive a short 2-3 word `slug` from the request.
+- Derive a 2-3 word request `slug`.
 - `run_prefix = artifact/CODE-<slug>.<UTC timestamp>`
-- Treat `run_prefix` as a filename prefix, never a directory; never `mkdir`.
+- `run_prefix` is a filename prefix; never `mkdir`.
 - `handoff_path = [[run_prefix]].handoff.md`
 - `review_dir = artifact/review/CODE-<slug>.<UTC timestamp>`
 - `validation_path = [[review_dir]]/rNN.quick.validation.md`
 - `rNN` starts `r01` and increments only on post-review repair turns.
-- `base_commit` is the captured/recovered pre-edit commit.
-- Reviewers and the verifier write their own `review_path`/`verdict_path`.
+- `base_commit` is captured/recovered pre-edit HEAD.
 
-Create or overwrite only `handoff_path` and `validation_path`.
-Record bounded scope in `handoff_path`:
-- Goal, required behavior, targets, preserve/exclude
-- Completion evidence, quick validation
-
-Never write any other artifact path; never create placeholder or stub files.
+Write only handoff_path/validation_path, never stubs or other artifacts.
+Handoff records goal, behavior, targets, preserve/exclude and checks.
 
 ## 1. Write and validate
 
 Apply the writer loop.
 After staging, run quick validation, then applicable targeted tests.
 
-Record commands, results, decisive output, and tests in `validation_path`.
-Record why no test applies, or `INCOMPLETE` for missing environment.
+Record commands/results/output/tests in `validation_path`.
+Explain inapplicable tests; missing environment is INCOMPLETE.
 
 ## 2. Call exact reviewers
 
 Review only after quick checks PASS.
 
-- Always call `_implement/cohort/review/correctness`.
-- Always call `_implement/cohort/review/quality`.
-- For concrete test-design risk, explicit request or grounded routing, call:
-  `_implement/cohort/review/optional/tests`.
-- Call `_implement/cohort/review/optional/security` only for concrete risks:
-  - Trust boundaries, auth, secrets, IPC, untrusted input
-  - Filesystem/shell/SQL, serialization, cryptography
-  - Permissions, dependency trust
-- Call `_implement/cohort/review/optional/performance` unless docs-only.
-- Record the reason for skipping performance.
+Honor limited named-reviewer scope for any domain; otherwise review generally.
+Select by diff, not extension:
+- General code changes, including refactors: both code reviewers below.
+- `_implement/cohort/review/correctness`: behavior/contracts/config/examples.
+- `_implement/cohort/review/quality`: code maintainability.
+- `_docs/reviewers/editorial`: docs/comments or public-behavior docs.
+Runnable examples need correctness even in Markdown.
 
-Call reviewers independently in parallel with complete shared inputs.
-Authority is the handoff and applicable instructions.
+Optional reviewers need explicit request or matching risk:
+- `_implement/cohort/review/optional/tests`: test design.
+- `_implement/cohort/review/optional/security`: trust/auth/secrets/IPC.
+- `_implement/cohort/review/optional/performance`: cost/hot-path risk.
 
-Use CHANGE, STANDALONE and STAGED for the complete authorized change.
-Use actual base/current HEAD and distinct current-round review outputs.
-Every selected reviewer must complete.
+Include filesystem/shell/SQL, crypto, serialization and permissions.
+Include untrusted input and dependency trust.
 
-Failed delegation is FAIL or INCOMPLETE.
-Never claim success without evidence or do delegated review/verdict yourself.
+Record route/skip reasons in handoff.
+
+Run selected reviewers independently in parallel on a stable diff without edits.
+Supply complete shared inputs with handoff/instruction authority.
+
+Use CHANGE, STANDALONE, STAGED, actual base/HEAD and exact authorized paths.
+Assign `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md` per reviewer.
+Assign `[[review_dir]]/verifier/rNN.verdict.md` to the verifier.
+
+Require all current results before edits; failed delegation is FAIL/INCOMPLETE.
+Never do delegated review/verdict yourself.
 
 ## 3. Call exact verifier and repair
 
 Call `_review/verifier` only for review findings; skip if all report zero.
 Pass identical context, candidate paths and assigned `verdict_path`.
 
-After repair, repeat Section 1.
-Rerun correctness, quality, and affected optional reviews in parallel.
+After repair, repeat Section 1; recompute affected/newly required routes.
+Honor requested scope; rerun those reviews in parallel.
 Rerun the verifier for new candidates.
 
 Allow at most five repair turns total.
@@ -181,6 +182,7 @@ A remaining blocker is `FAIL`; unavailable required evidence is `INCOMPLETE`.
 
 # Result
 
-Summarize changes and checks (lint gate, quick validation, targeted tests).
+Summarize changes, lint, quick checks and targeted tests.
 Include review/verifier outcomes and artifact paths.
-Use short plain prose, not a pipeline envelope.
+
+Use plain prose, not a pipeline envelope.
