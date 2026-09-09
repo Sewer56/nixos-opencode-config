@@ -57,6 +57,7 @@ permission:
   task:
     "*": deny
     "general": allow
+    "web-search": allow
     "_iterate/editor": allow
     "_iterate/review": allow
     "_iterate/verifier": allow
