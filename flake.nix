@@ -314,6 +314,7 @@
           pkgs.rust-analyzer
           pkgs.pkg-config
           pkgs.stdenv.cc
+          pkgs.uv
           (pkgs.python3.withPackages (pythonPackages: [
             pythonPackages.json5
             pythonPackages.pyyaml

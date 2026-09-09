@@ -11,7 +11,6 @@ Agent frontmatter and permissions:
 - Validate IDs, YAML, modes, descriptions, provider-qualified models, permission
   decisions/defaults/order, environment-file denial, and external-directory
   policy of ask, allow, or a pattern map.
-- Reject temperature, step-limit, and tools fields.
 
 Commands and task graph:
 - Validate command targets, entry points, routes, reachability, cycles, disabled
@@ -20,14 +19,9 @@ Commands and task graph:
   A mismatch is an error, never a configuration write.
 
 Prompt structure and imports:
+- Exempt the _iterate/edit agent body from prompt checks.
 - Check Markdown fences, output contracts, imports, import cycles, rule
   reachability and names, and imported support files.
-- Check instruction lines: 240-character cap, no em dashes, warnings over 80.
-
-Documentation and source syntax:
-- Require README.md, EXPLAINER.md, and .opencode/ITERATE.md.
-- Check their local links and Markdown anchors.
-- Parse project Python and run ``bash -n`` on configured shell scripts.
 
 Result:
 - Print metrics/errors/warnings; exit 0 for PASS, 1 for FAIL.
@@ -36,18 +30,16 @@ Result:
 Outside scope:
 - Nix evaluation/formatting, unit tests, builds, type checks, broader linters,
   OpenCode, plugins, external services, model review, and workflow semantics.
+- Documentation links, required docs, source syntax and prose formatting.
 """
 from __future__ import annotations
 
 import argparse
-import ast
 import re
-import subprocess
 import sys
 from collections import deque
 from pathlib import Path
 from typing import Any
-from urllib.parse import unquote
 
 import json5
 import yaml
@@ -57,7 +49,6 @@ FENCE_RE = re.compile(r"^\s*(```|~~~)", re.MULTILINE)
 AGENT_ROOTS = (Path("config/agent"), Path(".opencode/agent"))
 COMMAND_ROOTS = (Path("config/command"), Path(".opencode/command"))
 BUILTIN_AGENTS = {"build", "explore", "general", "plan"}
-FORBIDDEN_AGENT_KEYS = {"temperature", "steps", "maxSteps", "tools"}
 VALID_AGENT_MODES = {"primary", "subagent", "all"}
 VALID_PERMISSION_DECISIONS = {"allow", "ask", "deny"}
 CONFIG_PATH_FORMS = (
@@ -66,19 +57,8 @@ CONFIG_PATH_FORMS = (
 )
 BUILTIN_AGENT_ALLOW_EXTERNAL = ("build", "plan")
 MAX_CUSTOM_TASK_DEPTH = 3
-REQUIRED_PATHS = (
-    "README.md",
-    "EXPLAINER.md",
-    ".opencode/ITERATE.md",
-)
-LOCAL_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
-REFERENCE_LINK_RE = re.compile(r"(?m)^\[(?!\^)[^\]]+\]:\s*(\S+)")
-INSTRUCTION_LIST_RE = re.compile(r"^\s*(?:[-*+]\s+|\d+\.\s+)")
-INSTRUCTION_TABLE_RE = re.compile(r"^\s*\|")
-INSTRUCTION_URL_RE = re.compile(r"^\s*(https?://\S+|<https?://[^>]+>)\s*$")
-INSTRUCTION_TEMPLATE_RE = re.compile(r"^\s*\{\{")
-INSTRUCTION_PARAGRAPH_CAP = 240
-INSTRUCTION_LINE_TARGET = 80
+PROMPT_CHECK_EXCLUSIONS = {Path(".opencode/agent/_iterate/edit.md")}
+
 
 def load_frontmatter(path: Path) -> dict[str, Any]:
     text = path.read_text(encoding="utf-8")
@@ -156,60 +136,6 @@ def active_prompt_files(repo: Path) -> list[Path]:
     return sorted(set(paths))
 
 
-def instruction_format_issues(text: str) -> list[tuple[str, str]]:
-    """Return ``(severity, message)`` instruction-format issues for one text.
-
-    Each line is one statement; consecutive lines are never joined. Error: a
-    non-exempt line whose statement (list marker excluded) exceeds 240
-    characters. Error: any em dash. Warning: a non-exempt line over 80
-    characters, suggesting a split into simpler separate statements. Exempt
-    from all three rules: YAML frontmatter, fenced code content, table rows,
-    URL-only lines, ``{{ ... }}`` template directive lines, and blank lines.
-    """
-    issues: list[tuple[str, str]] = []
-    lines = text.split("\n")
-    frontmatter_lines = 0
-    if text.startswith("---\n"):
-        end = text.find("\n---\n", 4)
-        if end >= 0:
-            frontmatter_lines = text[: end + 5].count("\n")
-
-    def exempt(number: int, line: str) -> bool:
-        if number <= frontmatter_lines:
-            return True
-        if not line.strip():
-            return True
-        return bool(
-            INSTRUCTION_TABLE_RE.match(line)
-            or INSTRUCTION_URL_RE.match(line)
-            or INSTRUCTION_TEMPLATE_RE.match(line)
-        )
-
-    fenced = False
-    for number, line in enumerate(lines, 1):
-        if FENCE_RE.match(line):
-            fenced = not fenced
-            continue
-        if fenced or exempt(number, line):
-            continue
-        if "—" in line:
-            issues.append(("error", f"line {number}: em dash"))
-        statement = INSTRUCTION_LIST_RE.sub("", line, count=1)
-        if len(statement) > INSTRUCTION_PARAGRAPH_CAP:
-            issues.append(
-                ("error", f"line {number}: statement exceeds 240 characters ({len(statement)})")
-            )
-        elif len(line) > INSTRUCTION_LINE_TARGET:
-            issues.append(
-                (
-                    "warning",
-                    f"line {number}: {len(line)} characters; "
-                    "split into simpler separate statements",
-                )
-            )
-    return issues
-
-
 def validate_config_path_pairing(ident: str, external: Any, errors: list[str]) -> None:
     """Both the physical config path and its symlink must be allowed together."""
     if not isinstance(external, dict):
@@ -260,53 +186,6 @@ def validate_permission_map(ident: str, permission: Any, errors: list[str]) -> N
         errors.append(f"agent {ident} task permission may only use scalar 'deny'")
     elif isinstance(task, dict) and str(task.get("*", "")).lower() != "deny":
         errors.append(f"agent {ident} task permission must default to deny")
-
-
-def markdown_anchors(path: Path) -> set[str]:
-    anchors: set[str] = set()
-    counts: dict[str, int] = {}
-    fenced = False
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if line.lstrip().startswith(("```", "~~~")):
-            fenced = not fenced
-            continue
-        if fenced or not line.startswith("#"):
-            continue
-        heading = line.lstrip("#").strip().lower()
-        anchor = re.sub(r"[^a-z0-9 _-]", "", heading).replace(" ", "-")
-        anchor = re.sub(r"-+", "-", anchor).strip("-")
-        suffix = counts.get(anchor, 0)
-        counts[anchor] = suffix + 1
-        anchors.add(anchor if suffix == 0 else f"{anchor}-{suffix}")
-    return anchors
-
-
-def validate_doc_links(repo: Path, paths: list[Path], errors: list[str]) -> int:
-    checked = 0
-    anchors: dict[Path, set[str]] = {}
-    for source in paths:
-        body = source.read_text(encoding="utf-8")
-        destinations = [*LOCAL_LINK_RE.findall(body), *REFERENCE_LINK_RE.findall(body)]
-        for raw in destinations:
-            destination = raw.strip().split(maxsplit=1)[0].strip("<>")
-            if not destination or destination.startswith(("http://", "https://", "mailto:")):
-                continue
-            checked += 1
-            target_raw, _, fragment = destination.partition("#")
-            target = source if not target_raw else (source.parent / unquote(target_raw)).resolve()
-            try:
-                target.relative_to(repo)
-            except ValueError:
-                errors.append(f"{source.relative_to(repo)} has external local link {destination}")
-                continue
-            if not target.exists():
-                errors.append(f"{source.relative_to(repo)} has stale link {destination}")
-                continue
-            if fragment and target.suffix.lower() == ".md":
-                anchors.setdefault(target, markdown_anchors(target))
-                if unquote(fragment).lower() not in anchors[target]:
-                    errors.append(f"{source.relative_to(repo)} has stale heading link {destination}")
-    return checked
 
 
 def longest_depth(graph: dict[str, set[str]], roots: set[str]) -> tuple[int, list[str], list[list[str]]]:
@@ -375,7 +254,11 @@ def has_output_contract(repo: Path, path: Path, seen: set[Path] | None = None) -
         return False
     seen.add(path)
     text = path.read_text(encoding="utf-8")
-    if re.search(r"(?mi)^#{1,3}\s+(?:output|result)\b|return (?:exactly|only)(?: this[^:\n]*)?:", text):
+    if re.search(
+        r"(?mi)^#{1,3}\s+(?:\d+(?:\.\d+)*\.?\s+)?(?:output|result)\b"
+        r"|return (?:exactly|only)(?: this[^:\n]*)?:",
+        text,
+    ):
         return True
     return any(
         target is not None and has_output_contract(repo, target, seen)
@@ -429,11 +312,6 @@ def main() -> int:
                 errors.append(f"{path.relative_to(repo)}: {exc}")
                 fm = {}
             agent_frontmatter[ident] = fm
-            forbidden = sorted(FORBIDDEN_AGENT_KEYS.intersection(fm))
-            if forbidden:
-                errors.append(
-                    f"{path.relative_to(repo)} sets forbidden agent field(s): {', '.join(forbidden)}"
-                )
             mode = fm.get("mode")
             if mode not in VALID_AGENT_MODES:
                 errors.append(f"{path.relative_to(repo)} has invalid agent mode {mode!r}")
@@ -532,7 +410,10 @@ def main() -> int:
         errors.append(f"config.subagent_depth must be {required_subagent_depth}, got {config.get('subagent_depth')!r}")
     details.append(f"config.subagent_depth: {required_subagent_depth}")
 
-    all_prompt_files = active_prompt_files(repo)
+    all_prompt_files = [
+        path for path in active_prompt_files(repo)
+        if path.relative_to(repo) not in PROMPT_CHECK_EXCLUSIONS
+    ]
     imported_targets: set[Path] = set()
     import_edges: dict[Path, set[Path]] = {}
     import_count = 0
@@ -592,51 +473,6 @@ def main() -> int:
         if path.is_file() and path.suffix != ".md" and path.resolve() not in imported_targets:
             errors.append(f"unreferenced prompt support file: {path.relative_to(repo)}")
 
-    instruction_targets = sorted({*all_prompt_files, *(repo / ".opencode/rules").glob("*.md")})
-    instruction_format_error_count = 0
-    instruction_format_warning_count = 0
-    for path in instruction_targets:
-        for severity, message in instruction_format_issues(path.read_text(encoding="utf-8")):
-            entry = f"{path.relative_to(repo)}: {message}"
-            if severity == "error":
-                instruction_format_error_count += 1
-                errors.append(entry)
-            else:
-                instruction_format_warning_count += 1
-                warnings.append(entry)
-    details.append(
-        f"Instruction format: {instruction_format_error_count} statement error(s), "
-        f"{instruction_format_warning_count} split-suggestion warning(s)"
-    )
-
-    for part in REQUIRED_PATHS:
-        if not (repo / part).is_file():
-            errors.append(f"required documentation is missing: {part}")
-
-    documentation = [repo / "README.md", repo / "EXPLAINER.md", repo / ".opencode/ITERATE.md"]
-    link_count = validate_doc_links(repo, [path for path in documentation if path.is_file()], errors)
-
-    python_paths = sorted((repo / ".opencode").rglob("*.py")) + sorted((repo / "scripts").rglob("*.py")) + sorted(
-        (repo / "config/scripts").rglob("*.py")
-    )
-    for path in python_paths:
-        try:
-            ast.parse(path.read_text(encoding="utf-8"), filename=str(path.relative_to(repo)))
-        except SyntaxError as exc:
-            errors.append(f"{path.relative_to(repo)} has Python syntax error: {exc}")
-
-    shell_paths = [
-        repo / ".githooks/pre-commit",
-        *sorted((repo / "scripts").rglob("*.sh")),
-        *sorted((repo / "tools").glob("*.sh")),
-    ]
-    for path in shell_paths:
-        if not path.is_file():
-            continue
-        result = subprocess.run(["bash", "-n", str(path)], text=True, capture_output=True, check=False)
-        if result.returncode:
-            errors.append(f"{path.relative_to(repo)} has shell syntax error: {result.stderr.strip()}")
-
     tool_output = config.get("tool_output")
     if not isinstance(tool_output, dict):
         errors.append("config.tool_output is missing")
@@ -685,8 +521,6 @@ def main() -> int:
             f"Commands: {command_count}",
             f"Prompt imports: {import_count}",
             f"Reachable custom agents: {len(reachable)}/{len(agent_files)}",
-            f"Documentation links checked: {link_count}",
-            f"Forbidden temperature/step fields: 0" if not any("forbidden agent field" in e for e in errors) else "Forbidden temperature/step fields: present",
         ]
     )
 

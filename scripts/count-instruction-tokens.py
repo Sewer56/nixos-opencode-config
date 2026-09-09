@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["tiktoken"]
+# ///
 """Count explicit UTF-8 files with tiktoken cl100k_base; print JSON.
 
-Usage: python3 scripts/count-instruction-tokens.py config/agent/code.md
+Usage: uv run scripts/count-instruction-tokens.py config/agent/code.md
 Add --report PATH to create a JSON report (existing files are never replaced).
 
 Requires Python 3.10+, tiktoken and its preloaded cl100k_base cache.
 Markdown also needs Bun and the existing md-expand plugin dependencies.
 
-Prepare dependencies separately; this command never installs or downloads them.
-Preload the cache separately with:
-  python3 -c 'import tiktoken; tiktoken.get_encoding("cl100k_base")'
+uv can download dependencies on first use and reuses cached environments.
+The counting code never installs or downloads packages or tokenizer data.
+Prepare the tokenizer cache separately (this preparation can download data):
+  uv run --no-project --with tiktoken python3 -c \\
+    'import tiktoken; tiktoken.get_encoding("cl100k_base")'
+
+Ordinary python3 invocation works when dependencies and cache are prepared.
 
 TIKTOKEN_CACHE_DIR and DATA_GYM_CACHE_DIR select an existing cache.
 Markdown counts use the existing renderer, including its whitespace handling.
@@ -25,6 +33,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -41,7 +50,8 @@ def load_encoder():
         import tiktoken
         import tiktoken.load
     except ImportError as exc:
-        raise RuntimeError("tiktoken is unavailable; use a prepared Python environment") from exc
+        command = shlex.join(["uv", "run", str(Path(__file__).resolve()), *sys.argv[1:]])
+        raise RuntimeError(f"tiktoken is unavailable; run: {command}") from exc
 
     cache = os.environ.get(
         "TIKTOKEN_CACHE_DIR",

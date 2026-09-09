@@ -8,7 +8,7 @@ Execution translates human authority without hidden decisions.
 Use only the routing syntax checked by `config/scripts/plan-bundle.py`.
 
 Reject combined legacy plans and plan contracts/aliases; never auto-convert.
-Standalone handoffs and iterate contracts remain separate valid authority.
+Standalone handoffs and agreed iterate scope remain separate valid authority.
 
 Evidence and runtime `review/` are not source members or writable plans.
 Missing/conflicting authority stops writers with `NEEDS_INPUT`.
