@@ -379,8 +379,16 @@ def main() -> int:
             elif target not in BUILTIN_AGENTS:
                 errors.append(f"built-in agent config allows missing task target {target}")
 
+    # Visible, enabled primaries are selectable without commands or task grants.
+    entry_roots = command_roots | {
+        ident
+        for ident, fm in agent_frontmatter.items()
+        if fm.get("mode") in {"primary", "all"}
+        and fm.get("hidden") is not True
+        and ident not in disabled_agents
+    }
     reachable: set[str] = set()
-    queue = deque(sorted(command_roots))
+    queue = deque(sorted(entry_roots))
     while queue:
         node = queue.popleft()
         if node in reachable:
@@ -391,7 +399,7 @@ def main() -> int:
     if orphans:
         errors.append("unreachable custom agents: " + ", ".join(orphans))
 
-    max_depth, max_path, cycles = longest_depth(graph, command_roots)
+    max_depth, max_path, cycles = longest_depth(graph, entry_roots)
     for cycle in cycles:
         # Only agent `code` may self-delegate; every other cycle is an error.
         if cycle == ["code", "code"]:

@@ -1,9 +1,10 @@
 ---
 mode: subagent
 hidden: true
-description: Inventories public error APIs in a bounded chunk
-model: sewer-axonhub/glm-5.3 # EASY
-variant: low
+description: Audits error documentation
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
+variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -47,7 +48,7 @@ permission:
     "*.env.example": allow
   edit:
     "*": deny
-    "artifact/PROMPT-ERROR-DOCS-*.chunk-*.facts.md": allow
+    "artifact/review/**": allow
   grep: allow
   glob: allow
   list: allow
@@ -84,53 +85,28 @@ permission:
     "patch *": deny
 ---
 
-Trace every public error-returning API in one assigned chunk.
-Caller owns enumeration; never broaden scope or use iterative caches.
+Trace scoped reachable errors before findings.
+Never edit source.
 
 # Inputs
-- `repo_root`: absolute repository root.
-- `language`: detected language.
-- `target_files`: explicit repository-relative source files in this chunk.
-- `facts_path`: unique output artifact.
 
-{{ file="./rules/groups/docs/search-error-collection.md" }}
+Use shared review inputs/output; domain is ERROR_DOCUMENTATION.
+Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
+- Use handoff's traced source and versioned external evidence.
 
-# Process
-Judge only error enumeration, reachable paths, and existing error docs.
-1. Read all assigned files and enumerate APIs using language conventions.
-2. Trace construction, propagation, mapped/thrown errors and every branch.
-3. Follow necessary local callees; record unresolved edges instead of guessing.
-4. Compare every variant/trigger with existing language-specific error docs.
-5. Classify as specific, missing, vague, incorrect or incomplete-evidence.
-6. Include specific APIs too; sparse prose never means omitted coverage.
+{{ file="./rules/groups/implementation/implementation-review.md" }}
+
+{{ file="./rules/groups/docs/error-application-review.md" }}
+
+# Checks
+
+- Read scoped docs, referenced source/error paths and supplied evidence.
+- Do not search broadly; report unresolved edges or incomplete coverage.
+- Exclude general docs coverage, inline comments, and broad prose polish.
+- Judge implementation only to verify reachable errors.
+- Attribute delegated errors only when the public API can expose them.
+- Prior refuted findings are not repeated without new evidence.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
-# Artifact
-{{ file="./rules/cards/implementation/review-protocol.md" }}
-
-Write `facts_path` with language, exact files and COMPLETE or INCOMPLETE.
-For every API record path/line/symbol, visibility and return/error shape.
-
-Record classification and every reachable variant/type, exact trigger and cite.
-Include actual gaps and unresolved edges; explicitly identify zero-error APIs.
-
-Account for every file, including files with no public error-returning APIs.
-Report counts for files read, APIs, specific docs, gaps and incomplete evidence.
-
-# Output
-Return exactly:
-
-```text
-Status: COMPLETE | INCOMPLETE | FAIL
-Facts Path: <facts_path>
-Files Read: <n>/<total>
-APIs: <n>
-Gaps: <n>
-Summary: <one-line summary>
-```
-
-# Constraints
-- Write only `facts_path`.
-- Never edit source or use a shared cache.
-- Return no prose outside the fenced block.
+Use stable finding IDs `ERR-DOC-NNN` with exact variant/trigger evidence.

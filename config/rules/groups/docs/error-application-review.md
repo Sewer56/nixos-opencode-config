@@ -11,8 +11,9 @@ Check functions, paths, lines, variants, and triggers.
 Block dropped proposed variants or changed triggers.
 Allow only if code proves the proposal obsolete.
 
-With no traced error paths, use the language rule file's zero-path fallback.
-This applies to proposed docs.
+Distinguish proven zero-error APIs from incomplete tracing.
+Missing error-path evidence means INCOMPLETE, never an invented no-error claim.
+
 Block `TODO`, `TBD`, `FIXME`, `...`, and vague stubs in error docs.
 Check both proposed and applied docs.
 

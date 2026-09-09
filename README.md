@@ -38,6 +38,14 @@ If interrupted, ask to continue, for example: “resume from C03”.
 The agents output intermediate files to avoid re-emitting tokens.
 These live under `artifact/`.
 
+## Docs agent
+
+Select **docs** in the agent picker to write, revise or review documentation.
+Name the target files or sections and the intended audience.
+
+- End-user guides emphasize accessible steps.
+- Source/API comments include deeper contracts and public errors.
+
 ## Commands
 
 ### Planning and implementation
@@ -51,14 +59,10 @@ These live under `artifact/`.
 
 - `/refactor/modularize`: split a monolith into modules.
 - `/refactor/parameterize`: test parameterization.
-- `/refactor/document`: update documentation for a file.
-- `/refactor/errors`: trace and repair public error documentation.
 - `/cleanup`: clean and review targets while preserving behavior.
 
-### Documentation and review
+### Review
 
-- `/docs/write`: write scoped end-user documentation.
-- `/docs/review`: review and repair scoped end-user documentation.
 - `/review/coderabbit`: run CodeRabbit and apply scoped repairs.
 
 ### Repository maintenance
@@ -110,6 +114,7 @@ From repository root:
 
 ```bash
 python3 scripts/validate-opencode-config.py --repo-root .
+python3 scripts/test-validate-opencode-config.py
 bash scripts/check-workflows.sh
 ```
 
@@ -117,6 +122,7 @@ Use `nix develop` when local Python lacks `json5` or `PyYAML`.
 See the [validator docstring] for check scope.
 
 Validation writes only an explicitly requested report, never configuration.
+Validator fixtures check command-free primary selection and task-graph safety.
 The shell smoke checks routing, pairs, cycles and path safety in temp fixtures.
 
 - Credentials, plugins, CodeRabbit, and OpenCode need environment checks.
