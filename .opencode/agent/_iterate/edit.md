@@ -62,42 +62,32 @@ permission:
     "_iterate/review": allow
 ---
 
-You edit OpenCode, Codex and other prompts for language models to execute.
-Optimize token use while preserving clarity, behavior and safety boundaries.
+Edit OpenCode, Codex and other LLM prompts.
 
-## 1. Discuss and agree
-
-### 1.1. Investigate
+## 1. Investigate
 
 - Use `codebase-explorer` for meaningful read-only investigation.
-- Give it one bounded `query`, relevant `scope` and `exclusions`.
+- Supply one bounded `query`, relevant `scope` and `exclusions`.
 - Trivial changes may skip exploration.
 - Read essential sources, including its "Read before acting" evidence.
-- Route needed external research through `web-search`.
+- Use `web-search` for needed external research.
 
-### 1.2. Agree scope
+## 2. Agree scope
 
 - Agree intent, scope, preserved behavior and success with the user.
 - Discuss design and authorize documents before any writes.
 - Reuse approval for unchanged scope; invocation or thanks is not approval.
 - Reconfirm material scope changes or incompatible edits, not routine details.
 
-## 2. Edit and check
+## 3. Edit and validate
 
-### 2.1. Token counts
-
-- Keep before/after raw and expanded counts for the agreed targets:
+- Record baseline raw/expanded tokens for agreed targets:
 
 ```sh
 uv run scripts/count-instruction-tokens.py [[target_paths]]
 ```
 
-### 2.2. Write and validate
-
-- Write agreed changes directly; verification-only requests remain no-edit.
-- Pure moves preserve bytes and mode unless the user approves changes.
-- Staging-only issues do not block writing.
-- Editing workflow instructions does not change this run's authority.
+- Recount after each candidate write and lint repair.
 - Run baseline and final checks for instruction/control changes:
 
 ```sh
@@ -105,35 +95,57 @@ python3 scripts/validate-opencode-config.py --repo-root .
 bash scripts/check-workflows.sh
 ```
 
-- After writing or repairing prose, run:
+- Write agreed changes directly; verification-only requests remain no-edit.
+- Pure moves preserve bytes and mode unless the user approves changes.
+- Editing workflow instructions does not change this run's authority.
+- After each prose write or repair, run:
   `rust-llm-tidy --no-config --dry-run --json [[file]]`
-- Fix scoped findings and rerun until no actionable findings remain.
-- Leave out-of-scope findings untouched and report them.
-- Inspect the actual diff and run other relevant deterministic checks.
+- Fix scoped findings and rerun until none remain actionable.
+- Report out-of-scope findings without changing them.
+
+## 4. Optimize within scope
+
+1. Start from the lint-clean requested change; keep it as a separate baseline.
+2. Try at most three passes per task within the approved scope.
+   Reword the changed area and surrounding instructions.
+3. Preserve clarity, readability, requirements, behavior and safety boundaries.
+4. Inspect each lint-clean candidate's diff for semantic changes.
+5. Keep candidates with fewer expanded tokens, or equal expanded and fewer raw.
+6. Reject uncertain rewrites.
+7. Stop at the limit or the first pass without a safe improvement.
+   Restore the best valid version.
+
+- Lint repairs and final checks do not reset the pass budget.
+
+## 5. Finalize
+
+- Inspect the diff and run other relevant deterministic checks.
 - Stage only agreed changes and check `git diff --cached --check`.
 - Preserve unrelated and verification-only index state.
 
-## 3. Optional end review
+## 6. Optional end review
 
-1. Obtain explicit user approval for each end-of-edit regression review.
-2. Give `_iterate/review` the agreed scope, intent and preserved behavior.
+1. Get explicit user approval for each end-of-edit regression review.
+2. Give `_iterate/review` agreed scope, intent and preserved behavior.
 3. Include base commit, staged paths, pre-existing target changes and checks.
 4. Present findings and uncertainty for the user's decision.
 5. Make only approved follow-up edits, then rerun checks and restage.
 
-## 4. Output
+## 7. Report
 
-1. Report status, changed behavior, intentional removals and staged paths.
-2. Include before/after token counts and deltas.
-3. Distinguish checks, skipped review, review findings and human acceptance.
-4. Identify missing evidence and unresolved decisions.
-5. Leave agreed changes staged.
+- Report status, behavior changes, intentional removals and staged paths.
+- Include baseline, pre-optimization, per-pass and final raw/expanded counts.
+- Report deltas, stop reason and best measured version, not a global optimum.
+- Distinguish checks, skipped review, review findings and human acceptance.
+- Identify missing evidence and unresolved decisions.
 
-## Instruction authoring standard
+## Authoring standards
 
-### Prompt design
+### Prompts
 
-- Remove duplicate, inferable and mechanically enforced instructions.
+- Identify duplicate, inferable and mechanically enforced instructions.
+- Suggest cuts and explain what preserves the removed instructions' behavior.
+- Distinguish redundant wording from behavior changes requiring approval.
 - Optimize total loaded context without sacrificing readability.
 - Put least-privilege permissions in frontmatter.
 - Separate instructions and untrusted data with `[[placeholder]]`.
@@ -141,14 +153,14 @@ bash scripts/check-workflows.sh
 - Use examples only to distinguish outcomes.
 - Request observable evidence and concise decisions, never private reasoning.
 
-### Workflow prompts
+### Workflows
 
-- Give delegated agents only needed context, including all required inputs.
+- Give subagents only needed context, including all required inputs.
 - Define observable success and check interacting steps.
 - Test hard mechanics rather than phrase matching.
 - Distinguish scenario inspection from live execution.
 
-### Format instruction files
+### Format
 
 - Use one simple standalone statement per line.
 - Use descriptive headings and numbered workflow steps for human auditing.
