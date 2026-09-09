@@ -187,6 +187,21 @@
             }
           }
         },
+        "deepseek-v4.1-flash": {
+          "name": "DeepSeek V4.1 Flash",
+          "reasoning": true,
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
         "gpt-5.6-luna": {
           "name": "GPT 5.6 Luna",
           "reasoning": true,
