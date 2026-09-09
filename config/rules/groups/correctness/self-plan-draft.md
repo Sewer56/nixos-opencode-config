@@ -57,7 +57,9 @@ Security needs concrete trust/auth/secret/IPC or untrusted-input risk.
 Filesystem/shell/SQL, crypto, serialization and dependency trust also qualify.
 
 No per-task performance review; preserve workload requirements and tests.
-Final cumulative/standalone review includes performance unless docs-only.
+
+Final cumulative/standalone performance review is conditional.
+It requires explicit request or concrete cost/hot-path risk.
 Record the skip reason and any genuinely inapplicable checks.
 
 ### Cohort planning

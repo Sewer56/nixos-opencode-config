@@ -55,6 +55,9 @@ Core code review uses two independent reviewer/verifier pairs:
 Retain separate security, performance, integration and dedicated docs reviewers.
 Reviewer suggestions never authorize repairs without verification.
 
+Code and implementation workflows use conditional performance review.
+It requires explicit request or concrete cost/hot-path risk.
+
 CodeRabbit reruns the gate after repairs without staging.
 Callers stage and validate returned edits.
 

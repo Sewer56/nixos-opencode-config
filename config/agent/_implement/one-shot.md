@@ -155,8 +155,9 @@ Review/re-review needs fresh lint PASS or explicit not-opted-in skip evidence.
 - Always call `_review/code/correctness`.
 - Always call `_review/code/quality` before commit.
 - Honor explicit reviewer requests.
-- Call `_review/code/optional/performance` unless docs-only.
-- Record a docs-only skip reason; review the complete standalone change.
+- Performance requires explicit request or concrete cost/hot-path risk.
+- When selected, call `_review/code/optional/performance`.
+- Review the complete standalone change.
 
 Optional risks:
 - Call optional security reviewer only when concrete risk matches:

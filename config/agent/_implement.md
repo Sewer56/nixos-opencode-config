@@ -132,8 +132,8 @@ permission:
    - Rerun full validation/tests; record evidence before review.
    - Missing or failed current lint evidence blocks reviewers, including re-review.
 4. Always call `_review/code/integration`.
-   - Call `_review/code/optional/performance` unless docs-only.
-   - Record docs-only skip reason.
+   - Performance requires explicit request or concrete cost/hot-path risk.
+   - When selected, call `_review/code/optional/performance`.
    - Staged repairs need `_review/code/correctness` and quality.
    - Route security only for concrete cross-cohort risk.
    - Add cumulative correctness for test-design risk or requested test review.
