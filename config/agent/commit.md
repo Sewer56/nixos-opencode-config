@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Creates Keep a Changelog-style commits without pushing
-model: sewer-axonhub/glm-5.3 # WRITER
+model: sewer-axonhub/glm-5.3 # EASY
 variant: low
 permission:
   "*": deny
