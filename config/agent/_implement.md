@@ -125,8 +125,14 @@ permission:
    - Include original base_commit, authorized partials or None and repair IDs.
    - Supply failed validation_path and/or all verified verdict_paths.
 3. Stage only scoped owned paths/approved partials; preserve unrelated hunks.
+   - Run `~/opencode/config/scripts/rust-llm-tidy-gate.sh` after staging.
+   - If lint changes files, inspect and restage only authorized changes; rerun.
+   - Record command, exit status and PASS or explicit not-opted-in skip.
+   - Retain cohort lint evidence for committed changes.
+   - Auto mode checks pending changes.
    - Run `git diff --cached --check` before validation and review.
    - Rerun full validation/tests; record evidence before review.
+   - Missing or failed current lint evidence blocks reviewers, including re-review.
 4. Always call `_review/code/integration`.
    - Call `_review/code/optional/performance` unless docs-only.
    - Record docs-only skip reason.
@@ -153,7 +159,7 @@ permission:
    - Await all verdicts before repairs, including after re-review.
    - Send repairs with all verdict/ID identities to integration repair.
 7. Allow two final repair turns.
-   - Repeat steps 3–6, including validation/tests and integration.
+   - After every repair, repeat steps 3–6, including lint.
    - Rerun correctness/quality and affected/newly required routes in parallel.
    - Remaining blocker: FAIL; missing evidence: INCOMPLETE.
 8. Re-read staged repair; confirm scope/ownership and call `commit` if changed.

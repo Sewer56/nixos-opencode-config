@@ -135,9 +135,12 @@ Code owns integration and staging.
 
 ## 4. Validate and stage
 
-- Follow the imported lint gate and run applicable checks/tests.
 - Stage only writer changes, never `artifact/` or `artifacts/`.
+- Run `~/opencode/config/scripts/rust-llm-tidy-gate.sh` after staging.
+- If lint changes files, inspect and restage only authorized changes; rerun.
+- Repair scoped failures and repeat this step after every repair.
 - Inspect staged diff; run `git diff --cached --check`.
+- Run applicable checks/tests.
 
 ## 5. Run approved review
 
@@ -160,11 +163,15 @@ Handoff: scoped goal/behavior, targets, preserve/exclude and checks.
 Repeat Step 4, then quick validation and targeted tests.
 
 Record shared check evidence in `validation_path`.
+Record lint command, exit status and PASS or explicit not-opted-in skip.
 Explain inapplicable tests.
 
 ### Select reviewers
 
-Require quick PASS; honor named-reviewer limits.
+Require quick PASS.
+Review/re-review needs fresh lint PASS or explicit not-opted-in skip evidence.
+
+Honor named-reviewer limits.
 Otherwise select by diff, not extension:
 - Code changes/refactors: both code reviewers below.
 - `_review/code/correctness`: behavior/contracts/config/examples.

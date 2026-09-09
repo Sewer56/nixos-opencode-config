@@ -111,19 +111,24 @@ Be sole code/tests/docs writer for one approved task.
 
 ## 2. Stage and check
 
-1. Require imported lint PASS before staging/quick validation.
-2. Stage only owned changes, including authorized resumed/compatibility edits.
-   Reject unexpected paths; preserve unrelated hunks.
-   Ambiguous ownership needs input.
+1. Stage only owned changes, including authorized resumed/compatibility edits.
+   - Reject unexpected paths; preserve unrelated hunks.
+   - Ambiguous ownership needs input.
+2. Run `~/opencode/config/scripts/rust-llm-tidy-gate.sh` after staging.
+   If lint changes files, inspect and restage only authorized changes; rerun.
 3. Inspect staged diff and run `git diff --cached --check`.
 4. Run quick validation/tests; explain inapplicable tests.
    Never install dependencies or update snapshots/generated files.
 5. Record shared check evidence and test gaps in `validation_path`.
+   Record lint command, exit status and PASS or explicit not-opted-in skip.
 6. Repair failures; repeat Section 2, replacing current validation.
 
 ## 3. Call exact reviewers
 
-After quick PASS, call `_review/code/correctness`.
+Require quick PASS.
+Review/re-review needs fresh lint PASS or explicit not-opted-in skip evidence.
+
+- Always call `_review/code/correctness`.
 - Always call `_review/code/quality`.
 - Select `_review/docs/editorial` for docs/comments or public-behavior docs.
 - Honor explicit reviewer requests.
@@ -144,7 +149,7 @@ Await all results without editing.
 
 - Send candidates to assigned verifiers under routing; await verdicts.
 
-- After repair, repeat Section 2.
+- After every repair, repeat Section 2, including lint.
 - Rerun correctness/quality and affected or newly required routes in parallel.
 - Send new candidates to assigned verifiers; await verdicts again.
 

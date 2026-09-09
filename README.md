@@ -43,6 +43,12 @@ These live under `artifact/`.
 Approve Code's design or Docs' outline before execution.
 Choose optional Code workers and reviewers during planning.
 
+Code and `/implement` run the lint gate after staging and after repairs.
+Review needs current rust-llm-tidy PASS or explicit not-opted-in skip evidence.
+
+CodeRabbit reruns the gate after repairs without staging.
+Callers stage and validate returned edits.
+
 Select **docs** in the agent picker to write, revise or review documentation.
 Name the target files or sections and the intended audience.
 

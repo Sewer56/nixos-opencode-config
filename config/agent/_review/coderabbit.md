@@ -146,17 +146,24 @@ Clean output names checked scope and limitations without empty findings.
 
 ## 4. Validate the repaired tree
 - Run imported lint plus non-mutating formatting/parser/type/build/test checks.
+- Record lint command, exit status and PASS or explicit not-opted-in skip.
+- Report untracked files excluded by the gate; leave staging to the caller.
 - Run broader tests only for repository convention or grounded repair impact.
 - Keep imported writer-gate and dependency rules for every edit.
 - Validation never installs, updates snapshots, regenerates or auto-formats.
 - Record cwd once; validation names command, result/exit and decisive evidence.
 - Reference native evidence instead of duplicating it.
 - Unexpected validation mutation is FAIL.
-- Fix code failures and rerun affected checks within two repair turns.
+
+### Validation repairs
+
+- Fix code failures within two repair turns.
+- After every repair, rerun the lint gate and affected checks.
 - Missing tools/services/credentials/fixtures/runtimes mean INCOMPLETE.
 - Missing environment never justifies product edits.
 
 ## 5. One bounded re-review
+- Re-review needs current lint PASS or explicit not-opted-in skip evidence.
 - After product edits, re-review the complete repaired scope once:
   - preserve `all` or `uncommitted` when that was the original scope;
   - Promote original committed scope to all so it includes uncommitted repairs.
