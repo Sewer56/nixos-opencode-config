@@ -54,6 +54,6 @@ Use supplied checks and source proof; missing required evidence is INCOMPLETE.
 
 {{ file="./rules/groups/quality/review-criteria.md" }}
 
-{{ file="./rules/groups/docs/editorial-criteria.md" shared="quality" }}
+{{ file="./rules/groups/docs/editorial-criteria.md" }}
 
 {{ file="./rules/groups/implementation/verify-candidates.md" }}

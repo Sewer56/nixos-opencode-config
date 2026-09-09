@@ -96,8 +96,6 @@ Create no artifacts or review caches.
 
 {{ file="./rules/groups/correctness/self-plan-draft.md" }}
 
-{{ file="./rules/groups/implementation/cohort-planning.md" }}
-
 {{ file="./rules/groups/tests/test-strategy.md" }}
 
 # Review

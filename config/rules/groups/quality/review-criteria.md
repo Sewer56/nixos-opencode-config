@@ -4,8 +4,6 @@
 
 {{ file="./rules/groups/docs/error-docs.md" }}
 
-{{ file="./rules/groups/quality/placement.md" }}
-
 {{ file="./rules/groups/docs/end-user-correctness.md" }}
 
 {{ file="./rules/groups/style/readability.md" }}

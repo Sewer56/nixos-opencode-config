@@ -71,8 +71,6 @@ permission:
 
 {{ file="./rules/groups/correctness/self-plan-draft.md" }}
 
-{{ file="./rules/groups/implementation/cohort-planning.md" }}
-
 ## 1. Discuss before documents
 
 - Establish goal, constraints, design choices, success and a small task outline.

@@ -1,8 +1,8 @@
 ## Code Documentation
 
-### Coverage
-Preserve required public API contracts and complete changed-API error docs.
+{{ file="./rules/cards/docs/documentation-context.md" }}
 
+### Coverage
 Private APIs need purpose and non-obvious contracts unless trivial.
 Refresh changed module/file boundary docs.
 
@@ -14,18 +14,17 @@ No docs-only backfill of untouched legacy.
 ### Examples and style
 Name each example for its one concept.
 Add examples, sections and cross-links only when they help readers.
+
 Examples use real APIs with hermetic fixtures.
 Examples show what static configuration cannot express.
 
 Block false claims and stale references.
-State facts once where owned.
-Use native links for other needed contracts.
 
 Open with a plain one-line purpose summary.
 Caveats: trailing `# Remarks` or equivalent.
 
 Use native doc links and `#` sections for multiple aspects.
-Name concrete mechanisms, not vague effects.
+Name concrete mechanisms when readers need them, not vague effects.
 
 ### Lists
 - Summarize categories unless readers need their members.

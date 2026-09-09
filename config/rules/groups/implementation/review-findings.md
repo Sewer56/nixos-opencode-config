@@ -30,6 +30,11 @@ Factual/mixed claims need execution or source proof and a falsifiable check.
 Reader/maintainability impact needs no runtime failure.
 Test applicability, issue and bounded correction.
 
+For doc additions, cite a requirement or concrete reader consequence.
+Justify placement here rather than in an existing reference.
+
+Truth, completeness or plan mechanics alone do not justify additions.
+
 Preserve necessary information/behavior; truth does not refute irrelevance.
 Reject unsupported preference; unverifiable material claims are INCOMPLETE.
 
