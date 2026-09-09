@@ -31,6 +31,7 @@ permission:
     "git show --no-ext-diff --no-textconv *": allow
     "git status *": allow
     "git rev-parse *": allow
+    "realpath *": allow
     "*--output*": deny
     "*--ext-diff*": deny
     "*--textconv*": deny
