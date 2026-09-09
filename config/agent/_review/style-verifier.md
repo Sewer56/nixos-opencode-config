@@ -20,28 +20,45 @@ permission:
     "*": deny
     "artifact/review/**": allow
     "artifact/plan/*/review/**": allow
+  github_get_*: allow
+  github_search_*: allow
+  github_list_*: allow
+  context7_*: allow
+  deepwiki_*: allow
   grep: allow
   glob: allow
   list: allow
   bash:
-    "*": deny
-    "git diff --no-ext-diff --no-textconv *": allow
-    "git show --no-ext-diff --no-textconv *": allow
-    "git status --short": allow
-    "git rev-parse HEAD": allow
-    "*--output*": deny
-    "* --ext-diff*": deny
-    "* --textconv*": deny
-    "*--no-index*": deny
-    "*;*": deny
-    "*|*": deny
-    "*&*": deny
-    "*>*": deny
-    "*<*": deny
-    "*$*": deny
-    "*`*": deny
-    "*\n*": deny
-  task: deny
+    "*": allow
+    "sudo *": deny
+    "git push *": deny
+    "git commit *": deny
+    "git add *": deny
+    "git reset *": deny
+    "git clean *": deny
+    "git rebase *": deny
+    "git merge *": deny
+    "git checkout *": deny
+    "git switch *": deny
+    "git restore *": deny
+    "git stash *": deny
+    "git rm *": deny
+    "git mv *": deny
+    "git apply *": deny
+    "git cherry-pick *": deny
+    "git revert *": deny
+    "rm *": deny
+    "mv *": deny
+    "cp *": deny
+    "touch *": deny
+    "mkdir *": deny
+    "rmdir *": deny
+    "tee *": deny
+    "dd *": deny
+    "ln *": deny
+    "chmod *": deny
+    "chown *": deny
+    "patch *": deny
 ---
 
 Verify only caller-assigned QUALITY and EDITORIAL candidates.
