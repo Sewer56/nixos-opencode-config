@@ -1,7 +1,7 @@
 {{ file="./rules/groups/implementation/implementation-review.md" }}
 
-QUALITY, EDITORIAL: style, `_review/style-verifier`.
-All other shared domains: correctness, `_review/verifier`.
+QUALITY: style, `_review/quality-verifier`.
+All other shared domains: correctness, `_review/correctness-verifier`.
 
 Partition assigned reports by class and shared input identity as `boundary_id`.
 Identity includes authority/purpose/scope/boundary/base/head/paths.

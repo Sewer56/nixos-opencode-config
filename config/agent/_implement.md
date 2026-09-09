@@ -60,17 +60,15 @@ permission:
     "git commit --no-verify *": deny
   task:
     "*": deny
-    "_review/docs/editorial": allow
     "_implement/cohort": allow
     "_implement/integration-repair": allow
     "_review/code/integration": allow
     "_review/code/correctness": allow
     "_review/code/quality": allow
-    "_review/code/optional/tests": allow
     "_review/code/optional/security": allow
     "_review/code/optional/performance": allow
-    "_review/verifier": allow
-    "_review/style-verifier": allow
+    "_review/correctness-verifier": allow
+    "_review/quality-verifier": allow
     "_review/coderabbit": allow
     "commit": allow
 ---
@@ -138,12 +136,16 @@ permission:
    - Record docs-only skip reason.
    - Staged repairs need `_review/code/correctness` and quality.
    - Route security only for concrete cross-cohort risk.
-   - Route tests for concrete design risk, explicit request or approved routing.
+   - Add cumulative correctness for test-design risk or requested test review.
+   - Honor approved cumulative test-review routing.
+   - Limit this call to test strategy and observable coverage.
 
-   Editorial:
-   - Add `_review/docs/editorial` for docs/comments or public-behavior docs.
+   Documentation:
+   - Add cumulative `_review/code/quality` for documentation or comments.
+   - Include documentation required by changed public behavior.
+   - Limit this call to documentation and editorial review.
    - Honor explicit reviewer requests.
-   - Record selection/skips and valid prior editorial reuse in validation_path.
+   - Record routes/skips and valid documentation-review reuse in validation_path.
    - Reuse unchanged text/claims only with current boundary evidence.
 
    - Call selected reviewers independently in parallel on a stable diff.
@@ -153,8 +155,9 @@ permission:
    - Route relevant task exec/references.
    - Use CHANGE, FINAL, COMMITTED or STAGED for pending repairs.
    - Integration/security/performance use original base and cumulative paths.
-   - Editorial uses that cumulative boundary, including staged repairs.
-   - Correctness/quality use pre-repair HEAD and exact staged repair paths.
+   - Cumulative correctness/quality use original base, including staged repairs.
+   - Repair correctness/quality use pre-repair HEAD and exact staged repair paths.
+   - Separate cumulative and repair calls with distinct review paths/identities.
 6. Send candidates to assigned verifiers under routing.
    - Await all verdicts before repairs, including after re-review.
    - Send repairs with all verdict/ID identities to integration repair.

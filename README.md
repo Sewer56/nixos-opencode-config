@@ -46,6 +46,15 @@ Choose optional Code workers and reviewers during planning.
 Code and `/implement` run the lint gate after staging and after repairs.
 Review needs current rust-llm-tidy PASS or explicit not-opted-in skip evidence.
 
+Core code review uses two independent reviewer/verifier pairs:
+- Correctness covers behavior, test adequacy and test strategy.
+- Quality covers maintainability, documentation and editorial proposals.
+- `_review/correctness-verifier` verifies correctness and specialist findings.
+- `_review/quality-verifier` verifies quality findings using the `style` class.
+
+Retain separate security, performance, integration and dedicated docs reviewers.
+Reviewer suggestions never authorize repairs without verification.
+
 CodeRabbit reruns the gate after repairs without staging.
 Callers stage and validate returned edits.
 

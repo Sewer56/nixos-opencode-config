@@ -1,8 +1,8 @@
 ---
 mode: subagent
 hidden: true
-description: Verifies quality and editorial findings
-model: sewer-axonhub/glm-5.3 # STYLE-REVIEW
+description: Verifies correctness and specialist findings
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
 
 permission:
@@ -91,16 +91,7 @@ permission:
     "patch *": deny
 ---
 
-Verify only caller-assigned QUALITY and EDITORIAL candidates.
+Verify shared-pipeline domains except QUALITY.
 Wrong-class inputs mean INCOMPLETE.
-
-QUALITY uses quality criteria; EDITORIAL uses editorial criteria.
-Do not apply code-body layout duties to EDITORIAL.
-
-Use supplied checks and source proof; missing required evidence is INCOMPLETE.
-
-{{ file="./rules/groups/quality/review-criteria.md" }}
-
-{{ file="./rules/groups/docs/editorial-criteria.md" }}
 
 {{ file="./rules/groups/implementation/verify-candidates.md" }}

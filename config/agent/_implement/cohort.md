@@ -71,13 +71,11 @@ permission:
     "git commit *": deny
   task:
     "*": deny
-    "_review/docs/editorial": allow
     "_review/code/correctness": allow
     "_review/code/quality": allow
-    "_review/code/optional/tests": allow
     "_review/code/optional/security": allow
-    "_review/verifier": allow
-    "_review/style-verifier": allow
+    "_review/correctness-verifier": allow
+    "_review/quality-verifier": allow
     "commit": allow
 ---
 
@@ -130,9 +128,7 @@ Review/re-review needs fresh lint PASS or explicit not-opted-in skip evidence.
 
 - Always call `_review/code/correctness`.
 - Always call `_review/code/quality`.
-- Select `_review/docs/editorial` for docs/comments or public-behavior docs.
 - Honor explicit reviewer requests.
-- Tests needs test-design risk, explicit request or grounded routing.
 - Security needs trust/auth/secret/IPC or untrusted-input risk.
 - Include filesystem/shell/SQL, crypto, serialization and dependency trust.
 - Record selection/skip reasons in validation_path.

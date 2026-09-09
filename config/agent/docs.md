@@ -78,7 +78,7 @@ permission:
     "_review/docs/usability": allow
     "_review/docs/documentation": allow
     "_review/docs/errors": allow
-    "_review/verifier": allow
+    "_review/correctness-verifier": allow
 ---
 
 Write, revise or review scoped documentation.

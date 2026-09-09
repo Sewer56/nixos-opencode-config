@@ -76,14 +76,12 @@ permission:
     "git commit *": deny
   task:
     "*": deny
-    "_review/docs/editorial": allow
     "_review/code/correctness": allow
     "_review/code/quality": allow
-    "_review/code/optional/tests": allow
     "_review/code/optional/security": allow
     "_review/code/optional/performance": allow
-    "_review/verifier": allow
-    "_review/style-verifier": allow
+    "_review/correctness-verifier": allow
+    "_review/quality-verifier": allow
     "_review/coderabbit": allow
     "commit": allow
 ---
@@ -156,14 +154,12 @@ Review/re-review needs fresh lint PASS or explicit not-opted-in skip evidence.
 
 - Always call `_review/code/correctness`.
 - Always call `_review/code/quality` before commit.
-- Select `_review/docs/editorial` for docs/comments or public-behavior docs.
 - Honor explicit reviewer requests.
 - Call `_review/code/optional/performance` unless docs-only.
 - Record a docs-only skip reason; review the complete standalone change.
 
 Optional risks:
-- Call optional tests or security reviewer only when concrete risk matches:
-  - `TESTS` for concrete test-design risk, request or grounded routing.
+- Call optional security reviewer only when concrete risk matches:
   - `SECURITY` for trust boundaries, auth, secrets, IPC, or untrusted input.
   - Also for filesystem/shell/SQL, serialization, or cryptography.
   - Also for permissions or dependency trust.

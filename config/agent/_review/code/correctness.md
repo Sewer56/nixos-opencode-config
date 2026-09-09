@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews behavior and test adequacy
+description: Reviews behavior, test adequacy and test strategy
 model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
 
@@ -93,6 +93,9 @@ permission:
 
 Review the complete scoped behavioral change; domain is CORRECTNESS.
 Use shared inputs/output; verifier owns repair eligibility.
+Test-only assignments assess implementation only for observable coverage.
+
+{{ file="./rules/groups/tests/test-strategy.md" }}
 
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
@@ -101,14 +104,21 @@ Use shared inputs/output; verifier owns repair eligibility.
 Check `validation_path` first.
 Require applicable tests to pass after staging.
 
+COMMITTED review needs passing evidence for reviewed commits.
+
 Accept “no test applies” only when diff and test layout support it.
 Missing evidence is `INCOMPLETE`; code-caused failure is a candidate.
 
-Then review the staged diff as one behavioral change.
+Review the caller's STAGED or COMMITTED diff as one behavioral change.
 Include mapped impacts and completed predecessor compatibility.
 Check planned callers, registrations, exports, schemas, migrations, and config.
 
-Check basic test adequacy, not merely that tests ran.
+Review test strategy and observable coverage, not merely that tests ran.
+Read nearest tests against human outcomes and validation.
+
+Identify missing coverage, escaping regression and smallest useful test.
+Never demand low-value coverage or write implementation.
+
 Specialists never replace complete behavior and cross-domain review.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}

@@ -74,14 +74,12 @@ permission:
     "coder": allow
     "web-search": allow
     "codebase-explorer": allow
-    "_review/docs/editorial": allow
     "_review/code/correctness": allow
     "_review/code/quality": allow
-    "_review/code/optional/tests": allow
     "_review/code/optional/security": allow
     "_review/code/optional/performance": allow
-    "_review/verifier": allow
-    "_review/style-verifier": allow
+    "_review/correctness-verifier": allow
+    "_review/quality-verifier": allow
 ---
 
 Code within user scope.
@@ -174,13 +172,12 @@ Review/re-review needs fresh lint PASS or explicit not-opted-in skip evidence.
 Honor named-reviewer limits.
 Otherwise select by diff, not extension:
 - Code changes/refactors: both code reviewers below.
-- `_review/code/correctness`: behavior/contracts/config/examples.
-- `_review/code/quality`: code maintainability.
-- `_review/docs/editorial`: docs/comments or public-behavior docs.
+- `_review/code/correctness`: behavior/contracts/config/examples/tests.
+- `_review/code/quality`: maintainability and docs/comments.
+Include documentation required by changed public behavior.
 Runnable examples need correctness even in Markdown.
 
 Optional: explicit request or matching risk:
-- `_review/code/optional/tests`: test design.
 - `_review/code/optional/security`: trust/auth/secrets/IPC.
 - `_review/code/optional/performance`: cost/hot-path risk.
 
