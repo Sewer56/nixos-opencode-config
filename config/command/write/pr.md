@@ -4,4 +4,4 @@ agent: _write/pr
 ---
 
 User request (optional base, issues, audience, emphasis):
-[[$ARGUMENTS]]
+$ARGUMENTS
