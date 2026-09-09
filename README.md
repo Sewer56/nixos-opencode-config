@@ -67,7 +67,7 @@ Name the target files or sections and the intended audience.
 
 ### Repository maintenance
 
-- `/commit/main`: create semantic commits with explicit staging.
+- `/commit`: commit the current session's work in-context.
 - `/write/issue`: write a repository-grounded issue.
 - `/write/pr`: generate grounded `pr.md` from the branch diff.
 - `/iterate/edit`: discuss and edit or verify instruction artifacts.
