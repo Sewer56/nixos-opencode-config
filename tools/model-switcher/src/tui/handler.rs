@@ -1,10 +1,13 @@
+//! Keyboard handling for the main view and both pickers.
+
 use super::app::{AppModel, Mode};
 use crate::config::validate_work;
 use crate::env::rel;
 use crate::models::filter_models;
-use crate::rewrite::{apply_profile, build_model_line_re, current_counts};
+use crate::rewrite::{apply_profile, build_model_line_re};
 use crossterm::event::KeyCode;
 
+/// Key handling and model filtering for [`AppModel`].
 pub(crate) trait AppModelHandler {
     fn handle_key(&mut self, code: KeyCode);
     fn handle_main_key(&mut self, code: KeyCode);
@@ -116,10 +119,6 @@ impl<'a> AppModelHandler for AppModel<'a> {
                             result.lines,
                             result.files.len()
                         );
-                        // Refresh counts after apply
-                        if let Ok(c) = current_counts(self.env, &self.tier_order, &re) {
-                            self.counts = c;
-                        }
                         self.update_preview();
                     }
                     Err(e) => self.message = format!("apply failed: {}", e),

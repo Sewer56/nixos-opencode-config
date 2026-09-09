@@ -1,8 +1,10 @@
+//! TUI state for reviewing and editing tier-model assignments.
+
 use super::handler::AppModelHandler;
 use super::render::AppModelRender;
 use crate::config::load_config;
 use crate::models::available_models;
-use crate::rewrite::{affected_agents, build_model_line_re, current_counts};
+use crate::rewrite::{affected_agents, build_model_line_re};
 use crate::types::{ApplyResult, Config, Env};
 use anyhow::bail;
 use crossterm::event::{self, Event, KeyEventKind};
@@ -11,7 +13,7 @@ use std::collections::BTreeMap;
 
 /// Interactive TUI state for reviewing and editing tier-model assignments.
 ///
-/// Holds loaded config, available models, current tier counts, selection
+/// Holds loaded config, available models, affected agents per tier, selection
 /// indices, picker state, and the apply preview result.
 pub(crate) struct AppModel<'a> {
     pub(crate) env: &'a Env,
@@ -19,7 +21,6 @@ pub(crate) struct AppModel<'a> {
     pub(crate) tier_order: Vec<String>,
     pub(crate) profiles: Vec<String>,
     pub(crate) models: Vec<String>,
-    pub(crate) counts: BTreeMap<String, BTreeMap<String, usize>>,
     pub(crate) agents: BTreeMap<String, Vec<String>>,
     pub(crate) agents_error: Option<String>,
     pub(crate) agent_offset: usize,
@@ -34,6 +35,7 @@ pub(crate) struct AppModel<'a> {
     pub(crate) apply_preview_err: Option<String>,
 }
 
+/// Which view currently owns keyboard input.
 pub(crate) enum Mode {
     Main,
     ModelPicker,
@@ -44,14 +46,13 @@ impl<'a> AppModel<'a> {
     /// Initialize the app state for interactive assignment review.
     ///
     /// Loads the config file, fetches available models, builds the model-line
-    /// regex, reads current tier counts, and validates the initial profile.
+    /// regex, reads affected agents, and validates the initial profile.
     ///
     /// Pass an empty `initial_profile` to select the first profile in the config.
     pub(crate) fn new(env: &'a Env, initial_profile: &str) -> anyhow::Result<Self> {
         let loaded = load_config(env)?;
         let models = available_models(env)?;
         let re = build_model_line_re(&loaded.tier_order);
-        let counts = current_counts(env, &loaded.tier_order, &re).unwrap_or_default();
         let (agents, agents_error) = match affected_agents(env, &re) {
             Ok(agents) => (agents, None),
             Err(error) => (BTreeMap::new(), Some(error.to_string())),
@@ -76,7 +77,6 @@ impl<'a> AppModel<'a> {
             tier_order: loaded.tier_order,
             profiles,
             models,
-            counts,
             agents,
             agents_error,
             agent_offset: 0,
@@ -212,7 +212,6 @@ mod tests {
             tier_order,
             profiles,
             models: vec![],
-            counts: BTreeMap::new(),
             agents: BTreeMap::new(),
             agents_error: None,
             agent_offset: 0,

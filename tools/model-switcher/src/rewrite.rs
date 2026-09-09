@@ -1,3 +1,7 @@
+//! Rewrite agent frontmatter model tags and list affected agents.
+//!
+//! `apply_profile` writes changes; `affected_agents` reports tagged files.
+
 use crate::types::{ApplyResult, Env, TierSet};
 use anyhow::Context;
 use regex::Regex;
@@ -11,17 +15,40 @@ pub static MODEL_LINE_DISCOVERY_RE: LazyLock<Regex> =
 static VARIANT_LINE_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"^(\s*variant:\s*)(\S+)(.*)$"#).unwrap());
 
-// -- private helpers --
-
-/// A parsed tagged model line.
-#[derive(Debug)]
-struct TaggedModelLine {
-    model: String,
-    tier: String,
+/// List tagged agents per tier, including assignments already matching a profile.
+///
+/// # Errors
+///
+/// - Returns an error when an agent directory or agent file cannot be read.
+pub fn affected_agents(env: &Env, re: &Regex) -> anyhow::Result<BTreeMap<String, Vec<String>>> {
+    let mut agents: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    for file in agent_files(env)? {
+        let data = std::fs::read_to_string(&file).with_context(|| format!("read: {}", file))?;
+        for line in assignment_lines(&data) {
+            if let Some(tier) = parse_tagged_tier(line, re) {
+                agents
+                    .entry(tier)
+                    .or_default()
+                    .push(crate::env::rel(env, &file));
+            }
+        }
+    }
+    for paths in agents.values_mut() {
+        paths.sort();
+        paths.dedup();
+    }
+    Ok(agents)
 }
 
+// -- private helpers --
+
 /// Apply a profile's tier values to all agent markdown files.
-/// If dry_run is true, no files are written.
+///
+/// When `dry_run` is true, no files are written.
+///
+/// # Errors
+///
+/// - Returns an error when agent discovery, a file read, or a file write fails.
 pub fn apply_profile(
     env: &Env,
     values: &TierSet,
@@ -63,71 +90,11 @@ pub fn build_model_line_re(tiers: &[String]) -> Regex {
     Regex::new(&pattern).expect("build model line regex")
 }
 
-/// Count current assignments per tier/model in agent files.
-pub fn current_counts(
-    env: &Env,
-    tier_order: &[String],
-    re: &Regex,
-) -> anyhow::Result<BTreeMap<String, BTreeMap<String, usize>>> {
-    let mut counts: BTreeMap<String, BTreeMap<String, usize>> = BTreeMap::new();
-    for tier in tier_order {
-        counts.insert(tier.clone(), BTreeMap::new());
-    }
-    let files = agent_files(env)?;
-    for file in &files {
-        let data = std::fs::read_to_string(file).with_context(|| format!("read: {}", file))?;
-        for line in assignment_lines(&data) {
-            if let Some(parsed) = parse_tagged_model_line(line, re) {
-                *counts
-                    .entry(parsed.tier.clone())
-                    .or_default()
-                    .entry(parsed.model)
-                    .or_insert(0) += 1;
-            }
-        }
-    }
-    Ok(counts)
-}
-
-/// List tagged agents per tier, including assignments already matching a profile.
-pub fn affected_agents(env: &Env, re: &Regex) -> anyhow::Result<BTreeMap<String, Vec<String>>> {
-    let mut agents: BTreeMap<String, Vec<String>> = BTreeMap::new();
-    for file in agent_files(env)? {
-        let data = std::fs::read_to_string(&file).with_context(|| format!("read: {}", file))?;
-        for line in assignment_lines(&data) {
-            if let Some(parsed) = parse_tagged_model_line(line, re) {
-                agents
-                    .entry(parsed.tier)
-                    .or_default()
-                    .push(crate::env::rel(env, &file));
-            }
-        }
-    }
-    for paths in agents.values_mut() {
-        paths.sort();
-        paths.dedup();
-    }
-    Ok(agents)
-}
-
-fn assignment_lines(data: &str) -> impl Iterator<Item = &str> {
-    let range = assignment_range(data);
-    data.lines().skip(range.start).take(range.len())
-}
-
-fn assignment_range(data: &str) -> std::ops::Range<usize> {
-    let mut lines = data.lines();
-    if lines.next() != Some("---") {
-        return 0..0;
-    }
-    let end = lines
-        .position(|line| line == "---")
-        .map(|i| i + 1)
-        .unwrap_or(1);
-    1..end
-}
-
 /// Find all .md files under agent directories.
+///
+/// # Errors
+///
+/// - Returns an error when an agent directory cannot be read.
 pub fn agent_files(env: &Env) -> anyhow::Result<Vec<String>> {
     let mut files = Vec::new();
     for dir in &env.agent_dirs {
@@ -241,12 +208,15 @@ pub fn rewrite_line(line: &str, values: &TierSet, re: &Regex) -> (String, Option
     )
 }
 
-fn parse_tagged_model_line(line: &str, re: &Regex) -> Option<TaggedModelLine> {
+fn assignment_lines(data: &str) -> impl Iterator<Item = &str> {
+    let range = assignment_range(data);
+    data.lines().skip(range.start).take(range.len())
+}
+
+fn parse_tagged_tier(line: &str, re: &Regex) -> Option<String> {
     let (body, _eol) = split_eol(line);
-    re.captures(body).map(|caps| TaggedModelLine {
-        model: caps.get(2).unwrap().as_str().to_string(),
-        tier: caps.get(4).unwrap().as_str().to_string(),
-    })
+    re.captures(body)
+        .map(|caps| caps.get(4).unwrap().as_str().to_string())
 }
 
 fn walk_dir_entries(dir: &str, files: &mut Vec<String>) -> anyhow::Result<()> {
@@ -262,6 +232,18 @@ fn write_file_atomic(path: &str, data: &[u8]) -> anyhow::Result<()> {
         })
         .context("rename atomic")?;
     Ok(())
+}
+
+fn assignment_range(data: &str) -> std::ops::Range<usize> {
+    let mut lines = data.lines();
+    if lines.next() != Some("---") {
+        return 0..0;
+    }
+    let end = lines
+        .position(|line| line == "---")
+        .map(|i| i + 1)
+        .unwrap_or(1);
+    1..end
 }
 
 fn split_eol(line: &str) -> (&str, &str) {

@@ -76,7 +76,8 @@ Highlight a tier to see its tagged agents, including already-matching files.
 Relative paths distinguish agents with the same name in different roots.
 
 Use `PgUp`/`PgDn` or `Home`/`End` to reach agents beyond the visible list.
-The selected tier and agent list remain available in short terminals.
+The list uses leftover space only, so it hides on very short terminals.
+Resize to bring it back.
 
 ## Adding a new profile
 

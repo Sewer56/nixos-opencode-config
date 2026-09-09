@@ -1,4 +1,7 @@
+//! Rendering for the main view, compact fallback and picker overlays.
+
 use super::app::{AppModel, Mode};
+use super::handler::AppModelHandler;
 use ratatui::{
     Frame,
     layout::{Constraint, Direction, Layout, Rect},
@@ -7,16 +10,25 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph},
 };
 
+const MAIN_HELP: &str =
+    "←/→ profile • ↑/↓ tier • enter model • v variant • s save • a apply • q quit";
+
+/// Render the interactive views.
 pub(crate) trait AppModelRender {
     fn render(&mut self, f: &mut Frame);
     fn render_picker(&self, f: &mut Frame);
     fn render_variant_picker(&self, f: &mut Frame);
 }
 
-const MAIN_HELP: &str = "←/→ profile • ↑/↓ tier • PgUp/PgDn agents • enter model • v variant • s save • a apply • q quit";
-
 impl AppModel<'_> {
+    /// Affected-agent lines for the highlighted tier, capped to `height` rows.
+    ///
+    /// Returns empty text when `height` is zero so callers can hide the panel
+    /// instead of reserving layout space for it.
     fn agent_text(&self, height: u16) -> String {
+        if height == 0 {
+            return String::new();
+        }
         if let Some(error) = &self.agents_error {
             return format!("{} agents unavailable: {error}", self.tier());
         }
@@ -43,181 +55,14 @@ impl AppModel<'_> {
 
 impl<'a> AppModelRender for AppModel<'a> {
     fn render(&mut self, f: &mut Frame) {
-        let rows = self.tier_order.len() as u16 + 1;
-        if f.area().height < rows.saturating_mul(3).saturating_add(11) {
-            let assignment = &self.cfg[self.profile()][self.tier()];
-            let selection = match self.mode {
-                Mode::Main => format!("{} [{}]", assignment.model, assignment.variant),
-                Mode::ModelPicker => {
-                    use super::handler::AppModelHandler;
-                    self.filtered_models()
-                        .get(self.pick_idx)
-                        .cloned()
-                        .unwrap_or_else(|| "no models match".into())
-                }
-                Mode::VariantPicker => crate::types::VARIANTS[self.pick_idx].into(),
-            };
-            let help = match self.mode {
-                Mode::Main => MAIN_HELP,
-                Mode::ModelPicker => "type to filter • ↑/↓ move • enter select • esc back",
-                Mode::VariantPicker => "↑/↓ move • enter select • esc back",
-            };
-            let chunks = Layout::vertical([
-                Constraint::Length(1),
-                Constraint::Length(1),
-                Constraint::Min(0),
-                Constraint::Length(1),
-            ])
-            .split(f.area());
-            f.render_widget(
-                Paragraph::new(format!(
-                    "{} > {}: {}",
-                    self.profile(),
-                    self.tier(),
-                    selection
-                )),
-                chunks[0],
-            );
-            f.render_widget(Paragraph::new(help), chunks[1]);
-            f.render_widget(Paragraph::new(self.agent_text(chunks[2].height)), chunks[2]);
-            f.render_widget(
-                Paragraph::new(format!(
-                    "Resize for all tiers/preview/counts. {}",
-                    self.message
-                )),
-                chunks[3],
-            );
-            return;
+        let tiers = self.tier_order.len() as u16;
+        // Chrome that always renders: title, profiles, two blanks, tiers,
+        // message and help. Preview and affected agents share the rest.
+        if f.area().height < 6 + tiers {
+            render_compact(self, f);
+        } else {
+            render_full(self, f, tiers);
         }
-        let chunks = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([
-                Constraint::Length(1),    // title
-                Constraint::Length(1),    // profiles
-                Constraint::Length(1),    // blank
-                Constraint::Length(rows), // tiers
-                Constraint::Length(1),    // blank
-                Constraint::Length(rows), // preview
-                Constraint::Length(rows), // counts
-                Constraint::Min(4),       // affected agents
-                Constraint::Length(1),    // message
-                Constraint::Length(1),    // help
-            ])
-            .split(f.area());
-
-        // Title
-        let title = Line::from("opencode model switcher".bold().fg(Color::Cyan));
-        f.render_widget(Paragraph::new(title), chunks[0]);
-
-        // Profiles
-        let profile_spans: Vec<Span> = self
-            .profiles
-            .iter()
-            .enumerate()
-            .flat_map(|(i, p)| {
-                let s = format!(" {} ", p);
-                if i == self.profile_idx {
-                    vec![
-                        Span::raw(" "),
-                        Span::styled(s, Style::default().bg(Color::Cyan).fg(Color::Black)),
-                    ]
-                } else {
-                    vec![Span::raw(s)]
-                }
-            })
-            .collect();
-        f.render_widget(Paragraph::new(Line::from(profile_spans)), chunks[1]);
-
-        // Tiers
-        let tier_text = self
-            .tier_order
-            .iter()
-            .enumerate()
-            .map(|(i, tier)| {
-                let assignment = self
-                    .cfg
-                    .get(self.profile())
-                    .and_then(|v| v.get(tier))
-                    .cloned()
-                    .expect("validated tier assignment");
-                let marker = if i == self.tier_idx { "> " } else { "  " };
-                if i == self.tier_idx {
-                    Line::from(format!(
-                        "{}{:<7} {} [{}]",
-                        marker, tier, assignment.model, assignment.variant
-                    ))
-                    .fg(Color::Green)
-                    .bold()
-                } else {
-                    Line::from(format!(
-                        "{}{:<7} {} [{}]",
-                        marker, tier, assignment.model, assignment.variant
-                    ))
-                }
-            })
-            .collect::<Vec<_>>();
-        f.render_widget(Paragraph::new(Text::from(tier_text)), chunks[3]);
-
-        // Preview
-        if let Some(ref err) = self.apply_preview_err {
-            f.render_widget(
-                Paragraph::new(format!("preview failed: {}", err)).fg(Color::Red),
-                chunks[5],
-            );
-        } else if let Some(ref result) = self.apply_preview {
-            let mut lines = vec![format!(
-                "preview: {} line(s), {} file(s) would change",
-                result.lines,
-                result.files.len()
-            )];
-            for tier in &self.tier_order {
-                if let Some(&count) = result.tiers.get(tier)
-                    && count > 0
-                    && let Some(assignment) = self.cfg.get(self.profile()).and_then(|v| v.get(tier))
-                {
-                    lines.push(format!(
-                        "  {}: {} -> {} [{}]",
-                        tier, count, assignment.model, assignment.variant
-                    ));
-                }
-            }
-            f.render_widget(Paragraph::new(lines.join("\n")), chunks[5]);
-        }
-
-        // Counts
-        let mut count_lines = vec!["current marked assignments:".to_string()];
-        for tier in &self.tier_order {
-            let total: usize = self.counts.get(tier).map(|m| m.values().sum()).unwrap_or(0);
-            let mut line = format!("  {:<4} {}", tier, total);
-            if let Some(models) = self.counts.get(tier) {
-                let mut items: Vec<(usize, &String)> =
-                    models.iter().map(|(k, v)| (*v, k)).collect();
-                items.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1.cmp(b.1)));
-                if !items.is_empty() {
-                    line.push_str("  ");
-                    let parts: Vec<String> = items
-                        .iter()
-                        .take(2)
-                        .map(|(count, model)| format!("{}×{}", count, model))
-                        .collect();
-                    line.push_str(&parts.join(", "));
-                }
-            }
-            count_lines.push(line);
-        }
-        f.render_widget(Paragraph::new(count_lines.join("\n")), chunks[6]);
-
-        f.render_widget(Paragraph::new(self.agent_text(chunks[7].height)), chunks[7]);
-
-        // Message
-        if !self.message.is_empty() {
-            f.render_widget(Paragraph::new(self.message.as_str()), chunks[8]);
-        }
-
-        // Help
-        f.render_widget(Paragraph::new(MAIN_HELP).fg(Color::DarkGray), chunks[9]);
-
-        // Picker overlay
         if matches!(self.mode, Mode::ModelPicker) {
             self.render_picker(f);
         }
@@ -227,7 +72,6 @@ impl<'a> AppModelRender for AppModel<'a> {
     }
 
     fn render_picker(&self, f: &mut Frame) {
-        use super::handler::AppModelHandler;
         let filtered = self.filtered_models();
         let area = center_rect(f.area(), 60, 20);
 
@@ -309,10 +153,179 @@ fn center_rect(r: Rect, width: u16, height: u16) -> Rect {
     Rect::new(x, y, width.min(r.width), height.min(r.height))
 }
 
+/// Fallback for terminals too short for the full layout.
+///
+/// Shows the selected assignment, help and the affected agents, and leaves
+/// picker overlays to [`AppModelRender::render`].
+fn render_compact(app: &AppModel<'_>, f: &mut Frame) {
+    let assignment = &app.cfg[app.profile()][app.tier()];
+    let selection = match app.mode {
+        Mode::Main => format!("{} [{}]", assignment.model, assignment.variant),
+        Mode::ModelPicker => app
+            .filtered_models()
+            .get(app.pick_idx)
+            .cloned()
+            .unwrap_or_else(|| "no models match".into()),
+        Mode::VariantPicker => crate::types::VARIANTS[app.pick_idx].into(),
+    };
+    let help = match app.mode {
+        Mode::Main => MAIN_HELP,
+        Mode::ModelPicker => "type to filter • ↑/↓ move • enter select • esc back",
+        Mode::VariantPicker => "↑/↓ move • enter select • esc back",
+    };
+    let chunks = Layout::vertical([
+        Constraint::Length(1),
+        Constraint::Length(1),
+        Constraint::Min(0),
+        Constraint::Length(1),
+    ])
+    .split(f.area());
+    f.render_widget(
+        Paragraph::new(format!("{} > {}: {}", app.profile(), app.tier(), selection)),
+        chunks[0],
+    );
+    f.render_widget(Paragraph::new(help), chunks[1]);
+    if chunks[2].height > 0 {
+        f.render_widget(Paragraph::new(app.agent_text(chunks[2].height)), chunks[2]);
+    }
+    f.render_widget(
+        Paragraph::new(format!("Resize for the full layout. {}", app.message)),
+        chunks[3],
+    );
+}
+
+fn render_full(app: &AppModel<'_>, f: &mut Frame, tiers: u16) {
+    let preview = preview_lines(app);
+    let available = f.area().height.saturating_sub(6 + tiers);
+    // Keep room for the agent header and one agent when any are affected, so
+    // the preview never crowds the list out entirely.
+    let has_agent_panel = !app.selected_agents().is_empty() || app.agents_error.is_some();
+    let agent_min = if has_agent_panel { 2.min(available) } else { 0 };
+    let preview_h = preview
+        .len()
+        .min(available.saturating_sub(agent_min) as usize) as u16;
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(1),         // title
+            Constraint::Length(1),         // profiles
+            Constraint::Length(1),         // blank
+            Constraint::Length(tiers),     // tiers
+            Constraint::Length(1),         // blank
+            Constraint::Length(preview_h), // preview (content-sized)
+            Constraint::Min(0),            // affected agents (leftover space)
+            Constraint::Length(1),         // message
+            Constraint::Length(1),         // help
+        ])
+        .split(f.area());
+
+    // Title
+    let title = Line::from("opencode model switcher".bold().fg(Color::Cyan));
+    f.render_widget(Paragraph::new(title), chunks[0]);
+
+    // Profiles
+    let profile_spans: Vec<Span> = app
+        .profiles
+        .iter()
+        .enumerate()
+        .flat_map(|(i, p)| {
+            let s = format!(" {} ", p);
+            if i == app.profile_idx {
+                vec![
+                    Span::raw(" "),
+                    Span::styled(s, Style::default().bg(Color::Cyan).fg(Color::Black)),
+                ]
+            } else {
+                vec![Span::raw(s)]
+            }
+        })
+        .collect();
+    f.render_widget(Paragraph::new(Line::from(profile_spans)), chunks[1]);
+
+    // Tiers
+    let tier_text = app
+        .tier_order
+        .iter()
+        .enumerate()
+        .map(|(i, tier)| {
+            let assignment = app
+                .cfg
+                .get(app.profile())
+                .and_then(|v| v.get(tier))
+                .cloned()
+                .expect("validated tier assignment");
+            let marker = if i == app.tier_idx { "> " } else { "  " };
+            if i == app.tier_idx {
+                Line::from(format!(
+                    "{}{:<7} {} [{}]",
+                    marker, tier, assignment.model, assignment.variant
+                ))
+                .fg(Color::Green)
+                .bold()
+            } else {
+                Line::from(format!(
+                    "{}{:<7} {} [{}]",
+                    marker, tier, assignment.model, assignment.variant
+                ))
+            }
+        })
+        .collect::<Vec<_>>();
+    f.render_widget(Paragraph::new(Text::from(tier_text)), chunks[3]);
+
+    // Preview
+    f.render_widget(Paragraph::new(preview), chunks[5]);
+
+    // Affected agents take leftover space only. One row shows the header as a
+    // hint; from three rows the list gets a blank separator line above it.
+    match chunks[6].height {
+        0 => {}
+        1 => f.render_widget(Paragraph::new(app.agent_text(1)), chunks[6]),
+        2 => f.render_widget(Paragraph::new(app.agent_text(2)), chunks[6]),
+        height => {
+            let body = app.agent_text(height - 1);
+            f.render_widget(Paragraph::new(format!("\n{body}")), chunks[6]);
+        }
+    }
+
+    // Message
+    if !app.message.is_empty() {
+        f.render_widget(Paragraph::new(app.message.as_str()), chunks[7]);
+    }
+
+    // Help
+    f.render_widget(Paragraph::new(MAIN_HELP).fg(Color::DarkGray), chunks[8]);
+}
+
+/// Preview lines for the pending apply, empty when nothing would change.
+fn preview_lines(app: &AppModel<'_>) -> Vec<Line<'static>> {
+    if let Some(err) = &app.apply_preview_err {
+        return vec![Line::from(format!("preview failed: {err}")).fg(Color::Red)];
+    }
+    let Some(result) = &app.apply_preview else {
+        return Vec::new();
+    };
+    let mut lines = vec![Line::from(format!(
+        "preview: {} line(s), {} file(s) would change",
+        result.lines,
+        result.files.len()
+    ))];
+    for tier in &app.tier_order {
+        if let Some(&count) = result.tiers.get(tier)
+            && count > 0
+            && let Some(assignment) = app.cfg.get(app.profile()).and_then(|v| v.get(tier))
+        {
+            lines.push(Line::from(format!(
+                "  {}: {} -> {} [{}]",
+                tier, count, assignment.model, assignment.variant
+            )));
+        }
+    }
+    lines
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tui::handler::AppModelHandler;
     use crate::types::{ApplyResult, Assignment, Env, TierSet};
     use crossterm::event::KeyCode;
     use ratatui::{Terminal, backend::TestBackend};
@@ -355,10 +368,6 @@ mod tests {
             tier_order: tiers.clone(),
             profiles: vec!["normal".into(), "work".into()],
             models: vec!["chosen/model".into()],
-            counts: tiers
-                .iter()
-                .map(|t| (t.clone(), BTreeMap::from([("old".into(), 2)])))
-                .collect(),
             agents: tiers
                 .iter()
                 .map(|tier| (tier.clone(), vec![format!("config/agent/{tier}.md")]))
@@ -394,11 +403,11 @@ mod tests {
         };
         let full = render(&mut app, 40);
         for (i, tier) in tiers.iter().enumerate() {
-            assert!(full.contains(&format!("{tier}")));
+            assert!(full.contains(tier));
             assert!(full.contains(&format!("model-{i} [low]")));
             assert!(full.contains(&format!("{tier}: 1 -> model-{i}")));
-            assert!(full.contains(&format!("{tier:<4} 2")));
         }
+        assert!(!full.contains("current marked assignments"));
         for tier in &tiers {
             let short = render(&mut app, 6);
             assert!(short.contains(&format!("> {tier}:")));
@@ -410,6 +419,31 @@ mod tests {
         assert_eq!(app.tier_idx, 0);
         app.handle_key(KeyCode::Up);
         assert_eq!(app.tier(), "WRITER");
+
+        // Leftover-space behavior: full list on an ordinary 24-row terminal,
+        // header hint with one row, hidden with none.
+        let ordinary = render(&mut app, 24);
+        assert!(ordinary.contains("config/agent/WRITER.md"));
+        assert!(ordinary.contains("a apply • q quit"));
+        let hint_only = render(&mut app, 14);
+        assert!(hint_only.contains("WRITER agents (1/1)"));
+        assert!(!hint_only.contains("config/agent/WRITER.md"));
+        let hidden = render(&mut app, 13);
+        assert!(!hidden.contains("WRITER agents"));
+        assert!(hidden.contains("a apply • q quit"));
+
+        // Ordinary 80x24 terminal keeps the full layout and the agent list.
+        let mut terminal = Terminal::new(TestBackend::new(80, 24)).unwrap();
+        terminal.draw(|f| app.render(f)).unwrap();
+        let buffer = terminal.backend().buffer();
+        let standard: String = (0..24)
+            .map(|y| (0..80).map(|x| buffer[(x, y)].symbol()).collect::<String>())
+            .collect::<Vec<_>>()
+            .join("\n");
+        assert!(standard.contains("CORRECTNESS-REVIEW"));
+        assert!(standard.contains("config/agent/WRITER.md"));
+        assert!(standard.contains("a apply • q quit"));
+
         app.agents.insert(
             "WRITER".into(),
             (0..30)
