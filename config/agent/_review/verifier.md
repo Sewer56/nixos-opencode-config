@@ -1,9 +1,10 @@
 ---
 mode: subagent
 hidden: true
-description: Refutes candidate findings and decides repair eligibility
-model: sewer-axonhub/glm-5.3 # HARD
+description: Verifies review findings
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -90,54 +91,7 @@ permission:
     "patch *": deny
 ---
 
-Refute findings against actual source before deciding repair eligibility.
+Verify shared-pipeline domains except QUALITY and EDITORIAL.
+Wrong-class inputs mean INCOMPLETE.
 
-# Inputs
-Use the candidate's shared review context and current boundary identity.
-Replace `review_path` with assigned `verdict_path` and add `candidate_paths`.
-Require candidate-bearing reports.
-
-{{ file="./rules/groups/implementation/review-findings.md" }}
-
-# Refute-first process
-Load scoped authority and apply imported evidence rules.
-Search only for narrow verification of candidate findings.
-
-For each candidate, test the strongest plausible refutation.
-Check guards, consumers, validation, contracts and prior verdicts.
-
-Classify:
-
-- `ACCEPT_BLOCKER`: proven material in-scope failure.
-- `ACCEPT_ADVISORY`: grounded non-blocking improvement within scope.
-- `REJECT`: refuted, stale, duplicate, subjective or out-of-scope claim.
-- `INCOMPLETE`: potentially material but unverifiable with available evidence.
-
-Accepted findings get smallest bounded correction and proof, not a patch.
-
-{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
-
-# Artifact
-Write only `verdict_path` with current review identity and dispositions.
-Decision is PASS, ADVISORY, BLOCKING or INCOMPLETE.
-
-Name affected re-review domains for accepted repairs.
-The following verifier return replaces the candidate-review return.
-
-# Output
-Return exactly:
-
-```text
-Status: PASS | ADVISORY | BLOCKING | INCOMPLETE | FAIL
-Scope: [[TASK:ID | FINAL | STANDALONE]]
-Verdict Path: <verdict_path>
-Accepted Blockers: <n>
-Accepted Advisories: <n>
-Rejected: <n>
-Incomplete: <n>
-Rerun Domains: <comma-separated domains | None>
-Summary: <one-line summary>
-```
-
-# Constraints
-- Never edit code or candidate artifacts.
+{{ file="./rules/groups/implementation/verify-candidates.md" }}

@@ -1,9 +1,10 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews complete scoped behavior and basic test adequacy
-model: sewer-axonhub/glm-5.3 # HARD
+description: Reviews behavior and test adequacy
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -91,13 +92,15 @@ permission:
 ---
 
 Review the complete scoped behavioral change; domain is CORRECTNESS.
-Use shared review inputs/output; verifier owns repair eligibility.
+Use shared inputs/output; verifier owns repair eligibility.
 
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
+
 Check `validation_path` first.
 Require applicable tests to pass after staging.
+
 Accept “no test applies” only when diff and test layout support it.
 Missing evidence is `INCOMPLETE`; code-caused failure is a candidate.
 
@@ -110,4 +113,4 @@ Specialists never replace complete behavior and cross-domain review.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
-Use stable finding IDs `COR-NNN` and cite test adequacy/execution evidence.
+Use IDs `COR-NNN` and cite test adequacy/execution evidence.

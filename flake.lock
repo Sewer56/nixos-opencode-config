@@ -120,11 +120,11 @@
     "rust-llm-tidy": {
       "flake": false,
       "locked": {
-        "lastModified": 1788881137,
-        "narHash": "sha256-Hors3gD11wz0IZK4yng1XrwzFaHI/1IOXP+29WFNjvU=",
-        "ref": "refs/heads/qualified-path-import",
-        "rev": "f5fbe01da99ab497c6b73cb9a8761690e99a1a57",
-        "revCount": 432,
+        "lastModified": 1788963361,
+        "narHash": "sha256-jB5/2h1j0H7MzRYFGITBYiQwDZHKiS4iOwNG614KGi4=",
+        "ref": "refs/heads/main",
+        "rev": "cd5739af12324b515501463c8d76848871f39d7f",
+        "revCount": 455,
         "type": "git",
         "url": "file:///home/sewer/nixos/users/sewer/home-manager/programs/opencode/tools/rust-llm-tidy"
       },

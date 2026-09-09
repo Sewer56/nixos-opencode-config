@@ -1,8 +1,9 @@
 ---
 mode: all
-description: Runs CodeRabbit with bounded repair and one re-review
-model: sewer-axonhub/glm-5.3 # HARD
+description: CodeRabbit with bounded repair and one re-review
+model: sewer-axonhub/glm-5.3 # CODER
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -117,7 +118,10 @@ cr review --agent --type committed --base-commit [[comparison_commit]]
 - Rate/service failures, nonzero exit or malformed output mean INCOMPLETE.
 - Missing completion or inconsistent counts also mean INCOMPLETE.
 - On auth/startup failure run auth status once; never change auth.
-- Zero findings still require a PASS artifact with exact review identity.
+
+### Artifact
+
+- Zero findings require a PASS artifact with exact review identity.
 - Map critical/major to BLOCKING; minor/trivial/info to ADVISORY.
 - Write findings to `candidate_path`, omitting generic praise and summaries.
 

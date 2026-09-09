@@ -1,9 +1,10 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews concrete test-design risks
-model: sewer-axonhub/glm-5.3 # HARD
+description: Reviews tests
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -86,7 +87,7 @@ permission:
 ---
 
 Review concrete test-design risk; domain is TESTS.
-Use shared review inputs/output and the caller's grounded trigger.
+Use shared inputs/output and caller's grounded trigger.
 Changed behavior alone does not require this specialist.
 
 {{ file="./rules/groups/tests/test-strategy.md" }}
@@ -94,6 +95,7 @@ Changed behavior alone does not require this specialist.
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
+
 Read referenced test/source files; search only for narrow verification.
 Judge implementation only to assess observable coverage.
 

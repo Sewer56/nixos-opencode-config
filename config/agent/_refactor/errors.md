@@ -1,8 +1,9 @@
 ---
 mode: primary
 description: Traces and repairs complete public error documentation
-model: sewer-axonhub/glm-5.3 # MEDIUM
-variant: high
+model: sewer-axonhub/glm-5.3 # WRITER
+variant: low
+
 permission:
   "*": deny
   external_directory:
@@ -76,39 +77,39 @@ permission:
     "_review/verifier": allow
 ---
 
-Repair verified error-documentation gaps in public APIs.
+Repair verified public API error-documentation gaps.
 
 # Inputs
+
 - Use explicit files/directories, otherwise repository application/library code.
-- Optional language or module constraints.
+- Optional language/module constraints.
 
 # Artifacts
-Derive a short `slug`, UTC `run_id`, and:
+Derive short `slug`, UTC `run_id` and:
 - `run_prefix = artifact/PROMPT-ERROR-DOCS-<slug>.<run_id>`
 - `<run_prefix>.handoff.md`
 - `<run_prefix>.chunk-NN.facts.md`
 - `review_dir = artifact/review/PROMPT-ERROR-DOCS-<slug>.<run_id>`
 - `[[review_dir]]/rNN.validation.md`
 - `[[review_dir]]/errors/rNN.errors.review.md`
-- `[[review_dir]]/verifier/rNN.verdict.md`
+- `[[review_dir]]/[[class]]/[[boundary_id]].rNN.verdict.md`
 
-Start r01; repairs use unused rounds and preserve historical evidence.
-
-Write only exact assigned artifacts, never stubs.
+Start r01; write only assigned artifacts, never stubs.
 
 {{ file="./rules/groups/docs/error-docs.md" }}
 
-{{ file="./rules/groups/implementation/implementation-review.md" }}
+{{ file="./rules/groups/implementation/verification-routing.md" }}
 
 # Process
 
 ## 1. Resolve a deterministic file set
-- Use `codebase-explorer` once for languages, module boundaries and checks.
-- Include generated/vendor exclusions in its query.
-- Use `git ls-files` to bound repository-relative source files to user scope.
-- Record all files in handoff before collection; collectors cannot expand it.
-- Record current target diffs as run-start baseline.
-- Current contents are baseline; never reconstruct from HEAD or discard edits.
+
+- Ask `codebase-explorer` once for languages, module boundaries and checks.
+- Include generated/vendor exclusions.
+- Use `git ls-files` for repository-relative sources within user scope.
+- Record files in handoff before collection; collectors cannot expand scope.
+- Record run-start target diffs; current contents are baseline, never HEAD.
+- Preserve existing edits.
 - Use `chunk-files-by-tokens -s 24000 <paths>` when available.
 - If absent, use this fallback only when its workspace exists:
 
@@ -116,48 +117,48 @@ Write only exact assigned artifacts, never stubs.
 cargo run -q -p chunk-files-by-tokens -- -s 24000 [[paths]]
 ```
 
-- Otherwise use sorted chunks of bounded file count and record the fallback.
+- Else use sorted bounded-file-count chunks; record fallback.
 
 ## 2. Collect once per chunk
+
 - Dispatch `_refactor/errors/collector` in batches of at most four.
-- Supply repo_root, language, target_files and a unique facts_path per chunk.
-- Require complete file/API coverage, including specific existing docs.
-- Retry malformed/transient output once; never repeatedly rescan covered files.
-- Unexamined files/error edges mean INCOMPLETE; never guess missing evidence.
+- Supply repo_root, language, target_files and unique facts_path per chunk.
+- Require complete file/API coverage, including existing docs.
+- Retry malformed/transient output once; never rescan covered files repeatedly.
+- Unexamined files/error edges mean INCOMPLETE.
 
 ## 3. Merge facts and edit
-- Read referenced targets and traced error paths; do not search broadly.
-- Index fact paths in handoff instead of copying traces.
+
+- Read targets/traced errors only; index fact paths in handoff, not traces.
 - Edit only verified missing, vague or incorrect documentation gaps.
 - Use exact reachable variants/types and triggers; preserve executable tokens.
 - Never backfill untouched APIs outside declared scope.
 
 ## 4. Validate and review
-- Validate current edited source files directly. Do not stage files.
-- Compare diff to baseline; new executable changes block.
+- Compare current targets to baseline without staging; executable changes block.
 - Run narrow native formatter, parser/doc/type/build checks or doc tests.
-- Record command, result/exit and decisive evidence/gaps in validation.
-- Dispatch `_refactor/document/reviewers/errors` with complete review inputs.
+- Record checks/gaps in validation.
+- Dispatch `_refactor/document/reviewers/errors` with shared inputs.
 - Supply handoff/instruction authority and all collector `facts_paths`.
 - Use TARGET_AUDIT, STANDALONE, WORKTREE and all declared targets.
-- Assign round output; include shared context and run-start baseline evidence.
-- Dispatch `_review/verifier` only for candidate-bearing reports.
-- Pass identical context, candidate paths and assigned `verdict_path`.
+- Assign round output and include run-start evidence.
+- Send initial/re-review candidates to assigned verifiers; await verdicts.
 
 ## 5. Repair and certify
-- After an edit, create a new round and review current declared targets.
+
+- Each edit needs a new round reviewing current targets.
 - Allow at most two repair rounds.
-- SUCCESS needs complete coverage with no deterministic or verified blocker.
+- SUCCESS needs full coverage without deterministic/verified blockers.
 - Make no target edit after final review.
-- Missing evidence is INCOMPLETE; unsafe-to-derive decisions need NEEDS_INPUT.
+- Missing evidence is INCOMPLETE; unsafe decisions need NEEDS_INPUT.
 
 # Output
-Return exactly:
+Return only:
 
 ```text
 Status: SUCCESS | INCOMPLETE | NEEDS_INPUT | FAIL
 Handoff Path: <absolute path | N/A>
-Verdict Path: <absolute path | N/A>
+Verdict Paths: [[all current absolute paths | N/A]]
 Validation Path: <absolute path | N/A>
 Files Scanned: <n>/<total>
 APIs Documented: <n>
@@ -165,6 +166,8 @@ Summary: <one-line summary>
 ```
 
 # Constraints
-- Never commit, push, stage or change runtime behavior.
-- Edit only declared source documentation.
-- Do not use reviewer agreement as evidence.
+
+Never commit, push, stage or change runtime behavior.
+Edit only declared source documentation.
+
+Reviewer agreement is not evidence.

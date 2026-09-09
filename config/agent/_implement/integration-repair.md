@@ -1,9 +1,10 @@
 ---
 mode: subagent
 hidden: true
-description: Repairs final integration failures across approved plan scope
-model: sewer-axonhub/glm-5.3 # HARD
+description: Repairs final integration within approved scope
+model: sewer-axonhub/glm-5.3 # CODER
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -87,8 +88,8 @@ Repair final integration as sole writer this turn.
 - Root/shared execution and issue-relevant human brief/exec paths.
 - `base_commit` and protected user-change paths.
 - Authorized same-run partial changes or `None`.
-- Failed full `validation_path` and/or verified final `verdict_path`.
-- Parent-selected repair IDs within remaining scope and budget.
+- Failed full `validation_path` and/or all verified final `verdict_paths`.
+- Selected IDs with verdict/evidence identities within scope/budget.
 
 # Process
 

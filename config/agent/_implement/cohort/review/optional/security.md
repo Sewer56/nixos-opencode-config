@@ -1,9 +1,10 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews concrete trust-boundary risks
-model: sewer-axonhub/glm-5.3 # HARD
+description: Reviews trust boundaries
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -86,7 +87,7 @@ permission:
 ---
 
 Review concrete trust-boundary risk; domain is SECURITY.
-Use shared review inputs/output and caller's grounded risk.
+Use shared inputs/output and caller's risk.
 Do not emit generic hardening advice.
 
 {{ file="./rules/groups/security/security.md" }}
@@ -94,8 +95,10 @@ Do not emit generic hardening advice.
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
+
 Read affected trust boundaries, referenced contracts/config, and tests.
 Search only for narrow verification.
+
 Exclude general style and performance unrelated to denial of service.
 
 Review current diff against approved trust boundaries.

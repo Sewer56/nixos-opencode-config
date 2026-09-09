@@ -4,17 +4,22 @@ Rust workspace for local OpenCode utilities.
 
 ## Binaries
 
-- `opencode-model-switcher` — TUI for `# EASY` / `# MEDIUM` / `# HARD` model tiers and variants. Config: `config/model-switcher.json`.
-- `opencode-sessions` — browse/export OpenCode SQLite sessions.
-- `chunk-files-by-tokens` — split files/directories into token-sized chunks.
-- `token-count-after-expand` — render md-expand prompt files and estimate tokens.
-- `opencode-yolo-mode` — flip external_directory `'*'` ask↔allow across agent frontmatter and `config/opencode.json`; guards after `'*'` (secrets deny/ask) keep winning.
-- `rust-llm-tidy` — reorder/lint Rust source; built from the submodule input.
+- `opencode-model-switcher`: edits seven model/variant tiers.
+  Config: `config/model-switcher.json`.
+  Roles: `STYLE-REVIEW`, `CORRECTNESS-REVIEW`, `CODER`, `WRITER`;
+  existing tiers: `EASY`, `MEDIUM`, `HARD`.
+- `opencode-sessions`: browse/export OpenCode SQLite sessions.
+- `chunk-files-by-tokens`: split files/directories into token-sized chunks.
+- `token-count-after-expand`: render prompts and estimate tokens.
+- `opencode-yolo-mode`: toggle external_directory `'*'` between ask and allow.
+  Applies to agent frontmatter and `config/opencode.json`.
+  Later secret guards retain precedence.
+- `rust-llm-tidy`: reorder/lint Rust source; built from the submodule input.
 
 ## Shell helpers
 
-- `tools/render-file.sh <path>` — render one md-expand prompt file.
-- `tools/validate-file-interp.sh [paths...]` — validate md-expand references.
+- `tools/render-file.sh <path>`: render one md-expand prompt file.
+- `tools/validate-file-interp.sh [paths...]`: validate md-expand references.
 
 ## Examples
 

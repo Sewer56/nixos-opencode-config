@@ -9,6 +9,7 @@ Text assertions check wiring only, not model routing or parallel dispatch.
 from __future__ import annotations
 
 import re
+import json
 import runpy
 from pathlib import Path
 
@@ -17,6 +18,8 @@ ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = runpy.run_path(str(ROOT / "scripts/validate-opencode-config.py"))
 EDITORIAL = "_docs/reviewers/editorial"
 CALLERS = ("_implement/cohort", "_implement/one-shot", "_implement", "code")
+STYLE = "_review/style-verifier"
+ALL_CALLERS = (*CALLERS, "_cleanup", "_docs", "_refactor/document", "_refactor/errors")
 
 
 def require(condition: bool, message: str) -> None:
@@ -93,6 +96,121 @@ def check_topology(agents: dict) -> None:
                 in imports(ROOT / f"config/agent/{caller}.md"),
                 f"caller lacks shared transport: {caller}")
     print("PASS parsed topology: four caller edges, verifier edges and imports")
+
+
+def check_verification(agents: dict) -> None:
+    """Exercise parsed routes and output templates, not live dispatch."""
+    rule = ROOT / "config/rules/groups/implementation/verification-routing.md"
+    rows = {}
+    for line in rule.read_text().splitlines():
+        route = re.fullmatch(r"(.+): (style|correctness), `(_review/[^`]+)`\.", line)
+        if route:
+            domains, kind, agent = route.groups()
+            for domain in domains.split(", "):
+                rows[domain] = (kind, agent)
+    require(rows == {
+        "QUALITY": ("style", STYLE), "EDITORIAL": ("style", STYLE),
+        "All other shared domains": ("correctness", "_review/verifier"),
+    }, "verification routes changed")
+    for caller in ALL_CALLERS:
+        sources = imports(ROOT / f"config/agent/{caller}.md")
+        require(rule in sources, f"missing routing owner: {caller}")
+        targets = VALIDATOR["task_targets"](agents[caller])
+        require("_review/verifier" in targets, f"missing correctness edge: {caller}")
+        require((STYLE in targets) == (caller in (*CALLERS, "_cleanup")),
+                f"style privilege mismatch: {caller}")
+    profiles = {ROOT / f"config/rules/groups/{p}/review-criteria.md" for p in ("quality",)}
+    profiles.add(ROOT / "config/rules/groups/docs/editorial-criteria.md")
+    require(profiles <= imports(ROOT / f"config/agent/{STYLE}.md"), "style criteria missing")
+    require(not profiles & imports(ROOT / "config/agent/_review/verifier.md"),
+            "correctness imports style criteria")
+    for agent in (STYLE, "_review/verifier"):
+        require(ROOT / "config/rules/groups/implementation/verify-candidates.md"
+                in imports(ROOT / f"config/agent/{agent}.md"), "missing shared verifier")
+        permission = agents[agent]["permission"]
+        require(decision(permission, "edit", "src/lib.rs") == "deny", "verifier product write")
+        require(decision(permission, "task", "code") == "deny", "verifier delegation")
+
+    # Caller labels, not report-supplied domains, select partitions.
+    reports = [("EDITORIAL", "cumulative", "QUALITY"),
+               ("QUALITY", "repair", "CORRECTNESS"),
+               ("CORRECTNESS", "repair", "EDITORIAL")]
+    partitions = {}
+    for assigned, boundary, _forged in reports:
+        kind, agent = rows.get(assigned, rows["All other shared domains"])
+        partitions.setdefault((kind, boundary, agent), []).append(assigned)
+    require(len(partitions) == 3, "cumulative editorial merged with repair quality")
+    templates = []
+    card = text("config/rules/cards/implementation/artifact-paths.md")
+    templates.append(re.search(r"`verdict_path`:\s*`([^`]+)`", card)[1])
+    for caller in ALL_CALLERS:
+        body = text(f"config/agent/{caller}.md")
+        if caller in ("_implement", "_implement/cohort"):
+            continue
+        template = re.search(r"`(?:verdict_path = )?([^`\n]+\.verdict\.md)`", body)
+        require(template is not None, f"missing verdict template: {caller}")
+        templates.append(template[1])
+    for template in templates:
+        outputs = set()
+        for round_id in ("r01", "r02"):
+            for kind, boundary, agent in partitions:
+                output = template
+                for key, value in {
+                    "[[class]]": kind, "[[boundary_id]]": boundary,
+                    "[[review_dir]]": "artifact/review/CODE-demo",
+                    "[[run_prefix]]": "artifact/plan/demo/review",
+                    "[[run_id]]": "run", "Cnn": "final", "rNN": round_id,
+                }.items():
+                    output = output.replace(key, value)
+                require("[[" not in output, f"unresolved output: {output}")
+                require(decision(agents[agent]["permission"], "edit", output) == "allow",
+                        f"verdict output denied: {output}")
+                outputs.add(output)
+        require(len(outputs) == 6, "class/boundary/round verdict collision")
+    print("PASS parsed verification routes, imports, privileges and output identities")
+
+
+def check_role_tags(agents: dict) -> None:
+    roles = {
+        "STYLE-REVIEW": ("_implement/cohort/review/quality", STYLE),
+        "CORRECTNESS-REVIEW": (
+            "_review/verifier", "_implement/cohort/review/correctness",
+            "_implement/review/integration", "_implement/cohort/review/optional/tests",
+            "_implement/cohort/review/optional/security", "_implement/cohort/review/optional/performance",
+            "_docs/reviewers/accuracy", "_docs/reviewers/usability",
+            "_refactor/document/reviewers/documentation", "_refactor/document/reviewers/errors",
+        ),
+        "CODER": ("code", "_cleanup", "_implement/one-shot", "_implement/cohort",
+                  "_implement/integration-repair", "_refactor/reorder", "_review/coderabbit",
+                  "migrate"),
+        "WRITER": ("_iterate/editor", EDITORIAL, "_plan/draft", "_docs",
+                   "_refactor/document", "_refactor/errors", "_write/issue", "_write/pr"),
+    }
+    presets = json.loads(text("config/model-switcher.json"))
+    expected_order = ["EASY", "MEDIUM", "HARD", *roles]
+    require(list(presets["$tierOrder"].values()) == expected_order, "seven-tier order mismatch")
+    for role, names in roles.items():
+        for name in names:
+            root = ".opencode/agent" if name in ("migrate", "_iterate/editor") else "config/agent"
+            path = ROOT / root / f"{name}.md"
+            fm = VALIDATOR["load_frontmatter"](path)
+            tag = re.search(r"(?m)^model:\s+\S+\s+#\s+(\S+)\s*$", path.read_text())
+            require(tag is not None and tag[1] == role, f"wrong role tag: {name}")
+            require({key: fm.get(key) for key in ("model", "variant")}
+                    == presets["normal"][role], f"wrong normal assignment: {name}")
+        for profile in ("normal", "work"):
+            if role == "WRITER":
+                expected = ({"model": "sewer-axonhub/glm-5.3", "variant": "low"}
+                            if profile == "normal" else
+                            {"model": "sewer-axonhub-work/gpt-6-astra", "variant": "medium"})
+                require(presets[profile][role] == expected, f"wrong writer preset: {profile}")
+                continue
+            inherited = "MEDIUM" if role == "CODER" else "HARD"
+            require(presets[profile][role] == presets[profile][inherited],
+                    f"wrong initial model/variant: {profile}/{role}")
+    require(agents["_implement"]["model"] == presets["normal"]["HARD"]["model"],
+            "orchestration-only implement model changed")
+    print("PASS parsed role tags and both preset model/variant assignments")
 
 
 def check_permissions(permission: dict) -> None:
@@ -220,10 +338,8 @@ def check_text_wiring() -> None:
             "Insertions use `Before: EMPTY` with an exact anchor and before/after placement.",
             "Keep concise reader consequences outside edits.",
             "No vague or whole-document rewrites.",
-            "Preserve source delimiters, indentation, directives and doctest behavior.",
             "EDT-NNN",
             "Never mutate Git", "independent checks", "frozen regions",
-            "behavioral bookkeeping", "required contract", "Keep frequency details",
         ),
         "config/agent/code.md": (
             "By default, write no review artifacts and make no delegations",
@@ -241,10 +357,14 @@ def check_text_wiring() -> None:
             "fidelity", "complete reachable error conditions", "defer duplicate editorial",
         ),
     }
+    expectations["config/rules/groups/docs/editorial-criteria.md"] = (
+        "Preserve source delimiters, indentation, directives and doctest behavior.",
+        "required contracts", "frequency details",
+    )
     for caller in CALLERS:
         path = f"config/agent/{caller}.md"
         expectations[path] = (*expectations.get(path, ()), "parallel", "stable diff",
-                              "newly required", "INCOMPLETE", "verdict_path")
+                              "newly required", "INCOMPLETE")
     for caller in CALLERS[:2]:
         path = f"config/agent/{caller}.md"
         expectations[path] += (
@@ -270,6 +390,8 @@ def main() -> int:
             for path in agent_root.rglob("*.md")
         }
         check_topology(agents)
+        check_verification(agents)
+        check_role_tags(agents)
         permission = agents[EDITORIAL]["permission"]
         check_permissions(permission)
         check_output_transport(permission)

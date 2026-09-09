@@ -1,9 +1,10 @@
 ---
 mode: subagent
 hidden: true
-description: Audits reachable error documentation
-model: sewer-axonhub/glm-5.3 # HARD
+description: Audits error documentation
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -84,10 +85,11 @@ permission:
     "patch *": deny
 ---
 
-Audit scoped error documentation; trace reachable errors before findings.
+Trace scoped reachable errors before findings.
 Never edit source.
 
 # Inputs
+
 Use shared review inputs/output; domain is ERROR_DOCUMENTATION.
 Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
 - Optional `facts_paths` from exhaustive collectors.
@@ -97,6 +99,7 @@ Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
 {{ file="./rules/groups/docs/error-application-review.md" }}
 
 # Checks
+
 - Read proposed docs, referenced source/error paths, and any supplied facts.
 - Do not search broadly or take over collector enumeration.
 - Exclude general docs coverage, inline comments, and broad prose polish.

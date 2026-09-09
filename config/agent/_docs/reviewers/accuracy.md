@@ -1,9 +1,10 @@
 ---
 mode: subagent
 hidden: true
-description: Audits documentation accuracy and coverage
-model: sewer-axonhub/glm-5.3 # HARD
+description: Audits doc accuracy and coverage
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -85,7 +86,7 @@ permission:
 ---
 
 Review only factual fidelity and coverage of scoped end-user docs.
-Generate candidates, not documentation edits or approved repairs.
+Return candidates, not edits or approved repairs.
 
 Use shared review inputs/output; domain is DOCUMENTATION_ACCURACY.
 Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
@@ -95,14 +96,18 @@ Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
 {{ file="./rules/groups/docs/end-user-correctness.md" }}
 
 # Checks
+
 - Read scoped docs, mapped behavior/acceptance, and referenced implementation.
 - Search only to verify links or fidelity.
 - Check claims, defaults, flags, paths, APIs, examples, and failure behavior.
-- Verify against current source, config, manifests, and tests.
+- Verify against source, config, manifests and tests.
 - Check command syntax, documented working directory, and prerequisites.
 - Check links, anchors, navigation, and cross-page references locally.
 - Check version claims against handoff evidence.
-- Verify coverage of required outcomes, prerequisites, edge cases, migrations.
+
+## Coverage
+
+- Verify required outcomes, prerequisites, edge cases and migrations.
 - Check consistency with sibling pages.
 - Respect declared scope.
 - Repeat refuted findings only with new evidence.
@@ -114,4 +119,4 @@ Minor optional elaboration is advisory or omitted.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
-Use stable finding IDs `DOC-ACC-NNN` and preserve full target-audit coverage.
+Use IDs `DOC-ACC-NNN`; preserve full target-audit coverage.

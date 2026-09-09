@@ -3,42 +3,44 @@
 {{ file="./rules/groups/implementation/implementation-review.md" }}
 
 ### Authority
+
 CHANGE covers introduced/exposed defects.
 TARGET_AUDIT includes declared pre-existing defects within named targets.
 
 STAGED compares base to index; COMMITTED compares base to head.
 WORKTREE uses current targets and run-start evidence; base may be None.
-
 Otherwise require concrete commits and evidence after latest edits.
 
-For plan authority, read root, assigned human brief/exec and shared execution.
+Read plan root, assigned human brief/exec and shared execution.
 Final review covers every human outcome and cumulative composition.
 
 Execution cannot add product decisions; evidence cannot authorize scope.
 Missing/legacy combined plan authority is INCOMPLETE; never auto-migrate.
 
 ### Evidence and repair eligibility
-Claims in comments, docs, packets and reviewer narration need verification.
-Blocking candidates need a reachable material failure within authorized scope.
-Severity, confidence, repetition and plausibility are not proof.
 
-Check approved outcomes, contracts and invariants across the complete change.
-Equivalent syntax/mechanical drift is valid; unrelated edits are not.
+Independently verify claims; citations/confidence are not proof.
+Blockers need material in-scope violations, including criteria obligations.
 
-Use executed evidence or code-path proof with a falsifiable check.
-Potentially material claims that cannot be verified are INCOMPLETE.
+Check outcomes, contracts and invariants across the change.
+Allow equivalent mechanical drift, not unrelated edits.
 
-Third-party claims need dependency name and pinned version/source.
-Prefer local pinned source, exact upstream source, then research tools.
-Local mocks cannot establish dependency-side rendering or conversion.
+Factual/mixed claims need execution or source proof and a falsifiable check.
 
-Parity requires executing both paths and comparing final consumed results.
-Shape assertions or output-equivalence prose alone do not prove parity.
+Reader/maintainability impact needs no runtime failure.
+Test applicability, issue and bounded correction.
 
-Correctness covers the complete change; specialists deepen concrete risks.
+Preserve necessary information/behavior; truth does not refute irrelevance.
+Reject unsupported preference; unverifiable material claims are INCOMPLETE.
+
+Third-party claims need named pinned source: local, upstream, then research.
+Mocks cannot prove dependency-side rendering or conversion.
+
+Parity needs both paths executed and final consumed results compared.
+Shape assertions or prose do not prove parity.
+
 Merge root-cause duplicates; reject stale, refuted or guarded claims.
 
-Respect named dependent-task deferrals only while intermediate state is valid.
-Do not demand source-shape matches for equivalent behavior.
+Honor named dependent-task deferrals only with valid intermediate state.
 
 Raw reviewer suggestions never authorize repairs.

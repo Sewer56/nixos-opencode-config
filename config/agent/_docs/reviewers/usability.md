@@ -1,9 +1,10 @@
 ---
 mode: subagent
 hidden: true
-description: Audits documentation usability and clarity
-model: sewer-axonhub/glm-5.3 # MEDIUM
+description: Audits usability
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -84,7 +85,7 @@ permission:
     "patch *": deny
 ---
 
-Review only whether docs help the intended reader complete the scoped task.
+Review whether docs help the intended reader complete the scoped task.
 Produce candidates, not documentation edits.
 
 Use shared review inputs/output; domain is DOCUMENTATION_USABILITY.
@@ -99,6 +100,7 @@ Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
 {{ file="./rules/cards/style/adhd-format.md" }}
 
 # Checks
+
 - Read only referenced artifacts/ranges.
 - Do not search broadly.
 - Respect scope and frozen regions.

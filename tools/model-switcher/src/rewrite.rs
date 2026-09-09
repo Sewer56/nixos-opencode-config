@@ -7,7 +7,7 @@ use std::sync::LazyLock;
 const MAX_WALK_DEPTH: usize = 32;
 /// Regex for discovering tier tags from model lines in agent markdown files.
 pub static MODEL_LINE_DISCOVERY_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"^\s*model:\s*\S+\s*#\s*(\S+)\b.*$"#).unwrap());
+    LazyLock::new(|| Regex::new(r#"^\s*model:\s*\S+\s*#\s*(\S+)(?:\s.*)?$"#).unwrap());
 static VARIANT_LINE_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"^(\s*variant:\s*)(\S+)(.*)$"#).unwrap());
 
@@ -56,7 +56,10 @@ pub fn build_model_line_re(tiers: &[String]) -> Regex {
     let mut sorted = tiers.to_vec();
     sorted.sort_by_key(|b| std::cmp::Reverse(b.len()));
     let alt: Vec<String> = sorted.iter().map(|t| regex::escape(t)).collect();
-    let pattern = format!(r#"^(\s*model:\s*)(\S+)(\s*#\s*({})\b.*)$"#, alt.join("|"));
+    let pattern = format!(
+        r#"^(\s*model:\s*)(\S+)(\s*#\s*({})(?:\s.*)?)$"#,
+        alt.join("|")
+    );
     Regex::new(&pattern).expect("build model line regex")
 }
 
@@ -73,7 +76,7 @@ pub fn current_counts(
     let files = agent_files(env)?;
     for file in &files {
         let data = std::fs::read_to_string(file).with_context(|| format!("read: {}", file))?;
-        for line in data.lines() {
+        for line in assignment_lines(&data) {
             if let Some(parsed) = parse_tagged_model_line(line, re) {
                 *counts
                     .entry(parsed.tier.clone())
@@ -86,6 +89,44 @@ pub fn current_counts(
     Ok(counts)
 }
 
+/// List tagged agents per tier, including assignments already matching a profile.
+pub fn affected_agents(env: &Env, re: &Regex) -> anyhow::Result<BTreeMap<String, Vec<String>>> {
+    let mut agents: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    for file in agent_files(env)? {
+        let data = std::fs::read_to_string(&file).with_context(|| format!("read: {}", file))?;
+        for line in assignment_lines(&data) {
+            if let Some(parsed) = parse_tagged_model_line(line, re) {
+                agents
+                    .entry(parsed.tier)
+                    .or_default()
+                    .push(crate::env::rel(env, &file));
+            }
+        }
+    }
+    for paths in agents.values_mut() {
+        paths.sort();
+        paths.dedup();
+    }
+    Ok(agents)
+}
+
+fn assignment_lines(data: &str) -> impl Iterator<Item = &str> {
+    let range = assignment_range(data);
+    data.lines().skip(range.start).take(range.len())
+}
+
+fn assignment_range(data: &str) -> std::ops::Range<usize> {
+    let mut lines = data.lines();
+    if lines.next() != Some("---") {
+        return 0..0;
+    }
+    let end = lines
+        .position(|line| line == "---")
+        .map(|i| i + 1)
+        .unwrap_or(1);
+    1..end
+}
+
 /// Find all .md files under agent directories.
 pub fn agent_files(env: &Env) -> anyhow::Result<Vec<String>> {
     let mut files = Vec::new();
@@ -96,7 +137,7 @@ pub fn agent_files(env: &Env) -> anyhow::Result<Vec<String>> {
     Ok(files)
 }
 
-/// Rewrite full file content. Pure function — easy to test.
+/// Rewrite full file content without I/O.
 /// Returns (new_content, changes_by_tier, lines_changed).
 pub fn rewrite_content(
     input: &str,
@@ -108,9 +149,15 @@ pub fn rewrite_content(
     let mut changed = 0;
 
     let lines: Vec<&str> = input.split_inclusive('\n').collect();
+    let assignments = assignment_range(input);
     let mut i = 0;
     while i < lines.len() {
         let line = lines[i];
+        if !assignments.contains(&i) {
+            out.push_str(line);
+            i += 1;
+            continue;
+        }
         let (new_line, tier, did_change) = rewrite_line(line, values, re);
         out.push_str(&new_line);
         if did_change {
@@ -234,9 +281,13 @@ fn walk_dir_entries_depth(dir: &str, files: &mut Vec<String>, depth: usize) -> a
     for entry in std::fs::read_dir(dir).with_context(|| format!("read agent dir: {}", dir))? {
         let entry = entry?;
         let path = entry.path();
-        if path.is_dir() {
+        let kind = entry.file_type()?;
+        if kind.is_symlink() {
+            continue;
+        }
+        if kind.is_dir() {
             walk_dir_entries_depth(&path.to_string_lossy(), files, depth + 1)?;
-        } else if path.extension().map(|e| e == "md").unwrap_or(false) {
+        } else if kind.is_file() && path.extension().map(|e| e == "md").unwrap_or(false) {
             files.push(path.to_string_lossy().into_owned());
         }
     }

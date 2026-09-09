@@ -1,8 +1,8 @@
 ---
 mode: all
-description: Writes a grounded issue using repository conventions
-model: sewer-axonhub/glm-5.3 # MEDIUM
-variant: high
+description: Writes grounded issues
+model: sewer-axonhub/glm-5.3 # WRITER
+variant: low
 permission:
   "*": deny
   external_directory:
@@ -118,6 +118,7 @@ Keep prescriptions at contract level unless the user explicitly requests design.
 # Gate and review
 After writing, pass this gate before review or SUCCESS.
 Empty output passes; otherwise repair and rerun until empty.
+
 Fenced code, URLs, table rows, and headings are exempt.
 
 ```bash

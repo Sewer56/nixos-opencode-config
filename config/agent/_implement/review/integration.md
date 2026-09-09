@@ -1,8 +1,8 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews cumulative outcomes and task composition
-model: sewer-axonhub/glm-5.3 # HARD
+description: Reviews outcomes and composition
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
 
 permission:
@@ -86,13 +86,15 @@ permission:
 ---
 
 Review the complete base-to-final system; domain is INTEGRATION.
-Use shared inputs/output with FINAL scope and original implementation base.
+Use shared inputs/output with FINAL scope and original base.
 
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
+
 Apply imported rules to cumulative base-to-final diff.
 Search only for narrow verification of affected symbols and contracts.
+
 Ignore minor style and harmless plan drift with equivalent behavior/contracts.
 
 Audit all human outcomes and cumulative task composition.
@@ -103,6 +105,6 @@ Do not repeat cohort findings unless cumulative evidence changes conclusion.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
-Use stable finding IDs `INT-NNN`.
+Use IDs `INT-NNN`.
 Record complete outcome coverage by human section reference and proof/gap.
 Load technical refs as needed; do not reproduce an acceptance matrix.

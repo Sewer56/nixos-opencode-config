@@ -2,8 +2,9 @@
 mode: subagent
 hidden: true
 description: Reviews quality and docs
-model: sewer-axonhub/glm-5.3 # HARD
+model: sewer-axonhub/glm-5.3 # STYLE-REVIEW
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -87,23 +88,12 @@ permission:
 
 Review scoped quality, placement and documentation; domain is QUALITY.
 
-{{ file="./rules/groups/quality/general.md" }}
-
-{{ file="./rules/groups/docs/code-docs.md" }}
-
-{{ file="./rules/groups/docs/error-docs.md" }}
-
-{{ file="./rules/groups/quality/placement.md" }}
-
-{{ file="./rules/groups/docs/end-user-correctness.md" }}
-
-{{ file="./rules/groups/style/readability.md" }}
-
-{{ file="./rules/groups/style/wording.md" }}
+{{ file="./rules/groups/quality/review-criteria.md" }}
 
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
+
 Read only changed/referenced files and traced errors; verify fidelity and links.
 Retain code duties, API contracts and complete reachable error conditions.
 

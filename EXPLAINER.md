@@ -6,12 +6,14 @@
 
 Separate human decisions, execution instructions and evidence.
 A readable plan lets people audit what will change without reading tool recipes.
+
 Execution files translate that agreement; they cannot introduce product choices.
 
 ### Discussion before documents
 
 The [draft owner] discusses goals, constraints, design and a small task outline.
 Explicit agreement and document authorization prevent premature plan writing.
+
 Earlier agreement covers unchanged scope; thanks alone is not approval.
 
 The [explorer] gathers bounded repository evidence for the draft owner.
@@ -64,7 +66,20 @@ The [evidence convention] separates authority, subject and output.
 Shared validation avoids rerunning suites in every reviewer.
 
 Compact findings retain consequences and proof; clean reviews skip verification.
-The [finding verifier] tests candidates before they become repair-eligible.
+
+The [style verifier] tests QUALITY and EDITORIAL using imported criteria.
+The [finding verifier] tests other shared domains without those profiles.
+
+Both independently test evidence, relevance and bounded corrections.
+True but irrelevant detail can warrant an advisory; essential caveats stay.
+
+Callers partition by assigned domain and review boundary, not report claims.
+Class, boundary and round have distinct verdict paths.
+
+Cumulative editorial never merges with repair-only quality.
+Repairs wait for all verdicts, then deduplicate without losing identities.
+
+The total repair budget remains shared across both classes.
 
 CHANGE reviews introduced/exposed defects, not every old problem nearby.
 TARGET_AUDIT retains docs/refactor's declared existing-defect scope.
@@ -81,6 +96,7 @@ These boundaries protect unrelated user changes rather than resetting the tree.
 
 [CodeRabbit] owns verification of its original external findings.
 Its resulting edits still re-enter local checks/reviews before scoped commit.
+
 Immutable rounds and bounded re-review preserve evidence of what was checked.
 
 [One-shot] uses one compact handoff for an already-clear bounded request.
@@ -112,6 +128,7 @@ Static checks and scenarios are not live-agent execution or usability evidence.
 [task worker]: config/agent/_implement/cohort.md
 [evidence convention]: config/rules/cards/implementation/review-protocol.md
 [finding verifier]: config/agent/_review/verifier.md
+[style verifier]: config/agent/_review/style-verifier.md
 [CodeRabbit]: config/agent/_review/coderabbit.md
 [One-shot]: config/agent/_implement/one-shot.md
 [Code]: config/agent/code.md

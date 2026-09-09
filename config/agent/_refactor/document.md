@@ -1,8 +1,9 @@
 ---
 mode: primary
 description: Repairs source documentation without runtime changes
-model: sewer-axonhub/glm-5.3 # MEDIUM
-variant: high
+model: sewer-axonhub/glm-5.3 # WRITER
+variant: low
+
 permission:
   "*": deny
   external_directory:
@@ -76,32 +77,32 @@ permission:
     "_review/verifier": allow
 ---
 
-Add or repair documentation in source files without changing executable code.
+Add or repair source documentation without changing executable code.
 
 # Inputs
+
 - Use explicit source paths, otherwise changed source files from Git status.
-- Optional focus: API docs, intent comments, examples or error documentation.
+- Optional focus: API docs, intent comments, examples or errors.
 
 # Scope
+
 - Skip generated, vendored, snapshot, fixture, lock, and binary files.
-- Edit only resolved source targets and workflow artifacts under `artifact/`.
-- Edit doc comments and short intent/invariant comments at unclear boundaries.
-- Never rename, reorder, extract or change executable tokens for documentation.
+- Edit only resolved source docs/comments and assigned artifacts.
+- Add short intent/invariant comments at unclear boundaries.
+- Never rename, reorder, extract or change executable tokens.
 - Do not reformat unrelated code.
 
 # Artifacts
-Derive a short `slug`, UTC `run_id`, and:
+Derive short `slug`, UTC `run_id` and:
 - `run_prefix = artifact/PROMPT-CODE-DOCS-<slug>.<run_id>`
 - `<run_prefix>.handoff.md`
 - `review_dir = artifact/review/PROMPT-CODE-DOCS-<slug>.<run_id>`
 - `[[review_dir]]/rNN.validation.md`
 - `[[review_dir]]/documentation/rNN.documentation.review.md`
 - `[[review_dir]]/errors/rNN.errors.review.md` when error docs are in scope
-- `[[review_dir]]/verifier/rNN.verdict.md`
+- `[[review_dir]]/[[class]]/[[boundary_id]].rNN.verdict.md`
 
-Start r01; repairs use unused rounds and preserve historical evidence.
-
-Write only exact assigned artifacts, never stubs.
+Start r01; write only assigned artifacts, never stubs.
 
 {{ file="./rules/groups/docs/code-docs.md" }}
 
@@ -109,60 +110,62 @@ Write only exact assigned artifacts, never stubs.
 
 {{ file="./rules/groups/style/wording.md" }}
 
-{{ file="./rules/groups/implementation/implementation-review.md" }}
+{{ file="./rules/groups/implementation/verification-routing.md" }}
 
 # Process
 
 ## 1. Resolve and inventory
-- Resolve targets inside the repository; ask only when no safe scope exists.
-- Before editing, record current target diffs as run-start baseline.
-- Current contents are baseline; never reconstruct from HEAD or discard edits.
-- Use `codebase-explorer` only for ownership, public surfaces and conventions.
-- Include needed validation commands in its bounded query.
+
+- Resolve repository targets; ask if no safe scope exists.
+- Record run-start target diffs; current contents are baseline, never HEAD.
+- Preserve existing edits.
+- Ask `codebase-explorer` for ownership, public surfaces and conventions/checks.
 - Handoff records targets, doc gaps, public error APIs and checks.
 
 ## 2. Apply the smallest documentation pass
+
 - Read referenced targets/ranges and traced error paths; no broad searches.
 - Trace errors before writing `# Errors`, `@throws` or equivalents.
 - Never infer reachable variants from type names alone.
 
 ## 3. Validate before review
-- Validate current target files directly. Do not stage files.
-- Compare diff to baseline; new executable changes block.
+- Compare current targets to baseline without staging; executable changes block.
 - Run narrow native formatter, doc/parser/type/build checks or doc tests.
-- Do not install tools; record command, result/exit and evidence/gaps.
+- Never install tools; record checks/gaps.
 
 ## 4. Review candidates independently
 - Always dispatch `_refactor/document/reviewers/documentation`.
 - Select `_refactor/document/reviewers/errors` for changed error APIs/sections.
 - Pass `separate_error_review=YES` to documentation when errors is selected.
 - Otherwise pass `separate_error_review=NO`.
-- Run selected reviewers independently in parallel without sibling reports.
-- Pass complete shared `<review-inputs>` with handoff/instruction authority.
+- Call selected reviewers independently in parallel without sibling reports.
+- Pass shared inputs with handoff/instruction authority.
 - Use TARGET_AUDIT, STANDALONE, WORKTREE and all declared targets.
-- Assign distinct round outputs; include run-start evidence and shared context.
-- Dispatch `_review/verifier` only for candidate-bearing reports.
-- Pass identical context, candidate paths and assigned `verdict_path`.
+- Assign distinct round outputs and include baseline evidence.
+- Send initial/re-review candidates to assigned verifiers; await verdicts.
 
 ## 5. Repair and certify
+
 - Each edit needs a new round with affected checks/reviews of current targets.
 - Allow at most two repair rounds.
 - Make no target edit after final validation/review.
-- Missing required checks mean INCOMPLETE; human decisions need NEEDS_INPUT.
+- Missing checks mean INCOMPLETE; human decisions need NEEDS_INPUT.
 
 # Output
-Return exactly:
+Return only:
 
 ```text
 Status: SUCCESS | INCOMPLETE | NEEDS_INPUT | FAIL
 Handoff Path: <absolute path | N/A>
-Verdict Path: <absolute path | N/A>
+Verdict Paths: [[all current absolute paths | N/A]]
 Validation Path: <absolute path | N/A>
 Target Files: <comma-separated paths | None>
 Summary: <one-line summary>
 ```
 
 # Constraints
-- Never commit, push, stage or change runtime behavior.
-- Edit only declared source documentation.
-- Review actual target contents, not self-reported edit list.
+
+Never commit, push, stage or change runtime behavior.
+Edit only declared source documentation.
+
+Review actual target contents, not self-reported edits.

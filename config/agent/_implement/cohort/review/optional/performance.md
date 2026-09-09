@@ -1,9 +1,10 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews final cumulative or standalone performance
-model: sewer-axonhub/glm-5.3 # HARD
+description: Reviews system performance
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -86,7 +87,7 @@ permission:
 ---
 
 Review final cumulative or complete standalone change; domain is PERFORMANCE.
-Never review an individual task; use the shared review inputs/output.
+Never review individual tasks; use shared inputs/output.
 Judge realistic repository workloads, not hypothetical scale.
 
 {{ file="./rules/groups/performance/performance.md" }}
@@ -94,8 +95,10 @@ Judge realistic repository workloads, not hypothetical scale.
 {{ file="./rules/groups/implementation/review-findings.md" }}
 
 # Review
+
 Read affected targets/callers, workload bounds, and relevant validation.
 Search only for narrow verification.
+
 Exclude style, coverage, and correctness unrelated to material performance.
 
 Apply workload evidence to cumulative composition and resource bounds.

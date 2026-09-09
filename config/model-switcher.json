@@ -1,13 +1,21 @@
 {
-  "$tierOrder": {"0": "EASY","1": "MEDIUM","2": "HARD"},
+  "$tierOrder": {"0": "EASY","1": "MEDIUM","2": "HARD","3": "STYLE-REVIEW","4": "CORRECTNESS-REVIEW","5": "CODER","6": "WRITER"},
   "normal": {
     "EASY": {"model":"sewer-axonhub/glm-5.3","variant":"low"},
     "MEDIUM": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
-    "HARD": {"model":"sewer-axonhub/glm-5.3","variant":"high"}
+    "HARD": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
+    "STYLE-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
+    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
+    "CODER": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
+    "WRITER": {"model":"sewer-axonhub/glm-5.3","variant":"low"}
   },
   "work": {
     "EASY": {"model":"sewer-axonhub-work/gpt-5.6-luna","variant":"low"},
     "MEDIUM": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"low"},
-    "HARD": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"}
+    "HARD": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"},
+    "STYLE-REVIEW": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"},
+    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"},
+    "CODER": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"low"},
+    "WRITER": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"}
   }
 }

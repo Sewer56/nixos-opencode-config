@@ -37,10 +37,19 @@ impl<'a> AppModelHandler for AppModel<'a> {
             }
             KeyCode::Up => {
                 self.tier_idx = (self.tier_idx + self.tier_order.len() - 1) % self.tier_order.len();
+                self.agent_offset = 0;
             }
             KeyCode::Down => {
                 self.tier_idx = (self.tier_idx + 1) % self.tier_order.len();
+                self.agent_offset = 0;
             }
+            KeyCode::PageUp => self.agent_offset = self.agent_offset.saturating_sub(1),
+            KeyCode::PageDown => {
+                self.agent_offset =
+                    (self.agent_offset + 1).min(self.selected_agents().len().saturating_sub(1));
+            }
+            KeyCode::Home => self.agent_offset = 0,
+            KeyCode::End => self.agent_offset = self.selected_agents().len().saturating_sub(1),
             KeyCode::Enter | KeyCode::Char(' ') => {
                 self.mode = Mode::ModelPicker;
                 self.pick_idx = 0;
@@ -115,6 +124,7 @@ impl<'a> AppModelHandler for AppModel<'a> {
                     }
                     Err(e) => self.message = format!("apply failed: {}", e),
                 }
+                self.refresh_agents();
             }
             _ => {}
         }

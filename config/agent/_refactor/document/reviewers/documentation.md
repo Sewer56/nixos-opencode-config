@@ -1,9 +1,10 @@
 ---
 mode: subagent
 hidden: true
-description: Audits source documentation and readability
-model: sewer-axonhub/glm-5.3 # MEDIUM
+description: Audits source docs
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -84,9 +85,10 @@ permission:
     "patch *": deny
 ---
 
-Audit scoped source documentation; never edit source.
+Audit source docs; never edit source.
 
 # Inputs
+
 Use shared review inputs/output; domain is DOCUMENTATION.
 Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
 - `separate_error_review`: explicit `YES | NO` from the parent.
@@ -100,6 +102,7 @@ Purpose is TARGET_AUDIT, boundary WORKTREE, with handoff authority.
 {{ file="./rules/groups/style/wording.md" }}
 
 # Checks
+
 - Read referenced targets/ranges only; do not search broadly.
 - With `separate_error_review=YES`, delegate only error completeness.
 - With `NO`, retain error-completeness responsibility.

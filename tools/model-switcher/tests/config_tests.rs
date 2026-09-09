@@ -1,5 +1,23 @@
+//! Tests config persistence, validation, and tier discovery with local fixtures.
+
 use opencode_model_switcher::config;
 use opencode_model_switcher::types::{Assignment, Config, Env, TierSet};
+
+#[test]
+fn discovery_keeps_complete_hyphenated_tags() {
+    let (_dir, env) =
+        test_env_with_config(r#"{"normal":{"EASY":{"model":"a","variant":"low"}}}"#).unwrap();
+    std::fs::write(
+        std::path::Path::new(&env.agent_dirs[0]).join("review.md"),
+        "model: a # STYLE-REVIEW\nmodel: b # CORRECTNESS-REVIEW\nmodel: c # HARD-UNKNOWN\n",
+    )
+    .unwrap();
+    let order = config::derive_tier_order(&env, &Config::new(), &Default::default());
+    assert_eq!(
+        order,
+        ["CORRECTNESS-REVIEW", "HARD-UNKNOWN", "STYLE-REVIEW"]
+    );
+}
 
 #[test]
 fn test_load_and_save_config() {

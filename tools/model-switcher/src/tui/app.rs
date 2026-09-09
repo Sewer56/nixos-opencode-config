@@ -2,7 +2,7 @@ use super::handler::AppModelHandler;
 use super::render::AppModelRender;
 use crate::config::load_config;
 use crate::models::available_models;
-use crate::rewrite::{build_model_line_re, current_counts};
+use crate::rewrite::{affected_agents, build_model_line_re, current_counts};
 use crate::types::{ApplyResult, Config, Env};
 use anyhow::bail;
 use crossterm::event::{self, Event, KeyEventKind};
@@ -20,6 +20,9 @@ pub(crate) struct AppModel<'a> {
     pub(crate) profiles: Vec<String>,
     pub(crate) models: Vec<String>,
     pub(crate) counts: BTreeMap<String, BTreeMap<String, usize>>,
+    pub(crate) agents: BTreeMap<String, Vec<String>>,
+    pub(crate) agents_error: Option<String>,
+    pub(crate) agent_offset: usize,
     pub(crate) profile_idx: usize,
     pub(crate) tier_idx: usize,
     pub(crate) mode: Mode,
@@ -48,7 +51,11 @@ impl<'a> AppModel<'a> {
         let loaded = load_config(env)?;
         let models = available_models(env)?;
         let re = build_model_line_re(&loaded.tier_order);
-        let counts = current_counts(env, &loaded.tier_order, &re)?;
+        let counts = current_counts(env, &loaded.tier_order, &re).unwrap_or_default();
+        let (agents, agents_error) = match affected_agents(env, &re) {
+            Ok(agents) => (agents, None),
+            Err(error) => (BTreeMap::new(), Some(error.to_string())),
+        };
         let profiles = crate::config::sorted_profiles(&loaded.profiles);
         if profiles.is_empty() {
             bail!("no profiles configured");
@@ -70,6 +77,9 @@ impl<'a> AppModel<'a> {
             profiles,
             models,
             counts,
+            agents,
+            agents_error,
+            agent_offset: 0,
             profile_idx,
             tier_idx: 0,
             mode: Mode::Main,
@@ -88,6 +98,30 @@ impl<'a> AppModel<'a> {
 
     pub(crate) fn tier(&self) -> &str {
         &self.tier_order[self.tier_idx]
+    }
+
+    pub(crate) fn selected_agents(&self) -> &[String] {
+        self.agents
+            .get(self.tier())
+            .map(Vec::as_slice)
+            .unwrap_or_default()
+    }
+
+    pub(crate) fn refresh_agents(&mut self) {
+        let re = build_model_line_re(&self.tier_order);
+        match affected_agents(self.env, &re) {
+            Ok(agents) => {
+                self.agents = agents;
+                self.agents_error = None;
+            }
+            Err(error) => {
+                self.agents.clear();
+                self.agents_error = Some(error.to_string());
+            }
+        }
+        self.agent_offset = self
+            .agent_offset
+            .min(self.selected_agents().len().saturating_sub(1));
     }
 }
 
@@ -179,6 +213,9 @@ mod tests {
             profiles,
             models: vec![],
             counts: BTreeMap::new(),
+            agents: BTreeMap::new(),
+            agents_error: None,
+            agent_offset: 0,
             profile_idx: 0,
             tier_idx: 1,
             mode: Mode::Main,
