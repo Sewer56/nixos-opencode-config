@@ -1,5 +1,5 @@
 ---
-description: "General rules-baked coding agent; reviewer/verifier delegation on explicit request"
+description: "Coding with a Coder worker; reviews on request"
 agent: code
 ---
 

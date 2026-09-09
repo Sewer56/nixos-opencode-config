@@ -4,9 +4,10 @@ Read applicable instructions.
 Search only on concrete evidence clues.
 
 ### Lint gate
-Before review or handoff, run the linter:
+Before review or handoff, run:
 `~/opencode/config/scripts/rust-llm-tidy-gate.sh`
-Before staging, apply the Self-contained committed content rule.
+Fix in-scope failures and rerun.
+Report gate status and uncovered changes.
 
 Verify third-party behavior against pinned dependency sources before writing dependent code or tests.
 Use package caches, vendored sources, or read-only research tools when granted.

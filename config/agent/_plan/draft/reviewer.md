@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews whole-bundle fidelity, readability and readiness
-model: sewer-axonhub/glm-5.3 # HARD
+model: sewer-axonhub/glm-5.3 # PLANNER
 variant: high
 permission:
   "*": deny

@@ -69,29 +69,37 @@ Apply `{{gitpath:.opencode/rules/instruction-authoring.md}}`.
 
 ## 1. Discuss, then contract
 
-1. Require readable `HEAD`, not a clean repository or pre-existing staged work.
+1. Require readable `HEAD`, not a clean repository or staged work.
    - Preserve unrelated index/worktree changes, including dirty submodules.
    - Inspect target/dependency overlap; preserve compatible target edits.
-   - Material choices or incompatible edits need input; choose routine details.
+   - Ask about material choices/incompatible edits; choose routine details.
 2. Discuss intent, constraints and design using bounded read-only discovery.
    - Agree success/outline and authorize documents before any writes.
    - Reuse agreement for unchanged scope; agree substantive refinements.
-   - Invocation, detail, silence or thanks is not agreement; ask until agreed.
+   - Invocation, detail, silence or thanks is not approval; keep asking.
 3. Save verbatim request:
    `artifacts/iterate/[[timestamp]]-[[slug]]/request.md`.
-4. Mark assertions needing changes `UPDATE`, not `VERIFY`, before scope freezes.
+4. Mark needed changes `UPDATE`, not `VERIFY`, before freezing scope.
 5. Write `contract.md`:
    - `Base Commit: [[HEAD]]`;
    - exact `CREATE`, `UPDATE`, `DELETE`, `MOVE old -> new`, or `VERIFY` targets;
-   - required/preserved behavior, non-goals, and review lenses;
-   - `UPDATE`: preserve boundaries without token growth.
+   - required/preserved behavior, non-goals and review lenses;
+   - `UPDATE`: preserve behavior, boundaries and useful structure.
 
 Runtime/routes need behavior review; structure needs architecture review.
 Permissions/source boundaries need adversarial review.
 Self-edits need architecture and adversarial review.
 
 Run baseline validator/smoke before control edits.
-Record raw/expanded cl100k_base old/new counts in run artifacts.
+Count existing explicit targets before edits and after final repair:
+
+```sh
+python3 scripts/count-instruction-tokens.py --report [[count_path]] [[target_paths]]
+```
+
+Save raw/expanded cl100k_base counts in separate baseline/final reports.
+Label created/deleted targets and absent sides.
+Mark missing counts unavailable, never estimated.
 
 ## 2. Edit
 
@@ -108,10 +116,14 @@ Recovery Context: [[bounded facts/answers under unchanged authority/scope, or No
 
 Save task_id and run/authority identity in editor-task.md.
 
+After each Editor turn, save and show its read-only per-target token report.
+Include raw/expanded before → after counts and deltas; mark unavailable or N/A.
+Efficiency passes do not add recovery/repair turns.
+
 On non-success, check cause/authority/contract/evidence/targets.
 Correct mistakes, obtain evidence, retry transient failures.
 
-Resume same-run identity as a tool argument after input/target revalidation.
+Revalidate inputs/targets before resuming same-run identity via tool argument.
 Changed authority needs fresh preflight/task, never a child override.
 Record stale/unavailable identity before fallback; never reuse across runs.
 
@@ -133,10 +145,8 @@ python3 scripts/validate-opencode-config.py --repo-root . --report [[run_dir]]/v
 
 ## 4. Review and verify
 
-Call `_iterate/review` with required lenses.
-Pass request/contract/check paths, base, staged paths and review output.
-
-Checks: validation, smoke, tidy.
+Call `_iterate/review` with required lenses, base and staged paths.
+Pass request/contract, validation/smoke/tidy and review output paths.
 
 Send findings to `_iterate/verifier`; skip clean reviews.
 Pass contract, validation, candidate review, prior verdict and verdict output.

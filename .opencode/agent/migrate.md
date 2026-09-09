@@ -1,7 +1,7 @@
 ---
 mode: primary
 description: Migrates production upstream
-model: sewer-axonhub/glm-5.3 # CODER
+model: sewer-axonhub/glm-5.3 # PLANNER
 variant: high
 
 permission:

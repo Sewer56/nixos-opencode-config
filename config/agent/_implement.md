@@ -1,7 +1,7 @@
 ---
 mode: all
 description: Executes approved tasks and final review
-model: sewer-axonhub/glm-5.3 # MEDIUM
+model: sewer-axonhub/glm-5.3 # CODER
 variant: high
 permission:
   "*": deny

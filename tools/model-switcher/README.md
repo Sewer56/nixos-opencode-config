@@ -8,7 +8,7 @@ TUI for managing model tier assignments across OpenCode agent profiles.
 opencode-model-switcher [profile]
 ```
 
-Launch interactive editor. Optionally pre-select a profile name.
+Launch the editor with an optional profile.
 
 **Keys**
 
@@ -31,35 +31,31 @@ In picker: type to filter, `Enter` select, `Esc` cancel.
 Stored at `~/.config/opencode/model-switcher.json`.
 With XDG set, use `$XDG_CONFIG_HOME/opencode/model-switcher.json`.
 
-```jsonc
-{
-  "$tierOrder": {"0": "EASY", "1": "MEDIUM", "2": "HARD", "3": "STYLE-REVIEW", "4": "CORRECTNESS-REVIEW", "5": "CODER", "6": "WRITER"},
-  "normal": {
-    "EASY": {"model": "provider/cheap-model", "variant": "low"},
-    "MEDIUM": {"model": "provider/default-model", "variant": "medium"},
-    "HARD": {"model": "provider/expensive-model", "variant": "high"},
-    "STYLE-REVIEW": {"model": "provider/expensive-model", "variant": "high"},
-    "CORRECTNESS-REVIEW": {"model": "provider/expensive-model", "variant": "high"},
-    "CODER": {"model": "provider/default-model", "variant": "medium"},
-    "WRITER": {"model": "provider/writing-model", "variant": "low"}
-  },
-  "work": {
-    "EASY": {"model": "sewer-axonhub-work/cheap", "variant": "low"},
-    "MEDIUM": {"model": "sewer-axonhub-work/default", "variant": "medium"},
-    "HARD": {"model": "sewer-axonhub-work/expensive", "variant": "high"},
-    "STYLE-REVIEW": {"model": "sewer-axonhub-work/expensive", "variant": "high"},
-    "CORRECTNESS-REVIEW": {"model": "sewer-axonhub-work/expensive", "variant": "high"},
-    "CODER": {"model": "sewer-axonhub-work/default", "variant": "medium"},
-    "WRITER": {"model": "sewer-axonhub-work/writing", "variant": "medium"}
-  }
-}
-```
+Each profile maps tier names to `model` and `variant` objects.
+See [the shipped presets](../../config/model-switcher.json).
 
 - All profiles must have identical tier keys.
 - `work` profile requires `sewer-axonhub-work/` provider prefix.
 - Variants are `low`, `medium`, `high`, `xhigh`, or `max`.
 - `$tierOrder` is optional.
 - Missing tiers are discovered from profile keys and agent model tags.
+
+### Routing and tiers
+
+Tier order matches the shipped presets.
+
+- PLANNER: Code, draft, draft reviewer and migrate.
+- CODER: understood Code assignments and existing implementation roles.
+- Draft verifier uses CORRECTNESS-REVIEW.
+- The iterate editor inherits its runtime model without an explicit tier.
+
+Code handles obvious fixes directly and prefers cheaper research agents.
+It reads essential references and consults supporting citations when needed.
+
+Coder works without delegation or staging; Code owns integration.
+Code and Coder never write concurrently and share the same lint standards.
+
+PLANNER uses GLM-5.3 high normally and GPT-6-Astra medium at work.
 
 ## Agent files
 

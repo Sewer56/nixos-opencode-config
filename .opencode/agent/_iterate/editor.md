@@ -2,8 +2,6 @@
 mode: subagent
 hidden: true
 description: Contracted writer
-model: sewer-axonhub/glm-5.3 # WRITER
-variant: low
 permission:
   "*": deny
   external_directory:
@@ -102,6 +100,22 @@ Only orchestrator stages; staging-only issues cannot block writing.
 
 Only Repair Notes authorize repairs.
 Never edit inputs, artifacts or unlisted consumers.
+
+# Token checks
+
+Each turn, including repairs, count existing targets before editing:
+
+```sh
+python3 scripts/count-instruction-tokens.py [[target_paths]]
+```
+
+After edits, make up to three token-efficiency passes within scope.
+Preserve behavior, useful headings and readability; recount after each pass.
+Stop when no useful improvement remains; justified growth is acceptable.
+
+Report per-target raw/expanded before → after counts and deltas read-only.
+Mark missing counts unavailable and absent-file deltas N/A.
+The orchestrator saves and shows each turn’s report.
 
 # Output
 

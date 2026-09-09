@@ -36,7 +36,10 @@ Apply only to locked targets.
 
 ## Compact existing instructions
 
-- Cut whole redundant rules and structure before rewording.
+- Trim wording and redundancy without changing behavior or boundaries.
+- Preserve useful headings, grouping and readable prose.
+- Allow justified growth; only user-approved token budgets are hard limits.
+- Tune only authorized sections.
 - Discuss human-first scope and design before authorizing documents.
 - Orchestrator records raw/expanded cl100k_base counts in run artifacts.
 

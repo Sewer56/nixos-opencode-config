@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Refutes candidates and promotes required draft corrections
-model: sewer-axonhub/glm-5.3 # HARD
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
 variant: high
 permission:
   "*": deny
