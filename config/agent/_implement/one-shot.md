@@ -76,12 +76,12 @@ permission:
     "git commit *": deny
   task:
     "*": deny
-    "_docs/reviewers/editorial": allow
-    "_implement/cohort/review/correctness": allow
-    "_implement/cohort/review/quality": allow
-    "_implement/cohort/review/optional/tests": allow
-    "_implement/cohort/review/optional/security": allow
-    "_implement/cohort/review/optional/performance": allow
+    "_review/docs/editorial": allow
+    "_review/code/correctness": allow
+    "_review/code/quality": allow
+    "_review/code/optional/tests": allow
+    "_review/code/optional/security": allow
+    "_review/code/optional/performance": allow
     "_review/verifier": allow
     "_review/style-verifier": allow
     "_review/coderabbit": allow
@@ -151,11 +151,11 @@ Unapproved behavior/contract/compatibility/security/migration/scope needs input.
 
 Review only after quick checks PASS.
 
-- Always call `_implement/cohort/review/correctness`.
-- Always call `_implement/cohort/review/quality` before commit.
-- Select `_docs/reviewers/editorial` for docs/comments or public-behavior docs.
+- Always call `_review/code/correctness`.
+- Always call `_review/code/quality` before commit.
+- Select `_review/docs/editorial` for docs/comments or public-behavior docs.
 - Honor explicit reviewer requests.
-- Call `_implement/cohort/review/optional/performance` unless docs-only.
+- Call `_review/code/optional/performance` unless docs-only.
 - Record a docs-only skip reason; review the complete standalone change.
 
 Optional risks:

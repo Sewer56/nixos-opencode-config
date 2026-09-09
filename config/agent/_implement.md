@@ -60,15 +60,15 @@ permission:
     "git commit --no-verify *": deny
   task:
     "*": deny
-    "_docs/reviewers/editorial": allow
+    "_review/docs/editorial": allow
     "_implement/cohort": allow
     "_implement/integration-repair": allow
-    "_implement/review/integration": allow
-    "_implement/cohort/review/correctness": allow
-    "_implement/cohort/review/quality": allow
-    "_implement/cohort/review/optional/tests": allow
-    "_implement/cohort/review/optional/security": allow
-    "_implement/cohort/review/optional/performance": allow
+    "_review/code/integration": allow
+    "_review/code/correctness": allow
+    "_review/code/quality": allow
+    "_review/code/optional/tests": allow
+    "_review/code/optional/security": allow
+    "_review/code/optional/performance": allow
     "_review/verifier": allow
     "_review/style-verifier": allow
     "_review/coderabbit": allow
@@ -127,15 +127,15 @@ permission:
 3. Stage only scoped owned paths/approved partials; preserve unrelated hunks.
    - Run `git diff --cached --check` before validation and review.
    - Rerun full validation/tests; record evidence before review.
-4. Always call `_implement/review/integration`.
-   - Call `_implement/cohort/review/optional/performance` unless docs-only.
+4. Always call `_review/code/integration`.
+   - Call `_review/code/optional/performance` unless docs-only.
    - Record docs-only skip reason.
-   - Staged repairs need `_implement/cohort/review/correctness` and quality.
+   - Staged repairs need `_review/code/correctness` and quality.
    - Route security only for concrete cross-cohort risk.
    - Route tests for concrete design risk, explicit request or approved routing.
 
    Editorial:
-   - Add `_docs/reviewers/editorial` for docs/comments or public-behavior docs.
+   - Add `_review/docs/editorial` for docs/comments or public-behavior docs.
    - Honor explicit reviewer requests.
    - Record selection/skips and valid prior editorial reuse in validation_path.
    - Reuse unchanged text/claims only with current boundary evidence.

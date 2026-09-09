@@ -74,12 +74,12 @@ permission:
     "coder": allow
     "web-search": allow
     "codebase-explorer": allow
-    "_docs/reviewers/editorial": allow
-    "_implement/cohort/review/correctness": allow
-    "_implement/cohort/review/quality": allow
-    "_implement/cohort/review/optional/tests": allow
-    "_implement/cohort/review/optional/security": allow
-    "_implement/cohort/review/optional/performance": allow
+    "_review/docs/editorial": allow
+    "_review/code/correctness": allow
+    "_review/code/quality": allow
+    "_review/code/optional/tests": allow
+    "_review/code/optional/security": allow
+    "_review/code/optional/performance": allow
     "_review/verifier": allow
     "_review/style-verifier": allow
 ---
@@ -162,15 +162,15 @@ Explain inapplicable tests.
 Require quick PASS; honor named-reviewer limits.
 Otherwise select by diff, not extension:
 - Code changes/refactors: both code reviewers below.
-- `_implement/cohort/review/correctness`: behavior/contracts/config/examples.
-- `_implement/cohort/review/quality`: code maintainability.
-- `_docs/reviewers/editorial`: docs/comments or public-behavior docs.
+- `_review/code/correctness`: behavior/contracts/config/examples.
+- `_review/code/quality`: code maintainability.
+- `_review/docs/editorial`: docs/comments or public-behavior docs.
 Runnable examples need correctness even in Markdown.
 
 Optional: explicit request or matching risk:
-- `_implement/cohort/review/optional/tests`: test design.
-- `_implement/cohort/review/optional/security`: trust/auth/secrets/IPC.
-- `_implement/cohort/review/optional/performance`: cost/hot-path risk.
+- `_review/code/optional/tests`: test design.
+- `_review/code/optional/security`: trust/auth/secrets/IPC.
+- `_review/code/optional/performance`: cost/hot-path risk.
 
 Security includes filesystem/shell/SQL, crypto, serialization and permissions.
 Include untrusted input/dependency trust.

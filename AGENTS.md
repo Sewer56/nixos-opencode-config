@@ -6,7 +6,7 @@ Repo map for `/iterate/edit` sessions. Personal OpenCode configuration repo;
 ## Edit targets
 
 - `config/agent/` — agents and subagent dirs
-  (`_docs/`, `_implement/`, `_plan/`, `_refactor/`, `_review/`, `_write/`).
+  (`_implement/`, `_plan/`, `_refactor/`, `_review/`, `_write/`).
 - `config/command/` — commands (`draft`, `implement`, `write/`, ...).
 - `config/rules/` — shared rules; `groups/` owns domains, `cards/` have
   multiple importers; wording counts in every importer's expanded tokens.

@@ -74,10 +74,10 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "web-search": allow
-    "_docs/reviewers/accuracy": allow
-    "_docs/reviewers/usability": allow
-    "_docs/reviewers/documentation": allow
-    "_docs/reviewers/errors": allow
+    "_review/docs/accuracy": allow
+    "_review/docs/usability": allow
+    "_review/docs/documentation": allow
+    "_review/docs/errors": allow
     "_review/verifier": allow
 ---
 
@@ -167,9 +167,9 @@ Earlier edits without baseline/ownership need NEEDS_INPUT.
 ### Select independent reviewers
 
 Honor review limits; otherwise route by content:
-- End-user docs: `_docs/reviewers/accuracy` and `_docs/reviewers/usability`.
-- Source docs/comments: `_docs/reviewers/documentation`.
-- Source error APIs/sections: also `_docs/reviewers/errors`.
+- End-user docs: `_review/docs/accuracy` and `_review/docs/usability`.
+- Source docs/comments: `_review/docs/documentation`.
+- Source error APIs/sections: also `_review/docs/errors`.
 
 Pass documentation `separate_error_review=YES` if errors is selected, else `NO`.
 

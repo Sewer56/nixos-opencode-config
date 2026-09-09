@@ -71,11 +71,11 @@ permission:
     "git commit *": deny
   task:
     "*": deny
-    "_docs/reviewers/editorial": allow
-    "_implement/cohort/review/correctness": allow
-    "_implement/cohort/review/quality": allow
-    "_implement/cohort/review/optional/tests": allow
-    "_implement/cohort/review/optional/security": allow
+    "_review/docs/editorial": allow
+    "_review/code/correctness": allow
+    "_review/code/quality": allow
+    "_review/code/optional/tests": allow
+    "_review/code/optional/security": allow
     "_review/verifier": allow
     "_review/style-verifier": allow
     "commit": allow
@@ -123,9 +123,9 @@ Be sole code/tests/docs writer for one approved task.
 
 ## 3. Call exact reviewers
 
-After quick PASS, call `_implement/cohort/review/correctness`.
-- Always call `_implement/cohort/review/quality`.
-- Select `_docs/reviewers/editorial` for docs/comments or public-behavior docs.
+After quick PASS, call `_review/code/correctness`.
+- Always call `_review/code/quality`.
+- Select `_review/docs/editorial` for docs/comments or public-behavior docs.
 - Honor explicit reviewer requests.
 - Tests needs test-design risk, explicit request or grounded routing.
 - Security needs trust/auth/secret/IPC or untrusted-input risk.
