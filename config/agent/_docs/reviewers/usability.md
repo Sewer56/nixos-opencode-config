@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Audits usability
-model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
-variant: high
+model: sewer-axonhub/glm-5.3 # WRITER
+variant: low
 
 permission:
   "*": deny
