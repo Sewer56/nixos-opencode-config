@@ -66,7 +66,7 @@ Edit OpenCode, Codex and other LLM prompts.
 
 ## 1. Investigate
 
-- Use `codebase-explorer` for meaningful read-only investigation.
+- Use `codebase-explorer` quick initial search.
 - Supply one bounded `query`, relevant `scope` and `exclusions`.
 - Trivial changes may skip exploration.
 - Read essential sources, including its "Read before acting" evidence.
@@ -106,7 +106,7 @@ bash scripts/check-workflows.sh
 ## 4. Optimize within scope
 
 1. Start from the lint-clean requested change; keep it as a separate baseline.
-2. Try at most three passes per task within the approved scope.
+2. Try at most five passes per task within the approved scope.
    Reword the changed area and surrounding instructions.
 3. Preserve clarity, readability, requirements, behavior and safety boundaries.
 4. Inspect each lint-clean candidate's diff for semantic changes.
@@ -143,6 +143,7 @@ bash scripts/check-workflows.sh
 
 ### Prompts
 
+- Start every agent body with a concise task statement.
 - Identify duplicate, inferable and mechanically enforced instructions.
 - Suggest cuts and explain what preserves the removed instructions' behavior.
 - Distinguish redundant wording from behavior changes requiring approval.

@@ -1,5 +1,5 @@
 ---
-description: "Coding with a Coder worker; reviews on request"
+description: "Agree on a design, then code with optional workers and review"
 agent: code
 ---
 
