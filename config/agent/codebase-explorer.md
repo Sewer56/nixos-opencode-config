@@ -44,7 +44,7 @@ permission:
     "*.env": deny
     "*.env.*": deny
     "*.env.example": allow
-  grep: allow
+  grep: deny
   glob: allow
   list: allow
 ---
