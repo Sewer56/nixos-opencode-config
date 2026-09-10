@@ -25,13 +25,10 @@ Keep required/consequential frequency details, like error conditions.
 
 ### Documentation concision
 
-Review necessity and accuracy across code and non-code documentation.
-For unnecessary content, propose deletion before rewriting.
+Propose deletion, not paraphrase or relocation of unnecessary content.
 
-Identify the removable passage and existing coverage that makes it redundant.
-Otherwise explain why it serves no relevant reader purpose.
-Truth or possible usefulness cannot rebut redundancy.
+Name the removable passage and existing coverage or the missing reader purpose.
 
 Block material clutter from repetition or detail obscuring tasks or contracts.
-This overrides advisory-only criteria for such documentation findings.
+This overrides advisory-only documentation criteria.
 Minor wording improvements remain advisory; omit synonym nits.

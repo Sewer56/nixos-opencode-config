@@ -5,12 +5,8 @@ Read applicable instructions.
 Search only on concrete evidence clues.
 
 ### Documentation handoff
-Before review/handoff, separately inspect authorized doc changes and prune them.
-
-Apply the shared deletion test before compressing sentences.
-Remove irrelevant internals, repeated caveats and unnecessary examples/sections.
-
-Never spread unnecessary content into bullets or sections to pass prose lints.
+Apply shared doc pruning before validation and after lint repairs.
+Never keep unnecessary content by splitting it into bullets to pass lints.
 
 No extra report or repair scope.
 

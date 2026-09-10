@@ -117,7 +117,7 @@ Review test strategy and observable coverage, not merely that tests ran.
 Read nearest tests against human outcomes and validation.
 
 Identify missing coverage, escaping regression and smallest useful test.
-Never demand low-value coverage or write implementation.
+Never demand low-value coverage or edit implementation files.
 
 Specialists never replace complete behavior and cross-domain review.
 

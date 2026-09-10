@@ -113,7 +113,7 @@ Markdown/comment findings need location and exact `Before:`/`After:` text.
 Deletions use `After: DELETE`.
 Insertions use `Before: EMPTY` with an exact anchor and before/after placement.
 
-Keep reader consequences concise and outside edits.
+Keep explanations outside edits.
 No vague or whole-document rewrites.
 
 Use supplied checks; never rerun solely for editorial findings.

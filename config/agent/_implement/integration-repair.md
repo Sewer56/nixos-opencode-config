@@ -95,12 +95,16 @@ Repair final integration as sole writer this turn.
 
 1. Load authority and selected repairs.
    Verify findings have `ACCEPT_BLOCKER` or `ACCEPT_ADVISORY` dispositions.
-2. Make the smallest in-scope correction; preserve completed contracts.
+2. Check current source before reusing verifier-approved candidate edits.
+   Otherwise follow the verified repair requirement.
+3. Make the smallest in-scope correction; preserve completed contracts.
    Prioritize blockers; report infeasible advisories.
    Never redesign architecture.
-3. Add needed regression evidence; leave full validation to the parent.
-4. Inspect writer-local diff for scope; never touch protected user changes.
-5. Apply shared autonomy; escalations need `NEEDS_INPUT`.
+4. Never use rejected or unresolved corrections.
+   Flag material departures from verified corrections for parent reverification.
+5. Add needed regression evidence; leave full validation to the parent.
+6. Inspect writer-local diff for scope; never touch protected user changes.
+7. Apply shared autonomy; escalations need `NEEDS_INPUT`.
 
 # Output
 

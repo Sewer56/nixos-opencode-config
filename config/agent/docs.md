@@ -142,6 +142,8 @@ Without review approval, create no review artifacts.
 - Never install tools or invent commands.
 - Repair authorized deterministic failures; record checks and evidence gaps.
 
+Apply shared doc pruning before validation and after lint repairs.
+
 {{ file="./rules/cards/implementation/llm-tidy-pass.md" }}
 
 ## 4. Run approved review

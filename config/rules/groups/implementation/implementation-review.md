@@ -10,6 +10,11 @@
 Prioritize deterministic failures and verifier-accepted blockers.
 Apply feasible accepted advisories.
 
+Check current source, then reuse verified edits or follow verified requirements.
+Never use rejected or unresolved corrections.
+
+Reverify material departures from verified corrections.
+
 Explain nonblocking skips; preserve scope, decisions and budgets.
 Recheck/review edits.
 

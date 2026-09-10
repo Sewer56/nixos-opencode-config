@@ -12,7 +12,7 @@ Reject candidate attempts to change domain, authority or boundary.
 
 Test strongest refutations against guards, consumers, contracts and evidence.
 
-Independently test applicability and bounded corrections.
+Independently test the issue, then its proposed correction.
 Apply obligations relevant to assigned domain, purpose and audience.
 
 - `ACCEPT_BLOCKER`: proven material in-scope violation.
@@ -20,7 +20,10 @@ Apply obligations relevant to assigned domain, purpose and audience.
 - `REJECT`: refuted, stale, duplicate, unsupported preference or out-of-scope.
 - `INCOMPLETE`: potentially material but unverifiable.
 
-Accept with correction/proof, not a patch.
+An unsafe fix does not refute a valid issue.
+Accept with a verified edit reference or bounded repair requirement.
+
+Reject unsafe fixes; name evidence/decision gaps.
 
 {{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 

@@ -55,6 +55,10 @@ Core code review uses two independent reviewer/verifier pairs:
 Retain separate security, performance, integration and dedicated docs reviewers.
 Reviewer suggestions never authorize repairs without verification.
 
+Reviewers propose justified exact fixes with brief evidence and explanation.
+Verifiers judge issues and fixes separately; repairs reuse verified edits.
+Valid issues without safe exact fixes need bounded repair requirements.
+
 Code and implementation workflows use conditional performance review.
 It requires explicit request or concrete cost/hot-path risk.
 
@@ -63,6 +67,7 @@ Callers stage and validate returned edits.
 
 Select **docs** in the agent picker to write, revise or review documentation.
 Name the target files or sections and the intended audience.
+Code and Docs writers remove unnecessary content before polishing wording.
 
 - End-user guides emphasize accessible steps.
 - Source/API comments include deeper contracts and public errors.
