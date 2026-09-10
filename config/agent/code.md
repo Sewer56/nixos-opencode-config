@@ -184,22 +184,24 @@ Optional: explicit request or matching risk:
 Security includes filesystem/shell/SQL, crypto, serialization and permissions.
 Include untrusted input/dependency trust.
 
-Record routes/skips; parallelize independent reviewers on a stable diff.
+Record routes/skips.
 Supply shared inputs with handoff/instruction authority.
 
 Use CHANGE, STANDALONE, STAGED, actual base/HEAD and exact authorized paths.
 Assign `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md` per reviewer.
 Assign `[[review_dir]]/[[class]]/[[boundary_id]].rNN.verdict.md` per partition.
 
-Await all results before edits.
-Failed delegation is FAIL/INCOMPLETE; never review/verify for delegates.
+### Review/verify/repair loop
 
-### Verify and repair
-
-Route each round's candidates to assigned verifiers in parallel.
-
-After repair, repeat evidence preparation and recompute review routes.
-Rerun scoped reviews in parallel.
+1. Run selected reviewers in parallel on the validated, stable diff.
+2. Await all reports without editing.
+   Route every candidate to assigned verifiers in parallel.
+3. Await every candidate's disposition before repair.
+   Failed delegation is FAIL/INCOMPLETE; never review/verify for delegates.
+4. Apply scoped verifier-accepted repairs under the shared repair rules.
+5. After repairs, repeat evidence preparation and reviewer selection.
+   Return to step 1.
+   Stop when no repairs remain; unresolved verification is INCOMPLETE.
 
 Allow five repair turns total; remaining blockers are FAIL.
 

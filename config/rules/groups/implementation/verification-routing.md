@@ -1,5 +1,11 @@
 {{ file="./rules/groups/implementation/implementation-review.md" }}
 
+Assigned verifiers alone judge candidate accuracy and repair eligibility.
+
+Before verdicts, orchestrators only check routing metadata.
+Never investigate or filter findings before verifier disposition.
+Route every reported candidate to its assigned verifier.
+
 QUALITY: style, `_review/quality-verifier`.
 All other shared domains: correctness, `_review/correctness-verifier`.
 
