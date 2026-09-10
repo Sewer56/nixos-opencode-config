@@ -11,9 +11,9 @@
   "work": {
     "EASY": {"model":"sewer-axonhub-work/gpt-5.6-luna","variant":"low"},
     "PLANNER": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"},
-    "CODER": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"low"},
-    "WRITER": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"},
-    "STYLE-REVIEW": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"},
+    "CODER": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"},
+    "WRITER": {"model":"sewer-axonhub-work/gpt-5.6-luna","variant":"medium"},
+    "STYLE-REVIEW": {"model":"sewer-axonhub-work/gpt-5.6-sol","variant":"medium"},
     "CORRECTNESS-REVIEW": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"}
   }
 }
