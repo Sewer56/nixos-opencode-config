@@ -53,7 +53,7 @@ Approve the outline before writing.
 ### Shared reviewers
 
 - `correctness`: behavior, integration, runnable examples and test adequacy.
-- `code-quality`: maintainability, placement and code organization.
+- `code-quality`: maintainability, placement, code and test organization.
 - `doc-quality`: doc accuracy, coverage, API errors and reader usability.
 
 Docs uses one documentation reviewer when you approve review.
@@ -151,6 +151,6 @@ The shell smoke checks routing, pairs, cycles and path safety in temp fixtures.
 - Use small models for `subagent/codebase-explorer` and
   `subagent/web-search` to filter context.
   Pass the relevant findings to the larger model.
-- Split work into thematic “cohorts” for easier human and LLM review.
+- Split work into thematic "cohorts" for easier human and LLM review.
 - Prompts are tightly token optimized for language-model execution.
 - The custom linter `rust-llm-tidy` repairs common LLM writing shenanigans.

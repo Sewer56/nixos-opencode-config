@@ -1,7 +1,0 @@
-- Each error bullet names the specific condition that produces it.
-- Block vague triggers such as `on error` or `if invalid`.
-- Error sections cover every reachable error variant/type/path in changed APIs.
-- Error docs must match implementation.
-- List only errors the function can return.
-- Follow language and project conventions for error docs and links.
-- Do not backfill untouched legacy files solely for error docs.

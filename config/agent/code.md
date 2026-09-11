@@ -79,8 +79,7 @@ permission:
     "_review/doc-quality": allow
     "_review/code/optional/security": allow
     "_review/code/optional/performance": allow
-    "_review/verifiers/correctness": allow
-    "_review/verifiers/quality": allow
+    "_review/verifier": allow
 ---
 
 Code within user scope.
@@ -185,13 +184,13 @@ Supply shared inputs with handoff/instruction authority.
 
 Use STANDALONE, STAGED, actual base/HEAD and exact authorized paths.
 Assign `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md` per reviewer.
-Assign `[[review_dir]]/[[class]]/[[boundary_id]].rNN.verdict.md` per partition.
+Assign `[[review_dir]]/verifier/[[boundary_id]].rNN.verdict.md` per partition.
 
 ### Review/verify/repair loop
 
 1. Run selected reviewers in parallel on the validated, stable diff.
 2. Await all reports without editing.
-   Route every candidate to assigned verifiers in parallel.
+   Route each boundary's candidates together to `_review/verifier`.
 3. Await every candidate's disposition before repair.
    Failed delegation is FAIL/INCOMPLETE; never review/verify for delegates.
 4. Apply scoped verifier-accepted repairs under the shared repair rules.
@@ -225,5 +224,165 @@ Report changes, checks, review/verdict outcomes and paths.
 {{ file="./rules/plan-confirmation.md" }}
 
 {{ file="./rules/code/writing.md" }}
+
+### Code quality
+
+Preserve behavior unless explicitly changed; use the smallest viable diff.
+Refactor broadly only when required or requested.
+
+Use repository types, schemas, signatures and patterns.
+Minimize visibility within required API boundaries.
+Reuse constants by meaning; derive related boundaries and test inputs from them.
+
+#### Placement
+
+Keep orchestration in the entrypoint and prefer one data model per file.
+Keep enums, newtypes and value objects with their sole parent type.
+
+Keep non-public helpers local and conversions beside the type.
+No global `conversions` buckets or unrequested collapse into monoliths.
+
+Shared behavior belongs in the lowest shared owning package.
+If ownership is unclear, use the package others depend on.
+
+Integration-family packages contain wiring and package-specific behavior.
+Co-locate tests unless repository convention is stronger.
+
+#### Body layout
+
+Group new or substantially rewritten non-trivial bodies, including moved code.
+Include ported regions.
+
+No re-layout for incidental edits; formatters own line wrapping.
+
+- Separate coherent steps with one blank line.
+- Put needed why/purpose comments once above their group.
+- Tests separate arrange, act and assert.
+- Split long arrange into harness, fixtures and inputs.
+- Group multi-step loops; skip single-group bodies.
+
+### Test strategy
+
+#### Coverage
+
+Test critical success, failure and edge behavior.
+Cover all new code when tests are required.
+
+Equivalence needs one test executing both paths and comparing final results.
+Compare rendered/consumed results, not intermediate representations.
+Request-shape mocks and examples do not replace behavioral tests.
+
+Map removed redundant assertions to surviving tests.
+Allow redundancy only across public entry points.
+Control, seed or freeze I/O, time and network.
+
+#### Test cases
+
+Extend matching setup and entry points first.
+Parameterize independent data-only variations of one claim with named cases.
+
+Use a framework such as Rust's rstest; add it if needed.
+
+Separate differing claims or cases without one descriptive name.
+Use loops only within one stateful scenario or assertion.
+
+Order case arguments: primary input, mode/flags, expected output.
+Comment only non-obvious parameters/assertions.
+Keep readable cases near 80-100 columns.
+
+Extract helpers for repetition or shared setup clarity.
+Prefer one parameterizable local helper over per-test mock structs.
+
+Name tests `subject_should_expectation_when_condition`.
+Use the language's identifier style.
+Use `when` only for conditional/edge behavior; omit module-redundant prefixes.
+
+Group related tests with lightweight section comments.
+Order: construction, core behavior, edge cases, convenience.
+
+### Security
+
+Expose the smallest named operation needed.
+
+When an explicit operation suffices, avoid:
+- Generic command/channel invocation.
+- Token/secret getters and raw storage.
+- Broad filesystem access and ambient authority.
+
+Keep secrets within their owner; implement complete clearing and revocation.
+Auth errors must not reach privileged behavior or leak sensitive distinctions.
+Retries/defaults must not turn auth errors into success.
+
+Require explicit approval to weaken verification or broaden dependency trust.
+Require explicit approval to disable certificate/signature checks.
+
+### Performance
+
+Prefer the highest-performance correct implementation.
+Simplify for readability, never at meaningful performance cost.
+
+Use equally clear bounded alternatives; avoid needless allocation or copying.
+Avoid needless clones and initialization, including zero-filling.
+Never obfuscate for unmeasured wins.
+
+Bound growing inputs with pagination, limits, batching or streaming.
+Avoid nested per-item database, network or filesystem work on list paths.
+Cap user input before proportional allocation, sorting or logging.
+
+Measure provably bounded work when the plan requires it.
+Otherwise record unmeasured bounded work as a limitation.
+
+### Documentation
+
+#### Coverage
+
+Document scoped new/changed public features for purpose and use.
+Preserve contracts, safety/compatibility caveats and meaningful exceptions.
+
+Preserve required/consequential frequency details.
+
+Preserve source delimiters, indentation, directives and doctest behavior.
+Do not backfill untouched legacy solely for docs or edit frozen regions.
+
+Use real APIs and hermetic fixtures in runnable examples.
+Update links after heading changes or preserve anchors.
+
+#### Source/API conventions
+
+Apply this subsection only to source/API docs.
+
+Private APIs need purpose and non-obvious contracts unless trivial.
+Refresh changed module/file boundary docs.
+
+Package docs cover import/usage; code docs cover exports.
+Update both only when both exist and change.
+Put requested API-owned examples in code docs.
+
+Open with a plain one-line purpose summary.
+Put caveats in trailing `# Remarks` or equivalent.
+Use native doc links and `#` sections for multiple aspects.
+
+#### Error documentation
+
+Cover every reachable error variant/type/path in changed APIs.
+Name each specific trigger and only errors the function can return.
+
+Follow language/project conventions for error docs and links; never use stubs.
+
+#### Formatting
+
+Lead with the point or next action; omit intros and outros.
+Use numbered steps for procedures, one action each.
+
+Use `Next:` or checkable `Done when:` only for useful procedural guidance.
+
+API errors and returns come last; errors name condition, cause and fix.
+Use concrete units for non-trivial work and colons or periods, not em dashes.
+
+Full explanations, destructive actions, ambiguity and accuracy override shape.
+Harness, wording and documentation requirements also take precedence.
+In exceptions, retain the lead and drop closers.
+
+### Review coordination
 
 {{ file="./rules/review/routing.md" }}

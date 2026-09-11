@@ -101,9 +101,25 @@ Review current diff against approved trust boundaries.
 Final review includes cumulative capability and data-flow composition.
 
 Use stable finding IDs `SEC-NNN` with attacker input, boundary and impact.
+State the reachable path and missing or incorrect control.
+Generic hardening advice is advisory at most.
 
 # Rules
 
-{{ file="./rules/code/security.md" }}
+### Security
 
-{{ file="./agent/_review/shared/review-rules.txt" }}
+Check exposed capabilities against the smallest named operation needed.
+Where explicit operations suffice, flag unnecessarily broad interfaces:
+
+- Generic command/channel invocation.
+- Token/secret getters and raw storage.
+- Broad filesystem access and ambient authority.
+
+Trace secret confinement, clearing and revocation through their owning boundary.
+Check auth errors for privileged access or leaks of sensitive distinctions.
+Check retries/defaults for conversion of auth errors into success.
+
+Require explicit approval for weakened verification or broader dependency trust.
+Check approval before accepting disabled certificate/signature checks.
+
+{{ file="./agent/_review/shared/candidates.txt" }}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exercise validator entry points, task graphs and rule imports in temporary repos."""
+"""Test validator mechanics and the repository's local review import boundaries."""
 from __future__ import annotations
 
 import contextlib
@@ -153,10 +153,10 @@ class EntryPointTests(unittest.TestCase):
             destination.write(f'\n{{{{ file="./rules/{name}" }}}}\n')
 
     def test_nested_verifier_ids_and_transitive_rules_are_reachable(self):
-        self.agent("Code", targets=("_review/verifiers/quality", "_review/verifiers/correctness"))
+        targets = ("_review/verifier", "_plan/draft/verifier")
+        self.agent("Code", targets=targets)
         self.config["subagent_depth"] = 3
-        for name in ("quality", "correctness"):
-            agent = f"_review/verifiers/{name}"
+        for agent in targets:
             self.agent(agent, "subagent")
             self.import_rule(agent, "review/verifiers.md")
         self.rule("review/verifiers.md", '{{ file="./rules/review/findings.md" }}\n')
@@ -209,11 +209,11 @@ class EntryPointTests(unittest.TestCase):
             destination.write(f'\n{{{{ file="./agent/{name}" }}}}\n')
 
     def test_transitive_local_fragments_are_not_agents(self):
-        self.agent("Code", targets=("_review/verifiers/quality",))
-        self.agent("_review/verifiers/quality", "subagent")
+        self.agent("Code", targets=("_review/verifier",))
+        self.agent("_review/verifier", "subagent")
         self.config["subagent_depth"] = 3
-        self.import_fragment("_review/verifiers/quality", "_review/verifiers/shared/verification.txt")
-        self.fragment("_review/verifiers/shared/verification.txt",
+        self.import_fragment("_review/verifier", "_review/shared/verification.txt")
+        self.fragment("_review/shared/verification.txt",
                       '{{ file="./agent/_review/shared/findings.txt" }}\n')
         self.fragment("_review/shared/findings.txt", '{{ file="./rules/review/contract.md" }}\n')
         self.rule("review/contract.md")
@@ -243,6 +243,76 @@ class EntryPointTests(unittest.TestCase):
         self.import_fragment("Code", "_review/shared/accidental.md")
         self.fragment("_review/shared/accidental.md")
         self.validate(1, "agent shared fragments must use .txt, not .md:")
+
+
+class LocalReviewArchitectureTests(unittest.TestCase):
+    repo = Path(__file__).resolve().parents[1]
+
+    def imports(self, relative):
+        pending = [self.repo / relative]
+        seen = set()
+        while pending:
+            path = pending.pop().resolve()
+            if path in seen:
+                continue
+            seen.add(path)
+            for raw in validator.IMPORT_RE.findall(path.read_text(encoding="utf-8")):
+                target = validator.resolve_import(self.repo, path, raw)
+                self.assertIsNotNone(target, (path, raw))
+                pending.append(target)
+        return {p.relative_to(self.repo).as_posix() for p in seen}
+
+    def test_callers_share_one_local_verifier(self):
+        for caller in ("code", "docs", "_implement/cohort"):
+            path = self.repo / "config/agent" / f"{caller}.md"
+            targets = validator.task_targets(validator.load_frontmatter(path))
+            self.assertEqual(
+                {t for t in targets if t.startswith("_review/") and "verif" in t},
+                {"_review/verifier"}, caller,
+            )
+
+    def test_verifier_imports_only_protocol(self):
+        self.assertEqual(self.imports("config/agent/_review/verifier.md"), {
+            "config/agent/_review/verifier.md",
+            "config/agent/_review/shared/review-rules.txt",
+            "config/rules/review/contract.md",
+            "config/rules/review/reporting.md",
+        })
+
+    def test_writers_do_not_load_candidate_or_wording_checklists(self):
+        for caller in ("code", "docs", "subagent/coder", "_implement/cohort",
+                       "_review/coderabbit", "_write/pr", "_write/issue"):
+            imports = self.imports(f"config/agent/{caller}.md")
+            self.assertFalse(imports & {
+                "config/rules/write/wording.md",
+                "config/agent/_review/shared/candidates.txt",
+                "config/agent/_review/doc-quality.md",
+            }, caller)
+
+    def test_candidate_reviewers_import_only_protocol(self):
+        protocol = {
+            "config/agent/_review/shared/candidates.txt",
+            "config/agent/_review/shared/review-rules.txt",
+            "config/rules/review/contract.md",
+            "config/rules/review/reporting.md",
+        }
+        for reviewer in ("code-quality", "correctness", "doc-quality",
+                         "code/optional/security", "code/optional/performance"):
+            root = f"config/agent/_review/{reviewer}.md"
+            self.assertEqual(self.imports(root), protocol | {root})
+
+    def test_no_domain_rule_imports_remain(self):
+        shared_procedures = {
+            "config/rules/code/writing.md",
+            "config/rules/write/llm-tidy-pass.md",
+        }
+        for path in (self.repo / "config/agent").rglob("*.md"):
+            root = path.relative_to(self.repo).as_posix()
+            domain_imports = {p for p in self.imports(root)
+                              if p.startswith(("config/rules/code/",
+                                               "config/rules/docs/",
+                                               "config/rules/write/"))}
+            self.assertFalse(domain_imports - shared_procedures, root)
 
 
 if __name__ == "__main__":

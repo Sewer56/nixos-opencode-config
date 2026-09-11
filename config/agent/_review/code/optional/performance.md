@@ -102,8 +102,29 @@ Preserve required measurements; distinguish unmeasured from unbounded work.
 
 Use stable finding IDs `PERF-NNN` with workload, resource impact and proof.
 
+Unmeasured but provably bounded work is not a finding.
+For performance evidence, return INCOMPLETE only if validation cannot run,
+the plan requires the measurement, or no bound is provable.
+
 # Rules
 
-{{ file="./rules/code/performance.md" }}
+### Performance
 
-{{ file="./agent/_review/shared/review-rules.txt" }}
+Judge read target code and workload evidence, not plan wording.
+Check for meaningful cost versus the highest-performance correct alternative.
+
+Readability does not justify meaningful performance regressions.
+
+Prefer equally clear bounded alternatives.
+Reject obfuscation for unmeasured wins.
+
+Check needless allocation, clones, copies and initialization like zero-filling.
+
+Check growing inputs for pagination, limits, batching or streaming.
+Look for nested per-item database, network or filesystem work on list paths.
+Verify caps precede proportional allocation, sorting or logging of user input.
+
+Provably bounded work needs measurements only when the plan requires them.
+Record unmeasured bounded work as a limitation.
+
+{{ file="./agent/_review/shared/candidates.txt" }}

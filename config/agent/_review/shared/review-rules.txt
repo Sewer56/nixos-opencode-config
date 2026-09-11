@@ -4,7 +4,7 @@
 
 ### Authority
 
-Review authorized scope, including existing issues in explicitly named targets.
+Stay within authorized scope; it includes existing issues in named targets.
 Do not broaden review to unrelated legacy issues.
 
 STAGED compares base to index; COMMITTED compares base to head.
@@ -19,30 +19,19 @@ Never auto-migrate plans.
 
 ### Evidence and repair eligibility
 
-Independently verify claims; citations/confidence are not proof.
+Independently verify applicability, issue and correction.
+Citations/confidence are not proof.
+
 Blockers need material in-scope violations, including criteria obligations.
 
-Check outcomes, contracts and invariants across the change.
 Allow equivalent mechanical drift, not unrelated edits.
 
 Factual/mixed claims need execution or source proof and a falsifiable check.
 
-Reader/maintainability impact needs no runtime failure.
-Test applicability, issue and bounded correction.
-
-For doc additions, cite a requirement or concrete reader consequence.
-Justify placement here rather than in an existing reference.
-
-Truth, completeness or plan mechanics alone do not justify additions.
-
-Preserve necessary information/behavior; truth does not refute irrelevance.
 Reject unsupported preference; unverifiable material claims are INCOMPLETE.
 
 Third-party claims need named pinned source: local, upstream, then research.
 Mocks cannot prove dependency-side rendering or conversion.
-
-Parity needs both paths executed and final consumed results compared.
-Shape assertions or prose do not prove parity.
 
 Merge root-cause duplicates; reject stale, refuted or guarded claims.
 

@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews whole-bundle fidelity, readability and readiness
+description: Reviews plan bundles
 model: sewer-axonhub/glm-5.3 # PLANNER
 variant: high
 permission:
@@ -99,11 +99,15 @@ Create no artifacts or review caches.
 - Require mechanics and tidy evidence before semantic review.
 - Read root/briefs as human authority, then check execution fidelity.
 - Judge readability and auditable task scope, not token length alone.
+
+## Readiness
+
 - Search only for narrow verification, not final implementation review.
 - Check direct impact/verification surfaces, not exhaustive inventories.
 - Block unresolved implementation-shaping choices or missing evidence.
 - Reject pseudo-patches, exact line recipes, import diffs or speculative bodies.
 - Ignore harmless wording and safely discoverable mechanics.
+
 - Required changes need falsifiable affected-member and section/check evidence.
 
 - `READY`: no correction is required before implementation.
@@ -126,6 +130,20 @@ BLOCKED identifies missing evidence or the needed human decision.
 
 {{ file="./agent/_plan/draft/shared/requirements.txt" }}
 
-{{ file="./rules/code/tests.md" }}
+### Test strategy
+
+Judge planned checks by observable acceptance behavior, not compiler guarantees.
+Require critical success, failure and edge coverage.
+
+When tests are required, check planned coverage of all new code.
+Equivalence needs both paths executed in one test with final results compared.
+Compare rendered/consumed results, not intermediate representations.
+
+Request-shape mocks and examples cannot replace behavioral tests.
+Removed redundant assertions need surviving coverage.
+Allow redundancy across public entry points.
+
+Check planned control of I/O, time and network for deterministic results.
+Leave test naming, layout and parameterization mechanics to implementation.
 
 {{ file="./rules/review/reporting.md" }}

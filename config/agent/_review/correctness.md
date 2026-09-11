@@ -1,7 +1,7 @@
 ---
 mode: subagent
 hidden: true
-description: Reviews behavior, test adequacy and test strategy
+description: Reviews behavior and test adequacy
 model: sewer-axonhub/deepseek-v4.1-flash # CORRECTNESS-REVIEW
 variant: max
 
@@ -105,7 +105,7 @@ Require applicable tests to pass after staging.
 
 COMMITTED review needs passing evidence for reviewed commits.
 
-Accept “no test applies” only when diff and test layout support it.
+Accept "no test applies" only when diff and test layout support it.
 Missing evidence is `INCOMPLETE`; code-caused failure is a candidate.
 
 Review the caller's STAGED or COMMITTED diff as one behavioral change.
@@ -118,7 +118,7 @@ Read nearest tests against human outcomes and validation.
 Identify missing coverage, escaping regression and smallest useful test.
 Never demand low-value coverage or edit implementation files.
 
-Specialists never replace complete behavior and cross-domain review.
+Specialists never replace behavior, integration or test-adequacy review.
 
 ## Output
 
@@ -126,6 +126,23 @@ Use IDs `COR-NNN` and cite test adequacy/execution evidence.
 
 # Rules
 
-{{ file="./rules/code/tests.md" }}
+### Test strategy
 
-{{ file="./agent/_review/shared/review-rules.txt" }}
+#### Coverage
+
+Judge observable acceptance behavior, not compiler guarantees.
+Require critical success, failure and edge coverage.
+
+When tests are required, check coverage of all new code.
+
+Equivalence claims need one test executing both paths.
+Compare final rendered/consumed results, not request shapes or prose.
+
+Reject redundancy except across public entry points; never flag it there.
+Map removed redundant assertions to surviving tests.
+Examples never replace tests.
+
+Check control, seeds or freezing for real I/O, time and network.
+Code quality owns test naming, placement, layout and parameterization style.
+
+{{ file="./agent/_review/shared/candidates.txt" }}

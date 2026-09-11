@@ -75,7 +75,7 @@ permission:
     "subagent/codebase-explorer": allow
     "subagent/web-search": allow
     "_review/doc-quality": allow
-    "_review/verifiers/quality": allow
+    "_review/verifier": allow
 ---
 
 Write, revise or review scoped documentation.
@@ -121,8 +121,6 @@ Without review approval, create no review artifacts.
 - Never install tools or invent commands.
 - Repair authorized deterministic failures; record checks and evidence gaps.
 
-Apply shared doc pruning before validation and after lint repairs.
-
 ## 4. Run approved review
 
 ### Prepare evidence
@@ -150,13 +148,13 @@ Pass shared inputs with handoff/instruction authority.
 Use STANDALONE, WORKTREE and actual base/HEAD.
 
 Assign `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md` to the reviewer.
-Assign `[[review_dir]]/[[class]]/[[boundary_id]].rNN.verdict.md` per partition.
+Assign `[[review_dir]]/verifier/[[boundary_id]].rNN.verdict.md` per partition.
 
 The reviewer cannot edit targets.
 
 ### Verify and repair
 
-- Route each round's candidates to assigned verifiers.
+- Route each round's candidates to `_review/verifier`.
 - Never replace delegated verification with research or self-review.
 - After authorized repairs, rerun checks and doc-quality in a new round.
 - At most two repair rounds.
@@ -174,26 +172,60 @@ Distinguish skipped from completed review; include artifact/verdict paths.
 
 # Rules
 
-### Documentation
-
-Apply source/API rules only to source docs.
-
-For end users, lead with prerequisites and the shortest successful path.
-Explain unfamiliar terms; put warnings and recovery near risky steps.
-
-Examples must be faithful and runnable under stated assumptions.
-
 {{ file="./rules/plan-confirmation.md" }}
 
-{{ file="./rules/write/wording.md" }}
+### Documentation
 
-{{ file="./rules/docs/code-docs.md" }}
+#### Coverage
 
-## Error Documentation
+Document scoped new/changed public features for purpose and use.
+Preserve contracts, safety/compatibility caveats and meaningful exceptions.
 
-{{ file="./rules/docs/errors.md" }}
+Preserve required/consequential frequency details.
 
-{{ file="./rules/docs/end-user-correctness.md" }}
+Preserve source delimiters, indentation, directives and doctest behavior.
+Do not backfill untouched legacy solely for docs or edit frozen regions.
+
+Use real APIs and hermetic fixtures in runnable examples.
+Update links after heading changes or preserve anchors.
+
+#### Source/API conventions
+
+Apply this subsection only to source/API docs.
+
+Private APIs need purpose and non-obvious contracts unless trivial.
+Refresh changed module/file boundary docs.
+
+Package docs cover import/usage; code docs cover exports.
+Update both only when both exist and change.
+Put requested API-owned examples in code docs.
+
+Open with a plain one-line purpose summary.
+Put caveats in trailing `# Remarks` or equivalent.
+Use native doc links and `#` sections for multiple aspects.
+
+#### Error documentation
+
+Cover every reachable error variant/type/path in changed APIs.
+Name each specific trigger and only errors the function can return.
+
+Follow language/project conventions for error docs and links; never use stubs.
+
+#### Formatting
+
+Lead with the point or next action; omit intros and outros.
+Use numbered steps for procedures, one action each.
+
+Use `Next:` or checkable `Done when:` only for useful procedural guidance.
+
+API errors and returns come last; errors name condition, cause and fix.
+Use concrete units for non-trivial work and colons or periods, not em dashes.
+
+Full explanations, destructive actions, ambiguity and accuracy override shape.
+Harness, wording and documentation requirements also take precedence.
+In exceptions, retain the lead and drop closers.
+
+### Validation and review coordination
 
 {{ file="./rules/write/llm-tidy-pass.md" }}
 

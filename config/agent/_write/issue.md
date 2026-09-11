@@ -155,6 +155,18 @@ Errors: <one-line error or None>
 
 # Rules
 
-{{ file="./rules/write/wording.md" }}
+### Documentation
 
-{{ file="./rules/write/adhd-format.md" }}
+#### Formatting
+
+Lead with the point or next action; omit intros and outros.
+Use numbered steps for procedures, one action each.
+
+Use `Next:` or checkable `Done when:` only for useful procedural guidance.
+
+API errors and returns come last; errors name condition, cause and fix.
+Use concrete units for non-trivial work and colons or periods, not em dashes.
+
+Full explanations, destructive actions, ambiguity and accuracy override shape.
+Harness, wording and documentation requirements also take precedence.
+In exceptions, retain the lead and drop closers.
