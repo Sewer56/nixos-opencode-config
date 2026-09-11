@@ -167,9 +167,13 @@ Honor named-reviewer limits.
 Otherwise select by diff, not extension:
 - Code changes/refactors: correctness and code-quality.
 - `_review/correctness`: behavior/contracts/config/examples/tests.
-- `_review/code-quality`: maintainability, placement and code-body layout.
-- `_review/doc-quality`: changed docs/comments.
-Also select doc-quality when changed public behavior requires documentation.
+- `_review/code-quality`: code quality and source-embedded docs/comments.
+- `_review/doc-quality`: standalone Markdown/text docs (API references too).
+
+Select both for mixed documentation changes.
+Apply this split to documentation required by changed public behavior too.
+
+For docs-only requests, review only documentation and scope violations.
 Runnable examples need correctness even in Markdown.
 
 Optional: explicit request or matching risk:

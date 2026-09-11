@@ -53,11 +53,13 @@ Approve the outline before writing.
 ### Shared reviewers
 
 - `correctness`: behavior, integration, runnable examples and test adequacy.
-- `code-quality`: maintainability, placement, code and test organization.
-- `doc-quality`: doc accuracy, coverage, API errors and reader usability.
+- `code-quality`: maintainability, code/test layout and source documentation.
+- `doc-quality`: standalone Markdown/text docs, including API references.
 
-Docs uses one documentation reviewer when you approve review.
-Code and Implement cohorts also use it for documentation changes or obligations.
+Docs selects reviewers by documentation location when you approve review.
+Mixed documentation changes use both, limited to their documentation scope.
+
+Code and Implement cohorts use the same documentation split.
 Changed public behavior can require documentation review even without doc edits.
 
 Old reviewer domains or input schemas require fresh review on resume.

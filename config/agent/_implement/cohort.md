@@ -117,8 +117,9 @@ Be sole code/tests/docs writer for one approved task.
 Require quick PASS and current tidy PASS or not-opted-in skip.
 
 - Always call `_review/correctness` and `_review/code-quality`.
-- Call `_review/doc-quality` for changed docs/comments.
-- Also call it when changed public behavior requires documentation.
+- Code-quality covers source-embedded docs/comments and their coverage gaps.
+- Call `_review/doc-quality` for standalone Markdown/text documentation changes.
+- Also call it when changed public behavior requires standalone documentation.
 - Honor explicit reviewer requests.
 - Security needs trust/auth/secret/IPC or untrusted-input risk.
 - Include filesystem/shell/SQL, crypto, serialization and dependency trust.

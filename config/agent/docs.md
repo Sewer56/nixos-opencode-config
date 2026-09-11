@@ -74,6 +74,7 @@ permission:
     "*": deny
     "subagent/codebase-explorer": allow
     "subagent/web-search": allow
+    "_review/code-quality": allow
     "_review/doc-quality": allow
     "_review/verifier": allow
 ---
@@ -139,25 +140,31 @@ Handoff: action/audience, targets, bounds, baseline/ownership and claims/gaps.
 Validation records shared check evidence or inapplicability.
 Earlier edits without baseline/ownership need NEEDS_INPUT.
 
-### Call the documentation reviewer
+### Select documentation reviewers
 
-Honor review limits; call `_review/doc-quality` on stable targets.
-Supply only its target paths, scope, audience and evidence.
+Honor review limits; call reviewers by documentation location on stable targets.
 
-1. Pass shared inputs with handoff/instruction authority.
+- `_review/code-quality`: source-embedded docs/comments.
+- `_review/doc-quality`: standalone Markdown/text docs (API references too).
+- Select both for mixed targets.
+
+Limit each reviewer to its documentation targets and scope violations.
+Supply its paths, scope, audience and evidence.
+
+1. Pass each reviewer shared inputs with handoff/instruction authority.
 2. Pass STANDALONE, WORKTREE and actual base/HEAD.
    Set review scope to current targets against run-start evidence.
 
-Assign `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md` to the reviewer.
+Assign each reviewer `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md`.
 Assign `[[review_dir]]/verifier/[[boundary_id]].rNN.verdict.md` per partition.
 
-The reviewer cannot edit targets.
+Reviewers cannot edit targets.
 
 ### Verify and repair
 
 - Route each round's candidates to `_review/verifier`.
 - Never replace delegated verification with research or self-review.
-- After authorized repairs, rerun checks and doc-quality in a new round.
+- After authorized repairs, rerun checks and affected reviewers in a new round.
 - At most two repair rounds.
 - Make no target edit after final validation/review.
 

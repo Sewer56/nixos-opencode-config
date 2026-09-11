@@ -16,7 +16,6 @@ Repo map for `/iterate/edit` sessions. Personal OpenCode configuration repo;
 
 Shared rules live in `config/rules/`, organized by consumer family.
 Workflow-local fragments live in `config/agent/**/shared/*.txt`.
-See `config/rules/README.md` for ownership and inlining conventions.
 
 Wording counts in every importer's expanded tokens.
 
