@@ -40,11 +40,10 @@
 
 ## Review imports
 
-- Local reviewers/verifier import only `_review/shared/review-rules.txt`.
-- This covers scope, evidence, safe writes and reporting without nested imports.
-- Put its import first under `# Rules`, followed by role-specific rules.
-- Candidate findings and verifier dispositions/returns stay in their agents.
-- `_review/verifier` tests candidate justifications without domain checklists.
+- Keep reviewer/verifier scope, evidence, safe writes and reporting inline.
+- Keep domain rules in each reviewer's final `# Rules` section.
+- Keep candidate findings and verifier dispositions/returns in their agents.
+- `_review/verifier` checks assigned findings and fixes against cited evidence.
 - Only `doc-quality` carries the documentation acceptance checklist, inline.
 - Correctness owns test adequacy; code quality owns test organization/style.
 - Writers carry inline production rules, not acceptance checklists.

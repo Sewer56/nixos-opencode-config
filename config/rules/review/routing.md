@@ -4,10 +4,10 @@
 
 Before verdicts, orchestrators only check routing metadata.
 Never investigate or filter findings before verifier disposition.
-Route every reported candidate, with its justification, to `_review/verifier`.
+Route every finding and its evidence to `_review/verifier`.
 
 Group all domains sharing input identity into one `boundary_id` partition.
-Identity: authority, review scope/exclusions, scope/boundary/base/head/paths.
+Identity: authority, targets/comparison/exclusions, scope/boundary/base/head.
 
 Pass shared inputs, domains/candidate IDs and paths, boundary_id and round.
 Send only candidate-bearing partitions, without siblings.
@@ -19,8 +19,6 @@ Missing/mismatched results mean INCOMPLETE.
 Deduplicate repairs within unchanged budgets.
 Return all verdict paths; retain identities/evidence for resume/handoff.
 Obsolete domains or input schemas require fresh review, not relabeled evidence.
-
-Prior reports lacking justified-v1 cases cannot authorize repairs.
 
 ### Accepted repairs
 

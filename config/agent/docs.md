@@ -144,8 +144,9 @@ Earlier edits without baseline/ownership need NEEDS_INPUT.
 Honor review limits; call `_review/doc-quality` on stable targets.
 Supply only its target paths, scope, audience and evidence.
 
-Pass shared inputs with handoff/instruction authority.
-Use STANDALONE, WORKTREE and actual base/HEAD.
+1. Pass shared inputs with handoff/instruction authority.
+2. Pass STANDALONE, WORKTREE and actual base/HEAD.
+   Set review scope to current targets against run-start evidence.
 
 Assign `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md` to the reviewer.
 Assign `[[review_dir]]/verifier/[[boundary_id]].rNN.verdict.md` per partition.

@@ -180,9 +180,11 @@ Security includes filesystem/shell/SQL, crypto, serialization and permissions.
 Include untrusted input/dependency trust.
 
 Record routes/skips.
-Supply shared inputs with handoff/instruction authority.
 
-Use STANDALONE, STAGED, actual base/HEAD and exact authorized paths.
+1. Supply shared inputs with handoff/instruction authority.
+2. Pass STANDALONE, STAGED, actual base/HEAD and exact authorized paths.
+   Set review scope to base-to-index changes in those paths.
+
 Assign `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md` per reviewer.
 Assign `[[review_dir]]/verifier/[[boundary_id]].rNN.verdict.md` per partition.
 

@@ -127,8 +127,9 @@ Require quick PASS and current tidy PASS or not-opted-in skip.
 Call selected reviewers independently in parallel on a stable diff.
 Await all results without editing.
 
-- Supply shared inputs with root/execution/brief/exec/instructions.
-- Use TASK:[[ID]], STAGED, task-start base, HEAD and staged paths.
+1. Supply shared inputs with root/execution/brief/exec/instructions.
+2. Pass TASK:[[ID]], STAGED, task-start base, HEAD and staged paths.
+   Set review scope to task-start-base-to-index changes in those paths.
 
 - Failed delegation cannot pass; never review/verify/commit for delegates.
 

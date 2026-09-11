@@ -271,10 +271,9 @@ class LocalReviewArchitectureTests(unittest.TestCase):
                 {"_review/verifier"}, caller,
             )
 
-    def test_verifier_imports_only_protocol(self):
+    def test_verifier_is_self_contained(self):
         self.assertEqual(self.imports("config/agent/_review/verifier.md"), {
             "config/agent/_review/verifier.md",
-            "config/agent/_review/shared/review-rules.txt",
         })
 
     def test_writers_do_not_load_candidate_or_wording_checklists(self):
@@ -287,14 +286,11 @@ class LocalReviewArchitectureTests(unittest.TestCase):
                 "config/agent/_review/doc-quality.md",
             }, caller)
 
-    def test_candidate_reviewers_import_only_protocol(self):
-        protocol = {
-            "config/agent/_review/shared/review-rules.txt",
-        }
+    def test_candidate_reviewers_are_self_contained(self):
         for reviewer in ("code-quality", "correctness", "doc-quality",
                          "code/optional/security", "code/optional/performance"):
             root = f"config/agent/_review/{reviewer}.md"
-            self.assertEqual(self.imports(root), protocol | {root})
+            self.assertEqual(self.imports(root), {root})
 
     def test_no_domain_rule_imports_remain(self):
         shared_procedures = {
