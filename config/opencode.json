@@ -8,7 +8,7 @@
     "./plugins/opencode-plugin-md-expand/src/index",
     "opencode-axonhub-tracing"
   ],
-  "small_model": "sewer-axonhub/deepseek-v4-flash",
+  "small_model": "sewer-axonhub/deepseek-v4.1-flash",
   "permission": {
     "bash": {
       "*": "allow"
