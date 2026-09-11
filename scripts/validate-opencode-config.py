@@ -3,6 +3,9 @@
 
 Runs static checks without a model; writes only the explicit ``--report``.
 
+Keep checks mechanical; never assess prose wording, quality or meaning.
+Add checks only for concrete configuration failures, not prompt preferences.
+
 Configuration documents:
 - Parse active JSON/JSONC configuration and local Caveman plugin package data.
 - Require positive output limits and an ask/allow/pattern external policy.

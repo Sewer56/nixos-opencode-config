@@ -40,9 +40,10 @@
 
 ## Review imports
 
-- Candidate reviewers import `_review/shared/candidates.txt` for their return.
-- Candidates and the verifier share `_review/shared/review-rules.txt`.
-  It includes evidence-only writes and imports `review/contract.md` here.
+- Local reviewers/verifier import only `_review/shared/review-rules.txt`.
+- This covers scope, evidence, safe writes and reporting without nested imports.
+- Put its import first under `# Rules`, followed by role-specific rules.
+- Candidate findings and verifier dispositions/returns stay in their agents.
 - `_review/verifier` tests candidate justifications without domain checklists.
 - Only `doc-quality` carries the documentation acceptance checklist, inline.
 - Correctness owns test adequacy; code quality owns test organization/style.
@@ -53,7 +54,7 @@
 
 - Orchestrators import `review/routing.md`, not reviewer write restrictions.
 - Routing owns accepted-repair procedures.
-- Review rules and routing share `review/contract.md` for inputs.
+- Routing imports `review/contract.md` for inputs.
 - The contract imports `review/reporting.md` for evidence and report handoffs.
   Plan, writing-adherence and CodeRabbit roles also import reporting directly.
 

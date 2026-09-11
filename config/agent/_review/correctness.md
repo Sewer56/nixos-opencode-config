@@ -92,13 +92,15 @@ permission:
 ---
 
 Review the complete scoped behavioral change; domain is CORRECTNESS.
-Use shared inputs/output; verifier owns repair eligibility.
+The verifier owns repair eligibility.
 Test-only assignments assess implementation only for observable coverage.
 
 Check runnable examples, including those in documentation.
 Documentation fidelity and coverage belong to doc-quality.
 
 ## 1. Review
+
+Check scoped outcomes, contracts and invariants in targets and direct consumers.
 
 Check `validation_path` first.
 Require applicable tests to pass after staging.
@@ -124,7 +126,22 @@ Specialists never replace behavior, integration or test-adequacy review.
 
 Use IDs `COR-NNN` and cite test adequacy/execution evidence.
 
+Write `[[review_path]]` findings with stable ID/severity, location and issue.
+
+- Obligation: exact requirement and origin; required or advisory.
+- Applicability: why it governs this domain, target, scope and audience.
+- Evidence: source/execution proof with a falsifiable check.
+- Consequence: concrete impact justifying severity.
+- Correction: smallest exact edit or bounded repair; preservation constraints.
+
+Quote prompt-owned criteria separately from user/repository requirements.
+
+Return Status: PASS|CANDIDATES|INCOMPLETE|FAIL.
+Include Domain, Review Path, Finding Count (all), one-line Summary.
+
 # Rules
+
+{{ file="./agent/_review/shared/review-rules.txt" }}
 
 ### Test strategy
 
@@ -144,5 +161,3 @@ Examples never replace tests.
 
 Check control, seeds or freezing for real I/O, time and network.
 Code quality owns test naming, placement, layout and parameterization style.
-
-{{ file="./agent/_review/shared/candidates.txt" }}

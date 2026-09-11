@@ -87,13 +87,15 @@ permission:
 ---
 
 Review concrete trust-boundary risk; domain is SECURITY.
-Use shared inputs/output and caller's risk.
+Use the caller's risk.
 Do not emit generic hardening advice.
 
 # Review
 
 Read affected trust boundaries, referenced contracts/config, and tests.
 Search only for narrow verification.
+
+Check scoped outcomes, contracts and invariants in targets and direct consumers.
 
 Exclude general style and performance unrelated to denial of service.
 
@@ -104,7 +106,24 @@ Use stable finding IDs `SEC-NNN` with attacker input, boundary and impact.
 State the reachable path and missing or incorrect control.
 Generic hardening advice is advisory at most.
 
+## Output
+
+Write `[[review_path]]` findings with stable ID/severity, location and issue.
+
+- Obligation: exact requirement and origin; required or advisory.
+- Applicability: why it governs this domain, target, scope and audience.
+- Evidence: source/execution proof with a falsifiable check.
+- Consequence: concrete impact justifying severity.
+- Correction: smallest exact edit or bounded repair; preservation constraints.
+
+Quote prompt-owned criteria separately from user/repository requirements.
+
+Return Status: PASS|CANDIDATES|INCOMPLETE|FAIL.
+Include Domain, Review Path, Finding Count (all), one-line Summary.
+
 # Rules
+
+{{ file="./agent/_review/shared/review-rules.txt" }}
 
 ### Security
 
@@ -121,5 +140,3 @@ Check retries/defaults for conversion of auth errors into success.
 
 Require explicit approval for weakened verification or broader dependency trust.
 Check approval before accepting disabled certificate/signature checks.
-
-{{ file="./agent/_review/shared/candidates.txt" }}

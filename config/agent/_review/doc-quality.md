@@ -94,6 +94,8 @@ For docs-only requests, flag executable changes or unrelated code churn.
 
 ## 1. Check fidelity and coverage
 
+Check scoped outcomes, contracts and invariants in targets and direct consumers.
+
 - Read scoped docs, authority, mapped behavior and referenced implementation.
 - Search only to verify fidelity, links or reachable errors.
 - Check claims, defaults, flags, paths, APIs, examples, and failure behavior.
@@ -128,7 +130,22 @@ No vague or whole-document rewrites.
 
 Use IDs `DQL-NNN` with concrete reader consequences.
 
+Write `[[review_path]]` findings with stable ID/severity, location and issue.
+
+- Obligation: exact requirement and origin; required or advisory.
+- Applicability: why it governs this domain, target, scope and audience.
+- Evidence: source/execution proof with a falsifiable check.
+- Consequence: concrete impact justifying severity.
+- Correction: smallest exact edit or bounded repair; preservation constraints.
+
+Quote prompt-owned criteria separately from user/repository requirements.
+
+Return Status: PASS|CANDIDATES|INCOMPLETE|FAIL.
+Include Domain, Review Path, Finding Count (all), one-line Summary.
+
 # Rules
+
+{{ file="./agent/_review/shared/review-rules.txt" }}
 
 ### Documentation
 
@@ -265,7 +282,3 @@ Reject facts that only display implementation knowledge.
 Prefer current behavior and omit inventories unless readers need members.
 Preserve exact project terms, distinctions, identifiers and API/CLI names.
 Keep commands, paths, URLs and safety wording exact within authorized scope.
-
-### Review procedure
-
-{{ file="./agent/_review/shared/candidates.txt" }}

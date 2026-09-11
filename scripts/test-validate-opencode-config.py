@@ -275,8 +275,6 @@ class LocalReviewArchitectureTests(unittest.TestCase):
         self.assertEqual(self.imports("config/agent/_review/verifier.md"), {
             "config/agent/_review/verifier.md",
             "config/agent/_review/shared/review-rules.txt",
-            "config/rules/review/contract.md",
-            "config/rules/review/reporting.md",
         })
 
     def test_writers_do_not_load_candidate_or_wording_checklists(self):
@@ -285,16 +283,13 @@ class LocalReviewArchitectureTests(unittest.TestCase):
             imports = self.imports(f"config/agent/{caller}.md")
             self.assertFalse(imports & {
                 "config/rules/write/wording.md",
-                "config/agent/_review/shared/candidates.txt",
+                "config/agent/_review/shared/review-rules.txt",
                 "config/agent/_review/doc-quality.md",
             }, caller)
 
     def test_candidate_reviewers_import_only_protocol(self):
         protocol = {
-            "config/agent/_review/shared/candidates.txt",
             "config/agent/_review/shared/review-rules.txt",
-            "config/rules/review/contract.md",
-            "config/rules/review/reporting.md",
         }
         for reviewer in ("code-quality", "correctness", "doc-quality",
                          "code/optional/security", "code/optional/performance"):

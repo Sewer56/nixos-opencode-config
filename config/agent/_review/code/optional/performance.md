@@ -87,13 +87,15 @@ permission:
 ---
 
 Review final cumulative or complete standalone change; domain is PERFORMANCE.
-Never review individual tasks; use shared inputs/output.
+Never review individual tasks.
 Judge realistic repository workloads, not hypothetical scale.
 
 # Review
 
 Read affected targets/callers, workload bounds, and relevant validation.
 Search only for narrow verification.
+
+Check scoped outcomes, contracts and invariants in targets and direct consumers.
 
 Exclude style, coverage, and correctness unrelated to material performance.
 
@@ -106,7 +108,24 @@ Unmeasured but provably bounded work is not a finding.
 For performance evidence, return INCOMPLETE only if validation cannot run,
 the plan requires the measurement, or no bound is provable.
 
+## Output
+
+Write `[[review_path]]` findings with stable ID/severity, location and issue.
+
+- Obligation: exact requirement and origin; required or advisory.
+- Applicability: why it governs this domain, target, scope and audience.
+- Evidence: source/execution proof with a falsifiable check.
+- Consequence: concrete impact justifying severity.
+- Correction: smallest exact edit or bounded repair; preservation constraints.
+
+Quote prompt-owned criteria separately from user/repository requirements.
+
+Return Status: PASS|CANDIDATES|INCOMPLETE|FAIL.
+Include Domain, Review Path, Finding Count (all), one-line Summary.
+
 # Rules
+
+{{ file="./agent/_review/shared/review-rules.txt" }}
 
 ### Performance
 
@@ -126,5 +145,3 @@ Verify caps precede proportional allocation, sorting or logging of user input.
 
 Provably bounded work needs measurements only when the plan requires them.
 Record unmeasured bounded work as a limitation.
-
-{{ file="./agent/_review/shared/candidates.txt" }}

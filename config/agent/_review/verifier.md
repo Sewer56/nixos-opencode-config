@@ -145,6 +145,8 @@ Write only verdict_path with schema, input identity, boundary_id and round.
 Give every assigned domain/ID a disposition, including duplicates.
 
 Reference the retained finding for duplicates.
+Reference each disposition's edit.
+Explain refutations or correction changes, not agreement.
 
 ## Output
 
@@ -162,6 +164,6 @@ Summary: [[one line]]
 
 # Rules
 
-Never edit code or candidates.
-
 {{ file="./agent/_review/shared/review-rules.txt" }}
+
+Never edit code or candidates.
