@@ -201,9 +201,6 @@ Order: construction, core behavior, edge cases, convenience.
 
 ## Source documentation
 
-Review docstrings, API and module/file comments, and source-owned examples.
-Standalone Markdown/text documentation belongs to `_review/doc-quality`.
-
 Check accuracy, coverage and readability against reader needs and source.
 Flag unnecessary detail and repetition without dropping needed contracts.
 Reject frozen-region findings, including versions, licenses and warnings.
