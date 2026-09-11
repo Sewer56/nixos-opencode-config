@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Audits source docs
-model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
-variant: high
+model: sewer-axonhub/deepseek-v4.1-flash # CORRECTNESS-REVIEW
+variant: max
 
 permission:
   "*": deny

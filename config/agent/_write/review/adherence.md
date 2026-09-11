@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Produces rule-adherence candidate findings for _write artifacts
-model: sewer-axonhub/glm-5.3 # WRITER
-variant: low
+model: sewer-axonhub/deepseek-v4.1-flash # WRITER
+variant: high
 permission:
   "*": deny
   external_directory:

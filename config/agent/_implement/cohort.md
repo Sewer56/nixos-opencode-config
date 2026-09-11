@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Implements approved tasks
-model: sewer-axonhub/glm-5.3 # CODER
+model: sewer-axonhub/deepseek-v4.1-flash # CODER
 variant: high
 
 permission:

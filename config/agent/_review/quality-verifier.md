@@ -2,8 +2,8 @@
 mode: subagent
 hidden: true
 description: Verifies quality and editorial findings
-model: sewer-axonhub/glm-5.3 # STYLE-REVIEW
-variant: high
+model: sewer-axonhub/deepseek-v4.1-flash # STYLE-REVIEW
+variant: max
 
 permission:
   "*": deny

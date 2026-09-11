@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Researches external questions, versioned docs, and URLs
-model: sewer-axonhub/glm-5.3 # EASY
+model: sewer-axonhub/deepseek-v4.1-flash # EASY
 variant: low
 permission:
   "*": deny

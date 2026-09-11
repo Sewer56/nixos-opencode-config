@@ -1,8 +1,8 @@
 ---
 mode: all
 description: Drafts PRs; creates on request
-model: sewer-axonhub/glm-5.3 # WRITER
-variant: low
+model: sewer-axonhub/deepseek-v4.1-flash # WRITER
+variant: high
 permission:
   "*": deny
   external_directory:
