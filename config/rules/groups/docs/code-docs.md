@@ -1,6 +1,30 @@
 ## Code Documentation
 
-{{ file="./rules/cards/docs/documentation-context.md" }}
+### Documentation context
+
+Adapt all documentation to audience, reader task and document type.
+
+Match concise peers' structure and depth unless requirements justify departures.
+
+Apply source/API duties only to source/API docs.
+Preserve explicit requirements, contracts and complete changed-API errors.
+
+Keep consequential safety/compatibility caveats.
+Maintainer docs explain needed mechanisms.
+
+Write for action, decisions or required understanding, not a fact inventory.
+
+Before validation/handoff, separately prune scoped doc changes.
+Delete unnecessary sections, examples and sentences before polishing.
+
+Omit consequences clear from defaults, definitions or examples.
+Truth or possible usefulness alone is insufficient.
+
+State facts once where owned; link configuration/contracts instead of repeating.
+Never relocate unnecessary detail into new docs.
+
+Examples show choices/usage, not every field.
+Keep necessary content; no length quotas.
 
 ### Coverage
 Private APIs need purpose and non-obvious contracts unless trivial.
@@ -34,21 +58,5 @@ Name concrete mechanisms when readers need them, not vague effects.
 
 {{ file="./rules/cards/style/adhd-format.md" }}
 
-### Body layout
-Comment non-trivial bodies' steps if names/flow obscure intent.
-
-Group new/substantively rewritten non-trivial bodies, including tests.
-No re-layout for incidental edits.
-Formatters own line wrapping.
-- Separate coherent steps with one blank line.
-- Comments explain why, not replace blank lines.
-- Tests separate arrange, act, assert.
-- Split long arrange into harness, fixtures, inputs.
-- Sub-group multi-step loop bodies.
-- Skip single-group bodies.
-- Put required purpose comments once above their group.
-- Group moved/ported/rewritten regions even if dense.
-
 ### Severity
-- BLOCKING: 3+ groups with zero internal blank lines.
-- All other issues: ADVISORY.
+Other documentation issues are ADVISORY.

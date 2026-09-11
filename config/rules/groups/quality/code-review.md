@@ -42,3 +42,23 @@ When ownership is unclear, use the package others depend on.
 
 Focus integration-family packages on wiring and package-specific behavior.
 Co-locate tests with their module unless repo convention is stronger.
+
+## Body layout
+
+Comment non-trivial bodies' steps if names/flow obscure intent.
+
+Group new/substantively rewritten non-trivial bodies, including tests.
+No re-layout for incidental edits.
+Formatters own line wrapping.
+- Separate coherent steps with one blank line.
+- Comments explain why, not replace blank lines.
+- Tests separate arrange, act, assert.
+- Split long arrange into harness, fixtures, inputs.
+- Sub-group multi-step loop bodies.
+- Skip single-group bodies.
+- Put required purpose comments once above their group.
+- Group moved/ported/rewritten regions even if dense.
+
+### Severity
+- BLOCKING: 3+ groups with zero internal blank lines.
+- All other layout issues: ADVISORY.

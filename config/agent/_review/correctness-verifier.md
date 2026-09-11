@@ -91,7 +91,18 @@ permission:
     "patch *": deny
 ---
 
-Verify shared-pipeline domains except QUALITY.
+Verify caller-assigned CORRECTNESS, SECURITY and PERFORMANCE candidates.
+
+## 1. Verify
+
+Apply the shared refute-first process to `[[candidate_paths]]`.
+
+## Output
+
+Return the shared verifier result.
+
+## Rules
+
 Wrong-class inputs mean INCOMPLETE.
 
 {{ file="./rules/groups/implementation/verify-candidates.md" }}

@@ -1,7 +1,7 @@
 {{ file="./rules/cards/implementation/review-protocol.md" }}
 
 `<review-inputs>`:
-- authority_paths; purpose: CHANGE|TARGET_AUDIT.
+- authority_paths; authorized review scope and exclusions.
 - scope: TASK:[[ID]]|FINAL|STANDALONE.
 - boundary: STAGED|WORKTREE|COMMITTED; base_commit, head_commit.
 - Repo-relative paths; cwd; current validation_path.

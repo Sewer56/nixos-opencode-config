@@ -1,0 +1,59 @@
+{{ file="./rules/groups/docs/code-docs.md" }}
+
+## Error Application Review
+
+{{ file="./rules/cards/docs/error-documentation.md" }}
+
+Verify applied docs against traced source.
+Check functions, paths, lines, variants and triggers.
+
+Block dropped proposed variants or changed triggers.
+Allow only if code proves the proposal obsolete.
+
+Missing error-path evidence means INCOMPLETE, not proof of zero errors.
+
+Block `TODO`, `TBD`, `FIXME`, `...`, and vague stubs in error docs.
+Check both proposed and applied docs.
+
+For findings with multiple diff blocks, label each block separately.
+Put its own `**Lines: ~start-end**` before its diff fence.
+
+{{ file="./rules/groups/docs/end-user-correctness.md" }}
+
+## Readability
+
+Flag jargon or references the intended reader cannot resolve nearby.
+Define, rewrite plainly, or point to an explanation.
+
+Flag ambiguity that could cause incorrect action.
+Name the exact path, condition, or action.
+
+Flag compression that harms comprehension.
+Prefer plain expansions over stacked shorthand.
+
+Flag acronyms not expanded on first use as `Expanded Name (ACRONYM)`.
+
+Exclude ordinary or previously defined terms, literal identifiers, and paths.
+Exclude headings and non-instructional prose.
+
+{{ file="./rules/groups/style/wording.md" }}
+
+## Documentation and editorial
+
+Module/file summaries describe organization, not implementations.
+Keep traversal differences affecting maintainer decisions.
+
+Preserve meaningful exceptions and required/consequential frequency details.
+Preserve source delimiters, indentation, directives and doctest behavior.
+
+Harmful inaccuracies, unsafe guidance and missing required contracts can block.
+
+### Documentation concision
+
+Propose deletion, not paraphrase or relocation of unnecessary content.
+
+Name the removable passage and existing coverage or the missing reader purpose.
+
+Block material clutter from repetition or detail obscuring tasks or contracts.
+This overrides advisory-only documentation criteria.
+Minor wording improvements remain advisory; omit synonym nits.

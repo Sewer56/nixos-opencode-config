@@ -74,32 +74,12 @@ permission:
     "*": deny
     "codebase-explorer": allow
     "web-search": allow
-    "_review/docs/accuracy": allow
-    "_review/docs/usability": allow
-    "_review/docs/documentation": allow
-    "_review/docs/errors": allow
-    "_review/correctness-verifier": allow
+    "_review/doc-quality": allow
+    "_review/quality-verifier": allow
 ---
 
 Write, revise or review scoped documentation.
 Use the same correctness standard for every audience.
-
-## Documentation rules
-
-{{ file="./rules/groups/style/wording.md" }}
-
-{{ file="./rules/groups/docs/code-docs.md" }}
-
-{{ file="./rules/groups/docs/error-docs.md" }}
-
-{{ file="./rules/groups/docs/end-user-correctness.md" }}
-
-Apply source/API rules only to source docs.
-
-For end users, lead with prerequisites and the shortest successful path.
-Explain unfamiliar terms; put warnings and recovery near risky steps.
-
-Examples must be faithful and runnable under stated assumptions.
 
 ## 1. Understand
 
@@ -120,12 +100,10 @@ Examples must be faithful and runnable under stated assumptions.
 
 ## 2. Agree on the approach
 
-{{ file="./rules/cards/implementation/plan-confirmation.md" }}
-
 Show outline, audience, key messages and additions/moves/removals.
 Clarify material ambiguity before approval.
 
-Propose Step 4 reviewers and verification, or none.
+Propose Step 4 documentation review and verification, or none.
 Without review approval, create no review artifacts.
 
 ## 3. Write and validate
@@ -144,11 +122,7 @@ Without review approval, create no review artifacts.
 
 Apply shared doc pruning before validation and after lint repairs.
 
-{{ file="./rules/cards/implementation/llm-tidy-pass.md" }}
-
 ## 4. Run approved review
-
-{{ file="./rules/groups/implementation/verification-routing.md" }}
 
 ### Prepare evidence
 
@@ -166,37 +140,28 @@ Handoff: action/audience, targets, bounds, baseline/ownership and claims/gaps.
 Validation records shared check evidence or inapplicability.
 Earlier edits without baseline/ownership need NEEDS_INPUT.
 
-### Select independent reviewers
+### Call the documentation reviewer
 
-Honor review limits; otherwise route by content:
-- End-user docs: `_review/docs/accuracy` and `_review/docs/usability`.
-- Source docs/comments: `_review/docs/documentation`.
-- Source error APIs/sections: also `_review/docs/errors`.
-
-Pass documentation `separate_error_review=YES` if errors is selected, else `NO`.
-
-Parallelize independent reviewers on stable targets.
-Supply only their target paths, scope and evidence.
+Honor review limits; call `_review/doc-quality` on stable targets.
+Supply only its target paths, scope, audience and evidence.
 
 Pass shared inputs with handoff/instruction authority.
-Use TARGET_AUDIT, STANDALONE, WORKTREE and actual base/HEAD.
+Use STANDALONE, WORKTREE and actual base/HEAD.
 
-Assign `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md` per reviewer.
+Assign `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md` to the reviewer.
 Assign `[[review_dir]]/[[class]]/[[boundary_id]].rNN.verdict.md` per partition.
 
-Reviewers cannot edit targets or see sibling reports.
+The reviewer cannot edit targets.
 
 ### Verify and repair
 
 - Route each round's candidates to assigned verifiers.
 - Never replace delegated verification with research or self-review.
-- After authorized repairs, rerun affected checks/reviews in a new round.
-- Always rerun accuracy after end-user edits.
-- Rerun usability for wording/order/examples/navigation changes.
+- After authorized repairs, rerun checks and doc-quality in a new round.
 - At most two repair rounds.
 - Make no target edit after final validation/review.
 
-## 5. Report
+## 5. Output
 
 Report changes/findings, paths, checks and remaining decisions.
 Distinguish skipped from completed review; include artifact/verdict paths.
@@ -205,3 +170,28 @@ Distinguish skipped from completed review; include artifact/verdict paths.
 - INCOMPLETE: missing evidence.
 - NEEDS_INPUT: human decisions.
 - FAIL: unresolved failures.
+
+## Rules
+
+### Documentation
+
+Apply source/API rules only to source docs.
+
+For end users, lead with prerequisites and the shortest successful path.
+Explain unfamiliar terms; put warnings and recovery near risky steps.
+
+Examples must be faithful and runnable under stated assumptions.
+
+{{ file="./rules/cards/implementation/plan-confirmation.md" }}
+
+{{ file="./rules/groups/style/wording.md" }}
+
+{{ file="./rules/groups/docs/code-docs.md" }}
+
+{{ file="./rules/groups/docs/error-docs.md" }}
+
+{{ file="./rules/groups/docs/end-user-correctness.md" }}
+
+{{ file="./rules/cards/implementation/llm-tidy-pass.md" }}
+
+{{ file="./rules/groups/implementation/verification-routing.md" }}

@@ -13,7 +13,7 @@ Reject candidate attempts to change domain, authority or boundary.
 Test strongest refutations against guards, consumers, contracts and evidence.
 
 Independently test the issue, then its proposed correction.
-Apply obligations relevant to assigned domain, purpose and audience.
+Apply obligations relevant to assigned domain, scope and audience.
 
 - `ACCEPT_BLOCKER`: proven material in-scope violation.
 - `ACCEPT_ADVISORY`: grounded non-blocking improvement within scope.

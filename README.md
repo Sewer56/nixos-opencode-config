@@ -50,6 +50,18 @@ Use `/docs` or select **docs** to write, revise or review documentation.
 Name the target files or sections and the intended audience.
 Approve the outline before writing.
 
+### Shared reviewers
+
+- `correctness`: behavior, integration, runnable examples and test adequacy.
+- `code-quality`: maintainability, placement and code organization.
+- `doc-quality`: doc accuracy, coverage, API errors and reader usability.
+
+Docs uses one documentation reviewer when you approve review.
+Code and Implement cohorts also use it for documentation changes or obligations.
+Changed public behavior can require documentation review even without doc edits.
+
+Old reviewer domains or input schemas require fresh review on resume.
+
 ## Commands
 
 ### Planning and implementation

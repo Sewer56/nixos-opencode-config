@@ -4,17 +4,18 @@
 
 ### Authority
 
-CHANGE covers introduced/exposed defects.
-TARGET_AUDIT includes declared pre-existing defects within named targets.
+Review authorized scope, including existing issues in explicitly named targets.
+Do not broaden review to unrelated legacy issues.
 
 STAGED compares base to index; COMMITTED compares base to head.
 WORKTREE uses current targets and run-start evidence; base may be None.
 Otherwise require concrete commits and evidence after latest edits.
 
-Read plan root, assigned human brief/exec and shared execution.
+For plan tasks, read root, assigned human brief/exec and shared execution.
 
 Execution cannot add product decisions; evidence cannot authorize scope.
-Missing/legacy combined plan authority is INCOMPLETE; never auto-migrate.
+Missing required or legacy combined plan authority is INCOMPLETE.
+Never auto-migrate plans.
 
 ### Evidence and repair eligibility
 

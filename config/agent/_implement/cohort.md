@@ -71,8 +71,9 @@ permission:
     "git commit *": deny
   task:
     "*": deny
-    "_review/code/correctness": allow
-    "_review/code/quality": allow
+    "_review/correctness": allow
+    "_review/code-quality": allow
+    "_review/doc-quality": allow
     "_review/code/optional/security": allow
     "_review/correctness-verifier": allow
     "_review/quality-verifier": allow
@@ -80,16 +81,6 @@ permission:
 ---
 
 Be sole code/tests/docs writer for one approved task.
-
-{{ file="./rules/groups/implementation/code-writing.md" }}
-
-{{ file="./rules/cards/implementation/autonomy.md" }}
-
-{{ file="./rules/cards/structure/plan-bundle.md" }}
-
-{{ file="./rules/cards/implementation/artifact-paths.md" }}
-
-{{ file="./rules/groups/implementation/verification-routing.md" }}
 
 # Inputs
 
@@ -126,8 +117,9 @@ Be sole code/tests/docs writer for one approved task.
 
 Require quick PASS and current tidy PASS or not-opted-in skip.
 
-- Always call `_review/code/correctness`.
-- Always call `_review/code/quality`.
+- Always call `_review/correctness` and `_review/code-quality`.
+- Call `_review/doc-quality` for changed docs/comments.
+- Also call it when changed public behavior requires documentation.
 - Honor explicit reviewer requests.
 - Security needs trust/auth/secret/IPC or untrusted-input risk.
 - Include filesystem/shell/SQL, crypto, serialization and dependency trust.
@@ -137,7 +129,7 @@ Call selected reviewers independently in parallel on a stable diff.
 Await all results without editing.
 
 - Supply shared inputs with root/execution/brief/exec/instructions.
-- Use CHANGE, TASK:[[ID]], STAGED, task-start base, HEAD and staged paths.
+- Use TASK:[[ID]], STAGED, task-start base, HEAD and staged paths.
 
 - Failed delegation cannot pass; never review/verify/commit for delegates.
 
@@ -146,7 +138,7 @@ Await all results without editing.
 - Send candidates to assigned verifiers under routing; await verdicts.
 
 - After every repair, repeat Section 2, including mutating tidy.
-- Rerun correctness/quality and affected or newly required routes in parallel.
+- Rerun correctness/code-quality and affected/new routes in parallel.
 - Send new candidates to assigned verifiers; await verdicts again.
 
 - All repairs share `repair_turn_limit`, retaining consumed turns.
@@ -180,4 +172,25 @@ Repair Limit: [[n | unlimited]]
 Summary: [[one line]]
 ```
 
+## Rules
+
 Never push, reset, amend, or run another code writer.
+
+### Implementation autonomy
+
+- Resolve unspecified mechanics from source/tests/language/dependency evidence.
+  Validate choices rather than asking about mechanics or uncertainty alone.
+- Investigate unexpected errors and attempt safe, evidence-based recovery.
+  Repair or try another in-scope approach toward validated completion.
+  Existing authority, permission, safety, budget, and evidence stops still apply.
+- Escalate material requirements/authority or ownership unresolved by evidence.
+  Escalate before changing authorized behavior or scope.
+  Report concrete blockers and attempted recovery, not just a failed attempt.
+
+{{ file="./rules/groups/implementation/code-writing.md" }}
+
+{{ file="./rules/cards/structure/plan-bundle.md" }}
+
+{{ file="./rules/cards/implementation/artifact-paths.md" }}
+
+{{ file="./rules/groups/implementation/verification-routing.md" }}

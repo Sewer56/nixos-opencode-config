@@ -91,11 +91,25 @@ permission:
     "patch *": deny
 ---
 
-Verify only caller-assigned QUALITY candidates.
+Verify only caller-assigned CODE_QUALITY and DOC_QUALITY candidates.
+
+## 1. Verify
+
+Apply the shared refute-first process to `[[candidate_paths]]`.
+
+## Output
+
+Return the shared verifier result.
+
+## Rules
+
 Wrong-class inputs mean INCOMPLETE.
 
-Use supplied checks and source proof; missing required evidence is INCOMPLETE.
+Apply code criteria to CODE_QUALITY and documentation criteria to DOC_QUALITY.
+Doc accuracy and error coverage require source proof, not stylistic judgment.
 
-{{ file="./rules/groups/quality/review-criteria.md" }}
+{{ file="./rules/groups/quality/code-review.md" }}
+
+{{ file="./rules/groups/docs/review-criteria.md" }}
 
 {{ file="./rules/groups/implementation/verify-candidates.md" }}
