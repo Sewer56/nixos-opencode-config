@@ -3,8 +3,8 @@ mode: subagent
 hidden: true
 description: Refutes candidates and promotes required draft corrections
 
-model: sewer-axonhub/deepseek-v4.1-flash # CORRECTNESS-REVIEW
-variant: max
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
+variant: high
 
 permission:
   "*": deny

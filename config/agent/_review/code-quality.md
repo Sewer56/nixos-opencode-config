@@ -3,8 +3,8 @@ mode: subagent
 hidden: true
 description: Reviews code quality and source documentation
 
-model: sewer-axonhub/deepseek-v4.1-flash # STYLE-REVIEW
-variant: max
+model: sewer-axonhub/glm-5.3 # STYLE-REVIEW
+variant: high
 
 permission:
   "*": deny

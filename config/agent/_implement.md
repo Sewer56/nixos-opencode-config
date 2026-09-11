@@ -1,8 +1,8 @@
 ---
 mode: all
 description: Executes approved tasks and final review
-model: sewer-axonhub/deepseek-v4.1-flash # CODER
-variant: high
+model: sewer-axonhub/glm-5.3 # CODER
+variant: low
 
 permission:
   "*": deny

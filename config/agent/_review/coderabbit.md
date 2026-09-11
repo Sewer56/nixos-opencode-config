@@ -1,8 +1,8 @@
 ---
 mode: all
 description: CodeRabbit with bounded repair and one re-review
-model: sewer-axonhub/deepseek-v4.1-flash # CODER
-variant: high
+model: sewer-axonhub/glm-5.3 # CODER
+variant: low
 
 permission:
   "*": deny
