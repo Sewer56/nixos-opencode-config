@@ -450,7 +450,7 @@ def main() -> int:
             + " -> ".join(str(path.relative_to(repo)) for path in cycle)
         )
 
-    # Rule cards/groups are runtime modules. Every module must be imported by
+    # Rules other than directory READMEs are runtime modules. Each must be imported by
     # an active frontmatter agent or command.
     runtime_roots = {
         path.resolve()
@@ -466,15 +466,24 @@ def main() -> int:
             continue
         reachable_imports.add(path)
         import_queue.extend(sorted(import_edges.get(path, set()) - reachable_imports))
-    for rule_root in (repo / "config/rules/cards", repo / "config/rules/groups"):
-        for path in sorted(rule_root.rglob("*.md")):
-            if path.resolve() not in reachable_imports:
-                errors.append(f"unreachable rule module: {path.relative_to(repo)}")
-    prefixed_groups = sorted((repo / "config/rules/groups").rglob("target-*.md"))
-    if prefixed_groups:
+    rule_root = repo / "config/rules"
+    for path in sorted(rule_root.rglob("*.md")):
+        if path.name != "README.md" and path.resolve() not in reachable_imports:
+            errors.append(f"unreachable rule module: {path.relative_to(repo)}")
+    for rel_root in AGENT_ROOTS:
+        root = repo / rel_root
+        for path in sorted(root.rglob("*")):
+            if not path.is_file() or "shared" not in path.relative_to(root).parts[:-1]:
+                continue
+            if path.suffix == ".md":
+                errors.append(f"agent shared fragments must use .txt, not .md: {path.relative_to(repo)}")
+            elif path.suffix == ".txt" and path.resolve() not in reachable_imports:
+                errors.append(f"unreachable agent fragment: {path.relative_to(repo)}")
+    prefixed_rules = sorted(rule_root.rglob("target-*.md"))
+    if prefixed_rules:
         errors.append(
-            "rule group filenames use obsolete target- prefix: "
-            + ", ".join(path.relative_to(repo).as_posix() for path in prefixed_groups)
+            "rule filenames use obsolete target- prefix: "
+            + ", ".join(path.relative_to(repo).as_posix() for path in prefixed_rules)
         )
 
     for path in sorted((repo / "config/agent").rglob("*")):

@@ -92,10 +92,6 @@ Review one written artifact for judgment-level adherence; never edit.
 - `constraints`: the applicable rule constraints.
 - `grounding`: cited facts/unknowns; PR includes base/merge-base/HEAD and diff.
 
-{{ file="./rules/groups/style/wording.md" }}
-
-{{ file="./rules/cards/style/adhd-format.md" }}
-
 # Review lens
 - Read referenced artifacts and grounding evidence; do not search broadly.
 - Ground PR claims in actual merge-base diff, commits and test evidence.
@@ -114,7 +110,6 @@ Review one written artifact for judgment-level adherence; never edit.
 - `BLOCKED`: safe correction needs a human decision, access, or evidence.
 
 # Output
-{{ file="./rules/cards/implementation/review-protocol.md" }}
 
 Return `# Write review` with `Verdict: READY | REVISE | BLOCKED` inline.
 Name checked artifact and limits; required findings use stable IDs.
@@ -126,3 +121,11 @@ BLOCKED states missing evidence or the actual needed decision.
 
 # Constraints
 - Read-only: never edit any file; never modify git state.
+
+# Rules
+
+{{ file="./rules/write/wording.md" }}
+
+{{ file="./rules/write/adhd-format.md" }}
+
+{{ file="./rules/review/reporting.md" }}

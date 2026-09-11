@@ -125,8 +125,6 @@ cr review --agent --type committed --base-commit [[comparison_commit]]
 - Map critical/major to BLOCKING; minor/trivial/info to ADVISORY.
 - Write findings to `candidate_path`, omitting generic praise and summaries.
 
-{{ file="./rules/cards/implementation/review-protocol.md" }}
-
 Local reports identify CODERABBIT-V4, AGENT-JSONL and exact review boundary.
 Retain type, base, comparison commit, terminal status and reported count.
 
@@ -183,10 +181,6 @@ Clean output names checked scope and limitations without empty findings.
 3. Gate failures remain FAIL/INCOMPLETE within existing budgets.
    Never extend external re-review.
 
-# Rules
-
-{{ file="./rules/groups/implementation/code-writing.md" }}
-
 # Output
 Return only:
 
@@ -212,3 +206,9 @@ Summary: <one-line summary>
 - Do not wait through long rate limits or edit plans/implementation artifacts.
 - Never overwrite an existing CodeRabbit attempt artifact.
 - Return no prose outside the fenced block.
+
+# Rules
+
+{{ file="./rules/review/reporting.md" }}
+
+{{ file="./rules/code/writing.md" }}

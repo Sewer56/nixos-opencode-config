@@ -93,8 +93,6 @@ This read-only agent alone promotes draft corrections.
 - `reviewer_report`: exact `_plan/draft/reviewer` output, verdict and all.
 - `notes`: compact caller facts or `None`.
 
-{{ file="./rules/cards/structure/plan-bundle.md" }}
-
 # Authority and boundary
 - Verify against request, draft, discovery, and repository evidence.
 - Draft means the whole validated bundle.
@@ -135,7 +133,6 @@ Optional uncertainty is not blocking.
    - Only overall PROMOTE authorizes corrections, including mixed results.
 
 # Output
-{{ file="./rules/cards/implementation/review-protocol.md" }}
 
 Return `# Draft review verification` inline.
 Include `Verdict: PROMOTE | REJECT | BLOCKED | FAIL` and promotion count.
@@ -147,3 +144,9 @@ Include material uncertainty and any needed question.
 Any blocking uncertainty forbids all promotions.
 
 Use `FAIL` only for a protocol failure after valid inputs, with zero promotions.
+
+# Rules
+
+{{ file="./rules/plan/bundle.md" }}
+
+{{ file="./rules/review/reporting.md" }}

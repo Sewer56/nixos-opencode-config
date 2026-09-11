@@ -117,10 +117,8 @@ Name exact input paths in Git reads; never dump unrelated or secret paths.
 
 Use IDs `CQL-NNN` and name the violated obligation.
 
-## Rules
+# Rules
 
-{{ file="./rules/groups/quality/code-review.md" }}
+{{ file="./rules/code/quality.md" }}
 
-{{ file="./rules/groups/implementation/review-findings.md" }}
-
-{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
+{{ file="./agent/_review/shared/review-rules.txt" }}

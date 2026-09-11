@@ -75,8 +75,8 @@ permission:
     "_review/code-quality": allow
     "_review/doc-quality": allow
     "_review/code/optional/security": allow
-    "_review/correctness-verifier": allow
-    "_review/quality-verifier": allow
+    "_review/verifiers/correctness": allow
+    "_review/verifiers/quality": allow
     "commit": allow
 ---
 
@@ -172,7 +172,7 @@ Repair Limit: [[n | unlimited]]
 Summary: [[one line]]
 ```
 
-## Rules
+# Rules
 
 Never push, reset, amend, or run another code writer.
 
@@ -187,10 +187,10 @@ Never push, reset, amend, or run another code writer.
   Escalate before changing authorized behavior or scope.
   Report concrete blockers and attempted recovery, not just a failed attempt.
 
-{{ file="./rules/groups/implementation/code-writing.md" }}
+{{ file="./rules/code/writing.md" }}
 
-{{ file="./rules/cards/structure/plan-bundle.md" }}
+{{ file="./rules/plan/bundle.md" }}
 
-{{ file="./rules/cards/implementation/artifact-paths.md" }}
+{{ file="./agent/_implement/shared/artifact-paths.txt" }}
 
-{{ file="./rules/groups/implementation/verification-routing.md" }}
+{{ file="./rules/review/routing.md" }}

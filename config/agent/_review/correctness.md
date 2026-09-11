@@ -124,10 +124,8 @@ Specialists never replace complete behavior and cross-domain review.
 
 Use IDs `COR-NNN` and cite test adequacy/execution evidence.
 
-## Rules
+# Rules
 
-{{ file="./rules/groups/tests/test-strategy.md" }}
+{{ file="./rules/code/tests.md" }}
 
-{{ file="./rules/groups/implementation/review-findings.md" }}
-
-{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
+{{ file="./agent/_review/shared/review-rules.txt" }}

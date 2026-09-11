@@ -41,8 +41,6 @@ permission:
 
 Implement Code's bounded assignment.
 
-{{ file="./rules/groups/implementation/code-writing.md" }}
-
 ## Inputs
 
 Execute `[[assignment]]` only; preserve protected and unrelated work.
@@ -69,3 +67,7 @@ Allow two in-scope failure repair attempts; rerun checks after repairs.
 
 Return DONE, FAIL or INCOMPLETE with changed paths and commands/results.
 Report concrete blockers; missing required evidence is INCOMPLETE.
+
+# Rules
+
+{{ file="./rules/code/writing.md" }}

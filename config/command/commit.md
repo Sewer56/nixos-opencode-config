@@ -18,7 +18,7 @@ If nothing the conversation produced maps onto a change, fall back to the curren
 
 # Rules
 
-{{ file="./rules/cards/implementation/commit-message.md" }}
+{{ file="./rules/commit-message.md" }}
 
 # Process
 1. Inspect `git status`, `git diff`, `git diff --check`, and recent commits in parallel.

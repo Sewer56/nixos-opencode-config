@@ -1,4 +1,4 @@
-{{ file="./rules/groups/implementation/implementation-review.md" }}
+{{ file="./rules/review/contract.md" }}
 
 Assigned verifiers alone judge candidate accuracy and repair eligibility.
 
@@ -6,8 +6,8 @@ Before verdicts, orchestrators only check routing metadata.
 Never investigate or filter findings before verifier disposition.
 Route every reported candidate to its assigned verifier.
 
-CODE_QUALITY and DOC_QUALITY: style, `_review/quality-verifier`.
-CORRECTNESS/SECURITY/PERFORMANCE: correctness, `_review/correctness-verifier`.
+CODE_QUALITY and DOC_QUALITY: style, `_review/verifiers/quality`.
+CORRECTNESS/SECURITY/PERFORMANCE: correctness, `_review/verifiers/correctness`.
 
 Partition assigned reports by class and shared input identity as `boundary_id`.
 Identity: authority, review scope/exclusions, scope/boundary/base/head/paths.

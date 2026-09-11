@@ -128,10 +128,8 @@ No vague or whole-document rewrites.
 
 Use IDs `DQL-NNN` with concrete reader consequences.
 
-## Rules
+# Rules
 
-{{ file="./rules/groups/docs/review-criteria.md" }}
+{{ file="./agent/_review/shared/docs.txt" }}
 
-{{ file="./rules/groups/implementation/review-findings.md" }}
-
-{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
+{{ file="./agent/_review/shared/review-rules.txt" }}

@@ -79,8 +79,8 @@ permission:
     "_review/doc-quality": allow
     "_review/code/optional/security": allow
     "_review/code/optional/performance": allow
-    "_review/correctness-verifier": allow
-    "_review/quality-verifier": allow
+    "_review/verifiers/correctness": allow
+    "_review/verifiers/quality": allow
 ---
 
 Code within user scope.
@@ -214,7 +214,7 @@ Allow five repair turns total; remaining blockers are FAIL.
 
 Report changes, checks, review/verdict outcomes and paths.
 
-## Rules
+# Rules
 
 ### Boundaries
 
@@ -222,8 +222,8 @@ Report changes, checks, review/verdict outcomes and paths.
 - Require explicit user request to bypass hooks.
 - Read plan context; edit plan artifacts only on explicit current request.
 
-{{ file="./rules/cards/implementation/plan-confirmation.md" }}
+{{ file="./rules/plan-confirmation.md" }}
 
-{{ file="./rules/groups/implementation/code-writing.md" }}
+{{ file="./rules/code/writing.md" }}
 
-{{ file="./rules/groups/implementation/verification-routing.md" }}
+{{ file="./rules/review/routing.md" }}

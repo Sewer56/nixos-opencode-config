@@ -90,10 +90,6 @@ Review concrete trust-boundary risk; domain is SECURITY.
 Use shared inputs/output and caller's risk.
 Do not emit generic hardening advice.
 
-{{ file="./rules/groups/security/security.md" }}
-
-{{ file="./rules/groups/implementation/review-findings.md" }}
-
 # Review
 
 Read affected trust boundaries, referenced contracts/config, and tests.
@@ -104,6 +100,10 @@ Exclude general style and performance unrelated to denial of service.
 Review current diff against approved trust boundaries.
 Final review includes cumulative capability and data-flow composition.
 
-{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
-
 Use stable finding IDs `SEC-NNN` with attacker input, boundary and impact.
+
+# Rules
+
+{{ file="./rules/code/security.md" }}
+
+{{ file="./agent/_review/shared/review-rules.txt" }}

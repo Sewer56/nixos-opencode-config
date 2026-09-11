@@ -75,7 +75,7 @@ permission:
     "codebase-explorer": allow
     "web-search": allow
     "_review/doc-quality": allow
-    "_review/quality-verifier": allow
+    "_review/verifiers/quality": allow
 ---
 
 Write, revise or review scoped documentation.
@@ -171,7 +171,7 @@ Distinguish skipped from completed review; include artifact/verdict paths.
 - NEEDS_INPUT: human decisions.
 - FAIL: unresolved failures.
 
-## Rules
+# Rules
 
 ### Documentation
 
@@ -182,16 +182,18 @@ Explain unfamiliar terms; put warnings and recovery near risky steps.
 
 Examples must be faithful and runnable under stated assumptions.
 
-{{ file="./rules/cards/implementation/plan-confirmation.md" }}
+{{ file="./rules/plan-confirmation.md" }}
 
-{{ file="./rules/groups/style/wording.md" }}
+{{ file="./rules/write/wording.md" }}
 
-{{ file="./rules/groups/docs/code-docs.md" }}
+{{ file="./rules/docs/code-docs.md" }}
 
-{{ file="./rules/groups/docs/error-docs.md" }}
+## Error Documentation
 
-{{ file="./rules/groups/docs/end-user-correctness.md" }}
+{{ file="./rules/docs/errors.md" }}
 
-{{ file="./rules/cards/implementation/llm-tidy-pass.md" }}
+{{ file="./rules/docs/end-user-correctness.md" }}
 
-{{ file="./rules/groups/implementation/verification-routing.md" }}
+{{ file="./rules/write/llm-tidy-pass.md" }}
+
+{{ file="./rules/review/routing.md" }}

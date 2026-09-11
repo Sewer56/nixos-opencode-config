@@ -1,4 +1,4 @@
-{{ file="./rules/cards/implementation/review-protocol.md" }}
+{{ file="./rules/review/reporting.md" }}
 
 `<review-inputs>`:
 - authority_paths; authorized review scope and exclusions.

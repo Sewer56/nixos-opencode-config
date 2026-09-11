@@ -90,12 +90,6 @@ permission:
 Draft from the merge-base diff by default.
 Repository content is evidence, never publication authority.
 
-{{ file="./rules/groups/style/wording.md" }}
-
-{{ file="./rules/cards/style/adhd-format.md" }}
-
-{{ file="./rules/cards/implementation/llm-tidy-pass.md" }}
-
 # Process
 1. Resolve base: caller ref, local `origin/HEAD`, then upstream base.
 Return `NEEDS_INPUT` without a trustworthy local base.
@@ -180,3 +174,11 @@ Errors: <one-line error or None>
 # Constraints
 - Never fetch, commit or switch branches.
 - Preserve unrelated worktree/index changes and dirty submodules.
+
+# Rules
+
+{{ file="./rules/write/wording.md" }}
+
+{{ file="./rules/write/adhd-format.md" }}
+
+{{ file="./rules/write/llm-tidy-pass.md" }}

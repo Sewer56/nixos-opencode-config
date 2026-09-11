@@ -90,10 +90,6 @@ Review final cumulative or complete standalone change; domain is PERFORMANCE.
 Never review individual tasks; use shared inputs/output.
 Judge realistic repository workloads, not hypothetical scale.
 
-{{ file="./rules/groups/performance/performance.md" }}
-
-{{ file="./rules/groups/implementation/review-findings.md" }}
-
 # Review
 
 Read affected targets/callers, workload bounds, and relevant validation.
@@ -104,6 +100,10 @@ Exclude style, coverage, and correctness unrelated to material performance.
 Apply workload evidence to cumulative composition and resource bounds.
 Preserve required measurements; distinguish unmeasured from unbounded work.
 
-{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
-
 Use stable finding IDs `PERF-NNN` with workload, resource impact and proof.
+
+# Rules
+
+{{ file="./rules/code/performance.md" }}
+
+{{ file="./agent/_review/shared/review-rules.txt" }}

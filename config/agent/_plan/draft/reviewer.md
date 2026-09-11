@@ -94,10 +94,6 @@ Create no artifacts or review caches.
 - `checks`: latest whole-bundle mechanics and per-member tidy evidence.
 - `notes`: compact caller facts or `None`.
 
-{{ file="./rules/groups/correctness/self-plan-draft.md" }}
-
-{{ file="./rules/groups/tests/test-strategy.md" }}
-
 # Review
 - Read the request, discovery, and directly referenced targets.
 - Require mechanics and tidy evidence before semantic review.
@@ -116,7 +112,6 @@ Create no artifacts or review caches.
 - `BLOCKED`: safe correction needs a human decision or missing access/evidence.
 
 # Output
-{{ file="./rules/cards/implementation/review-protocol.md" }}
 
 Return `# Plan review` and `Verdict: READY | REVISE | BLOCKED` inline.
 Name checked bundle and limitations.
@@ -126,3 +121,11 @@ Mark optional suggestions ADVISORY; READY has no required-change candidates.
 
 REVISE requires at least one concrete required change.
 BLOCKED identifies missing evidence or the needed human decision.
+
+# Rules
+
+{{ file="./agent/_plan/draft/shared/requirements.txt" }}
+
+{{ file="./rules/code/tests.md" }}
+
+{{ file="./rules/review/reporting.md" }}

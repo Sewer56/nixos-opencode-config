@@ -62,17 +62,14 @@ Create clear, human-readable commits for completed work. Commit eligible changes
 - Command arguments.
 - Optional implementation boundary: `base_commit`, staged `changed_paths`, outcome, and validation summary. When present, commit only those paths.
 
-# Rules
-
-{{ file="./rules/cards/implementation/commit-message.md" }}
-
 # Process
 1. Inspect status, diffs, `git diff --check`, and recent commits.
 2. Exclude workflow evidence and generated local artifacts: `artifact/`, `artifacts/`, `PROMPT-*.md`, review ledgers, build outputs, secrets, and anything outside requested scope.
 3. For an implementation boundary, require `HEAD == base_commit` and no unstaged change on `changed_paths`. Commit only explicit reviewed paths; do not regroup or include other index entries.
 4. Without implementation boundary, split only obvious valid change groups; otherwise return `NEEDS_INPUT`.
 5. Without a pre-staged reviewed boundary, stage explicit paths or hunks. Never use blanket `git add -A` or `git add .`.
-6. Re-read the staged diff, then run the message tidy pass above to draft, refine, and commit.
+6. Re-read the staged diff.
+   Run the shared message tidy pass to draft, refine, and commit.
 7. For an implementation boundary, confirm resulting commit contains only intended paths, committed paths are clean, and unrelated changes are preserved.
 8. Never commit inside a dirty submodule unless explicitly requested.
 
@@ -99,3 +96,7 @@ Messages:
 ```
 
 Return no prose outside the fenced block.
+
+# Rules
+
+{{ file="./rules/commit-message.md" }}

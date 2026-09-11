@@ -1,8 +1,8 @@
 ---
 mode: subagent
 hidden: true
-description: Verifies correctness and specialist findings
-model: sewer-axonhub/deepseek-v4.1-flash # CORRECTNESS-REVIEW
+description: Verifies quality and editorial findings
+model: sewer-axonhub/deepseek-v4.1-flash # STYLE-REVIEW
 variant: max
 
 permission:
@@ -91,7 +91,7 @@ permission:
     "patch *": deny
 ---
 
-Verify caller-assigned CORRECTNESS, SECURITY and PERFORMANCE candidates.
+Verify only caller-assigned CODE_QUALITY and DOC_QUALITY candidates.
 
 ## 1. Verify
 
@@ -101,8 +101,15 @@ Apply the shared refute-first process to `[[candidate_paths]]`.
 
 Return the shared verifier result.
 
-## Rules
+# Rules
 
 Wrong-class inputs mean INCOMPLETE.
 
-{{ file="./rules/groups/implementation/verify-candidates.md" }}
+Apply code criteria to CODE_QUALITY and documentation criteria to DOC_QUALITY.
+Doc accuracy and error coverage require source proof, not stylistic judgment.
+
+{{ file="./rules/code/quality.md" }}
+
+{{ file="./agent/_review/shared/docs.txt" }}
+
+{{ file="./agent/_review/verifiers/shared/verification.txt" }}

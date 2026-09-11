@@ -1,6 +1,6 @@
 ## Review Findings
 
-{{ file="./rules/groups/implementation/implementation-review.md" }}
+{{ file="./rules/review/contract.md" }}
 
 ### Authority
 
@@ -49,3 +49,16 @@ Merge root-cause duplicates; reject stale, refuted or guarded claims.
 Honor named dependent-task deferrals only with valid intermediate state.
 
 Raw reviewer suggestions never authorize repairs.
+
+# Writable surface
+Write only assigned evidence under `artifact/` with edit tools.
+Validate canonical/symlink paths before access.
+
+Require resolved outputs to remain beneath the assigned evidence directory.
+Reject outputs aliasing authority, inputs or historical evidence.
+
+Never overwrite source plans by assigning them as report outputs.
+Bash is read-only, including Git and env/secret restrictions.
+
+Unavailable/unsafe output means `INCOMPLETE` without writing elsewhere.
+Never probe, relocate, create stubs or write via bash.

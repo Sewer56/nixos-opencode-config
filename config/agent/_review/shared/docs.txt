@@ -1,8 +1,8 @@
-{{ file="./rules/groups/docs/code-docs.md" }}
+{{ file="./rules/docs/code-docs.md" }}
 
 ## Error Application Review
 
-{{ file="./rules/cards/docs/error-documentation.md" }}
+{{ file="./rules/docs/errors.md" }}
 
 Verify applied docs against traced source.
 Check functions, paths, lines, variants and triggers.
@@ -18,7 +18,7 @@ Check both proposed and applied docs.
 For findings with multiple diff blocks, label each block separately.
 Put its own `**Lines: ~start-end**` before its diff fence.
 
-{{ file="./rules/groups/docs/end-user-correctness.md" }}
+{{ file="./rules/docs/end-user-correctness.md" }}
 
 ## Readability
 
@@ -36,7 +36,7 @@ Flag acronyms not expanded on first use as `Expanded Name (ACRONYM)`.
 Exclude ordinary or previously defined terms, literal identifiers, and paths.
 Exclude headings and non-instructional prose.
 
-{{ file="./rules/groups/style/wording.md" }}
+{{ file="./rules/write/wording.md" }}
 
 ## Documentation and editorial
 

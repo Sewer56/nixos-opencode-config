@@ -3,7 +3,7 @@
 Verify `[[candidate_paths]]` against assigned domains/identity.
 Use `[[verdict_path]]`, not review_path.
 
-{{ file="./rules/groups/implementation/review-findings.md" }}
+{{ file="./agent/_review/shared/review-rules.txt" }}
 
 # Refute-first process
 
@@ -24,8 +24,6 @@ An unsafe fix does not refute a valid issue.
 Accept with a verified edit reference or bounded repair requirement.
 
 Reject unsafe fixes; name evidence/decision gaps.
-
-{{ file="./rules/cards/structure/writable-surface.md" root="artifact" }}
 
 # Artifact
 

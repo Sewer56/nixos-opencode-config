@@ -1,6 +1,6 @@
 ## Plan Draft
 
-{{ file="./rules/cards/structure/plan-bundle.md" }}
+{{ file="./rules/plan/bundle.md" }}
 
 ### Human documents
 Root starts with title and `Status: DRAFT | READY_FOR_IMPLEMENT`.

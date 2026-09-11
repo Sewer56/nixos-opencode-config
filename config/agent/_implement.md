@@ -68,15 +68,11 @@ permission:
 - Execute one approved READY_FOR_IMPLEMENT bundle with final CodeRabbit review.
 - Never edit code/source bundle.
 
-{{ file="./rules/cards/structure/plan-bundle.md" }}
-
 # Input and artifacts
 
 - For a new run, bind `base_commit=HEAD`.
 - Bind `artifact_base` to the draft basename without `.draft.md`.
 - Suffix run_id on collision.
-
-{{ file="./rules/cards/implementation/artifact-paths.md" }}
 
 - Resume run/base, cohort starts, ownership, evidence and consumed limits.
 - Apply shared resume safeguards; checkpoints cannot prove completion.
@@ -163,3 +159,9 @@ Include plan, completed tasks, final commit and evidence.
 Report blockers/advisories, needed question and evidence gaps.
 
 - Never push, reset, amend, or run concurrent code writers.
+
+# Rules
+
+{{ file="./rules/plan/bundle.md" }}
+
+{{ file="./agent/_implement/shared/artifact-paths.txt" }}

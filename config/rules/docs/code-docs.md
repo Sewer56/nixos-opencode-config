@@ -56,7 +56,7 @@ Name concrete mechanisms when readers need them, not vague effects.
 - Lead-ins never restate bullets.
 - Keep single coherent mechanics in prose.
 
-{{ file="./rules/cards/style/adhd-format.md" }}
+{{ file="./rules/write/adhd-format.md" }}
 
 ### Severity
 Other documentation issues are ADVISORY.

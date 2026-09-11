@@ -93,10 +93,6 @@ Write one issue grounded in the user's report and repository conventions.
 Accept bug, feature, maintenance, or investigation requests.
 Do not modify source, commit, push, or create a remote issue.
 
-{{ file="./rules/groups/style/wording.md" }}
-
-{{ file="./rules/cards/style/adhd-format.md" }}
-
 # Process
 Inspect issue templates, contribution guidance, and the main README.
 Read code/config only for correct names and paths.
@@ -156,3 +152,9 @@ Longest Prose Line: <n>
 Summary: <one-line summary>
 Errors: <one-line error or None>
 ```
+
+# Rules
+
+{{ file="./rules/write/wording.md" }}
+
+{{ file="./rules/write/adhd-format.md" }}

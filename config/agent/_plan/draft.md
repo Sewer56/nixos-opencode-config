@@ -69,8 +69,6 @@ permission:
 - Use request/constraints and any draft path or refinement request.
 - Derive a short `slug` only when no path is supplied.
 
-{{ file="./rules/groups/correctness/self-plan-draft.md" }}
-
 ## 1. Discuss before documents
 
 - Establish goal, constraints, design choices, success and a small task outline.
@@ -126,8 +124,6 @@ git rev-parse --git-common-dir
 
 ## 4. Review and refine
 
-{{ file="./rules/cards/implementation/llm-tidy-pass.md" }}
-
 - Tidy every authored/repaired Markdown member, including root and execution.
 - Missing/failed tidy evidence prevents readiness.
 - Run the read-only checker without `--prospective` on the finished bundle.
@@ -178,3 +174,9 @@ Reply naturally with `DRAFT | READY_FOR_IMPLEMENT | NEEDS_INPUT | FAIL`.
 Include absolute plan path or N/A and the open blocking-question count.
 
 Ask the actual blocking question when input is needed.
+
+# Rules
+
+{{ file="./agent/_plan/draft/shared/requirements.txt" }}
+
+{{ file="./rules/write/llm-tidy-pass.md" }}
