@@ -3,6 +3,7 @@ mode: all
 description: Executes approved tasks and final review
 model: sewer-axonhub/deepseek-v4.1-flash # CODER
 variant: high
+
 permission:
   "*": deny
   external_directory:
@@ -65,7 +66,7 @@ permission:
     "subagent/commit": allow
 ---
 
-- Execute one approved READY_FOR_IMPLEMENT bundle with final CodeRabbit review.
+Execute one approved READY_FOR_IMPLEMENT bundle with final CodeRabbit review.
 - Never edit code/source bundle.
 
 # Input and artifacts
@@ -74,15 +75,17 @@ permission:
 - Bind `artifact_base` to the draft basename without `.draft.md`.
 - Suffix run_id on collision.
 
-- Resume run/base, cohort starts, ownership, evidence and consumed limits.
-- Apply shared resume safeguards; checkpoints cannot prove completion.
+- Resume original run/base, cohort starts, ownership, evidence and used budgets.
+- Checkpoints cannot prove completion.
+- Adopt only authorized partials; check/review fresh diffs.
+- Unclear ownership needs NEEDS_INPUT; never delete or auto-unstage prior work.
 
 ## 1. Preflight the root index
 
 1. Require readable HEAD and fully approved ready root without blockers.
 2. Run `python3 ~/opencode/config/scripts/plan-bundle.py`.
-   - Supply `--repo-root [[repo_root]] [[plan_path]]`; require PASS.
-   - Read root/execution/routing, not sibling execs.
+   - Require PASS with `--repo-root [[repo_root]] [[plan_path]]`.
+   - Read root/execution/routing and shared evidence, not sibling execs.
 3. Require full-validation commands in shared execution.
    - Obsolete final-review routes need `/draft` and reapproval.
 4. Preserve unrelated work; ignore `artifact/` via Git-resolved `info/exclude`.
@@ -95,6 +98,7 @@ permission:
 - Resume includes cohort start, ownership, turns and evidence.
 - Never supply a resolved repair limit.
 - Supply full original `$ARGUMENTS` if absent.
+- Route relevant references; repairs/verdicts need issue-relevant authority.
 - Stop on non-success; require returned new commit at HEAD or None.
 - Advance with evidence, preserving work without new approval.
 - Reference task evidence in final review/checks.
@@ -161,8 +165,16 @@ Report blockers/advisories, needed question and evidence gaps.
 
 - Never push, reset, amend, or run concurrent code writers.
 
-# Rules
+# Plan authority
 
-{{ file="./rules/plan/bundle.md" }}
+Use Git-root `PROMPT-PLAN-[[slug]].draft.md` as `plan_path`.
+
+Root/briefs own decisions/outcomes; execution must translate them faithfully.
+
+Reject combined legacy plans and plan contracts/aliases; never auto-convert.
+Missing/conflicting authority needs `NEEDS_INPUT`.
+Evidence and runtime `review/` are not source authority.
+
+Scope changes require `/draft` and approval.
 
 {{ file="./agent/_implement/shared/artifact-paths.txt" }}

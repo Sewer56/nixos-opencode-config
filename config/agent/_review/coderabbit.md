@@ -71,7 +71,8 @@ permission:
 ---
 
 Run CodeRabbit review and bounded repairs using its findings as authority.
-They already passed its review pipeline; never add a local verifier.
+Never add a local verifier.
+Caller constraints bound repairs; labels grant no authority.
 
 # Inputs
 - `base_branch`: explicit ref, otherwise local `origin/HEAD`.
@@ -121,20 +122,25 @@ cr review --agent --type committed --base-commit [[comparison_commit]]
 
 ### Artifact
 
-- Zero findings require a PASS artifact with exact review identity.
 - Map critical/major to BLOCKING; minor/trivial/info to ADVISORY.
 - Write findings to `candidate_path`, omitting generic praise and summaries.
 
-Local reports identify CODERABBIT-V4, AGENT-JSONL and exact review boundary.
-Retain type, base, comparison commit, terminal status and reported count.
+Reports identify CODERABBIT-V4, AGENT-JSONL, type, base, comparison commit,
+terminal status and reported count.
 
-Decision is PASS or CANDIDATES; finding IDs are stable `CR-NNN`.
-Preserve original severity and CodeRabbit correction/evidence faithfully.
+Cover selected scope/direct consumers against current evidence.
+Write only assigned artifacts; complete them before returning.
 
-Do not invent local proof or reverify original external findings.
-Native JSONL remains unchanged; compact only local evidence presentation.
+Decision: PASS or CANDIDATES; stable finding IDs: `CR-NNN`.
 
-Clean output names checked scope and limitations without empty findings.
+Retain original severity, corrections and evidence.
+Include requirement/location and impact.
+Record dispositions/minimal corrections by ID; explain changes or refutations.
+
+State evidence/decision gaps; never invent fixes/proof or reverify findings.
+Preserve native JSONL; compact only local evidence presentation.
+
+Zero findings require a PASS artifact with scope/limits, not empty sections.
 
 ## 3. Apply bounded repairs
 - As sole writer, apply each blocker with the smallest cohesive diff.
@@ -152,15 +158,14 @@ Clean output names checked scope and limitations without empty findings.
 - Run broader tests only for repository convention or grounded repair impact.
 - Keep dependency rules for every edit.
 - Checks never install, update snapshots, regenerate or auto-format.
-- Record cwd once; validation names command, result/exit and decisive evidence.
-- Reference native evidence instead of duplicating it.
+- Record cwd once, command, result/exit and native evidence references.
 - Mutation outside the explicit tidy phase is FAIL.
 
 ### Validation repairs
 
 - Fix code failures within two repair turns.
 - After every repair, rerun the lint gate and affected checks.
-- Missing tools/services/credentials/fixtures/runtimes mean INCOMPLETE.
+- Missing environment or missing/stale required evidence means INCOMPLETE.
 - Missing environment never justifies product edits.
 
 ## 5. One bounded re-review
@@ -208,7 +213,5 @@ Summary: <one-line summary>
 - Return no prose outside the fenced block.
 
 # Rules
-
-{{ file="./rules/review/reporting.md" }}
 
 {{ file="./agent/_review/coder-rules.trimmeddownfromrules.mdtext" }}
