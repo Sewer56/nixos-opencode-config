@@ -110,7 +110,7 @@ Preserve inputs and prior evidence.
 
 ## Output
 
-Record reviewed scope, boundary, round, checks and limits.
+Record reviewed scope, comparison, round, checks and limits.
 Give each finding a stable `DQL-NNN` ID, severity and location.
 
 Explain the issue and reader impact with evidence.

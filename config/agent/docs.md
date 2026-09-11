@@ -110,7 +110,8 @@ Reconfirm only material design/scope/delegation changes.
 Skip generated, vendored, snapshot, fixture, lock and binary files.
 No executable/runtime changes, staging, commits or pushes.
 
-- Capture HEAD/index/target diffs; preserve existing work and unrelated layout.
+- Capture HEAD/index/target contents, including untracked files.
+- Preserve existing work and unrelated layout.
 
 - Follow project conventions with minimal edits.
 - After prose writes/repairs, run:
@@ -141,42 +142,34 @@ Missing pre-edit baseline/ownership needs NEEDS_INPUT.
 
 ### Reviewers
 
-Honor review limits; route stable documentation targets by location:
+Run applicable reviewers in parallel within agreed limits:
 
 - `_review/code-quality`: source-embedded docs/comments.
 - `_review/doc-quality`: standalone docs, including API references.
-- Select both for mixed targets.
 
-Limit review to documentation and scope violations; supply audience/evidence.
+Supply audience/evidence; review only documentation and scope violations.
 Pass `[[review-inputs]]`:
 - `authority_paths`: handoff and instructions.
-- Authorized targets, exclusions and comparison against run-start evidence.
-- `scope`: STANDALONE; `boundary`: WORKTREE; actual `base_commit`/`head_commit`.
+- Authorized targets/exclusions, including unowned edits.
+- Comparison: `git diff [[base_commit]] -- [[paths...]]` plus scoped new files.
+- `scope`: STANDALONE; start `base_commit`, current `head_commit`.
 - Repo-relative paths, cwd, current `validation_path`, `prior_verdict_paths[]`.
-- Assigned `review_path` and round.
+- Round and `review_path`: `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md`.
 
-Assign each reviewer `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md`.
-Assign `[[review_dir]]/verifier/[[boundary_id]].rNN.verdict.md` per partition.
+Assign `verdict_path`: `[[review_dir]]/verifier/rNN.verdict.md`.
 
 ### Verify and repair
 
-1. Call reviewers; await all reports without editing.
-   Never investigate/filter findings before verdicts.
-2. Send every finding/evidence to `_review/verifier` grouped by `boundary_id`.
-   - Match authority, targets/comparison/exclusions, scope/boundary/base/head.
-   - One call per candidate-bearing partition, all domains, no siblings.
-   - Pass review inputs, candidate domains/IDs/paths, boundary_id and verdict_path.
-3. Await every disposition before repair.
-   Only the verifier judges accuracy and repair eligibility.
-   Missing/mismatched results or stale required evidence mean INCOMPLETE.
-4. Deduplicate authorized repairs; prioritize deterministic failures/blockers.
-   - Apply feasible accepted advisories; explain nonblocking skips within scope.
-   - Follow verified edits/requirements, not rejected/unresolved corrections.
-   - Reverify contradictions/material departures with the assigned verifier.
-5. After repairs, rerun checks and affected reviewers in a new round.
+1. Send all reports unfiltered to `_review/verifier` if findings exist.
+   Include review inputs, candidate domains/IDs/paths and verdict_path.
+2. Apply verified scoped fixes, blockers first; explain advisory skips.
+   Reverify contradictions/material departures with the same verifier.
+3. After fixes, rerun checks and affected reviews within two repair rounds.
 
-Allow two repair rounds; never replace delegated verification with self-review.
-Obsolete domains/input schemas need fresh review, not relabeled evidence.
+Await all reviewers/verifier without editing or judging findings.
+Missing/mismatched/stale results: INCOMPLETE; never replace failed delegates.
+
+Obsolete domains/schemas need fresh review.
 Make no target edit after final validation/review.
 
 ## 5. Output

@@ -77,7 +77,6 @@ permission:
     "_review/correctness": allow
     "_review/code-quality": allow
     "_review/doc-quality": allow
-    "_review/code/optional/security": allow
     "_review/code/optional/performance": allow
     "_review/verifier": allow
 ---
@@ -109,7 +108,8 @@ Reconfirm only material design/scope/delegation changes.
 
 ## 3. Implement
 
-Capture HEAD and target index/worktree ownership; preserve unrelated work.
+Capture HEAD, target contents and index ownership, including untracked files.
+Preserve pre-existing and unrelated work.
 
 Worker `[[assignment]]`:
 - Outcome, checks, owned/protected paths and stops.
@@ -149,55 +149,41 @@ Reuse Step 4 evidence: cwd, commands, exits, diagnostics and gaps/skips.
 
 ### Reviewers
 
-Require current quick PASS and tidy PASS or not-opted-in skip.
-Honor reviewer limits; route by diff:
-- `_review/correctness`: behavior/contracts/config/examples/tests.
-- `_review/code-quality`: code and source docs/comments.
-- `_review/doc-quality`: standalone docs, including API references.
+After quick PASS and tidy PASS/not-opted-in skip, run in parallel:
 
-Code/refactors need correctness and code-quality.
-Route changed/required docs by location; mixed docs need both quality reviewers.
-Docs-only review covers docs/scope violations and runnable-example correctness.
+- `_review/correctness`, `_review/code-quality`: code/config/tests/refactors.
+- `_review/code-quality`: changed/required source docs/comments.
+- `_review/doc-quality`: changed/required standalone docs, including API docs.
 
-On request or matching risk:
-- `_review/code/optional/security`: trust/auth/secrets/IPC/untrusted input.
-- `_review/code/optional/performance`: cost/hot-path risk.
+Docs-only: documentation, scope violations and runnable-example correctness.
 
-Security includes filesystem/shell/SQL, crypto and serialization.
-Include permissions/dependency trust.
+Add `_review/code/optional/performance` on request or performance risk.
 
-Record routing reasons.
+Honor reviewer limits; record routing reasons.
 
 Pass `[[review-inputs]]`:
 - `authority_paths`: handoff and instructions.
-- Exact authorized targets, exclusions and base-to-index comparison.
-- `scope`: STANDALONE; `boundary`: STAGED; actual `base_commit`/`head_commit`.
+- Authorized targets/exclusions, including unowned edits.
+- Comparison: `git diff [[base_commit]] -- [[paths...]]` plus scoped new files.
+- `scope`: STANDALONE; start `base_commit`, current `head_commit`.
 - Repo-relative paths, cwd, current `validation_path`, `prior_verdict_paths[]`.
-- Assigned `review_path` and round.
+- Round and `review_path`: `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md`.
 
-Assign `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md` per reviewer.
-Assign `[[review_dir]]/verifier/[[boundary_id]].rNN.verdict.md` per partition.
+Assign `verdict_path`: `[[review_dir]]/verifier/rNN.verdict.md`.
 
 ### Review and repair
 
-1. Run reviewers in parallel on the validated diff.
-   Await all reports without editing or investigating/filtering findings.
-2. Send every finding/evidence to `_review/verifier` grouped by `boundary_id`.
-   - Match authority, targets/comparison/exclusions, scope/boundary/base/head.
-   - One call per candidate-bearing partition, all domains, no siblings.
-   - Pass review inputs, candidate domains/IDs/paths, boundary_id and verdict_path.
-3. Await every disposition before repair.
-   Only the verifier judges accuracy and repair eligibility.
-   Missing/mismatched results or stale required evidence mean INCOMPLETE.
-4. Deduplicate accepted repairs; prioritize deterministic failures/blockers.
-   - Apply feasible advisories; explain nonblocking skips.
-   - Follow verified edits/requirements, not rejected/unresolved corrections.
-   - Reverify contradictions/material departures with the assigned verifier.
-5. After repairs, repeat Steps 4 and 5 until no repairs remain.
+1. Send all reports unfiltered to `_review/verifier` if findings exist.
+   Include review inputs, candidate domains/IDs/paths and verdict_path.
+2. Apply verified scoped fixes, blockers first; explain advisory skips.
+   Reverify contradictions/material departures with the same verifier.
+3. After fixes, repeat Sections 4 and 5 within five total turns.
 
-Keep repairs in scope; allow five turns total, then FAIL for remaining blockers.
-Failed delegation is FAIL/INCOMPLETE; never review/verify for delegates.
-Obsolete domains/input schemas need fresh review, not relabeled evidence.
+Await all reviewers/verifier without editing or judging findings.
+Missing/mismatched/stale results: INCOMPLETE; blockers at limit: FAIL.
+Never substitute for failed delegates.
+
+Obsolete domains/schemas need fresh review.
 
 ## 6. Final tidy gate
 
@@ -206,6 +192,7 @@ Fix scoped failures even without review approval.
 
 Restage mutations; repeat affected checks/reviews and this gate.
 All retries share the five-turn budget.
+At handoff, require staged owned changes to match validation/approved review.
 
 ## 7. Output
 

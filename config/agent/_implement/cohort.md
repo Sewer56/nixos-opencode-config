@@ -74,7 +74,6 @@ permission:
     "_review/correctness": allow
     "_review/code-quality": allow
     "_review/doc-quality": allow
-    "_review/code/optional/security": allow
     "_review/verifier": allow
     "subagent/commit": allow
 ---
@@ -99,7 +98,7 @@ Never push, reset, amend, or run another code writer.
 
 ## 2. Write
 
-- Capture HEAD/ownership before implementing the task.
+- Capture HEAD, target contents and ownership before edits, including untracked.
 - Edit later cohorts only for required compatibility.
 - Resolve mechanics from evidence and validate choices without asking.
 - Attempt safe recovery within scope and limits.
@@ -124,45 +123,38 @@ Never push, reset, amend, or run another code writer.
 
 Require current quick PASS and tidy PASS or not-opted-in skip.
 
-- Always call `_review/correctness` and `_review/code-quality`.
-- Call `_review/doc-quality` for changed/required standalone docs.
-- Honor explicit reviewer requests.
-- Security needs trust/auth/secret/IPC or untrusted-input risk.
-- Include filesystem/shell/SQL, crypto, serialization and dependency trust.
-- Record routing reasons in validation_path.
+Run in parallel:
+- `_review/correctness`, `_review/code-quality`: always.
+- `_review/doc-quality`: changed/required standalone docs.
 
-Run selected reviewers in parallel on a stable diff.
-Await all results without editing.
+Honor reviewer requests; record routing reasons in validation_path.
 
 Pass `[[review-inputs]]`:
 - `authority_paths`: root/execution/brief/exec/instructions.
-- Authorized staged paths, exclusions and task-start-base-to-index comparison.
-- `scope`: TASK:[[ID]]; `boundary`: STAGED.
+- Authorized targets/exclusions, including unowned edits.
+- Comparison: `git diff [[base_commit]] -- [[paths...]]` plus scoped new files.
+- `scope`: TASK:[[ID]].
 - Task-start `base_commit`, current `head_commit`.
 - Repo-relative paths, cwd, current `validation_path`, `prior_verdict_paths[]`.
 - Assigned `review_path` and round.
 
-Failed delegation cannot pass; never review/verify/commit for delegates.
+Never review/verify/commit for failed delegates.
 
 ## 5. Verify and repair
 
-1. Send every finding/evidence to `_review/verifier` grouped by `boundary_id`.
-   - Match authority, targets/comparison/exclusions, scope/boundary/base/head.
-   - One call per candidate-bearing partition, all domains, no siblings.
-   - Pass review inputs, candidate domains/IDs/paths, boundary_id and verdict_path.
-2. Await every disposition without investigating/filtering findings.
-   Only the verifier judges accuracy/repair eligibility.
-   Missing/mismatched results or stale required evidence mean INCOMPLETE.
-3. Deduplicate accepted repairs; prioritize deterministic failures/blockers.
-   - Apply feasible advisories; explain nonblocking skips.
-   - Follow verified edits/requirements, not rejected/unresolved corrections.
-   - Reverify contradictions/material departures with the assigned verifier.
-4. After repairs, repeat Step 3 and this review/verification cycle.
-   Rerun correctness/code-quality and affected/new routes in parallel.
+1. Send all reports unfiltered to `_review/verifier` if findings exist.
+   Include review inputs, candidate domains/IDs/paths and verdict_path.
+2. Apply verified scoped fixes, blockers first; explain advisory skips.
+   Reverify contradictions/material departures with the same verifier.
+3. After fixes, repeat Sections 3 to 5, including affected/new review routes.
 
-Keep repairs in scope; all share `repair_turn_limit`, including resumed turns.
+Await all reviewers/verifier without editing or judging findings.
+Missing/mismatched/stale results: INCOMPLETE.
+
+All repairs share `repair_turn_limit`, including resumed turns.
 Exhaustion: FAIL; report turns/limit.
-Obsolete domains/input schemas need fresh review, not relabeled evidence.
+
+Obsolete domains/schemas need fresh review.
 
 ## 6. Final tidy gate and commit
 
@@ -172,7 +164,8 @@ Require checks PASS, complete reviews and no blocker.
    Require PASS or not-opted-in skip.
 2. Fix scoped lint failures and restage changes.
    Repeat checks, affected reviews and this gate after changes.
-3. Re-read staged diff; call `subagent/commit` for owned reviewed paths only.
+3. Confirm staged owned changes match validation/review.
+4. Call `subagent/commit` for owned reviewed paths only.
    Supply pre-commit HEAD as base_commit, paths, outcome and validation.
    Skip empty commits with evidence.
 

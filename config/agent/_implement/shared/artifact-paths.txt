@@ -11,7 +11,7 @@ Evidence:
 - `validation_path`: `[[run_prefix]]/[[run_id]].Cnn.rNN.quick.validation.md`
 - `review_path`: `[[run_prefix]]/<reviewer>/[[run_id]].Cnn.rNN.review.md`
 - `verdict_path`:
-  `[[run_prefix]]/verifier/[[run_id]].Cnn.[[boundary_id]].rNN.verdict.md`
+  `[[run_prefix]]/verifier/[[run_id]].Cnn.rNN.verdict.md`
 - Final paths replace `Cnn` with `final` and omit `quick.`.
 
 Assign exact paths; overwrite only current-round evidence.

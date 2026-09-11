@@ -52,7 +52,7 @@ Approve the outline before writing.
 
 ### Shared reviewers
 
-- `correctness`: behavior, integration, runnable examples and test adequacy.
+- `correctness`: behavior, integration, runnable examples, tests and security.
 - `code-quality`: maintainability, code/test layout and source documentation.
 - `doc-quality`: standalone Markdown/text docs, including API references.
 

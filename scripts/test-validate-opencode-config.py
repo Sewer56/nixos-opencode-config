@@ -288,7 +288,7 @@ class LocalReviewArchitectureTests(unittest.TestCase):
 
     def test_candidate_reviewers_are_self_contained(self):
         for reviewer in ("code-quality", "correctness", "doc-quality",
-                         "code/optional/security", "code/optional/performance"):
+                         "code/optional/performance"):
             root = f"config/agent/_review/{reviewer}.md"
             self.assertEqual(self.imports(root), {root})
 
