@@ -123,9 +123,9 @@ Return Status: PASS|CANDIDATES|INCOMPLETE|FAIL.
 Include Domain, Review Path, Finding Count (all) and one-line Summary.
 Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
-## Rules
+# Rules
 
-### Code quality
+## Code quality
 
 Keep APIs no more public than required.
 
@@ -139,7 +139,7 @@ Flag unnecessary or single-implementation abstractions.
 Tiny single-use helpers may be inline.
 Retain useful names, reuse and boundaries.
 
-#### Placement
+### Placement
 
 Keep module entrypoints focused on orchestration.
 Prefer one data model per file.
@@ -155,7 +155,7 @@ If ownership is unclear, prefer the package others depend on.
 Integration-family packages contain wiring and package-specific behavior.
 Co-locate tests with their module unless repository convention is stronger.
 
-#### Body layout
+### Body layout
 
 For substantive changes, including ports, ensure that:
 
@@ -164,11 +164,11 @@ For substantive changes, including ports, ensure that:
 - Tests separate arrange, act and assert with comments.
 - Long arrange groups separate harness, fixtures and inputs.
 
-### Test strategy
+## Test strategy
 
 Check test organization and readability, not behavioral adequacy.
 
-#### Parameterization
+### Parameterization
 
 Prefer extending tests with matching setup and entry points.
 Prefer named framework cases for independent data variations of one claim.
@@ -177,19 +177,19 @@ Separate differing claims or cases lacking one descriptive name.
 
 Use loops only within one stateful scenario or assertion.
 
-#### Arguments
+### Arguments
 
 Order case arguments: primary input, mode/flags, expected output.
 Comment only non-obvious parameters or assertions.
 
 Keep readable cases near 80-100 characters per line.
 
-#### Helpers
+### Helpers
 
 Use helpers for repetition or shared setup clarity.
 Prefer one parameterizable local helper over per-test mock structs.
 
-#### Naming and grouping
+### Naming and grouping
 
 Test names describe acceptance behavior, not labels or IDs.
 Use `subject_should_expectation_when_condition` in language identifier style.
@@ -199,7 +199,7 @@ Use `when` only for conditional/edge behavior; omit module-redundant prefixes.
 Group related tests with lightweight section comments.
 Order: construction, core behavior, edge cases, convenience.
 
-### Source documentation
+## Source documentation
 
 Review docstrings, API and module/file comments, and source-owned examples.
 Standalone Markdown/text documentation belongs to `_review/doc-quality`.
@@ -208,7 +208,7 @@ Check accuracy, coverage and readability against reader needs and source.
 Flag unnecessary detail and repetition without dropping needed contracts.
 Reject frozen-region findings, including versions, licenses and warnings.
 
-#### Source/API conventions
+### Source/API conventions
 
 Document private APIs only if nontrivial.
 Ensure docs are up to date.
@@ -224,13 +224,13 @@ Examples should use real APIs and hermetic fixtures.
 API summaries and module comments have no automatic closers.
 API errors and returns come last; errors name condition, cause and fix.
 
-#### Error documentation
+### Error documentation
 
 Check that documented public functions list all errors they can return and when.
 Do not demand docs-only backfill of untouched legacy.
 
 Block vague triggers and error-doc stubs: `TODO`, `TBD`, `FIXME`, `...`.
 
-#### Severity
+### Severity
 
 Block false claims, stale references and missing public-feature coverage.

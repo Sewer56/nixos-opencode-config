@@ -114,7 +114,7 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
 # Rules
 
-### Security
+## Security
 
 Check exposed capabilities against the smallest named operation needed.
 Where explicit operations suffice, flag unnecessarily broad interfaces:

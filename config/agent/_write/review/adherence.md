@@ -124,9 +124,9 @@ BLOCKED states missing evidence or the actual needed decision.
 
 # Rules
 
-### Documentation
+## Documentation
 
-#### Wording
+### Wording
 
 Check plain wording without loss of meaning, coverage or consequential caveats.
 Details need reader action, decisions or prevention of real mistakes.
@@ -137,7 +137,7 @@ Prefer current behavior; inventories need a reader purpose.
 Preserve project terms, distinctions, identifiers and API/CLI names.
 Keep commands, paths, URLs and safety wording exact within authorized scope.
 
-#### Formatting
+### Formatting
 
 Judge ADHD readability.
 Wording, documentation, errors and accuracy win conflicts.

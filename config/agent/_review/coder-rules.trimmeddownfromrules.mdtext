@@ -1,0 +1,112 @@
+## Placement
+
+Keep module entrypoints focused on orchestration.
+Prefer one data model per file.
+
+Keep enums, newtypes and value objects with their sole parent type.
+
+Keep non-public helpers local and conversions beside the type.
+Organize by domain, not global `types` or `conversions` buckets.
+
+## Body layout
+
+For substantive changes, including ports, ensure that:
+
+- Coherent steps have one blank line between them.
+- Comments explain steps only where names or flow obscure intent.
+- Tests separate arrange, act and assert with comments.
+- Long arrange groups separate harness, fixtures and inputs.
+
+## Test strategy
+
+### Coverage
+
+Cover all new code when tests are required.
+
+Map removed redundant assertions to surviving tests.
+Allow redundancy only across public entry points.
+Control, seed or freeze I/O, time and network.
+
+### Parameterization
+
+Extend matching setup and entry points first.
+Prefer named framework cases for independent data variations of one claim.
+
+Use a framework such as Rust's rstest; add it if needed.
+
+Separate differing claims or cases without one descriptive name.
+Use loops only within one stateful scenario or assertion.
+
+### Arguments
+
+Order case arguments: primary input, mode/flags, expected output.
+Comment only non-obvious parameters/assertions.
+
+Keep readable cases near 80-100 characters per line.
+
+### Helpers
+
+Extract helpers for repetition or shared setup clarity.
+Prefer one parameterizable local helper over per-test mock structs.
+
+### Naming and grouping
+
+Name tests `subject_should_expectation_when_condition`.
+Use the language's identifier style.
+
+Use `when` only for conditional/edge behavior; omit module-redundant prefixes.
+
+Group related tests with lightweight section comments.
+Order: construction, core behavior, edge cases, convenience.
+
+## Performance
+
+Prefer the highest-performance correct implementation.
+Simplify for readability, never at meaningful performance cost.
+
+Use equally clear bounded alternatives; avoid needless allocation or copying.
+Avoid needless clones and initialization, including zero-filling.
+
+Bound growing inputs with pagination, limits, batching or streaming.
+Avoid nested per-item database, network or filesystem work on list paths.
+Cap user input before proportional allocation, sorting or logging.
+
+## Documentation
+
+### Coverage
+
+Document scoped new/changed public features for purpose and use.
+
+
+Preserve source delimiters, indentation, directives and doctest behavior.
+
+Use real APIs and hermetic fixtures in runnable examples.
+
+### Source/API conventions
+
+Private APIs need purpose and non-obvious contracts unless trivial.
+Refresh changed module/file boundary docs.
+
+Package docs cover import/usage; code docs cover exports.
+Update both only when both exist and change.
+Put requested API-owned examples in code docs.
+
+Open with a plain one-line purpose summary.
+Put caveats in trailing `# Remarks` or equivalent.
+Use native doc links and `#` sections for multiple aspects.
+
+### Error documentation
+
+Cover every reachable error variant/type/path in changed APIs.
+Name each specific trigger and only errors the function can return.
+
+Follow language/project conventions for error docs and links; never use stubs.
+
+### Formatting
+
+Lead with the point or next action; omit intros and outros.
+Use numbered steps for procedures, one action each.
+
+Use `Next:` or checkable `Done when:` only for useful procedural guidance.
+
+Use concrete units for non-trivial work and colons or periods, not em dashes.

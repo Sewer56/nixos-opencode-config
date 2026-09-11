@@ -130,7 +130,7 @@ BLOCKED identifies missing evidence or the needed human decision.
 
 {{ file="./agent/_plan/draft/shared/requirements.txt" }}
 
-### Test strategy
+## Test strategy
 
 Judge planned checks by observable acceptance behavior, not compiler guarantees.
 Require critical success, failure and edge coverage.

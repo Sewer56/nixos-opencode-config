@@ -182,24 +182,19 @@ Distinguish skipped from completed review; include artifact/verdict paths.
 
 {{ file="./rules/plan-confirmation.md" }}
 
-### Documentation
+## Documentation
 
-#### Coverage
+### Coverage
 
 Document scoped new/changed public features for purpose and use.
 Preserve contracts, safety/compatibility caveats and meaningful exceptions.
 
-Preserve required/consequential frequency details.
 
 Preserve source delimiters, indentation, directives and doctest behavior.
-Do not backfill untouched legacy solely for docs or edit frozen regions.
 
 Use real APIs and hermetic fixtures in runnable examples.
-Update links after heading changes or preserve anchors.
 
-#### Source/API conventions
-
-Apply this subsection only to source/API docs.
+### Source/API conventions
 
 Private APIs need purpose and non-obvious contracts unless trivial.
 Refresh changed module/file boundary docs.
@@ -212,14 +207,14 @@ Open with a plain one-line purpose summary.
 Put caveats in trailing `# Remarks` or equivalent.
 Use native doc links and `#` sections for multiple aspects.
 
-#### Error documentation
+### Error documentation
 
 Cover every reachable error variant/type/path in changed APIs.
 Name each specific trigger and only errors the function can return.
 
 Follow language/project conventions for error docs and links; never use stubs.
 
-#### Formatting
+### Formatting
 
 Lead with the point or next action; omit intros and outros.
 Use numbered steps for procedures, one action each.
@@ -229,11 +224,7 @@ Use `Next:` or checkable `Done when:` only for useful procedural guidance.
 API errors and returns come last; errors name condition, cause and fix.
 Use concrete units for non-trivial work and colons or periods, not em dashes.
 
-Full explanations, destructive actions, ambiguity and accuracy override shape.
-Harness, wording and documentation requirements also take precedence.
-In exceptions, retain the lead and drop closers.
-
-### Validation and review coordination
+## Validation and review coordination
 
 {{ file="./rules/write/llm-tidy-pass.md" }}
 

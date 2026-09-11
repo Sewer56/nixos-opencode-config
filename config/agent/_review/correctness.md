@@ -125,7 +125,7 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
 # Rules
 
-### Test coverage
+## Test coverage
 
 Judge observable acceptance behavior, not compiler guarantees.
 Require critical success, failure and edge coverage.

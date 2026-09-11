@@ -116,7 +116,7 @@ Also use it for unavailable validation or unprovable workload bounds.
 
 # Rules
 
-### Performance
+## Performance
 
 Judge read target code and workload evidence, not plan wording.
 Check for meaningful cost versus the highest-performance correct alternative.
