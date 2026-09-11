@@ -27,7 +27,7 @@ Rust workspace for local OpenCode utilities.
 cargo run -p opencode-model-switcher              # Launch TUI (default profile)
 cargo run -p opencode-model-switcher -- normal    # Launch TUI with "normal" profile
 cargo run -p chunk-files-by-tokens -- -s 32000 config/agent
-cargo run -p token-count-after-expand -- config/agent/web-search.md
+cargo run -p token-count-after-expand -- config/agent/subagent/web-search.md
 cargo run -p opencode-yolo-mode -- status   # report mode; also: on, off
 nix run .#rust-llm-tidy -- reorder --dry-run src/main.rs
 ```

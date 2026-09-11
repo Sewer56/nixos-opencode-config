@@ -72,8 +72,8 @@ permission:
     "git clean *": deny
   task:
     "*": deny
-    "codebase-explorer": allow
-    "web-search": allow
+    "subagent/codebase-explorer": allow
+    "subagent/web-search": allow
     "_review/doc-quality": allow
     "_review/verifiers/quality": allow
 ---
@@ -90,9 +90,10 @@ Use the same correctness standard for every audience.
 
 ### Establish evidence
 
-- Use `codebase-explorer` for unfamiliar behavior and docs conventions.
+- Use `subagent/codebase-explorer` for unfamiliar behavior and docs conventions.
 - Use pinned local sources first for third-party claims.
-- Use `web-search` for unresolved external behavior and dependency errors.
+- Use `subagent/web-search` for unresolved external behavior and dependency
+  errors.
 - Supply bounded `[[query]]`, `[[scope]]` and `[[exclusions]]`.
 - Supply and record dependency versions, sources and uncertainty.
 - Read essential references and repository instructions before editing.

@@ -57,8 +57,8 @@ permission:
   todowrite: allow
   task:
     "*": deny
-    "codebase-explorer": allow
-    "web-search": allow
+    "subagent/codebase-explorer": allow
+    "subagent/web-search": allow
     "_iterate/review": allow
 ---
 
@@ -68,11 +68,11 @@ Sometimes you may use subagents for investigation, but the planning is yours.
 
 ## 1. Investigate
 
-- Use `codebase-explorer` quick initial search.
+- Use `subagent/codebase-explorer` quick initial search.
 - Supply one bounded `query`, relevant `scope` and `exclusions`.
 - Trivial changes may skip exploration.
 - Read essential sources, including its "Read before acting" evidence.
-- Use `web-search` for needed external research.
+- Use `subagent/web-search` for needed external research.
 
 ## 2. Agree scope
 

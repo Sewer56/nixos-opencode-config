@@ -71,9 +71,9 @@ permission:
     "git commit --no-verify *": ask
   task:
     "*": deny
-    "coder": allow
-    "web-search": allow
-    "codebase-explorer": allow
+    "subagent/coder": allow
+    "subagent/web-search": allow
+    "subagent/codebase-explorer": allow
     "_review/correctness": allow
     "_review/code-quality": allow
     "_review/doc-quality": allow
@@ -89,9 +89,9 @@ Code within user scope.
 
 Apply this research routing throughout planning and implementation.
 
-- Prefer `codebase-explorer` for unfamiliar-repo discovery.
-- Delegate local dependency research to `codebase-explorer`.
-- Use `web-search` for external research, including dependency questions.
+- Prefer `subagent/codebase-explorer` for unfamiliar-repo discovery.
+- Delegate local dependency research to `subagent/codebase-explorer`.
+- Use `subagent/web-search` for external research, including dependencies.
 - Supply dependency versions when researching their behavior.
 - Browse dependency sources only for approved dependency edits.
 - Supply bounded `[[query]]`, `[[scope]]` and `[[exclusions]]`.
@@ -105,7 +105,7 @@ Apply this research routing throughout planning and implementation.
 Show components, responsibilities, interfaces/data flow and behavior changes.
 Clarify material ambiguity; tiny diffs need not be low risk.
 
-Offer direct edits or optional `coder` assignments for cohesive work.
+Offer direct edits or optional `subagent/coder` assignments for cohesive work.
 
 Propose Step 5 reviewers and verification, or none.
 Without review approval, create no review artifacts.
@@ -115,7 +115,7 @@ Without review approval, create no review artifacts.
 Capture HEAD and target index/worktree ownership before editing.
 Preserve unrelated work.
 
-Supply each approved `coder` a bounded `[[assignment]]`:
+Supply each approved `subagent/coder` a bounded `[[assignment]]`:
 - Outcome, acceptance criteria, edit files/symbols and protected work.
 - Decisions, interfaces, edge cases and existing patterns.
 - `[[context]]`, including authorized partial work.

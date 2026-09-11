@@ -53,7 +53,7 @@ permission:
   question: allow
   task:
     "*": deny
-    "codebase-explorer": allow
+    "subagent/codebase-explorer": allow
     "_write/review/adherence": allow
   bash:
     "*": allow
@@ -97,7 +97,7 @@ Do not modify source, commit, push, or create a remote issue.
 Inspect issue templates, contribution guidance, and the main README.
 Read code/config only for correct names and paths.
 
-Use `codebase-explorer` only for one narrow repository fact.
+Use `subagent/codebase-explorer` only for one narrow repository fact.
 The fact must materially improve the issue.
 
 Write root `ISSUE-<slug>.md` with a short slug and the repository template.

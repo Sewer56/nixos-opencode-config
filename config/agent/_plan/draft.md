@@ -63,7 +63,7 @@ permission:
     "_plan/draft/explorer": allow
     "_plan/draft/reviewer": allow
     "_plan/draft/verifier": allow
-    "web-search": allow
+    "subagent/web-search": allow
 ---
 
 - Use request/constraints and any draft path or refinement request.
@@ -88,7 +88,8 @@ permission:
 - Supply existing `plan_path` or `None` and `notes` or `None`.
 - The explorer alone discovers repository evidence for this parent.
 - Never bypass it with shell/search or product reads.
-- Use `web-search` only on `External Research: REQUIRED` or user request.
+- Use `subagent/web-search` only on `External Research: REQUIRED` or user
+  request.
 - External facts need package/version evidence and sources.
 
 ## 3. Write or refine

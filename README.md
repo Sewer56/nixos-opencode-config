@@ -148,7 +148,8 @@ The shell smoke checks routing, pairs, cycles and path safety in temp fixtures.
 
 ## Tricks
 
-- Use small models for `codebase-explorer` and `web-search` to filter context.
+- Use small models for `subagent/codebase-explorer` and
+  `subagent/web-search` to filter context.
   Pass the relevant findings to the larger model.
 - Split work into thematic “cohorts” for easier human and LLM review.
 - Prompts are tightly token optimized for language-model execution.

@@ -6,7 +6,7 @@ Repo map for `/iterate/edit` sessions. Personal OpenCode configuration repo;
 ## Edit targets
 
 - `config/agent/` — agents and subagent dirs
-  (`_implement/`, `_plan/`, `_refactor/`, `_review/`, `_write/`).
+  (`_implement/`, `_plan/`, `_refactor/`, `_review/`, `_write/`, `subagent/`).
 - `config/command/` — commands (`draft`, `implement`, `write/`, ...).
 - `config/plugins/` — local plugins; `opencode-plugin-md-expand` drives
   expanded token counts (submodule).

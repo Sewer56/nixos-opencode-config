@@ -63,8 +63,8 @@
         "task": {
           "*": "deny",
           "general": "allow",
-          "web-search": "allow",
-          "codebase-explorer": "allow"
+          "subagent/web-search": "allow",
+          "subagent/codebase-explorer": "allow"
         },
         "skill": "deny",
         "external_directory": "allow"
@@ -77,8 +77,8 @@
         "task": {
           "*": "deny",
           "general": "allow",
-          "web-search": "allow",
-          "codebase-explorer": "allow"
+          "subagent/web-search": "allow",
+          "subagent/codebase-explorer": "allow"
         },
         "skill": "deny",
         "external_directory": "allow"
@@ -90,7 +90,7 @@
         "websearch": "deny",
         "task": {
           "*": "deny",
-          "web-search": "allow"
+          "subagent/web-search": "allow"
         }
       }
     },

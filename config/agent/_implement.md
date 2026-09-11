@@ -62,7 +62,7 @@ permission:
     "*": deny
     "_implement/cohort": allow
     "_review/coderabbit": allow
-    "commit": allow
+    "subagent/commit": allow
 ---
 
 - Execute one approved READY_FOR_IMPLEMENT bundle with final CodeRabbit review.
@@ -142,7 +142,8 @@ After PASS/ADVISORY:
 2. Stage owned pending edits and repeat Section 3's gate and full checks.
    - Require current-tree review evidence.
    - Post-review mutations without coverage mean INCOMPLETE; never extend budgets.
-3. Re-read staged diff; confirm scope/ownership and call `commit` if nonempty.
+3. Re-read staged diff; confirm scope/ownership and call `subagent/commit`
+   if nonempty.
    - Supply reviewed paths, outcome, validation and pre-commit HEAD as base.
    - Require returned new commit at HEAD or None; preserve unrelated index entries.
 

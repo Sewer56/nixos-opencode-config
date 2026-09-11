@@ -77,7 +77,7 @@ permission:
     "_review/code/optional/security": allow
     "_review/verifiers/correctness": allow
     "_review/verifiers/quality": allow
-    "commit": allow
+    "subagent/commit": allow
 ---
 
 Be sole code/tests/docs writer for one approved task.
@@ -154,7 +154,7 @@ Require checks PASS, complete reviews and no blocker.
 2. Fix scoped lint failures and restage changes.
    Repeat checks, affected reviews and this gate after changes.
    All retries share the existing repair budget.
-3. Re-read staged diff; call `commit` for owned reviewed paths only.
+3. Re-read staged diff; call `subagent/commit` for owned reviewed paths only.
    Supply pre-commit HEAD as base_commit, paths, outcome and validation.
    Skip empty commits with evidence.
 
