@@ -16,7 +16,7 @@ Omit milestones, copied requests, acceptance-ID matrices and empty headings.
 Do not repeat research, shared checks, decisions or review boilerplate.
 
 ### Execution documents
-`execution.md` owns shared technical constraints, checks and final routing.
+`execution.md` owns shared technical constraints and full-validation commands.
 
 It contains one `plan-tasks` fenced block, one row per task:
 `[[ID]] [[NN-name.md]] [[comma-separated prerequisite IDs or -]]`.
@@ -49,18 +49,17 @@ Check comments/docs referring to changed or removed behavior.
 Unresolved compatibility or external API contracts block readiness.
 Never invent evidence or answers for brevity.
 
-Correctness and quality are required before each implementation commit.
+Correctness and quality are required before each cohort commit.
 Correctness includes basic test adequacy and execution evidence.
 
-Tests specialist needs concrete test-design risk, request or grounded routing.
+Route test-design risks and requested test review to cohort correctness.
 Security needs concrete trust/auth/secret/IPC or untrusted-input risk.
 Filesystem/shell/SQL, crypto, serialization and dependency trust also qualify.
 
 No per-task performance review; preserve workload requirements and tests.
 
-Final cumulative/standalone performance review is conditional.
-It requires explicit request or concrete cost/hot-path risk.
-Record the skip reason and any genuinely inapplicable checks.
+CodeRabbit alone reviews the final change; do not route local final reviewers.
+Record genuinely inapplicable checks.
 
 ### Cohort planning
 

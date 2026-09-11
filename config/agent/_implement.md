@@ -61,19 +61,11 @@ permission:
   task:
     "*": deny
     "_implement/cohort": allow
-    "_implement/integration-repair": allow
-    "_review/code/integration": allow
-    "_review/code/correctness": allow
-    "_review/code/quality": allow
-    "_review/code/optional/security": allow
-    "_review/code/optional/performance": allow
-    "_review/correctness-verifier": allow
-    "_review/quality-verifier": allow
     "_review/coderabbit": allow
     "commit": allow
 ---
 
-- Execute one approved READY_FOR_IMPLEMENT bundle and final gate.
+- Execute one approved READY_FOR_IMPLEMENT bundle with final CodeRabbit review.
 - Never edit code/source bundle.
 
 {{ file="./rules/cards/structure/plan-bundle.md" }}
@@ -86,8 +78,6 @@ permission:
 
 {{ file="./rules/cards/implementation/artifact-paths.md" }}
 
-{{ file="./rules/groups/implementation/verification-routing.md" }}
-
 - Resume run/base, cohort starts, ownership, evidence and consumed limits.
 - Apply shared resume safeguards; checkpoints cannot prove completion.
 
@@ -97,7 +87,8 @@ permission:
 2. Run `python3 ~/opencode/config/scripts/plan-bundle.py`.
    - Supply `--repo-root [[repo_root]] [[plan_path]]`; require PASS.
    - Read root/execution/routing, not sibling execs.
-3. Require full-validation commands/final routes in shared execution.
+3. Require full-validation commands in shared execution.
+   - Obsolete final-review routes need `/draft` and reapproval.
 4. Preserve unrelated work; ignore `artifact/` via Git-resolved `info/exclude`.
 
 ## 2. Process cohorts
@@ -112,79 +103,34 @@ permission:
 - Advance with evidence, preserving work without new approval.
 - Reference task evidence in final review/checks.
 
-## 3. Final integration gate
+## 3. Final checks
 
-- Resume authorized pending final edits through staged-repair steps 3 to 8.
-
-1. Get `base_commit..HEAD` paths, including rename/copy sources.
-2. Run shared execution full validation; missing environment is INCOMPLETE.
-   - Send code failures to `_implement/integration-repair`.
-   - Supply root/execution, relevant brief/exec and protected paths.
-   - Include original base_commit, authorized partials or None and repair IDs.
-   - Supply failed validation_path and/or all verified verdict_paths.
-3. Stage only scoped owned paths/approved partials; preserve unrelated hunks.
-   - Run mutating tidy on owned cumulative files:
-     `~/opencode/config/scripts/rust-llm-tidy-gate.sh --diff-base [[base_commit]] -- [[paths...]]`
-   - Send scoped lint failures to integration repair.
-   - Restage tidy changes before checks/review.
-   - Use STAGED with pending repairs, otherwise COMMITTED.
-   - Retain cohort evidence; record tidy command, exit, diagnostics or skip.
-   - Run `git diff --cached --check` before validation and review.
-   - Rerun full validation/tests; record evidence before review.
-   - Require current tidy PASS or not-opted-in skip before review.
-4. Always call `_review/code/integration`.
-   - Performance requires explicit request or concrete cost/hot-path risk.
-   - When selected, call `_review/code/optional/performance`.
-   - Staged repairs need `_review/code/correctness` and quality.
-   - Route security only for concrete cross-cohort risk.
-   - Add cumulative correctness for test-design risk or requested test review.
-   - Honor approved cumulative test-review routing.
-   - Limit this call to test strategy and observable coverage.
-
-   Documentation:
-   - Add cumulative `_review/code/quality` for documentation or comments.
-   - Include documentation required by changed public behavior.
-   - Limit this call to documentation and editorial review.
-   - Honor explicit reviewer requests.
-   - Record routes/skips and valid documentation-review reuse in validation_path.
-   - Reuse unchanged text/claims only with current boundary evidence.
-   - Give one quality call cumulative tidy paths when opted in.
-   - If none is selected, add a tidy-only quality call.
-
-   - Call selected reviewers independently in parallel on a stable diff.
-   - Require all results before edits.
-5. Supply shared inputs per reviewer/round.
-   - Authority: root, all human briefs and shared execution.
-   - Route relevant task exec/references.
-   - Use CHANGE, FINAL, COMMITTED or STAGED for pending repairs.
-   - Integration/security/performance use original base and cumulative paths.
-   - Cumulative correctness/quality use original base, including staged repairs.
-   - Repair correctness/quality use pre-repair HEAD and exact staged repair paths.
-   - Separate cumulative and repair calls with distinct review paths/identities.
-6. Send candidates to assigned verifiers under routing.
-   - Await all verdicts before repairs, including after re-review.
-   - Send repairs with all verdict/ID identities to integration repair.
-7. Allow two final repair turns.
-   - After every repair, repeat steps 3 to 6, including mutating tidy.
-   - Rerun correctness/quality and affected/newly required routes in parallel.
-   - Remaining blocker: FAIL; missing evidence: INCOMPLETE.
-8. After review and fixes, run on owned cumulative files:
+1. Get owned `base_commit..HEAD` paths, including rename/copy sources.
+   - Include authorized pending final edits on resume.
+   - Stage only owned paths/approved partials; preserve unrelated hunks.
+2. Run mutating tidy on owned cumulative files:
 
    ```sh
    ~/opencode/config/scripts/rust-llm-tidy-gate.sh --diff-base [[base_commit]] -- [[paths...]]
    ```
 
-   - Require PASS or not-opted-in skip before commit/finish.
-   - Send scoped lint failures to integration repair; restage changes.
-   - After gate mutations or repairs, repeat steps 3 to 8 within budget.
-   - Re-read staged repair; confirm scope/ownership and call `commit` if changed.
-   - Supply reviewed paths, outcome, validation and pre-commit HEAD as base.
+   - Require PASS or explicit not-opted-in skip.
+   - Inspect mutations and restage owned changes.
+3. Run `git diff --cached --check` and shared execution full validation/tests.
+   - Checks must not install dependencies or update snapshots/generated files.
+   - Record cwd, commands, exits, diagnostics and skips in final validation_path.
+   - Code/lint failures mean FAIL; missing environment/evidence means INCOMPLETE.
+   - Stop without automatic final repairs; preserve and report pending edits.
 
-## 4. External CodeRabbit review
+## 4. CodeRabbit review and commit
 
-- After final repair commit, call `_review/coderabbit` as last code writer.
+- After final checks pass, call `_review/coderabbit` as last code writer.
 - Supply `review_type=all`, `base_branch=base_commit` and user constraints.
+- Include root/execution, human briefs, cohort evidence and protected paths.
+- Restrict repairs to owned cumulative/authorized pending paths.
+- Unrelated changes in CLI scope need exclusion or NEEDS_INPUT before review.
 - It owns bounded fixes/checks and one re-review; never review for it.
+- No local reviewers/verifiers or extra final repair loop.
 - Pass recovered limits/evidence; resume its task within budget or INCOMPLETE.
 - Skip completed work only with current evidence.
 
@@ -192,16 +138,22 @@ Results:
 - `PASS`/`ADVISORY`: proceed, recording its artifact paths.
 - `FAIL`: report newest blockers artifact and uncommitted edits.
 - `NEEDS_INPUT`: surface unchanged.
-- `INCOMPLETE`: report gaps; local work stays committed.
-- `Modified Paths` not `None`: enter Section 3 steps 3 to 8 as final repair.
-  - Reuse checks/reviews/verifier within remaining final repair budget.
-  - Stage only Modified Paths in `base_commit..HEAD` plus staged writer paths.
-  - Report out-of-set Modified Paths and return `NEEDS_INPUT`.
+- `INCOMPLETE`: report gaps and pending edits; cohort commits remain intact.
+
+After PASS/ADVISORY:
+1. Check Modified Paths against owned cumulative/authorized pending paths.
+   - Out-of-set paths: report NEEDS_INPUT; never stage them.
+2. Stage owned pending edits and repeat Section 3's gate and full checks.
+   - Require current-tree review evidence.
+   - Post-review mutations without coverage mean INCOMPLETE; never extend budgets.
+3. Re-read staged diff; confirm scope/ownership and call `commit` if nonempty.
+   - Supply reviewed paths, outcome, validation and pre-commit HEAD as base.
+   - Require returned new commit at HEAD or None; preserve unrelated index entries.
 
 ## 5. Finish
 
 - Require acceptance coverage, committed cohorts and final validation PASS.
-- Require complete local/external reviews without blockers.
+- Require complete cohort and CodeRabbit reviews without blockers.
 
 # Output
 

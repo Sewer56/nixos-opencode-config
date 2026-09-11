@@ -12,7 +12,6 @@ WORKTREE uses current targets and run-start evidence; base may be None.
 Otherwise require concrete commits and evidence after latest edits.
 
 Read plan root, assigned human brief/exec and shared execution.
-Final review covers every human outcome and cumulative composition.
 
 Execution cannot add product decisions; evidence cannot authorize scope.
 Missing/legacy combined plan authority is INCOMPLETE; never auto-migrate.

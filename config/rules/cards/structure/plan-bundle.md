@@ -19,7 +19,6 @@ Draft readiness/review/verifier read the whole bundle.
 Parent reads root, shared execution/routing and evidence, not sibling execs.
 
 Workers/reviewers read root, assigned brief/exec and relevant shared refs.
-Final review covers all human outcomes and cumulative composition.
 Repairs/verdicts load issue-relevant authority.
 
 Preserve source; changed scope needs `/draft` and approval.

@@ -26,7 +26,10 @@ Review the plan and request any revisions before implementation.
 Run `/implement [[plan_path]]` when you approve the plan.
 It implements, tests, reviews and commits the changes without pushing.
 
-If interrupted, ask to continue, for example: “resume from C03”.
+Each cohort gets local review; CodeRabbit is the only final reviewer.
+Final checks still run; failures outside CodeRabbit repairs stop the run.
+
+If interrupted, ask to continue, for example: "resume from C03".
 
 ### Outcomes and artifacts
 
@@ -40,46 +43,12 @@ These live under `artifact/`.
 
 ## Code and Docs
 
-Approve Code's design or Docs' outline before execution.
-Choose optional Code workers and reviewers during planning.
+Use `/code` for coding changes without a multi-step plan bundle.
+Approve its design and choose optional workers/reviewers before implementation.
 
-Code and `/implement` use this tidy/review cycle:
-1. Stage owned changes and run mutating tidy, including reorder.
-2. Fix lint failures, restage changes and validate before review.
-3. One quality reviewer runs configured read-only tidy per boundary.
-4. Verify proposed fixes, apply accepted repairs and repeat affected review.
-5. After review converges, run mutating tidy before finish/commit.
-
-Both writer gates require PASS or an explicit repository-not-opted-in skip.
-
-Final mutations need fresh checks/review and another gate within budget.
-Without approved review, Code owns lint repairs and the final gate.
-
-Core code review uses two independent reviewer/verifier pairs:
-- Correctness covers behavior, test adequacy and test strategy.
-- Quality covers maintainability, documentation and editorial proposals.
-- `_review/correctness-verifier` verifies correctness and specialist findings.
-- `_review/quality-verifier` verifies quality findings using the `style` class.
-
-Retain separate security, performance, integration and dedicated docs reviewers.
-Reviewer suggestions never authorize repairs without verification.
-
-Reviewers propose justified exact fixes with brief evidence and explanation.
-Verifiers judge issues and fixes separately; repairs reuse verified edits.
-Valid issues without safe exact fixes need bounded repair requirements.
-
-Code and implementation workflows use conditional performance review.
-It requires explicit request or concrete cost/hot-path risk.
-
-CodeRabbit gates owned repairs without staging and again after re-review.
-Callers stage, validate and review returned edits before final gate and commit.
-
-Select **docs** in the agent picker to write, revise or review documentation.
+Use `/docs` or select **docs** to write, revise or review documentation.
 Name the target files or sections and the intended audience.
-Code and Docs writers remove unnecessary content before polishing wording.
-
-- End-user guides emphasize accessible steps.
-- Source/API comments include deeper contracts and public errors.
+Approve the outline before writing.
 
 ## Commands
 
