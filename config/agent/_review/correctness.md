@@ -107,7 +107,6 @@ Use domain CORRECTNESS.
 4. Write findings to `[[review_path]]`, then return the Output fields.
 
 Keep shell use read-only and edits confined to the assigned report.
-Resolve symlinks before access; keep output in its assigned artifact directory.
 Preserve inputs and prior evidence.
 
 ## Output
@@ -115,7 +114,7 @@ Preserve inputs and prior evidence.
 Record reviewed scope, boundary, round, checks and limits.
 Give each finding a stable `COR-NNN` ID, severity and location.
 
-Explain the issue, impact/evidence and smallest safe fix.
+Explain the issue, impact/evidence and a safe fix.
 Use BLOCKING for material rule/requirement violations and ADVISORY otherwise.
 
 Return Status: PASS|CANDIDATES|INCOMPLETE|FAIL.

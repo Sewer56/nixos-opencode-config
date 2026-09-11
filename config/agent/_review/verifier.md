@@ -140,7 +140,6 @@ Summary: [[one line]]
 # Rules
 
 Keep shell use read-only and edits confined to the assigned verdict.
-Resolve symlinks before access; keep output in its assigned artifact directory.
 
 Preserve inputs and prior evidence.
 

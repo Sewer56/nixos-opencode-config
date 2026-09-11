@@ -102,103 +102,92 @@ Use domain CODE_QUALITY.
 4. Write findings to `[[review_path]]`, then return the Output fields.
 
 Keep shell use read-only and edits confined to the assigned report.
-Resolve symlinks before access; keep output in its assigned artifact directory.
 Preserve inputs and prior evidence.
-
-Use individual Git reads with exact paths and external helpers disabled.
 
 ## Output
 
 Record reviewed scope, boundary, round, checks and limits.
 Give each finding a stable `CQL-NNN` ID, severity and location.
 
-Explain the issue, impact/evidence and smallest safe fix.
+Explain the issue, impact/evidence and a safe fix.
 Use BLOCKING for material rule/requirement violations and ADVISORY otherwise.
 
 Return Status: PASS|CANDIDATES|INCOMPLETE|FAIL.
 Include Domain, Review Path, Finding Count (all) and one-line Summary.
 Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
-# Rules
+## Rules
 
 ### Code quality
 
-Flag unnecessary scope or refactoring beyond the requested change.
-Judge visibility against required API boundaries.
+Keep APIs no more public than required.
 
-Check cohesive edits, obvious control flow and established repository patterns.
-
-Check reuse of constants by meaning, not coincidental equality.
-Related boundaries and test inputs should derive from those constants.
+Reuse constants for the same concept instead of repeating literals.
+Derive related boundaries and test inputs from them.
 
 Flag vague names, cleverness and jargon without an established narrow meaning.
-Prefer descriptive, domain-first module, file, type and function names.
+Prefer descriptive, domain-first names.
 
 Flag unnecessary or single-implementation abstractions.
 Tiny single-use helpers may be inline.
 Retain useful names, reuse and boundaries.
 
-Resolve drifting `path:line` hints through cited symbols, contracts and context.
-
 #### Placement
 
-Check catch-all modules and unrequested collapse of modular code into monoliths.
-Keep orchestration in the entrypoint and prefer one data model per file.
+Keep module entrypoints focused on orchestration.
+Prefer one data model per file.
 
-Enums, newtypes and value objects belong with their sole parent type.
-Non-public helpers stay local; conversions belong beside the type.
-Reject global `conversions` buckets.
+Keep enums, newtypes and value objects with their sole parent type.
+Keep non-public helpers local.
+Put conversions beside the type.
+Organize by domain, not global `types` or `conversions` buckets.
 
 Shared behavior belongs in the lowest shared owning package.
 If ownership is unclear, prefer the package others depend on.
 
-Integration-family packages should contain wiring and package-specific behavior.
-Tests belong with their module unless repository convention is stronger.
+Integration-family packages contain wiring and package-specific behavior.
+Co-locate tests with their module unless repository convention is stronger.
 
 #### Body layout
 
-Check new or substantially rewritten non-trivial bodies, including moved code.
-Include ported regions.
-
-Do not demand re-layout for incidental edits; formatters own line wrapping.
+For substantive changes, including ports, ensure that:
 
 - Coherent steps have one blank line between them.
-- Why/purpose comments appear once above their group, not instead of spacing.
 - Comments explain steps only where names or flow obscure intent.
-- Tests separate arrange, act and assert.
+- Tests separate arrange, act and assert with comments.
 - Long arrange groups separate harness, fixtures and inputs.
-- Multi-step loops have internal groups; single-group bodies need no split.
-
-#### Severity
-
-- BLOCKING: 3+ groups with zero internal blank lines.
-- All other layout issues: ADVISORY.
 
 ### Test strategy
 
 Check test organization and readability, not behavioral adequacy.
-Correctness owns coverage, execution, equivalence and determinism.
 
-#### Test cases
+#### Parameterization
 
-Prefer extending tests with matching setup and entry point.
-One claim with independent data-only variation belongs in named framework cases.
+Prefer extending tests with matching setup and entry points.
+Prefer named framework cases for independent data variations of one claim.
 
 Separate differing claims or cases lacking one descriptive name.
 
-Flag data loops replacing named framework cases, such as Rust's rstest cases.
-Allow loops intrinsic to one stateful scenario or assertion.
+Use loops only within one stateful scenario or assertion.
 
-Case arguments should run primary input, mode/flags, then expected output.
-Only non-obvious parameters or assertions need comments.
-Readable cases should stay around 80-100 columns.
+#### Arguments
 
-Helpers should serve repetition or shared setup clarity.
+Order case arguments: primary input, mode/flags, expected output.
+Comment only non-obvious parameters or assertions.
+
+Keep readable cases near 80-100 characters per line.
+
+#### Helpers
+
+Use helpers for repetition or shared setup clarity.
 Prefer one parameterizable local helper over per-test mock structs.
+
+#### Naming and grouping
 
 Test names describe acceptance behavior, not labels or IDs.
 Use `subject_should_expectation_when_condition` in language identifier style.
+
 Use `when` only for conditional/edge behavior; omit module-redundant prefixes.
 
-Check lightweight section comments for related tests.
+Group related tests with lightweight section comments.
 Order: construction, core behavior, edge cases, convenience.

@@ -78,16 +78,20 @@ Preserve behavior unless explicitly changed; use the smallest viable diff.
 Refactor broadly only when required or requested.
 
 Use repository types, schemas, signatures and patterns.
-Minimize visibility within required API boundaries.
-Reuse constants by meaning; derive related boundaries and test inputs from them.
+Keep APIs as private as their required use allows.
+
+Reuse constants for the same concept instead of repeating literals.
+Related boundaries and test inputs should derive from those constants.
 
 #### Placement
 
-Keep orchestration in the entrypoint and prefer one data model per file.
+Keep module entrypoints focused on orchestration.
+Prefer one data model per file.
+
 Keep enums, newtypes and value objects with their sole parent type.
 
 Keep non-public helpers local and conversions beside the type.
-No global `conversions` buckets or unrequested collapse into monoliths.
+Organize by domain, not global `types` or `conversions` buckets.
 
 Shared behavior belongs in the lowest shared owning package.
 If ownership is unclear, use the package others depend on.
@@ -97,16 +101,12 @@ Co-locate tests unless repository convention is stronger.
 
 #### Body layout
 
-Group new or substantially rewritten non-trivial bodies, including moved code.
-Include ported regions.
+For substantive changes, including ports, ensure that:
 
-No re-layout for incidental edits; formatters own line wrapping.
-
-- Separate coherent steps with one blank line.
-- Put needed why/purpose comments once above their group.
-- Tests separate arrange, act and assert.
-- Split long arrange into harness, fixtures and inputs.
-- Group multi-step loops; skip single-group bodies.
+- Coherent steps have one blank line between them.
+- Comments explain steps only where names or flow obscure intent.
+- Tests separate arrange, act and assert with comments.
+- Long arrange groups separate harness, fixtures and inputs.
 
 ### Test strategy
 
@@ -123,25 +123,33 @@ Map removed redundant assertions to surviving tests.
 Allow redundancy only across public entry points.
 Control, seed or freeze I/O, time and network.
 
-#### Test cases
+#### Parameterization
 
 Extend matching setup and entry points first.
-Parameterize independent data-only variations of one claim with named cases.
+Prefer named framework cases for independent data variations of one claim.
 
 Use a framework such as Rust's rstest; add it if needed.
 
 Separate differing claims or cases without one descriptive name.
 Use loops only within one stateful scenario or assertion.
 
+#### Arguments
+
 Order case arguments: primary input, mode/flags, expected output.
 Comment only non-obvious parameters/assertions.
-Keep readable cases near 80-100 columns.
+
+Keep readable cases near 80-100 characters per line.
+
+#### Helpers
 
 Extract helpers for repetition or shared setup clarity.
 Prefer one parameterizable local helper over per-test mock structs.
 
+#### Naming and grouping
+
 Name tests `subject_should_expectation_when_condition`.
 Use the language's identifier style.
+
 Use `when` only for conditional/edge behavior; omit module-redundant prefixes.
 
 Group related tests with lightweight section comments.
