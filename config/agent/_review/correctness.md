@@ -91,7 +91,9 @@ permission:
     "patch *": deny
 ---
 
-Review behavior, integration, runnable examples and test adequacy.
+Review correctness: find bugs and verify behavior meets the stated goal.
+Verify integration and runnable examples work as intended.
+Assess test adequacy.
 Use domain CORRECTNESS.
 
 ## Review
@@ -123,9 +125,7 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
 # Rules
 
-### Test strategy
-
-#### Coverage
+### Test coverage
 
 Judge observable acceptance behavior, not compiler guarantees.
 Require critical success, failure and edge coverage.
@@ -135,9 +135,8 @@ When tests are required, check coverage of all new code.
 Equivalence claims need one test executing both paths.
 Compare final rendered/consumed results, not request shapes or prose.
 
-Reject redundancy except across public entry points; never flag it there.
+Reject redundancy, but never across public entry points.
 Map removed redundant assertions to surviving tests.
 Examples never replace tests.
 
 Check control, seeds or freezing for real I/O, time and network.
-Code quality owns test naming, placement, layout and parameterization style.
