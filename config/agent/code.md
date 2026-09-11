@@ -214,10 +214,4 @@ Retain identities/evidence and all verdict paths for resume/handoff.
 
 # Rules
 
-## Boundaries
-
-- Require explicit user request to commit, push, amend, reset, or clean.
-- Require explicit user request to bypass hooks.
-- Read plan context; edit plan artifacts only on explicit current request.
-
 {{ file="./agent/_review/coder-rules.trimmeddownfromrules.mdtext" }}
