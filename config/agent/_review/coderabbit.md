@@ -70,124 +70,125 @@ permission:
   task: deny
 ---
 
-Run CodeRabbit review and bounded repairs using its findings as authority.
+Run CodeRabbit review and bounded repairs under caller constraints.
+Its findings authorize repairs; labels do not.
+
 Never add a local verifier.
-Caller constraints bound repairs; labels grant no authority.
 
-# Inputs
-- `base_branch`: explicit ref, otherwise local `origin/HEAD`.
-- All/committed review needs a trustworthy local base, else NEEDS_INPUT.
-- `review_type`: all by default; accept all, committed or uncommitted.
-- `apply_advisories`: default true.
+## 1. Select review scope
 
-# Process
-
-## 1. Scope
+- `[[review_type]]`: all (default), committed or uncommitted.
+- `[[base_branch]]`: explicit ref or local `origin/HEAD`.
+- `[[apply_advisories]]`: default true.
 - Resolve installed `cr` or `coderabbit`; absent means INCOMPLETE.
-- Never install/update it or fetch refs.
-- Untracked selected files need caller exclusion or NEEDS_INPUT; never add them.
-- Match Git comparison to CLI review scope:
-  - All/committed: `comparison_commit` is merge-base of `base_branch` and HEAD.
-  - All command:
 
-```sh
-cr review --agent --type all --base-commit [[comparison_commit]]
-```
-  - For `all`, derive paths from committed plus staged/unstaged Git diff.
-  - Committed paths are `comparison_commit..HEAD`; command:
+Never stage, commit, reset, push, fetch, install/update software or alter auth.
 
-```sh
-cr review --agent --type committed --base-commit [[comparison_commit]]
-```
+Never edit plans/implementation artifacts or wait through long rate limits.
+Untracked selected files need caller exclusion or NEEDS_INPUT.
 
-  - Uncommitted uses HEAD as comparison with index/worktree, without a base ref.
-  - Uncommitted command: `cr review --agent --type uncommitted`.
-- Empty selected diff yields PASS with NO_CHANGES; never call the service.
-- Set `run_id = <UTC YYYYMMDDTHHMMSSZ>`; append suffix on collision.
-- `review_dir = artifact/review/CODERABBIT-<run_id>/coderabbit`
-- Create immutable round-one paths:
-  - `candidate_path = [[review_dir]]/r01.review.md`
-  - `validation_path = [[review_dir]]/r01.validation.md`
+- All/committed: require a trustworthy local base or NEEDS_INPUT.
+- Set `comparison_commit` to merge-base of base and HEAD for all/committed.
+- Committed selects `comparison_commit..HEAD`; all adds staged/unstaged changes.
+- Uncommitted compares HEAD with index/worktree without a base ref.
+- Empty diff: PASS/NO_CHANGES without service calls.
 
-## 2. Parse review
-- Run structured review once; collect `finding` JSONL events.
-- Record `review_context` and `status`; ignore `heartbeat`.
-- Require one successful `complete`; stop on terminal `error`.
-- Ignore unknown events unless completion becomes ambiguous.
-- Use `codegenInstructions`, falling back to documented `comment` when absent.
-- Preserve useful `suggestions` as secondary hints.
-- Rate/service failures, nonzero exit or malformed output mean INCOMPLETE.
-- Missing completion or inconsistent counts also mean INCOMPLETE.
-- On auth/startup failure run auth status once; never change auth.
+## 2. Run review and record evidence
 
-### Artifact
+Bind `run_id` to UTC `YYYYMMDDTHHMMSSZ`, suffixing collisions.
+Set `review_dir = artifact/review/CODERABBIT-[[run_id]]/coderabbit`.
 
-- Map critical/major to BLOCKING; minor/trivial/info to ADVISORY.
-- Write findings to `candidate_path`, omitting generic praise and summaries.
+- `candidate_path = [[review_dir]]/r01.review.md`
+- `validation_path = [[review_dir]]/r01.validation.md`
 
-Reports identify CODERABBIT-V4, AGENT-JSONL, type, base, comparison commit,
-terminal status and reported count.
+Write only assigned artifacts; complete them before return.
+Never overwrite prior attempts.
 
+Run `cr review --agent --type [[review_type]]` once.
+Add `--base-commit [[comparison_commit]]` for all/committed.
+
+Collect `finding`, `review_context` and `status` JSONL events.
+Ignore `heartbeat` and unknown events unless completion becomes ambiguous.
+
+Require one successful `complete`; stop on terminal `error`.
+
+Rate/service failures, nonzero exit, malformed output, missing completion or
+inconsistent counts mean INCOMPLETE.
+
+On auth/startup failure, run auth status once.
+
+Write PASS or CANDIDATES to `candidate_path` with stable `CR-NNN` finding IDs.
+
+Identify CODERABBIT-V4, AGENT-JSONL, type, base, comparison commit, terminal
+status and reported count.
+
+Map critical/major to BLOCKING; minor/trivial/info to ADVISORY.
+
+Use `codegenInstructions`, falling back to documented `comment`.
+Keep useful `suggestions` as secondary hints.
+
+Preserve original severity, corrections, requirement/location, impact,
+evidence and native JSONL.
 Cover selected scope/direct consumers against current evidence.
-Write only assigned artifacts; complete them before returning.
-
-Decision: PASS or CANDIDATES; stable finding IDs: `CR-NNN`.
-
-Retain original severity, corrections and evidence.
-Include requirement/location and impact.
-Record dispositions/minimal corrections by ID; explain changes or refutations.
 
 State evidence/decision gaps; never invent fixes/proof or reverify findings.
-Preserve native JSONL; compact only local evidence presentation.
-
-Zero findings require a PASS artifact with scope/limits, not empty sections.
+Compact only local evidence presentation.
+Omit generic praise/summaries/empty sections.
+Zero findings need a PASS artifact with scope/limits.
 
 ## 3. Apply bounded repairs
-- As sole writer, apply each blocker with the smallest cohesive diff.
-- Apply feasible scoped advisories per `apply_advisories`; record skip reasons.
-- Advisories never block success or extend scope, decisions or repair budgets.
-- Preserve existing repository patterns and all imported writer rules below.
 
-## 4. Validate the repaired tree
-1. Run mutating tidy on owned repair files:
-   `~/opencode/config/scripts/rust-llm-tidy-gate.sh -- [[paths...]]`
-   Inspect mutations; leave staging to the caller.
-   Skip with evidence when there are no repairs.
-2. Run non-mutating formatting/parser/type/build/test checks.
-- Record lint command, exit status and PASS or explicit not-opted-in skip.
-- Run broader tests only for repository convention or grounded repair impact.
-- Keep dependency rules for every edit.
-- Checks never install, update snapshots, regenerate or auto-format.
-- Record cwd once, command, result/exit and native evidence references.
-- Mutation outside the explicit tidy phase is FAIL.
+- As sole writer, apply blockers with minimal cohesive diffs.
+- Apply feasible scoped advisories per `[[apply_advisories]]`; explain skips.
+- Advisories never block success or extend scope, decisions or budgets.
+- Preserve repository patterns, dependency rules and imported writer rules.
+- Record dispositions/corrections by ID, explaining changes or refutations.
 
-### Validation repairs
+## 4. Validate repairs
 
-- Fix code failures within two repair turns.
-- After every repair, rerun the lint gate and affected checks.
-- Missing environment or missing/stale required evidence means INCOMPLETE.
-- Missing environment never justifies product edits.
+Run mutating tidy on owned repair files:
+`~/opencode/config/scripts/rust-llm-tidy-gate.sh -- [[paths...]]`.
 
-## 5. One bounded re-review
-- Re-review needs current lint PASS or explicit not-opted-in skip evidence.
-- After product edits, re-review the complete repaired scope once:
-  - preserve `all` or `uncommitted` when that was the original scope;
-  - Promote original committed scope to all so it includes uncommitted repairs.
-- Write unused r02 review/validation paths, never overwrite round one.
-- A blocker is resolved only when applied and validated.
-- Unapplied/failed/budget-exhausted blockers remain in the newest artifact.
-- Remaining blockers mean FAIL with each fully described for caller repair.
-- Otherwise return ADVISORY if advisories remain, else PASS.
+Inspect mutations; skip with evidence when there are no repairs.
+Record lint command, exit and PASS or explicit not-opted-in skip.
 
-## 6. Final tidy gate
+Run non-mutating formatting/parser/type/build/test checks.
+Broader tests need repository convention or evidenced repair impact.
 
-1. After re-review, repeat Section 4's gate and affected checks on owned paths.
-2. Return mutations for caller validation/review without claiming coverage.
-3. Gate failures remain FAIL/INCOMPLETE within existing budgets.
-   Never extend external re-review.
+Checks must not install, update snapshots, regenerate or auto-format.
+Mutation by checks outside tidy means FAIL.
 
-# Output
-Return only:
+Record cwd once, commands, results/exits and native evidence.
+
+Fix code failures within two repair turns.
+Rerun tidy and affected checks after each repair.
+
+Missing environment or missing/stale required evidence means INCOMPLETE.
+Missing environment never justifies product edits.
+
+## 5. Re-review and finish
+
+After product edits, re-review the entire scope once with current lint
+PASS or explicit not-opted-in skip.
+
+Preserve all/uncommitted; promote committed to all to include repairs.
+Use unused r02 review/validation paths.
+
+After re-review, repeat Step 4's gate and affected checks on owned paths.
+Gate failures remain FAIL/INCOMPLETE within existing budgets.
+
+Never extend external re-review.
+Return post-review mutations for caller validation/review, not as covered.
+
+Resolve blockers only when applied and validated.
+Keep unapplied/failed/budget-exhausted blockers in the newest artifact.
+
+Fully describe remaining blockers for caller repair and return FAIL.
+Otherwise return ADVISORY for remaining advisories or PASS.
+
+## 6. Output
+
+Return only this fenced block:
 
 ```text
 Status: PASS | ADVISORY | INCOMPLETE | NEEDS_INPUT | FAIL
@@ -205,12 +206,6 @@ Summary: <one-line summary>
 ```
 
 `Remaining Blockers` lists unresolved blocker IDs on FAIL, otherwise None.
-
-# Constraints
-- Never stage, commit, reset, push, install/update software or alter auth.
-- Do not wait through long rate limits or edit plans/implementation artifacts.
-- Never overwrite an existing CodeRabbit attempt artifact.
-- Return no prose outside the fenced block.
 
 # Rules
 
