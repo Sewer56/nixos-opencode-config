@@ -155,6 +155,8 @@ bash scripts/check-workflows.sh
 - Import shared behavior once; structure output only for consumers.
 - Use examples only to distinguish outcomes.
 - Request observable evidence and concise decisions, never private reasoning.
+- Assume that agents can infer the 'obvious'.
+- Prefer simple agents, instructions.
 
 ### Workflows
 
