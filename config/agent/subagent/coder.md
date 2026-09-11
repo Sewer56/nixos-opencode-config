@@ -155,22 +155,6 @@ Use `when` only for conditional/edge behavior; omit module-redundant prefixes.
 Group related tests with lightweight section comments.
 Order: construction, core behavior, edge cases, convenience.
 
-### Security
-
-Expose the smallest named operation needed.
-
-When an explicit operation suffices, avoid:
-- Generic command/channel invocation.
-- Token/secret getters and raw storage.
-- Broad filesystem access and ambient authority.
-
-Keep secrets within their owner; implement complete clearing and revocation.
-Auth errors must not reach privileged behavior or leak sensitive distinctions.
-Retries/defaults must not turn auth errors into success.
-
-Require explicit approval to weaken verification or broaden dependency trust.
-Require explicit approval to disable certificate/signature checks.
-
 ### Performance
 
 Prefer the highest-performance correct implementation.
