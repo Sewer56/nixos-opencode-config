@@ -189,7 +189,6 @@ Distinguish skipped from completed review; include artifact/verdict paths.
 Document scoped new/changed public features for purpose and use.
 Preserve contracts, safety/compatibility caveats and meaningful exceptions.
 
-
 Preserve source delimiters, indentation, directives and doctest behavior.
 
 Use real APIs and hermetic fixtures in runnable examples.

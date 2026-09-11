@@ -77,7 +77,6 @@ Cap user input before proportional allocation, sorting or logging.
 
 Document scoped new/changed public features for purpose and use.
 
-
 Preserve source delimiters, indentation, directives and doctest behavior.
 
 Use real APIs and hermetic fixtures in runnable examples.
