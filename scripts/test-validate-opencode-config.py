@@ -295,7 +295,6 @@ class LocalReviewArchitectureTests(unittest.TestCase):
     def test_no_domain_rule_imports_remain(self):
         shared_procedures = {
             "config/rules/code/writing.md",
-            "config/rules/write/llm-tidy-pass.md",
         }
         for path in (self.repo / "config/agent").rglob("*.md"):
             root = path.relative_to(self.repo).as_posix()

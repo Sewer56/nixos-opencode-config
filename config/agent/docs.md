@@ -115,7 +115,13 @@ Without review approval, create no review artifacts.
 - Preserve existing work and unrelated text/layout.
 - No executable/runtime changes, staging, commits or pushes.
 
+### Edit and check
+
 - Make minimal scoped edits using project conventions.
+- After prose writes/repairs, run:
+  `rust-llm-tidy --no-config --dry-run --json [[file]]`.
+- Fix actionable findings and rerun until clean.
+- Report out-of-scope/frozen findings without edits.
 - Compare target diffs to baseline; executable changes block completion.
 - Run applicable native formatting, Markdown, link and anchor checks.
 - Run applicable doc builds and example/doc tests.
@@ -224,7 +230,5 @@ API errors and returns come last; errors name condition, cause and fix.
 Use concrete units for non-trivial work and colons or periods, not em dashes.
 
 ## Validation and review coordination
-
-{{ file="./rules/write/llm-tidy-pass.md" }}
 
 {{ file="./rules/review/routing.md" }}

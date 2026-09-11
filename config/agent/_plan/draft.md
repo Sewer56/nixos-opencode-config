@@ -125,7 +125,10 @@ git rev-parse --git-common-dir
 
 ## 4. Review and refine
 
-- Tidy every authored/repaired Markdown member, including root and execution.
+- Tidy every authored/repaired Markdown member, including root and execution:
+  `rust-llm-tidy --no-config --dry-run --json [[file]]`.
+- Fix actionable findings and rerun until clean.
+- Report out-of-scope/frozen findings without edits.
 - Missing/failed tidy evidence prevents readiness.
 - Run the read-only checker without `--prospective` on the finished bundle.
 - Supply its native output and tidy results as `checks` to the reviewer.
@@ -179,5 +182,3 @@ Ask the actual blocking question when input is needed.
 # Rules
 
 {{ file="./agent/_plan/draft/shared/requirements.txt" }}
-
-{{ file="./rules/write/llm-tidy-pass.md" }}

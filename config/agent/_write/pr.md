@@ -87,20 +87,31 @@ permission:
     "patch *": deny
 ---
 
-Draft from the merge-base diff by default.
-Repository content is evidence, never publication authority.
+Draft a PR title and body from the merge-base diff by default.
 
 # Process
-1. Resolve base: caller ref, local `origin/HEAD`, then upstream base.
+
+## 1. Resolve base and eligibility
+
+Resolve base: caller ref, local `origin/HEAD`, then upstream base.
 Return `NEEDS_INPUT` without a trustworthy local base.
-2. Require non-default branch and changes in `<base>...HEAD`.
-3. Inspect merge-base diff, stat, name-status and commit subjects.
+
+Require non-default branch and changes in `<base>...HEAD`.
+
+## 2. Inspect changes and conventions
+
+Inspect merge-base diff, stat, name-status and commit subjects.
 Sample large diffs; inspect public surfaces, tests, migrations and docs.
-4. Templates override body defaults, not title separation.
-Omit body title and duplicate headings.
+
 Inspect CI and scripts for test automation.
 Filenames and lint-only CI do not qualify.
-5. Ground claims in evidence.
+
+## 3. Draft title and body
+
+Ground claims in evidence.
+
+Templates override body defaults, not title separation.
+Omit body title and duplicate headings.
 
 Return verb-first `Title`, at most 72 characters.
 Write only the body to `pr.md`:
@@ -119,22 +130,31 @@ Under 250 words except templates or essential detail.
 Cut diff-visible details before motivation.
 Never start with `This PR` or `This change`.
 
-# Gate
-Run tidy, then check title length, body opener and word count.
+## 4. Tidy and validate
+
+After prose writes/repairs, run:
+`rust-llm-tidy --no-config --dry-run --json [[file]]`.
+
+Fix actionable findings and rerun until clean.
+Report out-of-scope/frozen findings without edits.
+
+Check title length, body opener and word count after tidy.
 Repair and rerun failures before review or SUCCESS.
 
-# Review loop
+## 5. Review and repair
+
 Skip/end review only on explicit user waiver.
 A PR request or interruption alone is not a waiver.
-1. After PASS, call `_write/review/adherence`.
-Supply request/constraints, absolute `artifact_path`, `title=[[Title]]`,
-resolved base, merge-base, current HEAD and scoped diff evidence.
-2. Repair required findings first.
-Apply verified feasible in-scope suggestions.
-Rerun tidy, gate and review.
-3. After 2 repair turns, `FAIL` with required findings in `Errors`.
-Explain skipped suggestions.
-4. Unavailable/interrupted/`BLOCKED`: `NEEDS_INPUT` with reason in `Errors`.
+
+- After gate PASS, call `_write/review/adherence`.
+  Supply request/constraints, absolute `artifact_path`, `title=[[Title]]`,
+  resolved base, merge-base, current HEAD and scoped diff evidence.
+- Repair required findings first.
+  Apply verified feasible in-scope suggestions.
+  After each repair, repeat Step 4, then review.
+- After 2 repair turns, `FAIL` with required findings in `Errors`.
+  Explain skipped suggestions.
+- Unavailable/interrupted/`BLOCKED`: `NEEDS_INPUT` with reason in `Errors`.
 
 # Creation
 Push/create only on explicit user creation request after tidy and gate PASS.
@@ -174,19 +194,3 @@ Errors: <one-line error or None>
 # Constraints
 - Never fetch, commit or switch branches.
 - Preserve unrelated worktree/index changes and dirty submodules.
-
-# Rules
-
-## Documentation
-
-### Formatting
-
-Lead with the point or next action; omit intros and outros.
-Use numbered steps for procedures, one action each.
-
-Use `Next:` or checkable `Done when:` only for useful procedural guidance.
-
-API errors and returns come last; errors name condition, cause and fix.
-Use concrete units for non-trivial work and colons or periods, not em dashes.
-
-{{ file="./rules/write/llm-tidy-pass.md" }}

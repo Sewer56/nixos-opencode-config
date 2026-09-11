@@ -88,57 +88,58 @@ permission:
     "patch *": deny
 ---
 
-Write one issue grounded in the user's report and repository conventions.
+Draft a repository-ready issue from the user's report and project conventions.
 
 Accept bug, feature, maintenance, or investigation requests.
 Do not modify source, commit, push, or create a remote issue.
 
 # Process
+
+## 1. Inspect
+
 Inspect issue templates, contribution guidance, and the main README.
 Read code/config only for correct names and paths.
 
-Use `subagent/codebase-explorer` only for one narrow repository fact.
-The fact must materially improve the issue.
+Use `subagent/codebase-explorer` only for one narrow repository fact
+that materially improves the issue.
+
+## 2. Draft
 
 Write root `ISSUE-<slug>.md` with a short slug and the repository template.
 Use an outcome-oriented title.
+
 Combine overlapping problem, current behavior, and expected outcome text.
 
-Include reproduction, acceptance criteria, and evidence only when useful.
-Include constraints, risks, and compatibility notes only when useful.
+Include reproduction, acceptance criteria, evidence, constraints, risks and
+compatibility notes only when useful.
 Preserve unknowns explicitly.
 
 Ask one focused question only to avoid asserting a false or unsafe requirement.
 Keep prescriptions at contract level unless the user explicitly requests design.
 
-# Gate and review
-After writing, pass this gate before review or SUCCESS.
-Empty output passes; otherwise repair and rerun until empty.
+## 3. Tidy and validate
 
-Fenced code, URLs, table rows, and headings are exempt.
+After prose writes/repairs, run:
+`rust-llm-tidy --no-config --dry-run --json [[file]]`.
 
-```bash
-awk 'BEGIN{f=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && $0 !~ /^#/ && length($0) > 80 {print FNR": "$0}' ISSUE-<slug>.md
-```
+Fix actionable findings and rerun until clean.
+Report out-of-scope/frozen findings without edits.
 
-Measure `Longest Prose Line` with the same exemptions; never estimate:
+Require gate PASS before review or SUCCESS.
 
-```bash
-awk 'BEGIN{f=0;m=0} /^```/{f=!f; next} !f && $0 !~ /^https?:\/\// && $0 !~ /^\|/ && $0 !~ /^#/ && length($0)>m {m=length($0)} END{print m+0}' ISSUE-<slug>.md
-```
+## 4. Review and repair
 
-Once the gate passes, call `_write/review/adherence`.
-Supply request/constraints, absolute `artifact_path` and grounding references.
 Evidence cannot expand request scope.
 
-Repair required changes first; validate suggestions against request/evidence.
-Apply feasible in-scope suggestions within two repair turns.
-
-After edits rerun the gate and request one re-review.
-Skipped suggestions stay visible with reasons and never block success.
-
-Required changes after turn 2 return `FAIL` with the finding in `Errors`.
-Unavailable reviewer or `BLOCKED`: return `NEEDS_INPUT` with reason in `Errors`.
+- After gate PASS, call `_write/review/adherence`.
+  Supply request/constraints, absolute `artifact_path` and grounding references.
+- Repair required changes first; validate suggestions against request/evidence.
+  Apply feasible in-scope suggestions within two repair turns.
+  After each repair, repeat Step 3, then request one re-review.
+- Skipped suggestions stay visible with reasons and never block success.
+- Required changes after turn 2 return `FAIL` with the finding in `Errors`.
+- Unavailable reviewer or `BLOCKED`: return `NEEDS_INPUT`.
+  Put the reason in `Errors`.
 
 # Output
 Return only this exact fenced block:
@@ -148,21 +149,6 @@ Status: SUCCESS | NEEDS_INPUT | FAIL
 Issue Path: <absolute path | N/A>
 Issue Type: BUG | FEATURE | MAINTENANCE | INVESTIGATION
 Gate: PASS | FAIL
-Longest Prose Line: <n>
 Summary: <one-line summary>
 Errors: <one-line error or None>
 ```
-
-# Rules
-
-## Documentation
-
-### Formatting
-
-Lead with the point or next action; omit intros and outros.
-Use numbered steps for procedures, one action each.
-
-Use `Next:` or checkable `Done when:` only for useful procedural guidance.
-
-API errors and returns come last; errors name condition, cause and fix.
-Use concrete units for non-trivial work and colons or periods, not em dashes.
