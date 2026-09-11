@@ -133,12 +133,13 @@ Code owns integration and staging.
 
 ## 4. Validate and stage
 
-- Stage only writer changes, never `artifact/` or `artifacts/`.
-- Run `~/opencode/config/scripts/rust-llm-tidy-gate.sh` after staging.
-- If lint changes files, inspect and restage only authorized changes; rerun.
-- Repair scoped failures and repeat this step after every repair.
-- Inspect staged diff; run `git diff --cached --check`.
-- Run applicable checks/tests.
+1. Stage only writer changes, never `artifact/` or `artifacts/`.
+2. Run mutating tidy on owned files:
+   `~/opencode/config/scripts/rust-llm-tidy-gate.sh -- [[paths...]]`
+   Fix scoped lint failures; repeat staging and checks after changes.
+3. Inspect staged diff and run `git diff --cached --check`.
+   Run applicable checks/tests.
+4. Repair scoped check failures and repeat this section.
 
 ## 5. Run approved review
 
@@ -158,16 +159,15 @@ Later review without pre-edit base/ownership needs NEEDS_INPUT.
 Write only handoff_path/validation_path, never stubs.
 Handoff: scoped goal/behavior, targets, preserve/exclude and checks.
 
-Repeat Step 4, then quick validation and targeted tests.
+Reuse current Step 4 checks for quick validation and targeted tests.
 
 Record shared check evidence in `validation_path`.
-Record lint command, exit status and PASS or explicit not-opted-in skip.
+Include tidy command, exit status, diagnostics or not-opted-in skip.
 Explain inapplicable tests.
 
 ### Select reviewers
 
-Require quick PASS.
-Review/re-review needs fresh lint PASS or explicit not-opted-in skip evidence.
+Require quick PASS and current tidy PASS or not-opted-in skip.
 
 Honor named-reviewer limits.
 Otherwise select by diff, not extension:
@@ -199,13 +199,22 @@ Assign `[[review_dir]]/[[class]]/[[boundary_id]].rNN.verdict.md` per partition.
 3. Await every candidate's disposition before repair.
    Failed delegation is FAIL/INCOMPLETE; never review/verify for delegates.
 4. Apply scoped verifier-accepted repairs under the shared repair rules.
-5. After repairs, repeat evidence preparation and reviewer selection.
+5. After repairs, repeat Step 4, evidence preparation and reviewer selection.
    Return to step 1.
    Stop when no repairs remain; unresolved verification is INCOMPLETE.
 
 Allow five repair turns total; remaining blockers are FAIL.
 
-## 6. Report
+## 6. Final tidy gate
+
+1. After review and fixes, run:
+   `~/opencode/config/scripts/rust-llm-tidy-gate.sh -- [[paths...]]`
+2. Require PASS or not-opted-in skip before finishing.
+3. Inspect/restage mutations; repeat affected checks/reviews, then this gate.
+   - Fix scoped lint failures yourself, including without review approval.
+   - All retries share the five-turn repair budget.
+
+## 7. Report
 
 Report changes, checks, review/verdict outcomes and paths.
 

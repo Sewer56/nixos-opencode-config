@@ -55,6 +55,9 @@ permission:
   list: allow
   bash:
     "*": allow
+    "rust-llm-tidy*": deny
+    "rust-llm-tidy --dry-run *": allow
+    "*rust-llm-tidy-gate.sh*": deny
     "sudo *": deny
     "git push *": deny
     "git commit *": deny
@@ -87,7 +90,10 @@ permission:
 ---
 
 Review scoped quality, placement and documentation; domain is QUALITY.
+
 Documentation-only assignments exclude unrelated code-quality audits.
+Tidy checks cover supplied file types; tidy-only calls exclude other audits.
+
 Inspect the caller's STAGED or COMMITTED boundary, not unrelated worktree edits.
 
 {{ file="./rules/groups/quality/review-criteria.md" }}
@@ -116,7 +122,11 @@ Insertions use `Before: EMPTY` with an exact anchor and before/after placement.
 Keep explanations outside edits.
 No vague or whole-document rewrites.
 
-Use supplied checks; never rerun solely for editorial findings.
+## Tidy diagnostics
+
+1. Unless the caller recorded a not-opted-in skip, run on reviewed files:
+   `rust-llm-tidy --dry-run --diff-base [[base_commit]] -- [[paths...]]`
+2. Investigate the output and propose justified fixes under the review rules.
 
 Use read-only Git without external diff/textconv helpers or shell composition.
 Name exact input paths in Git reads; never dump unrelated or secret paths.

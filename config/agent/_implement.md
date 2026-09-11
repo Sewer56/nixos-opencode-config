@@ -114,7 +114,7 @@ permission:
 
 ## 3. Final integration gate
 
-- Resume authorized pending final edits through staged-repair steps 3–8.
+- Resume authorized pending final edits through staged-repair steps 3 to 8.
 
 1. Get `base_commit..HEAD` paths, including rename/copy sources.
 2. Run shared execution full validation; missing environment is INCOMPLETE.
@@ -123,14 +123,15 @@ permission:
    - Include original base_commit, authorized partials or None and repair IDs.
    - Supply failed validation_path and/or all verified verdict_paths.
 3. Stage only scoped owned paths/approved partials; preserve unrelated hunks.
-   - Run `~/opencode/config/scripts/rust-llm-tidy-gate.sh` after staging.
-   - If lint changes files, inspect and restage only authorized changes; rerun.
-   - Record command, exit status and PASS or explicit not-opted-in skip.
-   - Retain cohort lint evidence for committed changes.
-   - Auto mode checks pending changes.
+   - Run mutating tidy on owned cumulative files:
+     `~/opencode/config/scripts/rust-llm-tidy-gate.sh --diff-base [[base_commit]] -- [[paths...]]`
+   - Send scoped lint failures to integration repair.
+   - Restage tidy changes before checks/review.
+   - Use STAGED with pending repairs, otherwise COMMITTED.
+   - Retain cohort evidence; record tidy command, exit, diagnostics or skip.
    - Run `git diff --cached --check` before validation and review.
    - Rerun full validation/tests; record evidence before review.
-   - Missing or failed current lint evidence blocks reviewers, including re-review.
+   - Require current tidy PASS or not-opted-in skip before review.
 4. Always call `_review/code/integration`.
    - Performance requires explicit request or concrete cost/hot-path risk.
    - When selected, call `_review/code/optional/performance`.
@@ -147,6 +148,8 @@ permission:
    - Honor explicit reviewer requests.
    - Record routes/skips and valid documentation-review reuse in validation_path.
    - Reuse unchanged text/claims only with current boundary evidence.
+   - Give one quality call cumulative tidy paths when opted in.
+   - If none is selected, add a tidy-only quality call.
 
    - Call selected reviewers independently in parallel on a stable diff.
    - Require all results before edits.
@@ -162,10 +165,19 @@ permission:
    - Await all verdicts before repairs, including after re-review.
    - Send repairs with all verdict/ID identities to integration repair.
 7. Allow two final repair turns.
-   - After every repair, repeat steps 3–6, including lint.
+   - After every repair, repeat steps 3 to 6, including mutating tidy.
    - Rerun correctness/quality and affected/newly required routes in parallel.
    - Remaining blocker: FAIL; missing evidence: INCOMPLETE.
-8. Re-read staged repair; confirm scope/ownership and call `commit` if changed.
+8. After review and fixes, run on owned cumulative files:
+
+   ```sh
+   ~/opencode/config/scripts/rust-llm-tidy-gate.sh --diff-base [[base_commit]] -- [[paths...]]
+   ```
+
+   - Require PASS or not-opted-in skip before commit/finish.
+   - Send scoped lint failures to integration repair; restage changes.
+   - After gate mutations or repairs, repeat steps 3 to 8 within budget.
+   - Re-read staged repair; confirm scope/ownership and call `commit` if changed.
    - Supply reviewed paths, outcome, validation and pre-commit HEAD as base.
 
 ## 4. External CodeRabbit review
@@ -181,7 +193,7 @@ Results:
 - `FAIL`: report newest blockers artifact and uncommitted edits.
 - `NEEDS_INPUT`: surface unchanged.
 - `INCOMPLETE`: report gaps; local work stays committed.
-- `Modified Paths` not `None`: enter Section 3 steps 3–8 as staged final repair.
+- `Modified Paths` not `None`: enter Section 3 steps 3 to 8 as final repair.
   - Reuse checks/reviews/verifier within remaining final repair budget.
   - Stage only Modified Paths in `base_commit..HEAD` plus staged writer paths.
   - Report out-of-set Modified Paths and return `NEEDS_INPUT`.

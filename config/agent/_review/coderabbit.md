@@ -70,7 +70,7 @@ permission:
   task: deny
 ---
 
-CodeRabbit CLI is external review authority for its structured findings.
+Run CodeRabbit review and bounded repairs using its findings as authority.
 They already passed its review pipeline; never add a local verifier.
 
 # Inputs
@@ -145,15 +145,18 @@ Clean output names checked scope and limitations without empty findings.
 - Preserve existing repository patterns and all imported writer rules below.
 
 ## 4. Validate the repaired tree
-- Run imported lint plus non-mutating formatting/parser/type/build/test checks.
+1. Run mutating tidy on owned repair files:
+   `~/opencode/config/scripts/rust-llm-tidy-gate.sh -- [[paths...]]`
+   Inspect mutations; leave staging to the caller.
+   Skip with evidence when there are no repairs.
+2. Run non-mutating formatting/parser/type/build/test checks.
 - Record lint command, exit status and PASS or explicit not-opted-in skip.
-- Report untracked files excluded by the gate; leave staging to the caller.
 - Run broader tests only for repository convention or grounded repair impact.
-- Keep imported writer-gate and dependency rules for every edit.
-- Validation never installs, updates snapshots, regenerates or auto-formats.
+- Keep dependency rules for every edit.
+- Checks never install, update snapshots, regenerate or auto-format.
 - Record cwd once; validation names command, result/exit and decisive evidence.
 - Reference native evidence instead of duplicating it.
-- Unexpected validation mutation is FAIL.
+- Mutation outside the explicit tidy phase is FAIL.
 
 ### Validation repairs
 
@@ -172,6 +175,13 @@ Clean output names checked scope and limitations without empty findings.
 - Unapplied/failed/budget-exhausted blockers remain in the newest artifact.
 - Remaining blockers mean FAIL with each fully described for caller repair.
 - Otherwise return ADVISORY if advisories remain, else PASS.
+
+## 6. Final tidy gate
+
+1. After re-review, repeat Section 4's gate and affected checks on owned paths.
+2. Return mutations for caller validation/review without claiming coverage.
+3. Gate failures remain FAIL/INCOMPLETE within existing budgets.
+   Never extend external re-review.
 
 # Rules
 

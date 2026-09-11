@@ -112,19 +112,19 @@ Be sole code/tests/docs writer for one approved task.
 1. Stage only owned changes, including authorized resumed/compatibility edits.
    - Reject unexpected paths; preserve unrelated hunks.
    - Ambiguous ownership needs input.
-2. Run `~/opencode/config/scripts/rust-llm-tidy-gate.sh` after staging.
-   If lint changes files, inspect and restage only authorized changes; rerun.
+2. Run mutating tidy on owned files:
+   `~/opencode/config/scripts/rust-llm-tidy-gate.sh -- [[paths...]]`
+   Fix scoped lint failures; repeat staging and checks after changes.
 3. Inspect staged diff and run `git diff --cached --check`.
 4. Run quick validation/tests; explain inapplicable tests.
    Never install dependencies or update snapshots/generated files.
 5. Record shared check evidence and test gaps in `validation_path`.
-   Record lint command, exit status and PASS or explicit not-opted-in skip.
-6. Repair failures; repeat Section 2, replacing current validation.
+   Include tidy command, exit status, diagnostics or not-opted-in skip.
+6. Repair check failures and repeat Section 2.
 
 ## 3. Call exact reviewers
 
-Require quick PASS.
-Review/re-review needs fresh lint PASS or explicit not-opted-in skip evidence.
+Require quick PASS and current tidy PASS or not-opted-in skip.
 
 - Always call `_review/code/correctness`.
 - Always call `_review/code/quality`.
@@ -145,20 +145,26 @@ Await all results without editing.
 
 - Send candidates to assigned verifiers under routing; await verdicts.
 
-- After every repair, repeat Section 2, including lint.
+- After every repair, repeat Section 2, including mutating tidy.
 - Rerun correctness/quality and affected or newly required routes in parallel.
 - Send new candidates to assigned verifiers; await verdicts again.
 
 - All repairs share `repair_turn_limit`, retaining consumed turns.
 - Exhaustion: FAIL; report turns/limit.
 
-## 5. Commit
+## 5. Final tidy gate and commit
 
 Require checks PASS, complete reviews and no blocker.
 
-- Re-read staged diff; call `commit` for owned reviewed paths only.
-- Supply pre-commit HEAD as base_commit, paths, outcome and validation.
-- Skip empty commits with evidence.
+1. After review and fixes, run on owned files:
+   `~/opencode/config/scripts/rust-llm-tidy-gate.sh -- [[paths...]]`
+   Require PASS or not-opted-in skip.
+2. Fix scoped lint failures and restage changes.
+   Repeat checks, affected reviews and this gate after changes.
+   All retries share the existing repair budget.
+3. Re-read staged diff; call `commit` for owned reviewed paths only.
+   Supply pre-commit HEAD as base_commit, paths, outcome and validation.
+   Skip empty commits with evidence.
 
 # Output
 
