@@ -160,7 +160,7 @@ Co-locate tests with their module unless repository convention is stronger.
 For substantive changes, including ports, ensure that:
 
 - Coherent steps have one blank line between them.
-- Comments explain steps only where names or flow obscure intent.
+- Comments explain steps or resulting states only where intent is unclear.
 - Tests separate arrange, act and assert with comments.
 - Long arrange groups separate harness, fixtures and inputs.
 
@@ -222,13 +222,10 @@ Ensure docs are up to date.
 Module/file docs explain needed domain models, flows and rationale.
 Name concrete mechanisms when readers need them, not vague effects.
 
-Open with a plain one-line purpose summary.
 Put caveats in trailing `# Remarks` or equivalent.
 Use native doc links and `#` sections for multiple aspects.
 
 Examples should use real APIs and hermetic fixtures.
-API summaries and module comments have no automatic closers.
-API errors and returns come last; errors name condition, cause and fix.
 
 ### Error documentation
 
@@ -241,3 +238,5 @@ Block vague triggers and error-doc stubs: `TODO`, `TBD`, `FIXME`, `...`.
 
 Block false claims, stale references and missing public-feature coverage.
 Block explanation gaps preventing required understanding or correct use.
+
+{{ file="./rules/adhd-communication.md" }}

@@ -286,11 +286,14 @@ class LocalReviewArchitectureTests(unittest.TestCase):
                 "config/agent/_review/doc-quality.md",
             }, caller)
 
-    def test_candidate_reviewers_are_self_contained(self):
+    def test_candidate_reviewers_import_only_shared_adhd_rules(self):
         for reviewer in ("code-quality", "correctness", "doc-quality",
                          "code/optional/performance"):
             root = f"config/agent/_review/{reviewer}.md"
-            self.assertEqual(self.imports(root), {root})
+            expected = {root}
+            if reviewer in ("code-quality", "doc-quality"):
+                expected.add("config/rules/adhd-communication.md")
+            self.assertEqual(self.imports(root), expected)
 
     def test_no_domain_rule_imports_remain(self):
         shared_procedures = {

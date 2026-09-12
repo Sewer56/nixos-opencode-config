@@ -163,13 +163,10 @@ Link existing coverage; delete unnecessary content rather than rewording it.
 
 ### Readability and examples
 
-Open with a plain one-line purpose summary.
-
 Flag technical terms or references lacking explanations or clear links nearby.
 Define, rewrite plainly, or link an explanation.
 
 Flag ambiguity risking incorrect action; name the path, condition or action.
-Flag compression harming comprehension; prefer plain expansions.
 
 Flag unexplained concepts or connections needed to follow how/why things work.
 Name the gap and a short explanation or worked example that resolves it.
@@ -204,16 +201,9 @@ Block docs steps missing file, scope, sections or concrete changes.
 Block broken heading links across docs steps.
 Block explanation gaps preventing required understanding or correct use.
 
-### Formatting
-
-Optimize for readers with limited attention, including readers with ADHD.
-Lead with the point or next action; put supporting context afterward.
-
-Use short paragraphs and numbered procedures with one action per step.
-Omit unnecessary introductions, recaps and closing instructions.
-Keep explanations and warnings needed for understanding and safe, accurate use.
-
 ### Wording
 
 Use plain language without losing meaning or necessary caveats.
 Keep project terms, identifiers, commands, paths and URLs exact.
+
+{{ file="./rules/adhd-communication.md" }}

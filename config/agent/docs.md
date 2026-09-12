@@ -219,7 +219,6 @@ Package docs cover import/use; code docs cover exports.
 Update both only when both exist and change.
 Place requested API-owned examples in code docs.
 
-Open with a plain one-line purpose.
 End with caveats in `# Remarks` or equivalent.
 Use native doc links and `#` sections for multiple aspects.
 
@@ -229,12 +228,4 @@ Cover each reachable error and its trigger in changed APIs, never other errors.
 
 Follow language/project conventions for error docs and links; never use stubs.
 
-## Formatting
-
-Lead with the point or next action; omit unnecessary introductions and recaps.
-Use numbered steps for procedures, one action each.
-
-Use `Next:` or `Done when:` only for useful, checkable guidance.
-
-API errors and returns come last; errors name condition, cause and fix.
-Use concrete units for non-trivial work and colons or periods, not em dashes.
+{{ file="./rules/adhd-communication.md" }}

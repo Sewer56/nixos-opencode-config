@@ -13,7 +13,7 @@ Organize by domain, not global `types` or `conversions` buckets.
 For substantive changes, including ports, ensure that:
 
 - Coherent steps have one blank line between them.
-- Comments explain steps only where names or flow obscure intent.
+- Comments explain steps or resulting states only where intent is unclear.
 - Tests separate arrange, act and assert with comments.
 - Long arrange groups separate harness, fixtures and inputs.
 
@@ -105,7 +105,6 @@ Package docs cover import/usage; code docs cover exports.
 Update both only when both exist and change.
 Put requested API-owned examples in code docs.
 
-Open with a plain one-line purpose summary.
 Put caveats in trailing `# Remarks` or equivalent.
 Use native doc links and `#` sections for multiple aspects.
 
@@ -116,11 +115,4 @@ Name each specific trigger and only errors the function can return.
 
 Follow language/project conventions for error docs and links; never use stubs.
 
-### Formatting
-
-Lead with the point or next action; omit unnecessary introductions and recaps.
-Use numbered steps for procedures, one action each.
-
-Use `Next:` or checkable `Done when:` only for useful procedural guidance.
-
-Use concrete units for non-trivial work and colons or periods, not em dashes.
+{{ file="./rules/adhd-communication.md" }}
