@@ -10,11 +10,11 @@ Organize by domain, not global `types` or `conversions` buckets.
 
 ## Body layout
 
-In method bodies ensure that:
+In method bodies:
 
-- Coherent groups of steps have one blank line between them.
-- Short comments explain steps/resulting states where intent is unclear.
-- Tests separate arrange, act and assert with comments.
+- Separate coherent groups of steps with one blank line.
+- Explain steps/resulting states with short comments where intent is unclear.
+- Separate arrange, act and assert with comments in tests.
 
 ## Redundancy
 
@@ -25,17 +25,19 @@ Prefer one parameterizable local helper over per-test mock structs.
 
 ### Coverage
 
-Cover all new code.
-Delete any un-needed tests after code removal/change.
+Test all new code.
+Delete tests made unnecessary by code removal/change.
 
 Map removed redundant assertions to surviving tests.
-Allow redundancy only across public entry points.
+Retain test redundancy only across public entry points.
 
 ### Parameterization
 
 Parameterize tests where possible.
 Prefer named framework cases.
-Use a framework such as Rust's rstest; add it if needed.
+
+Use a framework such as Rust's rstest.
+Add it if needed.
 
 Prefer parameterization over loops of inputs.
 
@@ -50,10 +52,11 @@ Keep readable cases near 80-100 characters per line.
 Name tests `subject_should_expectation_when_condition`.
 Use the language's identifier style.
 
-Use `when` only for conditional/edge behavior; omit module-redundant prefixes.
+Use `when` only for conditional/edge behavior.
+Omit module-redundant prefixes from test names.
 
 Group related tests with lightweight section comments.
-Order: construction, core behavior, edge cases, convenience.
+Order test groups: construction, core behavior, edge cases, convenience.
 
 ## Performance
 
@@ -66,27 +69,28 @@ Avoid needless allocation, clones, initialization, etc.
 
 ### Coverage
 
-Document all new/changes public items.
-Use real APIs and hermetic fixtures in examples.
-Ensure existing documentation is up to date.
+Document all new or changed public items.
 
-Don't repeat docs, link to existing ones.
+Use real APIs and hermetic fixtures in examples.
+Keep existing documentation up to date.
+
+Link existing coverage instead of repeating it.
 Document private APIs only if nontrivial.
 
 ### Reader understanding
 
-Do not assume reader has subject expertise.
+Do not assume reader expertise.
 Explain prerequisite concepts and terms before using them.
 
 Show how and why complex mechanisms work, not just their components.
 Use short worked examples to clarify mechanisms or relationships.
 
-Match audience. Keep user facing docs simple and concise.
+Match the audience.
+Keep user-facing docs simple and concise.
 Use `# Remarks` or equivalent for miscellaneous caveats.
 
 ### Error documentation
 
-List every possible error in public APIs.
-Name the cause, and concise explanation.
+List every public API error with its cause and a concise explanation.
 
 {{ file="./rules/adhd-communication.md" }}

@@ -129,7 +129,7 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 ### Audience
 
 Judge docs by task, type and stated audience requirements.
-Do not assume subject expertise.
+Do not assume reader expertise.
 
 Classify by reader and task, not just filename.
 Assess mixed-audience docs by section.
@@ -138,10 +138,10 @@ Assess mixed-audience docs by section.
 
 End-user docs explain product setup, use and troubleshooting.
 
-Include task-relevant instructions, behavior and limitations.
-Omit implementation inventories and internal processes that do not help users.
+Check for task-relevant instructions, behavior and limitations.
+Flag implementation inventories and internal processes that do not help users.
 
-Omit consequences clear from defaults, definitions or examples.
+Flag consequences clear from defaults, definitions or examples.
 
 #### Package documentation
 
@@ -150,46 +150,47 @@ Package docs explain how to import and use the package.
 #### Maintainer documentation
 
 Maintainer docs support safe system changes and operation.
-Retain task-relevant architecture, mechanisms, invariants and rationale.
+Check for task-relevant architecture, mechanisms, invariants and rationale.
 
-Name concrete mechanisms when readers need them, not vague effects.
+Flag vague effects where readers need concrete mechanisms.
 
 ### Unnecessary content
 
-Omit repetition and detail serving no requirement or reader need.
-Omit line-by-line code narration, not prerequisite explanations.
+Flag repetition and detail serving no requirement or reader need.
+Flag line-by-line code narration, not prerequisite explanations.
 
-Link existing coverage; delete unnecessary content rather than rewording it.
+Recommend links to existing coverage.
+Recommend deletion over rewording for unnecessary content.
 
 ### Readability and examples
 
 Flag technical terms or references lacking explanations or clear links nearby.
-Define, rewrite plainly, or link an explanation.
+Recommend a definition, plain wording or explanatory link.
 
-Flag ambiguity risking incorrect action; name the path, condition or action.
+Flag ambiguity risking incorrect action.
+Specify the path, condition or action that resolves it.
 
 Flag unexplained concepts or connections needed to follow how/why things work.
 Name the gap and a short explanation or worked example that resolves it.
 
-Expand acronyms on first use as `Expanded Name (ACRONYM)`.
+Flag acronyms not expanded on first use as `Expanded Name (ACRONYM)`.
 Exempt already-defined terms, literal identifiers and paths.
 Exempt headings and non-instructional prose from acronym expansion.
 
-Examples show choices/usage, not every field or static configuration.
-Name each for its one concept.
-Add examples, sections and cross-links only when they help readers.
+Check examples show choices/usage, not every field or static configuration.
+Check each example name identifies its one concept.
+Recommend examples, sections and cross-links only when they help readers.
 
-Summarize categories unless readers need members.
-Use bullets for required lists.
-Prefer concise lead-ins with bullets where possible.
+Recommend category summaries unless readers need members.
+Check required lists use bullets.
+Recommend concise lead-ins with bullets where possible.
 
 ### Coverage
 
-Ensure docs are up to date.
-Examples should use real APIs and hermetic fixtures.
+Flag outdated documentation.
+Check examples use real APIs and hermetic fixtures.
 
 Reject frozen-region findings, including versions, licenses and warnings.
-Flag broken heading links across docs steps.
 
 Do not demand docs-only backfill of untouched legacy.
 
@@ -203,7 +204,7 @@ Block explanation gaps preventing required understanding or correct use.
 
 ### Wording
 
-Use plain language without losing meaning or necessary caveats.
-Keep project terms, identifiers, commands, paths and URLs exact.
+Check for plain wording that preserves meaning and necessary caveats.
+Check project terms, identifiers, commands, paths and URLs are exact.
 
 {{ file="./rules/adhd-communication.md" }}

@@ -127,37 +127,37 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
 ## Code quality
 
-Keep APIs no more public than required.
+Flag APIs more public than required.
 
-Reuse constants for the same concept instead of repeating literals.
-Derive related boundaries and test inputs from them.
+Check constants replace repeated literals for the same concept.
+Check related boundaries and test inputs derive from them.
 
 Flag vague names, cleverness and jargon without an established narrow meaning.
-Prefer descriptive, domain-first names.
+Recommend descriptive, domain-first names.
 
 Flag unnecessary or single-implementation abstractions.
 Tiny single-use helpers may be inline.
-Retain useful names, reuse and boundaries.
+Preserve useful names, reuse and boundaries in recommendations.
 
 ### Placement
 
-Keep module entrypoints focused on orchestration.
-Prefer one data model per file.
+Check module entrypoints focus on orchestration.
+Recommend one data model per file.
 
-Keep enums, newtypes and value objects with their sole parent type.
+Check enums, newtypes and value objects stay with their sole parent type.
 
-Keep non-public helpers local and conversions beside the type.
-Organize by domain, not global `types` or `conversions` buckets.
+Check non-public helpers stay local and conversions beside the type.
+Check domain organization, not global `types` or `conversions` buckets.
 
-Shared behavior belongs in the lowest shared owning package.
-If ownership is unclear, prefer the package others depend on.
+Check shared behavior belongs in the lowest shared owning package.
+If ownership is unclear, recommend the package others depend on.
 
-Integration-family packages contain wiring and package-specific behavior.
-Co-locate tests with their module unless repository convention is stronger.
+Check integration-family packages contain wiring and package-specific behavior.
+Check tests sit beside their module unless repository convention is stronger.
 
 ### Body layout
 
-In method bodies ensure that:
+In method bodies, check that:
 
 - Coherent groups of steps have one blank line between them.
 - Short comments explain steps/resulting states where intent is unclear.
@@ -165,8 +165,8 @@ In method bodies ensure that:
 
 ### Redundancy
 
-Extract helpers for repeated code.
-Prefer one parameterizable local helper over per-test mock structs.
+Recommend helper extraction for repeated code.
+Recommend one parameterizable local helper over per-test mock structs.
 
 ## Test strategy
 
@@ -174,35 +174,37 @@ Check test organization and readability, not behavioral adequacy.
 
 ### Coverage
 
-Cover all new code.
-Delete any un-needed tests after code removal/change.
+Check tests cover all new code.
+Flag tests made unnecessary by code removal/change.
 
-Map removed redundant assertions to surviving tests.
-Allow redundancy only across public entry points.
+Trace removed redundant assertions to surviving tests.
+Flag test redundancy except across public entry points.
 
 ### Parameterization
 
-Parameterize tests where possible.
-Prefer named framework cases.
+Check for test parameterization where possible.
+Recommend named framework cases.
 
-Use a framework such as Rust's rstest; add it if needed.
-Prefer parameterization over loops of inputs.
+Check tests use a framework such as Rust's rstest.
+Recommend adding one if needed.
+Recommend parameterization over loops of inputs.
 
 ### Arguments
 
-Order case arguments: primary input, mode/flags, expected output.
+Check case argument order: primary input, mode/flags, expected output.
 
-Keep readable cases near 80-100 characters per line.
+Check cases are readable near 80-100 characters per line.
 
 ### Naming and grouping
 
-Name tests `subject_should_expectation_when_condition`.
-Use the language's identifier style.
+Check test names follow `subject_should_expectation_when_condition`.
+Check names use the language's identifier style.
 
-Use `when` only for conditional/edge behavior; omit module-redundant prefixes.
+Flag `when` outside conditional/edge behavior.
+Flag module-redundant test-name prefixes.
 
-Group related tests with lightweight section comments.
-Order: construction, core behavior, edge cases, convenience.
+Check lightweight section comments group related tests.
+Check order: construction, core behavior, edge cases, convenience.
 
 ## Source documentation
 
@@ -213,28 +215,27 @@ Reject frozen-region findings, including versions, licenses and warnings.
 
 ### Coverage
 
-Document all new/changes public items.
-Use real APIs and hermetic fixtures in examples.
+Flag missing documentation for new or changed public items.
+Check examples use real APIs and hermetic fixtures.
 
-Ensure existing documentation is up to date.
-Don't repeat docs, link to existing ones.
-Document private APIs only if nontrivial.
+Flag outdated documentation.
+Recommend links to existing coverage.
+Check private APIs have documentation only if nontrivial.
 
 ### Reader understanding
 
-Do not assume reader has subject expertise.
-Explain prerequisite concepts and terms before using them.
+Do not assume reader expertise.
+Flag prerequisite concepts or terms used before explanation.
 
-Show how and why complex mechanisms work, not just their components.
-Use short worked examples to clarify mechanisms or relationships.
+Check docs explain how/why complex mechanisms work, not just their components.
+Recommend short worked examples to clarify mechanisms or relationships.
 
-Match audience. Keep user facing docs simple and concise.
-Use `# Remarks` or equivalent for miscellaneous caveats.
+Check audience fit and simple, concise user-facing docs.
+Check miscellaneous caveats use `# Remarks` or equivalent.
 
 ### Error documentation
 
-List every possible error in public APIs.
-Name the cause, and concise explanation.
+Check public API docs list every error with its cause and concise explanation.
 
 Do not demand docs-only backfill of untouched legacy.
 

@@ -128,18 +128,18 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 ## Test coverage
 
 Judge observable acceptance behavior, not compiler guarantees.
-Require critical success, failure and edge coverage.
+Check critical success, failure and edge coverage.
 
 When tests are required, check coverage of all new code.
 
-Equivalence claims need one test executing both paths.
+Check one test executes both paths for equivalence claims.
 Compare final rendered/consumed results, not request shapes or prose.
 
-Reject redundancy, but never across public entry points.
-Map removed redundant assertions to surviving tests.
-Examples never replace tests.
+Trace removed redundant assertions to surviving tests.
+Flag test redundancy except across public entry points.
+Flag examples used instead of tests.
 
-Check control, seeds or freezing for real I/O, time and network.
+Check real I/O, time and network use controls, seeds or freezing.
 
 ## Security
 
