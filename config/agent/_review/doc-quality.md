@@ -119,6 +119,8 @@ for extra things to look at.
 ## 4. Optimize concision
 
 Shorten scoped documentation where useful.
+Assume documentation contains yapping and should be concised.
+
 Consider context and delete unnecessary content.
 Not every detail always needs to be included.
 
