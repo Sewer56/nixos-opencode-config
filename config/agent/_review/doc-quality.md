@@ -119,6 +119,8 @@ for extra things to look at.
 ## 4. Optimize concision
 
 Shorten scoped documentation where useful.
+Consider context and delete unnecessary content.
+Not every detail always needs to be included.
 
 1. Use a unique run directory under worktree `artifact/review/token-pairs/`.
    - Save each original excerpt once as `[[id]].before.txt`.
@@ -127,11 +129,12 @@ Shorten scoped documentation where useful.
 2. Compare all pairs:
    `uv run ~/opencode/scripts/compare-token-pairs.py [[scratch_directory]]`.
    If counting fails, omit numeric savings.
-3. Trim only after files for at most three measured passes total.
+3. Run `rust-llm-tidy` on the `[[id]].after.txt` files to lint.
+4. Trim only after files for at most three measured passes total.
    - Keep each pair's best meaning-preserving version.
    - Stop when no safe improvement remains.
    - Restore best versions after regressions.
-4. Recommend the best shorter wording with measured raw snippet savings.
+5. Recommend the best shorter wording with measured raw snippet savings.
 
 ## 5. Output
 
