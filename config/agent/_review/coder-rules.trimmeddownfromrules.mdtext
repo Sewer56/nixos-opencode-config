@@ -67,6 +67,8 @@ Avoid needless allocation, clones, initialization, etc.
 
 ## Documentation
 
+Documentation must appear easy and human.
+
 ### Coverage
 
 Document all new or changed public items.

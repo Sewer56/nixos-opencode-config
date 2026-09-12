@@ -156,6 +156,8 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
 ## Documentation
 
+Ensure all documentation appears easy and human.
+
 ### Audience
 
 Judge docs by task, type and stated audience requirements.
