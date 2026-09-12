@@ -136,7 +136,7 @@ Require current quick PASS and tidy PASS or not-opted-in skip.
 
 Run in parallel:
 - `_review/correctness`, `_review/code-quality`: always.
-- `_review/doc-quality`: changed/required standalone docs.
+- `_review/doc-quality`: changed/required docs, including source docs/comments.
 
 Honor reviewer requests; record routing reasons in validation_path.
 

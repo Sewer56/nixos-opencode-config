@@ -86,7 +86,10 @@ Show how and why complex mechanisms work, not just their components.
 Use short worked examples to clarify mechanisms or relationships.
 
 Match the audience.
-Keep user-facing docs simple and concise.
+Keep docs simple, concise and focused on readers' tasks.
+
+Save tokens without losing necessary explanations, contracts or caveats.
+
 Use `# Remarks` or equivalent for miscellaneous caveats.
 
 ### Error documentation

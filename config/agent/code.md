@@ -152,10 +152,7 @@ Reuse Step 4 evidence: cwd, commands, exits, diagnostics and gaps/skips.
 After quick PASS and tidy PASS/not-opted-in skip, run in parallel:
 
 - `_review/correctness`, `_review/code-quality`: code/config/tests/refactors.
-- `_review/code-quality`: changed/required source docs/comments.
-- `_review/doc-quality`: changed/required standalone docs, including API docs.
-
-Docs-only: documentation, scope violations and runnable-example correctness.
+- `_review/doc-quality`: changed/required docs, including source docs/comments.
 
 Add `_review/code/optional/performance` on request or performance risk.
 

@@ -74,7 +74,6 @@ permission:
     "*": deny
     "subagent/codebase-explorer": allow
     "subagent/web-search": allow
-    "_review/code-quality": allow
     "_review/doc-quality": allow
     "_review/verifier": allow
 ---
@@ -142,10 +141,7 @@ Missing pre-edit baseline/ownership needs NEEDS_INPUT.
 
 ### Reviewers
 
-Run applicable reviewers in parallel within agreed limits:
-
-- `_review/code-quality`: source-embedded docs/comments.
-- `_review/doc-quality`: standalone docs, including API references.
+Run `_review/doc-quality` within agreed limits.
 
 Supply audience/evidence; review only documentation and scope violations.
 Pass `[[review-inputs]]`:
