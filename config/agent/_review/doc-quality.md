@@ -4,7 +4,7 @@ hidden: true
 description: Reviews standalone docs, API docs, docstrings and comments
 
 model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
-variant: high
+variant: low
 
 permission:
   "*": deny

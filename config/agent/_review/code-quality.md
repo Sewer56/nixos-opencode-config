@@ -4,7 +4,7 @@ hidden: true
 description: Reviews code structure, maintainability and test organization
 
 model: sewer-axonhub/glm-5.3 # STYLE-REVIEW
-variant: high
+variant: low
 
 permission:
   "*": deny

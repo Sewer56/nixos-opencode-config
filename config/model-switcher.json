@@ -5,8 +5,8 @@
     "PLANNER": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
     "CODER": {"model":"sewer-axonhub/glm-5.3","variant":"low"},
     "WRITER": {"model":"sewer-axonhub/glm-5.3","variant":"low"},
-    "STYLE-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
-    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"high"}
+    "STYLE-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"low"},
+    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"low"}
   },
   "work": {
     "EASY": {"model":"sewer-axonhub-work/gpt-5.6-luna","variant":"low"},
