@@ -203,14 +203,23 @@ Order: construction, core behavior, edge cases, convenience.
 
 Check accuracy, coverage and readability against reader needs and source.
 Flag unnecessary detail and repetition without dropping needed contracts.
+
 Reject frozen-region findings, including versions, licenses and warnings.
+
+### Reader understanding
+
+Do not assume subject expertise.
+Flag unexplained prerequisite concepts, terms and connections.
+
+Name the gap and a short explanation or worked example that resolves it.
+Preserve precision; omit line-by-line code narration.
 
 ### Source/API conventions
 
 Document private APIs only if nontrivial.
 Ensure docs are up to date.
 
-Module/file summaries describe organization, not implementations.
+Module/file docs explain needed domain models, flows and rationale.
 Name concrete mechanisms when readers need them, not vague effects.
 
 Open with a plain one-line purpose summary.
@@ -231,3 +240,4 @@ Block vague triggers and error-doc stubs: `TODO`, `TBD`, `FIXME`, `...`.
 ### Severity
 
 Block false claims, stale references and missing public-feature coverage.
+Block explanation gaps preventing required understanding or correct use.

@@ -128,7 +128,8 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
 ### Audience
 
-Judge documentation against its audience, reader task and document type.
+Judge docs by task, type and stated audience requirements.
+Do not assume subject expertise.
 
 Classify by reader and task, not just filename.
 Assess mixed-audience docs by section.
@@ -156,7 +157,7 @@ Name concrete mechanisms when readers need them, not vague effects.
 ### Unnecessary content
 
 Omit repetition and detail serving no requirement or reader need.
-Omit details readers do not need, even when accurate.
+Omit line-by-line code narration, not prerequisite explanations.
 
 Link existing coverage; delete unnecessary content rather than rewording it.
 
@@ -164,14 +165,17 @@ Link existing coverage; delete unnecessary content rather than rewording it.
 
 Open with a plain one-line purpose summary.
 
-Flag jargon or references the intended reader cannot resolve nearby.
+Flag technical terms or references lacking explanations or clear links nearby.
 Define, rewrite plainly, or link an explanation.
 
 Flag ambiguity risking incorrect action; name the path, condition or action.
 Flag compression harming comprehension; prefer plain expansions.
 
+Flag unexplained concepts or connections needed to follow how/why things work.
+Name the gap and a short explanation or worked example that resolves it.
+
 Expand acronyms on first use as `Expanded Name (ACRONYM)`.
-Exempt ordinary or already-defined terms, literal identifiers and paths.
+Exempt already-defined terms, literal identifiers and paths.
 Exempt headings and non-instructional prose from acronym expansion.
 
 Examples show choices/usage, not every field or static configuration.
@@ -198,6 +202,7 @@ Block false claims, stale references and missing public-feature coverage.
 Block docs steps missing file, scope, sections or concrete changes.
 
 Block broken heading links across docs steps.
+Block explanation gaps preventing required understanding or correct use.
 
 ### Formatting
 
@@ -206,7 +211,7 @@ Lead with the point or next action; put supporting context afterward.
 
 Use short paragraphs and numbered procedures with one action per step.
 Omit unnecessary introductions, recaps and closing instructions.
-Keep explanations and warnings needed for safe, accurate use.
+Keep explanations and warnings needed for understanding and safe, accurate use.
 
 ### Wording
 
