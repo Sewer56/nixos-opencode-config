@@ -188,44 +188,26 @@ Retain identities/evidence for resume.
 
 ## Coverage
 
-Document scoped new/changed public features for purpose and use.
-Preserve contracts, safety/compatibility caveats and exceptions.
+Document all new/changes public items.
+Use real APIs and hermetic fixtures in examples.
+Ensure existing documentation is up to date.
 
-Preserve source delimiters, indentation, directives and doctest behavior.
-
-Use real APIs and hermetic fixtures in runnable examples.
+Don't repeat docs, link to existing ones.
+Document private APIs only if nontrivial.
 
 ## Reader understanding
 
-Do not assume subject expertise.
+Do not assume reader has subject expertise.
 Explain prerequisite concepts and terms before using them.
 
-Show how and why mechanisms work, not just their components.
-Use short worked examples when they clarify mechanisms or relationships.
+Show how and why complex mechanisms work, not just their components.
+Use short worked examples to clarify mechanisms or relationships.
 
-Explain shared background once; link to it.
-Tie explanations to the documented behavior, mechanism or task.
-
-Preserve precision; omit line-by-line code narration.
-
-## Source/API conventions
-
-Private APIs need purpose and non-obvious contracts unless trivial.
-Refresh changed module/file boundary docs.
-
-Explain needed domain models, flows and rationale there.
-
-Package docs cover import/use; code docs cover exports.
-Update both only when both exist and change.
-Place requested API-owned examples in code docs.
-
-End with caveats in `# Remarks` or equivalent.
-Use native doc links and `#` sections for multiple aspects.
+Match audience. Keep user facing docs simple and concise.
 
 ## Error documentation
 
-Cover each reachable error and its trigger in changed APIs, never other errors.
-
-Follow language/project conventions for error docs and links; never use stubs.
+List every possible error in public APIs.
+Name the cause, and concise explanation.
 
 {{ file="./rules/adhd-communication.md" }}
