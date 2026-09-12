@@ -145,8 +145,8 @@ Keep module entrypoints focused on orchestration.
 Prefer one data model per file.
 
 Keep enums, newtypes and value objects with their sole parent type.
-Keep non-public helpers local.
-Put conversions beside the type.
+
+Keep non-public helpers local and conversions beside the type.
 Organize by domain, not global `types` or `conversions` buckets.
 
 Shared behavior belongs in the lowest shared owning package.
@@ -157,42 +157,47 @@ Co-locate tests with their module unless repository convention is stronger.
 
 ### Body layout
 
-For substantive changes, including ports, ensure that:
+In method bodies ensure that:
 
-- Coherent steps have one blank line between them.
-- Comments explain steps or resulting states only where intent is unclear.
+- Coherent groups of steps have one blank line between them.
+- Short comments explain steps/resulting states where intent is unclear.
 - Tests separate arrange, act and assert with comments.
-- Long arrange groups separate harness, fixtures and inputs.
+
+### Redundancy
+
+Extract helpers for repeated code.
+Prefer one parameterizable local helper over per-test mock structs.
 
 ## Test strategy
 
 Check test organization and readability, not behavioral adequacy.
 
+### Coverage
+
+Cover all new code.
+Delete any un-needed tests after code removal/change.
+
+Map removed redundant assertions to surviving tests.
+Allow redundancy only across public entry points.
+
 ### Parameterization
 
-Prefer extending tests with matching setup and entry points.
-Prefer named framework cases for independent data variations of one claim.
+Parameterize tests where possible.
+Prefer named framework cases.
 
-Separate differing claims or cases lacking one descriptive name.
-
-Use loops only within one stateful scenario or assertion.
+Use a framework such as Rust's rstest; add it if needed.
+Prefer parameterization over loops of inputs.
 
 ### Arguments
 
 Order case arguments: primary input, mode/flags, expected output.
-Comment only non-obvious parameters or assertions.
 
 Keep readable cases near 80-100 characters per line.
 
-### Helpers
-
-Use helpers for repetition or shared setup clarity.
-Prefer one parameterizable local helper over per-test mock structs.
-
 ### Naming and grouping
 
-Test names describe acceptance behavior, not labels or IDs.
-Use `subject_should_expectation_when_condition` in language identifier style.
+Name tests `subject_should_expectation_when_condition`.
+Use the language's identifier style.
 
 Use `when` only for conditional/edge behavior; omit module-redundant prefixes.
 
@@ -206,30 +211,31 @@ Flag unnecessary detail and repetition without dropping needed contracts.
 
 Reject frozen-region findings, including versions, licenses and warnings.
 
+### Coverage
+
+Document all new/changes public items.
+Use real APIs and hermetic fixtures in examples.
+
+Ensure existing documentation is up to date.
+Don't repeat docs, link to existing ones.
+Document private APIs only if nontrivial.
+
 ### Reader understanding
 
-Do not assume subject expertise.
-Flag unexplained prerequisite concepts, terms and connections.
+Do not assume reader has subject expertise.
+Explain prerequisite concepts and terms before using them.
 
-Name the gap and a short explanation or worked example that resolves it.
-Preserve precision; omit line-by-line code narration.
+Show how and why complex mechanisms work, not just their components.
+Use short worked examples to clarify mechanisms or relationships.
 
-### Source/API conventions
-
-Document private APIs only if nontrivial.
-Ensure docs are up to date.
-
-Module/file docs explain needed domain models, flows and rationale.
-Name concrete mechanisms when readers need them, not vague effects.
-
-Put caveats in trailing `# Remarks` or equivalent.
-Use native doc links and `#` sections for multiple aspects.
-
-Examples should use real APIs and hermetic fixtures.
+Match audience. Keep user facing docs simple and concise.
+Use `# Remarks` or equivalent for miscellaneous caveats.
 
 ### Error documentation
 
-Check that documented public functions list all errors they can return and when.
+List every possible error in public APIs.
+Name the cause, and concise explanation.
+
 Do not demand docs-only backfill of untouched legacy.
 
 Block vague triggers and error-doc stubs: `TODO`, `TBD`, `FIXME`, `...`.

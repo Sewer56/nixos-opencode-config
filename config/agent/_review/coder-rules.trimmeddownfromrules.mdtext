@@ -10,44 +10,40 @@ Organize by domain, not global `types` or `conversions` buckets.
 
 ## Body layout
 
-For substantive changes, including ports, ensure that:
+In method bodies ensure that:
 
-- Coherent steps have one blank line between them.
-- Comments explain steps or resulting states only where intent is unclear.
+- Coherent groups of steps have one blank line between them.
+- Short comments explain steps/resulting states where intent is unclear.
 - Tests separate arrange, act and assert with comments.
-- Long arrange groups separate harness, fixtures and inputs.
+
+## Redundancy
+
+Extract helpers for repeated code.
+Prefer one parameterizable local helper over per-test mock structs.
 
 ## Test strategy
 
 ### Coverage
 
-Cover all new code when tests are required.
+Cover all new code.
+Delete any un-needed tests after code removal/change.
 
 Map removed redundant assertions to surviving tests.
 Allow redundancy only across public entry points.
-Control, seed or freeze I/O, time and network.
 
 ### Parameterization
 
-Extend matching setup and entry points first.
-Prefer named framework cases for independent data variations of one claim.
-
+Parameterize tests where possible.
+Prefer named framework cases.
 Use a framework such as Rust's rstest; add it if needed.
 
-Separate differing claims or cases without one descriptive name.
-Use loops only within one stateful scenario or assertion.
+Prefer parameterization over loops of inputs.
 
 ### Arguments
 
 Order case arguments: primary input, mode/flags, expected output.
-Comment only non-obvious parameters/assertions.
 
 Keep readable cases near 80-100 characters per line.
-
-### Helpers
-
-Extract helpers for repetition or shared setup clarity.
-Prefer one parameterizable local helper over per-test mock structs.
 
 ### Naming and grouping
 
@@ -64,55 +60,33 @@ Order: construction, core behavior, edge cases, convenience.
 Prefer the highest-performance correct implementation.
 Simplify for readability, never at meaningful performance cost.
 
-Use equally clear bounded alternatives; avoid needless allocation or copying.
-Avoid needless clones and initialization, including zero-filling.
-
-Bound growing inputs with pagination, limits, batching or streaming.
-Avoid nested per-item database, network or filesystem work on list paths.
-Cap user input before proportional allocation, sorting or logging.
+Avoid needless allocation, clones, initialization, etc.
 
 ## Documentation
 
 ### Coverage
 
-Document scoped new/changed public features for purpose and use.
+Document all new/changes public items.
+Use real APIs and hermetic fixtures in examples.
+Ensure existing documentation is up to date.
 
-Preserve source delimiters, indentation, directives and doctest behavior.
-
-Use real APIs and hermetic fixtures in runnable examples.
+Don't repeat docs, link to existing ones.
+Document private APIs only if nontrivial.
 
 ### Reader understanding
 
-Do not assume subject expertise.
+Do not assume reader has subject expertise.
 Explain prerequisite concepts and terms before using them.
 
-Show how and why mechanisms work, not just their components.
-Use short worked examples when they clarify mechanisms or relationships.
+Show how and why complex mechanisms work, not just their components.
+Use short worked examples to clarify mechanisms or relationships.
 
-Explain shared background once; link to it.
-Tie explanations to the documented behavior, mechanism or task.
-
-Preserve precision; omit line-by-line code narration.
-
-### Source/API conventions
-
-Private APIs need purpose and non-obvious contracts unless trivial.
-Refresh changed module/file boundary docs.
-
-Explain needed domain models, flows and rationale there.
-
-Package docs cover import/usage; code docs cover exports.
-Update both only when both exist and change.
-Put requested API-owned examples in code docs.
-
-Put caveats in trailing `# Remarks` or equivalent.
-Use native doc links and `#` sections for multiple aspects.
+Match audience. Keep user facing docs simple and concise.
+Use `# Remarks` or equivalent for miscellaneous caveats.
 
 ### Error documentation
 
-Cover every reachable error variant/type/path in changed APIs.
-Name each specific trigger and only errors the function can return.
-
-Follow language/project conventions for error docs and links; never use stubs.
+List every possible error in public APIs.
+Name the cause, and concise explanation.
 
 {{ file="./rules/adhd-communication.md" }}
