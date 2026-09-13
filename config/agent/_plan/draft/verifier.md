@@ -4,7 +4,7 @@ hidden: true
 description: Refutes candidates and promotes required draft corrections
 
 model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
-variant: low
+variant: high
 
 permission:
   "*": deny

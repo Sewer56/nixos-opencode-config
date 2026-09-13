@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews system performance
 model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
-variant: low
+variant: high
 
 permission:
   "*": deny
