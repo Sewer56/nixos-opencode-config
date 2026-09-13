@@ -1,12 +1,17 @@
 ## Placement
 
 Keep module entrypoints focused on orchestration.
-Prefer one data model per file.
+Make file layout follow recursive code flow.
+
+Keep helpers and algorithms local, with conversions beside their type.
+
+Prefer one data model per file, keeping entrypoint definitions at entrypoints.
 
 Keep enums, newtypes and value objects with their sole parent type.
 
-Keep non-public helpers local and conversions beside the type.
-Organize by domain, not global `types` or `conversions` buckets.
+## Visibility
+
+Keep APIs as private as production callers and contracts allow.
 
 ## Body layout
 

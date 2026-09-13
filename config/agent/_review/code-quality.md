@@ -123,8 +123,6 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
 ## Code quality
 
-Flag APIs more public than required.
-
 Check constants replace repeated literals for the same concept.
 Check related boundaries and test inputs derive from them.
 
@@ -138,18 +136,20 @@ Preserve useful names, reuse and boundaries in recommendations.
 ### Placement
 
 Check module entrypoints focus on orchestration.
-Recommend one data model per file.
+Check file layout matches recursive control flow.
+
+Check helpers and algorithms stay local, with conversions beside their type.
+
+Recommend one data model per file, with entrypoint definitions at entrypoints.
 
 Check enums, newtypes and value objects stay with their sole parent type.
 
-Check non-public helpers stay local and conversions beside the type.
-Check domain organization, not global `types` or `conversions` buckets.
-
-Check shared behavior belongs in the lowest shared owning package.
-If ownership is unclear, recommend the package others depend on.
-
 Check integration-family packages contain wiring and package-specific behavior.
 Check tests sit beside their module unless repository convention is stronger.
+
+### Visibility
+
+Flag visibility broader than production callers or contracts require.
 
 ### Body layout
 
