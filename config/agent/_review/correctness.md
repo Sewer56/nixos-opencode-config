@@ -127,13 +127,14 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
 ## Test coverage
 
-Judge observable acceptance behavior, not compiler guarantees.
+Check required tests cover new/changed behavior, contracts and integration.
 Check critical success, failure and edge coverage.
 
-When tests are required, check coverage of all new code.
+Flag coverage padding and tests of compiler or library guarantees alone.
+Ground missing-test findings in an uncovered behavior and concrete failure.
 
 Check one test executes both paths for equivalence claims.
-Compare final rendered/consumed results, not request shapes or prose.
+Compare final rendered/consumed results, not request shapes or explanations.
 
 Trace removed redundant assertions to surviving tests.
 Flag test redundancy except across public entry points.
@@ -147,4 +148,5 @@ Check real I/O, time and network use controls, seeds or freezing.
 - Flag broad APIs/permissions when narrow operations suffice.
 - Check secret confinement, clearing/revocation and auth information leaks.
 - Reject fail-open auth, including retries/defaults.
-- Require explicit approval for weaker verification or broader dependency trust.
+- Require explicit approval for weaker verification.
+- Require approval for dependency trust beyond approved policy.

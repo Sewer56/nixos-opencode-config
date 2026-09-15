@@ -26,11 +26,18 @@ In method bodies:
 Extract helpers for repeated code.
 Prefer one parameterizable local helper over per-test mock structs.
 
+## Dependencies
+
+Allow common lightweight libraries that reduce net code and maintenance costs.
+Account for enabled features and transitive costs within repository policy.
+
 ## Test strategy
 
 ### Coverage
 
-Test all new code.
+Test new or changed repository behavior.
+Avoid testing compiler or library guarantees alone.
+
 Delete tests made unnecessary by code removal/change.
 
 Map removed redundant assertions to surviving tests.

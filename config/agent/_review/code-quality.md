@@ -133,6 +133,11 @@ Flag unnecessary or single-implementation abstractions.
 Tiny single-use helpers may be inline.
 Preserve useful names, reuse and boundaries in recommendations.
 
+### Dependencies
+
+Accept common lightweight libraries that reduce net code and maintenance costs.
+Account for enabled features and transitive costs within repository policy.
+
 ### Placement
 
 Check module entrypoints focus on orchestration.
@@ -167,9 +172,8 @@ Recommend one parameterizable local helper over per-test mock structs.
 
 Check test organization and readability, not behavioral adequacy.
 
-### Coverage
+### Redundancy
 
-Check tests cover all new code.
 Flag tests made unnecessary by code removal/change.
 
 Trace removed redundant assertions to surviving tests.
