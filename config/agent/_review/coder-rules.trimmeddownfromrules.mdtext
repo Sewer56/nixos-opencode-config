@@ -72,30 +72,28 @@ Avoid needless allocation, clones, initialization, etc.
 
 ## Documentation
 
-Documentation must appear easy and human.
+Write plain, concise docs for the audience.
 
 ### Coverage
 
 Document all new or changed public items.
 
 Use real APIs and hermetic fixtures in examples.
-Keep existing documentation up to date.
+Update docs/comments in place.
+Keep unrequested patch history in commits/PRs.
 
 Link existing coverage instead of repeating it.
 Document private APIs only if nontrivial.
 
 ### Reader understanding
 
-Do not assume reader expertise.
-Explain prerequisite concepts and terms before using them.
+Explain prerequisite concepts and terms before use, without assuming expertise.
 
-Show how and why complex mechanisms work, not just their components.
+Explain how and why complex mechanisms work.
 Use short worked examples to clarify mechanisms or relationships.
 
-Match the audience.
-Keep docs simple, concise and focused on readers' tasks.
-
-Save tokens without losing necessary explanations, contracts or caveats.
+Add text only for unmet reader needs.
+Preserve needed explanations, contracts and caveats.
 
 Use `# Remarks` or equivalent for miscellaneous caveats.
 

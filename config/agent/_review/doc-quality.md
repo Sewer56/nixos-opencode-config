@@ -191,16 +191,14 @@ Flag vague effects where readers need concrete mechanisms.
 
 ### Unnecessary content
 
-Flag repetition and detail serving no requirement or reader need.
-Preserve needed contracts when recommending cuts.
+Flag repetition, irrelevant detail and unrequested patch history.
+Prefer deletion or in-place correction over additions.
 
-Flag wordy documentation and suggest concise alternatives to save tokens.
-Focus on facts readers need for their task.
+Justify additions by needs unmet by existing docs or clear code.
+Preserve needed explanations, contracts and caveats.
 
+Shorten necessary content or link existing coverage.
 Flag line-by-line code narration, not prerequisite explanations.
-
-Recommend links to existing coverage.
-Recommend deletion over rewording for unnecessary content.
 
 ### Readability and examples
 
