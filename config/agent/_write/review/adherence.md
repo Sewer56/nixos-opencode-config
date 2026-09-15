@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Reviews prose
-model: sewer-axonhub/glm-5.3 # WRITER
+model: sewer-axonhub/glm-5.3-flash # WRITER
 variant: low
 permission:
   "*": deny
