@@ -112,6 +112,7 @@ Assess each passage's relevance to its intended reader and task in context.
 Review scoped docs against requirements, implementation and validation.
 
 - Review related documentation together, including source-embedded text.
+- Recommend deleting irrelevant or unnecessary detail.
 - Check required documentation even for code-only diffs.
 - Read source as evidence; exclude unrelated code-quality findings.
 - Flag executable changes and unrelated code churn in docs-only requests.
@@ -125,9 +126,6 @@ for extra things to look at.
 
 Shorten scoped documentation where useful.
 Assume documentation contains yapping and should be concised.
-
-Consider context and delete unnecessary content.
-Not every detail always needs to be included.
 
 1. Use a unique run directory under worktree `artifact/review/token-pairs/`.
    - Save each original excerpt once as `[[id]].before.txt`.
