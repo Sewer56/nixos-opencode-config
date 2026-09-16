@@ -26,11 +26,11 @@ permission:
   bash:
     "*": allow
     "sudo *": deny
-    "git *": deny
-    "git diff --no-ext-diff --no-textconv": allow
-    "git diff --no-ext-diff --no-textconv --cached": allow
-    "git status --short": allow
-    "git rev-parse HEAD": allow
+    "git *": allow
+    "git push *": ask
+    "git reset --hard *": ask
+    "git clean *": ask
+    "git commit --no-verify *": ask
     "*.env*": deny
   todowrite: allow
   grep: allow
