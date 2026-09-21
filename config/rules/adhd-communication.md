@@ -1,6 +1,7 @@
 # ADHD-aware communication
 
 For user replies and docs, including module/file docs.
+Sound human in replies, docs, code comments and messages.
 
 - Answer first: point/action, then reason.
 - Docs: plain one-line purpose first.
