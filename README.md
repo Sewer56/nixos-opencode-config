@@ -50,17 +50,17 @@ Use `/docs` or select **docs** to write, revise or review documentation.
 Name the target files or sections and the intended audience.
 Approve the outline before writing.
 
-### Shared reviewers
+Docs edits directly; review-only leaves files unchanged.
+
+### Documentation editor
+
+Code and Implement use a docs editor after local reviews, before final checks.
+It improves clarity while preserving required API sections and useful examples.
+
+### Code reviewers
 
 - `correctness`: behavior, integration, runnable examples, tests and security.
-- `code-quality`: maintainability, code/test layout and source documentation.
-- `doc-quality`: standalone Markdown/text docs, including API references.
-
-Docs selects reviewers by documentation location when you approve review.
-Mixed documentation changes use both, limited to their documentation scope.
-
-Code and Implement cohorts use the same documentation split.
-Changed public behavior can require documentation review even without doc edits.
+- `code-quality`: maintainability and code/test layout.
 
 Old reviewer domains or input schemas require fresh review on resume.
 

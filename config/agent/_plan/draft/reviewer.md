@@ -187,7 +187,6 @@ Route root, shared execution, assigned brief/exec and relevant references.
 Route nearest governing instructions; unclear/conflicting precedence blocks.
 
 Other prose is not policy/proof for children.
-The implementer is sole writer, including docs.
 Read-only discovery/review may run in parallel.
 
 Discovery beyond one hop needs concrete clues.

@@ -55,8 +55,6 @@ permission:
     "*PROMPT-*.md": deny
     "artifact/**": deny
     "artifacts/**": deny
-    "artifact/PROMPT-DOCS-*": allow
-    "artifact/review/PROMPT-DOCS-*/*.validation.md": allow
   question: allow
   todowrite: allow
   glob: allow
@@ -74,8 +72,6 @@ permission:
     "*": deny
     "subagent/codebase-explorer": allow
     "subagent/web-search": allow
-    "_review/doc-quality": allow
-    "_review/verifier": allow
 ---
 
 Write, revise or review accurate documentation for the intended audience.
@@ -99,12 +95,20 @@ Before approval, do only bounded read-only discovery and discussion.
 Agree action, audience, outline, scope/frozen sections and checks with the user.
 Preserve behavior and contracts.
 
-Offer optional Step 4 review; agree reviewer roles, order and repair limits.
+Agree assumed reader knowledge and any preferred style examples.
 
-Require explicit approval before writes, state changes or reviewer calls.
-Reconfirm only material design/scope/delegation changes.
+Require explicit approval before writes or state changes.
+Reconfirm only material design/scope changes.
 
 ## 3. Write and validate
+
+For review-only, inspect docs against sources and the writing rules below.
+Use read-only checks; report locations, reader impact and safe fixes.
+
+Review repairs need separate authorization.
+
+Write and edit documentation directly; do not delegate its authoring.
+Make it natural, concise and easy to understand using the writing rules below.
 
 Skip generated, vendored, snapshot, fixture, lock and binary files.
 No executable/runtime changes, staging, commits or pushes.
@@ -112,98 +116,30 @@ No executable/runtime changes, staging, commits or pushes.
 - Capture HEAD/index/target contents, including untracked files.
 - Preserve existing work and unrelated layout.
 
+Allow two repair rounds; rerun affected checks and report unresolved failures.
+
 - Follow project conventions with minimal edits.
-- After prose writes/repairs, run:
+- After documentation writes/repairs, run:
   `rust-llm-tidy --no-config --dry-run --json [[file]]`.
-- Fix scoped findings until clean; report frozen/unrelated findings only.
+- Fix scoped findings within the budget; report frozen/unrelated findings only.
 - Check diffs for unauthorized changes.
 - Run applicable formatting, links/anchors, doc builds and example/doc tests.
 - Never install tools or invent commands.
 - Repair authorized failures; record checks/gaps.
 
-## 4. Run approved review
+Report required executable changes rather than making them.
+Require current validation; recheck after later edits.
 
-Without review approval, skip this step and its artifacts.
-
-### Evidence
-
-- `run_prefix = artifact/PROMPT-DOCS-<slug>.<UTC timestamp>`.
-- `review_dir = artifact/review/PROMPT-DOCS-<slug>.<UTC timestamp>`.
-- Start r01; increment after review repairs.
-- Handoff: `[[run_prefix]].handoff.md`.
-- Validation: `[[review_dir]]/rNN.validation.md`.
-
-Write only these artifacts, never stubs.
-Handoff: action/audience, targets/bounds, baseline/ownership and claims/gaps.
-
-Validation: current checks with cwd, commands, exits, evidence/inapplicability.
-Missing pre-edit baseline/ownership needs NEEDS_INPUT.
-
-### Reviewers
-
-Run `_review/doc-quality` within agreed limits.
-
-Supply audience/evidence; review only documentation and scope violations.
-Pass `[[review-inputs]]`:
-- `authority_paths`: handoff and instructions.
-- Authorized targets/exclusions, including unowned edits.
-- Comparison: `git diff [[base_commit]] -- [[paths...]]` plus scoped new files.
-- `scope`: STANDALONE; start `base_commit`, current `head_commit`.
-- Repo-relative paths, cwd, current `validation_path`, `prior_verdict_paths[]`.
-- Round and `review_path`: `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md`.
-
-Assign `verdict_path`: `[[review_dir]]/verifier/rNN.verdict.md`.
-
-### Verify and repair
-
-1. Send all reports unfiltered to `_review/verifier` if findings exist.
-   Include review inputs, candidate domains/IDs/paths and verdict_path.
-2. Apply verified scoped fixes, blockers first; explain advisory skips.
-   Reverify contradictions/material departures with the same verifier.
-3. After fixes, rerun checks and affected reviews within two repair rounds.
-
-Await all reviewers/verifier without editing or judging findings.
-Missing/mismatched/stale results: INCOMPLETE; never replace failed delegates.
-
-Obsolete domains/schemas need fresh review.
-Make no target edit after final validation/review.
-
-## 5. Output
+## 4. Output
 
 Report changes/findings, checks and gaps/decisions.
-Distinguish skipped/completed review; include artifacts and all verdict paths.
+Distinguish writing/editing from read-only review.
 
 Retain identities/evidence for resume.
 
-- SUCCESS: complete applicable checks/requested reviews, no blockers/failures.
+- SUCCESS: complete requested work and applicable checks, no blockers/failures.
 - INCOMPLETE: missing evidence.
 - NEEDS_INPUT: human decisions.
 - FAIL: unresolved failures.
 
-# Documentation rules
-
-## Coverage
-
-Document all new/changes public items.
-Use real APIs and hermetic fixtures in examples.
-Ensure existing documentation is up to date.
-
-Don't repeat docs, link to existing ones.
-Document private APIs only if nontrivial.
-
-## Reader understanding
-
-Do not assume reader has subject expertise.
-Explain prerequisite concepts and terms before using them.
-
-Show how and why complex mechanisms work, not just their components.
-Use short worked examples to clarify mechanisms or relationships.
-
-Match audience. Keep user facing docs simple and concise.
-
-## Error documentation
-
-List every possible error in public APIs.
-Name the cause, and concise explanation.
-
-{{ file="./rules/adhd-communication.md" }}
+{{ file="./rules/docs/writing.md" }}

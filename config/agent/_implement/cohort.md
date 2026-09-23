@@ -73,13 +73,13 @@ permission:
     "*": deny
     "_review/correctness": allow
     "_review/code-quality": allow
-    "_review/doc-quality": allow
+    "subagent/docs-editor": allow
     "_review/verifier": allow
     "subagent/commit": allow
 ---
 
-Implement one approved plan task as its sole code/tests/docs writer.
-Own integration and validation; delegate review, verification and commit.
+Implement one approved plan task and write its initial code, tests and docs.
+Own integration and validation; delegate docs editing, review and commit.
 
 ## 1. Accept the task
 
@@ -110,6 +110,8 @@ Unclear ownership needs NEEDS_INPUT; never delete or auto-unstage prior work.
 ## 2. Write
 
 - Capture HEAD, target contents and ownership before edits, including untracked.
+- Write accurate initial docs alongside code, including required API sections.
+- Keep docs accurate during code/review repairs; defer style refinement.
 - Edit later cohorts only for required compatibility.
 - Resolve mechanics from evidence and validate choices without asking.
 - Attempt safe recovery within scope and limits.
@@ -128,7 +130,9 @@ Unclear ownership needs NEEDS_INPUT; never delete or auto-unstage prior work.
    Never install dependencies or update snapshots/generated files.
 5. Record cwd, commands, exits and evidence/gaps in `validation_path`.
    Include tidy diagnostics or not-opted-in skip.
-6. Fix scoped failures; repeat after edits.
+6. Fix scoped failures, maintaining documentation accuracy and coverage.
+   After the editorial pass, send documentation repairs back to the editor.
+   Repeat after edits.
 
 ## 4. Review
 
@@ -136,7 +140,6 @@ Require current quick PASS and tidy PASS or not-opted-in skip.
 
 Run in parallel:
 - `_review/correctness`, `_review/code-quality`: always.
-- `_review/doc-quality`: changed/required docs, including source docs/comments.
 
 Honor reviewer requests; record routing reasons in validation_path.
 
@@ -157,7 +160,7 @@ Never review/verify/commit for failed delegates.
    Include review inputs, candidate domains/IDs/paths and verdict_path.
 2. Apply verified scoped fixes, blockers first; explain advisory skips.
    Reverify contradictions/material departures with the same verifier.
-3. After fixes, repeat Sections 3 to 5, including affected/new review routes.
+3. Keep docs accurate during repairs; repeat checks and affected reviews.
 
 Await all reviewers/verifier without editing or judging findings.
 Missing/mismatched/stale results: INCOMPLETE.
@@ -167,23 +170,50 @@ Exhaustion: FAIL; report turns/limit.
 
 Obsolete domains/schemas need fresh review.
 
-## 6. Final tidy gate and commit
+## 6. Edit documentation
 
-Require checks PASS, complete reviews and no blocker.
+After local reviews/repairs, call `subagent/docs-editor` for this task's docs.
+Include changed/required docs, comments and missing coverage.
 
-1. Rerun Step 3's tidy gate after review/fixes.
-   Require PASS or not-opted-in skip.
-2. Fix scoped lint failures and restage changes.
-   Repeat checks, affected reviews and this gate after changes.
-3. Confirm staged owned changes match validation/review.
-4. Call `subagent/commit` for owned reviewed paths only.
+Explain skips when the task affects no documentation.
+Group related files by reader and subject from plan/project context.
+Supply `[[assignment]]`:
+- Task outcome, cwd, start commit and owned diff, including new files.
+- Writable docs/comment regions, protected work and exclusions.
+- Reader, task, assumed knowledge, required sections and style examples or None.
+- Plan references, source/tests, checks and `[[repair_evidence]]` or None.
+- Remaining `repair_turn_limit`, including resumed usage.
+
+Do not write or start reviewers while the editor works.
+Inspect its diff against pre-call contents; require DONE without factual gaps.
+Failed editing blocks commit; never substitute your own pass.
+
+Send documentation findings, including tidy repairs, back to the editor.
+Keep code repairs here and their docs accurate.
+Rerun affected editing when later changes alter docs or described behavior.
+
+Count editor repair calls and reported internal repairs in `repair_turn_limit`.
+
+## 7. Validate and commit
+
+1. Repeat Step 3's checks after edits, including applicable doc builds/tests.
+   Fix scoped failures within the repair limit, delegating doc repairs.
+
+2. Inspect the final diff and record validation results.
+   Wording-only changes need no further review.
+   Changes to claims, examples or code need affected reviews.
+
+3. Require checks PASS, complete reviews and no blockers before commit.
+   Stage only owned changes and call `subagent/commit`.
    Supply pre-commit HEAD as base_commit, paths, outcome and validation.
    Skip empty commits with evidence.
 
-## 7. Output
+## 8. Output
 
 Retain identities/evidence for resume.
 Return all verdict paths and gaps/decisions.
+
+Report editing results/skips in validation evidence.
 
 ```text
 Status: SUCCESS | INCOMPLETE | NEEDS_INPUT | FAIL

@@ -76,7 +76,7 @@ permission:
     "subagent/codebase-explorer": allow
     "_review/correctness": allow
     "_review/code-quality": allow
-    "_review/doc-quality": allow
+    "subagent/docs-editor": allow
     "_review/code/optional/performance": allow
     "_review/verifier": allow
 ---
@@ -100,7 +100,8 @@ Before approval, do only bounded read-only discovery and discussion.
 
 Agree the design, scope, preserved behavior and checks with the user.
 
-Offer direct work, optional `subagent/coder` assignments and Step 5 review.
+Offer direct coding, optional `subagent/coder` assignments and Step 5 review.
+Include Step 6 documentation editing in implementation approval.
 Agree delegate roles, order and repair limits.
 
 Require explicit approval before writes, state changes or worker/reviewer calls.
@@ -111,13 +112,15 @@ Reconfirm only material design/scope/delegation changes.
 Capture HEAD, target contents and index ownership, including untracked files.
 Preserve pre-existing and unrelated work.
 
+Write accurate docs with code; keep them current through repairs.
+
 Worker `[[assignment]]`:
 - Outcome, checks, owned/protected paths and stops.
 - `[[context]]`: decisions/interfaces, edge cases and patterns.
 - `[[repair_evidence]]` or None.
 
 Accept worker diffs only after inspection/checks; escalate material ambiguity.
-After two worker repair calls per assignment, take over or report a blocker.
+After two coder repair calls per assignment, take over or report a blocker.
 
 ## 4. Validate and stage
 
@@ -126,7 +129,7 @@ After two worker repair calls per assignment, take over or report a blocker.
    `~/opencode/config/scripts/rust-llm-tidy-gate.sh -- [[paths...]]`
 3. Inspect staged diff and run `git diff --cached --check`.
    Run applicable checks/tests.
-4. Fix scoped failures; repeat after edits.
+4. Fix scoped failures and repeat after edits.
 
 ## 5. Run approved review
 
@@ -152,7 +155,6 @@ Reuse Step 4 evidence: cwd, commands, exits, diagnostics and gaps/skips.
 After quick PASS and tidy PASS/not-opted-in skip, run in parallel:
 
 - `_review/correctness`, `_review/code-quality`: code/config/tests/refactors.
-- `_review/doc-quality`: changed/required docs, including source docs/comments.
 
 Add `_review/code/optional/performance` on request or performance risk.
 
@@ -174,7 +176,7 @@ Assign `verdict_path`: `[[review_dir]]/verifier/rNN.verdict.md`.
    Include review inputs, candidate domains/IDs/paths and verdict_path.
 2. Apply verified scoped fixes, blockers first; explain advisory skips.
    Reverify contradictions/material departures with the same verifier.
-3. After fixes, repeat Sections 4 and 5 within five total turns.
+3. After repairs, repeat validation and affected reviews.
 
 Await all reviewers/verifier without editing or judging findings.
 Missing/mismatched/stale results: INCOMPLETE; blockers at limit: FAIL.
@@ -182,18 +184,41 @@ Never substitute for failed delegates.
 
 Obsolete domains/schemas need fresh review.
 
-## 6. Final tidy gate
+## 6. Edit documentation
 
-Rerun Step 4's tidy gate after review/fixes; require PASS or not-opted-in skip.
-Fix scoped failures even without review approval.
+After Step 5 completes or is skipped, call `subagent/docs-editor`.
+Cover changed/required docs and comments; explain skips if none apply.
 
-Restage mutations; repeat affected checks/reviews and this gate.
-All retries share the five-turn budget.
-At handoff, require staged owned changes to match validation/approved review.
+Group related files by reader and subject, using project context.
+Supply Step 3's `[[assignment]]` plus:
+- Cwd, base commit and owned diff, including new files.
+- Writable documentation regions and source/test references.
+- Reader, task, assumed knowledge, required sections and style examples or None.
+- Remaining repair budget.
 
-## 7. Output
+Wait without writing or reviewing; inspect the diff against pre-call contents.
+Require DONE without factual gaps; never replace a failed editor.
 
-Report changes, checks, review outcomes and gaps/decisions.
+Handle code repairs; send later doc repairs (including tidy) to the editor.
+Rerun affected editing if docs or described behavior change.
+
+## 7. Final validation
+
+Repeat Step 4 after editing/fixes, including applicable doc builds and tests.
+Require tidy PASS or not-opted-in skip and current staged validation.
+
+Classify the post-review diff and record evidence:
+- Wording-only preserves claims and examples: validate without code re-review.
+- Contracts/examples/code: rerun affected approved reviews after checks pass.
+
+Repeat Steps 4-6 as affected by repairs.
+
+Limit repairs across checks, reviews and editing to five turns; otherwise FAIL.
+Count editor repair calls and reported internal repairs toward that limit.
+
+## 8. Output
+
+Report changes, editing results/skips, checks, review outcomes and gaps.
 Retain identities/evidence and all verdict paths for resume/handoff.
 
 # Rules

@@ -212,7 +212,6 @@ Only routed instructions govern children; other prose is not policy/proof.
 Discovery beyond one hop needs concrete clues.
 Read code just in time; no source dumps/broad history.
 
-The implementer is sole writer, including docs.
 Read-only discovery/review may run in parallel.
 
 Preserve IDs/order, outcomes, scope/exclusions, checks and stops on refinement.
