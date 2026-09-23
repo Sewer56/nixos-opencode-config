@@ -1,7 +1,7 @@
 {
   "$tierOrder": {"0": "EASY","1": "PLANNER","2": "CODER","3": "WRITER","4": "STYLE-REVIEW","5": "CORRECTNESS-REVIEW"},
   "normal": {
-    "EASY": {"model":"sewer-axonhub/deepseek-v4.1-flash","variant":"low"},
+    "EASY": {"model":"sewer-axonhub/glm-5.3-flash","variant":"low"},
     "PLANNER": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
     "CODER": {"model":"sewer-axonhub/glm-5.3","variant":"low"},
     "WRITER": {"model":"sewer-axonhub/glm-5.3-flash","variant":"low"},

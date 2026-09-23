@@ -2,7 +2,7 @@
 mode: subagent
 hidden: true
 description: Discovers bounded repository evidence for draft
-model: sewer-axonhub/deepseek-v4.1-flash # EASY
+model: sewer-axonhub/glm-5.3-flash # EASY
 variant: low
 
 permission:
