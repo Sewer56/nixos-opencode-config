@@ -78,8 +78,8 @@ permission:
     "subagent/commit": allow
 ---
 
-Implement one approved plan task and write its initial code, tests and docs.
-Own integration and validation; delegate docs editing, review and commit.
+Implement and validate one approved plan task's code and tests.
+Delegate review, documentation editing and commit.
 
 ## 1. Accept the task
 
@@ -110,8 +110,7 @@ Unclear ownership needs NEEDS_INPUT; never delete or auto-unstage prior work.
 ## 2. Write
 
 - Capture HEAD, target contents and ownership before edits, including untracked.
-- Write accurate initial docs alongside code, including required API sections.
-- Keep docs accurate during code/review repairs; defer style refinement.
+- Defer documentation until Step 6, after local reviews finish.
 - Edit later cohorts only for required compatibility.
 - Resolve mechanics from evidence and validate choices without asking.
 - Attempt safe recovery within scope and limits.
@@ -127,12 +126,11 @@ Unclear ownership needs NEEDS_INPUT; never delete or auto-unstage prior work.
    `~/opencode/config/scripts/rust-llm-tidy-gate.sh -- [[paths...]]`
 3. Inspect staged diff and run `git diff --cached --check`.
 4. Run quick validation/tests; explain inapplicable tests.
+   Defer documentation-only checks to Step 7.
    Never install dependencies or update snapshots/generated files.
 5. Record cwd, commands, exits and evidence/gaps in `validation_path`.
    Include tidy diagnostics or not-opted-in skip.
-6. Fix scoped failures, maintaining documentation accuracy and coverage.
-   After the editorial pass, send documentation repairs back to the editor.
-   Repeat after edits.
+6. Fix scoped failures and repeat after edits.
 
 ## 4. Review
 
@@ -146,6 +144,7 @@ Honor reviewer requests; record routing reasons in validation_path.
 Pass `[[review-inputs]]`:
 - `authority_paths`: root/execution/brief/exec/instructions.
 - Authorized targets/exclusions, including unowned edits.
+- Deferred documentation coverage, excluded from code review/repairs.
 - Comparison: `git diff [[base_commit]] -- [[paths...]]` plus scoped new files.
 - `scope`: TASK:[[ID]].
 - Task-start `base_commit`, current `head_commit`.
@@ -160,19 +159,20 @@ Never review/verify/commit for failed delegates.
    Include review inputs, candidate domains/IDs/paths and verdict_path.
 2. Apply verified scoped fixes, blockers first; explain advisory skips.
    Reverify contradictions/material departures with the same verifier.
-3. Keep docs accurate during repairs; repeat checks and affected reviews.
+3. After repairs, repeat checks and affected reviews.
 
 Await all reviewers/verifier without editing or judging findings.
 Missing/mismatched/stale results: INCOMPLETE.
 
 All repairs share `repair_turn_limit`, including resumed turns.
+Count the editor's internal repairs toward this limit.
 Exhaustion: FAIL; report turns/limit.
 
 Obsolete domains/schemas need fresh review.
 
 ## 6. Edit documentation
 
-After local reviews/repairs, call `subagent/docs-editor` for this task's docs.
+After local review loops finish, call `subagent/docs-editor` once.
 Include changed/required docs, comments and missing coverage.
 
 Explain skips when the task affects no documentation.
@@ -188,20 +188,13 @@ Do not write or start reviewers while the editor works.
 Inspect its diff against pre-call contents; require DONE without factual gaps.
 Failed editing blocks commit; never substitute your own pass.
 
-Send documentation findings, including tidy repairs, back to the editor.
-Keep code repairs here and their docs accurate.
-Rerun affected editing when later changes alter docs or described behavior.
-
-Count editor repair calls and reported internal repairs in `repair_turn_limit`.
-
 ## 7. Validate and commit
 
-1. Repeat Step 3's checks after edits, including applicable doc builds/tests.
-   Fix scoped failures within the repair limit, delegating doc repairs.
+1. Repeat Step 3's staging/checks, including applicable doc builds/tests.
+   - Do not restart implementation, review or documentation editing.
+   - If checks fail or further changes are needed, report them and stop.
 
 2. Inspect the final diff and record validation results.
-   Wording-only changes need no further review.
-   Changes to claims, examples or code need affected reviews.
 
 3. Require checks PASS, complete reviews and no blockers before commit.
    Stage only owned changes and call `subagent/commit`.

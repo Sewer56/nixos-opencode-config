@@ -1,8 +1,8 @@
 ---
 mode: subagent
 description: Rewrites documentation to sound human and read clearly
-model: sewer-axonhub/glm-5.3 # WRITER
-variant: high
+model: sewer-axonhub/glm-5.3 # DOC-WRITER
+variant: low
 
 permission:
   "*": deny
@@ -85,10 +85,11 @@ DONE allows unchanged docs that already meet requirements.
 
 Report repairs used for the caller's budget.
 
-Report uncertain claims, missing evidence and required code changes.
+Report uncertain claims and missing evidence.
 Missing evidence is INCOMPLETE; unresolved check failures are FAIL.
 
-Identify changed contracts, examples or other claims needing technical review.
+Identify changed claims/examples and their source/test evidence.
+Return required code changes as blockers, not requests to restart review.
 
 Do not create review reports or token-saving artifacts.
 

@@ -112,7 +112,7 @@ Reconfirm only material design/scope/delegation changes.
 Capture HEAD, target contents and index ownership, including untracked files.
 Preserve pre-existing and unrelated work.
 
-Write accurate docs with code; keep them current through repairs.
+Defer documentation to Step 6.
 
 Worker `[[assignment]]`:
 - Outcome, checks, owned/protected paths and stops.
@@ -123,6 +123,8 @@ Accept worker diffs only after inspection/checks; escalate material ambiguity.
 After two coder repair calls per assignment, take over or report a blocker.
 
 ## 4. Validate and stage
+
+Run documentation-only checks in Step 7.
 
 1. Stage owned changes only, excluding `artifact/` and `artifacts/`.
 2. Run mutating tidy on owned files:
@@ -163,6 +165,7 @@ Honor reviewer limits; record routing reasons.
 Pass `[[review-inputs]]`:
 - `authority_paths`: handoff and instructions.
 - Authorized targets/exclusions, including unowned edits.
+- Deferred documentation coverage, excluded from code review/repairs.
 - Comparison: `git diff [[base_commit]] -- [[paths...]]` plus scoped new files.
 - `scope`: STANDALONE; start `base_commit`, current `head_commit`.
 - Repo-relative paths, cwd, current `validation_path`, `prior_verdict_paths[]`.
@@ -184,9 +187,11 @@ Never substitute for failed delegates.
 
 Obsolete domains/schemas need fresh review.
 
+Limit repairs to five turns, including editor internal repairs; otherwise FAIL.
+
 ## 6. Edit documentation
 
-After Step 5 completes or is skipped, call `subagent/docs-editor`.
+After the review loop completes or is skipped, call `subagent/docs-editor` once.
 Cover changed/required docs and comments; explain skips if none apply.
 
 Group related files by reader and subject, using project context.
@@ -199,22 +204,13 @@ Supply Step 3's `[[assignment]]` plus:
 Wait without writing or reviewing; inspect the diff against pre-call contents.
 Require DONE without factual gaps; never replace a failed editor.
 
-Handle code repairs; send later doc repairs (including tidy) to the editor.
-Rerun affected editing if docs or described behavior change.
-
 ## 7. Final validation
 
-Repeat Step 4 after editing/fixes, including applicable doc builds and tests.
+Repeat Step 4's staging/checks, including applicable doc builds and tests.
 Require tidy PASS or not-opted-in skip and current staged validation.
 
-Classify the post-review diff and record evidence:
-- Wording-only preserves claims and examples: validate without code re-review.
-- Contracts/examples/code: rerun affected approved reviews after checks pass.
-
-Repeat Steps 4-6 as affected by repairs.
-
-Limit repairs across checks, reviews and editing to five turns; otherwise FAIL.
-Count editor repair calls and reported internal repairs toward that limit.
+Do not restart implementation, review or documentation editing.
+If checks fail or further changes are needed, report them and stop.
 
 ## 8. Output
 
