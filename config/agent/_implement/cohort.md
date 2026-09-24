@@ -73,13 +73,13 @@ permission:
     "*": deny
     "_review/correctness": allow
     "_review/code-quality": allow
-    "subagent/docs-editor": allow
+    "_review/doc-quality": allow
     "_review/verifier": allow
     "subagent/commit": allow
 ---
 
-Implement and validate one approved plan task's code and tests.
-Delegate review, documentation editing and commit.
+Implement one approved plan task as its sole code/tests/docs writer.
+Own integration and validation; delegate review and commit.
 
 ## 1. Accept the task
 
@@ -110,7 +110,7 @@ Unclear ownership needs NEEDS_INPUT; never delete or auto-unstage prior work.
 ## 2. Write
 
 - Capture HEAD, target contents and ownership before edits, including untracked.
-- Defer documentation until Step 6, after local reviews finish.
+- Write accurate docs alongside code, including required API sections.
 - Edit later cohorts only for required compatibility.
 - Resolve mechanics from evidence and validate choices without asking.
 - Attempt safe recovery within scope and limits.
@@ -126,7 +126,6 @@ Unclear ownership needs NEEDS_INPUT; never delete or auto-unstage prior work.
    `~/opencode/config/scripts/rust-llm-tidy-gate.sh -- [[paths...]]`
 3. Inspect staged diff and run `git diff --cached --check`.
 4. Run quick validation/tests; explain inapplicable tests.
-   Defer documentation-only checks to Step 7.
    Never install dependencies or update snapshots/generated files.
 5. Record cwd, commands, exits and evidence/gaps in `validation_path`.
    Include tidy diagnostics or not-opted-in skip.
@@ -144,7 +143,6 @@ Honor reviewer requests; record routing reasons in validation_path.
 Pass `[[review-inputs]]`:
 - `authority_paths`: root/execution/brief/exec/instructions.
 - Authorized targets/exclusions, including unowned edits.
-- Deferred documentation coverage, excluded from code review/repairs.
 - Comparison: `git diff [[base_commit]] -- [[paths...]]` plus scoped new files.
 - `scope`: TASK:[[ID]].
 - Task-start `base_commit`, current `head_commit`.
@@ -159,54 +157,42 @@ Never review/verify/commit for failed delegates.
    Include review inputs, candidate domains/IDs/paths and verdict_path.
 2. Apply verified scoped fixes, blockers first; explain advisory skips.
    Reverify contradictions/material departures with the same verifier.
-3. After repairs, repeat checks and affected reviews.
+3. After repairs, repeat checks and affected reviews, keeping docs accurate.
 
 Await all reviewers/verifier without editing or judging findings.
 Missing/mismatched/stale results: INCOMPLETE.
 
 All repairs share `repair_turn_limit`, including resumed turns.
-Count the editor's internal repairs toward this limit.
 Exhaustion: FAIL; report turns/limit.
 
 Obsolete domains/schemas need fresh review.
 
-## 6. Edit documentation
+### Documentation review
 
-After local review loops finish, call `subagent/docs-editor` once.
-Include changed/required docs, comments and missing coverage.
+After the code review loops finish, run `_review/doc-quality` as a separate
+group for changed/required docs, including source docs and comments.
 
-Explain skips when the task affects no documentation.
-Group related files by reader and subject from plan/project context.
-Supply `[[assignment]]`:
-- Task outcome, cwd, start commit and owned diff, including new files.
-- Writable docs/comment regions, protected work and exclusions.
-- Reader, task, assumed knowledge, required sections and style examples or None.
-- Plan references, source/tests, checks and `[[repair_evidence]]` or None.
-- Remaining `repair_turn_limit`, including resumed usage.
+- Changed public behavior can require it even without doc edits.
+- Record the skip reason in validation_path when no documentation applies.
+- Pass the same review-inputs; apply Section 5's verify-and-repair flow.
+- Documentation repairs share `repair_turn_limit`.
 
-Do not write or start reviewers while the editor works.
-Inspect its diff against pre-call contents; require DONE without factual gaps.
-Failed editing blocks commit; never substitute your own pass.
+## 6. Final validation and commit
 
-## 7. Validate and commit
-
-1. Repeat Step 3's staging/checks, including applicable doc builds/tests.
-   - Do not restart implementation, review or documentation editing.
-   - If checks fail or further changes are needed, report them and stop.
-
+1. Repeat Step 3's checks after repairs, including applicable doc builds/tests.
+   Fix scoped failures within the repair limit.
 2. Inspect the final diff and record validation results.
-
+   Wording-only changes need no further review.
+   Changes to claims, examples or code need affected reviews.
 3. Require checks PASS, complete reviews and no blockers before commit.
    Stage only owned changes and call `subagent/commit`.
    Supply pre-commit HEAD as base_commit, paths, outcome and validation.
    Skip empty commits with evidence.
 
-## 8. Output
+## 7. Output
 
 Retain identities/evidence for resume.
 Return all verdict paths and gaps/decisions.
-
-Report editing results/skips in validation evidence.
 
 ```text
 Status: SUCCESS | INCOMPLETE | NEEDS_INPUT | FAIL

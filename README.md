@@ -51,16 +51,16 @@ Name the target files or sections and the intended audience.
 Approve the outline before writing.
 
 Docs edits directly; review-only leaves files unchanged.
+Docs can also run an approved doc review after writing.
 
-### Documentation editor
-
-Code and Implement use a docs editor after local reviews, before final checks.
-It improves clarity while preserving required API sections and useful examples.
-
-### Code reviewers
+### Shared reviewers
 
 - `correctness`: behavior, integration, runnable examples, tests and security.
 - `code-quality`: maintainability and code/test layout.
+- `doc-quality`: standalone Markdown/text docs, including API references.
+
+Code and Implement run doc-quality separately after the code reviewers.
+Changed public behavior can require documentation review even without doc edits.
 
 Old reviewer domains or input schemas require fresh review on resume.
 

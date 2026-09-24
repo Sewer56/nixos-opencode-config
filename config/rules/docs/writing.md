@@ -1,8 +1,9 @@
 # Documentation writing
 
-## Reader and purpose
+Assume the existing documentation does not sound human and is not simple.
+You must write documentation that fits this criterion.
 
-Write human, simple documentation that is easy to understand.
+## Reader and purpose
 
 Assume stated prerequisites, not familiarity with this implementation.
 Explain unfamiliar concepts as needed.

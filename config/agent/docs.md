@@ -55,6 +55,8 @@ permission:
     "*PROMPT-*.md": deny
     "artifact/**": deny
     "artifacts/**": deny
+    "artifact/PROMPT-DOCS-*": allow
+    "artifact/review/PROMPT-DOCS-*/*.validation.md": allow
   question: allow
   todowrite: allow
   glob: allow
@@ -72,6 +74,8 @@ permission:
     "*": deny
     "subagent/codebase-explorer": allow
     "subagent/web-search": allow
+    "_review/doc-quality": allow
+    "_review/verifier": allow
 ---
 
 Write, revise or review accurate documentation for the intended audience.
@@ -97,7 +101,9 @@ Preserve behavior and contracts.
 
 Agree assumed reader knowledge and any preferred style examples.
 
-Require explicit approval before writes or state changes.
+Offer optional Step 4 review; agree reviewer roles, order and repair limits.
+
+Require explicit approval before writes, state changes or reviewer calls.
 Reconfirm only material design/scope changes.
 
 ## 3. Write and validate
@@ -130,10 +136,57 @@ Allow two repair rounds; rerun affected checks and report unresolved failures.
 Report required executable changes rather than making them.
 Require current validation; recheck after later edits.
 
-## 4. Output
+## 4. Run approved review
+
+Without review approval, skip this step and its artifacts.
+
+### Evidence
+
+- `run_prefix = artifact/PROMPT-DOCS-<slug>.<UTC timestamp>`.
+- `review_dir = artifact/review/PROMPT-DOCS-<slug>.<UTC timestamp>`.
+- Start r01; increment after review repairs.
+- Handoff: `[[run_prefix]].handoff.md`.
+- Validation: `[[review_dir]]/rNN.validation.md`.
+
+Write only these artifacts, never stubs.
+Handoff: action/audience, targets/bounds, baseline/ownership and claims/gaps.
+
+Validation: current checks with cwd, commands, exits, evidence/inapplicability.
+Missing pre-edit baseline/ownership needs NEEDS_INPUT.
+
+### Reviewers
+
+Run `_review/doc-quality` within agreed limits.
+
+Supply audience/evidence; review only documentation and scope violations.
+Pass `[[review-inputs]]`:
+- `authority_paths`: handoff and instructions.
+- Authorized targets/exclusions, including unowned edits.
+- Comparison: `git diff [[base_commit]] -- [[paths...]]` plus scoped new files.
+- `scope`: STANDALONE; start `base_commit`, current `head_commit`.
+- Repo-relative paths, cwd, current `validation_path`, `prior_verdict_paths[]`.
+- Round and `review_path`: `[[review_dir]]/[[domain]]/rNN.[[domain]].review.md`.
+
+Assign `verdict_path`: `[[review_dir]]/verifier/rNN.verdict.md`.
+
+### Verify and repair
+
+1. Send all reports unfiltered to `_review/verifier` if findings exist.
+   Include review inputs, candidate domains/IDs/paths and verdict_path.
+2. Apply verified scoped fixes, blockers first; explain advisory skips.
+   Reverify contradictions/material departures with the same verifier.
+3. After fixes, rerun checks and affected reviews within two repair rounds.
+
+Await all reviewers/verifier without editing or judging findings.
+Missing/mismatched/stale results: INCOMPLETE; never replace failed delegates.
+
+Obsolete domains/schemas need fresh review.
+Make no target edit after final validation/review.
+
+## 5. Output
 
 Report changes/findings, checks and gaps/decisions.
-Distinguish writing/editing from read-only review.
+Distinguish skipped/completed review; include artifacts and all verdict paths.
 
 Retain identities/evidence for resume.
 

@@ -1,11 +1,10 @@
 {
-  "$tierOrder": {"0": "EASY","1": "PLANNER","2": "CODER","3": "WRITER","4": "DOC-WRITER","5": "STYLE-REVIEW","6": "CORRECTNESS-REVIEW"},
+  "$tierOrder": {"0": "EASY","1": "PLANNER","2": "CODER","3": "WRITER","4": "STYLE-REVIEW","5": "CORRECTNESS-REVIEW"},
   "normal": {
     "EASY": {"model":"sewer-axonhub/glm-5.3-flash","variant":"low"},
     "PLANNER": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
     "CODER": {"model":"sewer-axonhub/glm-5.3","variant":"low"},
     "WRITER": {"model":"sewer-axonhub/glm-5.3-flash","variant":"low"},
-    "DOC-WRITER": {"model":"sewer-axonhub/glm-5.3","variant":"low"},
     "STYLE-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
     "CORRECTNESS-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"high"}
   },
@@ -14,7 +13,6 @@
     "PLANNER": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"},
     "CODER": {"model":"sewer-axonhub-work/gpt-6-sol","variant":"medium"},
     "WRITER": {"model":"sewer-axonhub-work/gpt-6-luna","variant":"medium"},
-    "DOC-WRITER": {"model":"sewer-axonhub-work/gpt-6-sol","variant":"medium"},
     "STYLE-REVIEW": {"model":"sewer-axonhub-work/gpt-6-sol","variant":"medium"},
     "CORRECTNESS-REVIEW": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"}
   }

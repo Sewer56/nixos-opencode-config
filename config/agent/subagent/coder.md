@@ -59,7 +59,7 @@ Use read-only Git without external diff/textconv helpers.
 ## Execution
 
 Make scoped edits and inspect the actual diff against acceptance criteria.
-Defer documentation until after review; report required coverage to the caller.
+Write accurate docs alongside code, following the Documentation writing rules.
 
 Run assigned targeted checks before handoff.
 Allow two in-scope failure repair attempts; rerun checks after repairs.

@@ -76,7 +76,7 @@ permission:
     "subagent/codebase-explorer": allow
     "_review/correctness": allow
     "_review/code-quality": allow
-    "subagent/docs-editor": allow
+    "_review/doc-quality": allow
     "_review/code/optional/performance": allow
     "_review/verifier": allow
 ---
@@ -100,8 +100,7 @@ Before approval, do only bounded read-only discovery and discussion.
 
 Agree the design, scope, preserved behavior and checks with the user.
 
-Offer direct coding, optional `subagent/coder` assignments and Step 5 review.
-Include Step 6 documentation editing in implementation approval.
+Offer direct work, optional `subagent/coder` assignments and Step 5 review.
 Agree delegate roles, order and repair limits.
 
 Require explicit approval before writes, state changes or worker/reviewer calls.
@@ -112,7 +111,7 @@ Reconfirm only material design/scope/delegation changes.
 Capture HEAD, target contents and index ownership, including untracked files.
 Preserve pre-existing and unrelated work.
 
-Defer documentation to Step 6.
+Write accurate docs with code; keep them current through repairs.
 
 Worker `[[assignment]]`:
 - Outcome, checks, owned/protected paths and stops.
@@ -123,8 +122,6 @@ Accept worker diffs only after inspection/checks; escalate material ambiguity.
 After two coder repair calls per assignment, take over or report a blocker.
 
 ## 4. Validate and stage
-
-Run documentation-only checks in Step 7.
 
 1. Stage owned changes only, excluding `artifact/` and `artifacts/`.
 2. Run mutating tidy on owned files:
@@ -165,7 +162,6 @@ Honor reviewer limits; record routing reasons.
 Pass `[[review-inputs]]`:
 - `authority_paths`: handoff and instructions.
 - Authorized targets/exclusions, including unowned edits.
-- Deferred documentation coverage, excluded from code review/repairs.
 - Comparison: `git diff [[base_commit]] -- [[paths...]]` plus scoped new files.
 - `scope`: STANDALONE; start `base_commit`, current `head_commit`.
 - Repo-relative paths, cwd, current `validation_path`, `prior_verdict_paths[]`.
@@ -187,34 +183,29 @@ Never substitute for failed delegates.
 
 Obsolete domains/schemas need fresh review.
 
-Limit repairs to five turns, including editor internal repairs; otherwise FAIL.
+Limit repairs to five turns; otherwise FAIL.
 
-## 6. Edit documentation
+### Documentation review
 
-After the review loop completes or is skipped, call `subagent/docs-editor` once.
-Cover changed/required docs and comments; explain skips if none apply.
+After the code review loop completes, run `_review/doc-quality` as a separate
+group for changed/required docs, including source docs and comments.
 
-Group related files by reader and subject, using project context.
-Supply Step 3's `[[assignment]]` plus:
-- Cwd, base commit and owned diff, including new files.
-- Writable documentation regions and source/test references.
-- Reader, task, assumed knowledge, required sections and style examples or None.
-- Remaining repair budget.
+- Changed public behavior can require it even without doc edits.
+- Skip with evidence when no documentation applies.
+- Reuse this step's evidence and review-inputs.
+- Apply the same verify-and-repair flow and limits.
 
-Wait without writing or reviewing; inspect the diff against pre-call contents.
-Require DONE without factual gaps; never replace a failed editor.
+## 6. Final validation
 
-## 7. Final validation
-
-Repeat Step 4's staging/checks, including applicable doc builds and tests.
+Repeat Step 4 after review/fixes, including applicable doc builds and tests.
 Require tidy PASS or not-opted-in skip and current staged validation.
 
-Do not restart implementation, review or documentation editing.
-If checks fail or further changes are needed, report them and stop.
+Fix scoped failures and repeat affected checks/reviews within the repair limit.
+At handoff, require staged owned changes to match validation/approved review.
 
-## 8. Output
+## 7. Output
 
-Report changes, editing results/skips, checks, review outcomes and gaps.
+Report changes, checks, review outcomes and gaps/decisions.
 Retain identities/evidence and all verdict paths for resume/handoff.
 
 # Rules
