@@ -2,7 +2,7 @@
 mode: primary
 description: Migrates production upstream
 model: sewer-axonhub/glm-5.3 # PLANNER
-variant: high
+variant: max
 
 permission:
   "*": deny

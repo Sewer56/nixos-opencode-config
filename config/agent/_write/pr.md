@@ -2,7 +2,7 @@
 mode: all
 description: Drafts PRs; creates on request
 model: sewer-axonhub/glm-5.3-flash # WRITER
-variant: low
+variant: max
 permission:
   "*": deny
   external_directory:

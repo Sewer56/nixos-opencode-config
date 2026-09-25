@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews prose
 model: sewer-axonhub/glm-5.3-flash # WRITER
-variant: low
+variant: max
 permission:
   "*": deny
   external_directory:

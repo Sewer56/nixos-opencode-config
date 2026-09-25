@@ -2,7 +2,7 @@
 mode: all
 description: General-purpose coding agent
 model: sewer-axonhub/glm-5.3 # PLANNER
-variant: high
+variant: max
 permission:
   "*": deny
   external_directory:
