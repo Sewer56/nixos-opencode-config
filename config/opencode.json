@@ -3,10 +3,11 @@
   "autoupdate": false,
   "subagent_depth": 4,
   "plugin": [
-    "./plugins/opencode-models-discovery/src/index",
-    "./plugins/caveman/src/index",
-    "./plugins/opencode-plugin-md-expand/src/index",
-    "opencode-axonhub-tracing"
+    "./plugins/opencode-models-discovery",
+    "./plugins/caveman",
+    "./plugins/path-guard",
+    "./plugins/opencode-plugin-md-expand",
+    "./plugins/prompt-builder"
   ],
   "small_model": "sewer-axonhub/deepseek-v4.1-flash",
   "permission": {
