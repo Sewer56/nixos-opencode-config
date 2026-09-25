@@ -120,17 +120,9 @@
       system = pkgs.stdenv.hostPlatform.system;
 
       opencodeRepo = "${config.home.homeDirectory}/nixos/users/sewer/home-manager/programs/opencode";
-      opencodeSource = "${opencodeRepo}/opencode-source";
-      opencodeBin = "${opencodeSource}/packages/opencode/dist/opencode-linux-x64/bin/opencode";
-
-      # Defaults to CWD, forwards args, enables Exa search.
-      opencodeScript = pkgs.writeShellScriptBin "opencode" ''
-        export OPENCODE_ENABLE_EXA=1
-        if [ "$#" -eq 0 ]; then
-          exec ${opencodeBin} .
-        else
-          exec ${opencodeBin} "$@"
-        fi
+      opencodeCommand = pkgs.runCommand "opencode" {} ''
+        mkdir -p $out/bin
+        ln -s ${llm-agents.packages.${system}.opencode2}/bin/opencode2 $out/bin/opencode
       '';
 
       # Local plugins import node_modules at runtime; missing deps fail
@@ -165,19 +157,6 @@
         exit $failed
       '';
 
-      # Rebuild opencode-source (bun build); separate command for iteration.
-      opencodeBuildScript = pkgs.writeShellScriptBin "opencode-build" ''
-        set -euo pipefail
-        # Plugin deps failing (e.g. offline) must not block the binary build.
-        ${pluginDepsScript}/bin/opencode-plugin-deps || \
-          echo "warning: plugin deps install failed; run opencode-plugin-deps manually"
-        pushd ${opencodeSource}/packages/opencode > /dev/null
-        bun install
-        bun run build --single
-        popd > /dev/null
-        chmod -R +x ${opencodeSource}/packages/opencode/dist/opencode-linux-x64/bin
-      '';
-
       # ── Cargo wrappers for tools/ members ────────────────────────────────
       # Editing tools/*.rs costs zero Nix rebuild. rust-llm-tidy is not
       # wrapped: it would inherit the caller's rustup toolchain and
@@ -198,8 +177,7 @@
         '';
     in {
       home.packages = [
-        opencodeScript
-        opencodeBuildScript
+        opencodeCommand
         pluginDepsScript
 
         (mkCargoTool {name = "opencode-model-switcher";})
@@ -211,9 +189,6 @@
         self.packages.${system}.rust-llm-tidy
 
         llm-agents.packages.${system}.coderabbit-cli
-
-        # OpenCode 2 alongside the V1 fork build during migration.
-        llm-agents.packages.${system}.opencode2
 
         # Runtime deps for MCP servers / local hacking.
         pkgs.nodejs
@@ -246,8 +221,7 @@
     packages = eachSystem (system: pkgs:
       (mkTools pkgs rust-llm-tidy)
       // {
-        # OpenCode 2 from the locked llm-agents input; the home-manager
-        # module also installs it on PATH next to the V1 fork build.
+        # OpenCode 2 from the locked llm-agents input.
         opencode2 = llm-agents.packages.${system}.opencode2;
       });
 
@@ -295,7 +269,7 @@
       opencode2 = {
         type = "app";
         program = "${llm-agents.packages.${system}.opencode2}/bin/opencode2";
-        meta.description = "OpenCode 2 (V2) alongside the V1 fork build";
+        meta.description = "OpenCode 2";
       };
 
       default = opencode-model-switcher;

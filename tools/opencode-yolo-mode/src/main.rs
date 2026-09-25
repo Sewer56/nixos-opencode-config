@@ -1,3 +1,5 @@
+//! Toggle the default external-path decision in agent files and V2 config.
+
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand};
 use ignore::WalkBuilder;
@@ -171,11 +173,18 @@ fn flip_line(text: &str, line_idx: usize, to: &str, path: &Path) -> Option<Strin
     let indent = &line[..line.len() - line.trim_start().len()];
     let trimmed = line.trim();
     let new_trimmed = if path.extension().is_some_and(|ext| ext == "json") {
-        // `"*": "ask",`
-        let (key, value) = trimmed.split_once("\":")?;
-        let v = value.trim();
-        let closing = v[1..].find('"')? + 1;
-        format!("{key}\": \"{to}\"{}", &v[closing + 1..])
+        if trimmed.contains("\"action\": \"external_directory\"") {
+            let from = if to == "allow" { "ask" } else { "allow" };
+            let effect = format!("\"effect\": \"{from}\"");
+            if !trimmed.contains(&effect) {
+                return None;
+            }
+            return Some(format!(
+                "{indent}{}",
+                trimmed.replacen(&effect, &format!("\"effect\": \"{to}\""), 1)
+            ));
+        }
+        return None;
     } else {
         // `"*": ask`
         let (key, value) = trimmed.split_once(':')?;
@@ -239,17 +248,15 @@ fn star_at(lines: &[&str], i: usize, path: &Path) -> Option<(usize, String)> {
     let is_json = path.extension().is_some_and(|ext| ext == "json");
 
     if is_json {
-        if !trimmed.starts_with("\"external_directory\": {") {
-            return None;
-        }
-        let mut depth = brace_delta(lines[i]);
-        let mut j = i + 1;
-        while j < lines.len() && depth > 0 {
-            if let Some(decision) = json_star_decision(lines[j].trim()) {
-                return Some((j, decision));
-            }
-            depth += brace_delta(lines[j]);
-            j += 1;
+        if trimmed.contains("\"action\": \"external_directory\"")
+            && trimmed.contains("\"resource\": \"*\"")
+        {
+            return trimmed
+                .split("\"effect\": \"")
+                .nth(1)
+                .and_then(|value| value.split('"').next())
+                .and_then(is_decision)
+                .map(|decision| (i, decision));
         }
         return None;
     }
@@ -276,20 +283,8 @@ fn star_at(lines: &[&str], i: usize, path: &Path) -> Option<(usize, String)> {
     None
 }
 
-fn brace_delta(line: &str) -> i32 {
-    line.matches('{').count() as i32 - line.matches('}').count() as i32
-}
-
 fn indent_of(line: &str) -> usize {
     line.len() - line.trim_start().len()
-}
-
-fn json_star_decision(trimmed: &str) -> Option<String> {
-    let (key, value) = trimmed.split_once("\":")?;
-    if key.trim() != "\"*" {
-        return None;
-    }
-    is_decision(value.trim().trim_matches(['"', ',']))
 }
 
 fn yaml_star_decision(trimmed: &str) -> Option<String> {

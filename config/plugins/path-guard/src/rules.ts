@@ -96,8 +96,9 @@ function matcher(pattern: string): RegExp {
 /**
  * Decide one external target from the external_directory rule map.
  *
- * Any matching deny rule denies. Otherwise any allow rule allows. Ask and
- * unmatched targets fail closed because the guard cannot raise prompts.
+ * Deny wins over every matching rule. Otherwise the last matching rule wins,
+ * so an explicit ask can protect a file inside a broadly allowed directory.
+ * Ask and unmatched targets fail closed because the guard cannot prompt.
  */
 export function decideExternal(target: string, rules: ExternalRules): Decision {
   const matches: Array<[string, RuleEffect]> = []
@@ -110,7 +111,7 @@ export function decideExternal(target: string, rules: ExternalRules): Decision {
     const pattern = matches.find(([, effect]) => effect === "deny")![0]
     return { effect: "deny", reason: `canonical target ${target} matches deny rule ${pattern}` }
   }
-  if (matches.some(([, effect]) => effect === "allow")) return { effect: "allow" }
+  if (matches.at(-1)?.[1] === "allow") return { effect: "allow" }
   return {
     effect: "deny",
     reason: `canonical target ${target} is outside the worktree with no allow rule (ask/unmatched fail closed)`,
@@ -119,14 +120,21 @@ export function decideExternal(target: string, rules: ExternalRules): Decision {
 
 let cache: { file: string; mtimeMs: number; rules: ExternalRules } | null = null
 
-/** Load `permission.external_directory` from the shared opencode.json. */
+/** Load external path rules from the ordered permissions array. */
 export async function loadExternalDirectoryRules(configFile: string): Promise<ExternalRules> {
   const mtimeMs = (await stat(configFile)).mtimeMs
   if (cache && cache.file === configFile && cache.mtimeMs === mtimeMs) return cache.rules
 
   const parsed = JSON.parse(stripJsonc(await readFile(configFile, "utf8")))
-  const raw = parsed?.permission?.external_directory
-  const rules: ExternalRules = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {}
+  const rules: ExternalRules = {}
+  if (Array.isArray(parsed?.permissions)) {
+    for (const rule of parsed.permissions) {
+      if (rule?.action !== "external_directory" || typeof rule.resource !== "string") continue
+      if (rule.effect === "allow" || rule.effect === "ask" || rule.effect === "deny") {
+        rules[rule.resource] = rule.effect
+      }
+    }
+  }
 
   cache = { file: configFile, mtimeMs, rules }
   return rules

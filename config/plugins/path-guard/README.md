@@ -19,9 +19,10 @@ deny. This plugin resolves the real target first, then decides.
    nowhere is not: it fails closed.
 3. Target inside the project: allowed. OpenCode's own rules already cover it.
 4. Target outside the project: must match an `allow` glob from
-   `permission.external_directory` in the shared `opencode.json`.
-   `deny` always wins; `ask` and unmatched paths fail closed because the
-   plugin cannot show a prompt.
+   an `external_directory` entry in the shared `opencode.json` permissions.
+   `deny` always wins. Otherwise the last matching rule wins, so a specific
+   `ask` protects a file inside a broadly allowed directory. `ask` and
+   unmatched paths fail closed because the plugin cannot show a prompt.
 
 ## Examples
 
@@ -29,11 +30,11 @@ Setup used below: a git repo in `/tmp/demo`, and this rule in
 `opencode.json`:
 
 ```json
-"external_directory": {
-  "*": "ask",
-  "/tmp/**": "allow",
-  "/home/sewer/projects/nixos-secrets/**": "deny"
-}
+"permissions": [
+  { "action": "external_directory", "resource": "*", "effect": "ask" },
+  { "action": "external_directory", "resource": "/tmp/**", "effect": "allow" },
+  { "action": "external_directory", "resource": "/home/sewer/projects/nixos-secrets/**", "effect": "deny" }
+]
 ```
 
 **Dangling link: refused.** The link points at a file that does not exist.

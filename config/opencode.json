@@ -1,8 +1,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "autoupdate": false,
-  "subagent_depth": 4,
-  "plugin": [
+  "update": "disable",
+  "plugins": [
     "./plugins/opencode-models-discovery",
     "./plugins/caveman",
     "./plugins/path-guard",
@@ -10,58 +9,50 @@
     "./plugins/prompt-builder"
   ],
   "small_model": "sewer-axonhub/deepseek-v4.1-flash",
-  "tools": {
-    "browser": false,
-    "opencode_*": false,
-    "execute": false,
-    "models_discovery_*": false
-  },
-  "permission": {
-    "bash": {
-      "*": "allow"
-    },
-    "task": {},
-    "webfetch": "allow",
-    "doom_loop": "deny",
-    "github_*": "deny",
-    "context7_*": "deny",
-    "deepwiki_*": "deny",
-    "external_directory": {
-      "*": "ask",
-      "/tmp/**": "allow",
-      "/proc/**": "allow",
-      "/sys/**": "allow",
-      "/etc/**": "allow",
-      "/nix/store/**": "allow",
-      "/var/log/**": "allow",
-      "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**": "allow",
-      "/home/sewer/opencode/**": "allow",
-      "/home/sewer/Downloads/**": "allow",
-      "/home/sewer/Documents/**": "allow",
-      "/home/sewer/Temp/**": "allow",
-      "/home/sewer/Work/**": "allow",
-      "/home/sewer/Obsidian Vault/**": "allow",
-      "/var/tmp/**": "allow",
-      "/home/sewer/.cargo/**": "allow",
-      "/home/sewer/.rustup/**": "allow",
-      "/home/sewer/go/**": "allow",
-      "/home/sewer/.bun/**": "allow",
-      "/home/sewer/.nuget/**": "allow",
-      "/home/sewer/.dotnet/**": "allow",
-      "/home/sewer/.npm/**": "allow",
-      "/home/sewer/.pnpm-store/**": "allow",
-      "/home/sewer/.yarn/**": "allow",
-      "/home/sewer/.cache/**": "allow",
-      "/home/sewer/.config/**": "allow",
-      "/home/sewer/.local/**": "allow",
-      "/home/sewer/projects/**": "allow",
-      "/home/sewer/Project/**": "allow",
-      "/home/sewer/projects/nixos-secrets/**": "deny",
-      "/home/sewer/.config/gh/hosts.yml": "ask",
-      "/home/sewer/.config/yara-report-app/credentials.json": "ask",
-      "/home/sewer/.local/share/opencode/*.json": "ask"
-    }
-  },
+  "permissions": [
+    { "action": "shell", "resource": "*", "effect": "allow" },
+    { "action": "webfetch", "resource": "*", "effect": "allow" },
+    { "action": "browser", "resource": "*", "effect": "deny" },
+    { "action": "opencode_*", "resource": "*", "effect": "deny" },
+    { "action": "execute", "resource": "*", "effect": "deny" },
+    { "action": "models_discovery_*", "resource": "*", "effect": "deny" },
+    { "action": "github_*", "resource": "*", "effect": "deny" },
+    { "action": "context7_*", "resource": "*", "effect": "deny" },
+    { "action": "deepwiki_*", "resource": "*", "effect": "deny" },
+    { "action": "external_directory", "resource": "*", "effect": "ask" },
+    { "action": "external_directory", "resource": "/tmp/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/proc/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/sys/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/etc/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/nix/store/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/var/log/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/opencode/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/Downloads/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/Documents/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/Temp/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/Work/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/Obsidian Vault/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/var/tmp/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/.cargo/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/.rustup/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/go/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/.bun/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/.nuget/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/.dotnet/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/.npm/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/.pnpm-store/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/.yarn/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/.cache/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/.config/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/.local/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/projects/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/Project/**", "effect": "allow" },
+    { "action": "external_directory", "resource": "/home/sewer/projects/nixos-secrets/**", "effect": "deny" },
+    { "action": "external_directory", "resource": "/home/sewer/.config/gh/hosts.yml", "effect": "ask" },
+    { "action": "external_directory", "resource": "/home/sewer/.config/yara-report-app/credentials.json", "effect": "ask" },
+    { "action": "external_directory", "resource": "/home/sewer/.local/share/opencode/*.json", "effect": "ask" }
+  ],
   "agent": {
     "plan": {
       "permission": {
@@ -154,7 +145,6 @@
       "models": {
         "glm-5.3": {
           "name": "GLM 5.3",
-          "reasoning": true,
           "variants": {
             "low": {
               "reasoningEffort": "low"
@@ -169,7 +159,6 @@
         },
         "glm-5.3-flash": {
           "name": "GLM 5.3 Flash",
-          "reasoning": true,
           "variants": {
             "low": {
               "reasoningEffort": "low"
@@ -184,7 +173,6 @@
         },
         "glm-5.2": {
           "name": "GLM 5.2",
-          "reasoning": true,
           "variants": {
             "high": {
               "reasoningEffort": "high"
@@ -196,7 +184,6 @@
         },
         "deepseek-v4.1-flash": {
           "name": "DeepSeek V4.1 Flash",
-          "reasoning": true,
           "variants": {
             "low": {
               "reasoningEffort": "low"
@@ -211,7 +198,6 @@
         },
         "gpt-6-astra": {
           "name": "GPT 6 Astra",
-          "reasoning": true,
           "variants": {
             "low": {
               "reasoningEffort": "low"
@@ -232,7 +218,6 @@
         },
         "gpt-6-sol": {
           "name": "GPT 6 Sol",
-          "reasoning": true,
           "variants": {
             "none": {
               "reasoningEffort": "none"
@@ -256,7 +241,6 @@
         },
         "gpt-6-luna": {
           "name": "GPT 6 Luna",
-          "reasoning": true,
           "variants": {
             "none": {
               "reasoningEffort": "none"
@@ -294,7 +278,6 @@
       "models": {
         "gpt-6-astra": {
           "name": "GPT 6 Astra",
-          "reasoning": true,
           "variants": {
             "low": {
               "reasoningEffort": "low"
@@ -315,7 +298,6 @@
         },
         "gpt-6-sol": {
           "name": "GPT 6 Sol",
-          "reasoning": true,
           "variants": {
             "none": {
               "reasoningEffort": "none"
@@ -365,9 +347,7 @@
     }
   },
   "experimental": {
-    // V2 reads subagent depth here; the top-level key keeps serving V1.
-    "subagent_depth": 4,
-    "disable_paste_summary": true
+    "subagent_depth": 4
   },
   "tool_output": {
     "max_lines": 1000,
@@ -375,9 +355,7 @@
   },
   "compaction": {
     "auto": true,
-    /* Remove contents of old tool calls. */
-    "prune": false,
-    "reserved": 12000
+    "buffer": 12000
   },
   // Ignore certain locations in file watcher in OpenCode.
   "watcher": {

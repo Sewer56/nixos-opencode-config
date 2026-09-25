@@ -30,9 +30,9 @@ class EntryPointTests(unittest.TestCase):
         (self.repo / "config/agent").mkdir(parents=True)
         (self.repo / "config/command").mkdir()
         self.config = {
-            "subagent_depth": 2,
+            "experimental": {"subagent_depth": 2},
             "tool_output": {"max_lines": 10, "max_bytes": 100},
-            "permission": {"external_directory": "ask"},
+            "permissions": [{"action": "external_directory", "resource": "*", "effect": "ask"}],
             "agent": {
                 name: {"permission": {"external_directory": "allow"}}
                 for name in ("build", "plan")
@@ -88,7 +88,7 @@ class EntryPointTests(unittest.TestCase):
     def test_primary_reaches_hidden_reviewer(self):
         self.agent("Docs", targets=("_docs/reviewer",))
         self.agent("_docs/reviewer", "subagent", hidden=True)
-        self.config["subagent_depth"] = 3
+        self.config["experimental"]["subagent_depth"] = 3
         self.validate(0)
 
     def test_unreferenced_subagent_is_still_rejected(self):
@@ -121,7 +121,7 @@ class EntryPointTests(unittest.TestCase):
         self.agent("Docs", targets=("missing",))
         self.validate(1, "allows missing task target missing")
         self.agent("missing", "subagent", disable=True)
-        self.config["subagent_depth"] = 3
+        self.config["experimental"]["subagent_depth"] = 3
         self.validate(1, "routes to disabled agent missing")
 
     def test_primary_root_cycles_are_rejected(self):
@@ -134,13 +134,13 @@ class EntryPointTests(unittest.TestCase):
         self.agent("b", "subagent", targets=("c",))
         self.agent("c", "subagent", targets=("d",))
         self.agent("d", "subagent")
-        self.config["subagent_depth"] = 6
+        self.config["experimental"]["subagent_depth"] = 6
         self.validate(1, "custom task depth 4 exceeds policy maximum 3")
 
     def test_depth_configuration_still_matches_graph(self):
         self.agent("Docs", targets=("reviewer",))
         self.agent("reviewer", "subagent")
-        self.validate(1, "config.subagent_depth must be 3, got 2")
+        self.validate(1, "config.experimental.subagent_depth must be 3, got 2")
 
     def rule(self, name, text="Review scoped evidence.\n"):
         path = self.repo / "config/rules" / name
@@ -155,7 +155,7 @@ class EntryPointTests(unittest.TestCase):
     def test_nested_verifier_ids_and_transitive_rules_are_reachable(self):
         targets = ("_review/verifier", "_plan/draft/verifier")
         self.agent("Code", targets=targets)
-        self.config["subagent_depth"] = 3
+        self.config["experimental"]["subagent_depth"] = 3
         for agent in targets:
             self.agent(agent, "subagent")
             self.import_rule(agent, "review/verifiers.md")
@@ -211,7 +211,7 @@ class EntryPointTests(unittest.TestCase):
     def test_transitive_local_fragments_are_not_agents(self):
         self.agent("Code", targets=("_review/verifier",))
         self.agent("_review/verifier", "subagent")
-        self.config["subagent_depth"] = 3
+        self.config["experimental"]["subagent_depth"] = 3
         self.import_fragment("_review/verifier", "_review/shared/verification.txt")
         self.fragment("_review/shared/verification.txt",
                       '{{ file="./agent/_review/shared/findings.txt" }}\n')

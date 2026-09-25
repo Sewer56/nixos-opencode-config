@@ -18,7 +18,7 @@ Agent frontmatter and permissions:
 Commands and task graph:
 - Validate command targets, entry points, routes, reachability, cycles, disabled
   agents, and maximum custom task depth of three edges.
-- Require config.subagent_depth to equal maximum custom task depth + 2.
+- Require config.experimental.subagent_depth to equal maximum custom task depth + 2.
   A mismatch is an error, never a configuration write.
 
 Prompt structure and imports:
@@ -417,9 +417,11 @@ def main() -> int:
     )
 
     required_subagent_depth = max_depth + 2
-    if config.get("subagent_depth") != required_subagent_depth:
-        errors.append(f"config.subagent_depth must be {required_subagent_depth}, got {config.get('subagent_depth')!r}")
-    details.append(f"config.subagent_depth: {required_subagent_depth}")
+    experimental = config.get("experimental")
+    depth = experimental.get("subagent_depth") if isinstance(experimental, dict) else None
+    if depth != required_subagent_depth:
+        errors.append(f"config.experimental.subagent_depth must be {required_subagent_depth}, got {depth!r}")
+    details.append(f"config.experimental.subagent_depth: {required_subagent_depth}")
 
     all_prompt_files = [
         path for path in active_prompt_files(repo)
@@ -501,24 +503,24 @@ def main() -> int:
             errors.append("config.tool_output.max_lines must be a positive integer")
         if not isinstance(tool_output.get("max_bytes"), int) or tool_output["max_bytes"] <= 0:
             errors.append("config.tool_output.max_bytes must be a positive integer")
-    # Compaction pruning is optional by policy; prune:false preserves old
-    # tool-call contents in context, so it is not mandated here.
-    permission = config.get("permission")
-    external = permission.get("external_directory") if isinstance(permission, dict) else None
-    if not isinstance(permission, dict) or (
-        not isinstance(external, dict) and str(external).lower() not in {"ask", "allow"}
-    ):
-        errors.append("config.permission.external_directory must be ask, allow, or a pattern mapping")
+    permissions = config.get("permissions")
+    if not isinstance(permissions, list):
+        errors.append("config.permissions must be an ordered array")
+        permissions = []
+    external = {}
+    for index, rule in enumerate(permissions):
+        if not isinstance(rule, dict) or not all(
+            isinstance(rule.get(key), str) for key in ("action", "resource", "effect")
+        ):
+            errors.append(f"config.permissions[{index}] needs string action, resource and effect")
+            continue
+        if rule["effect"] not in VALID_PERMISSION_DECISIONS:
+            errors.append(f"config.permissions[{index}] has invalid effect {rule['effect']!r}")
+        if rule["action"] == "external_directory":
+            external[rule["resource"]] = rule["effect"]
+    if external.get("*") not in {"ask", "allow"}:
+        errors.append("config.permissions external_directory must default to ask or allow")
     validate_config_path_pairing("config", external, errors)
-    if isinstance(permission, dict):
-        for tool, rules in permission.items():
-            if not isinstance(rules, dict):
-                continue
-            for pattern, decision in rules.items():
-                if str(decision).lower() not in VALID_PERMISSION_DECISIONS:
-                    errors.append(
-                        f"config.permission {tool!r} pattern {pattern!r} has invalid decision {decision!r}"
-                    )
 
     # Default modes (build, plan) run user-driven, so they inherit a global
     # allow policy instead of the ask-everywhere default for subagents.

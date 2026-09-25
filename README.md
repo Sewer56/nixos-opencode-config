@@ -88,7 +88,6 @@ Old reviewer domains or input schemas require fresh review on resume.
 - `/write/issue`: write a repository-grounded issue.
 - `/write/pr`: generate grounded `pr.md` from the branch diff.
 - `/iterate/edit`: discuss and edit or verify instruction artifacts.
-- `/migrate`: run the separate pinned-source migration workflow.
 
 ## Installation
 
@@ -102,7 +101,6 @@ git submodule update --init --recursive
 - It supplies OpenCode, local tools, CodeRabbit CLI, and validation tooling.
 
 ```bash
-opencode-build
 opencode /path/to/project
 ```
 

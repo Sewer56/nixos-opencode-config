@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, symlink, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
 import { canonicalPath, GuardDeny } from "../src/canonical"
-import { decideExternal, globToRegExp, stripJsonc } from "../src/rules"
+import { decideExternal, globToRegExp, loadExternalDirectoryRules, stripJsonc } from "../src/rules"
 import { extractTargets } from "../src/guard"
 
 async function fixture(): Promise<string> {
@@ -164,6 +164,17 @@ describe("decideExternal", () => {
     expect(decision.effect).toBe("deny")
   })
 
+  test("decideExternal_should_fail_closed_when_specific_ask_overrides_allow", () => {
+    // Arrange
+    const rules = { "*": "ask", "/home/sewer/.config/**": "allow", "/home/sewer/.config/gh/hosts.yml": "ask" }
+
+    // Act
+    const decision = decideExternal("/home/sewer/.config/gh/hosts.yml", rules)
+
+    // Assert
+    expect(decision.effect).toBe("deny")
+  })
+
   test("decideExternal_should_fail_closed_when_no_rule_matches", () => {
     // Arrange
     const rules = { "/tmp/**": "allow" }
@@ -174,6 +185,27 @@ describe("decideExternal", () => {
     // Assert
     expect(decision.effect).toBe("deny")
   })
+})
+
+describe("loadExternalDirectoryRules", () => {
+  test("loadExternalDirectoryRules_should_read_ordered_rules", async () => {
+    // Arrange
+    const file = path.join(await fixture(), "opencode.json")
+    await writeFile(file, JSON.stringify({
+      permissions: [
+        { action: "external_directory", resource: "*", effect: "ask" },
+        { action: "external_directory", resource: "/tmp/**", effect: "allow" },
+        { action: "external_directory", resource: "/tmp/**", effect: "deny" },
+      ],
+    }))
+
+    // Act
+    const rules = await loadExternalDirectoryRules(file)
+
+    // Assert
+    expect(rules).toEqual({ "*": "ask", "/tmp/**": "deny" })
+  })
+
 })
 
 describe("extractTargets", () => {
