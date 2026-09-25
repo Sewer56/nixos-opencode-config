@@ -20,6 +20,8 @@ Commands and task graph:
   agents, and maximum custom task depth of three edges.
 - Require config.experimental.subagent_depth to equal maximum custom task depth + 2.
   A mismatch is an error, never a configuration write.
+- Require every parent that allows hidden agents to name each target ID and
+  a ``subagent(agent=...)`` call form in its own prompt.
 
 Prompt structure and imports:
 - Exempt the _iterate/edit agent body from prompt checks.
@@ -61,6 +63,7 @@ CONFIG_PATH_FORMS = (
 BUILTIN_AGENT_ALLOW_EXTERNAL = ("build", "plan")
 MAX_CUSTOM_TASK_DEPTH = 3
 PROMPT_CHECK_EXCLUSIONS = {Path(".opencode/agent/_iterate/edit.md")}
+HIDDEN_CALL_MARKER = "subagent(agent="
 
 
 def load_frontmatter(path: Path) -> dict[str, Any]:
@@ -112,6 +115,34 @@ def task_targets(frontmatter: dict[str, Any]) -> set[str]:
         for name, decision in task.items()
         if name != "*" and str(decision).lower() == "allow"
     }
+
+
+def agent_body(path: Path) -> str:
+    """Return an agent's prompt body: the text after its frontmatter."""
+    text = path.read_text(encoding="utf-8")
+    if not text.startswith("---\n"):
+        return text
+    end = text.find("\n---\n", 4)
+    return "" if end < 0 else text[end + len("\n---\n"):]
+
+
+def validate_hidden_disclosure(
+    ident: str, body: str, hidden_targets: set[str], errors: list[str]
+) -> None:
+    """Hidden task targets must be named and callable in the parent prompt."""
+    if not hidden_targets:
+        return
+    if HIDDEN_CALL_MARKER not in re.sub(r"\s+", " ", body):
+        errors.append(
+            f"agent {ident} allows hidden subagents but never says "
+            f"{HIDDEN_CALL_MARKER!r}; add the call form at each call site"
+        )
+    for target in sorted(hidden_targets):
+        if target not in body:
+            errors.append(
+                f"agent {ident} allows hidden subagent {target} but never names it"
+                "; add the ID at its call site"
+            )
 
 
 def active_json_files(repo: Path) -> list[Path]:
@@ -372,12 +403,31 @@ def main() -> int:
         for child in children & disabled_agents:
             errors.append(f"agent {ident} routes to disabled agent {child}")
 
+    # Hidden agents are filtered from the subagent tool's advertised list, so a
+    # parent must carry the explicit call form and the target IDs in its prompt.
+    hidden_agents = {
+        ident for ident, fm in agent_frontmatter.items() if fm.get("hidden") is True
+    }
+    for ident, path in agent_files.items():
+        validate_hidden_disclosure(
+            ident,
+            agent_body(path),
+            task_targets(agent_frontmatter[ident]) & hidden_agents,
+            errors,
+        )
+
     # Built-in agent task permissions are additional entry points into custom subagents.
     for builtin_cfg in (config.get("agent") or {}).values() if isinstance(config.get("agent"), dict) else []:
         if not isinstance(builtin_cfg, dict):
             continue
         for target in task_targets(builtin_cfg):
             if target in agent_files:
+                if target in hidden_agents:
+                    errors.append(
+                        f"built-in agent config allows hidden task target {target};"
+                        " built-in prompts cannot carry the call form,"
+                        " so unhide the agent or drop the grant"
+                    )
                 command_roots.add(target)
             elif target not in BUILTIN_AGENTS:
                 errors.append(f"built-in agent config allows missing task target {target}")

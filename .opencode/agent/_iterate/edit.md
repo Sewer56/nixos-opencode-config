@@ -128,7 +128,8 @@ bash scripts/check-workflows.sh
 ## 6. Optional end review
 
 1. Get explicit user approval for each end-of-edit regression review.
-2. Give `_iterate/review` agreed scope, intent and preserved behavior.
+2. Call `subagent(agent=_iterate/review)`, giving it agreed scope, intent
+   and preserved behavior.
 3. Include base commit, staged paths, pre-existing target changes and checks.
 4. Present findings and uncertainty for the user's decision.
 5. Make only approved follow-up edits, then rerun checks and restage.

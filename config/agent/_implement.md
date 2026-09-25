@@ -92,7 +92,9 @@ Execute one approved READY_FOR_IMPLEMENT bundle with final CodeRabbit review.
 
 ## 2. Process cohorts
 
-- Call `_implement/cohort` for each unfinished cohort in dependency order.
+Call `subagent(agent=_implement/cohort)` for each unfinished cohort in
+dependency order.
+
 - Supply plan_path/execution_path, assigned brief_path/exec_path and task ID.
 - Include run_prefix/run_id/artifact_base; resume context or None.
 - Resume includes cohort start, ownership, turns and evidence.

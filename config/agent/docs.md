@@ -156,7 +156,7 @@ Missing pre-edit baseline/ownership needs NEEDS_INPUT.
 
 ### Reviewers
 
-Run `_review/doc-quality` within agreed limits.
+Call `subagent(agent=_review/doc-quality)` within agreed limits.
 
 Supply audience/evidence; review only documentation and scope violations.
 Pass `[[review-inputs]]`:
