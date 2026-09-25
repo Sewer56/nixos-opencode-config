@@ -24,5 +24,9 @@
     "indicators": "status",
     "scope": "cwd",
     "mode": "auto"
+  },
+  "terminal": {
+    "title": true,
+    "copy": "select"
   }
 }
