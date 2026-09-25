@@ -10,6 +10,12 @@
     "./plugins/prompt-builder"
   ],
   "small_model": "sewer-axonhub/deepseek-v4.1-flash",
+  "tools": {
+    "browser": false,
+    "opencode_*": false,
+    "execute": false,
+    "models_discovery_*": false
+  },
   "permission": {
     "bash": {
       "*": "allow"
