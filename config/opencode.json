@@ -365,6 +365,8 @@
     }
   },
   "experimental": {
+    // V2 reads subagent depth here; the top-level key keeps serving V1.
+    "subagent_depth": 4,
     "disable_paste_summary": true
   },
   "tool_output": {
