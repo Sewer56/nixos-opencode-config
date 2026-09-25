@@ -95,11 +95,6 @@
         description = "Browse and export OpenCode conversations from local SQLite";
       };
 
-      chunk-files-by-tokens = mkTool {
-        pname = "chunk-files-by-tokens";
-        description = "Chunk files by estimated token count";
-      };
-
       token-count-after-expand = mkTool {
         pname = "token-count-after-expand";
         description = "Estimate prompt token counts after md-expand rendering";
@@ -209,7 +204,6 @@
 
         (mkCargoTool {name = "opencode-model-switcher";})
         (mkCargoTool {name = "opencode-sessions";})
-        (mkCargoTool {name = "chunk-files-by-tokens";})
         (mkCargoTool {name = "token-count-after-expand";})
         (mkCargoTool {name = "opencode-yolo-mode";})
 
@@ -261,7 +255,6 @@
     checks = eachSystem (system: _pkgs: {
       opencode-model-switcher = self.packages.${system}.opencode-model-switcher;
       opencode-sessions = self.packages.${system}.opencode-sessions;
-      chunk-files-by-tokens = self.packages.${system}.chunk-files-by-tokens;
       token-count-after-expand = self.packages.${system}.token-count-after-expand;
       opencode-yolo-mode = self.packages.${system}.opencode-yolo-mode;
       rust-llm-tidy = self.packages.${system}.rust-llm-tidy;
@@ -279,12 +272,6 @@
         type = "app";
         program = "${self.packages.${system}.opencode-sessions}/bin/opencode-sessions";
         meta.description = "Browse and export OpenCode sessions";
-      };
-
-      chunk-files-by-tokens = {
-        type = "app";
-        program = "${self.packages.${system}.chunk-files-by-tokens}/bin/chunk-files-by-tokens";
-        meta.description = "Chunk files by estimated token count";
       };
 
       token-count-after-expand = {
@@ -338,7 +325,6 @@
           # Built CLI tools.
           tools.opencode-model-switcher
           tools.opencode-sessions
-          tools.chunk-files-by-tokens
           tools.token-count-after-expand
           tools.opencode-yolo-mode
           tools.rust-llm-tidy

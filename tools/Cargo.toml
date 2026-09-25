@@ -2,7 +2,6 @@
 members = [
   "opencode-sessions",
   "model-switcher",
-  "chunk-files-by-tokens",
   "token-count-after-expand",
   "opencode-yolo-mode",
 ]
