@@ -218,6 +218,9 @@
 
         llm-agents.packages.${system}.coderabbit-cli
 
+        # OpenCode 2 alongside the V1 fork build during migration.
+        llm-agents.packages.${system}.opencode2
+
         # Runtime deps for MCP servers / local hacking.
         pkgs.nodejs
         pkgs.yarn
@@ -246,7 +249,13 @@
     # ── Flake outputs ─────────────────────────────────────────────────────
 
     # nix build .#opencode-model-switcher   etc.
-    packages = eachSystem (_system: pkgs: mkTools pkgs rust-llm-tidy);
+    packages = eachSystem (system: pkgs:
+      (mkTools pkgs rust-llm-tidy)
+      // {
+        # OpenCode 2 from the locked llm-agents input; the home-manager
+        # module also installs it on PATH next to the V1 fork build.
+        opencode2 = llm-agents.packages.${system}.opencode2;
+      });
 
     # nix flake check
     checks = eachSystem (system: _pkgs: {
@@ -294,6 +303,12 @@
         type = "app";
         program = "${self.packages.${system}.rust-llm-tidy}/bin/rust-llm-tidy";
         meta.description = "Reorder and lint Rust source";
+      };
+
+      opencode2 = {
+        type = "app";
+        program = "${llm-agents.packages.${system}.opencode2}/bin/opencode2";
+        meta.description = "OpenCode 2 (V2) alongside the V1 fork build";
       };
 
       default = opencode-model-switcher;
