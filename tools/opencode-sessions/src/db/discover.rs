@@ -1,3 +1,5 @@
+//! Finds and opens OpenCode sqlite databases.
+
 use crate::format::*;
 use anyhow::{Context, Result, bail};
 use rusqlite::{Connection, OpenFlags};
@@ -5,6 +7,7 @@ use std::fs::{self};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
+/// Opens a database read-only with a busy timeout.
 pub(crate) fn open_db(path: &Path) -> Result<Connection> {
     let flags = OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX;
     let conn = Connection::open_with_flags(path, flags)
@@ -14,6 +17,8 @@ pub(crate) fn open_db(path: &Path) -> Result<Connection> {
     Ok(conn)
 }
 
+/// Prints every database found under the OpenCode data directory, marking the
+/// default pick with `*`.
 pub(crate) fn print_discovered_dbs(explicit: Option<&Path>) -> Result<()> {
     let discovered = discover_db_paths()?;
     let default = resolve_db_path(explicit).ok();
@@ -50,6 +55,8 @@ pub(crate) fn print_discovered_dbs(explicit: Option<&Path>) -> Result<()> {
     Ok(())
 }
 
+/// Picks the database to use: an explicit path, `$OPENCODE_DB`, or the newest
+/// discovered file.
 pub(crate) fn resolve_db_path(explicit: Option<&Path>) -> Result<PathBuf> {
     if let Some(path) = explicit {
         let path = if path.is_absolute() {
@@ -84,6 +91,8 @@ pub(crate) fn resolve_db_path(explicit: Option<&Path>) -> Result<PathBuf> {
         .context("no OpenCode sqlite database found; use --db to point at one")
 }
 
+/// Lists `opencode.db` and `opencode-*.db` files under the OpenCode data
+/// directory, newest first.
 pub(crate) fn discover_db_paths() -> Result<Vec<PathBuf>> {
     let data_dir = opencode_data_dir()?;
     if !data_dir.is_dir() {
@@ -117,6 +126,7 @@ pub(crate) fn discover_db_paths() -> Result<Vec<PathBuf>> {
     Ok(found)
 }
 
+/// Returns the OpenCode data directory (`~/.local/share/opencode`).
 pub(crate) fn opencode_data_dir() -> Result<PathBuf> {
     dirs::home_dir()
         .map(|home| home.join(".local/share/opencode"))
