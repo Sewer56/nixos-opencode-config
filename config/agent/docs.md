@@ -1,8 +1,8 @@
 ---
 mode: primary
 description: Writes and reviews end-user, source and error documentation
-model: sewer-axonhub/gpt-6-sol # WRITER
-variant: medium
+model: sewer-axonhub/gpt-6-luna # WRITER
+variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }
