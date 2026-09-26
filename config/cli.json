@@ -71,5 +71,9 @@
   "terminal": {
     "title": true,
     "copy": "select"
-  }
+  },
+  "plugins": [
+    // Live token-rate readout at the bottom right of the input box.
+    "oc-tps@latest"
+  ]
 }
