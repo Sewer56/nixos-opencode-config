@@ -2,6 +2,9 @@
 
 Read local OpenCode SQLite database. No OpenCode API. No IPC.
 
+Requires v2 storage: databases without a `session_v2` table exit with an
+error.
+
 Machine-first export format.
 Vibecoded. Not great code, but does the job.
 

@@ -2,7 +2,7 @@
 mode: all
 description: General-purpose coding agent
 model: sewer-axonhub/glm-5.3 # PLANNER
-variant: high
+variant: max
 permission:
   "*": deny
   external_directory:
@@ -151,7 +151,8 @@ Reuse Step 4 evidence: cwd, commands, exits, diagnostics and gaps/skips.
 
 ### Reviewers
 
-After quick PASS and tidy PASS/not-opted-in skip, run in parallel:
+After quick PASS and tidy PASS/not-opted-in skip, call in parallel via
+`subagent(agent=ID)`:
 
 - `_review/correctness`, `_review/code-quality`: code/config/tests/refactors.
 

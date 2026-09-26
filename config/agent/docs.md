@@ -2,7 +2,7 @@
 mode: primary
 description: Writes and reviews end-user, source and error documentation
 model: sewer-axonhub/glm-5.3-flash # WRITER
-variant: low
+variant: max
 
 permission:
   "*": deny
@@ -156,7 +156,7 @@ Missing pre-edit baseline/ownership needs NEEDS_INPUT.
 
 ### Reviewers
 
-Run `_review/doc-quality` within agreed limits.
+Call `subagent(agent=_review/doc-quality)` within agreed limits.
 
 Supply audience/evidence; review only documentation and scope violations.
 Pass `[[review-inputs]]`:

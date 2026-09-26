@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Caveman — ultra-compressed communication for OpenCode",
   "type": "module",
-  "main": "./src/index.ts",
+  "main": "./src/v1.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/v1.ts"
   },
   "keywords": ["opencode", "plugin", "caveman", "brevity"],
   "license": "MIT",

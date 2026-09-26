@@ -12,7 +12,7 @@ Repo map for `/iterate/edit` sessions. Personal OpenCode configuration repo;
   expanded token counts (submodule).
 - `config/opencode.json` — main config.
 - `.opencode/agent/`, `.opencode/command/` — repo-local agents and commands
-  (`_iterate/`, `migrate`).
+  (`_iterate/`).
 
 Shared rules live in `config/rules/`, organized by consumer family.
 Workflow-local fragments live in `config/agent/**/shared/*.txt`.

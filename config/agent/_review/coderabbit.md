@@ -2,7 +2,7 @@
 mode: all
 description: CodeRabbit with bounded repair and one re-review
 model: sewer-axonhub/glm-5.3 # CODER
-variant: low
+variant: max
 
 permission:
   "*": deny

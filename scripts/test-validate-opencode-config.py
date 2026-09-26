@@ -30,16 +30,16 @@ class EntryPointTests(unittest.TestCase):
         (self.repo / "config/agent").mkdir(parents=True)
         (self.repo / "config/command").mkdir()
         self.config = {
-            "subagent_depth": 2,
+            "experimental": {"subagent_depth": 2},
             "tool_output": {"max_lines": 10, "max_bytes": 100},
-            "permission": {"external_directory": "ask"},
+            "permissions": [{"action": "external_directory", "resource": "*", "effect": "ask"}],
             "agent": {
                 name: {"permission": {"external_directory": "allow"}}
                 for name in ("build", "plan")
             },
         }
 
-    def agent(self, name, mode="primary", *, targets=(), **extra):
+    def agent(self, name, mode="primary", *, targets=(), body=None, **extra):
         frontmatter = {
             "mode": mode,
             "description": "Fixture agent",
@@ -52,8 +52,11 @@ class EntryPointTests(unittest.TestCase):
         }
         path = self.repo / "config/agent" / f"{name}.md"
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text("---\n" + yaml.safe_dump(frontmatter, sort_keys=False)
-                        + "---\n# Output\nReport findings.\n", encoding="utf-8")
+        path.write_text(
+            "---\n" + yaml.safe_dump(frontmatter, sort_keys=False)
+            + "---\n" + (body if body is not None else "# Output\nReport findings.\n"),
+            encoding="utf-8",
+        )
 
     def command(self, target):
         (self.repo / "config/command/run.md").write_text(
@@ -86,10 +89,41 @@ class EntryPointTests(unittest.TestCase):
                 self.validate(1, "unreachable custom agents: Docs")
 
     def test_primary_reaches_hidden_reviewer(self):
-        self.agent("Docs", targets=("_docs/reviewer",))
+        self.agent(
+            "Docs",
+            targets=("_docs/reviewer",),
+            body="# Output\nCall `subagent(agent=_docs/reviewer)`.\n",
+        )
         self.agent("_docs/reviewer", "subagent", hidden=True)
-        self.config["subagent_depth"] = 3
+        self.config["experimental"]["subagent_depth"] = 3
         self.validate(0)
+
+    def test_hidden_reviewer_without_call_form_is_rejected(self):
+        self.agent(
+            "Docs",
+            targets=("_docs/reviewer",),
+            body="# Output\nName `_docs/reviewer` for review.\n",
+        )
+        self.agent("_docs/reviewer", "subagent", hidden=True)
+        self.config["experimental"]["subagent_depth"] = 3
+        self.validate(1, "never says 'subagent(agent='")
+
+    def test_hidden_reviewer_without_named_id_is_rejected(self):
+        self.agent(
+            "Docs",
+            targets=("_docs/reviewer",),
+            body="# Output\nCall `subagent(agent=reviewer)` for review.\n",
+        )
+        self.agent("_docs/reviewer", "subagent", hidden=True)
+        self.config["experimental"]["subagent_depth"] = 3
+        self.validate(1, "allows hidden subagent _docs/reviewer but never names it")
+
+    def test_builtin_grant_to_hidden_agent_is_rejected(self):
+        self.agent("worker", "subagent", hidden=True)
+        self.config["agent"]["build"]["permission"]["task"] = {
+            "*": "deny", "worker": "allow"
+        }
+        self.validate(1, "allows hidden task target worker")
 
     def test_unreferenced_subagent_is_still_rejected(self):
         self.agent("Docs")
@@ -121,7 +155,7 @@ class EntryPointTests(unittest.TestCase):
         self.agent("Docs", targets=("missing",))
         self.validate(1, "allows missing task target missing")
         self.agent("missing", "subagent", disable=True)
-        self.config["subagent_depth"] = 3
+        self.config["experimental"]["subagent_depth"] = 3
         self.validate(1, "routes to disabled agent missing")
 
     def test_primary_root_cycles_are_rejected(self):
@@ -134,13 +168,13 @@ class EntryPointTests(unittest.TestCase):
         self.agent("b", "subagent", targets=("c",))
         self.agent("c", "subagent", targets=("d",))
         self.agent("d", "subagent")
-        self.config["subagent_depth"] = 6
+        self.config["experimental"]["subagent_depth"] = 6
         self.validate(1, "custom task depth 4 exceeds policy maximum 3")
 
     def test_depth_configuration_still_matches_graph(self):
         self.agent("Docs", targets=("reviewer",))
         self.agent("reviewer", "subagent")
-        self.validate(1, "config.subagent_depth must be 3, got 2")
+        self.validate(1, "config.experimental.subagent_depth must be 3, got 2")
 
     def rule(self, name, text="Review scoped evidence.\n"):
         path = self.repo / "config/rules" / name
@@ -155,7 +189,7 @@ class EntryPointTests(unittest.TestCase):
     def test_nested_verifier_ids_and_transitive_rules_are_reachable(self):
         targets = ("_review/verifier", "_plan/draft/verifier")
         self.agent("Code", targets=targets)
-        self.config["subagent_depth"] = 3
+        self.config["experimental"]["subagent_depth"] = 3
         for agent in targets:
             self.agent(agent, "subagent")
             self.import_rule(agent, "review/verifiers.md")
@@ -211,7 +245,7 @@ class EntryPointTests(unittest.TestCase):
     def test_transitive_local_fragments_are_not_agents(self):
         self.agent("Code", targets=("_review/verifier",))
         self.agent("_review/verifier", "subagent")
-        self.config["subagent_depth"] = 3
+        self.config["experimental"]["subagent_depth"] = 3
         self.import_fragment("_review/verifier", "_review/shared/verification.txt")
         self.fragment("_review/shared/verification.txt",
                       '{{ file="./agent/_review/shared/findings.txt" }}\n')

@@ -2,7 +2,7 @@
 mode: all
 description: Writes grounded issues
 model: sewer-axonhub/glm-5.3-flash # WRITER
-variant: low
+variant: max
 permission:
   "*": deny
   external_directory:
@@ -131,7 +131,7 @@ Require gate PASS before review or SUCCESS.
 
 Evidence cannot expand request scope.
 
-- After gate PASS, call `_write/review/adherence`.
+- After gate PASS, call `subagent(agent=_write/review/adherence)`.
   Supply request/constraints, absolute `artifact_path` and grounding references.
 - Repair required changes first; validate suggestions against request/evidence.
   Apply feasible in-scope suggestions within two repair turns.

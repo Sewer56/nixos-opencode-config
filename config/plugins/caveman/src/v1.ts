@@ -1,14 +1,13 @@
 /**
- * Caveman plugin: injects one static brevity + ADHD block to build/plan agents.
+ * @module v1 - OpenCode V1 entry point for the caveman plugin.
  *
- * No mode system. No /caveman commands, no deactivation. Always active for build/plan.
- *
- * Next: `CavemanPlugin`, default export, consumed by OpenCode plugin loader.
+ * V1 calls `server()` and expects the hooks object back. The hook logic
+ * tracks which agent each session uses and pushes INSTRUCTION into the
+ * system prompt of allowlisted agents.
  */
 import type { Plugin } from "@opencode-ai/plugin"
 
-/** Agents that receive the instruction block. Others are unaffected. */
-const ALLOWED_AGENTS = new Set(["build", "plan"])
+import { ALLOWED_AGENTS, INSTRUCTION } from "./instruction"
 
 /** Max entries in the session->agent map before oldest insertion is evicted. */
 const SESSION_MAP_MAX = 256
@@ -35,26 +34,6 @@ function createLog(client: { app: { log: (opts: unknown) => Promise<unknown> } }
       .catch(() => {})
   }
 }
-
-/**
- * Static instruction block, pushed every build/plan turn. Merged + deduped:
- * full brevity, persistence, ADHD rules (base card: config/rules/cards/style/adhd-format.md).
- *
- * **After this line:** every rule stated once; no "stop caveman" clause (deactivation gone).
- */
-const INSTRUCTION = `Respond terse like smart caveman. Drop: articles (a/an/the), filler (just/really/basically/actually/simply), pleasantries (sure/certainly/of course/happy to), hedging; keep all substance. Fragments OK. Short synonyms (big not extensive, fix not "implement a solution for"). Technical terms exact. Code blocks unchanged. Errors quoted exact.
-CAVEMAN MODE ACTIVE. ACTIVE EVERY RESPONSE. No revert after many turns. No drift. Still active if unsure.
-
-### ADHD-aware communication
-- Answer first: open with the point or next action. Pattern: [thing] [action] [reason].
-- Numbered steps, fewest, no double "and then".
-- Mark resulting states where intent is unclear (\`// After this line: ...\`), never trivial code.
-- End with \`Next:\` or a checkable \`Done when:\`; surface errors and returns last.
-- Errors: condition, cause, fix in one line (\`Error: condition. Fix: action.\`).
-- Concrete units (\`~2 min\`, not "a bit"), non-trivial work only.
-- No intro or outro; start at the answer, stop when done.
-- No em dashes; use colons or periods.
-- Drop the compressed form (still active, resume after) for: security warnings and destructive or irreversible actions; full-explanation or clarify requests; real ambiguity; multi-step sequences where fragment order risks misread; harness, task, accuracy, or fidelity rules. Code, commits, PRs written normal.`
 
 /**
  * Inject static block to allowlisted agents (build, plan).
@@ -100,4 +79,9 @@ export const CavemanPlugin: Plugin = async (input) => {
       output.system.push(INSTRUCTION)
     },
   } as unknown as Awaited<ReturnType<Plugin>>
+}
+
+export default {
+  id: "caveman",
+  server: CavemanPlugin,
 }

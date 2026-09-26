@@ -3,13 +3,73 @@
   "theme": {
     "name": "catppuccin"
   },
+  "keybinds": {
+    // App-wide commands and appearance.
+    "command.palette.show": "ctrl+[",
+    "theme.switch": "<leader>shift+p",
+    "app.exit": "ctrl+c,ctrl+d,<leader>shift+w",
+
+    // Session creation, browser-style tab navigation, and tab history.
+    "session.new": "<leader>t,<leader>n",
+    "session.tab.next": "ctrl+tab,<leader>pagedown",
+    "session.tab.previous": "ctrl+shift+tab,<leader>pageup",
+    "session.tab.history.back": "<leader>shift+left",
+    "session.tab.history.forward": "ctrl+i,<leader>shift+right",
+    "session.tab.next_unread": "alt+shift+down,<leader>shift+pagedown",
+    "session.tab.previous_unread": "alt+shift+up,<leader>shift+pageup",
+
+    // Close or reopen tabs, then select one by number.
+    "session.tab.close": "<leader>w",
+    "session.tab.reopen": "ctrl+shift+t",
+    "terminal.toggle": "<leader>shift+t",
+
+    // Disable quick-switch slots so Leader + digits select tab positions only.
+    "session.quick_switch.1": "none",
+    "session.quick_switch.2": "none",
+    "session.quick_switch.3": "none",
+    "session.quick_switch.4": "none",
+    "session.quick_switch.5": "none",
+    "session.quick_switch.6": "none",
+    "session.quick_switch.7": "none",
+    "session.quick_switch.8": "none",
+    "session.quick_switch.9": "none",
+    "session.tab.select.1": "<leader>1,ctrl+1",
+    "session.tab.select.2": "<leader>2,ctrl+2",
+    "session.tab.select.3": "<leader>3,ctrl+3",
+    "session.tab.select.4": "<leader>4,ctrl+4",
+    "session.tab.select.5": "<leader>5,ctrl+5",
+    "session.tab.select.6": "<leader>6,ctrl+6",
+    "session.tab.select.7": "<leader>7,ctrl+7",
+    "session.tab.select.8": "<leader>8,ctrl+8",
+    "session.tab.select.9": "<leader>9,ctrl+9",
+    "session.tab.select.10": "<leader>0,ctrl+0",
+
+    // Agent cycling: Shift+Tab for next, Leader+Tab for previous.
+    // Bare Tab stays with prompt autocomplete.
+    "agent.cycle": "shift+tab",
+    "agent.cycle.reverse": "<leader>tab"
+  },
+  "scroll": {
+    "speed": 1
+  },
   "diffs": {
     "wrap": "word"
   },
   "session": {
     "sidebar": "hide",
     "scrollbar": false,
-    "thinking": "show"
+    "thinking": "show",
+    "image_preview": false
   },
-  "animations": true
+  "animations": true,
+  "tabs": {
+    "layout": "horizontal",
+    "indicators": "status",
+    "scope": "cwd",
+    "mode": "auto"
+  },
+  "terminal": {
+    "title": true,
+    "copy": "select"
+  }
 }

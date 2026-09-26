@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Implements approved tasks
 model: sewer-axonhub/glm-5.3 # CODER
-variant: low
+variant: max
 
 permission:
   "*": deny
@@ -135,7 +135,7 @@ Unclear ownership needs NEEDS_INPUT; never delete or auto-unstage prior work.
 
 Require current quick PASS and tidy PASS or not-opted-in skip.
 
-Run in parallel:
+Call in parallel via `subagent(agent=ID)`:
 - `_review/correctness`, `_review/code-quality`: always.
 
 Honor reviewer requests; record routing reasons in validation_path.

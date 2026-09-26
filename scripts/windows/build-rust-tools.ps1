@@ -5,9 +5,9 @@
 .DESCRIPTION
   Two phases:
     - Main workspace: cargo build --release --workspace in tools\
-      Copies 4 .exe to bin\:
+      Copies 3 .exe to bin\:
         opencode-model-switcher, opencode-sessions,
-        chunk-files-by-tokens, token-count-after-expand
+        token-count-after-expand
     - rust-llm-tidy submodule (separate workspace at
       tools\rust-llm-tidy\src\Cargo.toml). Auto-runs
       `git submodule update --init` if the submodule is missing.
@@ -20,7 +20,7 @@
 #>
 #Requires -Version 5.1
 
-# Build the main Rust workspace (4 tool binaries).
+# Build the main Rust workspace (3 tool binaries).
 function Build-RustWorkspace {
   param([hashtable]$PreFlight)
 
@@ -58,7 +58,6 @@ function Build-RustWorkspace {
   $binaries = @(
     'opencode-model-switcher',
     'opencode-sessions',
-    'chunk-files-by-tokens',
     'token-count-after-expand'
   )
 

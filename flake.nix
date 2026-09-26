@@ -95,11 +95,6 @@
         description = "Browse and export OpenCode conversations from local SQLite";
       };
 
-      chunk-files-by-tokens = mkTool {
-        pname = "chunk-files-by-tokens";
-        description = "Chunk files by estimated token count";
-      };
-
       token-count-after-expand = mkTool {
         pname = "token-count-after-expand";
         description = "Estimate prompt token counts after md-expand rendering";
@@ -125,17 +120,9 @@
       system = pkgs.stdenv.hostPlatform.system;
 
       opencodeRepo = "${config.home.homeDirectory}/nixos/users/sewer/home-manager/programs/opencode";
-      opencodeSource = "${opencodeRepo}/opencode-source";
-      opencodeBin = "${opencodeSource}/packages/opencode/dist/opencode-linux-x64/bin/opencode";
-
-      # Defaults to CWD, forwards args, enables Exa search.
-      opencodeScript = pkgs.writeShellScriptBin "opencode" ''
-        export OPENCODE_ENABLE_EXA=1
-        if [ "$#" -eq 0 ]; then
-          exec ${opencodeBin} .
-        else
-          exec ${opencodeBin} "$@"
-        fi
+      opencodeCommand = pkgs.runCommand "opencode" {} ''
+        mkdir -p $out/bin
+        ln -s ${llm-agents.packages.${system}.opencode2}/bin/opencode2 $out/bin/opencode
       '';
 
       # Local plugins import node_modules at runtime; missing deps fail
@@ -170,19 +157,6 @@
         exit $failed
       '';
 
-      # Rebuild opencode-source (bun build); separate command for iteration.
-      opencodeBuildScript = pkgs.writeShellScriptBin "opencode-build" ''
-        set -euo pipefail
-        # Plugin deps failing (e.g. offline) must not block the binary build.
-        ${pluginDepsScript}/bin/opencode-plugin-deps || \
-          echo "warning: plugin deps install failed; run opencode-plugin-deps manually"
-        pushd ${opencodeSource}/packages/opencode > /dev/null
-        bun install
-        bun run build --single
-        popd > /dev/null
-        chmod -R +x ${opencodeSource}/packages/opencode/dist/opencode-linux-x64/bin
-      '';
-
       # ── Cargo wrappers for tools/ members ────────────────────────────────
       # Editing tools/*.rs costs zero Nix rebuild. rust-llm-tidy is not
       # wrapped: it would inherit the caller's rustup toolchain and
@@ -203,13 +177,11 @@
         '';
     in {
       home.packages = [
-        opencodeScript
-        opencodeBuildScript
+        opencodeCommand
         pluginDepsScript
 
         (mkCargoTool {name = "opencode-model-switcher";})
         (mkCargoTool {name = "opencode-sessions";})
-        (mkCargoTool {name = "chunk-files-by-tokens";})
         (mkCargoTool {name = "token-count-after-expand";})
         (mkCargoTool {name = "opencode-yolo-mode";})
 
@@ -246,13 +218,17 @@
     # ── Flake outputs ─────────────────────────────────────────────────────
 
     # nix build .#opencode-model-switcher   etc.
-    packages = eachSystem (_system: pkgs: mkTools pkgs rust-llm-tidy);
+    packages = eachSystem (system: pkgs:
+      (mkTools pkgs rust-llm-tidy)
+      // {
+        # OpenCode 2 from the locked llm-agents input.
+        opencode2 = llm-agents.packages.${system}.opencode2;
+      });
 
     # nix flake check
     checks = eachSystem (system: _pkgs: {
       opencode-model-switcher = self.packages.${system}.opencode-model-switcher;
       opencode-sessions = self.packages.${system}.opencode-sessions;
-      chunk-files-by-tokens = self.packages.${system}.chunk-files-by-tokens;
       token-count-after-expand = self.packages.${system}.token-count-after-expand;
       opencode-yolo-mode = self.packages.${system}.opencode-yolo-mode;
       rust-llm-tidy = self.packages.${system}.rust-llm-tidy;
@@ -272,12 +248,6 @@
         meta.description = "Browse and export OpenCode sessions";
       };
 
-      chunk-files-by-tokens = {
-        type = "app";
-        program = "${self.packages.${system}.chunk-files-by-tokens}/bin/chunk-files-by-tokens";
-        meta.description = "Chunk files by estimated token count";
-      };
-
       token-count-after-expand = {
         type = "app";
         program = "${self.packages.${system}.token-count-after-expand}/bin/token-count-after-expand";
@@ -294,6 +264,12 @@
         type = "app";
         program = "${self.packages.${system}.rust-llm-tidy}/bin/rust-llm-tidy";
         meta.description = "Reorder and lint Rust source";
+      };
+
+      opencode2 = {
+        type = "app";
+        program = "${llm-agents.packages.${system}.opencode2}/bin/opencode2";
+        meta.description = "OpenCode 2";
       };
 
       default = opencode-model-switcher;
@@ -323,7 +299,6 @@
           # Built CLI tools.
           tools.opencode-model-switcher
           tools.opencode-sessions
-          tools.chunk-files-by-tokens
           tools.token-count-after-expand
           tools.opencode-yolo-mode
           tools.rust-llm-tidy

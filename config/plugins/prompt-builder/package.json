@@ -1,0 +1,18 @@
+{
+  "name": "prompt-builder",
+  "private": true,
+  "type": "module",
+  "main": "./server.ts",
+  "description": "Builds prompts for the tools available in each OpenCode request and shortens known tool descriptions.",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "node --test test/*.test.ts && python3 -m unittest discover -s test -p '*_test.py'"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.0",
+    "typescript": "5.9.3"
+  }
+}

@@ -2,7 +2,7 @@
 mode: all
 description: Drafts PRs; creates on request
 model: sewer-axonhub/glm-5.3-flash # WRITER
-variant: low
+variant: max
 permission:
   "*": deny
   external_directory:
@@ -146,7 +146,7 @@ Repair and rerun failures before review or SUCCESS.
 Skip/end review only on explicit user waiver.
 A PR request or interruption alone is not a waiver.
 
-- After gate PASS, call `_write/review/adherence`.
+- After gate PASS, call `subagent(agent=_write/review/adherence)`.
   Supply request/constraints, absolute `artifact_path`, `title=[[Title]]`,
   resolved base, merge-base, current HEAD and scoped diff evidence.
 - Repair required findings first.

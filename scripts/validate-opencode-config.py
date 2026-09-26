@@ -18,8 +18,10 @@ Agent frontmatter and permissions:
 Commands and task graph:
 - Validate command targets, entry points, routes, reachability, cycles, disabled
   agents, and maximum custom task depth of three edges.
-- Require config.subagent_depth to equal maximum custom task depth + 2.
+- Require config.experimental.subagent_depth to equal maximum custom task depth + 2.
   A mismatch is an error, never a configuration write.
+- Require every parent that allows hidden agents to name each target ID and
+  a ``subagent(agent=...)`` call form in its own prompt.
 
 Prompt structure and imports:
 - Exempt the _iterate/edit agent body from prompt checks.
@@ -61,6 +63,7 @@ CONFIG_PATH_FORMS = (
 BUILTIN_AGENT_ALLOW_EXTERNAL = ("build", "plan")
 MAX_CUSTOM_TASK_DEPTH = 3
 PROMPT_CHECK_EXCLUSIONS = {Path(".opencode/agent/_iterate/edit.md")}
+HIDDEN_CALL_MARKER = "subagent(agent="
 
 
 def load_frontmatter(path: Path) -> dict[str, Any]:
@@ -112,6 +115,34 @@ def task_targets(frontmatter: dict[str, Any]) -> set[str]:
         for name, decision in task.items()
         if name != "*" and str(decision).lower() == "allow"
     }
+
+
+def agent_body(path: Path) -> str:
+    """Return an agent's prompt body: the text after its frontmatter."""
+    text = path.read_text(encoding="utf-8")
+    if not text.startswith("---\n"):
+        return text
+    end = text.find("\n---\n", 4)
+    return "" if end < 0 else text[end + len("\n---\n"):]
+
+
+def validate_hidden_disclosure(
+    ident: str, body: str, hidden_targets: set[str], errors: list[str]
+) -> None:
+    """Hidden task targets must be named and callable in the parent prompt."""
+    if not hidden_targets:
+        return
+    if HIDDEN_CALL_MARKER not in re.sub(r"\s+", " ", body):
+        errors.append(
+            f"agent {ident} allows hidden subagents but never says "
+            f"{HIDDEN_CALL_MARKER!r}; add the call form at each call site"
+        )
+    for target in sorted(hidden_targets):
+        if target not in body:
+            errors.append(
+                f"agent {ident} allows hidden subagent {target} but never names it"
+                "; add the ID at its call site"
+            )
 
 
 def active_json_files(repo: Path) -> list[Path]:
@@ -372,12 +403,31 @@ def main() -> int:
         for child in children & disabled_agents:
             errors.append(f"agent {ident} routes to disabled agent {child}")
 
+    # Hidden agents are filtered from the subagent tool's advertised list, so a
+    # parent must carry the explicit call form and the target IDs in its prompt.
+    hidden_agents = {
+        ident for ident, fm in agent_frontmatter.items() if fm.get("hidden") is True
+    }
+    for ident, path in agent_files.items():
+        validate_hidden_disclosure(
+            ident,
+            agent_body(path),
+            task_targets(agent_frontmatter[ident]) & hidden_agents,
+            errors,
+        )
+
     # Built-in agent task permissions are additional entry points into custom subagents.
     for builtin_cfg in (config.get("agent") or {}).values() if isinstance(config.get("agent"), dict) else []:
         if not isinstance(builtin_cfg, dict):
             continue
         for target in task_targets(builtin_cfg):
             if target in agent_files:
+                if target in hidden_agents:
+                    errors.append(
+                        f"built-in agent config allows hidden task target {target};"
+                        " built-in prompts cannot carry the call form,"
+                        " so unhide the agent or drop the grant"
+                    )
                 command_roots.add(target)
             elif target not in BUILTIN_AGENTS:
                 errors.append(f"built-in agent config allows missing task target {target}")
@@ -417,9 +467,11 @@ def main() -> int:
     )
 
     required_subagent_depth = max_depth + 2
-    if config.get("subagent_depth") != required_subagent_depth:
-        errors.append(f"config.subagent_depth must be {required_subagent_depth}, got {config.get('subagent_depth')!r}")
-    details.append(f"config.subagent_depth: {required_subagent_depth}")
+    experimental = config.get("experimental")
+    depth = experimental.get("subagent_depth") if isinstance(experimental, dict) else None
+    if depth != required_subagent_depth:
+        errors.append(f"config.experimental.subagent_depth must be {required_subagent_depth}, got {depth!r}")
+    details.append(f"config.experimental.subagent_depth: {required_subagent_depth}")
 
     all_prompt_files = [
         path for path in active_prompt_files(repo)
@@ -501,24 +553,24 @@ def main() -> int:
             errors.append("config.tool_output.max_lines must be a positive integer")
         if not isinstance(tool_output.get("max_bytes"), int) or tool_output["max_bytes"] <= 0:
             errors.append("config.tool_output.max_bytes must be a positive integer")
-    # Compaction pruning is optional by policy; prune:false preserves old
-    # tool-call contents in context, so it is not mandated here.
-    permission = config.get("permission")
-    external = permission.get("external_directory") if isinstance(permission, dict) else None
-    if not isinstance(permission, dict) or (
-        not isinstance(external, dict) and str(external).lower() not in {"ask", "allow"}
-    ):
-        errors.append("config.permission.external_directory must be ask, allow, or a pattern mapping")
+    permissions = config.get("permissions")
+    if not isinstance(permissions, list):
+        errors.append("config.permissions must be an ordered array")
+        permissions = []
+    external = {}
+    for index, rule in enumerate(permissions):
+        if not isinstance(rule, dict) or not all(
+            isinstance(rule.get(key), str) for key in ("action", "resource", "effect")
+        ):
+            errors.append(f"config.permissions[{index}] needs string action, resource and effect")
+            continue
+        if rule["effect"] not in VALID_PERMISSION_DECISIONS:
+            errors.append(f"config.permissions[{index}] has invalid effect {rule['effect']!r}")
+        if rule["action"] == "external_directory":
+            external[rule["resource"]] = rule["effect"]
+    if external.get("*") not in {"ask", "allow"}:
+        errors.append("config.permissions external_directory must default to ask or allow")
     validate_config_path_pairing("config", external, errors)
-    if isinstance(permission, dict):
-        for tool, rules in permission.items():
-            if not isinstance(rules, dict):
-                continue
-            for pattern, decision in rules.items():
-                if str(decision).lower() not in VALID_PERMISSION_DECISIONS:
-                    errors.append(
-                        f"config.permission {tool!r} pattern {pattern!r} has invalid decision {decision!r}"
-                    )
 
     # Default modes (build, plan) run user-driven, so they inherit a global
     # allow policy instead of the ask-everywhere default for subagents.
