@@ -1,22 +1,20 @@
-/**
- * Applies the tool-conditional prompt builder to one V2 session event.
- * @module prompt-builder/builder
- */
+/** Build and insert tool-specific guidance into a request's system prompt. */
 
-import { factsFromToolKeys } from "./facts"
-import { buildSections } from "./sections"
-import { expandTemplate } from "./template"
+import { factsFromToolKeys } from "./facts.ts"
+import { buildSections } from "./sections.ts"
+import { expandTemplate } from "./template.ts"
 
-/** First line of OpenCode 2's default base prompt; identifies the part to replace. */
+/** First line of OpenCode's default base prompt; identifies the part to replace. */
 export const BASE_PROMPT_MARKER = "You are an AI agent running in OpenCode"
 
 /** Tags builder output so a second application on the same event is a no-op. */
 export const BUILDER_TAG = "<!-- prompt-builder -->"
 
 /**
- * System parts OpenCode 2 injects on its own; strip mode removes them.
- * Matched by text prefix. Anything unlisted (our sections, other plugins'
- * additions, project instructions such as AGENTS.md) is kept.
+ * Identify OpenCode's own system parts by their text prefixes.
+ *
+ * Strip mode removes matching parts. It keeps everything else, including
+ * our sections, other plugins' additions and project instructions.
  */
 const CORE_PART_PREFIXES = [
   BASE_PROMPT_MARKER,
@@ -25,13 +23,13 @@ const CORE_PART_PREFIXES = [
   "Today's date:",
 ]
 
-/** Intro line of OpenCode 2's environment part. */
+/** Intro line of OpenCode's environment part. */
 const ENV_PART_PREFIX = "Here is some useful information about the environment"
 
 /**
  * Trim an environment part down to whatever follows the env block and date.
  *
- * OpenCode 2 packs `<env>`, the date, and project instructions such as
+ * OpenCode packs `<env>`, the date, and project instructions such as
  * AGENTS.md into one system part. Strip mode removes the env block and date
  * but must keep the attached instructions.
  */
@@ -43,7 +41,13 @@ function trimEnvironmentPart(text: string): string {
     .replace(/^\n+/, "")
 }
 
-/** Minimal structural types for the V2 session events we mutate. */
+/** Tag the first new part so another plugin load can detect it. */
+function prependTaggedSections(system: SystemPart[] | undefined, sections: string[]): void {
+  const tagged = sections.map((text, index) => (index === 0 ? `${BUILDER_TAG}\n${text}` : text))
+  system?.unshift(...tagged.map((text) => ({ type: "text", text })))
+}
+
+/** A system prompt part supplied by OpenCode. */
 export interface SystemPart {
   type: string
   text?: string
@@ -51,16 +55,16 @@ export interface SystemPart {
 
 export interface SessionEvent {
   system?: SystemPart[]
-  /** Tool snapshot keyed by tool name; V1 and V2 spellings both accepted. */
+  /** Available tools keyed by name, including supported aliases. */
   tools?: Record<string, unknown>
   agent?: unknown
 }
 
-/** Which base-prompt strategy a builder invocation used. */
+/** How the builder changed the system prompt. */
 export type BasePromptStrategy = "replaced" | "prepended" | "stripped" | "already-applied"
 
 export interface BuilderInput {
-  /** Working directory announced in the Environment section. */
+  /** Working directory shown in the Environment section. */
   readonly workingDirectory: string
   /** Platform string (e.g. `process.platform`). */
   readonly platform: string
@@ -73,13 +77,16 @@ export interface BuilderInput {
 }
 
 /**
- * Replace the default base prompt with builder sections, in place.
+ * Update a request's system prompt in place.
  *
- * When a system part contains the base-prompt marker, that part is removed
- * and the sections replace it (`replaced`).
+ * With `stripCore`, remove known OpenCode prompt parts and keep project
+ * instructions attached to the environment part (`stripped`).
  *
- * Without the marker nothing is deleted and the sections are prepended
- * instead (`prepended`), so agents with their own `system` prompt keep it.
+ * Otherwise, remove the part with the base-prompt marker (`replaced`), or keep
+ * every part if there is no marker (`prepended`). New sections go first.
+ *
+ * A tagged prompt is left alone (`already-applied`). Without `stripCore`,
+ * the caller must supply a `system` array for sections to be inserted.
  *
  * @param event - Mutable session event (`context`, `compaction` or `generate`).
  * @param input - Environment info and optional supplemental file paths.
@@ -122,8 +129,7 @@ export async function buildIntoEvent(
       kept.push(part)
     }
     event.system = kept
-    const tagged = sections.map((text, index) => (index === 0 ? `${BUILDER_TAG}\n${text}` : text))
-    event.system.unshift(...tagged.map((text) => ({ type: "text", text })))
+    prependTaggedSections(event.system, sections)
     return { strategy: "stripped", sections }
   }
 
@@ -132,17 +138,15 @@ export async function buildIntoEvent(
     event.system!.splice(baseIndex, 1)
     strategy = "replaced"
   }
-  const tagged = sections.map((text, index) => (index === 0 ? `${BUILDER_TAG}\n${text}` : text))
-  event.system?.unshift(...tagged.map((text) => ({ type: "text", text })))
+  prependTaggedSections(event.system, sections)
   return { strategy, sections }
 }
 
 /**
  * Render supplemental file entries into `{name, content}` sections.
  *
- * Each entry is a file path whose content goes through the template engine
- * (so files may themselves contain includes); the section name is the
- * basename without extension.
+ * Each entry includes a file and expands its argument/environment tokens.
+ * The section name is the file's basename without its extension.
  */
 async function resolveSupplemental(
   input: BuilderInput,

@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "noUncheckedIndexedAccess": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["server.ts", "src/**/*.ts", "test/**/*.ts"]
+}

@@ -1,8 +1,69 @@
-/**
- * @module server - Package-root plugin entry for OpenCode 2 directory plugins.
- *
- * OpenCode 2 loads a local plugin as a directory and resolves `server.ts` at
- * the package root; the V2 entry lives in `src/v2.ts`. V1 resolves the same
- * directory via package.json `main` (`src/v1.ts`).
- */
-export { default } from "./src/v2.ts"
+/** Register prompt and tool-description hooks for OpenCode requests. */
+import { buildIntoEvent, type SessionEvent } from "./src/builder.ts"
+import { capturePromptDump, writePromptDump } from "./src/prompt-dump.ts"
+import { shortenToolDescriptions } from "./src/tool-descriptions.ts"
+
+type PluginContext = {
+  options?: Record<string, unknown>
+  location?: { directory?: string }
+  session?: {
+    hook?: (name: string, handler: (event: SessionEvent) => Promise<void>) => Promise<unknown>
+  }
+}
+
+const debug = process.env.PROMPT_BUILDER_DEBUG === "1"
+
+const HOOKED_EVENTS = ["context", "compaction", "generate"] as const
+
+function log(message: string) {
+  if (debug) console.log(`[prompt-builder] ${message}`)
+}
+
+/** Ignore supplemental entries that are not file paths. */
+function readSupplementalOption(options?: Record<string, unknown>): string[] {
+  const value = options?.supplemental
+  return Array.isArray(value) ? value.filter((p): p is string => typeof p === "string") : []
+}
+
+export default {
+  id: "prompt-builder",
+
+  /**
+   * Build prompts and shorten known tool descriptions for each request.
+   *
+   * @param ctx - Plugin options, project directory and session hook registration.
+   * @returns Resolves when all available request hooks have been registered.
+   * @throws If OpenCode rejects a hook registration.
+   */
+  async setup(ctx: PluginContext) {
+    const workingDirectory = ctx.location?.directory ?? process.cwd()
+    const supplementalFiles = readSupplementalOption(ctx.options)
+    const stripCore = process.env.PROMPT_BUILDER_KEEP_CORE !== "1"
+
+    for (const name of HOOKED_EVENTS) {
+      await ctx.session?.hook?.(name, async (event) => {
+        const dump = process.env.PB_DUMP
+        const before = dump ? capturePromptDump(event) : undefined
+
+        const { strategy, sections } = await buildIntoEvent(event, {
+          workingDirectory,
+          platform: process.platform,
+          supplementalFiles,
+          cwd: workingDirectory,
+          stripCore,
+        })
+        shortenToolDescriptions(event.tools)
+
+        // A duplicate plugin load must not overwrite the original contract dump.
+        if (dump && before && strategy !== "already-applied") {
+          await writePromptDump(dump, name, before, event)
+        }
+        if (debug) {
+          const tools = Object.keys(event.tools ?? {})
+          log(`${name}: strategy=${strategy} sections=${sections.length} tools=${tools.length}:${tools.join(",")}`)
+        }
+      })
+    }
+    log(`init: workingDirectory=${workingDirectory} supplemental=${supplementalFiles.length} stripCore=${stripCore}`)
+  },
+}

@@ -1,22 +1,21 @@
 /**
- * Minimal template engine for supplemental context, self-contained so this
- * plugin carries no dependency on the md-expand package.
+ * Expand file, argument and environment tokens in supplemental text.
  *
  * Supports the token subset that supplemental files need:
  * `{{ file="path" }}` includes (relative to cwd), `{{arg:key}}` from the
  * options map, and `{{env:NAME}}` from the environment.
  *
- * Missing files expand to a visible error line instead of throwing,
- * matching md-expand's keep-the-failure-visible behavior.
- * @module prompt-builder/template
+ * Unreadable files produce an error line in the text instead of throwing.
  */
+import { readFile } from "node:fs/promises"
+import { resolve } from "node:path"
 
 export interface TemplateOptions {
   /** Base directory for relative file includes. */
   readonly cwd: string
   /** Values for `{{arg:key}}` tokens. */
   readonly args?: Record<string, string>
-  /** Maximum include nesting depth; guards include cycles. */
+  /** Maximum number of file tokens expanded per call; defaults to 10. */
   readonly maxDepth?: number
 }
 
@@ -27,9 +26,12 @@ const ENV_TOKEN = /\{\{\s*env:([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g
 /**
  * Expand template tokens in `text`.
  *
+ * File tokens are expanded from the input text, not recursively from included
+ * files. Argument and environment tokens are then replaced throughout the result.
+ *
  * @param text - Raw text, possibly containing tokens.
- * @param options - Cwd, arg values and depth limit.
- * @returns The text with every supported token replaced.
+ * @param options - Base directory, argument values and file-token limit.
+ * @returns Expanded text. Missing arguments and environment variables become empty strings.
  */
 export async function expandTemplate(text: string, options: TemplateOptions): Promise<string> {
   const expanded = await expandFiles(text, options, 0)
@@ -46,8 +48,6 @@ async function expandFiles(text: string, options: TemplateOptions, depth: number
   const after = text.slice(match.index + match[0].length)
   let content: string
   try {
-    const { resolve } = await import("node:path")
-    const { readFile } = await import("node:fs/promises")
     content = await readFile(resolve(options.cwd, match[1]!), "utf8")
   } catch (err) {
     content = `{{ file="${match[1]}" }}: unreadable (${(err as Error).message})`

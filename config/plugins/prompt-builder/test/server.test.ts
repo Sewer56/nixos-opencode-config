@@ -1,11 +1,13 @@
-import { describe, expect, test } from "bun:test"
+import assert from "node:assert/strict"
+import { describe, test } from "node:test"
 import { mkdtemp, readFile, rm, stat } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
-import plugin from "../src/v2"
-import { BUILDER_TAG, type SessionEvent } from "../src/builder"
-import { capturePromptDump, writePromptDump } from "../src/prompt-dump"
-import originals from "./fixtures/v2.0.16-descriptions.json"
+import plugin from "../server.ts"
+import { BUILDER_TAG, type SessionEvent } from "../src/builder.ts"
+import { capturePromptDump, writePromptDump } from "../src/prompt-dump.ts"
+import originals from "./fixtures/v2.0.16-descriptions.json" with { type: "json" }
+import { testCases } from "./cases.ts"
 
 async function handlers() {
   const hooks = new Map<string, (event: SessionEvent) => Promise<void>>()
@@ -16,19 +18,20 @@ async function handlers() {
   return hooks
 }
 
-describe("V2 hooks", () => {
+describe("request hooks", () => {
   // Construction and core behavior
   test("setup_should_register_all_request_hooks", async () => {
     // Arrange / Act
     const hooks = await handlers()
 
     // Assert
-    expect([...hooks.keys()]).toEqual(["context", "compaction", "generate"])
+    assert.deepEqual([...hooks.keys()], ["context", "compaction", "generate"])
   })
 
-  test.each(["context", "compaction", "generate"])(
-    "hook_should_shorten_descriptions_and_keep_contracts_when_%s",
-    async (name) => {
+  testCases(
+    "hook_should_shorten_descriptions_and_keep_contracts",
+    [{ name: "context" }, { name: "compaction" }, { name: "generate" }],
+    async ({ name }) => {
       // Arrange: an earlier builder invocation must not prevent tool rewriting.
       const hooks = await handlers()
       const input = { properties: { workdir: { type: "string" }, background: { type: "boolean" } } }
@@ -45,12 +48,12 @@ describe("V2 hooks", () => {
       await hooks.get(name)!(event)
 
       // Assert
-      expect(tools.shell.description.length).toBeLessThan(originals.shell.length)
-      expect(tools.shell.input).toBe(input)
-      expect(event.tools).toBe(tools)
-      expect(event.system).toBe(system)
-      expect(tools.subagent.description).toBe("Available subagents:\n- explorer: inspect code")
-      expect(event).toEqual(afterFirst)
+      assert.ok(tools.shell.description.length < originals.shell.length)
+      assert.equal(tools.shell.input, input)
+      assert.equal(event.tools, tools)
+      assert.equal(event.system, system)
+      assert.equal(tools.subagent.description, "Available subagents:\n- explorer: inspect code")
+      assert.deepEqual(event, afterFirst)
     },
   )
 })
@@ -78,8 +81,8 @@ describe("contract dumps", () => {
       // Assert
       const raw = JSON.parse(await readFile(`${prefix}.context.tools.raw.json`, "utf8"))
       const final = JSON.parse(await readFile(`${prefix}.context.tools.final.json`, "utf8"))
-      expect(raw.read.description).toBe(originals.read)
-      expect(final.read.description.length).toBeLessThan(originals.read.length)
+      assert.equal(raw.read.description, originals.read)
+      assert.ok(final.read.description.length < originals.read.length)
     } finally {
       if (previous === undefined) delete process.env.PB_DUMP
       else process.env.PB_DUMP = previous
@@ -106,13 +109,13 @@ describe("contract dumps", () => {
       // Assert
       const raw = JSON.parse(await readFile(`${prefix}.context.tools.raw.json`, "utf8"))
       const final = JSON.parse(await readFile(`${prefix}.context.tools.final.json`, "utf8"))
-      expect(raw.read.description).toBe(originals.read)
-      expect(final.read.description.length).toBeLessThan(raw.read.description.length)
-      expect(final.read.input).toEqual(raw.read.input)
-      expect(await readFile(`${prefix}.context.raw.txt`, "utf8")).toBe("original system")
-      expect(await readFile(`${prefix}.context.final.txt`, "utf8")).toContain(BUILDER_TAG)
-      expect(await readFile(`${prefix}.context.tools.txt`, "utf8")).toContain("read\t")
-      expect((await stat(`${prefix}.context.tools.raw.json`)).mode & 0o777).toBe(0o600)
+      assert.equal(raw.read.description, originals.read)
+      assert.ok(final.read.description.length < raw.read.description.length)
+      assert.deepEqual(final.read.input, raw.read.input)
+      assert.equal(await readFile(`${prefix}.context.raw.txt`, "utf8"), "original system")
+      assert.ok((await readFile(`${prefix}.context.final.txt`, "utf8")).includes(BUILDER_TAG))
+      assert.ok((await readFile(`${prefix}.context.tools.txt`, "utf8")).includes("read\t"))
+      assert.equal((await stat(`${prefix}.context.tools.raw.json`)).mode & 0o777, 0o600)
     } finally {
       await rm(directory, { recursive: true, force: true })
     }

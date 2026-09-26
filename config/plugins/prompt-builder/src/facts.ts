@@ -1,12 +1,8 @@
 /**
- * Snapshot of which tools a request advertised, used to decide which
- * prompt-builder sections apply.
+ * Choose prompt guidance from the tools available in a request.
  *
- * Tool keys arrive from the OpenCode session event's `tools` object, keyed by
- * tool name. Both V1 and V2 names are accepted (bash/shell, task/subagent,
- * apply_patch/patch) so the same facts drive both generators.
- *
- * @module prompt-builder/facts
+ * Tool names come from the session event's `tools` object. Aliases such as
+ * bash/shell, task/subagent and apply_patch/patch select the same guidance.
  */
 
 /** Boolean facts extracted from a per-request tool snapshot. */
@@ -26,7 +22,7 @@ export interface ToolFacts {
   readonly has_patch: boolean;
 }
 
-/** Maps tool names (V1 and V2 spellings) to the fact they set. */
+/** Map tool names and aliases to their availability flags. */
 const TOOL_KEY_MAP: Record<string, keyof ToolFacts> = {
   bash: "has_shell",
   shell: "has_shell",
@@ -83,7 +79,12 @@ export function factsFromToolKeys(keys: Iterable<string>): ToolFacts {
   return facts;
 }
 
-/** True when any cross-tool rule applies to this combination of tools. */
+/**
+ * Check whether any rule needs guidance about more than one tool.
+ *
+ * @param facts - Tools available in the request.
+ * @returns True when at least one shared rule applies.
+ */
 export function hasCommonRules(facts: ToolFacts): boolean {
   // Bash + at least one file tool
   if (
@@ -115,7 +116,7 @@ export function hasCommonRules(facts: ToolFacts): boolean {
 export function buildCommonRules(facts: ToolFacts): string {
   const rules: string[] = [];
 
-  // Shell vs file tools — only list tools that are actually present
+  // Recommend only file tools that are available.
   const fileTools = [
     facts.has_glob ? "glob" : null,
     facts.has_grep ? "grep" : null,
@@ -127,7 +128,7 @@ export function buildCommonRules(facts: ToolFacts): string {
     rules.push(`Prefer \`${fileTools.join("`, `")}\` over \`shell\` for ordinary file work.`);
   }
 
-  // Search tools separation — build a proper conjunction without double "and"
+  // Explain which search tool to use for each task.
   if (searchToolsPresent(facts)) {
     const parts: string[] = [];
     if (facts.has_glob) parts.push("`glob` for file-name search");
@@ -147,7 +148,7 @@ export function buildCommonRules(facts: ToolFacts): string {
     rules.push("Prefer `edit` for targeted changes and `write` for new files or full rewrites.");
   }
 
-  // Read before edit/write — the `{n}: ` prefix comes from the read tool, not the file
+  // Line-number prefixes come from Read output, not the file itself.
   if (facts.has_read && facts.has_edit && facts.has_write) {
     rules.push(
       "Read before `edit` or overwriting with `write`; for `edit`, copy exact text and omit any `{n}: ` prefixes.",

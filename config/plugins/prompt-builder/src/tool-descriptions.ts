@@ -1,8 +1,7 @@
-/** Shorten known V2 tool descriptions without changing their parameter schemas. */
+/** Shorten known tool descriptions without changing their input schemas. */
 
 // OpenCode v2.0.16, commit 3a103fe0aff726a4edc7492f03f7b88195d9e4c9.
-// Match the whole upstream text. New features or other plugins' wording must
-// survive unchanged until we have checked them, not disappear behind an override.
+// Only replace a complete match. Keep unfamiliar wording until it has been checked.
 const descriptions = {
   read: {
     original: [
@@ -15,9 +14,9 @@ const descriptions = {
       "Prefer one larger read over many small slices, and use grep to find specific content in large files.",
     ].join(" "),
     concise: [
-      "Read text, directories, images or PDFs; media is shown directly.",
-      "Text has 1-based line-number prefixes (not file content); directory entries use one line each.",
-      "Page with offset/limit. Prefer larger reads; use grep to locate specific content.",
+      "Read text files, directories, images or PDFs. Images and PDFs are shown directly.",
+      "Text lines have 1-based line-number prefixes that are not part of the file. Directory entries use one line each.",
+      "Use offset and limit to read in sections. Prefer larger reads; use grep to find specific content.",
     ].join(" "),
   },
   write: {
@@ -41,12 +40,12 @@ const descriptions = {
     ].join(" "),
     concise: [
       "Replace matching text. Preserve indentation and omit Read line-number prefixes.",
-      "oldString must exist and match once unless replaceAll=true; add context for a unique match or replace all occurrences.",
+      "oldString must exist and match once unless replaceAll is true. Add context for a unique match, or use replaceAll for every occurrence.",
     ].join(" "),
   },
   glob: {
     original: 'Search file paths using a glob pattern (examples: "**/*.ts", "src/**/*.tsx").',
-    concise: "Find file paths matching a glob, e.g. **/*.ts or src/**/*.tsx.",
+    concise: "Find file paths matching a glob pattern, such as **/*.ts or src/**/*.tsx.",
   },
   grep: {
     original: [
@@ -55,7 +54,7 @@ const descriptions = {
       "Returns matching file paths, line numbers, and line previews.",
     ].join(" "),
     concise: [
-      "Search file contents with ripgrep regex or literal text; narrow with path/include.",
+      "Search file contents with ripgrep regular expressions or literal text. Narrow the search with path or include.",
       "Returns file paths, line numbers and previews.",
     ].join(" "),
   },
@@ -74,8 +73,8 @@ const descriptions = {
     ].join("\n"),
     concise: [
       "Ask the user questions with choices; free-form answers are added automatically.",
-      "Use multiple=true for multi-select.",
-      'Put a recommended option first and suffix its label with "(Recommended)".',
+      "Set multiple to true to allow more than one choice.",
+      'Put the recommended option first and end its label with "(Recommended)".',
     ].join(" "),
   },
 } as const
@@ -93,8 +92,8 @@ const shellRemainder = [
 const shellOriginal = `${shellOpening} ${shellRemainder}`
 const shellConcise = [
   "Quote paths with spaces or special characters; prefer dedicated tools.",
-  "Large output returns a preview and full-output file; filter only when useful.",
-  "Optional timeout; background runs return immediately, default to no timeout and notify on completion.",
+  "Large output returns a preview and saves the full output to a file. Filter only when useful.",
+  "Set a timeout if needed. Background commands return immediately, have no timeout by default and notify you when they finish.",
 ].join(" ")
 
 /**
@@ -103,7 +102,7 @@ const shellConcise = [
  * The shell's runtime OS/shell sentence is kept verbatim. Subagent descriptions,
  * tool objects and input schemas are not replaced. Repeated calls are harmless.
  *
- * @param tools - Mutable tool snapshot from a V2 request; may be absent.
+ * @param tools - Mutable tool definitions from a request; may be absent.
  * @returns No value. Only recognized tools' description fields are updated.
  */
 export function shortenToolDescriptions(tools?: Record<string, unknown>): void {

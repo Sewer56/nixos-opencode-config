@@ -1,5 +1,6 @@
 /** Capture the system prompt and advertised tool contracts for local diagnostics. */
-import type { SessionEvent } from "./builder"
+import { writeFile } from "node:fs/promises"
+import type { SessionEvent } from "./builder.ts"
 
 interface PromptSnapshot {
   system: string
@@ -32,7 +33,6 @@ export async function writePromptDump(
   before: PromptSnapshot,
   event: SessionEvent,
 ): Promise<void> {
-  const { writeFile } = await import("node:fs/promises")
   const after = capturePromptDump(event)
   const sizes = Object.entries(event.tools ?? {}).map(([tool, definition]) => {
     const info = definition as { description?: string; input?: unknown } | null

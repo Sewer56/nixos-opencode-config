@@ -1,10 +1,11 @@
-import { describe, expect, test } from "bun:test"
+import assert from "node:assert/strict"
+import { describe, test } from "node:test"
 import { mkdtemp, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
 
-import { buildIntoEvent, BASE_PROMPT_MARKER } from "../src/builder"
-import type { SessionEvent } from "../src/builder"
+import { buildIntoEvent, BASE_PROMPT_MARKER, type SessionEvent } from "../src/builder.ts"
+import { testCases } from "./cases.ts"
 
 const baseInput = { workingDirectory: "/w", platform: "linux", cwd: "/w" }
 
@@ -29,55 +30,79 @@ function fakeEvent(): SessionEvent {
 
 describe("buildIntoEvent", () => {
   test("base_part_should_be_replaced_when_marker_present", async () => {
+    // Arrange
     const event = fakeEvent()
 
+    // Act
     const result = await buildIntoEvent(event, baseInput)
 
-    expect(result.strategy).toBe("replaced")
-    expect(event.system!.some((p) => p.text?.includes(BASE_PROMPT_MARKER))).toBe(false)
-    expect(event.system!.at(-1)!.text).toBe("agent prompt part")
-    expect(event.system![0]!.text).toContain("# Environment")
-    expect(event.system!.map((p) => p.text).join("\n")).toContain("# Tool Usage Guidelines")
+    // Assert
+    assert.equal(result.strategy, "replaced")
+    assert.equal(event.system!.some((p) => p.text?.includes(BASE_PROMPT_MARKER)), false)
+    assert.equal(event.system!.at(-1)!.text, "agent prompt part")
+    assert.ok(event.system![0]!.text!.includes("# Environment"))
+    assert.ok(event.system!.map((p) => p.text).join("\n").includes("# Tool Usage Guidelines"))
   })
 
   test("sections_should_prepend_when_base_prompt_absent", async () => {
+    // Arrange
     const event = fakeEvent()
     event.system = [{ type: "text", text: "custom agent prompt" }]
 
+    // Act
     const result = await buildIntoEvent(event, baseInput)
 
-    expect(result.strategy).toBe("prepended")
-    expect(event.system!.at(-1)!.text).toBe("custom agent prompt")
-    expect(event.system![0]!.text).toContain("# Environment")
+    // Assert
+    assert.equal(result.strategy, "prepended")
+    assert.equal(event.system!.at(-1)!.text, "custom agent prompt")
+    assert.ok(event.system![0]!.text!.includes("# Environment"))
   })
 
-  test.each([
-    ["edit_and_write_suppressed_when_apply_patch_present", { apply_patch: {}, read: {}, glob: {} }, ["## `Edit` Tool", "## `Write` Tool"], "## `ApplyPatch` Tool"],
-    ["read_before_edit_wording_when_both_present", { read: {}, edit: {} }, [], "Read before `edit`"],
-    ["task_section_lists_present_search_tools", { task: {}, glob: {}, grep: {} }, ["## `Read` Tool"], "`glob`, `grep`"],
-    ["v1_task_alias_maps_to_subagent_section", { task: {} }, [], "## `Subagent` Tool"],
-  ])("sections_should_%s", async (_name, tools, absent, expected) => {
+  testCases("sections_should_select_available_guidance", [
+    {
+      name: "apply_patch_present", tools: { apply_patch: {}, read: {}, glob: {} },
+      absent: ["## `Edit` Tool", "## `Write` Tool"], expected: "## `ApplyPatch` Tool",
+    },
+    {
+      name: "read_and_edit_present", tools: { read: {}, edit: {} },
+      absent: [], expected: "Read before `edit`",
+    },
+    {
+      name: "task_and_search_tools_present", tools: { task: {}, glob: {}, grep: {} },
+      absent: ["## `Read` Tool"], expected: "`glob`, `grep`",
+    },
+    {
+      name: "task_alias_present", tools: { task: {} },
+      absent: [], expected: "## `Subagent` Tool",
+    },
+  ], async ({ tools, absent, expected }) => {
+    // Arrange
     const event = fakeEvent()
     event.tools = tools
 
+    // Act
     const result = await buildIntoEvent(event, baseInput)
 
+    // Assert
     const joined = result.sections.join("\n")
-    for (const fragment of absent) expect(joined).not.toContain(fragment)
-    expect(joined).toContain(expected)
+    for (const fragment of absent) assert.ok(!joined.includes(fragment))
+    assert.ok(joined.includes(expected))
   })
 
   test("supplemental_should_render_when_file_option_set", async () => {
+    // Arrange
     const dir = await mkdtemp(path.join(tmpdir(), "pb-"))
     try {
       await writeFile(path.join(dir, "extra.md"), "supplemental body")
       const event = fakeEvent()
 
+      // Act
       const result = await buildIntoEvent(event, { ...baseInput, cwd: dir, supplementalFiles: ["extra.md"] })
 
+      // Assert
       const joined = result.sections.join("\n")
-      expect(joined).toContain("# Supplemental Context")
-      expect(joined).toContain("## extra\nsupplemental body")
+      assert.ok(joined.includes("# Supplemental Context"))
+      assert.ok(joined.includes("## extra\nsupplemental body"))
     } finally {
       await rm(dir, { recursive: true, force: true })
     }
@@ -99,9 +124,9 @@ describe("buildIntoEvent idempotency", () => {
     const result = await buildIntoEvent(event, input)
 
     // Assert
-    expect(result.strategy).toBe("already-applied")
-    expect(result.sections).toEqual([])
-    expect(JSON.stringify(event.system)).toBe(afterFirst)
+    assert.equal(result.strategy, "already-applied")
+    assert.deepEqual(result.sections, [])
+    assert.equal(JSON.stringify(event.system), afterFirst)
   })
 })
 
@@ -124,15 +149,15 @@ describe("buildIntoEvent strip mode", () => {
     const result = await buildIntoEvent(event, { ...baseInput, stripCore: true })
 
     // Assert
-    expect(result.strategy).toBe("stripped")
+    assert.equal(result.strategy, "stripped")
     const texts = event.system!.map((part) => part.text)
-    expect(texts.some((text) => text!.includes("AI agent running in OpenCode"))).toBe(false)
-    expect(texts.some((text) => text!.includes("# Your Model"))).toBe(false)
-    expect(texts.some((text) => text!.includes("<env>"))).toBe(false)
-    expect(texts.some((text) => text!.includes("worktree outside"))).toBe(false)
-    expect(texts.some((text) => text!.includes("AGENTS.md project instructions"))).toBe(true)
-    expect(texts.some((text) => text!.includes("CAVEMAN MODE ACTIVE"))).toBe(true)
-    expect(texts[0]!.startsWith("<!-- prompt-builder -->")).toBe(true)
+    assert.equal(texts.some((text) => text!.includes("AI agent running in OpenCode")), false)
+    assert.equal(texts.some((text) => text!.includes("# Your Model")), false)
+    assert.equal(texts.some((text) => text!.includes("<env>")), false)
+    assert.equal(texts.some((text) => text!.includes("worktree outside")), false)
+    assert.equal(texts.some((text) => text!.includes("AGENTS.md project instructions")), true)
+    assert.equal(texts.some((text) => text!.includes("CAVEMAN MODE ACTIVE")), true)
+    assert.equal(texts[0]!.startsWith("<!-- prompt-builder -->"), true)
   })
 
   test("buildIntoEvent_should_keep_instructions_attached_to_env_part_when_stripCore", async () => {
@@ -159,9 +184,9 @@ describe("buildIntoEvent strip mode", () => {
 
     // Assert
     const texts = event.system!.map((part) => part.text) as string[]
-    expect(texts[texts.length - 1]).toBe("Repo map for this project.")
-    expect(texts.some((text) => text.includes("<env>"))).toBe(false)
-    expect(texts.some((text) => text.includes("Today's date"))).toBe(false)
+    assert.equal(texts[texts.length - 1], "Repo map for this project.")
+    assert.equal(texts.some((text) => text.includes("<env>")), false)
+    assert.equal(texts.some((text) => text.includes("Today's date")), false)
   })
 
   test("buildIntoEvent_should_not_strip_when_stripCore_unset", async () => {
@@ -178,7 +203,7 @@ describe("buildIntoEvent strip mode", () => {
     const result = await buildIntoEvent(event, { ...baseInput })
 
     // Assert
-    expect(result.strategy).toBe("replaced")
-    expect(event.system!.some((part) => part.text!.includes("# Your Model"))).toBe(true)
+    assert.equal(result.strategy, "replaced")
+    assert.equal(event.system!.some((part) => part.text!.includes("# Your Model")), true)
   })
 })

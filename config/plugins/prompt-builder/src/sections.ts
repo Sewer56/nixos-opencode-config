@@ -1,26 +1,21 @@
 /**
- * Builds the tool-conditional system-prompt sections ("# Environment" and
- * "# Tool Usage Guidelines") that replace OpenCode's default base prompt in
- * the V2 session hooks.
+ * Build prompt sections for the tools available in a request.
  *
- * Ported from the V1 fork's `system-prompt-builder.ts` (patch 05): sections
- * are plain strings, one per top-level heading, so the caller decides how to
- * splice them into the event's system parts.
- *
- * @module prompt-builder/sections
+ * Each string starts with a top-level heading. The caller adds these strings
+ * to the request's system prompt.
  */
 
-import type { ToolFacts } from "./facts";
-import { buildCommonRules, hasCommonRules } from "./facts";
+import type { ToolFacts } from "./facts.ts";
+import { buildCommonRules, hasCommonRules } from "./facts.ts";
 
 export interface SectionInput {
   /** Tool facts for this request. */
   readonly facts: ToolFacts;
-  /** Working directory to announce in the Environment section. */
+  /** Working directory shown in the Environment section. */
   readonly workingDirectory: string;
   /** Platform string (e.g. `process.platform`) for the Environment section. */
   readonly platform: string;
-  /** Optional pre-rendered `{name, content}` supplemental sections. */
+  /** Optional supplemental text, already expanded from files. */
   readonly supplemental?: { name: string; content: string }[];
 }
 
@@ -56,7 +51,7 @@ export function buildSections(input: SectionInput): string[] {
     sections.push(parts.join("\n\n"));
   }
 
-  // Supplemental Context — only included when caller provides it
+  // Add supplemental context only when the caller provides it.
   if (input.supplemental && input.supplemental.length > 0) {
     const parts = ["# Supplemental Context"];
     for (const s of input.supplemental) {
