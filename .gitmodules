@@ -9,3 +9,6 @@
 [submodule "tools/rust-llm-tidy"]
 	path = tools/rust-llm-tidy
 	url = https://github.com/Sewer56/rust-llm-tidy.git
+[submodule "config/plugins/oc-tps"]
+	path = config/plugins/oc-tps
+	url = https://github.com/Tarquinen/oc-tps.git

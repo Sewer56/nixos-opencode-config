@@ -74,6 +74,7 @@
   },
   "plugins": [
     // Live token-rate readout at the bottom right of the input box.
-    "oc-tps@latest"
+    // Local path avoids issue #19 (duplicated Solid runtime from npm install).
+    "./plugins/oc-tps"
   ]
 }
