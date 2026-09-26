@@ -37,25 +37,29 @@ permissions:
   - { action: shell, resource: "*", effect: ask }
   - { action: shell, resource: "sudo *", effect: deny }
   - { action: shell, resource: pwd, effect: allow }
-  - { action: shell, resource: "git *", effect: deny }
-  - { action: shell, resource: "git status*", effect: allow }
-  - { action: shell, resource: "git diff*", effect: allow }
-  - { action: shell, resource: "git show*", effect: allow }
-  - { action: shell, resource: "git log*", effect: allow }
-  - { action: shell, resource: "git rev-parse*", effect: allow }
-  - action: shell
-    resource: "git ls-files --others --exclude-standard *"
-    effect: allow
-  - { action: shell, resource: "git add -- *", effect: allow }
+  - { action: shell, resource: "git *", effect: allow }
   - { action: shell, resource: "git add -A*", effect: deny }
   - { action: shell, resource: "git add --all*", effect: deny }
   - { action: shell, resource: "git add -u*", effect: deny }
   - { action: shell, resource: "git add .", effect: deny }
   - { action: shell, resource: "git add . *", effect: deny }
-  - { action: shell, resource: "git add *", effect: allow }
-  - { action: shell, resource: "git commit -F *", effect: allow }
   - { action: shell, resource: "git commit *--amend*", effect: deny }
   - { action: shell, resource: "git commit *--no-verify*", effect: deny }
+  - { action: shell, resource: "git push*", effect: deny }
+  - { action: shell, resource: "git pull*", effect: deny }
+  - { action: shell, resource: "git fetch*", effect: deny }
+  - { action: shell, resource: "git reset*", effect: deny }
+  - { action: shell, resource: "git clean*", effect: deny }
+  - { action: shell, resource: "git checkout*", effect: deny }
+  - { action: shell, resource: "git switch*", effect: deny }
+  - { action: shell, resource: "git restore*", effect: deny }
+  - { action: shell, resource: "git rebase*", effect: deny }
+  - { action: shell, resource: "git cherry-pick*", effect: deny }
+  - { action: shell, resource: "git revert*", effect: deny }
+  - { action: shell, resource: "git merge*", effect: deny }
+  - { action: shell, resource: "git filter-branch*", effect: deny }
+  - { action: shell, resource: "git submodule*", effect: deny }
+  - { action: shell, resource: "git worktree*", effect: deny }
 
   - action: shell
     resource: "rust-llm-tidy --no-config --dry-run --json *"
@@ -110,7 +114,7 @@ Update affected references, tests and docs within scope.
 Preserve public APIs, executable behavior and dependencies.
 Report required changes outside these boundaries.
 
-Use Git read-only except for explicitly requested scoped staging and commits.
+Use Git non-destructively; stage and commit only when explicitly requested.
 Disable external diff and textconv helpers.
 Never bypass read/edit boundaries through shell, search or delegation.
 
