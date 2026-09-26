@@ -3,7 +3,7 @@ import { describe, test } from "node:test"
 import { mkdtemp, readFile, rm, stat } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
-import plugin from "../server.ts"
+import plugin, { dumpPrefix } from "../server.ts"
 import { BUILDER_TAG, type SessionEvent } from "../src/builder.ts"
 import { capturePromptDump, writePromptDump } from "../src/prompt-dump.ts"
 import originals from "./fixtures/v2.0.16-descriptions.json" with { type: "json" }
@@ -59,6 +59,12 @@ describe("request hooks", () => {
 })
 
 describe("contract dumps", () => {
+  test("hook_should_use_plugin_directory_when_dump_is_enabled", async () => {
+    assert.equal(dumpPrefix("1"), path.join(import.meta.dirname, "..", "probe"))
+    assert.equal(dumpPrefix("/tmp/custom"), "/tmp/custom")
+    assert.equal(dumpPrefix(undefined), undefined)
+  })
+
   test("hook_should_keep_original_dump_when_loaded_twice", async () => {
     // Arrange
     const directory = await mkdtemp(path.join(tmpdir(), "pb-hook-dump-"))

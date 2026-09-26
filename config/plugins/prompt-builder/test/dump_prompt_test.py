@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+import shutil
 import stat
 import subprocess
 import sys
@@ -36,6 +37,22 @@ class DumpPromptTests(unittest.TestCase):
             [sys.executable, str(SCRIPT), str(self.prefix), *arguments],
             capture_output=True, text=True, check=False,
         )
+
+    def test_default_prefix_is_in_plugin_directory(self):
+        # Run a copy from another directory so the test never writes into the repo.
+        scripts = self.directory / "plugin" / "scripts"
+        scripts.mkdir(parents=True)
+        script = scripts / SCRIPT.name
+        shutil.copyfile(SCRIPT, script)
+        prefix = scripts.parent / "probe"
+        self.prefix = prefix
+        self.capture()
+        result = subprocess.run(
+            [sys.executable, str(script), str(prefix)], cwd=self.directory,
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(Path(f"{prefix}.context.report.md").is_file())
 
     # Core behavior
     def test_report_should_preserve_all_captures(self):
@@ -73,6 +90,15 @@ class DumpPromptTests(unittest.TestCase):
         self.assertTrue(Path(f"{self.prefix}.new_hook.report.md").is_file())
 
     # Edge cases
+    def test_report_should_explain_missing_capture(self):
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(f"Missing capture: {self.prefix}.context.raw.txt", result.stderr)
+        self.assertIn("Set PB_DUMP=1 in the OpenCode server's environment", result.stderr)
+        self.assertIn("make a request", result.stderr)
+        self.assertFalse(Path(f"{self.prefix}.context.report.md").exists())
+
     def test_report_should_refuse_existing_outputs(self):
         for kind in ("file", "symlink"):
             with self.subTest(kind=kind):
@@ -112,7 +138,10 @@ class DumpPromptTests(unittest.TestCase):
 
                 # Assert
                 self.assertEqual(result.returncode, 1)
-                self.assertIn("Check the capture prefix", result.stderr)
+                if kind == "missing":
+                    self.assertIn("Missing capture:", result.stderr)
+                else:
+                    self.assertIn("Check the capture prefix", result.stderr)
                 self.assertFalse(output.exists())
 
     # Convenience

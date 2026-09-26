@@ -1,4 +1,5 @@
 /** Register prompt and tool-description hooks for OpenCode requests. */
+import { fileURLToPath } from "node:url"
 import { buildIntoEvent, type SessionEvent } from "./src/builder.ts"
 import { capturePromptDump, writePromptDump } from "./src/prompt-dump.ts"
 import { shortenToolDescriptions } from "./src/tool-descriptions.ts"
@@ -12,6 +13,11 @@ type PluginContext = {
 }
 
 const debug = process.env.PROMPT_BUILDER_DEBUG === "1"
+const defaultDumpPrefix = fileURLToPath(new URL("./probe", import.meta.url))
+
+export function dumpPrefix(value: string | undefined): string | undefined {
+  return value === "1" ? defaultDumpPrefix : value
+}
 
 const HOOKED_EVENTS = ["context", "compaction", "generate"] as const
 
@@ -42,7 +48,7 @@ export default {
 
     for (const name of HOOKED_EVENTS) {
       await ctx.session?.hook?.(name, async (event) => {
-        const dump = process.env.PB_DUMP
+        const dump = dumpPrefix(process.env.PB_DUMP)
         const before = dump ? capturePromptDump(event) : undefined
 
         const { strategy, sections } = await buildIntoEvent(event, {
