@@ -83,10 +83,7 @@ permissions:
   - { action: shell, resource: "patch *", effect: deny }
 ---
 
-This is a review session: the documentation does not sound human and is not
-simple; it needs refinement.
-
-Review it for accuracy, coverage and audience fit using domain DOC_QUALITY.
+Review documentation for accuracy and audience fit using domain DOC_QUALITY.
 
 Edit only the report and `artifact/review/token-pairs/[[run-id]]/`.
 Preserve inputs and prior evidence.
@@ -104,7 +101,7 @@ Assess each passage's relevance to its intended reader and task in context.
 ## 3. Review documentation
 
 Review scoped docs against requirements, implementation and validation.
-The Documentation writing rules below are the standard; flag violations.
+Flag violations of the Documentation writing rules below.
 
 - Review related documentation together, including source-embedded text.
 - Recommend deleting irrelevant or unnecessary detail.
@@ -119,8 +116,7 @@ for extra things to look at.
 
 ## 5. Optimize concision
 
-Shorten scoped documentation where useful.
-Assume documentation contains yapping and should be concised.
+Measure proposed concision edits:
 
 1. Use a unique run directory under worktree `artifact/review/token-pairs/`.
    - Save each original excerpt once as `[[id]].before.txt`.
@@ -156,38 +152,19 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
 ## Documentation
 
-### Standard
-
-The Documentation writing rules below define the standard.
-Flag violations of them as findings.
-
-These review-specific rules add audience, scope and severity policy.
-
 ### Audience
 
-Judge docs by task, type and stated audience requirements.
-Do not assume reader expertise.
-
-Classify by reader and task, not just filename.
 Assess mixed-audience docs by section.
 Apply conventions only to the relevant doc form.
 
 #### End-user documentation
 
-End-user docs explain product setup, use and troubleshooting.
-
 Check for task-relevant instructions, behavior and limitations.
-Flag implementation inventories and internal processes that do not help users.
 
 Flag consequences clear from defaults, definitions or examples.
 
-#### Package documentation
-
-Package docs explain how to import and use the package.
-
 #### Maintainer documentation
 
-Maintainer docs support safe system changes and operation.
 Check for task-relevant architecture, mechanisms, invariants and rationale.
 
 Flag vague effects where readers need concrete mechanisms.
@@ -195,8 +172,7 @@ Flag vague effects where readers need concrete mechanisms.
 ### Review scope
 
 Prefer deletion or in-place correction over additions.
-Justify additions by needs unmet by existing docs or clear code.
-Preserve needed explanations, contracts and caveats.
+Justify additions by unmet reader needs or explicit requirements.
 
 Reject frozen-region findings, including versions, licenses and warnings.
 Do not demand docs-only backfill of untouched legacy.
@@ -216,7 +192,7 @@ Check project terms, identifiers, commands, paths and URLs are exact.
 
 ### Severity
 
-Block false claims, stale references and missing public-feature coverage.
+Block false claims, stale references and unmet documentation requirements.
 Block docs steps missing file, scope, sections or concrete changes.
 
 Block broken heading links across docs steps.

@@ -104,7 +104,7 @@ Reconfirm only material design/scope/delegation changes.
 Capture HEAD, target contents and index ownership, including untracked files.
 Preserve pre-existing and unrelated work.
 
-Write accurate docs with code; keep them current through repairs.
+Keep affected docs current through repairs.
 
 Worker `[[assignment]]`:
 - Outcome, checks, owned/protected paths and stops.
