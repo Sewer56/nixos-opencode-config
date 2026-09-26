@@ -47,6 +47,12 @@ permissions:
     resource: "git ls-files --others --exclude-standard *"
     effect: allow
   - { action: shell, resource: "git add -- *", effect: allow }
+  - { action: shell, resource: "git add -A*", effect: deny }
+  - { action: shell, resource: "git add --all*", effect: deny }
+  - { action: shell, resource: "git add -u*", effect: deny }
+  - { action: shell, resource: "git add .", effect: deny }
+  - { action: shell, resource: "git add . *", effect: deny }
+  - { action: shell, resource: "git add *", effect: allow }
   - { action: shell, resource: "git commit -F *", effect: allow }
   - { action: shell, resource: "git commit *--amend*", effect: deny }
   - { action: shell, resource: "git commit *--no-verify*", effect: deny }
