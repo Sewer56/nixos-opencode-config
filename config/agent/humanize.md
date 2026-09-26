@@ -50,6 +50,9 @@ permissions:
   - action: shell
     resource: "rust-llm-tidy --no-config --dry-run --json *"
     effect: allow
+  - action: shell
+    resource: "src/.llm/verify.sh"
+    effect: allow
 
   - { action: subagent, resource: "*", effect: deny }
   - { action: subagent, resource: subagent/codebase-explorer, effect: allow }
