@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm, stat } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
 import plugin, { dumpPrefix } from "../server.ts"
-import type { SessionEvent } from "../src/builder.ts"
+import { BASE_PROMPT_MARKER, type SessionEvent } from "../src/builder.ts"
 import { capturePromptDump, writePromptDump } from "../src/prompt-dump.ts"
 import originals from "./fixtures/v2.0.16-descriptions.json" with { type: "json" }
 import { testCases } from "./cases.ts"
@@ -39,7 +39,10 @@ describe("request hooks", () => {
         shell: { description: originals.shell, input },
         subagent: { description: "Available subagents:\n- explorer: inspect code", input: {} },
       }
-      const system = [{ type: "text", text: "custom agent prompt" }]
+      const system = [
+        { type: "text", text: BASE_PROMPT_MARKER },
+        { type: "text", text: "Here is some useful information about the environment you are running in:\n<env>\nx\n</env>\nToday's date: today\ncustom agent prompt" },
+      ]
       const event: SessionEvent = { system, tools }
 
       // Act
@@ -50,10 +53,35 @@ describe("request hooks", () => {
       assert.equal(tools.shell.input, input)
       assert.equal(event.tools, tools)
       assert.ok(event.system![0]!.text!.startsWith("# Environment"))
-      assert.equal(event.system!.at(-1), system[0])
+      assert.equal(event.system!.at(-1)!.text, "custom agent prompt")
       assert.equal(tools.subagent.description, "Available subagents:\n- explorer: inspect code")
     },
   )
+
+  test("hook_should_warn_once_and_leave_request_unchanged_when_layout_unknown", async () => {
+    // Arrange
+    const hooks = await handlers()
+    const originalWarn = console.warn
+    const warnings: string[] = []
+    console.warn = (message: string) => { warnings.push(message) }
+    const system = [{ type: "text", text: "new OpenCode base prompt" }]
+    const tools = { read: { description: originals.read } }
+    const event: SessionEvent = { system, tools }
+
+    try {
+      // Act
+      await hooks.get("context")!(event)
+      await hooks.get("generate")!(event)
+
+      // Assert
+      assert.equal(warnings.length, 1)
+      assert.match(warnings[0]!, /expected one OpenCode base prompt/)
+      assert.deepEqual(event.system, system)
+      assert.equal(tools.read.description, originals.read)
+    } finally {
+      console.warn = originalWarn
+    }
+  })
 })
 
 describe("contract dumps", () => {
@@ -68,7 +96,8 @@ describe("contract dumps", () => {
     const directory = await mkdtemp(path.join(tmpdir(), "pb-contracts-"))
     const prefix = path.join(directory, "probe")
     const event: SessionEvent = {
-      system: [{ type: "text", text: "original system" }],
+      system: [{ type: "text", text: BASE_PROMPT_MARKER },
+        { type: "text", text: "Here is some useful information about the environment you are running in:\n<env>\nx\n</env>\nToday's date: today\noriginal system" }],
       tools: { read: { description: originals.read, input: { type: "object" } } },
     }
     const before = capturePromptDump(event)
@@ -85,7 +114,7 @@ describe("contract dumps", () => {
       assert.equal(raw.read.description, originals.read)
       assert.ok(final.read.description.length < raw.read.description.length)
       assert.deepEqual(final.read.input, raw.read.input)
-      assert.equal(await readFile(`${prefix}.context.raw.txt`, "utf8"), "original system")
+      assert.ok((await readFile(`${prefix}.context.raw.txt`, "utf8")).includes("original system"))
       assert.ok((await readFile(`${prefix}.context.final.txt`, "utf8")).startsWith("# Environment"))
       assert.ok((await readFile(`${prefix}.context.tools.txt`, "utf8")).includes("read\t"))
       assert.equal((await stat(`${prefix}.context.tools.raw.json`)).mode & 0o777, 0o600)

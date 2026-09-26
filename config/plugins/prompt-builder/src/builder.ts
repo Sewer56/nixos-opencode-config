@@ -22,7 +22,23 @@ const CORE_PART_PREFIXES = [
 ]
 
 /** Text used to find OpenCode's environment part. */
-const ENV_PART_PREFIX = "Here is some useful information about the environment"
+const ENV_PART_PREFIX = "Here is some useful information about the environment you are running in:\n"
+const ENV_BLOCK = /^<env>\n[\s\S]*?\n<\/env>\n(?:\n)?Today's date:[^\n]*(?:\n|$)/
+
+/** Check the parts we need before removing any prompt text. */
+function unrecognizedLayout(system: SystemPart[] | undefined, stripCore: boolean): string | undefined {
+  if (!system) return "system prompt is missing"
+
+  const base = system.filter((part) => part.type === "text" && part.text?.startsWith(BASE_PROMPT_MARKER))
+  if (base.length !== 1) return `expected one OpenCode base prompt, found ${base.length}`
+  if (!stripCore) return undefined
+
+  const env = system.filter((part) => part.type === "text" && part.text?.startsWith(ENV_PART_PREFIX))
+  if (env.length !== 1 || !ENV_BLOCK.test(env[0]!.text!.slice(ENV_PART_PREFIX.length))) {
+    return "unrecognized OpenCode environment part"
+  }
+  return undefined
+}
 
 /**
  * Remove OpenCode's environment details without losing project instructions.
@@ -31,11 +47,7 @@ const ENV_PART_PREFIX = "Here is some useful information about the environment"
  * in the same part. Keep any instructions that follow the environment details.
  */
 function trimEnvironmentPart(text: string): string {
-  return text
-    .replace(/^Here is some useful information about the environment you are running in:\n/, "")
-    .replace(/<env>[\s\S]*?<\/env>\n?/, "")
-    .replace(/^Today's date:.*\n?/m, "")
-    .replace(/^\n+/, "")
+  return text.slice(ENV_PART_PREFIX.length).replace(ENV_BLOCK, "").replace(/^\n+/, "")
 }
 
 /** Put new sections ahead of the existing system prompt parts. */
@@ -57,8 +69,8 @@ export interface SessionEvent {
   agent?: unknown
 }
 
-/** Whether the builder replaced, prepended to or stripped OpenCode's prompt. */
-export type BasePromptStrategy = "replaced" | "prepended" | "stripped"
+/** Whether the builder replaced, stripped or left OpenCode's prompt alone. */
+export type BasePromptStrategy = "replaced" | "stripped" | "skipped"
 
 /** The environment details and options used to build prompt sections. */
 export interface BuilderInput {
@@ -80,20 +92,22 @@ export interface BuilderInput {
  * With `stripCore`, remove known OpenCode parts but keep project
  * instructions attached to the environment part. This returns `stripped`.
  *
- * Otherwise, replace OpenCode's base prompt if present (`replaced`). If it is
- * missing, leave the existing parts alone (`prepended`). New sections go first.
+ * Otherwise, replace OpenCode's base prompt (`replaced`). If required parts
+ * are unrecognized, leave the event untouched (`skipped`) and report why.
  *
- * The function updates `event.system` in place. Without `stripCore`, provide a
- * `system` array if you want the new sections inserted into the event.
+ * The function updates `event.system` in place only for recognized layouts.
  *
  * @param event - Request event to update (`context`, `compaction` or `generate`).
  * @param input - Environment details and optional files to include.
- * @returns The strategy used and the text of the new sections.
+ * @returns The strategy, new sections and a reason when rewriting was skipped.
  */
 export async function buildIntoEvent(
   event: SessionEvent,
   input: BuilderInput,
-): Promise<{ strategy: BasePromptStrategy; sections: string[] }> {
+): Promise<{ strategy: BasePromptStrategy; sections: string[]; warning?: string }> {
+  const warning = unrecognizedLayout(event.system, !!input.stripCore)
+  if (warning) return { strategy: "skipped", sections: [], warning }
+
   const supplemental = await resolveSupplemental(input)
 
   const sections = buildSections({
@@ -104,7 +118,7 @@ export async function buildIntoEvent(
   })
 
   const baseIndex = (event.system ?? []).findIndex(
-    (part) => typeof part.text === "string" && part.text.includes(BASE_PROMPT_MARKER),
+    (part) => part.type === "text" && part.text?.startsWith(BASE_PROMPT_MARKER),
   )
 
   if (input.stripCore) {
@@ -124,13 +138,9 @@ export async function buildIntoEvent(
     return { strategy: "stripped", sections }
   }
 
-  let strategy: BasePromptStrategy = "prepended"
-  if (baseIndex >= 0) {
-    event.system!.splice(baseIndex, 1)
-    strategy = "replaced"
-  }
+  event.system!.splice(baseIndex, 1)
   prependSections(event.system, sections)
-  return { strategy, sections }
+  return { strategy: "replaced", sections }
 }
 
 /**

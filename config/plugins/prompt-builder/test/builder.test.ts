@@ -44,7 +44,7 @@ describe("buildIntoEvent", () => {
     assert.ok(event.system!.map((p) => p.text).join("\n").includes("# Tool Usage Guidelines"))
   })
 
-  test("sections_should_prepend_when_base_prompt_absent", async () => {
+  test("sections_should_skip_when_base_prompt_absent", async () => {
     // Arrange
     const event = fakeEvent()
     event.system = [{ type: "text", text: "custom agent prompt" }]
@@ -53,9 +53,11 @@ describe("buildIntoEvent", () => {
     const result = await buildIntoEvent(event, baseInput)
 
     // Assert
-    assert.equal(result.strategy, "prepended")
+    assert.equal(result.strategy, "skipped")
+    assert.match(result.warning!, /expected one OpenCode base prompt, found 0/)
+    assert.deepEqual(result.sections, [])
     assert.equal(event.system!.at(-1)!.text, "custom agent prompt")
-    assert.ok(event.system![0]!.text!.includes("# Environment"))
+    assert.equal(event.system!.length, 1)
   })
 
   testCases("sections_should_select_available_guidance", [
@@ -159,6 +161,7 @@ describe("buildIntoEvent strip mode", () => {
     // Arrange: OpenCode packs AGENTS.md content into the environment part.
     const event = {
       system: [
+        { type: "text", text: `${BASE_PROMPT_MARKER} the base prompt` },
         {
           type: "text",
           text: [
@@ -200,5 +203,34 @@ describe("buildIntoEvent strip mode", () => {
     // Assert
     assert.equal(result.strategy, "replaced")
     assert.equal(event.system!.some((part) => part.text!.includes("# Your Model")), true)
+  })
+
+  testCases("buildIntoEvent_should_skip_unsafe_layout_without_mutating", [
+    { name: "missing_system", system: undefined, reason: /system prompt is missing/ },
+    { name: "changed_base", system: [{ type: "text", text: "Changed base prompt" }], reason: /base prompt, found 0/ },
+    { name: "duplicate_base", system: [
+      { type: "text", text: BASE_PROMPT_MARKER }, { type: "text", text: BASE_PROMPT_MARKER },
+    ], reason: /base prompt, found 2/ },
+    { name: "missing_env", system: [{ type: "text", text: BASE_PROMPT_MARKER }], reason: /environment part/ },
+    { name: "changed_env", system: [
+      { type: "text", text: BASE_PROMPT_MARKER }, { type: "text", text: "Environment layout changed" },
+    ], reason: /environment part/ },
+    { name: "malformed_env", system: [
+      { type: "text", text: BASE_PROMPT_MARKER },
+      { type: "text", text: "Here is some useful information about the environment you are running in:\n<env>\nx\n</env>\nProject instructions" },
+    ], reason: /environment part/ },
+  ], async ({ system, reason }) => {
+    // Arrange
+    const event: SessionEvent = { system, tools: { read: { description: "original" } } }
+    const before = structuredClone(event)
+
+    // Act
+    const result = await buildIntoEvent(event, { ...baseInput, stripCore: true })
+
+    // Assert
+    assert.equal(result.strategy, "skipped")
+    assert.match(result.warning!, reason)
+    assert.deepEqual(result.sections, [])
+    assert.deepEqual(event, before)
   })
 })

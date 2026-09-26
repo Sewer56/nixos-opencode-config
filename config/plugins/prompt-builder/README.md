@@ -3,6 +3,8 @@
 Replaces OpenCode's default system prompt with mine, tailored to the available
 tools. Project instructions and custom agent prompts stay intact.
 
+Unknown OpenCode prompt layout: warn and leave the request unchanged.
+
 ## Tweaks
 
 - `PROMPT_BUILDER_KEEP_CORE=1`: keep core parts except the marked base prompt.

@@ -45,20 +45,25 @@ export default {
     const workingDirectory = ctx.location?.directory ?? process.cwd()
     const supplementalFiles = readSupplementalOption(ctx.options)
     const stripCore = process.env.PROMPT_BUILDER_KEEP_CORE !== "1"
+    const warned = new Set<string>()
 
     for (const name of HOOKED_EVENTS) {
       await ctx.session?.hook?.(name, async (event) => {
         const dump = dumpPrefix(process.env.PB_DUMP)
         const before = dump ? capturePromptDump(event) : undefined
 
-        const { strategy, sections } = await buildIntoEvent(event, {
+        const { strategy, sections, warning } = await buildIntoEvent(event, {
           workingDirectory,
           platform: process.platform,
           supplementalFiles,
           cwd: workingDirectory,
           stripCore,
         })
-        shortenToolDescriptions(event.tools)
+        if (warning && !warned.has(warning)) {
+          console.warn(`[prompt-builder] ${warning}; leaving prompt and tools unchanged. Check OpenCode compatibility.`)
+          warned.add(warning)
+        }
+        if (!warning) shortenToolDescriptions(event.tools)
 
         if (dump && before) {
           await writePromptDump(dump, name, before, event)
