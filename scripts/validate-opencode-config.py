@@ -11,14 +11,15 @@ Configuration documents:
 - Require positive output limits and an ask/allow/pattern external policy.
 
 Agent frontmatter and permissions:
-- Validate IDs, YAML, modes, descriptions, provider-qualified models, permission
-  decisions/defaults/order, environment-file denial, and external-directory
-  policy of ask, allow, or a pattern map.
+- Validate IDs, YAML, modes, descriptions, provider-qualified models, v2
+  permission rule lists (actions/resources/effects/order), environment-file
+  denial, and external-directory policy of ask, allow, or patterns.
 
 Commands and task graph:
 - Validate command targets, entry points, routes, reachability, cycles, disabled
   agents, and maximum custom task depth of three edges.
-- Require config.experimental.subagent_depth to equal maximum custom task depth + 2.
+- Require config.experimental.subagent_depth to equal the maximum custom task
+  depth plus 2.
   A mismatch is an error, never a configuration write.
 - Require every parent that allows hidden agents to name each target ID and
   a ``subagent(agent=...)`` call form in its own prompt.
@@ -104,16 +105,17 @@ def resolve_import(repo: Path, current: Path, raw: str) -> Path | None:
 
 
 def task_targets(frontmatter: dict[str, Any]) -> set[str]:
-    permission = frontmatter.get("permission")
-    if not isinstance(permission, dict):
-        return set()
-    task = permission.get("task")
-    if not isinstance(task, dict):
+    """Allowed subagent resources from a v2 ``permissions`` rule list."""
+    permissions = frontmatter.get("permissions")
+    if not isinstance(permissions, list):
         return set()
     return {
-        str(name)
-        for name, decision in task.items()
-        if name != "*" and str(decision).lower() == "allow"
+        str(rule.get("resource"))
+        for rule in permissions
+        if isinstance(rule, dict)
+        and rule.get("action") == "subagent"
+        and rule.get("resource") not in (None, "*")
+        and str(rule.get("effect")).lower() == "allow"
     }
 
 
@@ -182,44 +184,56 @@ def validate_config_path_pairing(ident: str, external: Any, errors: list[str]) -
             )
 
 
-def validate_permission_map(ident: str, permission: Any, errors: list[str]) -> None:
-    if not isinstance(permission, dict):
-        errors.append(f"agent {ident} has no explicit permission mapping")
+def validate_permission_rules(ident: str, permissions: Any, errors: list[str]) -> None:
+    """Validate a v2 ordered permission rule list (last match wins)."""
+    if not isinstance(permissions, list) or not permissions:
+        errors.append(f"agent {ident} has no explicit permissions rule list")
         return
-    if str(permission.get("*", "")).lower() != "deny":
-        errors.append(f"agent {ident} permission must start from top-level '*: deny'")
     valid = VALID_PERMISSION_DECISIONS
-    for tool, rules in permission.items():
-        if isinstance(rules, str):
-            if rules.lower() not in valid:
-                errors.append(f"agent {ident} permission {tool!r} has invalid decision {rules!r}")
+    first = permissions[0]
+    if not (
+        isinstance(first, dict)
+        and first.get("action") == "*"
+        and first.get("resource") == "*"
+        and str(first.get("effect")).lower() == "deny"
+    ):
+        errors.append(f"agent {ident} permissions must start from global '*': deny")
+    seen_wildcard: dict[str, bool] = {}
+    external: dict[str, str] = {}
+    read_denials: set[str] = set()
+    subagent_default: str | None = None
+    for index, rule in enumerate(permissions):
+        if not isinstance(rule, dict) or not all(
+            isinstance(rule.get(key), str) for key in ("action", "resource", "effect")
+        ):
+            errors.append(f"agent {ident} permissions[{index}] needs string action, resource and effect")
             continue
-        if not isinstance(rules, dict):
-            errors.append(f"agent {ident} permission {tool!r} must be a decision or mapping")
-            continue
-        if "*" in rules and next(iter(rules)) != "*":
-            errors.append(f"agent {ident} permission {tool!r} wildcard must be first; last match wins")
-        for pattern, decision in rules.items():
-            if str(decision).lower() not in valid:
+        action, resource, effect = rule["action"], rule["resource"], rule["effect"]
+        if effect not in valid:
+            errors.append(f"agent {ident} permissions[{index}] has invalid effect {effect!r}")
+        if resource == "*":
+            if seen_wildcard.get(action):
                 errors.append(
-                    f"agent {ident} permission {tool!r} pattern {pattern!r} has invalid decision {decision!r}"
+                    f"agent {ident} permissions[{index}] wildcard for {action!r} must be first; last match wins"
                 )
-    external = permission.get("external_directory")
-    if external is not None and not isinstance(external, dict) and str(external).lower() not in {"ask", "allow"}:
-        errors.append(f"agent {ident} external_directory must be ask, allow, or a pattern mapping")
+            seen_wildcard[action] = True
+        if action == "external_directory":
+            external[resource] = effect
+        elif action == "read" and effect == "deny":
+            read_denials.add(resource)
+        elif action == "subagent" and resource == "*" and subagent_default is None:
+            subagent_default = effect
+    if external.get("*") not in {"ask", "allow"}:
+        errors.append(f"agent {ident} external_directory must default to ask or allow")
     validate_config_path_pairing(f"agent {ident}", external, errors)
-    read = permission.get("read")
-    if not isinstance(read, dict):
+    if not any(isinstance(r, dict) and r.get("action") == "read" for r in permissions):
         errors.append(f"agent {ident} read permission must be a mapping")
     else:
         for pattern in ("*.env", "*.env.*"):
-            if str(read.get(pattern, "")).lower() != "deny":
+            if pattern not in read_denials:
                 errors.append(f"agent {ident} read permission must deny {pattern!r}")
-    task = permission.get("task")
-    if isinstance(task, str) and task.lower() != "deny":
-        errors.append(f"agent {ident} task permission may only use scalar 'deny'")
-    elif isinstance(task, dict) and str(task.get("*", "")).lower() != "deny":
-        errors.append(f"agent {ident} task permission must default to deny")
+    if any(isinstance(r, dict) and r.get("action") == "subagent" for r in permissions) and subagent_default != "deny":
+        errors.append(f"agent {ident} subagent permission must default to deny")
 
 
 def longest_depth(graph: dict[str, set[str]], roots: set[str]) -> tuple[int, list[str], list[list[str]]]:
@@ -357,7 +371,7 @@ def main() -> int:
                 provider = model.split("/", 1)[0]
                 if provider not in (config.get("provider") or {}):
                     errors.append(f"{path.relative_to(repo)} uses undeclared model provider {provider}")
-            validate_permission_map(ident, fm.get("permission"), errors)
+            validate_permission_rules(ident, fm.get("permissions"), errors)
 
     command_roots: set[str] = set()
     command_count = 0
@@ -397,7 +411,7 @@ def main() -> int:
                 errors.append(f"agent {ident} allows missing task target {target}")
 
     disabled_agents = {
-        ident for ident, fm in agent_frontmatter.items() if fm.get("disable") is True
+        ident for ident, fm in agent_frontmatter.items() if fm.get("disabled") is True
     }
     for ident, children in graph.items():
         for child in children & disabled_agents:
@@ -416,8 +430,8 @@ def main() -> int:
             errors,
         )
 
-    # Built-in agent task permissions are additional entry points into custom subagents.
-    for builtin_cfg in (config.get("agent") or {}).values() if isinstance(config.get("agent"), dict) else []:
+    # Built-in agent task permissions also enter custom subagents.
+    for builtin_cfg in (config.get("agents") or {}).values() if isinstance(config.get("agents"), dict) else []:
         if not isinstance(builtin_cfg, dict):
             continue
         for target in task_targets(builtin_cfg):
@@ -574,16 +588,25 @@ def main() -> int:
 
     # Default modes (build, plan) run user-driven, so they inherit a global
     # allow policy instead of the ask-everywhere default for subagents.
-    agents = config.get("agent")
+    agents = config.get("agents")
     if not isinstance(agents, dict):
-        errors.append("config.agent must be a mapping")
+        errors.append("config.agents must be a mapping")
     else:
         for ident in BUILTIN_AGENT_ALLOW_EXTERNAL:
-            agent_perm = agents.get(ident, {}).get("permission") if isinstance(agents.get(ident), dict) else None
-            got = agent_perm.get("external_directory") if isinstance(agent_perm, dict) else None
+            rules = agents.get(ident, {}).get("permissions") if isinstance(agents.get(ident), dict) else None
+            got = next(
+                (
+                    rule.get("effect")
+                    for rule in rules or []
+                    if isinstance(rule, dict)
+                    and rule.get("action") == "external_directory"
+                    and rule.get("resource") == "*"
+                ),
+                None,
+            )
             if str(got).lower() != "allow":
                 errors.append(
-                    f"config.agent.{ident}.permission.external_directory must be allow (default mode)"
+                    f"config.agents.{ident}.permissions external_directory must be allow (default mode)"
                 )
 
     details.extend(

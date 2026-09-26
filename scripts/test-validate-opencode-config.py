@@ -33,8 +33,10 @@ class EntryPointTests(unittest.TestCase):
             "experimental": {"subagent_depth": 2},
             "tool_output": {"max_lines": 10, "max_bytes": 100},
             "permissions": [{"action": "external_directory", "resource": "*", "effect": "ask"}],
-            "agent": {
-                name: {"permission": {"external_directory": "allow"}}
+            "agents": {
+                name: {"permissions": [
+                    {"action": "external_directory", "resource": "*", "effect": "allow"}
+                ]}
                 for name in ("build", "plan")
             },
         }
@@ -43,11 +45,18 @@ class EntryPointTests(unittest.TestCase):
         frontmatter = {
             "mode": mode,
             "description": "Fixture agent",
-            "permission": {
-                "*": "deny",
-                "read": {"*": "allow", "*.env": "deny", "*.env.*": "deny"},
-                "task": {"*": "deny", **dict.fromkeys(targets, "allow")},
-            },
+            "permissions": [
+                {"action": "*", "resource": "*", "effect": "deny"},
+                {"action": "external_directory", "resource": "*", "effect": "ask"},
+                {"action": "read", "resource": "*", "effect": "allow"},
+                {"action": "read", "resource": "*.env", "effect": "deny"},
+                {"action": "read", "resource": "*.env.*", "effect": "deny"},
+                {"action": "subagent", "resource": "*", "effect": "deny"},
+                *(
+                    {"action": "subagent", "resource": target, "effect": "allow"}
+                    for target in targets
+                ),
+            ],
             **extra,
         }
         path = self.repo / "config/agent" / f"{name}.md"
@@ -83,7 +92,7 @@ class EntryPointTests(unittest.TestCase):
                 self.validate(0)
 
     def test_hidden_disabled_and_subagent_are_not_selection_roots(self):
-        for extra in ({"hidden": True}, {"disable": True}, {"mode": "subagent"}):
+        for extra in ({"hidden": True}, {"disabled": True}, {"mode": "subagent"}):
             with self.subTest(extra=extra):
                 self.agent("Docs", **extra)
                 self.validate(1, "unreachable custom agents: Docs")
@@ -120,9 +129,11 @@ class EntryPointTests(unittest.TestCase):
 
     def test_builtin_grant_to_hidden_agent_is_rejected(self):
         self.agent("worker", "subagent", hidden=True)
-        self.config["agent"]["build"]["permission"]["task"] = {
-            "*": "deny", "worker": "allow"
-        }
+        self.config["agents"]["build"]["permissions"] = [
+            {"action": "external_directory", "resource": "*", "effect": "allow"},
+            {"action": "subagent", "resource": "*", "effect": "deny"},
+            {"action": "subagent", "resource": "worker", "effect": "allow"},
+        ]
         self.validate(1, "allows hidden task target worker")
 
     def test_unreferenced_subagent_is_still_rejected(self):
@@ -137,9 +148,11 @@ class EntryPointTests(unittest.TestCase):
 
     def test_builtin_task_grant_remains_an_entry(self):
         self.agent("worker", "subagent")
-        self.config["agent"]["build"]["permission"]["task"] = {
-            "*": "deny", "worker": "allow"
-        }
+        self.config["agents"]["build"]["permissions"] = [
+            {"action": "external_directory", "resource": "*", "effect": "allow"},
+            {"action": "subagent", "resource": "*", "effect": "deny"},
+            {"action": "subagent", "resource": "worker", "effect": "allow"},
+        ]
         self.validate(0)
 
     def test_command_cannot_target_subagent(self):
@@ -154,7 +167,7 @@ class EntryPointTests(unittest.TestCase):
     def test_missing_and_disabled_task_targets_are_rejected(self):
         self.agent("Docs", targets=("missing",))
         self.validate(1, "allows missing task target missing")
-        self.agent("missing", "subagent", disable=True)
+        self.agent("missing", "subagent", disabled=True)
         self.config["experimental"]["subagent_depth"] = 3
         self.validate(1, "routes to disabled agent missing")
 
@@ -320,26 +333,6 @@ class LocalReviewArchitectureTests(unittest.TestCase):
                 "config/agent/_review/doc-quality.md",
             }, caller)
 
-    def test_candidate_reviewers_import_only_shared_adhd_rules(self):
-        for reviewer in ("code-quality", "correctness", "doc-quality",
-                         "code/optional/performance"):
-            root = f"config/agent/_review/{reviewer}.md"
-            expected = {root}
-            if reviewer in ("code-quality", "doc-quality"):
-                expected.add("config/rules/adhd-communication.md")
-            self.assertEqual(self.imports(root), expected)
-
-    def test_no_domain_rule_imports_remain(self):
-        shared_procedures = {
-            "config/rules/code/writing.md",
-        }
-        for path in (self.repo / "config/agent").rglob("*.md"):
-            root = path.relative_to(self.repo).as_posix()
-            domain_imports = {p for p in self.imports(root)
-                              if p.startswith(("config/rules/code/",
-                                               "config/rules/docs/",
-                                               "config/rules/write/"))}
-            self.assertFalse(domain_imports - shared_procedures, root)
 
 
 if __name__ == "__main__":

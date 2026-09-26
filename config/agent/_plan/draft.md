@@ -1,69 +1,60 @@
 ---
 mode: all
 description: Discusses and writes human-first bundles
-model: sewer-axonhub/glm-5.3 # PLANNER
-variant: high
-permission:
-  "*": deny
-  external_directory:
-    "*": ask
-    "/tmp/**": allow
-    "/proc/**": allow
-    "/sys/**": allow
-    "/etc/**": allow
-    "/nix/store/**": allow
-    "/var/log/**": allow
-    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**": allow
-    "/home/sewer/opencode/**": allow
-    "/home/sewer/Downloads/**": allow
-    "/home/sewer/Documents/**": allow
-    "/home/sewer/Temp/**": allow
-    "/home/sewer/Work/**": allow
-    "/home/sewer/Obsidian Vault/**": allow
-    "/var/tmp/**": allow
-    "/home/sewer/.cargo/**": allow
-    "/home/sewer/.rustup/**": allow
-    "/home/sewer/go/**": allow
-    "/home/sewer/.bun/**": allow
-    "/home/sewer/.nuget/**": allow
-    "/home/sewer/.dotnet/**": allow
-    "/home/sewer/.npm/**": allow
-    "/home/sewer/.pnpm-store/**": allow
-    "/home/sewer/.yarn/**": allow
-    "/home/sewer/.cache/**": allow
-    "/home/sewer/.config/**": allow
-    "/home/sewer/.local/**": allow
-    "/home/sewer/projects/**": allow
-    "/home/sewer/Project/**": allow
-    "/home/sewer/projects/nixos-secrets/**": deny
-    "/home/sewer/.config/gh/hosts.yml": ask
-    "/home/sewer/.config/yara-report-app/credentials.json": ask
-    "/home/sewer/.local/share/opencode/*.json": ask
-  read:
-    "*": allow
-    "*.env": deny
-    "*.env.*": deny
-    "*.env.example": allow
-  edit:
-    "*": deny
-    "PROMPT-PLAN-*.draft.md": allow
-    "artifact/plan/**/*.md": allow
-    "artifact/plan/**/review/**": deny
-  question: allow
-  todowrite: allow
-  bash: allow
-  glob:
-    "*": deny
-    "PROMPT-PLAN-*.draft.md": allow
-  grep:
-    "*": deny
-  list: allow
-  task:
-    "*": deny
-    "_plan/draft/explorer": allow
-    "_plan/draft/reviewer": allow
-    "_plan/draft/verifier": allow
-    "subagent/web-search": allow
+model: sewer-axonhub/glm-5.3#high # PLANNER
+permissions:
+  - { action: "*", resource: "*", effect: deny }
+  - { action: external_directory, resource: "*", effect: ask }
+  - { action: external_directory, resource: "/tmp/**", effect: allow }
+  - { action: external_directory, resource: "/proc/**", effect: allow }
+  - { action: external_directory, resource: "/sys/**", effect: allow }
+  - { action: external_directory, resource: "/etc/**", effect: allow }
+  - { action: external_directory, resource: "/nix/store/**", effect: allow }
+  - { action: external_directory, resource: "/var/log/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/opencode/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Downloads/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Documents/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Temp/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Work/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Obsidian Vault/**", effect: allow }
+  - { action: external_directory, resource: "/var/tmp/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.cargo/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.rustup/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/go/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.bun/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.nuget/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.dotnet/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.npm/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.pnpm-store/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.yarn/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.cache/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.config/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.local/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/projects/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Project/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/projects/nixos-secrets/**", effect: deny }
+  - { action: external_directory, resource: /home/sewer/.config/gh/hosts.yml, effect: ask }
+  - { action: external_directory, resource: /home/sewer/.config/yara-report-app/credentials.json, effect: ask }
+  - { action: external_directory, resource: "/home/sewer/.local/share/opencode/*.json", effect: ask }
+  - { action: read, resource: "*", effect: allow }
+  - { action: read, resource: "*.env", effect: deny }
+  - { action: read, resource: "*.env.*", effect: deny }
+  - { action: read, resource: "*.env.example", effect: allow }
+  - { action: edit, resource: "*", effect: deny }
+  - { action: edit, resource: "PROMPT-PLAN-*.draft.md", effect: allow }
+  - { action: edit, resource: "artifact/plan/**/*.md", effect: allow }
+  - { action: edit, resource: "artifact/plan/**/review/**", effect: deny }
+  - { action: question, resource: "*", effect: allow }
+  - { action: shell, resource: "*", effect: allow }
+  - { action: glob, resource: "*", effect: deny }
+  - { action: glob, resource: "PROMPT-PLAN-*.draft.md", effect: allow }
+  - { action: grep, resource: "*", effect: deny }
+  - { action: subagent, resource: "*", effect: deny }
+  - { action: subagent, resource: _plan/draft/explorer, effect: allow }
+  - { action: subagent, resource: _plan/draft/reviewer, effect: allow }
+  - { action: subagent, resource: _plan/draft/verifier, effect: allow }
+  - { action: subagent, resource: subagent/web-search, effect: allow }
 ---
 
 Discuss and author an approved human-first plan bundle for `/implement`.

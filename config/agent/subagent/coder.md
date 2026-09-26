@@ -1,42 +1,35 @@
 ---
 mode: subagent
 description: Code implementation worker
-model: sewer-axonhub/glm-5.3 # CODER
-variant: low
-permission:
-  "*": deny
-  external_directory:
-    "*": ask
-    "/home/sewer/opencode/config/scripts/rust-llm-tidy-gate.sh": allow
-    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/scripts/rust-llm-tidy-gate.sh": allow
-  read:
-    "*": allow
-    "*.env": deny
-    "*.env.*": deny
-    "*.env.example": allow
-  edit:
-    "*": allow
-    "*.env": deny
-    "*.env.*": deny
-    "*.env.example": allow
-    "artifact/**": deny
-    "artifacts/**": deny
-    ".git": deny
-    ".git/**": deny
-  bash:
-    "*": allow
-    "sudo *": deny
-    "git *": allow
-    "git push *": ask
-    "git reset --hard *": ask
-    "git clean *": ask
-    "git commit --no-verify *": ask
-    "*.env*": deny
-  todowrite: allow
-  grep: allow
-  glob: allow
-  list: allow
-  task: deny
+model: sewer-axonhub/glm-5.3#low # CODER
+permissions:
+  - { action: "*", resource: "*", effect: deny }
+  - { action: external_directory, resource: "*", effect: ask }
+  - { action: external_directory, resource: /home/sewer/opencode/config/scripts/rust-llm-tidy-gate.sh, effect: allow }
+  - { action: external_directory, resource: /home/sewer/nixos/users/sewer/home-manager/programs/opencode/config/scripts/rust-llm-tidy-gate.sh, effect: allow }
+  - { action: read, resource: "*", effect: allow }
+  - { action: read, resource: "*.env", effect: deny }
+  - { action: read, resource: "*.env.*", effect: deny }
+  - { action: read, resource: "*.env.example", effect: allow }
+  - { action: edit, resource: "*", effect: allow }
+  - { action: edit, resource: "*.env", effect: deny }
+  - { action: edit, resource: "*.env.*", effect: deny }
+  - { action: edit, resource: "*.env.example", effect: allow }
+  - { action: edit, resource: "artifact/**", effect: deny }
+  - { action: edit, resource: "artifacts/**", effect: deny }
+  - { action: edit, resource: .git, effect: deny }
+  - { action: edit, resource: ".git/**", effect: deny }
+  - { action: shell, resource: "*", effect: allow }
+  - { action: shell, resource: "sudo *", effect: deny }
+  - { action: shell, resource: "git *", effect: allow }
+  - { action: shell, resource: "git push *", effect: ask }
+  - { action: shell, resource: "git reset --hard *", effect: ask }
+  - { action: shell, resource: "git clean *", effect: ask }
+  - { action: shell, resource: "git commit --no-verify *", effect: ask }
+  - { action: shell, resource: "*.env*", effect: deny }
+  - { action: grep, resource: "*", effect: allow }
+  - { action: glob, resource: "*", effect: allow }
+  - { action: subagent, resource: "*", effect: deny }
 ---
 
 Implement the given assignment.

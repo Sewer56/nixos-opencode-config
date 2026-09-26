@@ -1,88 +1,81 @@
 ---
 mode: subagent
-hidden: true
+hidden: True
 description: Refutes candidates and promotes required draft corrections
-
-model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
-variant: high
-
-permission:
-  "*": deny
-  external_directory:
-    "*": ask
-    "/tmp/**": allow
-    "/proc/**": allow
-    "/sys/**": allow
-    "/etc/**": allow
-    "/nix/store/**": allow
-    "/var/log/**": allow
-    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**": allow
-    "/home/sewer/opencode/**": allow
-    "/home/sewer/Downloads/**": allow
-    "/home/sewer/Documents/**": allow
-    "/home/sewer/Temp/**": allow
-    "/home/sewer/Work/**": allow
-    "/home/sewer/Obsidian Vault/**": allow
-    "/var/tmp/**": allow
-    "/home/sewer/.cargo/**": allow
-    "/home/sewer/.rustup/**": allow
-    "/home/sewer/go/**": allow
-    "/home/sewer/.bun/**": allow
-    "/home/sewer/.nuget/**": allow
-    "/home/sewer/.dotnet/**": allow
-    "/home/sewer/.npm/**": allow
-    "/home/sewer/.pnpm-store/**": allow
-    "/home/sewer/.yarn/**": allow
-    "/home/sewer/.cache/**": allow
-    "/home/sewer/.config/**": allow
-    "/home/sewer/.local/**": allow
-    "/home/sewer/projects/**": allow
-    "/home/sewer/Project/**": allow
-    "/home/sewer/projects/nixos-secrets/**": deny
-    "/home/sewer/.config/gh/hosts.yml": ask
-    "/home/sewer/.config/yara-report-app/credentials.json": ask
-    "/home/sewer/.local/share/opencode/*.json": ask
-  read:
-    "*": allow
-    "*.env": deny
-    "*.env.*": deny
-    "*.env.example": allow
-    "../*": deny
-  edit: deny
-  glob: deny
-  grep: deny
-  list: deny
-  bash:
-    "*": allow
-    "sudo *": deny
-    "git push *": deny
-    "git commit *": deny
-    "git add *": deny
-    "git reset *": deny
-    "git clean *": deny
-    "git rebase *": deny
-    "git merge *": deny
-    "git checkout *": deny
-    "git switch *": deny
-    "git restore *": deny
-    "git stash *": deny
-    "git rm *": deny
-    "git mv *": deny
-    "git apply *": deny
-    "git cherry-pick *": deny
-    "git revert *": deny
-    "rm *": deny
-    "mv *": deny
-    "cp *": deny
-    "touch *": deny
-    "mkdir *": deny
-    "rmdir *": deny
-    "tee *": deny
-    "dd *": deny
-    "ln *": deny
-    "chmod *": deny
-    "chown *": deny
-    "patch *": deny
+model: sewer-axonhub/glm-5.3#high # CORRECTNESS-REVIEW
+permissions:
+  - { action: "*", resource: "*", effect: deny }
+  - { action: external_directory, resource: "*", effect: ask }
+  - { action: external_directory, resource: "/tmp/**", effect: allow }
+  - { action: external_directory, resource: "/proc/**", effect: allow }
+  - { action: external_directory, resource: "/sys/**", effect: allow }
+  - { action: external_directory, resource: "/etc/**", effect: allow }
+  - { action: external_directory, resource: "/nix/store/**", effect: allow }
+  - { action: external_directory, resource: "/var/log/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/opencode/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Downloads/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Documents/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Temp/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Work/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Obsidian Vault/**", effect: allow }
+  - { action: external_directory, resource: "/var/tmp/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.cargo/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.rustup/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/go/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.bun/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.nuget/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.dotnet/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.npm/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.pnpm-store/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.yarn/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.cache/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.config/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.local/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/projects/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Project/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/projects/nixos-secrets/**", effect: deny }
+  - { action: external_directory, resource: /home/sewer/.config/gh/hosts.yml, effect: ask }
+  - { action: external_directory, resource: /home/sewer/.config/yara-report-app/credentials.json, effect: ask }
+  - { action: external_directory, resource: "/home/sewer/.local/share/opencode/*.json", effect: ask }
+  - { action: read, resource: "*", effect: allow }
+  - { action: read, resource: "*.env", effect: deny }
+  - { action: read, resource: "*.env.*", effect: deny }
+  - { action: read, resource: "*.env.example", effect: allow }
+  - { action: read, resource: "../*", effect: deny }
+  - { action: edit, resource: "*", effect: deny }
+  - { action: glob, resource: "*", effect: deny }
+  - { action: grep, resource: "*", effect: deny }
+  - { action: shell, resource: "*", effect: allow }
+  - { action: shell, resource: "sudo *", effect: deny }
+  - { action: shell, resource: "git push *", effect: deny }
+  - { action: shell, resource: "git commit *", effect: deny }
+  - { action: shell, resource: "git add *", effect: deny }
+  - { action: shell, resource: "git reset *", effect: deny }
+  - { action: shell, resource: "git clean *", effect: deny }
+  - { action: shell, resource: "git rebase *", effect: deny }
+  - { action: shell, resource: "git merge *", effect: deny }
+  - { action: shell, resource: "git checkout *", effect: deny }
+  - { action: shell, resource: "git switch *", effect: deny }
+  - { action: shell, resource: "git restore *", effect: deny }
+  - { action: shell, resource: "git stash *", effect: deny }
+  - { action: shell, resource: "git rm *", effect: deny }
+  - { action: shell, resource: "git mv *", effect: deny }
+  - { action: shell, resource: "git apply *", effect: deny }
+  - { action: shell, resource: "git cherry-pick *", effect: deny }
+  - { action: shell, resource: "git revert *", effect: deny }
+  - { action: shell, resource: "rm *", effect: deny }
+  - { action: shell, resource: "mv *", effect: deny }
+  - { action: shell, resource: "cp *", effect: deny }
+  - { action: shell, resource: "touch *", effect: deny }
+  - { action: shell, resource: "mkdir *", effect: deny }
+  - { action: shell, resource: "rmdir *", effect: deny }
+  - { action: shell, resource: "tee *", effect: deny }
+  - { action: shell, resource: "dd *", effect: deny }
+  - { action: shell, resource: "ln *", effect: deny }
+  - { action: shell, resource: "chmod *", effect: deny }
+  - { action: shell, resource: "chown *", effect: deny }
+  - { action: shell, resource: "patch *", effect: deny }
 ---
 
 Refute draft review candidates; alone promote justified corrections.

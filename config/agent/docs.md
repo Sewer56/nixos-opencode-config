@@ -1,81 +1,72 @@
 ---
 mode: primary
 description: Writes and reviews end-user, source and error documentation
-model: sewer-axonhub/glm-5.3-flash # WRITER
-variant: low
-
-permission:
-  "*": deny
-  external_directory:
-    "*": ask
-    "/tmp/**": allow
-    "/proc/**": allow
-    "/sys/**": allow
-    "/etc/**": allow
-    "/nix/store/**": allow
-    "/var/log/**": allow
-    "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**": allow
-    "/home/sewer/opencode/**": allow
-    "/home/sewer/Downloads/**": allow
-    "/home/sewer/Documents/**": allow
-    "/home/sewer/Temp/**": allow
-    "/home/sewer/Work/**": allow
-    "/home/sewer/Obsidian Vault/**": allow
-    "/var/tmp/**": allow
-    "/home/sewer/.cargo/**": allow
-    "/home/sewer/.rustup/**": allow
-    "/home/sewer/go/**": allow
-    "/home/sewer/.bun/**": allow
-    "/home/sewer/.nuget/**": allow
-    "/home/sewer/.dotnet/**": allow
-    "/home/sewer/.npm/**": allow
-    "/home/sewer/.pnpm-store/**": allow
-    "/home/sewer/.yarn/**": allow
-    "/home/sewer/.cache/**": allow
-    "/home/sewer/.config/**": allow
-    "/home/sewer/.local/**": allow
-    "/home/sewer/projects/**": allow
-    "/home/sewer/Project/**": allow
-    "/home/sewer/projects/nixos-secrets/**": deny
-    "/home/sewer/.config/gh/hosts.yml": ask
-    "/home/sewer/.config/yara-report-app/credentials.json": ask
-    "/home/sewer/.local/share/opencode/*.json": ask
-  read:
-    "*": allow
-    "*.env": deny
-    "*.env.*": deny
-    "*.env.example": allow
-  edit:
-    "*": allow
-    "*.env": deny
-    "*.env.*": deny
-    "*.env.example": deny
-    ".git": deny
-    ".git/**": deny
-    "*PROMPT-*.md": deny
-    "artifact/**": deny
-    "artifacts/**": deny
-    "artifact/PROMPT-DOCS-*": allow
-    "artifact/review/PROMPT-DOCS-*/*.validation.md": allow
-  question: allow
-  todowrite: allow
-  glob: allow
-  grep: allow
-  list: allow
-  bash:
-    "*": allow
-    "sudo *": deny
-    "git push*": deny
-    "git commit*": deny
-    "git add*": deny
-    "git reset --hard *": deny
-    "git clean *": deny
-  task:
-    "*": deny
-    "subagent/codebase-explorer": allow
-    "subagent/web-search": allow
-    "_review/doc-quality": allow
-    "_review/verifier": allow
+model: sewer-axonhub/glm-5.3-flash#low # WRITER
+permissions:
+  - { action: "*", resource: "*", effect: deny }
+  - { action: external_directory, resource: "*", effect: ask }
+  - { action: external_directory, resource: "/tmp/**", effect: allow }
+  - { action: external_directory, resource: "/proc/**", effect: allow }
+  - { action: external_directory, resource: "/sys/**", effect: allow }
+  - { action: external_directory, resource: "/etc/**", effect: allow }
+  - { action: external_directory, resource: "/nix/store/**", effect: allow }
+  - { action: external_directory, resource: "/var/log/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/nixos/users/sewer/home-manager/programs/opencode/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/opencode/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Downloads/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Documents/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Temp/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Work/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Obsidian Vault/**", effect: allow }
+  - { action: external_directory, resource: "/var/tmp/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.cargo/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.rustup/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/go/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.bun/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.nuget/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.dotnet/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.npm/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.pnpm-store/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.yarn/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.cache/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.config/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/.local/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/projects/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/Project/**", effect: allow }
+  - { action: external_directory, resource: "/home/sewer/projects/nixos-secrets/**", effect: deny }
+  - { action: external_directory, resource: /home/sewer/.config/gh/hosts.yml, effect: ask }
+  - { action: external_directory, resource: /home/sewer/.config/yara-report-app/credentials.json, effect: ask }
+  - { action: external_directory, resource: "/home/sewer/.local/share/opencode/*.json", effect: ask }
+  - { action: read, resource: "*", effect: allow }
+  - { action: read, resource: "*.env", effect: deny }
+  - { action: read, resource: "*.env.*", effect: deny }
+  - { action: read, resource: "*.env.example", effect: allow }
+  - { action: edit, resource: "*", effect: allow }
+  - { action: edit, resource: "*.env", effect: deny }
+  - { action: edit, resource: "*.env.*", effect: deny }
+  - { action: edit, resource: "*.env.example", effect: deny }
+  - { action: edit, resource: .git, effect: deny }
+  - { action: edit, resource: ".git/**", effect: deny }
+  - { action: edit, resource: "*PROMPT-*.md", effect: deny }
+  - { action: edit, resource: "artifact/**", effect: deny }
+  - { action: edit, resource: "artifacts/**", effect: deny }
+  - { action: edit, resource: "artifact/PROMPT-DOCS-*", effect: allow }
+  - { action: edit, resource: "artifact/review/PROMPT-DOCS-*/*.validation.md", effect: allow }
+  - { action: question, resource: "*", effect: allow }
+  - { action: glob, resource: "*", effect: allow }
+  - { action: grep, resource: "*", effect: allow }
+  - { action: shell, resource: "*", effect: allow }
+  - { action: shell, resource: "sudo *", effect: deny }
+  - { action: shell, resource: "git push*", effect: deny }
+  - { action: shell, resource: "git commit*", effect: deny }
+  - { action: shell, resource: "git add*", effect: deny }
+  - { action: shell, resource: "git reset --hard *", effect: deny }
+  - { action: shell, resource: "git clean *", effect: deny }
+  - { action: subagent, resource: "*", effect: deny }
+  - { action: subagent, resource: subagent/codebase-explorer, effect: allow }
+  - { action: subagent, resource: subagent/web-search, effect: allow }
+  - { action: subagent, resource: _review/doc-quality, effect: allow }
+  - { action: subagent, resource: _review/verifier, effect: allow }
 ---
 
 Write, revise or review accurate documentation for the intended audience.

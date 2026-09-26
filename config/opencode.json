@@ -5,8 +5,9 @@
     "./plugins/opencode-models-discovery",
     "./plugins/caveman",
     "./plugins/path-guard",
-    "./plugins/opencode-plugin-md-expand",
-    "./plugins/prompt-builder"
+    "./plugins/prompt-builder",
+    // Keep after prompt-builder so it sees supplemental text.
+    "./plugins/opencode-plugin-md-expand"
   ],
   "small_model": "sewer-axonhub/deepseek-v4.1-flash",
   "permissions": [
@@ -53,47 +54,41 @@
     { "action": "external_directory", "resource": "/home/sewer/.config/yara-report-app/credentials.json", "effect": "ask" },
     { "action": "external_directory", "resource": "/home/sewer/.local/share/opencode/*.json", "effect": "ask" }
   ],
-  "agent": {
+  "agents": {
     "plan": {
-      "permission": {
-        "webfetch": "deny",
-        "websearch": "deny",
-        "task": {
-          "*": "deny",
-          "general": "allow",
-          "subagent/web-search": "allow",
-          "subagent/codebase-explorer": "allow"
-        },
-        "skill": "deny",
-        "external_directory": "allow"
-      }
+      "permissions": [
+        { "action": "subagent", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "general", "effect": "allow" },
+        { "action": "subagent", "resource": "subagent/web-search", "effect": "allow" },
+        { "action": "subagent", "resource": "subagent/codebase-explorer", "effect": "allow" },
+        { "action": "webfetch", "resource": "*", "effect": "deny" },
+        { "action": "websearch", "resource": "*", "effect": "deny" },
+        { "action": "skill", "resource": "*", "effect": "deny" },
+        { "action": "external_directory", "resource": "*", "effect": "allow" }
+      ]
     },
     "build": {
-      "permission": {
-        "webfetch": "deny",
-        "websearch": "deny",
-        "task": {
-          "*": "deny",
-          "general": "allow",
-          "subagent/web-search": "allow",
-          "subagent/codebase-explorer": "allow"
-        },
-        "skill": "deny",
-        "external_directory": "allow"
-      }
+      "permissions": [
+        { "action": "subagent", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "general", "effect": "allow" },
+        { "action": "subagent", "resource": "subagent/web-search", "effect": "allow" },
+        { "action": "subagent", "resource": "subagent/codebase-explorer", "effect": "allow" },
+        { "action": "webfetch", "resource": "*", "effect": "deny" },
+        { "action": "websearch", "resource": "*", "effect": "deny" },
+        { "action": "skill", "resource": "*", "effect": "deny" },
+        { "action": "external_directory", "resource": "*", "effect": "allow" }
+      ]
     },
     "general": {
-      "permission": {
-        "webfetch": "deny",
-        "websearch": "deny",
-        "task": {
-          "*": "deny",
-          "subagent/web-search": "allow"
-        }
-      }
+      "permissions": [
+        { "action": "subagent", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "subagent/web-search", "effect": "allow" },
+        { "action": "webfetch", "resource": "*", "effect": "deny" },
+        { "action": "websearch", "resource": "*", "effect": "deny" }
+      ]
     },
     "explore": {
-      "disable": true
+      "disabled": true
     }
   },
   "mcp": {
