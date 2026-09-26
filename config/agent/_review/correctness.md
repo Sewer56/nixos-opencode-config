@@ -2,7 +2,8 @@
 mode: subagent
 hidden: True
 description: Reviews behavior, security and test adequacy
-model: sewer-axonhub/glm-5.3#high # CORRECTNESS-REVIEW
+model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
+variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

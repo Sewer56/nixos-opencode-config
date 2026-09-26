@@ -1,7 +1,8 @@
 ---
 mode: all
 description: Executes approved tasks and final review
-model: sewer-axonhub/glm-5.3#low # CODER
+model: sewer-axonhub/glm-5.3 # CODER
+variant: low
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

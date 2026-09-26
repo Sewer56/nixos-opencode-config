@@ -1,7 +1,8 @@
 ---
 mode: all
 description: Writes grounded issues
-model: sewer-axonhub/glm-5.3-flash#low # WRITER
+model: sewer-axonhub/glm-5.3-flash # WRITER
+variant: low
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

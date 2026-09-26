@@ -1,7 +1,8 @@
 ---
 mode: all
 description: Discusses and writes human-first bundles
-model: sewer-axonhub/glm-5.3#high # PLANNER
+model: sewer-axonhub/glm-5.3 # PLANNER
+variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

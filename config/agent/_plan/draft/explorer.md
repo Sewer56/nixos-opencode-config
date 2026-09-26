@@ -2,7 +2,8 @@
 mode: subagent
 hidden: True
 description: Discovers bounded repository evidence for draft
-model: sewer-axonhub/glm-5.3-flash#low # EASY
+model: sewer-axonhub/glm-5.3-flash # EASY
+variant: low
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }
