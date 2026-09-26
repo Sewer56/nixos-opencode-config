@@ -1,20 +1,18 @@
-/** Build and insert tool-specific guidance into a request's system prompt. */
+/** Add guidance for the available tools to each request's system prompt. */
 
+import { readFile } from "node:fs/promises"
+import { resolve } from "node:path"
 import { factsFromToolKeys } from "./facts.ts"
 import { buildSections } from "./sections.ts"
-import { expandTemplate } from "./template.ts"
 
-/** First line of OpenCode's default base prompt; identifies the part to replace. */
+/** Text used to find OpenCode's base prompt. */
 export const BASE_PROMPT_MARKER = "You are an AI agent running in OpenCode"
 
-/** Tags builder output so a second application on the same event is a no-op. */
-export const BUILDER_TAG = "<!-- prompt-builder -->"
-
 /**
- * Identify OpenCode's own system parts by their text prefixes.
+ * These prefixes identify the OpenCode parts removed in strip mode.
  *
- * Strip mode removes matching parts. It keeps everything else, including
- * our sections, other plugins' additions and project instructions.
+ * Other parts stay in place, including additions from plugins and project
+ * instructions.
  */
 const CORE_PART_PREFIXES = [
   BASE_PROMPT_MARKER,
@@ -23,15 +21,14 @@ const CORE_PART_PREFIXES = [
   "Today's date:",
 ]
 
-/** Intro line of OpenCode's environment part. */
+/** Text used to find OpenCode's environment part. */
 const ENV_PART_PREFIX = "Here is some useful information about the environment"
 
 /**
- * Trim an environment part down to whatever follows the env block and date.
+ * Remove OpenCode's environment details without losing project instructions.
  *
- * OpenCode packs `<env>`, the date, and project instructions such as
- * AGENTS.md into one system part. Strip mode removes the env block and date
- * but must keep the attached instructions.
+ * OpenCode may put the `<env>` block, date and instructions such as AGENTS.md
+ * in the same part. Keep any instructions that follow the environment details.
  */
 function trimEnvironmentPart(text: string): string {
   return text
@@ -41,68 +38,62 @@ function trimEnvironmentPart(text: string): string {
     .replace(/^\n+/, "")
 }
 
-/** Tag the first new part so another plugin load can detect it. */
-function prependTaggedSections(system: SystemPart[] | undefined, sections: string[]): void {
-  const tagged = sections.map((text, index) => (index === 0 ? `${BUILDER_TAG}\n${text}` : text))
-  system?.unshift(...tagged.map((text) => ({ type: "text", text })))
+/** Put new sections ahead of the existing system prompt parts. */
+function prependSections(system: SystemPart[] | undefined, sections: string[]): void {
+  system?.unshift(...sections.map((text) => ({ type: "text", text })))
 }
 
-/** A system prompt part supplied by OpenCode. */
+/** One part of the system prompt supplied by OpenCode. */
 export interface SystemPart {
   type: string
   text?: string
 }
 
+/** The request data this builder reads and updates. */
 export interface SessionEvent {
   system?: SystemPart[]
-  /** Available tools keyed by name, including supported aliases. */
+  /** Tools available for this request, keyed by name or alias. */
   tools?: Record<string, unknown>
   agent?: unknown
 }
 
-/** How the builder changed the system prompt. */
-export type BasePromptStrategy = "replaced" | "prepended" | "stripped" | "already-applied"
+/** Whether the builder replaced, prepended to or stripped OpenCode's prompt. */
+export type BasePromptStrategy = "replaced" | "prepended" | "stripped"
 
+/** The environment details and options used to build prompt sections. */
 export interface BuilderInput {
-  /** Working directory shown in the Environment section. */
+  /** Working directory to show in the Environment section. */
   readonly workingDirectory: string
-  /** Platform string (e.g. `process.platform`). */
+  /** Platform to show in the Environment section, such as `process.platform`. */
   readonly platform: string
-  /** File paths whose expanded content becomes Supplemental Context sections. */
+  /** Files to include in Supplemental Context. */
   readonly supplementalFiles?: string[]
-  /** Base directory for supplemental template expansion. */
+  /** Directory used to resolve relative supplemental file paths. */
   readonly cwd: string
-  /** Remove OpenCode-injected parts instead of replacing the base prompt. */
+  /** Remove OpenCode's prompt parts instead of just its base prompt. */
   readonly stripCore?: boolean
 }
 
 /**
- * Update a request's system prompt in place.
+ * Add sections to a request's system prompt.
  *
- * With `stripCore`, remove known OpenCode prompt parts and keep project
- * instructions attached to the environment part (`stripped`).
+ * With `stripCore`, remove known OpenCode parts but keep project
+ * instructions attached to the environment part. This returns `stripped`.
  *
- * Otherwise, remove the part with the base-prompt marker (`replaced`), or keep
- * every part if there is no marker (`prepended`). New sections go first.
+ * Otherwise, replace OpenCode's base prompt if present (`replaced`). If it is
+ * missing, leave the existing parts alone (`prepended`). New sections go first.
  *
- * A tagged prompt is left alone (`already-applied`). Without `stripCore`,
- * the caller must supply a `system` array for sections to be inserted.
+ * The function updates `event.system` in place. Without `stripCore`, provide a
+ * `system` array if you want the new sections inserted into the event.
  *
- * @param event - Mutable session event (`context`, `compaction` or `generate`).
- * @param input - Environment info and optional supplemental file paths.
- * @returns The strategy used and the built section texts.
+ * @param event - Request event to update (`context`, `compaction` or `generate`).
+ * @param input - Environment details and optional files to include.
+ * @returns The strategy used and the text of the new sections.
  */
 export async function buildIntoEvent(
   event: SessionEvent,
   input: BuilderInput,
 ): Promise<{ strategy: BasePromptStrategy; sections: string[] }> {
-  // OpenCode may load this plugin twice (config array plus directory
-  // discovery); tagged output means this event was already built.
-  const alreadyApplied = (event.system ?? []).some(
-    (part) => typeof part.text === "string" && part.text.includes(BUILDER_TAG),
-  )
-  if (alreadyApplied) return { strategy: "already-applied", sections: [] }
-
   const supplemental = await resolveSupplemental(input)
 
   const sections = buildSections({
@@ -129,7 +120,7 @@ export async function buildIntoEvent(
       kept.push(part)
     }
     event.system = kept
-    prependTaggedSections(event.system, sections)
+    prependSections(event.system, sections)
     return { strategy: "stripped", sections }
   }
 
@@ -138,15 +129,15 @@ export async function buildIntoEvent(
     event.system!.splice(baseIndex, 1)
     strategy = "replaced"
   }
-  prependTaggedSections(event.system, sections)
+  prependSections(event.system, sections)
   return { strategy, sections }
 }
 
 /**
- * Render supplemental file entries into `{name, content}` sections.
+ * Read supplemental files for the prompt's Supplemental Context section.
  *
- * Each entry includes a file and expands its argument/environment tokens.
- * The section name is the file's basename without its extension.
+ * Use each file's name without its extension as a heading. If a file cannot
+ * be read, include an error message in place of its text.
  */
 async function resolveSupplemental(
   input: BuilderInput,
@@ -156,7 +147,12 @@ async function resolveSupplemental(
 
   const rendered: { name: string; content: string }[] = []
   for (const file of files) {
-    const content = await expandTemplate(`{{ file="${file}" }}`, { cwd: input.cwd })
+    let content: string
+    try {
+      content = await readFile(resolve(input.cwd, file), "utf8")
+    } catch (error) {
+      content = `${file}: unreadable (${(error as Error).message})`
+    }
     const base = file.split("/").pop() ?? file
     rendered.push({ name: base.replace(/\.[^.]+$/, ""), content })
   }

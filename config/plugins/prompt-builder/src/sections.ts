@@ -1,33 +1,34 @@
 /**
- * Build prompt sections for the tools available in a request.
+ * Put together the prompt sections for a request.
  *
- * Each string starts with a top-level heading. The caller adds these strings
- * to the request's system prompt.
+ * Each section starts with a `#` heading. The caller adds the sections to the
+ * system prompt.
  */
 
 import type { ToolFacts } from "./facts.ts";
 import { buildCommonRules, hasCommonRules } from "./facts.ts";
 
+/** What to include when building the prompt sections. */
 export interface SectionInput {
-  /** Tool facts for this request. */
+  /** Which tools this request can use. */
   readonly facts: ToolFacts;
-  /** Working directory shown in the Environment section. */
+  /** Working directory to show in the Environment section. */
   readonly workingDirectory: string;
-  /** Platform string (e.g. `process.platform`) for the Environment section. */
+  /** Platform to show in the Environment section, such as `process.platform`. */
   readonly platform: string;
-  /** Optional supplemental text, already expanded from files. */
+  /** Extra text to add under Supplemental Context, with a heading for each entry. */
   readonly supplemental?: { name: string; content: string }[];
 }
 
 /**
- * Build the top-level system-prompt sections for a request.
+ * Build the sections to add to a request's system prompt.
  *
- * The Environment section is always produced. The Tool Usage Guidelines
- * section appears only when at least one common rule or per-tool section
- * applies. Supplemental entries become one `##` subsection each.
+ * Every request gets an Environment section. Tool Usage Guidelines appears
+ * only when there is guidance for the available tools. Each supplemental
+ * entry gets its own `##` heading under Supplemental Context.
  *
- * @param input - Facts, environment info and optional supplemental sections.
- * @returns One string per top-level `#` section, in order.
+ * @param input - Available tools, environment details and any extra text.
+ * @returns The sections in prompt order, one string per `#` heading.
  */
 export function buildSections(input: SectionInput): string[] {
   const sections: string[] = [];
@@ -51,7 +52,7 @@ export function buildSections(input: SectionInput): string[] {
     sections.push(parts.join("\n\n"));
   }
 
-  // Add supplemental context only when the caller provides it.
+  // Supplemental Context
   if (input.supplemental && input.supplemental.length > 0) {
     const parts = ["# Supplemental Context"];
     for (const s of input.supplemental) {
@@ -60,7 +61,7 @@ export function buildSections(input: SectionInput): string[] {
     sections.push(parts.join("\n\n"));
   }
 
-  // Collapse triple newlines and trim trailing whitespace
+  // Remove extra blank lines and trailing whitespace.
   return sections.map((s) => s.replace(/\n{3,}/g, "\n\n").trimEnd());
 }
 

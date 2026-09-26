@@ -93,7 +93,7 @@ describe("buildIntoEvent", () => {
     // Arrange
     const dir = await mkdtemp(path.join(tmpdir(), "pb-"))
     try {
-      await writeFile(path.join(dir, "extra.md"), "supplemental body")
+      await writeFile(path.join(dir, "extra.md"), 'supplemental body\n{{env:TEST_PB_TOKEN}}\n')
       const event = fakeEvent()
 
       // Act
@@ -102,31 +102,26 @@ describe("buildIntoEvent", () => {
       // Assert
       const joined = result.sections.join("\n")
       assert.ok(joined.includes("# Supplemental Context"))
-      assert.ok(joined.includes("## extra\nsupplemental body"))
+      assert.ok(joined.includes('## extra\nsupplemental body\n{{env:TEST_PB_TOKEN}}'))
     } finally {
       await rm(dir, { recursive: true, force: true })
     }
   })
-})
 
-describe("buildIntoEvent idempotency", () => {
-  test("buildIntoEvent_should_not_duplicate_when_applied_twice", async () => {
+  test("supplemental_should_report_unreadable_file_when_missing", async () => {
     // Arrange
-    const event = {
-      system: [{ type: "text", text: `${BASE_PROMPT_MARKER} rest of base` }],
-      tools: { write: {}, read: {} },
+    const dir = await mkdtemp(path.join(tmpdir(), "pb-"))
+    try {
+      const event = fakeEvent()
+
+      // Act
+      const result = await buildIntoEvent(event, { ...baseInput, cwd: dir, supplementalFiles: ["missing.md"] })
+
+      // Assert
+      assert.ok(result.sections.join("\n").includes("## missing\nmissing.md: unreadable ("))
+    } finally {
+      await rm(dir, { recursive: true, force: true })
     }
-    const input = { ...baseInput }
-
-    // Act
-    await buildIntoEvent(event, input)
-    const afterFirst = JSON.stringify(event.system)
-    const result = await buildIntoEvent(event, input)
-
-    // Assert
-    assert.equal(result.strategy, "already-applied")
-    assert.deepEqual(result.sections, [])
-    assert.equal(JSON.stringify(event.system), afterFirst)
   })
 })
 
@@ -157,7 +152,7 @@ describe("buildIntoEvent strip mode", () => {
     assert.equal(texts.some((text) => text!.includes("worktree outside")), false)
     assert.equal(texts.some((text) => text!.includes("AGENTS.md project instructions")), true)
     assert.equal(texts.some((text) => text!.includes("CAVEMAN MODE ACTIVE")), true)
-    assert.equal(texts[0]!.startsWith("<!-- prompt-builder -->"), true)
+    assert.equal(texts[0]!.startsWith("# Environment"), true)
   })
 
   test("buildIntoEvent_should_keep_instructions_attached_to_env_part_when_stripCore", async () => {

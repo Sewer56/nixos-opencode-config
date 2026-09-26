@@ -60,8 +60,7 @@ export default {
         })
         shortenToolDescriptions(event.tools)
 
-        // A duplicate plugin load must not overwrite the original contract dump.
-        if (dump && before && strategy !== "already-applied") {
+        if (dump && before) {
           await writePromptDump(dump, name, before, event)
         }
         if (debug) {

@@ -1,11 +1,6 @@
-/**
- * Choose prompt guidance from the tools available in a request.
- *
- * Tool names come from the session event's `tools` object. Aliases such as
- * bash/shell, task/subagent and apply_patch/patch select the same guidance.
- */
+/** Track the tools and prompt features available for a request. */
 
-/** Boolean facts extracted from a per-request tool snapshot. */
+/** Which tools the current request can use. */
 export interface ToolFacts {
   readonly has_shell: boolean;
   readonly has_read: boolean;
@@ -22,7 +17,7 @@ export interface ToolFacts {
   readonly has_patch: boolean;
 }
 
-/** Map tool names and aliases to their availability flags. */
+/** Match tool names, including aliases, to their flags. */
 const TOOL_KEY_MAP: Record<string, keyof ToolFacts> = {
   bash: "has_shell",
   shell: "has_shell",
@@ -43,14 +38,13 @@ const TOOL_KEY_MAP: Record<string, keyof ToolFacts> = {
 };
 
 /**
- * Derive facts from the keys of a session event's `tools` object.
+ * Record which tools appear in a session event's `tools` object.
  *
- * `patch`/`apply_patch` wins over `edit`/`write`: when a patch-style tool is
- * present, the targeted-edit sections are suppressed to avoid teaching the
- * model two conflicting edit mechanisms.
+ * When `patch` or `apply_patch` is available, leave out `edit` and `write`
+ * guidance so the prompt recommends only one way to change files.
  *
- * @param keys - Tool names present in the request.
- * @returns Facts with every known tool marked present or absent.
+ * @param keys - Tool names from the request.
+ * @returns Availability flags for all known tools.
  */
 export function factsFromToolKeys(keys: Iterable<string>): ToolFacts {
   const facts = {
@@ -80,43 +74,42 @@ export function factsFromToolKeys(keys: Iterable<string>): ToolFacts {
 }
 
 /**
- * Check whether any rule needs guidance about more than one tool.
+ * Check whether the available tools need any shared guidance.
  *
  * @param facts - Tools available in the request.
- * @returns True when at least one shared rule applies.
+ * @returns Whether at least one shared rule applies.
  */
 export function hasCommonRules(facts: ToolFacts): boolean {
-  // Bash + at least one file tool
+  // Shell and a file tool
   if (
     facts.has_shell &&
     (facts.has_read || facts.has_edit || facts.has_write || facts.has_glob || facts.has_grep)
   ) {
     return true;
   }
-  // Search tools separation
+  // More than one way to find or read files
   if (facts.has_glob && facts.has_grep) return true;
   if (facts.has_glob && facts.has_read) return true;
   if (facts.has_grep && facts.has_read) return true;
-  // Edit vs write
+  // Both ways to change files
   if (facts.has_edit && facts.has_write) return true;
-  // Read before edit/write
+  // Reading before changing files
   if (facts.has_read && (facts.has_edit || facts.has_write)) return true;
   return false;
 }
 
 /**
- * Build the shared "## Common Rules" body for the present tool combination.
+ * Write common rules for the tools available in this request.
  *
- * Each rule only names tools that are actually present, so a restricted agent
- * never gets told to use a tool it cannot call.
+ * The rules never recommend a tool that the agent cannot use.
  *
- * @param facts - Tool facts for this request.
- * @returns Newline-joined rules, empty string when none apply.
+ * @param facts - Available tools for this request.
+ * @returns Rules separated by newlines, or an empty string if none apply.
  */
 export function buildCommonRules(facts: ToolFacts): string {
   const rules: string[] = [];
 
-  // Recommend only file tools that are available.
+  // Name only the file tools the agent can use.
   const fileTools = [
     facts.has_glob ? "glob" : null,
     facts.has_grep ? "grep" : null,
@@ -128,7 +121,7 @@ export function buildCommonRules(facts: ToolFacts): string {
     rules.push(`Prefer \`${fileTools.join("`, `")}\` over \`shell\` for ordinary file work.`);
   }
 
-  // Explain which search tool to use for each task.
+  // Say which tool to use for each kind of file lookup.
   if (searchToolsPresent(facts)) {
     const parts: string[] = [];
     if (facts.has_glob) parts.push("`glob` for file-name search");
@@ -143,12 +136,12 @@ export function buildCommonRules(facts: ToolFacts): string {
     }
   }
 
-  // Edit vs write
+  // Choose between editing and writing.
   if (facts.has_edit && facts.has_write) {
     rules.push("Prefer `edit` for targeted changes and `write` for new files or full rewrites.");
   }
 
-  // Line-number prefixes come from Read output, not the file itself.
+  // Read adds line numbers to its output; they are not part of the file.
   if (facts.has_read && facts.has_edit && facts.has_write) {
     rules.push(
       "Read before `edit` or overwriting with `write`; for `edit`, copy exact text and omit any `{n}: ` prefixes.",
