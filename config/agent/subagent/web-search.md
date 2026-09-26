@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Researches external questions, versioned docs, and URLs
-model: sewer-axonhub/glm-5.3-flash # EASY
+model: sewer-axonhub/gpt-6-luna # EASY
 variant: low
 permissions:
   - { action: "*", resource: "*", effect: deny }
