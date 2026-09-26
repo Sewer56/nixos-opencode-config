@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Reviews plan bundles
 model: sewer-axonhub/glm-5.3 # PLANNER
-variant: max
+variant: high
 permission:
   "*": deny
   external_directory:

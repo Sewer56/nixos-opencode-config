@@ -2,7 +2,7 @@
 mode: primary
 description: Writes and reviews end-user, source and error documentation
 model: sewer-axonhub/glm-5.3-flash # WRITER
-variant: max
+variant: low
 
 permission:
   "*": deny

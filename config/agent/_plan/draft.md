@@ -2,7 +2,7 @@
 mode: all
 description: Discusses and writes human-first bundles
 model: sewer-axonhub/glm-5.3 # PLANNER
-variant: max
+variant: high
 permission:
   "*": deny
   external_directory:

@@ -2,7 +2,7 @@
 mode: all
 description: Writes grounded issues
 model: sewer-axonhub/glm-5.3-flash # WRITER
-variant: max
+variant: low
 permission:
   "*": deny
   external_directory:

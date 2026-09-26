@@ -3,7 +3,7 @@ mode: subagent
 hidden: true
 description: Implements approved tasks
 model: sewer-axonhub/glm-5.3 # CODER
-variant: max
+variant: low
 
 permission:
   "*": deny
