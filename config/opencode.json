@@ -256,6 +256,48 @@
               "reasoningEffort": "max"
             }
           }
+        },
+        "coralbricks/glm-5.3-fp4": {
+          "name": "GLM 5.3 FP4",
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "coralbricks/glm-5.3-flash-fp4": {
+          "name": "GLM 5.3 Flash FP4",
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "coralbricks/deepseek-v4.1-flash-fast-fp4": {
+          "name": "DeepSeek V4.1 Flash Fast FP4",
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
         }
       }
     },
