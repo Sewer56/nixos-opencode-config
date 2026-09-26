@@ -4,7 +4,7 @@
     "EASY": {"model":"sewer-axonhub/glm-5.3-flash","variant":"low"},
     "PLANNER": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
     "CODER": {"model":"sewer-axonhub/glm-5.3","variant":"low"},
-    "WRITER": {"model":"sewer-axonhub/glm-5.3-flash","variant":"low"},
+    "WRITER": {"model":"sewer-axonhub/gpt-6-sol","variant":"medium"},
     "STYLE-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
     "CORRECTNESS-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"high"}
   },

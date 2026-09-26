@@ -1,8 +1,8 @@
 ---
 mode: all
 description: Drafts PRs; creates on request
-model: sewer-axonhub/glm-5.3-flash # WRITER
-variant: low
+model: sewer-axonhub/gpt-6-sol # WRITER
+variant: medium
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

@@ -1,8 +1,8 @@
 ---
 mode: primary
 description: Edits documentation for understanding with concrete examples
-model: sewer-axonhub/glm-5.3 # PLANNER
-variant: high
+model: sewer-axonhub/gpt-6-sol # WRITER
+variant: medium
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }
@@ -42,6 +42,9 @@ permissions:
   - { action: shell, resource: "git show*", effect: allow }
   - { action: shell, resource: "git log*", effect: allow }
   - { action: shell, resource: "git rev-parse*", effect: allow }
+  - action: shell
+    resource: "git ls-files --others --exclude-standard *"
+    effect: allow
 
   - action: shell
     resource: "rust-llm-tidy --no-config --dry-run --json *"

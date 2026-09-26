@@ -2,8 +2,8 @@
 mode: subagent
 hidden: True
 description: Reviews prose
-model: sewer-axonhub/glm-5.3-flash # WRITER
-variant: low
+model: sewer-axonhub/gpt-6-sol # WRITER
+variant: medium
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }
