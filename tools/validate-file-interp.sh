@@ -15,4 +15,5 @@ bun config/plugins/opencode-plugin-md-expand/src/cli/cli.ts validate \
   --exclude template-library.md \
   --exclude config/plugins/opencode-plugin-md-expand/README.md \
   --exclude config/plugins/opencode-plugin-md-expand/bench/fixtures \
+  --exclude node_modules \
   ${*:-.opencode config}
