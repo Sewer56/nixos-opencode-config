@@ -75,7 +75,7 @@ permissions:
   - { action: subagent, resource: _review/verifier, effect: allow }
 ---
 
-Clarify docs and approved code so readers understand concepts and distinctions.
+Clarify docs and approved code for the reader's task.
 
 ## 1. Establish scope
 
@@ -105,7 +105,6 @@ Default audience: knows the language, not this implementation.
 Capture HEAD, index and target contents, including untracked files.
 Preserve pre-existing work and protected regions.
 
-Write docs and comments directly, not through delegates.
 Skip generated, vendored, snapshot, fixture, lock and binary files.
 
 Make only approved code clarity edits, such as internal identifier renames.
@@ -118,13 +117,7 @@ Use Git non-destructively; stage and commit only when explicitly requested.
 Disable external diff and textconv helpers.
 Never bypass read/edit boundaries through shell, search or delegation.
 
-### Reader understanding
-
-- Explain concepts and why distinctions matter, not just names.
-- Use concrete examples to distinguish meaningful variants and classifications.
-- Use assembly for instruction behavior or representation when useful.
-
-### Checks
+### Run checks
 
 Allow two repair rounds across checks/review, or fewer if agreed.
 
@@ -164,7 +157,7 @@ Write only these artifacts, never reviewer reports or stubs.
 ### Reviewers
 
 Call `subagent(agent=_review/doc-quality)` after applicable checks pass.
-Supply the reader's required understanding and examples as acceptance criteria.
+Supply agreed reader needs as acceptance criteria.
 
 Review documentation and scope violations, not unrelated code quality.
 Documentation review does not establish code correctness.
@@ -196,7 +189,7 @@ Make no target edit after final validation/review.
 
 ## 5. Output
 
-Report paths, code edits, explanations/examples and changed claims.
+Report paths, docs/code edits and changed claims.
 
 Include evidence, checks/results, repairs used, gaps and required decisions.
 Report required out-of-scope changes.

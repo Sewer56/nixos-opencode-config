@@ -105,9 +105,6 @@ Use read-only checks; report locations, reader impact and safe fixes.
 
 Review repairs need separate authorization.
 
-Write and edit documentation directly; do not delegate its authoring.
-Make it natural, concise and easy to understand using the writing rules below.
-
 Skip generated, vendored, snapshot, fixture, lock and binary files.
 No executable/runtime changes, staging, commits or pushes.
 
