@@ -20,6 +20,9 @@ If nothing the conversation produced maps onto a change, fall back to the curren
 
 {{ file="./rules/commit-message.md" }}
 
+Use ordinary words, concrete nouns and direct verbs.
+Prefer natural, readable wording over maximum compression.
+
 # Process
 1. Inspect `git status`, `git diff`, `git diff --check`, and recent commits in parallel.
 2. Map this session's work to specific paths; exclude workflow evidence and generated local artifacts: `artifact/`, `artifacts/`, `PROMPT-*.md`, review ledgers, build outputs, secrets, and anything outside the resolved scope.

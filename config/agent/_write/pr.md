@@ -120,6 +120,9 @@ No `Not run`, empty sections or boilerplate.
 
 Allow first person and uncertainty.
 
+Use ordinary words, concrete nouns and direct verbs.
+Prefer natural, readable wording over maximum compression.
+
 Under 250 words except templates or essential detail.
 Cut diff-visible details before motivation.
 Never start with `This PR` or `This change`.
