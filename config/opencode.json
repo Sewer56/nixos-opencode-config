@@ -234,6 +234,29 @@
             }
           }
         },
+        "gpt-6.1-sol": {
+          "name": "GPT 6.1 Sol",
+          "variants": {
+            "none": {
+              "reasoningEffort": "none"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
         "gpt-6-luna": {
           "name": "GPT 6 Luna",
           "variants": {
@@ -293,6 +316,29 @@
         },
         "gpt-6-sol": {
           "name": "GPT 6 Sol",
+          "variants": {
+            "none": {
+              "reasoningEffort": "none"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "gpt-6.1-sol": {
+          "name": "GPT 6.1 Sol",
           "variants": {
             "none": {
               "reasoningEffort": "none"
