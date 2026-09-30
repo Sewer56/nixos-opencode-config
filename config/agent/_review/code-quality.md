@@ -171,6 +171,9 @@ Check enums, newtypes and value objects stay with their sole parent type.
 Check integration-family packages contain wiring and package-specific behavior.
 Check tests sit beside their module unless repository convention is stronger.
 
+Prefer Rust unit tests in the implementation file.
+Keep multi-component Rust integration tests separate.
+
 ### Visibility
 
 Flag visibility broader than production callers or contracts require.

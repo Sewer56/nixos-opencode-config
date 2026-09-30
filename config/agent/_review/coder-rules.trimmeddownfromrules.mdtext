@@ -9,6 +9,9 @@ Prefer one data model per file, keeping entrypoint definitions at entrypoints.
 
 Keep enums, newtypes and value objects with their sole parent type.
 
+Prefer Rust unit tests in the implementation file.
+Keep multi-component Rust integration tests separate.
+
 ## Visibility
 
 Keep APIs as private as production callers and contracts allow.

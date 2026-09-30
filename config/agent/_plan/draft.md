@@ -144,6 +144,9 @@ Unresolved compatibility/external API contracts block readiness.
 Keep each feature's behavior/tests/required docs in one testable task.
 Assign every completion obligation an owner.
 
+Prefer Rust unit tests in the implementation file.
+Keep multi-component Rust integration tests separate.
+
 Docs-only tasks need independent documentation requests.
 
 Split at stable interfaces, keeping dependent edits together.
