@@ -13,7 +13,7 @@
     "PLANNER": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"},
     "CODER": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"medium"},
     "WRITER": {"model":"sewer-axonhub-work/gpt-6-luna","variant":"medium"},
-    "STYLE-REVIEW": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"medium"},
-    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"medium"}
+    "STYLE-REVIEW": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"high"},
+    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"high"}
   }
 }
