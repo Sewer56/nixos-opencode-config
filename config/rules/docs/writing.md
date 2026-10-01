@@ -12,7 +12,17 @@ Classify by reader and purpose, not file extension.
 - Maintainer docs: internals needed for safe changes and operation.
 - Guides: prerequisites, actions, expected outcomes and recovery.
 
-Caller-facing docs describe constraints, not implementation details.
+## Separate user docs from implementation work
+
+User-facing docs describe public behavior, not development progress.
+
+Omit unsolicited internal wiring, refactor notes and migration markers.
+Omit TODOs, implementation status and pending-work lists unless requested.
+
+Describe user-visible limitations as current behavior, not unfinished work.
+Keep progress and remaining work in task artifacts or handoffs.
+
+Include internals only when requested or needed for correct use.
 
 ## Keep coverage minimal
 
