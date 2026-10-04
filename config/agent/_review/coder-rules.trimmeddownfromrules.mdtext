@@ -18,6 +18,13 @@ Keep enums, newtypes and value objects with their sole parent type.
 Prefer Rust unit tests in the implementation file.
 Keep multi-component Rust integration tests separate.
 
+## Module headers
+
+Open each source file's module doc with a one-line purpose.
+Then list caller-used items in typical call order, one line on each role.
+Skip the list for single-item modules.
+Add a short example when usage is non-obvious.
+
 ## Visibility
 
 Keep APIs as private as production callers and contracts allow.
@@ -26,8 +33,10 @@ Keep APIs as private as production callers and contracts allow.
 
 In method bodies:
 
-- Separate coherent groups of steps with one blank line.
-- Explain steps/resulting states with short comments where intent is unclear.
+- Split steps into coherent groups, separated by one blank line.
+- Open each group with a short plain-English comment on what it achieves.
+- The comments alone should explain the method.
+- Skip the comment in single-group bodies the name already explains.
 - Separate arrange, act and assert with comments in tests.
 
 ## Redundancy

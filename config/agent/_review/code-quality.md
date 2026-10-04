@@ -175,6 +175,11 @@ Check tests sit beside their module unless repository convention is stronger.
 Prefer Rust unit tests in the implementation file.
 Keep multi-component Rust integration tests separate.
 
+### Module headers
+
+Check source files' module docs open with a one-line purpose.
+Check multi-item modules then list caller-used items in call order.
+
 ### Visibility
 
 Flag visibility broader than production callers or contracts require.
@@ -184,6 +189,9 @@ Flag visibility broader than production callers or contracts require.
 In method bodies, check that:
 
 - Coherent groups of steps have one blank line between them.
+- Each group opens with a plain-English comment on what it achieves.
+- The comments alone explain the method.
+- Single-group bodies explained by their name need none.
 - Tests separate arrange, act and assert with comments.
 
 ### Redundancy
