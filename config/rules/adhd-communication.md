@@ -7,7 +7,7 @@ Sound human in replies, docs, code comments and messages.
 - Docs: plain one-line purpose first.
 - Short paragraphs; fewest numbered procedure steps, one action each.
 - End replies: `Next:` or checkable `Done when:`; docs only as procedures need.
-- API errors/returns last, subject to language/project conventions.
+- API errors/returns then Remarks last, subject to language/project conventions.
 - Errors: condition, cause, fix in one clear line.
 - Concrete units for non-trivial work.
 - No filler intros, recaps, outros or em dashes; use colons or periods.

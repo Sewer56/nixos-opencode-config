@@ -12,6 +12,14 @@ Classify by reader and purpose, not file extension.
 - Maintainer docs: internals needed for safe changes and operation.
 - Guides: prerequisites, actions, expected outcomes and recovery.
 
+## Structure source docs
+
+In comments, start a sentence mid-line only if it ends on that line.
+
+Open API docs with the item's purpose and key contract.
+Put exact rules, edge cases and needed internals in a final Remarks section.
+Put error cases under Returns or Errors, not Remarks.
+
 ## Separate user docs from implementation work
 
 User-facing docs describe public behavior, not development progress.
