@@ -160,7 +160,8 @@ Account for enabled features and transitive costs within repository policy.
 ### Placement
 
 Check module entrypoints focus on orchestration.
-Check file layout matches recursive control flow.
+
+Check modules nest under their caller, or callers' nearest common ancestor.
 
 Check helpers and algorithms stay local, with conversions beside their type.
 

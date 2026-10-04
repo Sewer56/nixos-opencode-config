@@ -1,7 +1,13 @@
+## Design
+
+Prefer the simplest correct design; avoid speculative abstraction.
+
 ## Placement
 
 Keep module entrypoints focused on orchestration.
-Make file layout follow recursive code flow.
+
+Mirror the call tree on disk: if module A calls B, nest B under A.
+Put modules with several callers in their nearest common ancestor.
 
 Keep helpers and algorithms local, with conversions beside their type.
 
