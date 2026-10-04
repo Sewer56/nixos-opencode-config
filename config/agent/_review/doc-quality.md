@@ -2,7 +2,7 @@
 mode: subagent
 hidden: True
 description: Reviews standalone docs, API docs, docstrings and comments
-model: sewer-axonhub/gpt-6.1-sol # CORRECTNESS-REVIEW
+model: sewer-axonhub/claude-opus-5-5 # CORRECTNESS-REVIEW
 variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }
