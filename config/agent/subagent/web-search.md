@@ -2,7 +2,7 @@
 mode: subagent
 description: Researches external questions, versioned docs, and URLs
 model: sewer-axonhub/gpt-6-luna # EASY
-variant: low
+variant: medium
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

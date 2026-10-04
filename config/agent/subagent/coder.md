@@ -1,8 +1,8 @@
 ---
 mode: subagent
 description: Code implementation worker
-model: sewer-axonhub/glm-5.3 # CODER
-variant: low
+model: sewer-axonhub/gpt-6.1-sol # CODER
+variant: medium
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

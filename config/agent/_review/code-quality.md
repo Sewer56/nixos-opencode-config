@@ -2,7 +2,7 @@
 mode: subagent
 hidden: True
 description: Reviews code structure, maintainability and test organization
-model: sewer-axonhub/glm-5.3 # STYLE-REVIEW
+model: sewer-axonhub/gpt-6.1-sol # STYLE-REVIEW
 variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }

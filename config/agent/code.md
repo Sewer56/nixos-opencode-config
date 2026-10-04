@@ -1,7 +1,7 @@
 ---
 mode: all
 description: General-purpose coding agent
-model: sewer-axonhub/glm-5.3 # PLANNER
+model: sewer-axonhub/gpt-6.1-sol # PLANNER
 variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }

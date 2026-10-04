@@ -2,7 +2,7 @@
 mode: subagent
 description: Answers bounded repository questions with cited evidence
 model: sewer-axonhub/gpt-6-luna # EASY
-variant: low
+variant: medium
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

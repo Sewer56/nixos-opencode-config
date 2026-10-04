@@ -1,12 +1,12 @@
 {
   "$tierOrder": {"0": "EASY","1": "PLANNER","2": "CODER","3": "WRITER","4": "STYLE-REVIEW","5": "CORRECTNESS-REVIEW"},
   "normal": {
-    "EASY": {"model":"sewer-axonhub/gpt-6-luna","variant":"low"},
-    "PLANNER": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
-    "CODER": {"model":"sewer-axonhub/glm-5.3","variant":"low"},
+    "EASY": {"model":"sewer-axonhub/gpt-6-luna","variant":"medium"},
+    "PLANNER": {"model":"sewer-axonhub/gpt-6.1-sol","variant":"high"},
+    "CODER": {"model":"sewer-axonhub/gpt-6.1-sol","variant":"medium"},
     "WRITER": {"model":"sewer-axonhub/gpt-6-luna","variant":"high"},
-    "STYLE-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"high"},
-    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub/glm-5.3","variant":"high"}
+    "STYLE-REVIEW": {"model":"sewer-axonhub/gpt-6.1-sol","variant":"high"},
+    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub/gpt-6.1-sol","variant":"high"}
   },
   "work": {
     "EASY": {"model":"sewer-axonhub-work/gpt-6-luna","variant":"low"},

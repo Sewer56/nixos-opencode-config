@@ -2,7 +2,7 @@
 mode: subagent
 hidden: True
 description: Reviews behavior, security and test adequacy
-model: sewer-axonhub/glm-5.3 # CORRECTNESS-REVIEW
+model: sewer-axonhub/gpt-6.1-sol # CORRECTNESS-REVIEW
 variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }

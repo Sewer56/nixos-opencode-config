@@ -2,7 +2,7 @@
 mode: subagent
 description: Creates Keep a Changelog-style commits without pushing
 model: sewer-axonhub/gpt-6-luna # EASY
-variant: low
+variant: medium
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }
