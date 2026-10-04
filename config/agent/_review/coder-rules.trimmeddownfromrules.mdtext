@@ -6,13 +6,67 @@ Prefer the simplest correct design; avoid speculative abstraction.
 
 Keep module entrypoints focused on orchestration.
 
+<!---
+```text
+src/
+├── main.rs        calls install::run and update::run
+├── download.rs    install and update both call it
+├── install/
+│   ├── mod.rs     calls manifest and unpack
+│   ├── manifest.rs
+│   └── unpack.rs
+└── update/
+    ├── mod.rs     calls diff and download
+    └── diff.rs
+```
+--->
 Mirror the call tree on disk: if module A calls B, nest B under A.
 Put modules with several callers in their nearest common ancestor.
 
+<!---
+```rust
+impl TryFrom<&str> for ModId {
+    type Error = InstallError;
+
+    fn try_from(text: &str) -> Result<Self, Self::Error> {
+        if text.is_empty() || !text.chars().all(is_id_char) {
+            return Err(InstallError::BadModId(text.to_owned()));
+        }
+        Ok(Self(text.to_owned()))
+    }
+}
+
+fn is_id_char(c: char) -> bool {
+    c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-'
+}
+```
+--->
 Keep helpers and algorithms local, with conversions beside their type.
 
 Prefer one data model per file, keeping entrypoint definitions at entrypoints.
 
+<!---
+```rust
+// install/manifest.rs
+struct Manifest {
+    // Used outside manifests too, so each lives in its own file.
+    id: ModId,
+    game_version: Version,
+    dependencies: Vec<Dependency>,
+}
+
+// Only Manifest uses these, so they live here.
+struct Dependency {
+    id: ModId,
+    kind: DependencyKind,
+}
+
+enum DependencyKind {
+    Required,
+    Optional,
+}
+```
+--->
 Keep enums, newtypes and value objects with their sole parent type.
 
 Prefer Rust unit tests in the implementation file.
@@ -20,9 +74,38 @@ Keep multi-component Rust integration tests separate.
 
 ## Module headers
 
+<!---
+```rust
+//! Install mod archives into the game's mods folder.
+//!
+//! - [`InstallOptions`]: choose the target folder and overwrite behavior.
+//! - [`run`]: install one archive and return the new mod's ID.
+//! - [`InstallError`]: why an install failed.
+```
+--->
 Open each source file's module doc with a one-line purpose.
 Then list caller-used items in typical call order, one line on each role.
+<!---
+```rust
+//! Download mod archives over HTTPS, resuming partial files.
+```
+--->
 Skip the list for single-item modules.
+<!---
+```rust
+//! Stage file changes, then apply them all at once or not at all.
+//!
+//! - [`Staging::new`]: start an empty change set for a mods folder.
+//! - [`Staging::copy`]: queue one file to copy in.
+//! - [`Staging::commit`]: apply every queued change.
+//!
+//! ```no_run
+//! let mut staging = Staging::new(&mods_dir)?;
+//! staging.copy(&texture, "textures/sky.dds")?;
+//! staging.commit()?;
+//! ```
+```
+--->
 Add a short example when usage is non-obvious.
 
 ## Visibility
@@ -33,15 +116,57 @@ Keep APIs as private as production callers and contracts allow.
 
 In method bodies:
 
+<!---
+```rust
+pub fn run(archive: &Path, options: &InstallOptions) -> Result<ModId, InstallError> {
+    // Read the manifest and reject mods built for another game version.
+    let manifest = Manifest::read_from_archive(archive)?;
+    if manifest.game_version != options.game_version {
+        return Err(InstallError::WrongGameVersion(manifest.game_version));
+    }
+
+    // Unpack into a temporary folder so a failed install leaves nothing behind.
+    let mut staging = Staging::new(&options.mods_dir)?;
+    unpack::extract_all(archive, &mut staging)?;
+
+    // Move the files into place.
+    staging.commit()?;
+    Ok(manifest.id)
+}
+```
+--->
 - Split steps into coherent groups, separated by one blank line.
 - Open each group with a short plain-English comment on what it achieves.
 - The comments alone should explain the method.
 - Skip the comment in single-group bodies the name already explains.
+<!---
+```rust
+#[test]
+fn run_should_reject_archive_when_game_version_differs() {
+    // Arrange
+    let archive = write_test_archive("mod.zip", "1.0.0");
+    let options = test_options("2.0.0");
+
+    // Act
+    let result = run(&archive, &options);
+
+    // Assert
+    assert!(matches!(result, Err(InstallError::WrongGameVersion(_))));
+}
+```
+--->
 - Separate arrange, act and assert with comments in tests.
 
 ## Redundancy
 
 Extract helpers for repeated code.
+<!---
+Instead of [`EmptyRegistry`] and [`FailingRegistry`] structs:
+
+```rust
+fn test_registry(installed: &[&str], fail_on_add: bool) -> FakeRegistry
+```
+--->
 Prefer one parameterizable local helper over per-test mock structs.
 
 ## Dependencies
@@ -56,6 +181,13 @@ Account for enabled features and transitive costs within repository policy.
 Test new or changed repository behavior.
 Avoid testing compiler or library guarantees alone.
 
+<!---
+For [`ModId::try_from`], test an empty ID and one with spaces.
+Skip each other invalid character; the same check rejects them all.
+--->
+Test edge cases only where a bug is likely or costly.
+Every test costs user review time; prefer fewer, clearer tests.
+
 Delete tests made unnecessary by code removal/change.
 
 Map removed redundant assertions to surviving tests.
@@ -63,6 +195,14 @@ Retain test redundancy only across public entry points.
 
 ### Parameterization
 
+<!---
+```rust
+#[rstest]
+#[case::plain("1.2.3", Version::new(1, 2, 3))]
+#[case::leading_v("v1.2.3", Version::new(1, 2, 3))]
+fn parse_should_read_version(#[case] text: &str, #[case] expected: Version) {
+```
+--->
 Parameterize tests where possible.
 Prefer named framework cases.
 
@@ -73,19 +213,47 @@ Prefer parameterization over loops of inputs.
 
 ### Arguments
 
+<!---
+```rust
+#[case::newer_patch_exact(Version::new(1, 2, 3), Match::Exact, false)]
+fn satisfies_should_match(#[case] game: Version, #[case] mode: Match, #[case] expected: bool)
+```
+--->
 Order case arguments: primary input, mode/flags, expected output.
 
 Keep readable cases near 80-100 characters per line.
 
 ### Naming and grouping
 
+<!---
+Rust `parse_should_fail_when_text_is_empty`; C# `Parse_ShouldFail_WhenTextIsEmpty`.
+--->
 Name tests `subject_should_expectation_when_condition`.
 Use the language's identifier style.
 
 Use `when` only for conditional/edge behavior.
 Omit module-redundant prefixes from test names.
 
-Group related tests with lightweight section comments.
+<!---
+```rust
+// ── Construction ─────────────────────────────────────────────────────────────
+
+fn parse_should_read_version() {}
+
+// ── Core behavior ────────────────────────────────────────────────────────────
+
+fn satisfies_should_match() {}
+
+// ── Edge cases ───────────────────────────────────────────────────────────────
+
+fn parse_should_fail_when_text_is_empty() {}
+
+// ── Convenience ──────────────────────────────────────────────────────────────
+
+fn to_string_should_print_dotted_form() {}
+```
+--->
+Group related tests under 80-column `// ── Name ───` banner comments.
 Order test groups: construction, core behavior, edge cases, convenience.
 
 ## Performance

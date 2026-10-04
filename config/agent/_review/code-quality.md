@@ -111,6 +111,7 @@ Use existing tests as evidence, not scope for unrelated cleanup.
 1. Identify the repository behavior and distinct failure each test protects.
 2. Find redundant tests/assertions, unnecessary cases and obsolete tests.
    Flag coverage padding and tests of compiler or library guarantees alone.
+   Flag edge tests where a bug is unlikely and cheap; they cost review time.
 3. Recommend exact deletions, merges or named parameterized cases.
    - Reduce maintenance without obscuring failures.
    - Map removed redundant assertions to surviving tests/assertions.
@@ -139,6 +140,10 @@ Include Domain, Review Path, Finding Count (all) and one-line Summary.
 Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
 # Rules
+
+<!---
+Examples: comments in `agent/_review/coder-rules.trimmeddownfromrules.mdtext`.
+--->
 
 ## Code quality
 
@@ -226,7 +231,7 @@ Check names use the language's identifier style.
 Flag `when` outside conditional/edge behavior.
 Flag module-redundant test-name prefixes.
 
-Check lightweight section comments group related tests.
+Check 80-column `// ── Name ───` banner comments group related tests.
 Check order: construction, core behavior, edge cases, convenience.
 
 {{ file="./rules/adhd-communication.md" }}

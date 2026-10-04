@@ -122,7 +122,9 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 ## Test coverage
 
 Check required tests cover new/changed behavior, contracts and integration.
+
 Check critical success, failure and edge coverage.
+Request edge tests only where a bug is likely or costly.
 
 Flag coverage padding and tests of compiler or library guarantees alone.
 Ground missing-test findings in an uncovered behavior and concrete failure.
