@@ -3,7 +3,7 @@ mode: subagent
 hidden: True
 description: Implements approved tasks
 model: sewer-axonhub/gpt-6.1-sol # CODER
-variant: medium
+variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

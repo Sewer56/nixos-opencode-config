@@ -2,7 +2,7 @@
 mode: all
 description: CodeRabbit with bounded repair and one re-review
 model: sewer-axonhub/gpt-6.1-sol # CODER
-variant: medium
+variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

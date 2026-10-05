@@ -3,7 +3,7 @@
   "normal": {
     "EASY": {"model":"sewer-axonhub/gpt-6-luna","variant":"medium"},
     "PLANNER": {"model":"sewer-axonhub/gpt-6.1-sol","variant":"high"},
-    "CODER": {"model":"sewer-axonhub/gpt-6.1-sol","variant":"medium"},
+    "CODER": {"model":"sewer-axonhub/gpt-6.1-sol","variant":"high"},
     "WRITER": {"model":"sewer-axonhub/gpt-6-luna","variant":"high"},
     "STYLE-REVIEW": {"model":"sewer-axonhub/claude-opus-5-5","variant":"high"},
     "CORRECTNESS-REVIEW": {"model":"sewer-axonhub/claude-opus-5-5","variant":"high"}
