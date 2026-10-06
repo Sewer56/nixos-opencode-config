@@ -81,7 +81,8 @@ Clarify docs and approved code for the reader's task.
 
 Before approval, only investigate read-only and discuss.
 
-Agree audience, docs/code scope, protected regions, priorities and checks.
+Agree audience, assumed domain knowledge, style examples, docs/code scope,
+protected regions, priorities and checks.
 Offer optional doc review and agree its scoped repair budget.
 
 Require explicit approval before writes or reviewer calls.
@@ -91,8 +92,6 @@ Reconfirm only material scope changes.
 
 Read repository instructions, scoped docs, relevant source and tests.
 Read related explanations, not just the code diff.
-
-Default audience: knows the language, not this implementation.
 
 - Use `subagent/codebase-explorer` for unfamiliar behavior or conventions.
 - Use `subagent/web-search` for claims unresolved by pinned local sources.

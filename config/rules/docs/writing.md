@@ -5,7 +5,11 @@ Leave docs unchanged when they already fit the reader's task.
 
 ## Match the reader's task
 
-Assume stated prerequisites, not familiarity with this implementation.
+Assume stated prerequisites only.
+By default, readers know the language, not this domain or implementation.
+
+Domain includes platforms, hardware, formats, protocols and project terms.
+
 Classify by reader and purpose, not file extension.
 
 - API reference: caller-visible contracts needed for correct use.
@@ -116,17 +120,24 @@ Never invent behavior, errors or examples to fill a section.
 ## Use human, simple wording
 
 Write like a person explaining to a colleague.
+Match the tone and terms of agreed style examples or the project's best docs.
 
 Keep sentences short, ideally under 25 words.
 Write full sentences, not clipped fragments.
-Cut filler, but choose easy reading over fewer words.
+Cut what readers don't need, not explanations they do.
+Choose easy reading over fewer words.
 
 Use everyday words and direct verbs.
 Say what happens before naming the concept.
-Keep precise technical terms; explain unfamiliar ones.
+
+Replace each domain term with its practical meaning, or explain it on first use.
+Skip only terms the user says readers know; if unsure, explain.
 Use one term for each thing.
 
-## Use examples only to resolve reader-relevant ambiguity
+## Use examples to make abstract ideas concrete
+
+Show an abstract mechanism with one real example, such as input and output.
+Skip examples that repeat what the text already makes clear.
 
 Reuse a coherent scenario without repeating explanations.
 Use diagrams when they clarify relationships better than text alone.

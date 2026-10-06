@@ -121,7 +121,8 @@ Measure proposed concision edits:
 1. Use a unique run directory under worktree `artifact/review/token-pairs/`.
    - Save each original excerpt once as `[[id]].before.txt`.
    - Save the replacement as `[[id]].after.txt`.
-   - Preserve facts readers need, explanations, contracts and caveats.
+   - Preserve facts, explanations, definitions, examples, contracts and caveats
+     readers need.
 2. Compare all pairs:
    `uv run ~/opencode/scripts/compare-token-pairs.py [[scratch_directory]]`.
    If counting fails, omit numeric savings.
@@ -180,9 +181,12 @@ Do not demand docs-only backfill of untouched legacy.
 ### Presentation
 
 Flag acronyms not expanded on first use as `Expanded Name (ACRONYM)`.
+Flag unexplained domain terms not marked as known; suggest a plain replacement.
 
 Exempt already-defined terms, literal identifiers and paths.
 Exempt headings and non-instructional prose from acronym expansion.
+
+Flag abstract mechanisms that one concrete example would clarify.
 
 Recommend category summaries unless readers need members.
 Check required lists use bullets.
@@ -196,7 +200,8 @@ Block false claims, stale references and unmet documentation requirements.
 Block docs steps missing file, scope, sections or concrete changes.
 
 Block broken heading links across docs steps.
-Block explanation gaps preventing required understanding or correct use.
+Block explanation gaps, including unexplained domain terms, that prevent
+required understanding or correct use.
 
 Block vague triggers and error-doc stubs: `TODO`, `TBD`, `FIXME`, `...`.
 
