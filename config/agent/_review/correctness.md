@@ -2,8 +2,8 @@
 mode: subagent
 hidden: True
 description: Reviews behavior, security and test adequacy
-model: sewer-axonhub/claude-opus-5-5 # CORRECTNESS-REVIEW
-variant: high
+model: sewer-axonhub/gpt-6.1-sol # CORRECTNESS-REVIEW
+variant: xhigh
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

@@ -2,7 +2,7 @@
 mode: subagent
 hidden: True
 description: Verifies justified local review findings
-model: sewer-axonhub/claude-opus-5-5 # CORRECTNESS-REVIEW
+model: sewer-axonhub/gpt-6.1-sol # VERIFIER
 variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }

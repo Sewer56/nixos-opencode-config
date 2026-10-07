@@ -2,7 +2,7 @@
 mode: subagent
 hidden: True
 description: Reviews standalone docs, API docs, docstrings and comments
-model: sewer-axonhub/claude-opus-5-5 # CORRECTNESS-REVIEW
+model: sewer-axonhub/claude-opus-5-5 # STYLE-REVIEW
 variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }

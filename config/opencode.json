@@ -20,7 +20,7 @@
     { "action": "github_*", "resource": "*", "effect": "deny" },
     { "action": "context7_*", "resource": "*", "effect": "deny" },
     { "action": "deepwiki_*", "resource": "*", "effect": "deny" },
-    { "action": "external_directory", "resource": "*", "effect": "ask" },
+    { "action": "external_directory", "resource": "*", "effect": "allow" },
     { "action": "external_directory", "resource": "/tmp/**", "effect": "allow" },
     { "action": "external_directory", "resource": "/proc/**", "effect": "allow" },
     { "action": "external_directory", "resource": "/sys/**", "effect": "allow" },
