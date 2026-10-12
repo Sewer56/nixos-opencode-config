@@ -121,6 +121,7 @@ Never invent behavior, errors or examples to fill a section.
 
 Write like a person explaining to a colleague.
 Match the tone and terms of agreed style examples or the project's best docs.
+Write very concisely.
 
 Keep sentences short, ideally under 25 words.
 Write full sentences, not clipped fragments.
