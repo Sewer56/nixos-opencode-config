@@ -166,6 +166,20 @@
             }
           }
         },
+        "glm-5.3-flashx": {
+          "name": "GLM 5.3 FlashX",
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
         "deepseek-v4.1-flash": {
           "name": "DeepSeek V4.1 Flash",
           "variants": {
