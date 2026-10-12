@@ -16,6 +16,30 @@ Classify by reader and purpose, not file extension.
 - Maintainer docs: internals needed for safe changes and operation.
 - Guides: prerequisites, actions, expected outcomes and recovery.
 
+## Keep user guides simple
+
+<!---
+```markdown
+Put your settings in a YAML file.
+
+- Save it where you run the command.
+- Or choose another file with `--config path/to/config.yml`.
+
+!!! tip "Keep tokens out of command history"
+
+    Use a token file or environment variable.
+```
+--->
+Use these layout choices for module docs, user guides and READMEs.
+
+- Open with one plain purpose line, then actions or choices.
+- Use short bullets instead of dense setup paragraphs.
+- Put example-specific guidance in short comments; do not repeat it in text.
+- Use examples and links instead of extra explanations.
+- Omit edge cases and validation details unless needed for the reader's task.
+- Use brief admonitions for tips and warnings when the format supports them.
+- Use title-only admonitions for labels, not warnings needing explanation.
+
 ## Structure source docs
 
 <!---
@@ -119,12 +143,27 @@ Never invent behavior, errors or examples to fill a section.
 
 ## Use human, simple wording
 
+<!---
+```rust
+/// Move files to the target folder.
+/// Copy them if the folders are on different drives.
+```
+--->
 Write like a person explaining to a colleague.
+
 Match the tone and terms of agreed style examples or the project's best docs.
 Write very concisely.
 
-Keep sentences short, ideally under 25 words.
+Prefer one short sentence per idea, ideally under 20 words.
 Write full sentences, not clipped fragments.
+
+<!---
+```rust
+// Temporary downloads.
+```
+--->
+Use short labels where they are enough.
+
 Cut what readers don't need, not explanations they do.
 Choose easy reading over fewer words.
 
