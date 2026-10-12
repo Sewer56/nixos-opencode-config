@@ -39,6 +39,7 @@ Use these layout choices for module docs, user guides and READMEs.
 - Omit edge cases and validation details unless needed for the reader's task.
 - Use brief admonitions for tips and warnings when the format supports them.
 - Use title-only admonitions for labels, not warnings needing explanation.
+- Use two trailing spaces `  ` for line breaks in markdown.
 
 ## Structure source docs
 
