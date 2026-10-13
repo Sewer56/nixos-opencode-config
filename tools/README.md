@@ -10,9 +10,10 @@ Rust workspace for local OpenCode utilities.
   existing tiers: `EASY`, `MEDIUM`, `HARD`.
 - `opencode-sessions`: browse/export OpenCode SQLite sessions.
 - `token-count-after-expand`: render prompts and estimate tokens.
-- `opencode-yolo-mode`: toggle external_directory `'*'` between ask and allow.
-  Applies to agent frontmatter and `config/opencode.json`.
-  Later secret guards retain precedence.
+- `opencode-yolo-mode`: stop permission prompts so agents run unattended.
+  -  `on` allows every `ask` in agent frontmatter and `config/opencode.json`.
+  - Secret-path and destructive-git asks become `deny`, so runs fail fast.
+  - Rewritten lines end in `# yolo` or `// yolo`; `off` restores them to `ask`.
 - `rust-llm-tidy`: reorder/lint Rust source; built from the submodule input.
 
 ## Shell helpers

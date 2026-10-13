@@ -102,7 +102,7 @@
 
       opencode-yolo-mode = mkTool {
         pname = "opencode-yolo-mode";
-        description = "Toggle external_directory '*' between ask (regular) and allow (yolo) across agent frontmatter and global config";
+        description = "Toggle OpenCode permission ask rules for unattended runs across agent frontmatter and global config";
       };
 
       rust-llm-tidy = rustLlmTidy;
@@ -257,7 +257,7 @@
       opencode-yolo-mode = {
         type = "app";
         program = "${self.packages.${system}.opencode-yolo-mode}/bin/opencode-yolo-mode";
-        meta.description = "Toggle external_directory yolo mode";
+        meta.description = "Toggle permission yolo mode";
       };
 
       rust-llm-tidy = {

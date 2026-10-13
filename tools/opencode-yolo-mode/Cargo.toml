@@ -8,3 +8,7 @@ license.workspace = true
 anyhow.workspace = true
 clap.workspace = true
 ignore.workspace = true
+regex.workspace = true
+
+[dev-dependencies]
+rstest.workspace = true

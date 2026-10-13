@@ -1,13 +1,20 @@
-//! Toggle the default external-path decision in agent files and V2 config.
+//! Toggle OpenCode permission `ask` rules so unattended runs never wait.
+//!
+//! - `status`: count rules still waiting for approval and rules yolo rewrote.
+//! - `on`: rewrite every `ask` in agent frontmatter and `config/opencode.json`.
+//! - `off`: restore every rewritten rule to `ask`.
 
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand};
 use ignore::WalkBuilder;
+use rule::{Mode, RuleLine, Syntax};
 use std::fs;
 use std::path::{Path, PathBuf};
 
+mod rule;
+
 #[derive(Parser, Debug)]
-#[command(about = "Toggle opencode external_directory '*' between ask (regular) and allow (yolo)")]
+#[command(about = "Toggle OpenCode permission ask rules between regular and yolo mode")]
 struct Args {
     #[command(subcommand)]
     cmd: Option<Cmd>,
@@ -17,17 +24,14 @@ struct Args {
     repo: Option<PathBuf>,
 }
 
-struct Found {
-    line_idx: usize,
-    decision: String,
-}
-
 #[derive(Subcommand, Debug)]
 enum Cmd {
-    /// Flip every external_directory '*' to allow (guards after '*' keep winning).
+    /// Allow every ask; deny path and command guards so runs fail fast.
     On,
-    /// Restore every external_directory '*' to ask.
+
+    /// Restore every yolo-rewritten rule to ask.
     Off,
+
     /// Report current mode without changing anything.
     Status,
 }
@@ -35,266 +39,200 @@ enum Cmd {
 fn main() -> Result<()> {
     let args = Args::parse();
     let root = find_repo(args.repo)?;
-    let targets = collect_targets(&root)?;
+    let targets = collect_targets(&root);
     if targets.is_empty() {
         bail!(
-            "no agent markdown or config/opencode.json found under {}",
+            "no agent markdown or config/opencode.json under {}",
             root.display()
         );
     }
     match args.cmd.unwrap_or(Cmd::Status) {
         Cmd::Status => status(&targets),
-        Cmd::On => apply(&targets, "allow"),
-        Cmd::Off => apply(&targets, "ask"),
+        Cmd::On => apply(&targets, Mode::Yolo),
+        Cmd::Off => apply(&targets, Mode::Regular),
     }
 }
 
-fn apply(targets: &[PathBuf], to: &str) -> Result<()> {
-    let mut changed = 0_u32;
-    let mut already = 0_u32;
-    for path in targets {
-        let text = fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
-        let found = scan(&text, path);
-        if found.is_empty() {
-            continue; // no external_directory entry; nothing to flip
+fn apply(targets: &[(PathBuf, Syntax)], to: Mode) -> Result<()> {
+    // Rewrite each file that has rules in the other mode
+    let (mut rules, mut files) = (0_usize, 0_usize);
+    for (path, syntax) in targets {
+        let text = read(path)?;
+        let (out, changed) = toggle(&text, *syntax, to);
+        if changed > 0 {
+            fs::write(path, out).with_context(|| format!("write {}", path.display()))?;
+            rules += changed;
+            files += 1;
         }
-        let Some(found) = found.into_iter().find(|f| f.decision != to) else {
-            already += 1;
-            continue;
-        };
-        let replacement = match flip_line(&text, found.line_idx, to, path) {
-            Some(line) => line,
-            None => {
-                println!("  skipped (unparsable line): {}", path.display());
-                continue;
-            }
-        };
-        write_line(path, &text, found.line_idx, &replacement)?;
-        changed += 1;
     }
-    println!("target: '*' -> {to}");
-    println!("  changed: {changed}  already {to}: {already}");
+
+    // Report the change and how to pick it up
+    let label = match to {
+        Mode::Yolo => "on",
+        Mode::Regular => "off",
+    };
+    println!("yolo mode {label}: rewrote {rules} rules in {files} files");
     println!("restart opencode for the change to take effect");
-    if to == "allow" {
-        println!(
-            "note: tests/test_draft_workflow.py expects '\"*\": ask' while ON; run it only after `off`"
-        );
-    }
     Ok(())
 }
 
 /// Agent markdown under both agent directories, plus the global JSONC config.
-fn collect_targets(root: &Path) -> Result<Vec<PathBuf>> {
-    let mut targets = Vec::new();
-    for dir in [
+fn collect_targets(root: &Path) -> Vec<(PathBuf, Syntax)> {
+    // Gather agent markdown from global and repo-local agent directories
+    let mut targets: Vec<(PathBuf, Syntax)> = [
         root.join("config").join("agent"),
         root.join(".opencode").join("agent"),
-    ] {
-        if !dir.is_dir() {
-            continue;
-        }
-        for entry in WalkBuilder::new(&dir).hidden(false).build().flatten() {
-            let path = entry.into_path();
-            if path.extension().is_some_and(|ext| ext == "md") {
-                targets.push(path);
-            }
-        }
-    }
+    ]
+    .iter()
+    .filter(|dir| dir.is_dir())
+    .flat_map(|dir| WalkBuilder::new(dir).hidden(false).build().flatten())
+    .map(ignore::DirEntry::into_path)
+    .filter(|path| path.extension().is_some_and(|ext| ext == "md"))
+    .map(|path| (path, Syntax::Yaml))
+    .collect();
+
+    // Add the global config last so output order stays stable
+    targets.sort_unstable_by(|a, b| a.0.cmp(&b.0));
     let json = root.join("config").join("opencode.json");
     if json.is_file() {
-        targets.push(json);
+        targets.push((json, Syntax::Json));
     }
-    targets.sort();
-    Ok(targets)
+    targets
 }
 
-/// Walk upward from CWD (or the --repo override) until a directory containing
-/// `config/agent`, `.opencode/agent`, or `config/opencode.json` is found.
+/// Find the repository root: `--repo`, or the nearest ancestor of CWD
+/// holding `config/opencode.json`.
 fn find_repo(override_root: Option<PathBuf>) -> Result<PathBuf> {
+    // Trust an explicit root only if it looks like this repository
     if let Some(root) = override_root {
-        if !root.join("config").is_dir() && !root.join(".opencode").is_dir() {
-            bail!(
-                "{} does not look like the opencode config repository",
-                root.display()
-            );
+        if !root.join("config").join("opencode.json").is_file() {
+            bail!("{} has no config/opencode.json", root.display());
         }
         return Ok(root);
     }
-    let mut dir = std::env::current_dir().context("get current directory")?;
-    loop {
-        if dir.join("config").join("agent").is_dir()
-            || dir.join(".opencode").join("agent").is_dir()
-            || dir.join("config").join("opencode.json").is_file()
-        {
-            return Ok(dir);
-        }
-        match dir.parent() {
-            Some(parent) => dir = parent.to_path_buf(),
-            None => bail!(
-                "opencode config repository not found; run from the repository or pass --repo"
-            ),
-        }
-    }
+
+    // Otherwise search the current directory and its ancestors
+    let cwd = std::env::current_dir().context("get current directory")?;
+    cwd.ancestors()
+        .find(|dir| dir.join("config").join("opencode.json").is_file())
+        .map(Path::to_path_buf)
+        .context("opencode config repository not found; run from it or pass --repo")
 }
 
-fn status(targets: &[PathBuf]) -> Result<()> {
-    let (mut ask, mut allow, mut none, mut mixed) = (0_u32, 0_u32, 0_u32, 0_u32);
-    for path in targets {
-        let text = fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
-        let decisions: Vec<String> = scan(&text, path).into_iter().map(|f| f.decision).collect();
-        if decisions.is_empty() {
-            none += 1;
-        } else if decisions.iter().all(|d| d == "ask") {
-            ask += 1;
-        } else if decisions.iter().all(|d| d == "allow") {
-            allow += 1;
-        } else {
-            mixed += 1;
+fn status(targets: &[(PathBuf, Syntax)]) -> Result<()> {
+    // Count toggleable rules in each mode across all files
+    let (mut regular, mut yolo) = (0_usize, 0_usize);
+    for (path, syntax) in targets {
+        let text = read(path)?;
+        for rule in rule_lines(&text, *syntax).filter_map(|(_, rule)| rule) {
+            match rule.mode() {
+                Some(Mode::Regular) => regular += 1,
+                Some(Mode::Yolo) => yolo += 1,
+                None => {}
+            }
         }
     }
-    let mode = match (mixed, allow, ask) {
-        (0, 0, _) => "OFF (regular)",
-        (0, _, 0) => "ON (yolo)",
-        _ => "MIXED",
+
+    // Summarize the overall mode
+    let mode = match (yolo, regular) {
+        (0, _) => "OFF (regular)",
+        (_, 0) => "ON (yolo)",
+        _ => "MIXED: run `opencode-yolo-mode on` or `off`",
     };
     println!("yolo mode: {mode}");
-    println!("  allow: {allow}  ask: {ask}  mixed: {mixed}  no external_directory: {none}");
-    if mixed > 0 {
-        println!("  run `opencode-yolo-mode on` or `off` to force one state");
-    }
-    println!("  guards after '*' (secrets deny/ask) always keep winning");
+    println!("  rewritten by yolo: {yolo}  waiting for approval: {regular}");
     Ok(())
 }
 
-/// Build the replacement for the target line, preserving indent, original
-/// colon spacing, and any trailing content (JSON comma).
-fn flip_line(text: &str, line_idx: usize, to: &str, path: &Path) -> Option<String> {
-    let line = text.lines().nth(line_idx)?;
-    let indent = &line[..line.len() - line.trim_start().len()];
-    let trimmed = line.trim();
-    let new_trimmed = if path.extension().is_some_and(|ext| ext == "json") {
-        if trimmed.contains("\"action\": \"external_directory\"") {
-            let from = if to == "allow" { "ask" } else { "allow" };
-            let effect = format!("\"effect\": \"{from}\"");
-            if !trimmed.contains(&effect) {
-                return None;
+fn read(path: &Path) -> Result<String> {
+    fs::read_to_string(path).with_context(|| format!("read {}", path.display()))
+}
+
+/// Rewrite every rule in `text` not yet in `to`, keeping all other bytes.
+///
+/// # Returns
+///
+/// The new text and the number of rewritten rules.
+fn toggle(text: &str, syntax: Syntax, to: Mode) -> (String, usize) {
+    let mut out = String::with_capacity(text.len() + 512);
+    let mut changed = 0;
+    for (line, rule) in rule_lines(text, syntax) {
+        match rule.and_then(|rule| rule.rewrite(to)) {
+            Some(new) => {
+                out.push_str(&new);
+                out.push_str(&line[line.trim_end_matches(['\r', '\n']).len()..]);
+                changed += 1;
             }
-            return Some(format!(
-                "{indent}{}",
-                trimmed.replacen(&effect, &format!("\"effect\": \"{to}\""), 1)
-            ));
+            None => out.push_str(line),
         }
-        return None;
-    } else {
-        // `"*": ask`
-        let (key, value) = trimmed.split_once(':')?;
-        let spacing = &value[..value.len() - value.trim_start().len()];
-        format!("{key}:{spacing}{to}")
+    }
+    (out, changed)
+}
+
+/// Each line with its ending, paired with its rule if it can hold permissions.
+///
+/// # Remarks
+///
+/// Markdown only scans the frontmatter.
+/// Rule examples in agent bodies stay untouched.
+fn rule_lines(text: &str, syntax: Syntax) -> impl Iterator<Item = (&str, Option<RuleLine<'_>>)> {
+    let limit = match syntax {
+        Syntax::Json => usize::MAX,
+        Syntax::Yaml => frontmatter_end(text),
     };
-    Some(format!("{indent}{new_trimmed}"))
+    text.split_inclusive('\n')
+        .enumerate()
+        .map(move |(idx, line)| {
+            let body = line.trim_end_matches(['\r', '\n']);
+            let rule = if idx < limit {
+                RuleLine::parse(body, syntax)
+            } else {
+                None
+            };
+            (line, rule)
+        })
 }
 
-/// Every external_directory '*' (or scalar) entry inside the file.
-/// Markdown scanning is limited to the frontmatter block; JSON scans all lines.
-fn scan(text: &str, path: &Path) -> Vec<Found> {
-    let lines: Vec<&str> = text.lines().collect();
-    let limit = match frontmatter_end(&lines, path) {
-        Some(end) => end,
-        None => lines.len(),
-    };
-    let mut found = Vec::new();
-    let mut i = 0;
-    while i < limit {
-        if let Some(f) = star_at(&lines, i, path) {
-            let (idx, decision) = f;
-            found.push(Found {
-                line_idx: idx,
-                decision,
-            });
-            i = idx + 1;
-        } else {
-            i += 1;
-        }
+/// Index of the closing `---` line, or 0 when the file has no frontmatter.
+fn frontmatter_end(text: &str) -> usize {
+    let mut lines = text.lines();
+    if lines.next().map(str::trim) != Some("---") {
+        return 0;
     }
-    found
+    lines
+        .position(|line| line.trim() == "---")
+        .map_or(0, |pos| pos + 1)
 }
 
-fn write_line(path: &Path, text: &str, line_idx: usize, replacement: &str) -> Result<()> {
-    let mut lines: Vec<String> = text.lines().map(str::to_owned).collect();
-    lines[line_idx] = replacement.to_owned();
-    let mut out = lines.join("\n");
-    if text.ends_with('\n') {
-        out.push('\n');
-    }
-    fs::write(path, out).with_context(|| format!("write {}", path.display()))
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
 
-/// Line index just past the YAML frontmatter block, or None for JSON or absent frontmatter.
-fn frontmatter_end(lines: &[&str], path: &Path) -> Option<usize> {
-    if path.extension().is_some_and(|ext| ext == "json") {
-        return None;
-    }
-    if lines.first()?.trim() != "---" {
-        return None;
-    }
-    Some(lines.iter().skip(1).position(|l| l.trim() == "---")? + 1)
-}
+    const AGENT: &str = "---\n\
+        mode: subagent\n\
+        permissions:\n  \
+        - { action: \"*\", resource: \"*\", effect: deny }\n  \
+        - { action: external_directory, resource: \"*\", effect: ask }\n  \
+        - { action: shell, resource: \"git push *\", effect: ask }\n\
+        ---\n\
+        Example:\n  \
+        - { action: edit, resource: \"*\", effect: ask }\n";
 
-/// If `lines[i]` opens an external_directory map, return the index and decision
-/// of its '*' entry. Scalar forms (whole-tool allow) are never touched: they are
-/// per-agent capabilities (e.g. plan/build), not the yolo wildcard.
-fn star_at(lines: &[&str], i: usize, path: &Path) -> Option<(usize, String)> {
-    let trimmed = lines[i].trim();
-    let is_json = path.extension().is_some_and(|ext| ext == "json");
+    // ── Toggle ──────────────────────────────────────────────────────────────
 
-    if is_json {
-        if trimmed.contains("\"action\": \"external_directory\"")
-            && trimmed.contains("\"resource\": \"*\"")
-        {
-            return trimmed
-                .split("\"effect\": \"")
-                .nth(1)
-                .and_then(|value| value.split('"').next())
-                .and_then(is_decision)
-                .map(|decision| (i, decision));
-        }
-        return None;
+    #[rstest]
+    fn toggle_should_rewrite_frontmatter_and_restore_exact_bytes() {
+        // Act
+        let (yolo, on) = toggle(AGENT, Syntax::Yaml, Mode::Yolo);
+        let (regular, off) = toggle(&yolo, Syntax::Yaml, Mode::Regular);
+
+        // Assert
+        assert_eq!(on, 2);
+        assert!(yolo.contains(r#"resource: "*", effect: allow } # yolo"#));
+        assert!(yolo.contains(r#"resource: "git push *", effect: deny } # yolo"#));
+        assert!(yolo.ends_with("  - { action: edit, resource: \"*\", effect: ask }\n"));
+        assert_eq!(off, 2);
+        assert_eq!(regular, AGENT);
     }
-
-    if trimmed != "external_directory:" {
-        return None;
-    }
-    let indent = indent_of(lines[i]);
-    let mut j = i + 1;
-    while j < lines.len() {
-        let line = lines[j];
-        if line.trim().is_empty() {
-            j += 1;
-            continue;
-        }
-        if indent_of(line) <= indent {
-            break;
-        }
-        if let Some(decision) = yaml_star_decision(line.trim()) {
-            return Some((j, decision));
-        }
-        j += 1;
-    }
-    None
-}
-
-fn indent_of(line: &str) -> usize {
-    line.len() - line.trim_start().len()
-}
-
-fn yaml_star_decision(trimmed: &str) -> Option<String> {
-    let (key, value) = trimmed.split_once(':')?;
-    if key.trim() != "\"*\"" {
-        return None;
-    }
-    is_decision(value.trim())
-}
-
-fn is_decision(value: &str) -> Option<String> {
-    (value == "ask" || value == "allow").then(|| value.to_owned())
 }
