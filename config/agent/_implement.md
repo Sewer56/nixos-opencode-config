@@ -1,8 +1,8 @@
 ---
 mode: all
 description: Executes approved tasks and final review
-model: sewer-axonhub/gpt-6.1-sol # CODER
-variant: high
+model: sewer-axonhub/claude-opus-5-5 # CODER
+variant: xhigh
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

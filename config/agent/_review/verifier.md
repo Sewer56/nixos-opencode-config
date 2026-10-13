@@ -2,7 +2,7 @@
 mode: subagent
 hidden: True
 description: Verifies justified local review findings
-model: sewer-axonhub/gpt-6.1-sol # VERIFIER
+model: sewer-axonhub/claude-sonnet-5-5 # VERIFIER
 variant: high
 permissions:
   - { action: "*", resource: "*", effect: deny }

@@ -1,8 +1,8 @@
 ---
 mode: primary
 description: Clarifies docs and approved code without changing behavior
-model: sewer-axonhub/gpt-6-luna # WRITER
-variant: high
+model: sewer-axonhub/claude-sonnet-5-5 # WRITER
+variant: medium
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }
@@ -88,6 +88,9 @@ Offer optional doc review and agree its scoped repair budget.
 Require explicit approval before writes or reviewer calls.
 Reconfirm only material scope changes.
 
+Use simple wording in guides and code docs. Keep only task-relevant detail.
+Preserve needed API contracts, errors and safety details.
+
 ## 2. Investigate the subject
 
 Read repository instructions, scoped docs, relevant source and tests.
@@ -156,7 +159,9 @@ Write only these artifacts, never reviewer reports or stubs.
 ### Reviewers
 
 Call `subagent(agent=_review/doc-quality)` after applicable checks pass.
-Supply agreed reader needs as acceptance criteria.
+
+Supply agreed reader needs, style and omissions as acceptance criteria.
+Review against them; do not expand coverage merely for completeness.
 
 Review documentation and scope violations, not unrelated code quality.
 Documentation review does not establish code correctness.

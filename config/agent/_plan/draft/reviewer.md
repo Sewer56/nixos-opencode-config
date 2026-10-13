@@ -2,8 +2,8 @@
 mode: subagent
 hidden: True
 description: Reviews plan bundles
-model: sewer-axonhub/gpt-6.1-sol # PLANNER
-variant: high
+model: sewer-axonhub/claude-opus-5-5 # PLANNER
+variant: xhigh
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

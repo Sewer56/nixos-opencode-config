@@ -1,8 +1,8 @@
 ---
 mode: all
 description: Writes grounded issues
-model: sewer-axonhub/gpt-6-luna # WRITER
-variant: high
+model: sewer-axonhub/claude-sonnet-5-5 # WRITER
+variant: medium
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

@@ -3,7 +3,7 @@ mode: subagent
 hidden: True
 description: Reviews system performance
 model: sewer-axonhub/claude-opus-5-5 # PERFORMANCE
-variant: high
+variant: xhigh
 permissions:
   - { action: "*", resource: "*", effect: deny }
   - { action: external_directory, resource: "*", effect: ask }

@@ -2,13 +2,13 @@
   "$tierOrder": {"0": "EASY","1": "PLANNER","2": "CODER","3": "WRITER","4": "STYLE-REVIEW","5": "PERFORMANCE","6": "VERIFIER","7": "CORRECTNESS-REVIEW"},
   "normal": {
     "EASY": {"model":"sewer-axonhub/gpt-6-luna","variant":"medium"},
-    "PLANNER": {"model":"sewer-axonhub/gpt-6.1-sol","variant":"high"},
-    "CODER": {"model":"sewer-axonhub/gpt-6.1-sol","variant":"high"},
-    "WRITER": {"model":"sewer-axonhub/gpt-6-luna","variant":"high"},
-    "STYLE-REVIEW": {"model":"sewer-axonhub/claude-opus-5-5","variant":"high"},
-    "PERFORMANCE": {"model":"sewer-axonhub/claude-opus-5-5","variant":"high"},
-    "VERIFIER": {"model":"sewer-axonhub/gpt-6.1-sol","variant":"high"},
-    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub/gpt-6.1-sol","variant":"xhigh"}
+    "PLANNER": {"model":"sewer-axonhub/claude-opus-5-5","variant":"xhigh"},
+    "CODER": {"model":"sewer-axonhub/claude-opus-5-5","variant":"xhigh"},
+    "WRITER": {"model":"sewer-axonhub/claude-sonnet-5-5","variant":"medium"},
+    "STYLE-REVIEW": {"model":"sewer-axonhub/claude-sonnet-5-5","variant":"high"},
+    "PERFORMANCE": {"model":"sewer-axonhub/claude-opus-5-5","variant":"xhigh"},
+    "VERIFIER": {"model":"sewer-axonhub/claude-sonnet-5-5","variant":"high"},
+    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub/claude-opus-5-5","variant":"high"}
   },
   "work": {
     "EASY": {"model":"sewer-axonhub-work/gpt-6-luna","variant":"low"},
