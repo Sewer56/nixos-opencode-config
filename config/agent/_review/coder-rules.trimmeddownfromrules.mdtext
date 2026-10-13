@@ -118,27 +118,34 @@ In method bodies:
 
 <!---
 ```rust
-pub fn run(archive: &Path, options: &InstallOptions) -> Result<ModId, InstallError> {
-    // Read the manifest and reject mods built for another game version.
-    let manifest = Manifest::read_from_archive(archive)?;
-    if manifest.game_version != options.game_version {
-        return Err(InstallError::WrongGameVersion(manifest.game_version));
-    }
+pub(crate) fn load() -> Result<LoadedInputs, ExitCode> {
+    // Parse arguments first.
+    let arguments = Arguments::try_parse().map_err(arguments::report_parse_error)?;
 
-    // Unpack into a temporary folder so a failed install leaves nothing behind.
-    let mut staging = Staging::new(&options.mods_dir)?;
-    unpack::extract_all(archive, &mut staging)?;
+    // Then read the working directory and environment token.
+    let cwd = env::current_dir().map_err(|error| {
+        eprintln!("cannot read working directory: {error}; run from an accessible directory");
+        ExitCode::FAILURE
+    })?;
+    let environment_token = env::var_os("MALWARE_CORPUS_TOKEN");
 
-    // Move the files into place.
-    staging.commit()?;
-    Ok(manifest.id)
+    // Finally, combine them together.
+    resolve(arguments, &cwd, environment_token.as_deref()).map_err(|error| {
+        eprintln!("{error}");
+        ExitCode::FAILURE
+    })
 }
 ```
 --->
 - Split steps into coherent groups, separated by one blank line.
-- Open each group with a short plain-English comment on what it achieves.
-- The comments alone should explain the method.
+- Open each group with a short comment, like walking a colleague through it.
+- Name the step plainly; leave details the code shows to the code.
+- Use sequence words such as "first", "then" and "finally" when order matters.
+- Together, the comments outline the method.
 - Skip the comment in single-group bodies the name already explains.
+
+Write `// Finally, combine them together.`,
+not `// Resolve settings and credentials, reporting failures to stderr.`
 <!---
 ```rust
 #[test]

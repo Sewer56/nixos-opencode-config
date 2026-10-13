@@ -194,8 +194,10 @@ Flag visibility broader than production callers or contracts require.
 In method bodies, check that:
 
 - Coherent groups of steps have one blank line between them.
-- Each group opens with a plain-English comment on what it achieves.
-- The comments alone explain the method.
+- Each group opens with a short comment, like walking a colleague through it.
+- Comments name the step plainly, leaving details the code shows to the code.
+- Sequence words such as "first", "then" and "finally" mark order that matters.
+- Together, the comments outline the method.
 - Single-group bodies explained by their name need none.
 - Tests separate arrange, act and assert with comments.
 
