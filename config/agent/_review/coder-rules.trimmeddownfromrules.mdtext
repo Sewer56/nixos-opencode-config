@@ -22,6 +22,7 @@ src/
 --->
 Mirror the call tree on disk: if module A calls B, nest B under A.
 Put modules with several callers in their nearest common ancestor.
+Use `foo/mod.rs` for Rust folder entrypoints, not `foo/foo.rs`.
 
 <!---
 ```rust
@@ -74,38 +75,40 @@ Keep multi-component Rust integration tests separate.
 
 ## Module headers
 
-<!---
-```rust
-//! Install mod archives into the game's mods folder.
-//!
-//! - [`InstallOptions`]: choose the target folder and overwrite behavior.
-//! - [`run`]: install one archive and return the new mod's ID.
-//! - [`InstallError`]: why an install failed.
-```
---->
 Open each source file's module doc with a one-line purpose.
 Then list caller-used items in typical call order, one line on each role.
-<!---
+
+<example name="pipeline-module">
 ```rust
-//! Download mod archives over HTTPS, resuming partial files.
+//! The recompilation pipeline: [`Recompiler`], and its errors.
+//!
+//! A run goes through three stages, in this order:
+//!
+//! 1. Load: build the run.
+//!    - [`Recompiler::load_input`]: from a config TOML.
+//!    - [`Recompiler::from_input`]: from an already-loaded config and bytes.
+//!
+//! 2. Analyse: find the functions to recompile.
+//!    - [`Recompiler::analyse`]: discover the recompilable functions.
+//!    - [`Recompiler::rename_entry_symbol`]: rename the entry point to `_xstart`.
+//!
+//! 3. Generate: produce the C++ file set.
+//!    - [`Recompiler::recompile`]: write the files to disk.
+//!    - [`Recompiler::generate_in_memory`]: keep the files in memory instead.
+//!    - [`Recompiler::generate`]: the shared code behind both.
 ```
---->
+</example>
+
+<example name="simple-module">
+```rust
+//! Writes the generated C++ files to disk or memory.
+//!
+//! - [`DiskWriter`] saves them to the output directory.
+//! - [`MemoryWriter`] saves them to memory.
+```
+</example>
+
 Skip the list for single-item modules.
-<!---
-```rust
-//! Stage file changes, then apply them all at once or not at all.
-//!
-//! - [`Staging::new`]: start an empty change set for a mods folder.
-//! - [`Staging::copy`]: queue one file to copy in.
-//! - [`Staging::commit`]: apply every queued change.
-//!
-//! ```no_run
-//! let mut staging = Staging::new(&mods_dir)?;
-//! staging.copy(&texture, "textures/sky.dds")?;
-//! staging.commit()?;
-//! ```
-```
---->
 Add a short example when usage is non-obvious.
 
 ## Visibility
@@ -116,7 +119,12 @@ Keep APIs as private as production callers and contracts allow.
 
 In method bodies:
 
-<!---
+- Separate coherent step groups with one blank line.
+- Open each group with a plain comment; together, comments outline the method.
+- Use "first", "then" and "finally" when order matters; omit code-obvious detail.
+- Single-group bodies explained by their name need no comment.
+
+<example name="narrative-steps">
 ```rust
 pub(crate) fn load() -> Result<LoadedInputs, ExitCode> {
     // Parse arguments first.
@@ -136,17 +144,40 @@ pub(crate) fn load() -> Result<LoadedInputs, ExitCode> {
     })
 }
 ```
---->
-- Split steps into coherent groups, separated by one blank line.
-- Open each group with a short comment, like walking a colleague through it.
-- Name the step plainly; leave details the code shows to the code.
-- Use sequence words such as "first", "then" and "finally" when order matters.
-- Together, the comments outline the method.
-- Skip the comment in single-group bodies the name already explains.
+</example>
 
-Write `// Finally, combine them together.`,
-not `// Resolve settings and credentials, reporting failures to stderr.`
-<!---
+Explain tricky logic with an invariant or, if needed, a worked input.
+
+<example name="worked-logic">
+```rust
+fn build_blocks(node: &FunctionNode, edges: &Edges) -> Vec<BasicBlock> {
+    // Example: two paths meet at 0x1005.
+    //   0x1000: test eax, eax
+    //   0x1002: jnz 0x1005
+    //   0x1004: nop
+    //   0x1005: ret
+
+    // First, every known function entry starts a block.
+    let mut starts = BTreeSet::from([node.entry]);
+
+    // Then add the targets of jumps and of paths that meet.
+    add_jump_targets(edges, &mut starts);
+
+    // So now we have:
+    // - 0x1000: the function entry
+    // - 0x1004: when jnz is not taken
+    // - 0x1005: when jnz is taken
+    split_at(node, &starts)
+}
+```
+</example>
+
+Explain why for steps a reader would question, such as an unusual operator.
+
+Separate arrange, act and assert with comments in tests.
+Keep `// Arrange` alone on its line; put explanations below.
+
+<example name="test-phases">
 ```rust
 #[test]
 fn run_should_reject_archive_when_game_version_differs() {
@@ -161,8 +192,23 @@ fn run_should_reject_archive_when_game_version_differs() {
     assert!(matches!(result, Err(InstallError::WrongGameVersion(_))));
 }
 ```
---->
-- Separate arrange, act and assert with comments in tests.
+</example>
+
+In Arrange, explain opaque test data, such as raw bytes, in readable form.
+
+<example name="readable-test-input">
+````rust
+// Arrange
+// The padding scan alone should find 0x1080.
+//
+// ```text
+//   0x107D: FF E0  jmp eax
+//   0x107F: CC     int3     ; padding after the jump
+//   0x1080: 55     push ebp ; aligned start: found
+// ```
+let code = padded_code(&[0xff, 0xe0, 0xcc, 0x55]);
+````
+</example>
 
 ## Redundancy
 
@@ -188,17 +234,11 @@ Account for enabled features and transitive costs within repository policy.
 Test new or changed repository behavior.
 Avoid testing compiler or library guarantees alone.
 
-<!---
-For [`ModId::try_from`], test an empty ID and one with spaces.
-Skip each other invalid character; the same check rejects them all.
---->
 Test edge cases only where a bug is likely or costly.
-Every test costs user review time; prefer fewer, clearer tests.
 
-Delete tests made unnecessary by code removal/change.
-
-Map removed redundant assertions to surviving tests.
-Retain test redundancy only across public entry points.
+- Keep tests focused on distinct behavior, not equivalent inputs.
+- Remove obsolete tests; map redundant assertions to surviving tests.
+- Before handoff, suggest safe scoped reductions; keep public-entry redundancy.
 
 ### Parameterization
 
@@ -232,14 +272,19 @@ Keep readable cases near 80-100 characters per line.
 
 ### Naming and grouping
 
-<!---
-Rust `parse_should_fail_when_text_is_empty`; C# `Parse_ShouldFail_WhenTextIsEmpty`.
---->
 Name tests `subject_should_expectation_when_condition`.
 Use the language's identifier style.
 
 Use `when` only for conditional/edge behavior.
 Omit module-redundant prefixes from test names.
+Keep names short: name the behavior and only the condition that matters.
+
+<example name="simple-test-names">
+```text
+parse_should_read_version
+parse_should_fail_when_empty
+```
+</example>
 
 <!---
 ```rust

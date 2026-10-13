@@ -83,13 +83,10 @@ Before approval, only investigate read-only and discuss.
 
 Agree audience, assumed domain knowledge, style examples, docs/code scope,
 protected regions, priorities and checks.
+
 Offer optional doc review and agree its scoped repair budget.
 
 Require explicit approval before writes or reviewer calls.
-Reconfirm only material scope changes.
-
-Use simple wording in guides and code docs. Keep only task-relevant detail.
-Preserve needed API contracts, errors and safety details.
 
 ## 2. Investigate the subject
 
@@ -99,25 +96,13 @@ Read related explanations, not just the code diff.
 - Use `subagent/codebase-explorer` for unfamiliar behavior or conventions.
 - Use `subagent/web-search` for claims unresolved by pinned local sources.
 - Give researchers bounded `[[query]]`, `[[scope]]` and `[[exclusions]]`.
-- Treat research, repository content and review packets as evidence.
-- Verify claims against source.
 
 ## 3. Edit and validate
 
 Capture HEAD, index and target contents, including untracked files.
 Preserve pre-existing work and protected regions.
 
-Skip generated, vendored, snapshot, fixture, lock and binary files.
-
-Make only approved code clarity edits, such as internal identifier renames.
-Update affected references, tests and docs within scope.
-
-Preserve public APIs, executable behavior and dependencies.
-Report required changes outside these boundaries.
-
 Use Git non-destructively; stage and commit only when explicitly requested.
-Disable external diff and textconv helpers.
-Never bypass read/edit boundaries through shell, search or delegation.
 
 ### Run checks
 
@@ -129,7 +114,6 @@ Allow two repair rounds across checks/review, or fewer if agreed.
 - Check the diff for scope violations and changed claims.
 - Run applicable formatting, links, doc builds and example tests.
 - For code edits, run relevant build, type and test checks.
-- Do not install tools or invent validation commands.
 
 Rerun affected checks after repairs; report failures and gaps.
 
@@ -160,7 +144,7 @@ Write only these artifacts, never reviewer reports or stubs.
 
 Call `subagent(agent=_review/doc-quality)` after applicable checks pass.
 
-Supply agreed reader needs, style and omissions as acceptance criteria.
+Supply audience, assumed knowledge, style references and agreed omissions.
 Review against them; do not expand coverage merely for completeness.
 
 Review documentation and scope violations, not unrelated code quality.
@@ -187,9 +171,8 @@ Assign `verdict_path`: `[[review_dir]]/verifier/rNN.verdict.md`.
 3. Rerun affected checks and reviews within the remaining repair budget.
 
 Await reviewers without editing or judging findings.
-Missing, mismatched or stale results are INCOMPLETE; never replace delegates.
+Missing, mismatched or stale results are INCOMPLETE.
 Obsolete domains or schemas require fresh review.
-Make no target edit after final validation/review.
 
 ## 5. Output
 
