@@ -7,7 +7,7 @@ fn test_filter_models_case_insensitive() {
         "sewer-axonhub/glm-5.1".to_string(),
     ];
 
-    let got = models::filter_models("normal", &models, "Gpt");
+    let got = models::filter_models(&models, "Gpt");
     assert_eq!(got, vec!["sewer-axonhub/GPT-5.5".to_string()]);
 }
 
@@ -18,12 +18,12 @@ fn test_filter_models_empty_query_returns_all() {
         "sewer-axonhub-work/b".to_string(),
     ];
 
-    let got = models::filter_models("normal", &models, "");
+    let got = models::filter_models(&models, "");
     assert_eq!(got.len(), 2);
 }
 
 #[test]
-fn test_filter_models_uses_tokens_and_work_provider() {
+fn test_filter_models_uses_tokens() {
     let models = vec![
         "sewer-axonhub/GLM-5.1".to_string(),
         "sewer-axonhub/gpt-5.5".to_string(),
@@ -31,7 +31,7 @@ fn test_filter_models_uses_tokens_and_work_provider() {
         "sewer-axonhub-work/gpt-5.4-mini".to_string(),
     ];
 
-    let got = models::filter_models("normal", &models, "gpt 5.5");
+    let got = models::filter_models(&models, "gpt 5.5");
     assert_eq!(
         got,
         vec![
@@ -39,26 +39,6 @@ fn test_filter_models_uses_tokens_and_work_provider() {
             "sewer-axonhub-work/gpt-5.5".to_string(),
         ]
     );
-
-    let got = models::filter_models("work", &models, "gpt");
-    assert_eq!(
-        got,
-        vec![
-            "sewer-axonhub-work/gpt-5.5".to_string(),
-            "sewer-axonhub-work/gpt-5.4-mini".to_string(),
-        ]
-    );
-}
-
-#[test]
-fn test_filter_models_work_profile_filters_non_work() {
-    let models = vec![
-        "sewer-axonhub/a".to_string(),
-        "sewer-axonhub-work/b".to_string(),
-    ];
-
-    let got = models::filter_models("work", &models, "");
-    assert_eq!(got, vec!["sewer-axonhub-work/b".to_string()]);
 }
 
 #[test]

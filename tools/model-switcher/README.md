@@ -32,10 +32,9 @@ Stored at `~/.config/opencode/model-switcher.json`.
 With XDG set, use `$XDG_CONFIG_HOME/opencode/model-switcher.json`.
 
 Each profile maps tier names to `model` and `variant` objects.
-See [the shipped presets](../../config/model-switcher.json).
+See [the shipped presets].
 
 - All profiles must have identical tier keys.
-- `work` profile requires `sewer-axonhub-work/` provider prefix.
 - Variants are `low`, `medium`, `high`, `xhigh`, or `max`.
 - `$tierOrder` is optional.
 - Missing tiers are discovered from profile keys and agent model tags.
@@ -84,3 +83,5 @@ Add a key to `model-switcher.json` with the same tier set as existing profiles.
 1. Add tier key to all profiles in `model-switcher.json`.
 2. Optionally update `$tierOrder` to control display order.
 3. Tag model lines in agent `.md` files with `# NEWTIER`.
+
+[the shipped presets]: ../../config/model-switcher.json

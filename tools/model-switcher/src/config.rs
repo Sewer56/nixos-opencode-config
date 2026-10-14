@@ -1,6 +1,6 @@
 use crate::env::rel;
 use crate::rewrite::agent_files;
-use crate::types::{Config, Env, LoadedConfig, TierSet, VARIANTS, WORK_PROVIDER};
+use crate::types::{Config, Env, LoadedConfig, VARIANTS};
 use anyhow::{Context, bail};
 use serde::Deserialize;
 
@@ -8,6 +8,7 @@ use serde::Deserialize;
 struct ConfigFile {
     #[serde(rename = "$tierOrder", default)]
     tier_order: std::collections::BTreeMap<String, String>,
+
     #[serde(flatten)]
     profiles: Config,
 }
@@ -35,26 +36,6 @@ pub fn save_config(env: &Env, loaded: &LoadedConfig) -> anyhow::Result<()> {
     let tmp = format!("{}.tmp", env.tier_file);
     std::fs::write(&tmp, &data).context("write tier file tmp")?;
     std::fs::rename(&tmp, &env.tier_file).context("rename tier file")?;
-    Ok(())
-}
-
-/// Work profile must only use work-provider models.
-pub fn validate_work(values: &TierSet, tier_order: &[String]) -> anyhow::Result<()> {
-    let mut bad = Vec::new();
-    for tier in tier_order {
-        if let Some(assignment) = values.get(tier)
-            && !assignment.model.starts_with(WORK_PROVIDER)
-        {
-            bad.push(format!("{}={}", tier, assignment.model));
-        }
-    }
-    if !bad.is_empty() {
-        bail!(
-            "work profile must use {} models: {}",
-            WORK_PROVIDER,
-            bad.join(", ")
-        );
-    }
     Ok(())
 }
 

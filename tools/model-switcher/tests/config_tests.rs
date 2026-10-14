@@ -124,26 +124,6 @@ fn test_validate_config_rejects_mismatched_tier_keys() {
     assert!(err.to_string().contains("differ"));
 }
 
-#[test]
-fn test_validate_work_requires_work_provider() {
-    let tier_order = vec!["EASY".to_string(), "MEDIUM".to_string(), "HARD".to_string()];
-    let mut good = TierSet::new();
-    good.insert("EASY".into(), assignment("sewer-axonhub-work/small", "low"));
-    good.insert(
-        "MEDIUM".into(),
-        assignment("sewer-axonhub-work/medium", "medium"),
-    );
-    good.insert(
-        "HARD".into(),
-        assignment("sewer-axonhub-work/large", "high"),
-    );
-    assert!(config::validate_work(&good, &tier_order).is_ok());
-
-    let mut bad = good.clone();
-    bad.insert("MEDIUM".into(), assignment("sewer-axonhub/other", "medium"));
-    assert!(config::validate_work(&bad, &tier_order).is_err());
-}
-
 fn assignment(model: &str, variant: &str) -> Assignment {
     Assignment {
         model: model.into(),

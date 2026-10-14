@@ -3,16 +3,16 @@ use std::collections::BTreeMap;
 
 /// Variants offered by the switcher.
 pub const VARIANTS: [&str; 5] = ["low", "medium", "high", "xhigh", "max"];
-/// Provider prefix required for work-mode model assignments.
-pub const WORK_PROVIDER: &str = "sewer-axonhub-work/";
 
 /// Result of applying a profile to agent markdown files.
 #[derive(Debug, Clone, Default)]
 pub struct ApplyResult {
     /// absolute path → changed line count
     pub files: BTreeMap<String, usize>,
+
     /// tier name → changed line count
     pub tiers: BTreeMap<String, usize>,
+
     pub lines: usize,
 }
 

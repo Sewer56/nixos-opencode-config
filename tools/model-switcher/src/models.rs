@@ -1,4 +1,4 @@
-use crate::types::{Env, WORK_PROVIDER};
+use crate::types::Env;
 use anyhow::{Context, bail};
 use std::process::Command;
 
@@ -19,15 +19,11 @@ pub fn available_models(env: &Env) -> anyhow::Result<Vec<String>> {
 }
 
 /// Filter models by case-insensitive space-separated token query.
-/// Work profile additionally requires `sewer-axonhub-work/` prefix.
-pub fn filter_models(profile: &str, models: &[String], query: &str) -> Vec<String> {
+pub fn filter_models(models: &[String], query: &str) -> Vec<String> {
     let query = query.trim().to_lowercase();
     let tokens: Vec<&str> = query.split_whitespace().collect();
     let mut out = Vec::new();
     for model in models {
-        if profile == "work" && !model.starts_with(WORK_PROVIDER) {
-            continue;
-        }
         let lower = model.to_lowercase();
         if tokens.iter().all(|t| lower.contains(t)) {
             out.push(model.clone());

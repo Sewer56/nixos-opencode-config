@@ -1,7 +1,6 @@
 //! Keyboard handling for the main view and both pickers.
 
 use super::app::{AppModel, Mode};
-use crate::config::validate_work;
 use crate::env::rel;
 use crate::models::filter_models;
 use crate::rewrite::{apply_profile, build_model_line_re};
@@ -74,14 +73,6 @@ impl<'a> AppModelHandler for AppModel<'a> {
                 self.message.clear();
             }
             KeyCode::Char('s') => {
-                let profile = self.profile().to_string();
-                if profile == "work"
-                    && let Some(values) = self.cfg.get("work")
-                    && let Err(e) = validate_work(values, &self.tier_order)
-                {
-                    self.message = format!("save failed: {}", e);
-                    return;
-                }
                 match crate::config::save_config(
                     self.env,
                     &crate::types::LoadedConfig {
@@ -104,12 +95,6 @@ impl<'a> AppModelHandler for AppModel<'a> {
                         return;
                     }
                 };
-                if profile == "work"
-                    && let Err(e) = validate_work(&values, &self.tier_order)
-                {
-                    self.message = format!("apply failed: {}", e);
-                    return;
-                }
                 let re = build_model_line_re(&self.tier_order);
                 match apply_profile(self.env, &values, false, &self.tier_order, &re) {
                     Ok(result) => {
@@ -204,7 +189,7 @@ impl<'a> AppModelHandler for AppModel<'a> {
     }
 
     fn filtered_models(&self) -> Vec<String> {
-        filter_models(self.profile(), &self.models, &self.input)
+        filter_models(&self.models, &self.input)
     }
 
     fn update_preview(&mut self) {
