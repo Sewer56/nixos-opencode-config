@@ -11,7 +11,7 @@ In overviews, explain the problem before implementation.
 
 Use short bullets, examples and links instead of dense setup paragraphs.
 
-Use supported callouts selectively; a title can headline the text below it.
+Use supported callouts selectively, with the takeaway as the title.
 Keep necessary warning explanations with the warning.
 
 Put example-specific guidance in code comments without repeating it in text.
@@ -79,7 +79,7 @@ pub fn copy(&mut self, source: &Path, target: &str) -> Result<usize, StagingErro
 ````
 </example>
 
-For several limits or cases, use a plain lead-in and short bullets.
+For several limits, rules or cases, use a plain lead-in and short bullets.
 Summarize categories unless readers need their members.
 
 <example name="return-limits">
@@ -131,11 +131,26 @@ pub fn from_response(status: u16, body: &[u8]) -> Result<Self, PageError> {
 
 ## Keep coverage minimal
 
-Explain each contract once; link existing coverage instead of repeating it.
+Explain each contract once: restate short conditions, link longer explanations.
+
 Omit boilerplate, obvious consequences and irrelevant edge cases.
 
 User-facing docs describe current behavior, not patch history or progress.
+Describe what callers see, not how the code ensures it.
 Include internals only when requested or needed for correct use.
+
+<example name="restate-short-condition">
+Before:
+```rust
+/// The result always stays under `self`, because `child` must itself pass
+/// the checks in [`StoragePath::new`]. Absolute and `..` children fail.
+```
+
+After:
+```rust
+/// Absolute paths and `..` segments are not allowed.
+```
+</example>
 
 ## Use human wording
 
@@ -183,7 +198,9 @@ State relevant limitations; give reliability estimates only with evidence.
 ## Use examples where they help
 
 State the behavior or invariant; show a small case if readers must simulate it.
-Skip examples that repeat a clear explanation; keep useful ones despite length.
+
+Skip examples that repeat a clear explanation or another example.
+Keep useful ones despite length.
 
 <example name="virtual-size-warning">
 ```markdown
