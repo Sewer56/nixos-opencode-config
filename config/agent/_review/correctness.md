@@ -1,6 +1,5 @@
 ---
 mode: subagent
-hidden: True
 description: Reviews behavior, security and test adequacy
 model: sewer-axonhub/claude-opus-5-5 # CORRECTNESS-REVIEW
 variant: high

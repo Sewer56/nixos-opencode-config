@@ -1,6 +1,5 @@
 ---
 mode: subagent
-hidden: True
 description: Implements approved tasks
 model: sewer-axonhub/claude-opus-5-5 # CODER
 variant: xhigh

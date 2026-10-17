@@ -1,6 +1,5 @@
 ---
 mode: subagent
-hidden: True
 description: Discovers bounded repository evidence for draft
 model: sewer-axonhub/gpt-6-luna # EASY
 variant: medium

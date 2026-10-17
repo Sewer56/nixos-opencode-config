@@ -1,6 +1,5 @@
 ---
 mode: subagent
-hidden: True
 description: Refutes candidates and promotes required draft corrections
 model: sewer-axonhub/claude-sonnet-5-5 # VERIFIER
 variant: high

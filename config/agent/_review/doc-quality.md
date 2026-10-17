@@ -1,6 +1,5 @@
 ---
 mode: subagent
-hidden: True
 description: Reviews standalone docs, API docs, docstrings and comments
 model: sewer-axonhub/claude-sonnet-5-5 # STYLE-REVIEW
 variant: high

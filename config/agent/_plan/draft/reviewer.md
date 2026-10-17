@@ -1,6 +1,5 @@
 ---
 mode: subagent
-hidden: True
 description: Reviews plan bundles
 model: sewer-axonhub/claude-opus-5-5 # PLANNER
 variant: xhigh

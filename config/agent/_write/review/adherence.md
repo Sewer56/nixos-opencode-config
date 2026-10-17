@@ -1,6 +1,5 @@
 ---
 mode: subagent
-hidden: True
 description: Reviews prose
 model: sewer-axonhub/claude-sonnet-5-5 # WRITER
 variant: medium

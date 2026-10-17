@@ -1,6 +1,5 @@
 ---
 mode: subagent
-hidden: True
 description: Verifies justified local review findings
 model: sewer-axonhub/claude-sonnet-5-5 # VERIFIER
 variant: high

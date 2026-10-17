@@ -1,6 +1,5 @@
 ---
 mode: subagent
-hidden: True
 description: Reviews code structure, maintainability and test organization
 model: sewer-axonhub/claude-sonnet-5-5 # STYLE-REVIEW
 variant: high

@@ -1,6 +1,5 @@
 ---
 mode: subagent
-hidden: True
 description: Read-only regression review for human judgment
 permissions:
   - { action: "*", resource: "*", effect: deny }
