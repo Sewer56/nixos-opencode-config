@@ -9,7 +9,7 @@
     // Keep after prompt-builder so it sees supplemental text.
     "./plugins/opencode-plugin-md-expand"
   ],
-  "small_model": "sewer-axonhub/deepseek-v4.1-flash",
+  "small_model": "sewer-axonhub-work/gpt-6-luna",
   "permissions": [
     { "action": "shell", "resource": "*", "effect": "allow" },
     { "action": "webfetch", "resource": "*", "effect": "allow" },

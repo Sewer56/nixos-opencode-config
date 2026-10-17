@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Discovers bounded repository evidence for draft
-model: sewer-axonhub/gpt-6-luna # EASY
+model: sewer-axonhub/claude-haiku-5-5 # EASY
 variant: medium
 permissions:
   - { action: "*", resource: "*", effect: deny }
