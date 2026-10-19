@@ -160,6 +160,7 @@ Preserve clear author voice; do not invent a persona.
 Use "we" naturally in walkthroughs, not as a compulsory subject.
 
 Trim wordiness without losing natural sentences or useful explanations.
+State what happens without unprompted "X, not Y" contrasts.
 
 <example name="trim-unnecessary-detail">
 Before:

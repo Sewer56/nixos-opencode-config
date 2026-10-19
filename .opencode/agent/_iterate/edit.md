@@ -88,7 +88,6 @@ uv run scripts/count-instruction-tokens.py [[target_paths]]
 
 ```sh
 python3 scripts/validate-opencode-config.py --repo-root .
-bash scripts/check-workflows.sh
 ```
 
 - Write agreed changes directly; verification-only requests remain no-edit.

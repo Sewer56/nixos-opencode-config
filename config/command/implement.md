@@ -1,5 +1,5 @@
 ---
-description: "Implement an approved human/exec task bundle in order"
+description: "Implement an approved draft"
 agent: _implement
 ---
 

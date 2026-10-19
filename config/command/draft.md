@@ -1,7 +1,7 @@
 ---
-description: "Discuss a design, then author its human-first task bundle"
+description: "Agree one task, then write its draft"
 agent: _plan/draft
 ---
 
-Request or draft refinement:
+Request or draft to refine:
 $ARGUMENTS

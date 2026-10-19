@@ -200,7 +200,7 @@ class EntryPointTests(unittest.TestCase):
             destination.write(f'\n{{{{ file="./rules/{name}" }}}}\n')
 
     def test_nested_verifier_ids_and_transitive_rules_are_reachable(self):
-        targets = ("_review/verifier", "_plan/draft/verifier")
+        targets = ("_review/verifier", "_plan/draft/reviewer")
         self.agent("Code", targets=targets)
         self.config["experimental"]["subagent_depth"] = 3
         for agent in targets:

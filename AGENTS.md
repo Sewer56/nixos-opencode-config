@@ -29,7 +29,5 @@ these change.
 - `scripts/validate-opencode-config.py` — static validation of config,
   permissions, task graph, imports.
   Exempts the `_iterate/edit` agent body from prompt-structure checks.
-- `scripts/check-workflows.sh` — plan-workflow routing smoke test;
-  helpers in `config/scripts/`.
 - `rust-llm-tidy` — on PATH via Nix; source is the `tools/rust-llm-tidy/`
   submodule.
