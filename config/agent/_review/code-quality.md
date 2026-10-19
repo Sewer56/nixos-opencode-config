@@ -113,6 +113,7 @@ Use existing tests as evidence, not scope for unrelated cleanup.
 1. Identify the repository behavior and distinct failure each test protects.
 2. Find redundant tests/assertions, unnecessary cases and obsolete tests.
    Flag coverage padding and tests of compiler or library guarantees alone.
+   Flag tests of obviously correct code.
    Flag edge tests where a bug is unlikely and cheap; they cost review time.
 3. Recommend exact deletions, merges or named parameterized cases.
    - Reduce maintenance without obscuring failures.

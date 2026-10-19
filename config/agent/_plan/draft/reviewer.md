@@ -153,7 +153,7 @@ Reject pseudo-patches, exact line recipes, import diffs and speculative bodies.
 Require critical behavioral success/failure/edge coverage, not compiler
 guarantees, request-shape mocks or examples as substitutes.
 
-When required, tests cover all new code.
+Reject tests of obviously correct code, like wiring, delegation or accessors.
 
 Equivalence needs both paths in one test.
 Compare final consumed/rendered results, not intermediate representations.

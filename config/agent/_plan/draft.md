@@ -146,6 +146,7 @@ Assign every completion obligation an owner.
 
 Prefer Rust unit tests in the implementation file.
 Keep multi-component Rust integration tests separate.
+Omit tests of obviously correct code, like wiring, delegation or accessors.
 
 Docs-only tasks need independent documentation requests.
 

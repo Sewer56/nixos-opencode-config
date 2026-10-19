@@ -232,6 +232,7 @@ Account for enabled features and transitive costs within repository policy.
 ### Coverage
 
 Test new or changed repository behavior.
+Skip obviously correct code, like wiring, delegation or accessors.
 Avoid testing compiler or library guarantees alone.
 
 Test edge cases only where a bug is likely or costly.
