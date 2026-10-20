@@ -123,6 +123,9 @@
   "provider": {
     "github-copilot": {
       "options": {
+        "headerTimeout": 2400000,
+        "chunkTimeout": 2400000,
+        "timeout": false,
         "reasoningSummary": "concise"
       }
     },
@@ -130,6 +133,9 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "Sewer AxonHub",
       "options": {
+        "headerTimeout": 2400000,
+        "chunkTimeout": 2400000,
+        "timeout": false,
         "baseURL": "{file:~/.secrets/axonhub-url}",
         "apiKey": "{file:~/.secrets/axonhub-key}",
         "modelsDiscovery": {
@@ -308,6 +314,9 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "AxonHub (Work Mode)",
       "options": {
+        "headerTimeout": 2400000,
+        "chunkTimeout": 2400000,
+        "timeout": false,
         "baseURL": "{file:~/.secrets/axonhub-url}",
         "apiKey": "{file:~/.secrets/axonhub-work-key}",
         "modelsDiscovery": {
