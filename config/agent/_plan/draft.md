@@ -82,15 +82,38 @@ Write the draft for humans; `/implement` fills in the mechanics:
 2. Optional `After: [[draft]]` line naming a draft that must land first.
 3. Numbered steps in implementation order, each with:
    - the file to create or change;
-   - new or changed signatures, types and traits, with API docs;
-   - test names, or why none are needed.
-4. A docs step for user-visible changes.
-5. Optional `## Unchanged`: behavior readers might expect to change.
-6. Optional `## Not doing`: work the request might imply.
+   - the change as code: new items in full, edits as diffs;
+   - the main test as code, others as names with one-line scenarios,
+     or why none are needed.
+4. A docs step for user-visible changes, as text or diffs.
+5. Optional `## Unchanged`: behavior readers would likely expect to change.
+6. Optional `## Not doing`: work the request would likely imply.
 7. `## Open questions`, only while some remain.
 
-Put invariants in API docs and comments.
-Show only the code a reviewer needs to judge the design.
+Let code carry the plan:
+
+- Put contracts and invariants in API docs and comments.
+- Elide only boilerplate, with `// ...`.
+- Under each block, add up to three one-line bullets for what code cannot show.
+- Never restate code, comments or earlier steps.
+- Omit provenance, validation and coding rules; `/implement` has them.
+
+<example name="draft-step">
+````markdown
+2. Change `src/scan/mod.rs`.
+
+   ~~~diff
+    pub(crate) mod download;
+   +// Remove when the sync runner uses it.
+   +#[allow(dead_code)]
+   +mod pages;
+   ~~~
+
+   - No exports; nothing calls the scanner yet.
+
+   Tests: none; declaration only.
+````
+</example>
 
 ## 4. Review
 

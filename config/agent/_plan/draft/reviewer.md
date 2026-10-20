@@ -87,6 +87,7 @@ Stay read-only, including shell.
 - Paths, symbols and signatures exist or fit the code they change.
 - Steps cover the request; nothing beyond it.
 - Each step builds on the previous one.
+- Changes are code or diffs, not restated in text.
 - Code follows the Rules.
 - Tests cover new behavior; none test obvious code.
 - Docs steps cover user-visible changes.
