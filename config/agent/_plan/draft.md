@@ -92,6 +92,7 @@ Write the draft for humans; `/implement` fills in the mechanics:
 
 Let code carry the plan:
 
+- Use `## 1.` step headings so code blocks stay unindented.
 - Put contracts and invariants in API docs and comments.
 - Elide only boilerplate, with `// ...`.
 - Under each block, add up to three one-line bullets for what code cannot show.
@@ -100,18 +101,18 @@ Let code carry the plan:
 
 <example name="draft-step">
 ````markdown
-2. Change `src/scan/mod.rs`.
+## 2. Change `src/scan/mod.rs`
 
-   ~~~diff
-    pub(crate) mod download;
-   +// Remove when the sync runner uses it.
-   +#[allow(dead_code)]
-   +mod pages;
-   ~~~
+~~~diff
+ pub(crate) mod download;
++// Remove when the sync runner uses it.
++#[allow(dead_code)]
++mod pages;
+~~~
 
-   - No exports; nothing calls the scanner yet.
+- No exports; nothing calls the scanner yet.
 
-   Tests: none; declaration only.
+Tests: none; declaration only.
 ````
 </example>
 
