@@ -1,3 +1,6 @@
 {
+  "env": {
+    "BUN_CONFIG_HTTP_IDLE_TIMEOUT": "0"
+  },
   "password": "cmV2TWQQTxFhfkxNLxbjS6OOHrFsXCr9TGman3FlvwE"
 }
