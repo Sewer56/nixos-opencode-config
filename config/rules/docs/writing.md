@@ -135,6 +135,9 @@ Explain each contract once: restate short conditions, link longer explanations.
 
 Omit boilerplate, obvious consequences and irrelevant edge cases.
 
+Never document unimplemented work unless the user explicitly asks.
+Update existing status notes only when their work changes.
+
 User-facing docs describe current behavior, not patch history or progress.
 Describe what callers see, not how the code ensures it.
 Include internals only when requested or needed for correct use.
