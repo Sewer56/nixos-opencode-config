@@ -235,6 +235,9 @@ Test new or changed repository behavior.
 Skip obviously correct code, like wiring, delegation or accessors.
 Avoid testing compiler or library guarantees alone.
 
+Never test that unimplemented features or wiring are absent.
+Test deliberate refusals, like fail-closed placeholders.
+
 Test edge cases only where a bug is likely or costly.
 
 - Keep tests focused on distinct behavior, not equivalent inputs.

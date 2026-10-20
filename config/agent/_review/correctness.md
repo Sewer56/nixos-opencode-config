@@ -129,6 +129,7 @@ Flag coverage padding and tests of compiler or library guarantees alone.
 Ground missing-test findings in an uncovered behavior and concrete failure.
 
 Flag tests of obviously correct code, like wiring or delegation.
+Flag tests that unimplemented features or wiring are absent.
 Never request them.
 
 Check one test executes both paths for equivalence claims.
