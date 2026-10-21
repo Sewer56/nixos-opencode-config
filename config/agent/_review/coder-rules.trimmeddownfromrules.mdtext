@@ -44,8 +44,6 @@ fn is_id_char(c: char) -> bool {
 --->
 Keep helpers and algorithms local, with conversions beside their type.
 
-Prefer one data model per file, keeping entrypoint definitions at entrypoints.
-
 <!---
 ```rust
 // install/manifest.rs
@@ -68,85 +66,17 @@ enum DependencyKind {
 }
 ```
 --->
+Prefer one data model per file, keeping entrypoint definitions at entrypoints.
 Keep enums, newtypes and value objects with their sole parent type.
 
 Prefer Rust unit tests in the implementation file.
 Keep multi-component Rust integration tests separate.
-
-## Module headers
-
-Open each source file's module doc with a one-line purpose.
-Then list caller-used items in typical call order, one line on each role.
-
-<example name="pipeline-module">
-```rust
-//! The recompilation pipeline: [`Recompiler`], and its errors.
-//!
-//! A run goes through three stages, in this order:
-//!
-//! 1. Load: build the run.
-//!    - [`Recompiler::load_input`]: from a config TOML.
-//!    - [`Recompiler::from_input`]: from an already-loaded config and bytes.
-//!
-//! 2. Analyse: find the functions to recompile.
-//!    - [`Recompiler::analyse`]: discover the recompilable functions.
-//!    - [`Recompiler::rename_entry_symbol`]: rename the entry point to `_xstart`.
-//!
-//! 3. Generate: produce the C++ file set.
-//!    - [`Recompiler::recompile`]: write the files to disk.
-//!    - [`Recompiler::generate_in_memory`]: keep the files in memory instead.
-//!    - [`Recompiler::generate`]: the shared code behind both.
-```
-</example>
-
-<example name="simple-module">
-```rust
-//! Writes the generated C++ files to disk or memory.
-//!
-//! - [`DiskWriter`] saves them to the output directory.
-//! - [`MemoryWriter`] saves them to memory.
-```
-</example>
-
-Skip the list for single-item modules.
-Add a short example when usage is non-obvious.
 
 ## Visibility
 
 Keep APIs as private as production callers and contracts allow.
 
 ## Body layout
-
-In method bodies:
-
-- Separate coherent step groups with one blank line.
-- Open each group with a plain comment; together, comments outline the method.
-- Use "first", "then" and "finally" when order matters; omit code-obvious detail.
-- Single-group bodies explained by their name need no comment.
-
-<example name="narrative-steps">
-```rust
-pub(crate) fn load() -> Result<LoadedInputs, ExitCode> {
-    // Parse arguments first.
-    let arguments = Arguments::try_parse().map_err(arguments::report_parse_error)?;
-
-    // Then read the working directory and environment token.
-    let cwd = env::current_dir().map_err(|error| {
-        eprintln!("cannot read working directory: {error}; run from an accessible directory");
-        ExitCode::FAILURE
-    })?;
-    let environment_token = env::var_os("MALWARE_CORPUS_TOKEN");
-
-    // Finally, combine them together.
-    resolve(arguments, &cwd, environment_token.as_deref()).map_err(|error| {
-        eprintln!("{error}");
-        ExitCode::FAILURE
-    })
-}
-```
-</example>
-
-Explain tricky logic with an invariant or, if needed, a worked input.
 
 <example name="worked-logic">
 ```rust
@@ -157,10 +87,10 @@ fn build_blocks(node: &FunctionNode, edges: &Edges) -> Vec<BasicBlock> {
     //   0x1004: nop
     //   0x1005: ret
 
-    // First, every known function entry starts a block.
+    // Every known function entry starts a block.
     let mut starts = BTreeSet::from([node.entry]);
 
-    // Then add the targets of jumps and of paths that meet.
+    // Add jump targets and places where paths meet.
     add_jump_targets(edges, &mut starts);
 
     // So now we have:
@@ -172,29 +102,8 @@ fn build_blocks(node: &FunctionNode, edges: &Edges) -> Vec<BasicBlock> {
 ```
 </example>
 
+Explain tricky logic with an invariant or, if needed, a worked input.
 Explain why for steps a reader would question, such as an unusual operator.
-
-Separate arrange, act and assert with comments in tests.
-Keep `// Arrange` alone on its line; put explanations below.
-
-<example name="test-phases">
-```rust
-#[test]
-fn run_should_reject_archive_when_game_version_differs() {
-    // Arrange
-    let archive = write_test_archive("mod.zip", "1.0.0");
-    let options = test_options("2.0.0");
-
-    // Act
-    let result = run(&archive, &options);
-
-    // Assert
-    assert!(matches!(result, Err(InstallError::WrongGameVersion(_))));
-}
-```
-</example>
-
-In Arrange, explain opaque test data, such as raw bytes, in readable form.
 
 <example name="readable-test-input">
 ````rust
@@ -210,9 +119,10 @@ let code = padded_code(&[0xff, 0xe0, 0xcc, 0x55]);
 ````
 </example>
 
+In Arrange, explain opaque test data, such as raw bytes, in readable form.
+
 ## Redundancy
 
-Extract helpers for repeated code.
 <!---
 Instead of [`EmptyRegistry`] and [`FailingRegistry`] structs:
 
@@ -220,6 +130,7 @@ Instead of [`EmptyRegistry`] and [`FailingRegistry`] structs:
 fn test_registry(installed: &[&str], fail_on_add: bool) -> FakeRegistry
 ```
 --->
+Extract helpers for repeated code.
 Prefer one parameterizable local helper over per-test mock structs.
 
 ## Dependencies
@@ -276,19 +187,19 @@ Keep readable cases near 80-100 characters per line.
 
 ### Naming and grouping
 
-Name tests `subject_should_expectation_when_condition`.
-Use the language's identifier style.
-
-Use `when` only for conditional/edge behavior.
-Omit module-redundant prefixes from test names.
-Keep names short: name the behavior and only the condition that matters.
-
 <example name="simple-test-names">
 ```text
 parse_should_read_version
 parse_should_fail_when_empty
 ```
 </example>
+
+Name tests `subject_should_expectation_when_condition`.
+Use the language's identifier style.
+
+Use `when` only for conditional/edge behavior.
+Omit module-redundant prefixes from test names.
+Keep names short: name the behavior and only the condition that matters.
 
 <!---
 ```rust

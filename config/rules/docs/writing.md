@@ -4,18 +4,9 @@
 
 Assume readers know the programming language, not the domain or implementation.
 
+Help future maintainers use and safely change the code.
+
 ## Keep guides simple
-
-Open with a plain purpose line, then actions or choices.
-In overviews, explain the problem before implementation.
-
-Use short bullets, examples and links instead of dense setup paragraphs.
-
-Use supported callouts selectively, with the takeaway as the title.
-Keep necessary warning explanations with the warning.
-
-Put example-specific guidance in code comments without repeating it in text.
-Use two trailing spaces `  ` for Markdown line breaks.
 
 <example name="guide-recovery">
 ```markdown
@@ -32,115 +23,113 @@ If this file blocks the next update:
 ```
 </example>
 
+Open with a plain purpose line, then actions or choices.
+In overviews, explain the problem before implementation.
+
+Use short bullets, examples and links instead of dense setup paragraphs.
+
+Use supported callouts selectively, with the takeaway as the title.
+Keep necessary warning explanations with the warning.
+
+Put example-specific guidance in code comments without repeating it in text.
+Use two trailing spaces `  ` for Markdown line breaks.
+
 ## Keep API docs focused
 
-Open with the item's purpose and key contract.
+<example name="api-sections">
+```rust
+/// Creates a folder.
+///
+/// # Arguments
+///
+/// - `path`: path of the new folder.
+///
+/// # Returns
+///
+/// [`Ok`] when the folder is created.
+///
+/// # Errors
+///
+/// - [`io::ErrorKind::AlreadyExists`]: `path` exists.
+/// - Other I/O errors if the folder cannot be created.
+///
+/// # Remarks
+///
+/// Create any parent folders first.
+pub fn create_folder(path: &std::path::Path) -> std::io::Result<()> {
+    std::fs::create_dir(path)
+}
+```
+</example>
+
+Open with what the item does.
 Keep type summaries short; put method-specific contracts on methods.
 
-Omit mechanics established by the signature or the reader's prerequisites.
+Document public methods with a summary, Arguments for non-`self` parameters,
+Returns for meaningful results, and Errors for fallible operations.
 
-Use only needed sections, in this order:
+Describe `Result<()>` success; omit Returns for plain unit returns.
+Use equivalent sections in other languages.
+
+Keep required sections brief, not absent.
+Omit mechanics established by the reader's prerequisites.
+
+Add other sections only when useful, keeping this order:
 
 - Rust: Arguments, Returns, Examples, Errors, Panics, Safety, Remarks.
 - C#: summary, typeparam, param, returns, value, exception, remarks, example,
   seealso.
 
 Give each parameter, return case and error one line where possible.
-In comments, start a sentence mid-line only if it ends on that line.
+Start each documentation sentence on a new source line.
 
-<example name="api-sections">
-````rust
-/// Queue one file to copy into the mods folder on [`Staging::commit`].
+Put error conditions under Errors.
+
+<example name="purpose-and-limit">
+Before:
+```rust
+/// Writes a chunk without going over the expected file size.
+```
+
+After, with Arguments, Returns and Errors retained between these sections:
+```rust
+/// Writes a chunk.
 ///
-/// # Arguments
+/// # Remarks
 ///
-/// - `source`: file to copy.
-/// - `target`: path relative to the mods folder.
-///
-/// # Returns
-///
-/// The number of files now queued.
-///
-/// # Examples
-///
-/// ```no_run
-/// staging.copy(&texture, "textures/sky.dds")?;
-/// ```
-///
-/// # Errors
-///
-/// - [`StagingError::Conflict`]: `target` is already queued.
-/// - [`StagingError::Io`]: `source` cannot be read.
-///
-/// # Panics
-///
-/// Panics if `target` is an absolute path.
-pub fn copy(&mut self, source: &Path, target: &str) -> Result<usize, StagingError> {
-````
+/// Does not write beyond the expected file size.
+```
 </example>
 
-For several limits, rules or cases, use a plain lead-in and short bullets.
+Put useful type-wide failure behavior, limits and guarantees in Remarks.
+Omit irrelevant detail rather than moving it there.
+Keep essential contracts and safety instructions even when they add length.
+
+<example name="simple-module">
+```rust
+//! Writes the generated C++ files to disk or memory.
+//!
+//! - [`DiskWriter`] saves them to the output directory.
+//! - [`MemoryWriter`] saves them to memory.
+```
+</example>
+
+Open module docs with a one-line purpose.
+Crate and entry-module docs then list public entry points, one brief role each.
+Skip the list for single-item modules.
+
+Omit private wiring from module headers.
+Entry headers omit workflows and API comparisons.
+Keep call sequences on the relevant type or focused module, not both.
+
+List call sequences as bullets, one call per bullet, never a paragraph.
+For several limits, rules or cases, use a lead-in and short bullets.
 Summarize categories unless readers need their members.
 
-<example name="return-limits">
-```rust
-/// Returns the section's stored bytes.
-///
-/// # Arguments
-///
-/// - `data`: The executable's complete file buffer.
-///
-/// # Returns
-///
-/// A slice of `data` starting at `raw_address`.
-/// Reads stop at the smallest of:
-/// - Raw size.
-/// - Mapped size.
-/// - Available file bytes.
-pub fn file_bytes<'a>(&self, data: &'a [u8]) -> &'a [u8] {
-```
-</example>
-
 Keep required return/error conditions without cataloging inferred consequences.
-Put errors under Returns or Errors; needed caveats and their reasons in Remarks.
 Link code items: rustdoc [`Item`] and [`None`], C# `<see cref>`.
 
-<example name="error-contract">
-```rust
-/// Parses one page from an already fetched response.
-///
-/// # Arguments
-/// - `status`: HTTP status code returned with `body`.
-/// - `body`: Response body, read only when `status` is 200.
-///
-/// # Returns
-/// The parsed page. `next_cursor` is [`None`] on the last page.
-///
-/// # Errors
-/// - [`PageError::AuthenticationDenied`] when `status` is 401.
-/// - [`PageError::CorpusAccessDenied`] when `status` is 403.
-/// - [`PageError::InvalidRequest`] when `status` is 422.
-/// - [`PageError::MalformedData`] when `status` is 200 and `body` is not
-///   a valid page.
-/// - [`PageError::TransientStatus`] when `status` is 408, 429, 500, 502,
-///   503 or 504.
-/// - [`PageError::UnexpectedStatus`] for any other `status`.
-pub fn from_response(status: u16, body: &[u8]) -> Result<Self, PageError> {
-```
-</example>
-
 ## Keep coverage minimal
-
-Explain each contract once: restate short conditions, link longer explanations.
-
-Omit boilerplate, obvious consequences and irrelevant edge cases.
-
-Never document unimplemented work unless the user explicitly asks.
-Update existing status notes only when their work changes.
-
-User-facing docs describe current behavior, not patch history or progress.
-Describe what callers see, not how the code ensures it.
-Include internals only when requested or needed for correct use.
 
 <example name="restate-short-condition">
 Before:
@@ -155,6 +144,40 @@ After:
 ```
 </example>
 
+Explain each contract once: restate short conditions, link longer explanations.
+Keep method docs specific to that operation, not the surrounding workflow.
+
+Omit generic trait remarks about implementations choosing names or storage.
+Document specific constraints callers or implementers must follow instead.
+
+<example name="irrelevant-qualification">
+Before:
+```rust
+/// Creates a cache without storing any values.
+```
+
+After:
+```rust
+/// Creates a cache.
+```
+</example>
+
+Omit boilerplate, obvious consequences and irrelevant edge cases.
+Include qualifications only when they help a decision or prevent a mistake.
+
+Do not add staging tutorials, responsibility reminders or durability disclaimers
+unless needed for the reader's task.
+
+Never document unimplemented work unless the user explicitly asks.
+Update existing status notes only when their work changes.
+
+Describe current caller-visible behavior, not internals or patch history.
+Omit progress notes.
+Explain internals only for maintainer tasks or correct use.
+
+Skip private-helper rustdoc when names and code explain it.
+Comment only on non-obvious reasons or invariants needed for safe changes.
+
 ## Use human wording
 
 Write like a person explaining to a colleague.
@@ -165,31 +188,50 @@ Use "we" naturally in walkthroughs, not as a compulsory subject.
 Trim wordiness without losing natural sentences or useful explanations.
 State what happens without unprompted "X, not Y" contrasts.
 
-<example name="trim-unnecessary-detail">
+<example name="direct-outcome">
 Before:
 ```rust
-/// The slice is a view into `data`, not a copy.
-/// A short `data` gives fewer bytes, not an error.
+/// [`Ok`] when the implementation finishes the file successfully.
+/// Returns an I/O error if the implementation cannot finish the file.
 ```
 
 After:
 ```rust
-/// Returns the section's stored bytes.
-/// Reads stop at the end of `data`.
+/// [`Ok`] when the file is complete.
+/// I/O error if the file cannot be finished.
 ```
 </example>
+
+Describe outcomes directly, without implementation-focused wording.
+Under Returns and Errors, start with the outcome or condition, not "Returns".
+Use "I/O error if..." without generic implementation-defined qualifications.
 
 Use full, short sentences, one idea each.
 Short labels are enough where a sentence would add nothing.
 
-Prefer everyday words and concrete verbs without losing precision.
+<example name="concrete-wording">
+Before:
+```rust
+//! Converts source data into caller-selected representations.
+// Materialize the computed result for subsequent reuse.
+```
+
+After:
+```rust
+//! Converts data to the format you choose.
+// Save the result.
+```
+</example>
+
+Use ordinary words for ordinary things, with concrete verbs and exact meaning.
 Explain unfamiliar terms the task needs, respecting agreed reader knowledge.
+
+Do not explain simple assignments or error recording; omit the comment or
+name the action briefly, without a failure-mechanism narrative.
 
 Expand unfamiliar acronyms on first use as `Expanded Name (ACRONYM)`.
 Exempt known terms, identifiers, paths, headings and non-instructional text.
 Use one term for each thing.
-
-Relate a new idea to one the reader knows, then give the difference.
 
 <example name="known-comparison">
 ```markdown
@@ -197,14 +239,11 @@ Basically a switch table, but `call` instead of `jmp`.
 ```
 </example>
 
-State relevant limitations; give reliability estimates only with evidence.
+Relate a new idea to one the reader knows, then give the difference.
+
+Give reliability estimates only with evidence.
 
 ## Use examples where they help
-
-State the behavior or invariant; show a small case if readers must simulate it.
-
-Skip examples that repeat a clear explanation or another example.
-Keep useful ones despite length.
 
 <example name="virtual-size-warning">
 ```markdown
@@ -222,32 +261,80 @@ Keep useful ones despite length.
 ```
 </example>
 
-For API docs, prefer usage examples over machinery demonstrations.
-Use verified APIs and hermetic fixtures for runnable examples.
+State the behavior or invariant; show a small case if readers must simulate it.
+
+Skip examples that repeat a clear explanation or another example.
+Keep useful ones despite length.
 
 <example name="api-usage">
 ````rust
-/// Inputs for a page request, serialized as URL query parameters.
-///
-/// Pass [`None`] for the first page.
-/// To continue, pass the returned cursor unchanged.
+/// Sends messages between parts of a program.
 ///
 /// # Examples
 ///
+/// ```rust
+/// use std::sync::mpsc;
+///
+/// // Send a message.
+/// let (sender, receiver) = mpsc::channel();
+/// sender.send("ready")?;
+///
+/// // Read it back.
+/// assert_eq!(receiver.recv()?, "ready");
+/// # Ok::<(), Box<dyn std::error::Error>>(())
 /// ```
-/// # use malware_corpus_client::{Page, PageRequest, InvalidPageLimit};
-/// # fn example(page: Page) -> Result<(), InvalidPageLimit> {
-/// let first = PageRequest::new(500, None)?;
-/// let next = PageRequest::new(500, page.next_cursor)?;
-/// # Ok(())
-/// # }
-/// ```
+///
+/// # Remarks
+///
+/// Messages arrive in send order.
 ````
 </example>
 
-Use before/after values or tables for transformations.
-Use diagrams for relationships.
-Include meaningful cases; reuse one scenario without explaining it twice.
+For APIs, add one short usage example only when callers must combine operations.
+Prefer usage over machinery; use verified APIs and hermetic fixtures.
+Use short comments to group example steps when that helps readers follow them.
+
+Let the example show the sequence; do not repeat it in text.
+Keep type introductions to purpose; put useful shared rules in brief Remarks.
+
+<example name="test-phases">
+```rust
+// Arrange
+let text = "twelve"; // <- not a number
+
+// Act
+let result = text.parse::<u32>(); // <- fails here
+
+// Assert
+assert!(result.is_err()); // <- rejected input
+```
+</example>
+
+Separate test phases with standalone `// Arrange`, `// Act` and `// Assert`.
+Put phase explanations below the label.
+
+<example name="scan-test-result">
+```rust
+let mut scores = std::collections::BTreeMap::from([("Ada", 3)]); // <- one entry
+scores.insert("Ada", 5); // <- replaces that entry
+assert_eq!(scores.len(), 1); // <- still one entry
+assert_eq!(scores["Ada"], 5); // <- updated score
+```
+</example>
+
+Use short trailing arrows to connect relevant setup, operation and result.
+Mark file or value creation when later checks are hard to trace.
+Apply this to successful and failing tests; do not annotate every line.
+
+Mark the bad input or faulting call with a short `// <-` comment, including
+parameterized case inputs; point to the fault before its assertion.
+Do not replace the marker with a paragraph about expected failure.
+
+Group related operations with blank lines and occasional plain comments.
+Name the group's action briefly; explain non-obvious reasons, not every line.
+Leave simple bodies alone when their names explain them.
+
+Use ordering words for non-obvious dependencies, not simple two-step bodies.
 
 <example name="markdown-transformation">
 ```markdown
@@ -268,8 +355,9 @@ We add `~1`, `~2`, and so on until we find an unused name.
 ```
 </example>
 
-In maintainer docs, explain the mechanism or invariant needed for safe changes.
-Name the function and file when they help readers navigate.
+Use before/after values or tables for transformations.
+Use diagrams for relationships.
+Include meaningful cases; reuse one scenario without explaining it twice.
 
 <example name="maintainer-invariant">
 ```rust
@@ -277,5 +365,16 @@ Name the function and file when they help readers navigate.
 // This lets us edit start..end without affecting bytes outside it.
 ```
 </example>
+
+In maintainer docs, explain the mechanism or invariant needed for safe changes.
+Name the function and file when they help readers navigate.
+
+## Apply the editorial profile
+
+Before delivery, check wording against these rules, audience and style examples.
+
+Apply user-corrected style patterns throughout the authorized scope.
+Prefer readability and useful explanations over shorter wording.
+Lint success alone does not establish reader fit.
 
 {{ file="./rules/adhd-communication.md" }}
