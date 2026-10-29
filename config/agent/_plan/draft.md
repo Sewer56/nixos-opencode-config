@@ -83,8 +83,7 @@ Write the draft for humans; `/implement` fills in the mechanics:
 3. Numbered steps in implementation order, each with:
    - the file to create or change;
    - the change as code: new items in full, edits as diffs;
-   - the main test as code, others as names with one-line scenarios,
-     or why none are needed.
+   - its few basic tests as code, or why none are needed.
 4. A docs step for user-visible changes, as text or diffs.
 5. Optional `## Unchanged`: behavior readers would likely expect to change.
 6. Optional `## Not doing`: work the request would likely imply.

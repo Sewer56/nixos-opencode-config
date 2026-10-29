@@ -89,7 +89,7 @@ Stay read-only, including shell.
 - Each step builds on the previous one.
 - Changes are code or diffs, not restated in text.
 - Code follows the Rules.
-- Tests cover new behavior; none test obvious code.
+- A few basic tests cover core behavior; none test obvious code or each error.
 - Docs steps cover user-visible changes.
 
 # Output

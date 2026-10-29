@@ -78,6 +78,96 @@ Keep APIs as private as production callers and contracts allow.
 
 ## Body layout
 
+<example name="step-functions">
+```rust
+pub fn recompile(&self, output: &Path) -> Result<(), RecompileError> {
+    // Find the functions to recompile.
+    let mut functions = self.analyse()?;
+    rename_entry_symbol(&mut functions, "_xstart");
+
+    // Generate the C++ files.
+    let files = generate_files(&functions)?;
+
+    // Replace the previous output.
+    clear_output(output)?;
+    write_files(output, &files)
+}
+```
+</example>
+
+<example name="steps-with-inline-check">
+```rust
+pub fn install(archive: &Path, options: &InstallOptions) -> Result<ModId, InstallError> {
+    // Reject mods for another game version.
+    let manifest = Manifest::read_from_archive(archive)?;
+    if manifest.game_version != options.game_version {
+        return Err(InstallError::WrongGameVersion(manifest.game_version));
+    }
+
+    // Unpack to staging.
+    let mut staging = Staging::new(&options.mods_dir)?;
+    unpack::extract_all(archive, &mut staging)?;
+
+    // Move the files into place.
+    staging.commit()?;
+    Ok(manifest.id)
+}
+```
+</example>
+
+Extract substantial steps into named functions, so callers read as steps.
+
+<example name="plain-loop">
+Before:
+```rust
+let stale: Vec<_> = samples
+    .iter()
+    .filter(|sample| {
+        sample.complete
+            && !sample.pinned
+            && sample.files.iter().any(|file| {
+                file.modified < cutoff && !file.is_lock()
+            })
+    })
+    .collect();
+```
+
+After:
+```rust
+let mut stale = Vec::new();
+for sample in &samples {
+    // Skip unfinished and pinned samples.
+    if !sample.complete || sample.pinned {
+        continue;
+    }
+
+    // Stale if any unlocked file is older than the cutoff.
+    for file in &sample.files {
+        if file.modified < cutoff && !file.is_lock() {
+            stale.push(sample);
+            break;
+        }
+    }
+}
+```
+</example>
+
+Prefer plain loops when chain closures hold multi-condition or nested checks.
+Split nested or wrapped conditions into early `continue` or `return` guards.
+Simple chains with one-line closures are fine.
+
+<example name="match-branches">
+```rust
+let current = match self.samples.get(&uid) {
+    Some(sample) => sample,
+    None => return Ok(true),
+};
+```
+</example>
+
+Prefer `match` over `let ... else` and `if let ... else`.
+It keeps both branches visible.
+
 <example name="worked-logic">
 ```rust
 fn build_blocks(node: &FunctionNode, edges: &Edges) -> Vec<BasicBlock> {
@@ -142,18 +232,19 @@ Account for enabled features and transitive costs within repository policy.
 
 ### Coverage
 
-Test new or changed repository behavior.
-Skip obviously correct code, like wiring, delegation or accessors.
+Write a few basic tests for the core of new or changed behavior.
+Skip obviously correct code, like wiring, delegation, accessors or `?`.
 Avoid testing compiler or library guarantees alone.
 
 Never test that unimplemented features or wiring are absent.
 Test deliberate refusals, like fail-closed placeholders.
 
-Test edge cases only where a bug is likely or costly.
+Never test each error or edge case.
+Test one only where a bug is likely and costly.
 
 - Keep tests focused on distinct behavior, not equivalent inputs.
 - Remove obsolete tests; map redundant assertions to surviving tests.
-- Before handoff, suggest safe scoped reductions; keep public-entry redundancy.
+- Before handoff, suggest safe scoped reductions.
 
 ### Parameterization
 

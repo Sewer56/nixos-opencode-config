@@ -313,25 +313,16 @@ assert!(result.is_err()); // <- rejected input
 Separate test phases with standalone `// Arrange`, `// Act` and `// Assert`.
 Put phase explanations below the label.
 
-<example name="scan-test-result">
-```rust
-let mut scores = std::collections::BTreeMap::from([("Ada", 3)]); // <- one entry
-scores.insert("Ada", 5); // <- replaces that entry
-assert_eq!(scores.len(), 1); // <- still one entry
-assert_eq!(scores["Ada"], 5); // <- updated score
-```
-</example>
+Use short trailing `// <-` arrows only to trace the faulting input.
+Leave other lines unmarked.
 
-Use short trailing arrows to connect relevant setup, operation and result.
-Mark file or value creation when later checks are hard to trace.
-Apply this to successful and failing tests; do not annotate every line.
-
-Mark the bad input or faulting call with a short `// <-` comment, including
-parameterized case inputs; point to the fault before its assertion.
+Mark that input, including parameterized case inputs, then each line that
+processes it, up to its assertion.
 Do not replace the marker with a paragraph about expected failure.
 
-Group related operations with blank lines and occasional plain comments.
-Name the group's action briefly; explain non-obvious reasons, not every line.
+Group related operations with blank lines.
+Open each group with a one-line comment naming its action.
+Use longer comments only for invariants or worked inputs.
 Leave simple bodies alone when their names explain them.
 
 Use ordering words for non-obvious dependencies, not simple two-step bodies.

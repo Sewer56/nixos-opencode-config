@@ -114,17 +114,16 @@ Use existing tests as evidence, not scope for unrelated cleanup.
 2. Find redundant tests/assertions, unnecessary cases and obsolete tests.
    Flag coverage padding and tests of compiler or library guarantees alone.
    Flag tests of obviously correct code.
-   Flag edge tests where a bug is unlikely and cheap; they cost review time.
+   Flag failure or edge tests unless a bug is likely and costly.
 3. Recommend exact deletions, merges or named parameterized cases.
    - Reduce maintenance without obscuring failures.
    - Map removed redundant assertions to surviving tests/assertions.
    - For obsolete or guarantee-only tests, explain why no behavior loses coverage.
 4. Report recommendations or explain why no safe reduction exists.
 
-Preserve distinct success, failure, edge, integration and public-entry coverage.
-Retain redundancy across public entry points.
+Preserve core behavior and integration coverage.
 Do not infer redundancy from similar names or structure.
-Optimize maintainability, not test count.
+Prefer fewer tests when maintainability is equal.
 
 ## 5. Output
 
@@ -155,6 +154,10 @@ Recommend descriptive, domain-first names.
 Flag unnecessary or single-implementation abstractions.
 Tiny single-use helpers may be inline.
 Preserve useful names, reuse and boundaries in recommendations.
+
+Flag long bodies that should extract substantial steps into named functions.
+Flag nested or wrapped conditions, especially inside chain closures.
+Flag multi-line comments on code that is not tricky.
 
 Check integration-family packages contain wiring and package-specific behavior.
 Check tests sit beside their module unless repository convention is stronger.

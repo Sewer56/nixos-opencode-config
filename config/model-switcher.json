@@ -11,10 +11,10 @@
     "CORRECTNESS-REVIEW": {"model":"sewer-axonhub/claude-opus-5-5","variant":"high"}
   },
   "work": {
-    "EASY": {"model":"sewer-axonhub-work/gpt-6-luna","variant":"low"},
-    "PLANNER": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"medium"},
-    "CODER": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"medium"},
-    "WRITER": {"model":"sewer-axonhub-work/gpt-6-luna","variant":"medium"},
+    "EASY": {"model":"sewer-axonhub-work/gpt-6.1-terra","variant":"low"},
+    "PLANNER": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"high"},
+    "CODER": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"high"},
+    "WRITER": {"model":"sewer-axonhub-work/gpt-6.1-terra","variant":"medium"},
     "STYLE-REVIEW": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"high"},
     "PERFORMANCE": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"high"},
     "VERIFIER": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"high"},

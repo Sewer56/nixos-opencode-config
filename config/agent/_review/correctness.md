@@ -120,15 +120,15 @@ Use INCOMPLETE for missing inputs, required current evidence or safe output.
 
 ## Test coverage
 
-Check required tests cover new/changed behavior, contracts and integration.
+Check basic tests cover the core of new/changed behavior and integration.
 
-Check critical success, failure and edge coverage.
-Request edge tests only where a bug is likely or costly.
+Request failure or edge tests only where a bug is likely and costly.
+Never request a test per error case.
 
 Flag coverage padding and tests of compiler or library guarantees alone.
 Ground missing-test findings in an uncovered behavior and concrete failure.
 
-Flag tests of obviously correct code, like wiring or delegation.
+Flag tests of obviously correct code, like wiring, delegation or `?`.
 Flag tests that unimplemented features or wiring are absent.
 Never request them.
 
@@ -136,8 +136,7 @@ Check one test executes both paths for equivalence claims.
 Compare final rendered/consumed results, not request shapes or explanations.
 
 Trace removed redundant assertions to surviving tests.
-Flag test redundancy except across public entry points.
-Flag examples used instead of tests.
+Flag test redundancy and examples used instead of tests.
 
 Check real I/O, time and network use controls, seeds or freezing.
 
