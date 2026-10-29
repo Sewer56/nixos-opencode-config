@@ -117,6 +117,20 @@ pub fn install(archive: &Path, options: &InstallOptions) -> Result<ModId, Instal
 
 Extract substantial steps into named functions, so callers read as steps.
 
+<example name="failure-branch">
+```rust
+// Write the manifest.
+if let Err(cause) = write_manifest(storage, &destination, &sample).await {
+    return self.undo_relabel(storage, sample, old_label, cause).await;
+}
+```
+</example>
+
+Keep step comments to the main path.
+Extract multi-line failure handling into a method named for what it does.
+Otherwise, open the failure branch with its own comment, such as
+`// Restore the old label and folder.`
+
 <example name="plain-loop">
 Before:
 ```rust

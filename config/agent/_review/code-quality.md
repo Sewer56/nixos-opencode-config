@@ -157,7 +157,9 @@ Preserve useful names, reuse and boundaries in recommendations.
 
 Flag long bodies that should extract substantial steps into named functions.
 Flag nested or wrapped conditions, especially inside chain closures.
+
 Flag multi-line comments on code that is not tricky.
+Flag step comments that also describe failure handling.
 
 Check integration-family packages contain wiring and package-specific behavior.
 Check tests sit beside their module unless repository convention is stronger.
