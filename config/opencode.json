@@ -200,6 +200,17 @@
             }
           }
         },
+        "claude-fable-5-2": {
+          "name": "Claude Fable 5.2",
+          "reasoning": true,
+          "variants": {
+            "low": { "reasoningEffort": "low" },
+            "medium": { "reasoningEffort": "medium" },
+            "high": { "reasoningEffort": "high" },
+            "xhigh": { "reasoningEffort": "xhigh" },
+            "max": { "reasoningEffort": "max" }
+          }
+        },
         "gpt-6-astra": {
           "name": "GPT 6 Astra",
           "variants": {
