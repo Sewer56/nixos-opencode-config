@@ -78,6 +78,8 @@ Keep APIs as private as production callers and contracts allow.
 
 ## Body layout
 
+In method bodies, add a blank line between `}` and the next statement in that block.
+
 <example name="step-functions">
 ```rust
 pub fn recompile(&self, output: &Path) -> Result<(), RecompileError> {
