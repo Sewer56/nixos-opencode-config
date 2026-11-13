@@ -51,6 +51,8 @@
         cargoLock.lockFile = ./tools/Cargo.lock;
         # --workspace: one compilation unit; install copies every bin.
         cargoBuildFlags = ["--workspace"];
+        nativeBuildInputs = [pkgs.pkg-config];
+        buildInputs = [pkgs.sqlite];
       };
 
       mkTool = {
@@ -291,6 +293,7 @@
           pkgs.pkg-config
           pkgs.stdenv.cc
           pkgs.uv
+          pkgs.sqlite
           (pkgs.python3.withPackages (pythonPackages: [
             pythonPackages.json5
             pythonPackages.pyyaml
