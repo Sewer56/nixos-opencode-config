@@ -40,6 +40,19 @@
     eachSystem = fn:
       nixpkgs.lib.genAttrs systems (system: fn system (mkPkgs system));
 
+    # Wraps a custom Python for git hooks, so external tools like GitKraken
+    # reuse our local version.
+    repoPython = pkgs:
+      pkgs.python3.withPackages (pythonPackages: [
+        pythonPackages.json5
+        pythonPackages.pyyaml
+      ]);
+
+    opencodePython = pkgs:
+      pkgs.writeShellScriptBin "opencode-python" ''
+        exec ${repoPython pkgs}/bin/python3 "$@"
+      '';
+
     # ── Tool packages (packages / apps / devShells) ───────────────────────
     # tools/ compiles once; per-tool packages pluck their binary.
     # rust-llm-tidy is a separate workspace built from the pinned input.
@@ -181,6 +194,7 @@
       home.packages = [
         opencodeCommand
         pluginDepsScript
+        (opencodePython pkgs)
 
         (mkCargoTool {name = "opencode-model-switcher";})
         (mkCargoTool {name = "opencode-sessions";})
@@ -294,10 +308,8 @@
           pkgs.stdenv.cc
           pkgs.uv
           pkgs.sqlite
-          (pkgs.python3.withPackages (pythonPackages: [
-            pythonPackages.json5
-            pythonPackages.pyyaml
-          ]))
+          (repoPython pkgs)
+          (opencodePython pkgs)
 
           # Built CLI tools.
           tools.opencode-model-switcher

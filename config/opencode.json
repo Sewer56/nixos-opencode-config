@@ -144,64 +144,27 @@
         }
       },
       "models": {
-        "glm-5.3": {
-          "name": "GLM 5.3",
+        "glm-5.4": {
+          "name": "GLM 5.4",
           "variants": {
-            "low": {
-              "reasoningEffort": "low"
-            },
-            "high": {
-              "reasoningEffort": "high"
-            },
-            "max": {
-              "reasoningEffort": "max"
-            }
-          }
-        },
-        "glm-5.3-flash": {
-          "name": "GLM 5.3 Flash",
-          "variants": {
-            "low": {
-              "reasoningEffort": "low"
-            },
-            "high": {
-              "reasoningEffort": "high"
-            },
-            "max": {
-              "reasoningEffort": "max"
-            }
-          }
-        },
-        "glm-5.3-flashx": {
-          "name": "GLM 5.3 FlashX",
-          "variants": {
-            "low": {
-              "reasoningEffort": "low"
-            },
-            "high": {
-              "reasoningEffort": "high"
-            },
-            "max": {
-              "reasoningEffort": "max"
-            }
-          }
-        },
-        "deepseek-v4.1-flash": {
-          "name": "DeepSeek V4.1 Flash",
-          "variants": {
-            "low": {
-              "reasoningEffort": "low"
-            },
-            "high": {
-              "reasoningEffort": "high"
-            },
-            "max": {
-              "reasoningEffort": "max"
-            }
+            "low": { "reasoningEffort": "low" },
+            "high": { "reasoningEffort": "high" },
+            "max": { "reasoningEffort": "max" }
           }
         },
         "claude-fable-5-2": {
           "name": "Claude Fable 5.2",
+          "reasoning": true,
+          "variants": {
+            "low": { "reasoningEffort": "low" },
+            "medium": { "reasoningEffort": "medium" },
+            "high": { "reasoningEffort": "high" },
+            "xhigh": { "reasoningEffort": "xhigh" },
+            "max": { "reasoningEffort": "max" }
+          }
+        },
+        "claude-haiku-5-5": {
+          "name": "Claude Haiku 5.5",
           "reasoning": true,
           "variants": {
             "low": { "reasoningEffort": "low" },
@@ -229,17 +192,6 @@
             "max": {
               "reasoningEffort": "max"
             }
-          }
-        },
-        "gpt-6.1-terra": {
-          "name": "GPT 6.1 Terra",
-          "variants": {
-            "none": { "reasoningEffort": "none" },
-            "low": { "reasoningEffort": "low" },
-            "medium": { "reasoningEffort": "medium" },
-            "high": { "reasoningEffort": "high" },
-            "xhigh": { "reasoningEffort": "xhigh" },
-            "max": { "reasoningEffort": "max" }
           }
         },
         "gpt-6.1-sol": {
@@ -347,8 +299,8 @@
         }
       },
       "models": {
-        "gpt-6-astra": {
-          "name": "GPT 6 Astra",
+        "gpt-6.2-astra": {
+          "name": "GPT 6.2 Astra",
           "variants": {
             "low": {
               "reasoningEffort": "low"
@@ -378,8 +330,8 @@
             "max": { "reasoningEffort": "max" }
           }
         },
-        "gpt-6.1-sol": {
-          "name": "GPT 6.1 Sol",
+        "gpt-6.2-sol": {
+          "name": "GPT 6.2 Sol",
           "variants": {
             "none": {
               "reasoningEffort": "none"

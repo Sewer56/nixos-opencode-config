@@ -125,26 +125,7 @@ pwsh ./scripts/windows/setup.ps1
 wsl -c 'curl -fsSL https://cli.coderabbit.ai/install.sh | sh'
 ```
 
-## Validation
-
-From repository root:
-
-```bash
-python3 scripts/validate-opencode-config.py --repo-root .
-python3 scripts/test-validate-opencode-config.py
-```
-
-Use `nix develop` when local Python lacks `json5` or `PyYAML`.
-See the [validator docstring] for check scope.
-
-Validation writes only an explicitly requested report, never configuration.
-Validator fixtures check command-free primary selection and task-graph safety.
-
-- Credentials, plugins, CodeRabbit, and OpenCode need environment checks.
-- Static checks cannot certify stochastic model behavior.
-
 [OpenCode]: https://opencode.ai
-[validator docstring]: scripts/validate-opencode-config.py
 
 ## Tricks
 

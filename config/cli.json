@@ -59,7 +59,8 @@
     "sidebar": "hide",
     "scrollbar": false,
     "thinking": "show",
-    "image_preview": false
+    "image_preview": false,
+    "verbosity": "medium"
   },
   "animations": true,
   "tabs": {

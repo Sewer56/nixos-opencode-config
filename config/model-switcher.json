@@ -12,12 +12,12 @@
   },
   "work": {
     "EASY": {"model":"sewer-axonhub-work/gpt-6.1-terra","variant":"low"},
-    "PLANNER": {"model":"sewer-axonhub-work/gpt-6-astra","variant":"high"},
-    "CODER": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"high"},
+    "PLANNER": {"model":"sewer-axonhub-work/gpt-6.2-astra","variant":"high"},
+    "CODER": {"model":"sewer-axonhub-work/gpt-6.2-sol","variant":"high"},
     "WRITER": {"model":"sewer-axonhub-work/gpt-6.1-terra","variant":"medium"},
-    "STYLE-REVIEW": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"high"},
-    "PERFORMANCE": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"high"},
-    "VERIFIER": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"high"},
-    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub-work/gpt-6.1-sol","variant":"xhigh"}
+    "STYLE-REVIEW": {"model":"sewer-axonhub-work/gpt-6.2-sol","variant":"high"},
+    "PERFORMANCE": {"model":"sewer-axonhub-work/gpt-6.2-sol","variant":"high"},
+    "VERIFIER": {"model":"sewer-axonhub-work/gpt-6.2-sol","variant":"high"},
+    "CORRECTNESS-REVIEW": {"model":"sewer-axonhub-work/gpt-6.2-sol","variant":"xhigh"}
   }
 }

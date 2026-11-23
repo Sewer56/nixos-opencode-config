@@ -29,5 +29,6 @@ if [ -n "$staged" ] && [ "$staged" != "$head_rev" ]; then
   fi
 fi
 
-python3 scripts/validate-opencode-config.py --repo-root .
+# Use the flake's interpreter to ensure json5/PyYAML are present.
+opencode-python scripts/validate-opencode-config.py --repo-root .
 exec tools/validate-file-interp.sh
