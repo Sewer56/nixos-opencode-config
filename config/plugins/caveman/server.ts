@@ -1,8 +1,7 @@
 /**
- * @module server - Package-root plugin entry for OpenCode 2 directory plugins.
+ * @module server - Caveman entry point for OpenCode 2.
  *
- * OpenCode 2 loads a local plugin as a directory and resolves `server.ts` at
- * the package root; the V2 entry lives in `src/v2.ts`. V1 resolves the same
- * directory via package.json `main` (`src/v1.ts`).
+ * OpenCode 2 prefers the `./server` package export.
+ * The package root still points to the OpenCode 1 entry.
  */
 export { default } from "./src/v2.ts"

@@ -5,6 +5,7 @@
   "type": "module",
   "main": "./src/v1.ts",
   "exports": {
+    "./server": "./server.ts",
     ".": "./src/v1.ts"
   },
   "keywords": ["opencode", "plugin", "caveman", "brevity"],
